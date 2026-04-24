@@ -16,10 +16,13 @@ defmodule Rendro.MixProject do
       description: "Pure-Elixir, Phoenix-first PDF/document generation with deterministic layout and pagination",
       source_url: @source_url,
       docs: docs(),
-      dialyzer: [plt_add_apps: [:mix]],
-      preferred_cli_env: [
-        ci: :test
-      ]
+      dialyzer: [plt_add_apps: [:mix]]
+    ]
+  end
+
+  def cli do
+    [
+      preferred_envs: [ci: :test]
     ]
   end
 

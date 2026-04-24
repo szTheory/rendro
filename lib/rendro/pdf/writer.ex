@@ -14,8 +14,8 @@ defmodule Rendro.PDF.Writer do
   @spec render(Rendro.Document.t()) :: {:ok, binary()}
   def render(%Rendro.Document{} = doc) do
     font = Font.helvetica()
-    {objects, catalog_num} = build_objects(doc, font)
-    pdf = assemble(objects, catalog_num)
+    {numbered_objects, catalog_num, info_num, total_objects} = build_objects(doc, font)
+    pdf = assemble({numbered_objects, catalog_num, info_num, total_objects}, catalog_num)
     {:ok, IO.iodata_to_binary(pdf)}
   end
 
