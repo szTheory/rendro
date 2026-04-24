@@ -134,9 +134,31 @@ defmodule Rendro.PDF.Writer do
     |> Enum.join("\n")
   end
 
-  defp render_block(%Rendro.Block{content: %Rendro.Text{} = text} = block, page, _font) do
-    x = block.x + page.margin_left
-    y = page.height - block.y - page.margin_top - text.size
+  defp render_block(%Rendro.Block{content: %Rendro.Table{} = table} = block, page, font) do
+    header_ops =
+      if table.header do
+        Enum.map(table.header, &render_block(&1, page, font, block.x, block.y))
+      else
+        []
+      end
+
+    rows_ops =
+      Enum.map(table.rows, fn row ->
+        Enum.map(row, &render_block(&1, page, font, block.x, block.y))
+      end)
+
+    [header_ops | rows_ops] |> List.flatten() |> Enum.join("\n")
+  end
+
+  defp render_block(%Rendro.Block{content: %Rendro.Text{}} = block, page, font) do
+    render_block(block, page, font, 0, 0)
+  end
+
+  defp render_block(_block, _page, _font), do: ""
+
+  defp render_block(%Rendro.Block{content: %Rendro.Text{} = text} = block, page, _font, ox, oy) do
+    x = block.x + ox + page.margin_left
+    y = page.height - (block.y + oy) - page.margin_top - text.size
 
     {r, g, b} = text.color
     color_op = "#{format_num(r / 255)} #{format_num(g / 255)} #{format_num(b / 255)} rg"
@@ -151,8 +173,6 @@ defmodule Rendro.PDF.Writer do
     ]
     |> Enum.join("\n")
   end
-
-  defp render_block(_block, _page, _font), do: ""
 
   @deterministic_date "D:20000101000000Z"
 

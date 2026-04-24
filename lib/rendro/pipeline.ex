@@ -66,9 +66,9 @@ defmodule Rendro.Pipeline do
 
   defp run_stages(doc, base_meta) do
     with {:ok, doc} <- span(:build, base_meta, fn -> Build.run(doc) end, doc),
-         {:ok, doc} <- span(:compose, base_meta, fn -> Compose.run(doc) end, doc),
          {:ok, doc} <- span(:measure, base_meta, fn -> Measure.run(doc) end, doc),
-         {:ok, doc} <- span(:paginate, base_meta, fn -> Paginate.run(doc) end, doc) do
+         {:ok, doc} <- span(:paginate, base_meta, fn -> Paginate.run(doc) end, doc),
+         {:ok, doc} <- span(:compose, base_meta, fn -> Compose.run(doc) end, doc) do
       span(:render, base_meta, fn -> Render.run(doc) end, doc)
     end
   end

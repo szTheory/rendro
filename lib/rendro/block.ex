@@ -13,7 +13,7 @@ defmodule Rendro.Block do
   ]
 
   @type t :: %__MODULE__{
-          content: Rendro.Text.t() | term(),
+          content: Rendro.Text.t() | Rendro.Table.t() | term(),
           x: number(),
           y: number(),
           width: number() | nil,

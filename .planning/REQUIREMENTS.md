@@ -9,11 +9,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Core Engine
 
-- [ ] **CORE-01**: Engineer can define a PDF document from Elixir data/components using a pure core API.
-- [ ] **CORE-02**: Engineer can render PDFs without requiring Chrome/Chromium runtime in core.
+- [x] **CORE-01**: Engineer can define a PDF document from Elixir data/components using a pure core API.
+- [x] **CORE-02**: Engineer can render PDFs without requiring Chrome/Chromium runtime in core.
 - [ ] **CORE-03**: Engineer can use a fixed-position API for exact-placement document use cases.
 - [ ] **CORE-04**: Engineer can use a flow API for report/document use cases.
-- [ ] **CORE-05**: Engineer can run deterministic mode that produces repeatable artifacts for identical inputs.
+- [x] **CORE-05**: Engineer can run deterministic mode that produces repeatable artifacts for identical inputs.
 
 ### Layout and Primitives
 
@@ -33,9 +33,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Observability and Safety
 
-- [ ] **OBS-01**: Operator can observe telemetry events for build, compose, measure, paginate, render, and validate lifecycle steps.
+- [x] **OBS-01**: Operator can observe telemetry events for build, compose, measure, paginate, render, and validate lifecycle steps.
 - [ ] **OBS-02**: Operator can correlate render operations with artifact metrics (duration, page count, byte size, status).
-- [ ] **OBS-03**: Operator receives structured errors that explain what happened, where it failed, why, and suggested next actions.
+- [x] **OBS-03**: Operator receives structured errors that explain what happened, where it failed, why, and suggested next actions.
 - [ ] **OBS-04**: Operator can enforce policy bounds for max pages, max output bytes, and render timeouts.
 
 ### Quality and Release
@@ -80,11 +80,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CORE-01 | Phase 1 | Pending |
-| CORE-02 | Phase 1 | Pending |
+| CORE-01 | Phase 1 | Done |
+| CORE-02 | Phase 1 | Done |
 | CORE-03 | Phase 2 | Pending |
 | CORE-04 | Phase 2 | Pending |
-| CORE-05 | Phase 1 | Pending |
+| CORE-05 | Phase 1 | Done |
 | LAY-01 | Phase 2 | Pending |
 | LAY-02 | Phase 2 | Pending |
 | LAY-03 | Phase 2 | Pending |
@@ -95,9 +95,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ADPT-03 | Phase 3 | Pending |
 | ADPT-04 | Phase 3 | Pending |
 | ADPT-05 | Phase 5 | Pending |
-| OBS-01 | Phase 1 | Pending |
+| OBS-01 | Phase 1 | Done |
 | OBS-02 | Phase 3 | Pending |
-| OBS-03 | Phase 1 | Pending |
+| OBS-03 | Phase 1 | Done |
 | OBS-04 | Phase 3 | Pending |
 | QUAL-01 | Phase 4 | Pending |
 | QUAL-02 | Phase 4 | Pending |
