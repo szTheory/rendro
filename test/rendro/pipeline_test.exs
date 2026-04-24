@@ -4,7 +4,13 @@ defmodule Rendro.PipelineTest do
   alias Rendro.Pipeline
 
   defp sample_document do
-    text = %Rendro.Text{content: "Hello, Pipeline!", font: "Helvetica", size: 12, color: {0, 0, 0}}
+    text = %Rendro.Text{
+      content: "Hello, Pipeline!",
+      font: "Helvetica",
+      size: 12,
+      color: {0, 0, 0}
+    }
+
     block = %Rendro.Block{content: text, x: 10, y: 20}
     page = %Rendro.Page{blocks: [block]}
 

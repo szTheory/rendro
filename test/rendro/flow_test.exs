@@ -13,10 +13,10 @@ defmodule Rendro.FlowTest do
     # 50 lines at ~14.4 units each (12 * 1.2)
     # Page height is 841.89, margins are 72+72=144. Available: 697.89
     # 50 * 14.4 = 720. Should be 2 pages.
-    
+
     assert pdf =~ "Line 1"
     assert pdf =~ "Line 50"
-    
+
     # Check that we have two pages in the PDF
     # The PDF structure has /Type /Page
     assert length(Regex.scan(~r"/Type\s*/Page\b", pdf)) == 2
@@ -32,16 +32,21 @@ defmodule Rendro.FlowTest do
   end
 
   test "flow document with table" do
-    table = Rendro.table([
-      ["A1", "B1"],
-      ["A2", "B2"]
-    ], header: ["Col A", "Col B"])
+    table =
+      Rendro.table(
+        [
+          ["A1", "B1"],
+          ["A2", "B2"]
+        ],
+        header: ["Col A", "Col B"]
+      )
 
-    doc = Rendro.flow([
-      Rendro.block(Rendro.text("Above Table")),
-      Rendro.block(table),
-      Rendro.block(Rendro.text("Below Table"))
-    ])
+    doc =
+      Rendro.flow([
+        Rendro.block(Rendro.text("Above Table")),
+        Rendro.block(table),
+        Rendro.block(Rendro.text("Below Table"))
+      ])
 
     {:ok, pdf} = Rendro.render(doc)
 
@@ -60,7 +65,7 @@ defmodule Rendro.FlowTest do
     # Header is another 14.4 units. Total ~734.4 units.
     # Page available: 697.89.
     # Should split across 2 pages.
-    
+
     rows = for i <- 1..50, do: ["A#{i}", "B#{i}"]
     table = Rendro.table(rows, header: ["Col A", "Col B"])
 
@@ -68,11 +73,11 @@ defmodule Rendro.FlowTest do
     {:ok, pdf} = Rendro.render(doc)
 
     assert length(Regex.scan(~r"/Type\s*/Page\b", pdf)) == 2
-    
+
     # "Col A" and "Col B" should appear twice (once per page)
     assert length(Regex.scan(~r/\(Col A\) Tj/, pdf)) == 2
     assert length(Regex.scan(~r/\(Col B\) Tj/, pdf)) == 2
-    
+
     assert pdf =~ "(A1) Tj"
     assert pdf =~ "(A50) Tj"
   end
@@ -101,10 +106,10 @@ defmodule Rendro.FlowTest do
     {:ok, pdf} = Rendro.render(doc)
 
     assert length(Regex.scan(~r"/Type\s*/Page\b", pdf)) == 2
-    
+
     # "My Report" on both pages
     assert length(Regex.scan(~r/\(My Report\) Tj/, pdf)) == 2
-    
+
     # Page numbers
     assert pdf =~ "(Page 1) Tj"
     assert pdf =~ "(Page 2) Tj"

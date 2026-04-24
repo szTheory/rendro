@@ -53,7 +53,10 @@ defmodule Rendro.Telemetry do
   end
 
   defp encode_uuid(<<a::32, b::16, c::16, d::16, e::48>>) do
-    hex = fn int, len -> int |> Integer.to_string(16) |> String.downcase() |> String.pad_leading(len, "0") end
+    hex = fn int, len ->
+      int |> Integer.to_string(16) |> String.downcase() |> String.pad_leading(len, "0")
+    end
+
     "#{hex.(a, 8)}-#{hex.(b, 4)}-#{hex.(c, 4)}-#{hex.(d, 4)}-#{hex.(e, 12)}"
   end
 end

@@ -44,7 +44,9 @@ defmodule Rendro.Error do
   defp what(:render, _reason), do: "PDF serialization failed during render."
   defp what(stage, _reason), do: "Render pipeline failed in stage #{inspect(stage)}."
 
-  defp why(reason) when is_atom(reason), do: reason |> Atom.to_string() |> String.replace("_", " ")
+  defp why(reason) when is_atom(reason),
+    do: reason |> Atom.to_string() |> String.replace("_", " ")
+
   defp why(reason) when is_binary(reason), do: reason
   defp why(reason), do: Exception.format_banner(:error, reason)
 

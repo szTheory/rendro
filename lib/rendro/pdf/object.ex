@@ -16,7 +16,10 @@ defmodule Rendro.PDF.Object do
 
   @spec serialize(term(), serialize_opts()) :: iodata()
   def serialize(value, _opts) when is_integer(value), do: Integer.to_string(value)
-  def serialize(value, _opts) when is_float(value), do: :erlang.float_to_binary(value, decimals: 4)
+
+  def serialize(value, _opts) when is_float(value),
+    do: :erlang.float_to_binary(value, decimals: 4)
+
   def serialize(true, _opts), do: "true"
   def serialize(false, _opts), do: "false"
   def serialize(nil, _opts), do: "null"
@@ -54,7 +57,8 @@ defmodule Rendro.PDF.Object do
     ["<<\n", Enum.intersperse(inner, "\n"), "\n>>"]
   end
 
-  def serialize({:stream, dict_entries, data}, opts) when is_list(dict_entries) and is_binary(data) do
+  def serialize({:stream, dict_entries, data}, opts)
+      when is_list(dict_entries) and is_binary(data) do
     entries_with_length = dict_entries ++ [{"Length", byte_size(data)}]
 
     [
@@ -78,7 +82,8 @@ defmodule Rendro.PDF.Object do
   end
 
   @doc "Serialize a value and wrap it in an indirect object."
-  @spec indirect_object(non_neg_integer(), non_neg_integer(), term(), serialize_opts()) :: iodata()
+  @spec indirect_object(non_neg_integer(), non_neg_integer(), term(), serialize_opts()) ::
+          iodata()
   def indirect_object(obj_num, gen_num, {:raw, content}, _opts) do
     indirect_object(obj_num, gen_num, content)
   end

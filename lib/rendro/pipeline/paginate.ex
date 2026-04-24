@@ -10,14 +10,13 @@ defmodule Rendro.Pipeline.Paginate do
   @spec run(Rendro.Document.t()) :: {:ok, Rendro.Document.t()} | {:error, term()}
   def run(%Rendro.Document{pages: pages, content: content} = doc) do
     cond do
-      length(pages) > 0 -> {:ok, doc}
-      length(content) > 0 -> paginate_flow(doc)
+      pages != [] -> {:ok, doc}
+      content != [] -> paginate_flow(doc)
       true -> {:error, :no_content}
     end
   end
 
   defp paginate_flow(%Rendro.Document{content: content, header: h_blocks, footer: f_blocks} = doc) do
-    # Default page template
     template = %Rendro.Page{}
 
     header_h = Enum.sum(Enum.map(h_blocks, &(&1.height || 0)))
@@ -28,62 +27,13 @@ defmodule Rendro.Pipeline.Paginate do
     try do
       pages =
         content
-        |> Enum.reduce([%{template | blocks: []}], fn block, [current_page | rest] ->
-          block_h = block.height || 0
-          current_h = Enum.sum(Enum.map(current_page.blocks, &(&1.height || 0)))
-
-          case block.content do
-            %Rendro.Table{} = table when current_h + block_h > max_h ->
-              # Table doesn't fit, try to split it
-              available_h = max_h - current_h
-              {this_page_table, remaining_table} = split_table(table, available_h)
-
-              cond do
-                this_page_table && remaining_table ->
-                  # Split table: put part on current page, rest as new flow elements
-                  this_block = %{block | content: this_page_table, height: table_height(this_page_table)}
-                  remaining_block = %{block | content: remaining_table, height: table_height(remaining_table)}
-
-                  current_page = %{current_page | blocks: current_page.blocks ++ [this_block]}
-                  new_page = %{template | blocks: [remaining_block]}
-                  [new_page, current_page | rest]
-
-                remaining_table ->
-                  # Didn't fit at all on current page, move to next
-                  if block_h > max_h do
-                    throw({:error, :content_overflow, %{block_height: block_h, max_height: max_h}})
-                  end
-
-                  new_page = %{template | blocks: [block]}
-                  [new_page, current_page | rest]
-
-                true ->
-                  # Fits in current page
-                  [%{current_page | blocks: current_page.blocks ++ [block]} | rest]
-              end
-
-            _ ->
-              if current_h + block_h <= max_h do
-                # Fits in current page
-                [%{current_page | blocks: current_page.blocks ++ [block]} | rest]
-              else
-                # Needs new page
-                if block_h > max_h do
-                  throw({:error, :content_overflow, %{block_height: block_h, max_height: max_h}})
-                end
-
-                new_page = %{template | blocks: [block]}
-                [new_page, current_page | rest]
-              end
-          end
+        |> Enum.reduce([%{template | blocks: []}], fn block, pages ->
+          paginate_block(block, pages, template, max_h)
         end)
         |> Enum.reverse()
         |> Enum.with_index(1)
         |> Enum.map(fn {page, idx} ->
-          # Apply header/footer and page numbers
-          h = replace_page_numbers(h_blocks, idx)
-          f = replace_page_numbers(f_blocks, idx)
-          %{page | blocks: h ++ page.blocks ++ f}
+          apply_page_template(page, idx, h_blocks, f_blocks)
         end)
 
       {:ok, %{doc | pages: pages, content: []}}
@@ -93,11 +43,73 @@ defmodule Rendro.Pipeline.Paginate do
     end
   end
 
+  defp paginate_block(block, [current_page | rest] = _pages, template, max_h) do
+    block_h = block.height || 0
+    current_h = Enum.sum(Enum.map(current_page.blocks, &(&1.height || 0)))
+
+    case block.content do
+      %Rendro.Table{} = table when current_h + block_h > max_h ->
+        handle_table_split(block, table, current_page, rest, template, max_h, current_h, block_h)
+
+      _ ->
+        if current_h + block_h <= max_h do
+          [%{current_page | blocks: current_page.blocks ++ [block]} | rest]
+        else
+          check_overflow!(block_h, max_h)
+          [%{template | blocks: [block]}, current_page | rest]
+        end
+    end
+  end
+
+  defp handle_table_split(block, table, current_page, rest, template, max_h, current_h, block_h) do
+    available_h = max_h - current_h
+    {this_page_table, remaining_table} = split_table(table, available_h)
+
+    cond do
+      this_page_table && remaining_table ->
+        this_block = %{block | content: this_page_table, height: table_height(this_page_table)}
+
+        remaining_block = %{
+          block
+          | content: remaining_table,
+            height: table_height(remaining_table)
+        }
+
+        current_page = %{current_page | blocks: current_page.blocks ++ [this_block]}
+        [%{template | blocks: [remaining_block]}, current_page | rest]
+
+      remaining_table ->
+        check_overflow!(block_h, max_h)
+        [%{template | blocks: [block]}, current_page | rest]
+
+      true ->
+        [%{current_page | blocks: current_page.blocks ++ [block]} | rest]
+    end
+  end
+
+  defp check_overflow!(block_h, max_h) do
+    if block_h > max_h do
+      throw({:error, :content_overflow, %{block_height: block_h, max_height: max_h}})
+    end
+  end
+
+  defp apply_page_template(page, idx, h_blocks, f_blocks) do
+    h = replace_page_numbers(h_blocks, idx)
+    f = replace_page_numbers(f_blocks, idx)
+    %{page | blocks: h ++ page.blocks ++ f}
+  end
+
   defp replace_page_numbers(blocks, page_num) do
     Enum.map(blocks, fn block ->
       case block.content do
         %Rendro.Text{content: text} = t ->
-          %{block | content: %{t | content: String.replace(text, "{{page_number}}", Integer.to_string(page_num))}}
+          %{
+            block
+            | content: %{
+                t
+                | content: String.replace(text, "{{page_number}}", Integer.to_string(page_num))
+              }
+          }
 
         _ ->
           block

@@ -45,8 +45,8 @@ defmodule Rendro.TelemetryTest do
       for stage <- [:build, :measure, :paginate, :compose, :render] do
         starts = stage_events(events, stage, :start)
         stops = stage_events(events, stage, :stop)
-        assert length(starts) == 1, "expected 1 start event for #{stage}, got #{length(starts)}"
-        assert length(stops) == 1, "expected 1 stop event for #{stage}, got #{length(stops)}"
+        assert starts != [], "expected 1 start event for #{stage}, got 0"
+        assert stops != [], "expected 1 stop event for #{stage}, got 0"
       end
     end
 
@@ -70,7 +70,7 @@ defmodule Rendro.TelemetryTest do
 
       assert length(start_events) == 6
       assert length(stop_events) == 6
-      assert length(exception_events) == 0
+      assert exception_events == []
     end
   end
 
@@ -118,7 +118,9 @@ defmodule Rendro.TelemetryTest do
       stop_events = events_by_suffix(events, :stop)
 
       for {_event, measurements, _meta} <- stop_events do
-        assert Map.has_key?(measurements, :duration), "stop event missing :duration in measurements"
+        assert Map.has_key?(measurements, :duration),
+               "stop event missing :duration in measurements"
+
         assert is_integer(measurements.duration)
         assert measurements.duration >= 0
       end

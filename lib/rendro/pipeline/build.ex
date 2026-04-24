@@ -17,8 +17,8 @@ defmodule Rendro.Pipeline.Build do
 
   defp validate(%Rendro.Document{pages: pages, content: content}) do
     cond do
-      length(pages) > 0 -> validate_pages(pages)
-      length(content) > 0 -> validate_content(content)
+      pages != [] -> validate_pages(pages)
+      content != [] -> validate_content(content)
       true -> {:error, :no_content}
     end
   end

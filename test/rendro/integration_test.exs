@@ -18,19 +18,13 @@ defmodule Rendro.IntegrationTest do
 
   defp multi_page_doc do
     page1 =
-      Rendro.page(
-        blocks: [Rendro.block(Rendro.text("First Page", size: 24), x: 72, y: 72)]
-      )
+      Rendro.page(blocks: [Rendro.block(Rendro.text("First Page", size: 24), x: 72, y: 72)])
 
     page2 =
-      Rendro.page(
-        blocks: [Rendro.block(Rendro.text("Second Page", size: 24), x: 72, y: 72)]
-      )
+      Rendro.page(blocks: [Rendro.block(Rendro.text("Second Page", size: 24), x: 72, y: 72)])
 
     page3 =
-      Rendro.page(
-        blocks: [Rendro.block(Rendro.text("Third Page", size: 18), x: 72, y: 144)]
-      )
+      Rendro.page(blocks: [Rendro.block(Rendro.text("Third Page", size: 18), x: 72, y: 144)])
 
     Rendro.document(
       pages: [page1, page2, page3],

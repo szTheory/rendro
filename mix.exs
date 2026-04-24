@@ -14,7 +14,8 @@ defmodule Rendro.MixProject do
       deps: deps(),
       aliases: aliases(),
       name: "Rendro",
-      description: "Pure-Elixir, Phoenix-first PDF/document generation with deterministic layout and pagination",
+      description:
+        "Pure-Elixir, Phoenix-first PDF/document generation with deterministic layout and pagination",
       source_url: @source_url,
       docs: docs(),
       dialyzer: [plt_add_apps: [:mix]]
@@ -23,7 +24,7 @@ defmodule Rendro.MixProject do
 
   def cli do
     [
-      preferred_envs: [ci: :test]
+      preferred_envs: [ci: :test, verify: :test]
     ]
   end
 
@@ -43,8 +44,8 @@ defmodule Rendro.MixProject do
       {:plug, "~> 1.14", optional: true},
       {:oban, "~> 2.17", optional: true},
       {:stream_data, "~> 1.3", only: [:dev, :test], runtime: false},
-      {:credo, "~> 1.7", only: :dev, runtime: false},
-      {:dialyxir, "~> 1.4", only: :dev, runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.40", only: :dev, runtime: false}
     ]
   end

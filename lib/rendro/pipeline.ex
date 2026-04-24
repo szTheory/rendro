@@ -28,54 +28,33 @@ defmodule Rendro.Pipeline do
 
     timeout = Keyword.get(policies, :timeout, 30_000)
 
-    task =
-      Task.async(fn ->
-        :telemetry.span(Rendro.Telemetry.render_prefix(), Map.put(base_meta, :stage, :render), fn ->
-          result = run_stages(doc, base_meta, policies)
-
-          case result do
-            {:ok, pdf_binary} ->
-              stop_meta = %{
-                render_id: render_id,
-                status: :ok,
-                page_count: length(doc.pages),
-                byte_size: byte_size(pdf_binary)
-              }
-
-              {{:ok, pdf_binary}, stop_meta}
-
-            {:error, %Error{} = error} ->
-              stop_meta = %{
-                render_id: render_id,
-                status: :error,
-                page_count: 0,
-                byte_size: 0
-              }
-
-              {{:error, error}, stop_meta}
-
-            {:error, reason} ->
-              error = Error.from_stage(:render, reason, base_meta)
-
-              stop_meta = %{
-                render_id: render_id,
-                status: :error,
-                page_count: 0,
-                byte_size: 0
-              }
-
-              {{:error, error}, stop_meta}
-          end
-        end)
-      end)
+    task = Task.async(fn -> execute_with_telemetry(doc, base_meta, policies) end)
 
     case Task.yield(task, timeout) || Task.shutdown(task) do
-      {:ok, result} ->
-        result
+      {:ok, result} -> result
+      nil -> {:error, Error.from_stage(:render, :timeout, base_meta)}
+    end
+  end
 
-      nil ->
-        error = Error.from_stage(:render, :timeout, base_meta)
-        {:error, error}
+  defp execute_with_telemetry(doc, base_meta, policies) do
+    :telemetry.span(Rendro.Telemetry.render_prefix(), Map.put(base_meta, :stage, :render), fn ->
+      result = run_stages(doc, base_meta, policies)
+      {result, build_stop_meta(result, doc, base_meta)}
+    end)
+  end
+
+  defp build_stop_meta(result, doc, base_meta) do
+    case result do
+      {:ok, pdf_binary} ->
+        %{
+          render_id: base_meta.render_id,
+          status: :ok,
+          page_count: length(doc.pages),
+          byte_size: byte_size(pdf_binary)
+        }
+
+      {:error, _error} ->
+        %{render_id: base_meta.render_id, status: :error, page_count: 0, byte_size: 0}
     end
   end
 

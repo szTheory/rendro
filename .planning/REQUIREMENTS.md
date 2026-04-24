@@ -40,11 +40,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Quality and Release
 
-- [ ] **QUAL-01**: Maintainer can run a canonical merge-blocking verification lane (`mix ci`) including format, compile, tests, docs, and package build.
-- [ ] **QUAL-02**: Maintainer can validate public docs/quickstart claims with docs-contract checks in CI.
-- [ ] **QUAL-03**: Maintainer can run a CI-verified Phoenix example app as executable adoption proof.
-- [ ] **QUAL-04**: Maintainer can run release preflight checks for version/tag parity and publish dry-run workflows.
-- [ ] **QUAL-05**: Maintainer can separate deterministic required lanes from advisory/provider-dependent lanes in verification output.
+- [x] **QUAL-01**: Maintainer can run a canonical merge-blocking verification lane (`mix ci`) including format, compile, tests, docs, and package build.
+- [x] **QUAL-02**: Maintainer can validate public docs/quickstart claims with docs-contract checks in CI.
+- [x] **QUAL-03**: Maintainer can run a CI-verified Phoenix example app as executable adoption proof.
+- [x] **QUAL-04**: Maintainer can run release preflight checks for version/tag parity and publish dry-run workflows.
+- [x] **QUAL-05**: Maintainer can separate deterministic required lanes from advisory/provider-dependent lanes in verification output.
 
 ## v2 Requirements
 
@@ -99,11 +99,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OBS-02 | Phase 3 | Done |
 | OBS-03 | Phase 1 | Done |
 | OBS-04 | Phase 3 | Done |
-| QUAL-01 | Phase 4 | Pending |
-| QUAL-02 | Phase 4 | Pending |
-| QUAL-03 | Phase 4 | Pending |
-| QUAL-04 | Phase 4 | Pending |
-| QUAL-05 | Phase 4 | Pending |
+| QUAL-01 | Phase 4 | Done |
+| QUAL-02 | Phase 4 | Done |
+| QUAL-03 | Phase 4 | Done |
+| QUAL-04 | Phase 4 | Done |
+| QUAL-05 | Phase 4 | Done |
 
 **Coverage:**
 - v1 requirements: 24 total

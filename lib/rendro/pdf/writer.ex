@@ -36,11 +36,17 @@ defmodule Rendro.PDF.Writer do
     next_num = next_num + 1
 
     font_dict =
-      {:dict, [{"Type", {:name, "Font"}}, {"Subtype", {:name, "Type1"}}, {"BaseFont", {:name, font.base_font}}]}
+      {:dict,
+       [
+         {"Type", {:name, "Font"}},
+         {"Subtype", {:name, "Type1"}},
+         {"BaseFont", {:name, font.base_font}}
+       ]}
 
     font_obj = Object.indirect_object(font_obj_num, 0, Object.serialize(font_dict, opts))
 
-    page_tree_kids = {:array, Enum.map(page_obj_nums, fn {page_num, _} -> {:ref, page_num, 0} end)}
+    page_tree_kids =
+      {:array, Enum.map(page_obj_nums, fn {page_num, _} -> {:ref, page_num, 0} end)}
 
     pages_dict =
       {:dict,
@@ -129,9 +135,7 @@ defmodule Rendro.PDF.Writer do
   end
 
   defp build_content_stream(%Rendro.Page{} = page, font) do
-    page.blocks
-    |> Enum.map(fn block -> render_block(block, page, font) end)
-    |> Enum.join("\n")
+    Enum.map_join(page.blocks, "\n", fn block -> render_block(block, page, font) end)
   end
 
   defp render_block(%Rendro.Block{content: %Rendro.Table{} = table} = block, page, font) do
@@ -226,7 +230,7 @@ defmodule Rendro.PDF.Writer do
     header_size = byte_size(header)
 
     {body_parts, xref_entries} =
-      Enum.reduce(numbered_objects, {[], [{0, 65535, "f"}]}, fn {obj_num, obj_iodata},
+      Enum.reduce(numbered_objects, {[], [{0, 65_535, "f"}]}, fn {obj_num, obj_iodata},
                                                                  {parts, entries} ->
         current_offset =
           header_size +
