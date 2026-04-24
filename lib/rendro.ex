@@ -5,7 +5,7 @@ defmodule Rendro do
 
   alias Rendro.{Block, Document, Metadata, Page, Pipeline, Text}
 
-  @type render_option :: {:output, Path.t()}
+  @type render_option :: {:output, Path.t()} | {:deterministic, boolean()}
   @type render_options :: [render_option()]
 
   @spec render(Document.t()) :: {:ok, binary()} | {:error, term()}
@@ -15,6 +15,13 @@ defmodule Rendro do
 
   @spec render(Document.t(), render_options()) :: {:ok, binary()} | {:error, term()}
   def render(%Document{} = doc, opts) when is_list(opts) do
+    render_opts =
+      if Keyword.get(opts, :deterministic, false),
+        do: [deterministic: true],
+        else: []
+
+    doc = put_in(doc.options[:render], render_opts)
+
     with {:ok, pdf_binary} <- Pipeline.run(doc) do
       case Keyword.get(opts, :output) do
         nil -> {:ok, pdf_binary}

@@ -7,6 +7,7 @@ defmodule Rendro.Pipeline.Render do
 
   @spec run(Rendro.Document.t()) :: {:ok, binary()} | {:error, term()}
   def run(%Rendro.Document{} = doc) do
-    Writer.render(doc)
+    opts = Map.get(doc.options, :render, [])
+    Writer.render(doc, opts)
   end
 end

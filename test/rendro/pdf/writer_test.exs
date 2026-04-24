@@ -160,4 +160,91 @@ defmodule Rendro.PDF.WriterTest do
       assert pdf =~ "1.0000 0.0000 0.0000 rg"
     end
   end
+
+  describe "render/2 deterministic mode" do
+    test "two renders produce identical binaries" do
+      doc = sample_document()
+      {:ok, pdf1} = Writer.render(doc, deterministic: true)
+      {:ok, pdf2} = Writer.render(doc, deterministic: true)
+      assert pdf1 == pdf2
+    end
+
+    test "includes fixed epoch timestamps" do
+      doc = sample_document()
+      {:ok, pdf} = Writer.render(doc, deterministic: true)
+      assert pdf =~ "(D:20000101000000Z)"
+    end
+
+    test "includes deterministic trailer ID" do
+      doc = sample_document()
+      {:ok, pdf} = Writer.render(doc, deterministic: true)
+      assert pdf =~ "/ID"
+    end
+
+    test "trailer ID is content-derived and stable" do
+      doc = sample_document()
+      {:ok, pdf1} = Writer.render(doc, deterministic: true)
+      {:ok, pdf2} = Writer.render(doc, deterministic: true)
+
+      extract_id = fn pdf ->
+        [_, after_id] = String.split(pdf, "/ID", parts: 2)
+        after_id |> String.split(">>", parts: 2) |> hd()
+      end
+
+      assert extract_id.(pdf1) == extract_id.(pdf2)
+    end
+
+    test "non-deterministic mode does not include fixed timestamps" do
+      doc = sample_document()
+      {:ok, pdf} = Writer.render(doc)
+      refute pdf =~ "(D:20000101000000Z)"
+    end
+
+    test "non-deterministic mode does not include trailer ID" do
+      doc = sample_document()
+      {:ok, pdf} = Writer.render(doc)
+      refute pdf =~ "/ID"
+    end
+
+    test "deterministic mode sorts dictionary keys" do
+      doc = sample_document()
+      {:ok, pdf} = Writer.render(doc, deterministic: true)
+
+      assert pdf =~ "/Type /Catalog"
+      assert pdf =~ "/Pages"
+    end
+
+    test "deterministic mode with metadata dates normalizes them" do
+      now = DateTime.utc_now()
+
+      doc = %Rendro.Document{
+        pages: [%Rendro.Page{blocks: []}],
+        metadata: %Rendro.Metadata{
+          title: "Dated Doc",
+          creation_date: now,
+          modification_date: now
+        }
+      }
+
+      {:ok, pdf} = Writer.render(doc, deterministic: true)
+      assert pdf =~ "(D:20000101000000Z)"
+      refute pdf =~ Calendar.strftime(now, "D:%Y%m%d")
+    end
+
+    test "non-deterministic mode with metadata dates includes real dates" do
+      now = ~U[2025-06-15 10:30:00Z]
+
+      doc = %Rendro.Document{
+        pages: [%Rendro.Page{blocks: []}],
+        metadata: %Rendro.Metadata{
+          title: "Dated Doc",
+          creation_date: now,
+          modification_date: now
+        }
+      }
+
+      {:ok, pdf} = Writer.render(doc)
+      assert pdf =~ "(D:20250615103000Z)"
+    end
+  end
 end
