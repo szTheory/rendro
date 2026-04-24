@@ -80,36 +80,36 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CORE-01 | Unassigned | Pending |
-| CORE-02 | Unassigned | Pending |
-| CORE-03 | Unassigned | Pending |
-| CORE-04 | Unassigned | Pending |
-| CORE-05 | Unassigned | Pending |
-| LAY-01 | Unassigned | Pending |
-| LAY-02 | Unassigned | Pending |
-| LAY-03 | Unassigned | Pending |
-| LAY-04 | Unassigned | Pending |
-| LAY-05 | Unassigned | Pending |
-| ADPT-01 | Unassigned | Pending |
-| ADPT-02 | Unassigned | Pending |
-| ADPT-03 | Unassigned | Pending |
-| ADPT-04 | Unassigned | Pending |
-| ADPT-05 | Unassigned | Pending |
-| OBS-01 | Unassigned | Pending |
-| OBS-02 | Unassigned | Pending |
-| OBS-03 | Unassigned | Pending |
-| OBS-04 | Unassigned | Pending |
-| QUAL-01 | Unassigned | Pending |
-| QUAL-02 | Unassigned | Pending |
-| QUAL-03 | Unassigned | Pending |
-| QUAL-04 | Unassigned | Pending |
-| QUAL-05 | Unassigned | Pending |
+| CORE-01 | Phase 1 | Pending |
+| CORE-02 | Phase 1 | Pending |
+| CORE-03 | Phase 2 | Pending |
+| CORE-04 | Phase 2 | Pending |
+| CORE-05 | Phase 1 | Pending |
+| LAY-01 | Phase 2 | Pending |
+| LAY-02 | Phase 2 | Pending |
+| LAY-03 | Phase 2 | Pending |
+| LAY-04 | Phase 2 | Pending |
+| LAY-05 | Phase 2 | Pending |
+| ADPT-01 | Phase 3 | Pending |
+| ADPT-02 | Phase 3 | Pending |
+| ADPT-03 | Phase 3 | Pending |
+| ADPT-04 | Phase 3 | Pending |
+| ADPT-05 | Phase 5 | Pending |
+| OBS-01 | Phase 1 | Pending |
+| OBS-02 | Phase 3 | Pending |
+| OBS-03 | Phase 1 | Pending |
+| OBS-04 | Phase 3 | Pending |
+| QUAL-01 | Phase 4 | Pending |
+| QUAL-02 | Phase 4 | Pending |
+| QUAL-03 | Phase 4 | Pending |
+| QUAL-04 | Phase 4 | Pending |
+| QUAL-05 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 24 total
-- Mapped to phases: 0
-- Unmapped: 24 ⚠️
+- Mapped to phases: 24
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-24*
-*Last updated: 2026-04-24 after initial definition*
+*Last updated: 2026-04-24 after roadmap creation*
