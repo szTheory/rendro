@@ -60,6 +60,10 @@ defmodule Rendro.Error do
     "Pass a %Rendro.Document{} struct to Rendro.render/1 or Rendro.render/2."
   end
 
+  defp next_step(:paginate, :content_overflow) do
+    "Reduce the height of the failing block or increase page dimensions (margin/height)."
+  end
+
   defp next_step(:render, _reason) do
     "Inspect telemetry events for the same render_id and verify PDF object generation inputs."
   end

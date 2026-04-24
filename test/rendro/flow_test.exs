@@ -54,4 +54,59 @@ defmodule Rendro.FlowTest do
     assert pdf =~ "B2"
     assert pdf =~ "Below Table"
   end
+
+  test "table splitting and header repetition" do
+    # 50 rows, each ~14.4 units. Total ~720 units.
+    # Header is another 14.4 units. Total ~734.4 units.
+    # Page available: 697.89.
+    # Should split across 2 pages.
+    
+    rows = for i <- 1..50, do: ["A#{i}", "B#{i}"]
+    table = Rendro.table(rows, header: ["Col A", "Col B"])
+
+    doc = Rendro.flow([Rendro.block(table)])
+    {:ok, pdf} = Rendro.render(doc)
+
+    assert length(Regex.scan(~r"/Type\s*/Page\b", pdf)) == 2
+    
+    # "Col A" and "Col B" should appear twice (once per page)
+    assert length(Regex.scan(~r/\(Col A\) Tj/, pdf)) == 2
+    assert length(Regex.scan(~r/\(Col B\) Tj/, pdf)) == 2
+    
+    assert pdf =~ "(A1) Tj"
+    assert pdf =~ "(A50) Tj"
+  end
+
+  test "returns overflow error when block is too large" do
+    # Huge block height (e.g. 2000 units on a 841 unit page)
+    block = %Rendro.Block{content: Rendro.text("Too big"), height: 2000}
+    doc = Rendro.flow([block])
+
+    assert {:error, %Rendro.Error{} = error} = Rendro.render(doc)
+    assert error.stage == :paginate
+    assert error.reason == :content_overflow
+    assert error.next =~ "Reduce the height"
+  end
+
+  test "headers, footers and page numbers" do
+    header = [Rendro.block(Rendro.text("My Report"))]
+    footer = [Rendro.block(Rendro.text("Page {{page_number}}"))]
+
+    content =
+      for i <- 1..50 do
+        Rendro.block(Rendro.text("Line #{i}"))
+      end
+
+    doc = Rendro.flow(content, header: header, footer: footer)
+    {:ok, pdf} = Rendro.render(doc)
+
+    assert length(Regex.scan(~r"/Type\s*/Page\b", pdf)) == 2
+    
+    # "My Report" on both pages
+    assert length(Regex.scan(~r/\(My Report\) Tj/, pdf)) == 2
+    
+    # Page numbers
+    assert pdf =~ "(Page 1) Tj"
+    assert pdf =~ "(Page 2) Tj"
+  end
 end

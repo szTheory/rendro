@@ -25,8 +25,8 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 
 ## Current Position
 
-Phase: 2 of 5 (Layout and Pagination Engine)
-Plan: 0 of 3 in current phase
+Phase: 3 of 5 (Adapter and Ops Integration)
+Plan: 0 of 2 in current phase
 Status: In progress
 Last activity: 2026-04-24 - Paused work; handoff written
 

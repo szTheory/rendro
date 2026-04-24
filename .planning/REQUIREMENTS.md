@@ -11,17 +11,17 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **CORE-01**: Engineer can define a PDF document from Elixir data/components using a pure core API.
 - [x] **CORE-02**: Engineer can render PDFs without requiring Chrome/Chromium runtime in core.
-- [ ] **CORE-03**: Engineer can use a fixed-position API for exact-placement document use cases.
-- [ ] **CORE-04**: Engineer can use a flow API for report/document use cases.
+- [x] **CORE-03**: Engineer can use a fixed-position API for exact-placement document use cases.
+- [x] **CORE-04**: Engineer can use a flow API for report/document use cases.
 - [x] **CORE-05**: Engineer can run deterministic mode that produces repeatable artifacts for identical inputs.
 
 ### Layout and Primitives
 
-- [ ] **LAY-01**: Engineer can compose document primitives including pages, blocks, tables, headers/footers, and metadata.
-- [ ] **LAY-02**: Engineer can render flowing content with automatic page breaks.
-- [ ] **LAY-03**: Engineer can render large tables across pages with repeating table headers.
-- [ ] **LAY-04**: Engineer can configure headers/footers with page numbers and predictable placement.
-- [ ] **LAY-05**: Engineer receives overflow diagnostics that identify where layout failed and what to try next.
+- [x] **LAY-01**: Engineer can compose document primitives including pages, blocks, tables, headers/footers, and metadata.
+- [x] **LAY-02**: Engineer can render flowing content with automatic page breaks.
+- [x] **LAY-03**: Engineer can render large tables across pages with repeating table headers.
+- [x] **LAY-04**: Engineer can configure headers/footers with page numbers and predictable placement.
+- [x] **LAY-05**: Engineer receives overflow diagnostics that identify where layout failed and what to try next.
 
 ### Integrations and Adapters
 
@@ -82,14 +82,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | CORE-01 | Phase 1 | Done |
 | CORE-02 | Phase 1 | Done |
-| CORE-03 | Phase 2 | Pending |
-| CORE-04 | Phase 2 | Pending |
+| CORE-03 | Phase 2 | Done |
+| CORE-04 | Phase 2 | Done |
 | CORE-05 | Phase 1 | Done |
-| LAY-01 | Phase 2 | Pending |
-| LAY-02 | Phase 2 | Pending |
-| LAY-03 | Phase 2 | Pending |
-| LAY-04 | Phase 2 | Pending |
-| LAY-05 | Phase 2 | Pending |
+| LAY-01 | Phase 2 | Done |
+| LAY-02 | Phase 2 | Done |
+| LAY-03 | Phase 2 | Done |
+| LAY-04 | Phase 2 | Done |
+| LAY-05 | Phase 2 | Done |
 | ADPT-01 | Phase 3 | Pending |
 | ADPT-02 | Phase 3 | Pending |
 | ADPT-03 | Phase 3 | Pending |

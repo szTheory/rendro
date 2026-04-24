@@ -53,14 +53,10 @@ defmodule Rendro.Pipeline.Measure do
     %{block | content: table, width: 500, height: height}
   end
 
-  defp measure_block(%Rendro.Block{content: %Rendro.Text{} = text, width: nil} = block, font) do
-    width = Font.text_width(font, text.content, text.size)
-    height = text.size * 1.2
+  defp measure_block(%Rendro.Block{content: %Rendro.Text{} = text} = block, font) do
+    width = block.width || Font.text_width(font, text.content, text.size)
+    height = block.height || text.size * 1.2
     %{block | width: width, height: height}
-  end
-
-  defp measure_block(%Rendro.Block{content: %Rendro.Text{} = text, height: nil} = block, _font) do
-    %{block | height: text.size * 1.2}
   end
 
   defp measure_block(block, _font), do: block

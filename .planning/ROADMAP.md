@@ -13,7 +13,7 @@ Rendro will be delivered through five coarse phases that move from non-negotiabl
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Core Deterministic Foundation** - Establish pure core boundaries, deterministic rendering contract, and lifecycle event/error schema.
-- [ ] **Phase 2: Layout and Pagination Engine** - Deliver practical document primitives, robust pagination, and table/header behavior for real invoice/report workloads.
+- [x] **Phase 2: Layout and Pagination Engine** - Deliver practical document primitives, robust pagination, and table/header behavior for real invoice/report workloads.
 - [ ] **Phase 3: Adapter and Ops Integration** - Add optional Phoenix/job adapter patterns with bounded execution and operational metrics.
 - [ ] **Phase 4: Quality and Release Hardening** - Implement CI verification contracts, docs truthfulness checks, and release safety gates.
 - [ ] **Phase 5: Early Ecosystem Recipes** - Ship do-now integration recipes without violating core boundary constraints.
@@ -48,9 +48,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: Implement dual API surface and shared document primitives
-- [ ] 02-02: Build pagination/table engine with repeat-header and overflow handling
-- [ ] 02-03: Add header/footer placement and metadata behavior with deterministic fixtures
+- [x] 02-01: Implement dual API surface and shared document primitives
+- [x] 02-02: Build pagination/table engine with repeat-header and overflow handling
+- [x] 02-03: Add header/footer placement and metadata behavior with deterministic fixtures
 
 ### Phase 3: Adapter and Ops Integration
 **Goal**: Enable production adoption through optional adapters, operational metrics, and bounded rendering policies.
