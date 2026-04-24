@@ -30,6 +30,7 @@ defmodule Rendro.Pipeline do
       case result do
         {:ok, pdf_binary} ->
           stop_meta = %{
+            render_id: render_id,
             status: :ok,
             page_count: length(doc.pages),
             byte_size: byte_size(pdf_binary)
@@ -39,6 +40,7 @@ defmodule Rendro.Pipeline do
 
         {:error, _} = error ->
           stop_meta = %{
+            render_id: render_id,
             status: :error,
             page_count: 0,
             byte_size: 0
@@ -64,11 +66,14 @@ defmodule Rendro.Pipeline do
     :telemetry.span([:rendro, :pipeline, stage], meta, fn ->
       case fun.() do
         {:ok, result} ->
-          stop_meta = stage_stop_meta(stage, result, doc)
+          stop_meta =
+            stage_stop_meta(stage, result, doc)
+            |> Map.put(:render_id, base_meta.render_id)
+
           {{:ok, result}, stop_meta}
 
         {:error, _} = error ->
-          stop_meta = %{status: :error, page_count: 0, byte_size: 0}
+          stop_meta = %{render_id: base_meta.render_id, status: :error, page_count: 0, byte_size: 0}
           {error, stop_meta}
       end
     end)

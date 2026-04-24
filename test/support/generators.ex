@@ -1,8 +1,7 @@
 defmodule Rendro.Test.Generators do
   @moduledoc false
 
-  import StreamData
-  import ExUnitProperties, only: [gen: 1]
+  use ExUnitProperties
 
   def text_gen do
     gen all(
