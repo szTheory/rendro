@@ -2,11 +2,12 @@ defmodule Rendro.Test.Generators do
   @moduledoc false
 
   import StreamData
+  import ExUnitProperties, only: [gen: 1]
 
   def text_gen do
     gen all(
-          content <- string(:printable, min_length: 1, max_length: 50),
-          content = String.replace(content, ~r/[()\\]/, ""),
+          raw <- string(:printable, min_length: 1, max_length: 50),
+          content = String.replace(raw, ~r/[()\\]/, ""),
           content != "",
           size <- float(min: 6.0, max: 72.0),
           r <- integer(0..255),
