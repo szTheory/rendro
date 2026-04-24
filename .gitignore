@@ -37,3 +37,4 @@ coverage/
 .cache/
 tmp/
 .planning/
+\n# Example app artifacts\nexamples/phoenix_example/_build/\nexamples/phoenix_example/deps/\n
