@@ -25,18 +25,18 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Integrations and Adapters
 
-- [ ] **ADPT-01**: Phoenix engineer can serve rendered PDFs through download-friendly adapter helpers.
-- [ ] **ADPT-02**: Phoenix engineer can preview rendered output through Phoenix-friendly integration helpers.
-- [ ] **ADPT-03**: Maintainer can enable optional adapters without introducing hard compile/runtime dependencies in core.
-- [ ] **ADPT-04**: Maintainer can use an optional job-processing adapter pattern for bounded asynchronous rendering.
+- [x] **ADPT-01**: Phoenix engineer can serve rendered PDFs through download-friendly adapter helpers.
+- [x] **ADPT-02**: Phoenix engineer can preview rendered output through Phoenix-friendly integration helpers.
+- [x] **ADPT-03**: Maintainer can enable optional adapters without introducing hard compile/runtime dependencies in core.
+- [x] **ADPT-04**: Maintainer can use an optional job-processing adapter pattern for bounded asynchronous rendering.
 - [ ] **ADPT-05**: Maintainer can provide do-now integration recipes for `threadline`, `mailglass`, and `accrue` without hard coupling.
 
 ### Observability and Safety
 
 - [x] **OBS-01**: Operator can observe telemetry events for build, compose, measure, paginate, render, and validate lifecycle steps.
-- [ ] **OBS-02**: Operator can correlate render operations with artifact metrics (duration, page count, byte size, status).
+- [x] **OBS-02**: Operator can correlate render operations with artifact metrics (duration, page count, byte size, status).
 - [x] **OBS-03**: Operator receives structured errors that explain what happened, where it failed, why, and suggested next actions.
-- [ ] **OBS-04**: Operator can enforce policy bounds for max pages, max output bytes, and render timeouts.
+- [x] **OBS-04**: Operator can enforce policy bounds for max pages, max output bytes, and render timeouts.
 
 ### Quality and Release
 
@@ -90,15 +90,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LAY-03 | Phase 2 | Done |
 | LAY-04 | Phase 2 | Done |
 | LAY-05 | Phase 2 | Done |
-| ADPT-01 | Phase 3 | Pending |
-| ADPT-02 | Phase 3 | Pending |
-| ADPT-03 | Phase 3 | Pending |
-| ADPT-04 | Phase 3 | Pending |
+| ADPT-01 | Phase 3 | Done |
+| ADPT-02 | Phase 3 | Done |
+| ADPT-03 | Phase 3 | Done |
+| ADPT-04 | Phase 3 | Done |
 | ADPT-05 | Phase 5 | Pending |
 | OBS-01 | Phase 1 | Done |
-| OBS-02 | Phase 3 | Pending |
+| OBS-02 | Phase 3 | Done |
 | OBS-03 | Phase 1 | Done |
-| OBS-04 | Phase 3 | Pending |
+| OBS-04 | Phase 3 | Done |
 | QUAL-01 | Phase 4 | Pending |
 | QUAL-02 | Phase 4 | Pending |
 | QUAL-03 | Phase 4 | Pending |

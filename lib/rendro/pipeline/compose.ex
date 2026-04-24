@@ -16,8 +16,9 @@ defmodule Rendro.Pipeline.Compose do
   defp compose_page(%Rendro.Page{blocks: blocks} = page) do
     {composed_blocks, _} =
       Enum.reduce(blocks, {[], 0}, fn block, {acc, current_y} ->
-        composed_block = compose_block(%{block | y: current_y})
-        next_y = current_y + (block.height || 0)
+        y = block.y || current_y
+        composed_block = compose_block(%{block | y: y})
+        next_y = y + (block.height || 0)
         {acc ++ [composed_block], next_y}
       end)
 

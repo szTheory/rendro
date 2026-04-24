@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Core Deterministic Foundation** - Establish pure core boundaries, deterministic rendering contract, and lifecycle event/error schema.
 - [x] **Phase 2: Layout and Pagination Engine** - Deliver practical document primitives, robust pagination, and table/header behavior for real invoice/report workloads.
-- [ ] **Phase 3: Adapter and Ops Integration** - Add optional Phoenix/job adapter patterns with bounded execution and operational metrics.
+- [x] **Phase 3: Adapter and Ops Integration** - Add optional Phoenix/job adapter patterns with bounded execution and operational metrics.
 - [ ] **Phase 4: Quality and Release Hardening** - Implement CI verification contracts, docs truthfulness checks, and release safety gates.
 - [ ] **Phase 5: Early Ecosystem Recipes** - Ship do-now integration recipes without violating core boundary constraints.
 
@@ -65,8 +65,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: Implement optional Phoenix adapter helpers for download/preview workflows
-- [ ] 03-02: Add optional job adapter pattern, policy bounds, and artifact metric correlation
+- [x] 03-01: Implement optional Phoenix adapter helpers for download/preview workflows
+- [x] 03-02: Add optional job adapter pattern, policy bounds, and artifact metric correlation
 
 ### Phase 4: Quality and Release Hardening
 **Goal**: Guarantee truthful, reproducible delivery through canonical verification and release safety automation.

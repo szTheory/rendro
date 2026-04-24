@@ -39,6 +39,9 @@ defmodule Rendro.MixProject do
   defp deps do
     [
       {:telemetry, "~> 1.4"},
+      {:phoenix, "~> 1.7", optional: true},
+      {:plug, "~> 1.14", optional: true},
+      {:oban, "~> 2.17", optional: true},
       {:stream_data, "~> 1.3", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7", only: :dev, runtime: false},
       {:dialyxir, "~> 1.4", only: :dev, runtime: false},

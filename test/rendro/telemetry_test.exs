@@ -42,7 +42,7 @@ defmodule Rendro.TelemetryTest do
       {:ok, _pdf} = Rendro.Pipeline.run(sample_document())
       events = TelemetryHelper.collect_events()
 
-      for stage <- [:build, :compose, :measure, :paginate, :render] do
+      for stage <- [:build, :measure, :paginate, :compose, :render] do
         starts = stage_events(events, stage, :start)
         stops = stage_events(events, stage, :stop)
         assert length(starts) == 1, "expected 1 start event for #{stage}, got #{length(starts)}"
@@ -197,7 +197,7 @@ defmodule Rendro.TelemetryTest do
       {:ok, _pdf} = Rendro.Pipeline.run(sample_document())
       events = TelemetryHelper.collect_events()
 
-      for stage <- [:build, :compose, :measure, :paginate, :render] do
+      for stage <- [:build, :measure, :paginate, :compose, :render] do
         [start] = stage_events(events, stage, :start)
         {_event, _measurements, meta} = start
         assert meta.stage == stage
@@ -314,7 +314,7 @@ defmodule Rendro.TelemetryTest do
         end)
         |> Enum.map(fn {[:rendro, :pipeline, stage, :start], _m, _meta} -> stage end)
 
-      assert stage_starts == [:build, :compose, :measure, :paginate, :render]
+      assert stage_starts == [:build, :measure, :paginate, :compose, :render]
     end
 
     test "top-level render start fires before all stage starts" do
@@ -351,7 +351,7 @@ defmodule Rendro.TelemetryTest do
 
       event_names = Enum.map(events, fn {event, _m, _meta} -> event end)
 
-      for stage <- [:build, :compose, :measure, :paginate, :render] do
+      for stage <- [:build, :measure, :paginate, :compose, :render] do
         start_idx = Enum.find_index(event_names, &(&1 == [:rendro, :pipeline, stage, :start]))
         stop_idx = Enum.find_index(event_names, &(&1 == [:rendro, :pipeline, stage, :stop]))
         assert start_idx < stop_idx, "#{stage} start should fire before stop"

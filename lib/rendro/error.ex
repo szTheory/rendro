@@ -64,6 +64,18 @@ defmodule Rendro.Error do
     "Reduce the height of the failing block or increase page dimensions (margin/height)."
   end
 
+  defp next_step(:paginate, :max_pages_exceeded) do
+    "Reduce document length or increase the :max_pages policy limit."
+  end
+
+  defp next_step(:render, :max_bytes_exceeded) do
+    "Reduce content complexity or increase the :max_bytes policy limit."
+  end
+
+  defp next_step(:render, :timeout) do
+    "Optimize document complexity or increase the :timeout policy limit."
+  end
+
   defp next_step(:render, _reason) do
     "Inspect telemetry events for the same render_id and verify PDF object generation inputs."
   end
