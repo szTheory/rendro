@@ -8,12 +8,12 @@ defmodule Rendro do
   @type render_option :: {:output, Path.t()} | {:deterministic, boolean()}
   @type render_options :: [render_option()]
 
-  @spec render(Document.t()) :: {:ok, binary()} | {:error, term()}
+  @spec render(Document.t()) :: {:ok, binary()} | {:error, Rendro.Error.t()}
   def render(%Document{} = doc) do
     Pipeline.run(doc)
   end
 
-  @spec render(Document.t(), render_options()) :: {:ok, binary()} | {:error, term()}
+  @spec render(Document.t(), render_options()) :: {:ok, binary()} | {:error, Rendro.Error.t()}
   def render(%Document{} = doc, opts) when is_list(opts) do
     render_opts =
       if Keyword.get(opts, :deterministic, false),

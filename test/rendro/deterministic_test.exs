@@ -54,9 +54,7 @@ defmodule Rendro.DeterministicTest do
       doc = simple_doc()
       {:ok, pdf} = Rendro.render(doc, deterministic: true)
 
-      trailer_match = Regex.scan(~r"/(\w+)\s", pdf) |> Enum.map(&List.last/1)
-
-      groups = chunk_by_dict(trailer_match)
+      groups = dictionary_key_groups(pdf)
 
       for group <- groups, length(group) > 1 do
         assert group == Enum.sort(group),
@@ -72,22 +70,40 @@ defmodule Rendro.DeterministicTest do
     %Rendro.Document{pages: [page], metadata: %Rendro.Metadata{title: "Test"}}
   end
 
-  defp chunk_by_dict(keys) do
-    keys
-    |> Enum.chunk_while(
-      [],
-      fn key, acc ->
-        if key in ["obj", "endobj", "stream", "endstream", "xref", "trailer", "startxref", "PDF", "EOF", "R"] do
-          if acc == [], do: {:cont, acc}, else: {:cont, Enum.reverse(acc), []}
-        else
-          {:cont, [key | acc]}
-        end
-      end,
-      fn
-        [] -> {:cont, []}
-        acc -> {:cont, Enum.reverse(acc), []}
-      end
-    )
+  defp dictionary_key_groups(pdf) do
+    Regex.scan(~r/<<\n(.*?)\n>>/s, pdf, capture: :all_but_first)
+    |> Enum.map(fn [body] -> body end)
+    |> Enum.map(&top_level_keys/1)
     |> Enum.filter(&(length(&1) > 1))
+  end
+
+  defp top_level_keys(dict_body) do
+    {_, keys} =
+      dict_body
+      |> String.split("\n")
+      |> Enum.map(&String.trim/1)
+      |> Enum.reject(&(&1 == ""))
+      |> Enum.reduce({0, []}, fn line, {depth, acc} ->
+        key =
+          if depth == 0 do
+            case Regex.run(~r/^\/([A-Za-z0-9]+)/, line, capture: :all_but_first) do
+              [found] -> found
+              _ -> nil
+            end
+          end
+
+        depth_delta = token_count(line, "<<") - token_count(line, ">>")
+        next_depth = max(depth + depth_delta, 0)
+        {next_depth, if(key, do: [key | acc], else: acc)}
+      end)
+
+    Enum.reverse(keys)
+  end
+
+  defp token_count(line, token) do
+    line
+    |> String.split(token)
+    |> length()
+    |> Kernel.-(1)
   end
 end

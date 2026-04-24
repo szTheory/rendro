@@ -95,7 +95,7 @@ defmodule Rendro.PDF.ObjectTest do
     test "stream with data" do
       stream = {:stream, [], "BT /F1 12 Tf (Hello) Tj ET"}
       result = IO.iodata_to_binary(Object.serialize(stream))
-      assert result =~ "/Length 27"
+      assert result =~ "/Length #{byte_size("BT /F1 12 Tf (Hello) Tj ET")}"
       assert result =~ "stream\n"
       assert result =~ "BT /F1 12 Tf (Hello) Tj ET"
       assert result =~ "\nendstream"

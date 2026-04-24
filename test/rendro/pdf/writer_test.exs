@@ -84,7 +84,8 @@ defmodule Rendro.PDF.WriterTest do
 
     test "xref entries have correct 20-byte format" do
       {:ok, pdf} = Writer.render(sample_document())
-      xref_section = pdf |> String.split("xref\n") |> List.last() |> String.split("trailer") |> hd()
+
+      [_, xref_section] = Regex.run(~r/\nxref\n(.*?)\ntrailer\n/s, pdf)
 
       xref_section
       |> String.split("\n")
@@ -147,7 +148,7 @@ defmodule Rendro.PDF.WriterTest do
       expected_x = 10 + 72
       expected_y = 792 - 20 - 72 - 14
 
-      assert pdf =~ "#{:erlang.float_to_binary(expected_x * 1.0, decimals: 4)} #{:erlang.float_to_binary(expected_y * 1.0, decimals: 4)} Td"
+      assert pdf =~ "#{expected_x} #{expected_y} Td"
     end
 
     test "applies text color as rg operator" do

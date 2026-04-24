@@ -232,7 +232,7 @@ defmodule Rendro.TelemetryTest do
 
   describe "failed render" do
     test "error in build stage emits stop with status: :error" do
-      {:error, :no_pages} = Rendro.Pipeline.run(failing_document())
+      assert {:error, %Rendro.Error{reason: :no_pages}} = Rendro.Pipeline.run(failing_document())
       events = TelemetryHelper.collect_events()
 
       [build_stop] = stage_events(events, :build, :stop)
@@ -243,7 +243,7 @@ defmodule Rendro.TelemetryTest do
     end
 
     test "error in build stage still emits top-level stop with status: :error" do
-      {:error, :no_pages} = Rendro.Pipeline.run(failing_document())
+      assert {:error, %Rendro.Error{reason: :no_pages}} = Rendro.Pipeline.run(failing_document())
       events = TelemetryHelper.collect_events()
 
       [top_stop] = render_events(events, :stop)
@@ -252,7 +252,7 @@ defmodule Rendro.TelemetryTest do
     end
 
     test "stages after the failed stage do not emit events" do
-      {:error, :no_pages} = Rendro.Pipeline.run(failing_document())
+      assert {:error, %Rendro.Error{reason: :no_pages}} = Rendro.Pipeline.run(failing_document())
       events = TelemetryHelper.collect_events()
 
       for stage <- [:compose, :measure, :paginate, :render] do
@@ -262,7 +262,7 @@ defmodule Rendro.TelemetryTest do
     end
 
     test "failed render emits build start, build stop, top-level start, top-level stop" do
-      {:error, :no_pages} = Rendro.Pipeline.run(failing_document())
+      assert {:error, %Rendro.Error{reason: :no_pages}} = Rendro.Pipeline.run(failing_document())
       events = TelemetryHelper.collect_events()
 
       event_names = Enum.map(events, fn {event, _m, _meta} -> event end)

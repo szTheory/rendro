@@ -35,15 +35,25 @@ defmodule Rendro.PipelineTest do
       assert pdf =~ "(Hello, Pipeline!) Tj"
     end
 
-    test "returns error for document with no pages" do
+    test "returns structured diagnostics for document with no pages" do
       doc = %Rendro.Document{pages: [], metadata: %Rendro.Metadata{}}
-      assert {:error, :no_pages} = Pipeline.run(doc)
+
+      assert {:error, %Rendro.Error{} = error} = Pipeline.run(doc)
+      assert error.stage == :build
+      assert error.reason == :no_pages
+      assert error.what =~ "validation"
+      assert error.where == "Rendro.Pipeline.Build"
+      assert error.next =~ "Add at least one page"
     end
 
-    test "returns error for invalid page dimensions" do
+    test "returns structured diagnostics for invalid page dimensions" do
       page = %Rendro.Page{blocks: [], width: -1, height: 100}
       doc = %Rendro.Document{pages: [page], metadata: %Rendro.Metadata{}}
-      assert {:error, :invalid_page_dimensions} = Pipeline.run(doc)
+
+      assert {:error, %Rendro.Error{} = error} = Pipeline.run(doc)
+      assert error.stage == :build
+      assert error.reason == :invalid_page_dimensions
+      assert error.next =~ "positive width and height"
     end
 
     test "handles multi-page documents" do

@@ -10,9 +10,10 @@ defmodule Rendro.Pipeline do
   `[:rendro, :pipeline, :stage_name]` events.
   """
 
+  alias Rendro.Error
   alias Rendro.Pipeline.{Build, Compose, Measure, Paginate, Render}
 
-  @spec run(Rendro.Document.t()) :: {:ok, binary()} | {:error, term()}
+  @spec run(Rendro.Document.t()) :: {:ok, binary()} | {:error, Rendro.Error.t()}
   def run(%Rendro.Document{} = doc) do
     render_id = Rendro.Telemetry.generate_render_id()
     render_opts = Map.get(doc.options, :render, [])
@@ -38,7 +39,7 @@ defmodule Rendro.Pipeline do
 
           {{:ok, pdf_binary}, stop_meta}
 
-        {:error, _} = error ->
+        {:error, %Error{} = error} ->
           stop_meta = %{
             render_id: render_id,
             status: :error,
@@ -46,7 +47,19 @@ defmodule Rendro.Pipeline do
             byte_size: 0
           }
 
-          {error, stop_meta}
+          {{:error, error}, stop_meta}
+
+        {:error, reason} ->
+          error = Error.from_stage(:render, reason, base_meta)
+
+          stop_meta = %{
+            render_id: render_id,
+            status: :error,
+            page_count: 0,
+            byte_size: 0
+          }
+
+          {{:error, error}, stop_meta}
       end
     end)
   end
@@ -72,9 +85,14 @@ defmodule Rendro.Pipeline do
 
           {{:ok, result}, stop_meta}
 
-        {:error, _} = error ->
+        {:error, %Error{} = error} ->
           stop_meta = %{render_id: base_meta.render_id, status: :error, page_count: 0, byte_size: 0}
-          {error, stop_meta}
+          {{:error, error}, stop_meta}
+
+        {:error, reason} ->
+          error = Error.from_stage(stage, reason, base_meta)
+          stop_meta = %{render_id: base_meta.render_id, status: :error, page_count: 0, byte_size: 0}
+          {{:error, error}, stop_meta}
       end
     end)
   end
