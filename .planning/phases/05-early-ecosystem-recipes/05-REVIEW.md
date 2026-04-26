@@ -1,159 +1,193 @@
 ---
 phase: 05-early-ecosystem-recipes
-reviewed: 2026-04-26T17:46:05Z
+reviewed: 2026-04-26T00:00:00Z
 depth: standard
-files_reviewed: 7
+files_reviewed: 12
 files_reviewed_list:
-  - lib/rendro/audit.ex
-  - lib/rendro/adapters/threadline.ex
+  - guides/integrations.md
+  - lib/rendro/adapters/accrue.ex
   - lib/rendro/adapters/mailglass.ex
-  - test/rendro/adapters/threadline_test.exs
+  - lib/rendro/adapters/threadline.ex
+  - lib/rendro/audit.ex
+  - mix.exs
+  - README.md
+  - test/rendro/adapters/accrue_test.exs
   - test/rendro/adapters/mailglass_test.exs
+  - test/rendro/adapters/threadline_test.exs
   - test/support/mocks.ex
   - test/test_helper.exs
 findings:
-  critical: 2
+  critical: 1
   warning: 6
-  info: 4
-  total: 12
+  info: 6
+  total: 13
 status: issues_found
 ---
 
-# Phase 05: Code Review Report
+# Phase 05: Code Review Report (post gap-closure)
 
-**Reviewed:** 2026-04-26T17:46:05Z
+**Reviewed:** 2026-04-26T00:00:00Z
 **Depth:** standard
-**Files Reviewed:** 7
+**Files Reviewed:** 12
 **Status:** issues_found
 
 ## Summary
 
-The phase 05 ecosystem-adapter code is generally well-structured: optional
-modules guarded by `Code.ensure_loaded?/1`, a clear `Rendro.Audit` behavior,
-and PII-conscious telemetry forwarding to Threadline. The Threadline adapter
-is in good shape and its tests are tight.
+The Phase 05 gap-closure work (commits `7ec2ea1..69085ad`) addresses the three
+gaps surfaced by verification:
 
-The Mailglass adapter, however, contains two correctness defects in the
-Mailglass-message handling path that can either silently drop user data or
-crash the process at runtime, and several quality issues around its
-fallback/best-effort branches. Additional warnings cover gaps in audit
-coverage (timeouts), a fragile struct-detection heuristic, and a latent
-test-helper bug in `test_pid/0` that will misroute captured calls when more
-than one process layer separates the caller from the test.
+- **05-02 (Accrue adapter):** A new `Rendro.Adapters.Accrue` recipe is shipped,
+  optional-gated, and accompanied by tests + stub modules in `mocks.ex`. The
+  happy paths and the documented `{:error, {:invalid_invoice, _}}` contract are
+  exercised.
+- **05-03 (Mailglass contract fixes):** CR-01 (silent data loss in
+  `extract_swoosh/1`) and CR-02 (`FunctionClauseError` from the
+  "best-effort" cond branch) are correctly resolved; `mailglass_message?/1` is
+  narrowed (WR-03) to require `.Message` suffix + `update_swoosh/2` export.
+  Negative-path tests now cover all three.
+- **05-04 (Integration documentation):** A new `guides/integrations.md` covers
+  setup, verification, and a failure-diagnostics table for each adapter, and is
+  wired into ExDoc extras. The README links to it.
+
+The Threadline adapter, the `Rendro.Audit` behavior, and the optional-dependency
+discipline are all in solid shape.
+
+That said, the Mailglass adapter's `put_swoosh/2` retains a contract bug that
+*precisely undermines the WR-03 narrowing* — it accepts custom Mailglass-style
+wrappers via `mailglass_message?/1` but always dispatches the re-wrap step
+through `Mailglass.Message.update_swoosh/2`, which raises `FunctionClauseError`
+for any wrapper struct that is not literally `%Mailglass.Message{}`. Several
+WARNING-class issues from the prior review (WR-01 timeout-not-audited, WR-02
+default-to-success, WR-05 unscoped rescue, IN-04 ETS race) remain open and have
+not been re-verified by the gap-closure work — they are restated here. New
+findings cover the Accrue adapter and tests, plus dead code shipped in the test
+fixtures.
 
 ## Critical Issues
 
-### CR-01: `extract_swoosh/1` fallback silently drops the caller's message and replaces it with an empty Swoosh email
+### CR-01: `put_swoosh/2` raises `FunctionClauseError` for any non-`Mailglass.Message` wrapper that the new `mailglass_message?/1` guard admits
 
-**File:** `lib/rendro/adapters/mailglass.ex:97-100`
+**File:** `lib/rendro/adapters/mailglass.ex:128-142`
 
-**Issue:** When `attach_to_mailglass/2` is given a `Mailglass.*` struct that
-has neither a `:swoosh` nor an `:email` field, `extract_swoosh/1` falls
-through to the `defp extract_swoosh(_), do: %Swoosh.Email{}` clause. The
-adapter then attaches the rendered PDF to a brand-new empty `%Swoosh.Email{}`
-and (via `put_swoosh/2`'s final `true ->` arm at line 113-114) returns that
-bare email, completely discarding the caller's original message — including
-any `:meta`, recipients, subject, or body the caller had set.
+**Issue:** Commit `51bc306` correctly narrows `mailglass_message?/1` to require
+the struct module's atom name to end in `.Message` AND that
+`update_swoosh/2` is exported by *that* struct's module
+(`function_exported?(mod, :update_swoosh, 2)` at line 101). The moduledoc at
+lines 21-23 explicitly advertises this: "a `Mailglass.Message` struct (it will
+be unwrapped, the attachment added to its underlying Swoosh email, and
+re-wrapped via `Mailglass.Message.update_swoosh/2` if available)" — and lines
+36-39 promise that wrappers "must ensure one of those fields is present, or
+implement `update_swoosh/2`" — i.e. the wrapper's own `update_swoosh/2`
+should be honored.
 
-This is worst-case data loss: the call appears to succeed
-(no `{:error, _}`), but the rendered PDF is attached to a wrong, empty
-email and the user's email content is gone. Combined with the silent
-type change in CR-02, this is a footgun for anyone using a non-canonical
-Mailglass-style wrapper.
-
-**Fix:** Refuse to handle unknown wrapper shapes instead of fabricating an
-empty email. Return `{:error, ...}` so the caller can decide:
+`put_swoosh/2`, however, hardcodes the re-wrap to the canonical
+`Mailglass.Message` module and never consults the input struct's own module:
 
 ```elixir
-defp extract_swoosh(%{swoosh: %Swoosh.Email{} = email}), do: {:ok, email}
-defp extract_swoosh(%{email: %Swoosh.Email{} = email}), do: {:ok, email}
-defp extract_swoosh(%Swoosh.Email{} = email), do: {:ok, email}
-defp extract_swoosh(other), do: {:error, {:unrecognized_message_shape, other.__struct__}}
-
-defp attach_to_mailglass(message, attachment) do
-  case extract_swoosh(message) do
-    {:ok, swoosh} ->
-      updated = Swoosh.Email.attachment(swoosh, attachment)
-      put_swoosh(message, updated)
-
-    {:error, _} = err ->
-      err
+defp put_swoosh(message, swoosh_email) do
+  cond do
+    function_exported?(Mailglass.Message, :update_swoosh, 2) ->
+      apply(Mailglass.Message, :update_swoosh, [message, swoosh_email])
+    # ...
   end
 end
 ```
 
-Update `attach_pdf/3`'s `@spec` and call site to propagate the new error.
+For a custom wrapper such as `%Mailglass.Wrapper.Message{swoosh: ...}` (the
+exact shape exercised by the new CR-01 test fixture at
+`test/rendro/adapters/mailglass_test.exs:16-26`), the trace is:
 
----
+1. `mailglass_message?/1` returns true (suffix `.Message` + `update_swoosh/2`
+   exported on `Mailglass.Wrapper.Message`).
+2. `extract_swoosh/1` matches `%{swoosh: %Swoosh.Email{} = email}` and returns
+   `{:ok, swoosh}`.
+3. `put_swoosh/2`'s first cond is true (`Mailglass.Message.update_swoosh/2`
+   exists — the real lib or `mocks.ex:161`).
+4. `apply(Mailglass.Message, :update_swoosh, [%Mailglass.Wrapper.Message{}, ...])`
+   is called.
+5. `Mailglass.Message.update_swoosh/2` (stub at `test/support/mocks.ex:161` or
+   the real lib) pattern-matches `%__MODULE__{} = message`. The input is a
+   `%Mailglass.Wrapper.Message{}`, NOT a `%Mailglass.Message{}`. **Raises
+   `FunctionClauseError`.**
 
-### CR-02: `attach_binary/3` "best-effort" fallback will crash, not degrade
+This is the same class of contract violation the CR-02 fix was supposed to
+eliminate ("attach_pdf/3 never raises — all failure paths return an
+`{:error, _}` tuple," moduledoc:27). It hides today only because the existing
+negative-path test (`mailglass_test.exs:149-163`) uses a wrapper *without* a
+`:swoosh` field, so the trace bails out at step 2 with the
+`{:unrecognized_message_shape, _}` error before ever reaching `put_swoosh/2`.
+Adding a `:swoosh` field to that fixture immediately reproduces the crash.
 
-**File:** `lib/rendro/adapters/mailglass.ex:64-67`
-
-**Issue:** The final `cond` branch claims:
-
-```elixir
-true ->
-  # Best-effort: assume the value behaves like a Swoosh email.
-  Swoosh.Email.attachment(email_or_message, attachment)
-```
-
-But `Swoosh.Email.attachment/2` (both the real implementation and the test
-stub at `test/support/mocks.ex:146-148`) is defined with a head that
-pattern-matches `%Swoosh.Email{} = email`. By the time control reaches the
-`true ->` arm, we have already determined via `swoosh_email?/1` that the
-value is NOT a `%Swoosh.Email{}` struct. Therefore this call will raise
-`FunctionClauseError` at runtime, not produce a "best-effort" attachment.
-
-The branch is dead in the success sense (cannot succeed for the inputs that
-actually reach it) and live in the failure sense (will crash callers that
-pass any unexpected input — e.g. `nil`, a plain map, a string filename
-mistakenly passed as the first argument). This contradicts the moduledoc's
-contract that rendering errors are surfaced as `{:error, Rendro.Error.t()}`:
-this path raises instead.
-
-**Fix:** Remove the misleading branch and return a typed error for unknown
-inputs:
+**Fix:** Dispatch the re-wrap through the *input struct's* module, mirroring
+the predicate in `mailglass_message?/1`. Fall back to canonical
+`Mailglass.Message`, then to direct field assignment, only if the input
+struct does not export `update_swoosh/2`:
 
 ```elixir
-cond do
-  mailglass_message?(email_or_message) ->
-    attach_to_mailglass(email_or_message, attachment)
+defp put_swoosh(message, swoosh_email) when is_struct(message) do
+  mod = message.__struct__
 
-  swoosh_email?(email_or_message) ->
-    Swoosh.Email.attachment(email_or_message, attachment)
+  cond do
+    function_exported?(mod, :update_swoosh, 2) ->
+      apply(mod, :update_swoosh, [message, swoosh_email])
 
-  true ->
-    {:error,
-     Rendro.Error.from_stage(:render, {:invalid_email_target, email_or_message}, %{})}
+    Map.has_key?(message, :swoosh) ->
+      %{message | swoosh: swoosh_email}
+
+    Map.has_key?(message, :email) ->
+      %{message | email: swoosh_email}
+
+    true ->
+      {:error, {:unrecognized_message_shape, mod}}
+  end
 end
 ```
 
-Then update the `@spec` of `attach_pdf/3` to include `{:error, Rendro.Error.t()}`
-for this case (it already does, so this is purely an implementation fix).
+Add a regression test that exercises a wrapper struct with both a `:swoosh`
+field AND its own `update_swoosh/2` to lock in the fix:
+
+```elixir
+test "Mailglass.* wrapper with :swoosh and own update_swoosh/2 is re-wrapped via the wrapper's module" do
+  msg = %Mailglass.Wrapper.Message{id: 1, payload: "data"}
+  # Add :swoosh to the fixture so extract_swoosh succeeds.
+  msg = %{msg | swoosh: Swoosh.Email.new()}
+
+  assert {:ok, %Mailglass.Wrapper.Message{}} =
+           Adapter.attach_pdf(msg, sample_document(), "x.pdf")
+end
+```
+
+Also delete the unreachable final `true -> swoosh_email` arm (it loses the
+caller's wrapper entirely — the same data-loss class that CR-01 in the prior
+review was meant to remove).
 
 ## Warnings
 
-### WR-01: Pipeline timeouts are never audited
+### WR-01: Pipeline timeouts are still never audited
 
-**File:** `lib/rendro/adapters/threadline.ex:73-82` (in concert with `lib/rendro/pipeline.ex:31-36`)
+**File:** `lib/rendro/adapters/threadline.ex:73-82`, `lib/rendro/pipeline.ex:31-36`
 
-**Issue:** `Rendro.Pipeline.run/1` wraps execution in `Task.async` and uses
-`Task.yield/Task.shutdown` to enforce a timeout. On timeout the outer
-`:telemetry.span` *never emits a `:stop` or `:exception` event* because the
-task is shut down before its span block completes. As a result, every
-timed-out render returns `{:error, %Rendro.Error{reason: :timeout}}` to the
-caller but produces zero Threadline audit calls — a class of failure that
-is arguably the most important to audit.
+**Issue:** Carried over from the prior review unchanged. `Rendro.Pipeline.run/1`
+wraps execution in `Task.async` and uses `Task.yield/Task.shutdown` to enforce
+the timeout. On timeout the outer `:telemetry.span` *never emits a `:stop` or
+`:exception` event*, so neither `[:rendro, :render, :stop]` nor
+`[:rendro, :render, :exception]` fires, and the Threadline handler is never
+called. Every timed-out render returns `{:error, %Rendro.Error{reason: :timeout}}`
+to the caller and produces zero audit calls.
 
-The Threadline adapter's moduledoc claims it audits "successful or failed
-renders" via `[:rendro, :render, :stop]` and "crashed renders" via
-`[:rendro, :render, :exception]`, neither of which fire on timeout.
+The 05-04 docs (`guides/integrations.md:120-154`) now disclose this as a known
+limitation with a manual mitigation snippet. That converts the bug from "silent
+audit gap" to "documented audit gap" — but it is still a defect against the
+adapter moduledoc's claim that it audits all "successful or failed renders" via
+`:stop` and "crashed renders" via `:exception`. Operators who rely on
+Threadline as a complete audit trail will silently miss the most-important
+class of failure unless they manually duplicate audit emission at every call
+site.
 
-**Fix:** Either (a) emit a `[:rendro, :render, :stop]` event explicitly from
-the timeout branch in `Pipeline.run/1` before returning the timeout error,
-or (b) add a separate `[:rendro, :render, :timeout]` event and subscribe the
-adapter to it. Option (a) is less invasive:
+**Fix:** Either (a) emit a `[:rendro, :render, :stop]` event explicitly from the
+timeout branch in `Pipeline.run/1` before returning the timeout error, or (b)
+add a `[:rendro, :render, :timeout]` event and subscribe the adapter to it.
+Option (a) is least invasive:
 
 ```elixir
 case Task.yield(task, timeout) || Task.shutdown(task) do
@@ -164,8 +198,10 @@ case Task.yield(task, timeout) || Task.shutdown(task) do
     err = Error.from_stage(:render, :timeout, base_meta)
     :telemetry.execute(
       Rendro.Telemetry.render_prefix() ++ [:stop],
-      %{duration: 0},
-      Map.merge(base_meta, %{status: :error, page_count: 0, byte_size: 0, reason: :timeout})
+      %{duration: timeout},
+      Map.merge(base_meta, %{
+        status: :error, page_count: 0, byte_size: 0, reason: :timeout
+      })
     )
     {:error, err}
 end
@@ -173,233 +209,297 @@ end
 
 ---
 
-### WR-02: `handle_event` defaults to `:render_succeeded` whenever `status` is missing or unrecognized
+### WR-02: `handle_event` defaults to `:render_succeeded` whenever `:status` is missing or unrecognized
 
 **File:** `lib/rendro/adapters/threadline.ex:75`
 
-**Issue:**
+**Issue:** Carried over from the prior review unchanged.
 
 ```elixir
-action = if Map.get(metadata, :status) == :error, do: :render_failed, else: :render_succeeded
+action =
+  if Map.get(metadata, :status) == :error,
+    do: :render_failed,
+    else: :render_succeeded
 ```
 
-If telemetry metadata ever lacks `:status` (or contains some other atom),
-the adapter classifies the event as a *successful* render and emits
-`:render_succeeded` to Threadline. That is a silent false-positive: a
-broken render gets logged as a success in the audit trail.
+If telemetry metadata ever lacks `:status` or carries an unrecognized atom, the
+adapter classifies the event as a *successful* render and emits
+`:render_succeeded` to Threadline. Today
+`Rendro.Pipeline.build_stop_meta/3` always sets `:status` to `:ok` or
+`:error`, so the bug is dormant — but the adapter is the audit-layer last line
+of defense and should fail closed.
 
-Today `Pipeline.build_stop_meta/3` always sets `:status` to `:ok` or
-`:error`, so the bug is dormant — but the adapter is the audit-layer last
-line of defense and should not assume upstream invariants.
-
-**Fix:** Make the mapping explicit and fail closed for unknown statuses:
+**Fix:** Make the mapping explicit:
 
 ```elixir
 action =
   case Map.get(metadata, :status) do
-    :ok -> :render_succeeded
+    :ok    -> :render_succeeded
     :error -> :render_failed
-    other -> :render_failed  # or {:render_unknown, other}
+    _      -> :render_failed
   end
 ```
 
 ---
 
-### WR-03: `is_mailglass_struct?/1` matches anything in the `Elixir.Mailglass.*` namespace
-
-**File:** `lib/rendro/adapters/mailglass.ex:81-86`
-
-**Issue:** The check `String.starts_with?(mod_str, "Elixir.Mailglass.")`
-will return `true` for any struct in the `Mailglass.*` namespace —
-including things like `%Mailglass.Config{}`, `%Mailglass.Whatever{}`, or a
-user-defined `%Mailglass.Foo{}` that has nothing to do with messages. Those
-values are then sent through `attach_to_mailglass/2`, which assumes they
-are message-like and falls through to the dangerous `extract_swoosh/1`
-fallback documented in CR-01.
-
-**Fix:** Narrow the check to actual message structs (or a small whitelist),
-and require the wrapper interface to be present:
-
-```elixir
-defp mailglass_message?(%Mailglass.Message{}), do: true
-defp mailglass_message?(value) when is_struct(value) do
-  mod = value.__struct__
-  mod |> Atom.to_string() |> String.ends_with?(".Message") and
-    function_exported?(mod, :update_swoosh, 2)
-end
-defp mailglass_message?(_), do: false
-```
-
----
-
-### WR-04: `test_pid/0` only inspects the head of `:"$callers"` and will mis-route across nested processes
-
-**File:** `test/support/mocks.ex:76-81`
-
-**Issue:**
-
-```elixir
-defp test_pid do
-  case Process.get(:"$callers") do
-    [pid | _] -> pid
-    _ -> self()
-  end
-end
-```
-
-Elixir's Task sets `:"$callers"` as `[immediate_caller | inherited_callers]`,
-so a Task spawned from another Task gets `[outer_task_pid, test_pid]`. The
-current implementation returns the *immediate* caller (an outer Task pid),
-not the test process. The captured call would then be inserted under a key
-the test never queries, and `threadline_calls/0` would return `[]`.
-
-The Rendro pipeline today only spawns one level of `Task.async` (see
-`lib/rendro/pipeline.ex:31`), so the bug is latent. But anyone introducing
-a second-level Task (e.g. parallel page rendering, async post-processing)
-will see ghost test failures with no obvious cause.
-
-**Fix:** Walk to the end of the chain — the last entry is the original
-caller:
-
-```elixir
-defp test_pid do
-  case Process.get(:"$callers") do
-    [_ | _] = chain -> List.last(chain)
-    _ -> self()
-  end
-end
-```
-
----
-
-### WR-05: `track_render/2` swallows arbitrary exceptions, including ones unrelated to Threadline
+### WR-03: `track_render/2` swallows arbitrary exceptions silently
 
 **File:** `lib/rendro/adapters/threadline.ex:89-98`
 
-**Issue:** The `try/rescue e ->` is unscoped — it catches every exception
-that bubbles out of `Threadline.record_action/2`, including
-`ArgumentError`s caused by malformed metadata that the *adapter itself*
-constructed, runtime bugs in `Threadline`, etc. The original exception is
-wrapped as `{:exception, e}` and silently returned. There is no log,
-telemetry event, or warning emitted to surface the underlying failure;
-audit problems will be invisible until someone goes looking.
+**Issue:** Carried over from the prior review unchanged. The
+`try/rescue e ->` is unscoped — it catches every exception that bubbles out
+of `Threadline.record_action/2`, including `ArgumentError` from malformed
+metadata that the adapter itself constructed, runtime bugs in `Threadline`, or
+unrelated VM failures. The original exception is wrapped as
+`{:error, {:exception, e}}` and silently returned. There is no log, telemetry
+event, or warning emitted to surface the underlying failure; audit-pipeline
+problems are invisible until someone goes looking.
 
-**Fix:** Either narrow the rescue to the specific exceptions Threadline
-documents, or at minimum log via `Logger.warning/1` (or emit a telemetry
-event) before returning the error so audit-pipeline failures aren't
-hidden:
+**Fix:** Either (a) narrow the rescue to specific exceptions Threadline
+documents, or (b) log via `Logger.warning/1` (or emit a meta-telemetry event)
+before returning the error so audit failures aren't hidden:
 
 ```elixir
 rescue
   e ->
     require Logger
-    Logger.warning("Threadline.record_action/2 raised: #{Exception.message(e)}")
+
+    Logger.warning(
+      "Threadline.record_action/2 raised: #{Exception.message(e)}"
+    )
+
     {:error, {:exception, e}}
 end
 ```
 
 ---
 
-### WR-06: `Rendro.render/1` is called without options, blocking deterministic-mode pass-through
+### WR-04: `track_render/2`'s `:action` contract is private and undocumented in the `Rendro.Audit` behavior
 
-**File:** `lib/rendro/adapters/mailglass.ex:48`
+**File:** `lib/rendro/audit.ex:38-47`, `lib/rendro/adapters/threadline.ex:84-99`
 
-**Issue:** `attach_pdf/3` calls `Rendro.render(document)` (1-arity), so
-callers cannot ask for deterministic output, custom timeouts, or any other
-render policy when emailing a PDF. The moduledoc explicitly mentions
-"existing core render policy (max pages/bytes), bounding the size of
-attachments produced," but those policies live on `document.options` so
-they do work — however other render-time options (deterministic, timeout)
-cannot be plumbed through. A signature like
-`attach_pdf(email, doc, filename \\ @default_filename, opts \\ [])` would
-match the rest of the public API.
+**Issue:** The `Rendro.Audit` behavior declares
+`@callback track_render(render_id, metadata) :: :ok | {:error, term()}` and
+documents the *forwarded* metadata keys (`:render_id`, `:stage`, `:status`,
+`:page_count`, `:byte_size`, `:duration`, `:document_type`, `:deterministic`).
 
-**Fix:** Add an `opts` parameter forwarded to `Rendro.render/2`:
+The Threadline implementation, however, reads `metadata.action` (lines 86, 90)
+and uses it to drive `Threadline.record_action/2`. The `:action` key is
+injected by the adapter's own `handle_event/4` (lines 76, 81) — it is *not*
+part of the documented metadata contract. A third-party that adopts
+`Rendro.Audit` (per the example in `audit.ex:11-19`) will not learn from the
+behavior or its docs that `:action` is a contract input, and the contract for
+"how to call `track_render/2` directly" is different from "how to call it via
+the telemetry handler."
+
+**Fix:** Either (a) lift `:action` into the behavior's documented metadata keys
+with a note that adapter callers must populate it, or (b) make `:action` an
+explicit positional argument:
 
 ```elixir
-@spec attach_pdf(term(), Rendro.Document.t(), String.t(), keyword()) ::
-        term() | {:error, Rendro.Error.t()}
-def attach_pdf(email_or_message, document, filename \\ @default_filename, opts \\ [])
+@callback track_render(render_id, action :: atom(), metadata) ::
+            :ok | {:error, term()}
+```
 
-def attach_pdf(email_or_message, %Rendro.Document{} = document, filename, opts)
-    when is_binary(filename) and is_list(opts) do
-  case Rendro.render(document, opts) do
-    {:ok, binary} -> attach_binary(email_or_message, binary, filename)
-    {:error, _} = err -> err
+Option (b) is cleanest because it removes the implicit map-shape contract.
+
+---
+
+### WR-05: `extract_swoosh/1`'s `%Swoosh.Email{}` clause is unreachable from `attach_to_mailglass/2`
+
+**File:** `lib/rendro/adapters/mailglass.ex:120-122`
+
+**Issue:** `extract_swoosh/1` declares a clause that matches a bare
+`%Swoosh.Email{}`:
+
+```elixir
+defp extract_swoosh(%Swoosh.Email{} = email), do: {:ok, email}
+```
+
+But `extract_swoosh/1` is only called from `attach_to_mailglass/2` (line 110),
+which is itself only entered when `mailglass_message?/1` returned true.
+`mailglass_message?/1` rejects `%Swoosh.Email{}` because Swoosh's struct module
+atom does not end in `.Message`. So the `%Swoosh.Email{} = email` clause is
+unreachable. Dead code is a code smell and (more concretely) misleads readers
+into believing the function handles Swoosh inputs as a fallback when it does
+not.
+
+**Fix:** Delete the unreachable clause:
+
+```elixir
+defp extract_swoosh(%{swoosh: %Swoosh.Email{} = email}), do: {:ok, email}
+defp extract_swoosh(%{email: %Swoosh.Email{} = email}), do: {:ok, email}
+defp extract_swoosh(other) when is_struct(other),
+  do: {:error, {:unrecognized_message_shape, other.__struct__}}
+defp extract_swoosh(other),
+  do: {:error, {:unrecognized_message_shape, other}}
+```
+
+---
+
+### WR-06: Accrue `recipe/1` validates only the outer struct; invalid `:line_items` entries crash the recipe
+
+**File:** `lib/rendro/adapters/accrue.ex:68-77`
+
+**Issue:** `recipe/1`'s spec is
+`{:ok, Rendro.Document.t()} | {:error, {:invalid_invoice, term()}}` — i.e. the
+recipe promises to return an `{:error, _}` tuple for any non-`%Accrue.Invoice{}`
+input. Inside `build_content/1`, however:
+
+```elixir
+rows =
+  Enum.map(line_items || [], fn %Accrue.LineItem{} = item ->
+    # ...
+  end)
+```
+
+The lambda pattern-matches `%Accrue.LineItem{} = item`. If `:line_items`
+contains anything other than a `%Accrue.LineItem{}` struct (a plain map, a
+keyword list, a string, a `nil`, or a custom Accrue struct), the call raises
+`FunctionClauseError`. The moduledoc claims "Returns
+`{:error, {:invalid_invoice, term()}}` for non-`%Accrue.Invoice{}` inputs" —
+which is technically true at the outer level but misleading because invalid
+*nested* input crashes rather than returning a typed error.
+
+The Accrue tests at `test/rendro/adapters/accrue_test.exs:7-17` only exercise
+the well-formed case, so the bug is not surfaced by CI.
+
+**Fix:** Either (a) validate line items up front and short-circuit with
+`{:error, {:invalid_invoice, ...}}`, or (b) handle non-LineItem entries
+gracefully. (a) is simplest and matches the documented contract:
+
+```elixir
+def recipe(%Accrue.Invoice{line_items: items} = invoice)
+    when is_list(items) do
+  if Enum.all?(items, &match?(%Accrue.LineItem{}, &1)) do
+    # ... build doc ...
+    {:ok, doc}
+  else
+    {:error, {:invalid_invoice, {:invalid_line_items, items}}}
   end
 end
+
+def recipe(%Accrue.Invoice{} = invoice) do
+  # line_items is not a list (or is nil)
+  {:error, {:invalid_invoice, invoice}}
+end
+
+def recipe(other), do: {:error, {:invalid_invoice, other}}
 ```
+
+Add a negative-path test that exercises an `Invoice` with a plain map in
+`:line_items`.
 
 ## Info
 
-### IN-01: `build_audit_metadata/2` includes fields not documented in the moduledoc / audit contract
+### IN-01: `Mailglass.UnrecognizedFixture` is defined but never used
 
-**File:** `lib/rendro/adapters/threadline.ex:101-115`
+**File:** `test/rendro/adapters/mailglass_test.exs:7-14`
 
-**Issue:** The moduledoc (`lib/rendro/adapters/threadline.ex:31-32`) and
-`Rendro.Audit`'s PII-safety section list eight forwarded keys:
-`:render_id, :stage, :status, :page_count, :byte_size, :duration,
-:document_type, :deterministic`. The actual `Map.take/2` list includes two
-extra keys that aren't documented anywhere: `:kind` and `:reason`. That
-discrepancy is fine in practice (both come from telemetry exception
-metadata and are useful), but the docs should match the implementation so
-readers know what gets forwarded to Threadline.
+**Issue:** The fixture module `Mailglass.UnrecognizedFixture` is defined at
+file-top-level "to exercise WR-03 overlap with CR-02," and the moduledoc
+comment at lines 11-13 explains its purpose — but no test in the file
+references it. The actual WR-03 test at lines 165-180 uses
+`Mailglass.ConfigFixture` instead. `Mailglass.UnrecognizedFixture` is dead
+code in the test file.
 
-**Fix:** Update the moduledoc (and the matching paragraph in
-`lib/rendro/audit.ex:25-27`) to add `:kind` and `:reason` to the listed
-keys, with a one-line note that they only appear on `:exception` events.
-
----
-
-### IN-02: Test stub `Swoosh.Email` differs from real Swoosh and may shadow it depending on load order
-
-**File:** `test/support/mocks.ex:119-153`
-
-**Issue:** `unless Code.ensure_loaded?(Swoosh.Email) do ... end` runs at
-compile-time of `mocks.ex`. If Swoosh is configured as an optional dep,
-the order in which the test compiler resolves it relative to `support/`
-files matters: in some configurations the stub is defined and then later
-"replaced" by a real Swoosh module (warning), and in others the stub wins
-and the real Swoosh.Email is shadowed for the remainder of the test run.
-The stub's struct does not include several fields the real Swoosh.Email
-has (e.g. `:date`), which can cause confusing assertion mismatches.
-
-**Fix:** Either (a) add Swoosh as a real `:test`-only dep in `mix.exs` and
-delete the stub, or (b) gate the stub's compilation on `Mix.env() == :test
-and not Code.ensure_loaded?(Swoosh.Email)` and clearly document the
-contract the stub aims to satisfy.
+**Fix:** Either delete `Mailglass.UnrecognizedFixture` outright, or write the
+test it was added to support. Note: `Mailglass.ConfigFixture` already exercises
+the WR-03 scenario described in the `UnrecognizedFixture` moduledoc, so the
+simplest fix is deletion.
 
 ---
 
-### IN-03: `AdapterReloader.recompile/0` will print "redefining module" warnings on every test boot
+### IN-02: `build_audit_metadata/2` includes `:kind` and `:reason` keys not listed in the moduledoc / behavior contract
 
-**File:** `test/support/mocks.ex:188-198`
+**File:** `lib/rendro/adapters/threadline.ex:101-115`, `lib/rendro/audit.ex:25-27`,
+`guides/integrations.md:62-64`
 
-**Issue:** `Code.compile_file/1` re-evaluates the adapter source files,
-which re-defines the modules; the Erlang VM emits a `redefining module`
-warning each time. The output noise during test runs makes real warnings
-harder to spot.
+**Issue:** The Threadline moduledoc (lines 31-32), the `Rendro.Audit`
+PII-safety section (`audit.ex:25-27`), and the integrations guide
+(`integrations.md:62-64`) all document eight forwarded keys: `:render_id`,
+`:stage`, `:status`, `:page_count`, `:byte_size`, `:duration`,
+`:document_type`, `:deterministic`. The actual `Map.take/2` list at
+`threadline.ex:103-113` includes two extra keys: `:kind` and `:reason`. Both
+keys are useful (they come from telemetry exception metadata), but the gap
+between docs and implementation means readers do not know they may be
+forwarded.
 
-**Fix:** Either (a) use `Code.put_compiler_option(:ignore_module_conflict,
-true)` around the compile, scoped narrowly, or (b) only recompile when the
-adapter modules are NOT already loaded (e.g. `unless
-Code.ensure_loaded?(Rendro.Adapters.Threadline) do ... end`), which avoids
-the warning when the real ecosystem libs are present.
+**Fix:** Add `:kind` and `:reason` to all three documentation sites with a
+one-liner noting they only appear on `:exception` events.
 
 ---
 
-### IN-04: `mocks.ex` `ensure_table!/0` race-prone if ever called from multiple processes
+### IN-03: Accrue `format_amount/1` rendering is locale-naive and offers no decimal handling
+
+**File:** `lib/rendro/adapters/accrue.ex:97-99`
+
+**Issue:** `format_amount/1` has three clauses:
+
+```elixir
+defp format_amount(nil), do: ""
+defp format_amount(value) when is_integer(value), do: "$#{value}"
+defp format_amount(value), do: to_string(value)
+```
+
+The integer branch unconditionally prepends `$`, which is a hard-coded USD
+assumption even though the moduledoc accepts "integer or Decimal-like value."
+The fallback `to_string(value)` will work for `Decimal` (which implements
+`String.Chars`), but the result will not include a currency prefix — so a
+mixed-mode `Invoice` that has integer line subtotals and a Decimal `:total`
+will render with `$1500` rows and a bare `123.45` total. Inconsistent.
+
+**Fix:** Either (a) require integers in the spec and document them as
+"smallest currency unit (cents)" with a separate formatter that adds the
+prefix, or (b) accept `Decimal` and prefix uniformly:
+
+```elixir
+defp format_amount(nil), do: ""
+defp format_amount(value) when is_integer(value), do: "$#{value}"
+defp format_amount(%Decimal{} = value), do: "$#{Decimal.to_string(value)}"
+defp format_amount(value), do: to_string(value)
+```
+
+---
+
+### IN-04: Accrue header uses `inspect/1` for `:issued_at`, producing developer-facing output
+
+**File:** `lib/rendro/adapters/accrue.ex:60-65`
+
+**Issue:**
+
+```elixir
+Rendro.block(Rendro.text("Issued: #{inspect(issued_at)}", size: 10)),
+```
+
+`inspect/1` is for debugging output. A `~D[2026-04-26]` Date, when inspected,
+produces `~D[2026-04-26]` literally — so a rendered invoice shows
+`Issued: ~D[2026-04-26]` to the recipient. End users see Elixir sigil
+syntax in their billing PDF.
+
+**Fix:** Use `Date.to_string/1` (or `to_string/1` via `String.Chars` for
+Date/DateTime — both implement it) and document the expected types:
+
+```elixir
+defp format_issued_at(nil), do: ""
+defp format_issued_at(%Date{} = d), do: Date.to_string(d)
+defp format_issued_at(%DateTime{} = dt), do: DateTime.to_iso8601(dt)
+defp format_issued_at(other), do: to_string(other)
+```
+
+---
+
+### IN-05: `mocks.ex` `ensure_table!/0` is non-atomic (race-prone if ever called from multiple processes)
 
 **File:** `test/support/mocks.ex:31-40`
 
-**Issue:** The `:ets.info` → `:ets.new` sequence is non-atomic. If two
-processes ever race here (today only `test_helper.exs` calls it, so this
-is purely defensive), the second `:ets.new/2` raises
-`ArgumentError`. Not a bug today, but `ensure_table!` reads as a generic
-helper that *could* be called from anywhere.
+**Issue:** Carried over from the prior review unchanged. The
+`:ets.info` → `:ets.new` sequence is non-atomic. If two processes ever race
+here, the second `:ets.new/2` call raises `ArgumentError`. Today only
+`test_helper.exs` calls it, so the bug is purely defensive — but the function
+reads as a generic helper that could be called from anywhere.
 
-**Fix:** Wrap the create in `try/rescue ArgumentError -> :ok end`, or
-serialize creation via a `GenServer`/named process. Cheapest patch:
+**Fix:** Wrap creation in `try/rescue ArgumentError -> :ok end`:
 
 ```elixir
 def ensure_table! do
@@ -420,6 +520,42 @@ end
 
 ---
 
-_Reviewed: 2026-04-26T17:46:05Z_
+### IN-06: `AdapterReloader.recompile/0` produces "redefining module" warnings on every test boot
+
+**File:** `test/support/mocks.ex:211-221`
+
+**Issue:** Carried over from the prior review unchanged. `Code.compile_file/1`
+re-evaluates the adapter source files, which redefines the modules; the Erlang
+VM emits a `redefining module` warning each time. The output noise during test
+runs makes real warnings harder to spot. With the new `accrue.ex` added to
+`@adapter_files` (line 208), the noise is now three lines per `mix test`
+invocation instead of two.
+
+**Fix:** Suppress conflict warnings narrowly around the recompile, or skip
+recompilation when the adapter modules are already loaded:
+
+```elixir
+def recompile do
+  Code.put_compiler_option(:ignore_module_conflict, true)
+
+  try do
+    project_root = File.cwd!()
+
+    for relative <- @adapter_files,
+        path = Path.join(project_root, relative),
+        File.exists?(path) do
+      Code.compile_file(path)
+    end
+
+    :ok
+  after
+    Code.put_compiler_option(:ignore_module_conflict, false)
+  end
+end
+```
+
+---
+
+_Reviewed: 2026-04-26T00:00:00Z_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
