@@ -170,6 +170,28 @@ unless Code.ensure_loaded?(Mailglass) do
   end
 end
 
+unless Code.ensure_loaded?(Accrue) do
+  defmodule Accrue.LineItem do
+    @moduledoc false
+    defstruct [:description, :quantity, :unit_amount, :subtotal]
+  end
+end
+
+unless Code.ensure_loaded?(Accrue) do
+  defmodule Accrue.Invoice do
+    @moduledoc false
+    defstruct [:id, :customer, :line_items, :total, :issued_at]
+  end
+end
+
+unless Code.ensure_loaded?(Accrue) do
+  defmodule Accrue do
+    @moduledoc false
+    @doc "Marker module to satisfy `Code.ensure_loaded?(Accrue)` in adapters."
+    def __accrue_stub__, do: true
+  end
+end
+
 defmodule Rendro.Test.Mocks.AdapterReloader do
   @moduledoc """
   Force-recompiles optional adapter modules so their `Code.ensure_loaded?/1`
@@ -182,7 +204,8 @@ defmodule Rendro.Test.Mocks.AdapterReloader do
 
   @adapter_files [
     "lib/rendro/adapters/threadline.ex",
-    "lib/rendro/adapters/mailglass.ex"
+    "lib/rendro/adapters/mailglass.ex",
+    "lib/rendro/adapters/accrue.ex"
   ]
 
   def recompile do
