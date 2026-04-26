@@ -92,10 +92,13 @@ Plans:
   1. Maintainers can follow tested recipes for `threadline`, `mailglass`, and `accrue`.
   2. Recipes remain optional and do not introduce hard dependencies into core.
   3. Integration documentation includes verification guidance and failure diagnostics.
-**Plans**: 1 plan
+**Plans**: 4 plans (05-01 executed; 05-02..05-04 added by gap closure 2026-04-26)
 
 Plans:
-- [ ] 05-01: Implement and validate threadline/mailglass/accrue recipe integrations
+- [x] 05-01: Implement and validate threadline/mailglass/accrue recipe integrations (verification: 4/7 must-haves; gaps closed below)
+- [ ] 05-02-PLAN.md — Implement optional Accrue billing-document recipe with contract mock (closes Gap 1)
+- [ ] 05-03-PLAN.md — Fix Mailglass attach_pdf/3 contract violations CR-01, CR-02, WR-03 with negative-path tests (closes Gap 3)
+- [ ] 05-04-PLAN.md — Author integration guide and wire into ExDoc + README (closes Gap 2)
 
 ## Progress
 
