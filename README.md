@@ -51,6 +51,17 @@ defmodule MyAppWeb.PDFController do
 end
 ```
 
+## Ecosystem Integrations
+
+Rendro ships optional adapters for `threadline` (audit logging),
+`mailglass` (transactional email attachments), and `accrue` (billing
+recipes). None of them are hard dependencies of Rendro — each adapter is
+compiled only when its target library is present in your application's
+own `mix.exs`.
+
+See [guides/integrations.md](guides/integrations.md) for setup steps,
+verification recipes, and failure-diagnostics reference for each adapter.
+
 ## Policies
 
 Protect your system from expensive render operations:

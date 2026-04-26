@@ -60,7 +60,10 @@ defmodule Rendro.MixProject do
     [
       main: "Rendro",
       source_url: @source_url,
-      extras: ["README.md"]
+      extras: [
+        "README.md",
+        "guides/integrations.md"
+      ]
     ]
   end
 end
