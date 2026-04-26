@@ -96,9 +96,9 @@ Plans:
 
 Plans:
 - [x] 05-01: Implement and validate threadline/mailglass/accrue recipe integrations (verification: 4/7 must-haves; gaps closed below)
-- [ ] 05-02-PLAN.md — Implement optional Accrue billing-document recipe with contract mock (closes Gap 1)
-- [ ] 05-03-PLAN.md — Fix Mailglass attach_pdf/3 contract violations CR-01, CR-02, WR-03 with negative-path tests (closes Gap 3)
-- [ ] 05-04-PLAN.md — Author integration guide and wire into ExDoc + README (closes Gap 2)
+- [x] 05-02-PLAN.md — Implement optional Accrue billing-document recipe with contract mock (closes Gap 1)
+- [x] 05-03-PLAN.md — Fix Mailglass attach_pdf/3 contract violations CR-01, CR-02, WR-03 with negative-path tests (closes Gap 3)
+- [x] 05-04-PLAN.md — Author integration guide and wire into ExDoc + README (closes Gap 2)
 
 ## Progress
 
