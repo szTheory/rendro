@@ -24,10 +24,24 @@ if Code.ensure_loaded?(Mailglass) do
 
     ## Errors
 
-    If rendering fails, `attach_pdf/3` returns `{:error, Rendro.Error.t()}`
-    so that callers can surface the failure or fall back. Rendering is
-    subject to the existing core render policy (max pages/bytes), bounding
-    the size of attachments produced.
+    `attach_pdf/3` never raises — all failure paths return an `{:error, _}` tuple:
+
+      * `{:error, %Rendro.Error{reason: {:invalid_email_target, value}}}` — the first
+        argument is neither a `%Swoosh.Email{}` nor a recognized `Mailglass.*` message
+        struct (i.e. not a `%Mailglass.Message{}` and not a struct whose module name ends
+        in `.Message` and exports `update_swoosh/2`). Callers should guard the input type
+        before calling `attach_pdf/3`.
+
+      * `{:error, {:unrecognized_message_shape, module}}` — the first argument looks like
+        a Mailglass message (passes the `mailglass_message?/1` check) but its struct has
+        neither a `:swoosh` field nor an `:email` field holding a `%Swoosh.Email{}`.
+        Callers using custom `Mailglass.*` wrapper structs must ensure one of those fields
+        is present, or implement `update_swoosh/2`.
+
+      * `{:error, %Rendro.Error{}}` — the document rendering step itself failed (e.g.
+        empty document, max-pages/bytes policy violation, timeout). Rendering is subject
+        to the existing core render policy (max pages/bytes), bounding the size of
+        attachments produced.
     """
 
     @default_filename "document.pdf"
@@ -40,7 +54,9 @@ if Code.ensure_loaded?(Mailglass) do
     rendering fails.
     """
     @spec attach_pdf(term(), Rendro.Document.t(), String.t()) ::
-            term() | {:error, Rendro.Error.t()}
+            term()
+            | {:error, Rendro.Error.t()}
+            | {:error, {:unrecognized_message_shape, atom() | term()}}
     def attach_pdf(email_or_message, document, filename \\ @default_filename)
 
     def attach_pdf(email_or_message, %Rendro.Document{} = document, filename)
@@ -62,8 +78,8 @@ if Code.ensure_loaded?(Mailglass) do
           Swoosh.Email.attachment(email_or_message, attachment)
 
         true ->
-          # Best-effort: assume the value behaves like a Swoosh email.
-          Swoosh.Email.attachment(email_or_message, attachment)
+          {:error,
+           Rendro.Error.from_stage(:render, {:invalid_email_target, email_or_message}, %{})}
       end
     end
 
@@ -74,30 +90,40 @@ if Code.ensure_loaded?(Mailglass) do
       )
     end
 
-    defp mailglass_message?(value) do
-      is_struct(value) and is_mailglass_struct(value)
+    defp mailglass_message?(%Mailglass.Message{}), do: true
+
+    defp mailglass_message?(value) when is_struct(value) do
+      mod = value.__struct__
+
+      mod
+      |> Atom.to_string()
+      |> String.ends_with?(".Message") and
+        function_exported?(mod, :update_swoosh, 2)
     end
 
-    defp is_mailglass_struct(%{__struct__: mod}) do
-      mod_str = Atom.to_string(mod)
-      String.starts_with?(mod_str, "Elixir.Mailglass.")
-    end
-
-    defp is_mailglass_struct(_), do: false
+    defp mailglass_message?(_), do: false
 
     defp swoosh_email?(%Swoosh.Email{}), do: true
     defp swoosh_email?(_), do: false
 
     defp attach_to_mailglass(message, attachment) do
-      swoosh = extract_swoosh(message)
-      updated = Swoosh.Email.attachment(swoosh, attachment)
-      put_swoosh(message, updated)
+      case extract_swoosh(message) do
+        {:ok, swoosh} ->
+          updated = Swoosh.Email.attachment(swoosh, attachment)
+          put_swoosh(message, updated)
+
+        {:error, _} = err ->
+          err
+      end
     end
 
-    defp extract_swoosh(%{swoosh: %Swoosh.Email{} = email}), do: email
-    defp extract_swoosh(%{email: %Swoosh.Email{} = email}), do: email
-    defp extract_swoosh(%Swoosh.Email{} = email), do: email
-    defp extract_swoosh(_), do: %Swoosh.Email{}
+    defp extract_swoosh(%{swoosh: %Swoosh.Email{} = email}), do: {:ok, email}
+    defp extract_swoosh(%{email: %Swoosh.Email{} = email}), do: {:ok, email}
+    defp extract_swoosh(%Swoosh.Email{} = email), do: {:ok, email}
+    defp extract_swoosh(other) when is_struct(other),
+      do: {:error, {:unrecognized_message_shape, other.__struct__}}
+    defp extract_swoosh(other),
+      do: {:error, {:unrecognized_message_shape, other}}
 
     defp put_swoosh(message, swoosh_email) do
       cond do
