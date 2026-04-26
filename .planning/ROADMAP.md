@@ -17,6 +17,12 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Adapter and Ops Integration** - Add optional Phoenix/job adapter patterns with bounded execution and operational metrics.
 - [x] **Phase 4: Quality and Release Hardening** - Implement CI verification contracts, docs truthfulness checks, and release safety gates.
 - [ ] **Phase 5: Early Ecosystem Recipes** - Ship do-now integration recipes without violating core boundary constraints.
+- [ ] **Phase 6: Pipeline Telemetry Contract Fixes** - Restore the spec-stated pipeline stage order and emit the missing `:validate` telemetry event so observability matches OBS-01.
+- [ ] **Phase 7: Phoenix Adapter Hardening + Example Skeleton** - Guard the optional Phoenix adapter, complete the example app, and surface structured error envelopes through HTTP responses.
+- [ ] **Phase 8: Bounded Async + Timeout Telemetry** - Inject policy bounds into the Oban worker and emit `:exception` telemetry on render timeouts so audit handlers see them.
+- [ ] **Phase 9: CI Scheduler + Release Hardening** - Land the CI YAML, expand the `mix ci` lane, fix `mix verify` advisory crash semantics, and harden release preflight tag/dry-run parity.
+- [ ] **Phase 10: Recipe Correctness + Traceability Sync** - Fix Mailglass custom-wrapper dispatch, return typed errors from Accrue, and resync REQUIREMENTS.md ADPT-05 status.
+- [ ] **Phase 11: Reconstruct Phase 1-4 GSD Artifacts** - Map existing tests to requirements and produce evidence-based PLAN/SUMMARY/VERIFICATION for phases 1-4 against the fixed code.
 
 ## Phase Details
 
@@ -99,6 +105,76 @@ Plans:
 - [x] 05-02-PLAN.md — Implement optional Accrue billing-document recipe with contract mock (closes Gap 1)
 - [x] 05-03-PLAN.md — Fix Mailglass attach_pdf/3 contract violations CR-01, CR-02, WR-03 with negative-path tests (closes Gap 3)
 - [x] 05-04-PLAN.md — Author integration guide and wire into ExDoc + README (closes Gap 2)
+
+### Phase 6: Pipeline Telemetry Contract Fixes
+**Goal**: Bring the rendering pipeline back into agreement with REQUIREMENTS.md OBS-01 — emit the missing `:validate` telemetry event, restore spec-stated stage order (build → compose → measure → paginate → render → validate), and stop dropping page/byte metrics on the error path.
+**Depends on**: None (independent of other gap-closure phases)
+**Requirements**: [OBS-01, OBS-02, CORE-01]
+**Gap Closure**: Closes BLOCKER-04, BLOCKER-05, MINOR-15 from `.planning/v1.0-MILESTONE-AUDIT.md`
+**Success Criteria** (what must be TRUE):
+  1. Pipeline emits `[:rendro, :stage, :start|:stop|:exception]` for `:validate` in addition to existing five stages.
+  2. Stage execution order matches REQUIREMENTS.md spec (compose precedes measure).
+  3. Stage stop metadata preserves `page_count` and `byte_size` from `doc.pages` even on the error path.
+**Plans**: 1 plan (to be planned via `/gsd-plan-phase 6`)
+
+### Phase 7: Phoenix Adapter Hardening + Example Skeleton
+**Goal**: Make the optional Phoenix adapter actually optional and the example app actually compilable, while surfacing structured `%Rendro.Error{}` envelopes through HTTP responses instead of leaking raw atoms.
+**Depends on**: None (independent of other gap-closure phases)
+**Requirements**: [ADPT-01, ADPT-02, ADPT-03, OBS-03, QUAL-03]
+**Gap Closure**: Closes BLOCKER-01, BLOCKER-02, MAJOR-11; restores Phoenix download/preview flows
+**Success Criteria** (what must be TRUE):
+  1. `lib/rendro/adapters/phoenix.ex` compiles and behaves correctly when `:plug` is absent (guarded by `Code.ensure_loaded?`).
+  2. `examples/phoenix_example/` boots end-to-end (Application, Endpoint, Router, Web, config) and renders a download response.
+  3. Error responses from the Phoenix adapter render the structured `%Rendro.Error{}` envelope (what/where/why/next), not `inspect(reason)`.
+**Plans**: 1 plan (to be planned via `/gsd-plan-phase 7`)
+
+### Phase 8: Bounded Async + Timeout Telemetry
+**Goal**: Make `Rendro.Adapters.Oban.RenderWorker` enforce render policy bounds and make the pipeline timeout path emit `:exception` telemetry so Threadline-style audit handlers can observe timeouts.
+**Depends on**: Phase 6 (uses telemetry contract)
+**Requirements**: [ADPT-04, ADPT-05, OBS-02, OBS-04]
+**Gap Closure**: Closes MAJOR-07, MAJOR-10; restores Threadline timeout audit flow
+**Success Criteria** (what must be TRUE):
+  1. Oban RenderWorker injects `max_pages`/`max_bytes`/`timeout` from job args into the document policy and has dedicated test coverage.
+  2. `Pipeline.run/1` timeout path emits `[:rendro, :stage, :exception]` (or equivalent) before returning `{:error, :timeout}`.
+  3. Threadline integration test (or equivalent) observes the timeout exception and records the audit entry.
+**Plans**: 1 plan (to be planned via `/gsd-plan-phase 8`)
+
+### Phase 9: CI Scheduler + Release Hardening
+**Goal**: Land an actual CI scheduler that runs `mix ci`, expand `mix ci` to match the QUAL-01 contract (format, compile, tests, docs, hex.build), fix `mix verify`'s advisory MatchError crash, fix `verify_docs.exs` `...` skip, and tighten `release.preflight` to enforce git-tag parity and a publish dry-run.
+**Depends on**: Phase 7 (Phoenix example app required for `mix verify` to pass)
+**Requirements**: [QUAL-01, QUAL-02, QUAL-03, QUAL-04, QUAL-05]
+**Gap Closure**: Closes BLOCKER-03, MAJOR-09, MAJOR-12, MAJOR-13, MINOR-14
+**Success Criteria** (what must be TRUE):
+  1. `.github/workflows/` (or equivalent) runs `mix ci` on every PR and merge to main.
+  2. `mix ci` includes `format --check-formatted`, `docs`, and `hex.build` in addition to compile/test/credo/dialyzer.
+  3. `mix verify` advisory lane returns a non-zero exit but does not crash with `MatchError`; example dir gets `mix deps.get` first.
+  4. `release.preflight` fails on tag/version mismatch and runs `mix hex.publish --dry-run`.
+  5. `verify_docs.exs` exercises code blocks containing `...` (or warns rather than silently skipping).
+**Plans**: 1 plan (to be planned via `/gsd-plan-phase 9`)
+
+### Phase 10: Recipe Correctness + Traceability Sync
+**Goal**: Fix the remaining Phase 5 recipe defects (Mailglass custom-wrapper dispatch, Accrue line-item discipline, Accrue date sigil leak) and resync REQUIREMENTS.md ADPT-05 status with 05-VERIFICATION.md so the traceability table tells the truth.
+**Depends on**: None (independent of other gap-closure phases)
+**Requirements**: [ADPT-05, QUAL-04]
+**Gap Closure**: Closes BLOCKER-06, REVIEW CR-01, REVIEW WR-06, REVIEW IN-04; resolves Mailglass custom-wrapper human-test path
+**Success Criteria** (what must be TRUE):
+  1. `Rendro.Adapters.Mailglass.put_swoosh/2` dispatches custom wrapper structs (any module ending in `.Message` exporting `update_swoosh/2`) without `FunctionClauseError`.
+  2. `Rendro.Adapters.Accrue.recipe/1` returns `{:error, {:invalid_invoice, _}}` on non-`%LineItem{}` entries instead of raising.
+  3. Accrue invoice does not render `~D[...]` sigil syntax for `issued_at` (uses `Date.to_iso8601/1` or equivalent).
+  4. REQUIREMENTS.md ADPT-05 row reads `[x]` / Done, matching `05-VERIFICATION.md`.
+**Plans**: 1 plan (to be planned via `/gsd-plan-phase 10`)
+
+### Phase 11: Reconstruct Phase 1-4 GSD Artifacts
+**Goal**: Produce evidence-based PLAN.md, SUMMARY.md, and VERIFICATION.md for Phases 1, 2, 3, and 4 by mapping the existing source tree and test suite to each requirement, so all 23 currently-orphaned requirements have formal verification trails.
+**Depends on**: Phases 6, 7, 8, 9, 10 (verifies against the fixed code)
+**Requirements**: [CORE-01, CORE-02, CORE-03, CORE-04, CORE-05, LAY-01, LAY-02, LAY-03, LAY-04, LAY-05, ADPT-01, ADPT-02, ADPT-03, ADPT-04, OBS-01, OBS-02, OBS-03, OBS-04, QUAL-01, QUAL-02, QUAL-03, QUAL-04, QUAL-05]
+**Gap Closure**: Closes the formal-orphan status of all 23 requirements claimed Done by Phases 1-4 in REQUIREMENTS.md but unbacked by GSD artifacts
+**Success Criteria** (what must be TRUE):
+  1. `.planning/phases/01-core-deterministic-foundation/` has a reconstructed PLAN.md, SUMMARY.md, and VERIFICATION.md that map each Phase 1 requirement to specific source files and tests.
+  2. New `.planning/phases/02-layout-and-pagination-engine/`, `.planning/phases/03-adapter-and-ops-integration/`, `.planning/phases/04-quality-and-release-hardening/` directories exist with the same triad of artifacts.
+  3. Each VERIFICATION.md scores must-haves against the live test suite (not against intent statements).
+  4. REQUIREMENTS.md traceability statuses for Phases 1-4 reflect verified evidence, not documentation drift.
+**Plans**: 1 plan (to be planned via `/gsd-plan-phase 11`)
 
 ## Progress
 
