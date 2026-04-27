@@ -23,6 +23,7 @@ defmodule PhoenixExample.MixProject do
       {:phoenix, "~> 1.7"},
       {:plug, "~> 1.14"},
       {:bandit, "~> 1.0"},
+      {:jason, "~> 1.2"},
       {:rendro, path: "../.."}
     ]
   end

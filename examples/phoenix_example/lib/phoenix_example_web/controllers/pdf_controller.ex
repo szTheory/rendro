@@ -1,5 +1,5 @@
 defmodule PhoenixExampleWeb.PDFController do
-  use Phoenix.Controller, formats: [:html, :json]
+  use PhoenixExampleWeb, :controller
   alias Rendro.Adapters.Phoenix, as: RendroPhoenix
 
   def download(conn, _params) do
