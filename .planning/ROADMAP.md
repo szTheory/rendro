@@ -118,9 +118,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Telemetry plumbing: add :validate to stage_names, unify stage_stop_meta (D-11..D-14), update build_stop_meta (D-16), add Rendro.Error :validate clauses (D-09); closes MINOR-15
-- [ ] 06-02-PLAN.md — Create Rendro.Pipeline.Validate stage module + wire into with-chain after :render; absorb max_bytes; CHANGELOG.md (D-18); closes BLOCKER-04
-- [ ] 06-03-PLAN.md — Restore canonical stage order (compose before measure); move normalize_row → Compose, y-stacking → Paginate (D-02..D-04); D-04 page-2 regression; D-20 Threadline verification; closes BLOCKER-05
+- [x] 06-01-PLAN.md — Telemetry plumbing: add :validate to stage_names, unify stage_stop_meta (D-11..D-14), update build_stop_meta (D-16), add Rendro.Error :validate clauses (D-09); closes MINOR-15
+- [x] 06-02-PLAN.md — Create Rendro.Pipeline.Validate stage module + wire into with-chain after :render; absorb max_bytes; CHANGELOG.md (D-18); closes BLOCKER-04
+- [x] 06-03-PLAN.md — Restore canonical stage order (compose before measure); move normalize_row → Compose, y-stacking → Paginate (D-02..D-04); D-04 page-2 regression; D-20 Threadline verification; closes BLOCKER-05
 
 ### Phase 7: Phoenix Adapter Hardening + Example Skeleton
 **Goal**: Make the optional Phoenix adapter actually optional and the example app actually compilable, while surfacing structured `%Rendro.Error{}` envelopes through HTTP responses instead of leaking raw atoms.
