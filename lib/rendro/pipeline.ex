@@ -2,17 +2,16 @@ defmodule Rendro.Pipeline do
   @moduledoc """
   Orchestrates the render pipeline: build -> compose -> measure -> paginate -> render -> validate.
 
-  NOTE: The current `run_stages/3` implementation has compose and measure
-  inverted vs the canonical contract. The `:validate` stage is wired in;
-  the compose<->measure swap lands in Phase 6 Plan 03 alongside the
-  responsibility shuffle (see CHANGELOG.md).
-
   Each stage returns `{:ok, result} | {:error, reason}`. The pipeline halts
   on the first error and returns it to the caller.
 
   All stages are instrumented with `:telemetry.span/3`. A top-level
   `[:rendro, :render]` span wraps the full pipeline, and each stage emits
   `[:rendro, :pipeline, :stage_name]` events.
+
+  The `:max_pages` policy guard runs after `:paginate` and before `:render`
+  (page count is final after pagination); the `:max_bytes` policy guard
+  runs inside the `:validate` stage (output size is only knowable post-render).
   """
 
   alias Rendro.Error
@@ -77,10 +76,10 @@ defmodule Rendro.Pipeline do
 
   defp run_stages(doc, base_meta, policies) do
     with {:ok, doc} <- span(:build, base_meta, fn -> Build.run(doc) end, doc),
+         {:ok, doc} <- span(:compose, base_meta, fn -> Compose.run(doc) end, doc),
          {:ok, doc} <- span(:measure, base_meta, fn -> Measure.run(doc) end, doc),
          {:ok, doc} <- span(:paginate, base_meta, fn -> Paginate.run(doc) end, doc),
          :ok <- validate_policy(:pages, doc, policies, base_meta),
-         {:ok, doc} <- span(:compose, base_meta, fn -> Compose.run(doc) end, doc),
          {:ok, pdf_binary} <- span(:render, base_meta, fn -> Render.run(doc) end, doc),
          {:ok, pdf_binary} <-
            span(:validate, base_meta, fn -> Validate.run(pdf_binary, doc) end, doc) do
