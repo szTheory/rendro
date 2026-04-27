@@ -79,4 +79,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-26 after Phase 05 (Early Ecosystem Recipes) completion — optional `threadline`, `mailglass`, and `accrue` recipes shipped with verification guidance and failure diagnostics; `ADPT-05` satisfied; no hard ecosystem deps in `mix.exs`.*
+*Last updated: 2026-04-27 after Phase 06 (Pipeline Telemetry Contract Fixes) completion — canonical stage order restored (`build → compose → measure → paginate → render → validate`), `:validate` telemetry event now emitted, error-path stop metadata preserves `page_count`/`byte_size`; closes BLOCKER-04, BLOCKER-05, MINOR-15 against `OBS-01`/`OBS-02`/`CORE-01`.*
