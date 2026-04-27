@@ -134,7 +134,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 07-01-PLAN.md — Harden Phoenix adapter and Example Skeleton
+- [x] 07-01-PLAN.md — Harden Phoenix adapter and Example Skeleton
 
 ### Phase 8: Bounded Async + Timeout Telemetry
 **Goal**: Make `Rendro.Adapters.Oban.RenderWorker` enforce render policy bounds and make the pipeline timeout path emit `:exception` telemetry so Threadline-style audit handlers can observe timeouts.
@@ -145,7 +145,10 @@ Plans:
   1. Oban RenderWorker injects `max_pages`/`max_bytes`/`timeout` from job args into the document policy and has dedicated test coverage.
   2. `Pipeline.run/1` timeout path emits `[:rendro, :stage, :exception]` (or equivalent) before returning `{:error, :timeout}`.
   3. Threadline integration test (or equivalent) observes the timeout exception and records the audit entry.
-**Plans**: 1 plan (to be planned via `/gsd-plan-phase 8`)
+**Plans**: 1 plan
+
+Plans:
+- [ ] 08-01-PLAN.md — Inject render policy bounds into Oban RenderWorker and emit telemetry exception on timeout
 
 ### Phase 9: CI Scheduler + Release Hardening
 **Goal**: Land an actual CI scheduler that runs `mix ci`, expand `mix ci` to match the QUAL-01 contract (format, compile, tests, docs, hex.build), fix `mix verify`'s advisory MatchError crash, fix `verify_docs.exs` `...` skip, and tighten `release.preflight` to enforce git-tag parity and a publish dry-run.
