@@ -1,6 +1,6 @@
 defmodule Rendro.Pipeline do
   @moduledoc """
-  Orchestrates the render pipeline: build -> measure -> paginate -> compose -> render.
+  Orchestrates the render pipeline: build -> compose -> measure -> paginate -> render -> validate.
 
   Each stage returns `{:ok, result} | {:error, reason}`. The pipeline halts
   on the first error and returns it to the caller.
@@ -48,13 +48,25 @@ defmodule Rendro.Pipeline do
       {:ok, pdf_binary} ->
         %{
           render_id: base_meta.render_id,
+          document_type: base_meta.document_type,
+          deterministic: base_meta.deterministic,
+          stage: :render,
           status: :ok,
           page_count: length(doc.pages),
           byte_size: byte_size(pdf_binary)
         }
 
-      {:error, _error} ->
-        %{render_id: base_meta.render_id, status: :error, page_count: 0, byte_size: 0}
+      {:error, %Error{} = error} ->
+        %{
+          render_id: base_meta.render_id,
+          document_type: base_meta.document_type,
+          deterministic: base_meta.deterministic,
+          stage: error.stage,
+          status: :error,
+          page_count: length(doc.pages),
+          byte_size: 0,
+          error: %{kind: error.reason, stage: error.stage}
+        }
     end
   end
 
@@ -90,39 +102,49 @@ defmodule Rendro.Pipeline do
     end
   end
 
-  defp span(stage, base_meta, fun, doc) do
-    meta = Map.put(base_meta, :stage, stage)
+  defp span(stage, base_meta, fun, last_doc) do
+    start_meta = Map.put(base_meta, :stage, stage)
 
-    :telemetry.span([:rendro, :pipeline, stage], meta, fn ->
+    :telemetry.span([:rendro, :pipeline, stage], start_meta, fn ->
       case fun.() do
         {:ok, result} ->
-          stop_meta =
-            stage_stop_meta(stage, result, doc)
-            |> Map.put(:render_id, base_meta.render_id)
-
-          {{:ok, result}, stop_meta}
+          {{:ok, result}, stage_stop_meta(stage, :ok, result, last_doc, base_meta)}
 
         {:error, %Error{} = error} ->
-          stop_meta = %{render_id: base_meta.render_id, status: :error, page_count: 0, byte_size: 0}
-          {{:error, error}, stop_meta}
+          {{:error, error}, stage_stop_meta(stage, {:error, error}, nil, last_doc, base_meta)}
 
         {:error, reason} ->
           error = Error.from_stage(stage, reason, base_meta)
-          stop_meta = %{render_id: base_meta.render_id, status: :error, page_count: 0, byte_size: 0}
-          {{:error, error}, stop_meta}
+          {{:error, error}, stage_stop_meta(stage, {:error, error}, nil, last_doc, base_meta)}
       end
     end)
   end
 
-  defp stage_stop_meta(:render, pdf_binary, %Rendro.Document{pages: pages}) when is_binary(pdf_binary) do
-    %{status: :ok, page_count: length(pages), byte_size: byte_size(pdf_binary)}
+  defp stage_stop_meta(stage, status_or_error, result, last_doc, base_meta) do
+    page_count = derive_page_count(result, last_doc)
+    byte_size = derive_byte_size(stage, result)
+
+    base = %{
+      render_id: base_meta.render_id,
+      document_type: base_meta.document_type,
+      deterministic: base_meta.deterministic,
+      stage: stage,
+      status: if(status_or_error == :ok, do: :ok, else: :error),
+      page_count: page_count,
+      byte_size: byte_size
+    }
+
+    case status_or_error do
+      :ok -> base
+      {:error, %Error{} = e} -> Map.put(base, :error, %{kind: e.reason, stage: e.stage})
+    end
   end
 
-  defp stage_stop_meta(_stage, %Rendro.Document{pages: pages}, _doc) do
-    %{status: :ok, page_count: length(pages), byte_size: 0}
-  end
+  defp derive_page_count(%Rendro.Document{pages: pages}, _last), do: length(pages)
+  defp derive_page_count(_result, %Rendro.Document{pages: pages}), do: length(pages)
+  defp derive_page_count(_result, _last), do: 0
 
-  defp stage_stop_meta(_stage, _result, _doc) do
-    %{status: :ok, page_count: 0, byte_size: 0}
-  end
+  defp derive_byte_size(:render, pdf) when is_binary(pdf), do: byte_size(pdf)
+  defp derive_byte_size(:validate, pdf) when is_binary(pdf), do: byte_size(pdf)
+  defp derive_byte_size(_stage, _result), do: 0
 end
