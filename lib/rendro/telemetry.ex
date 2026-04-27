@@ -23,7 +23,7 @@ defmodule Rendro.Telemetry do
       %{kind: atom(), reason: term(), stacktrace: list()}
   """
 
-  @stage_names [:build, :compose, :measure, :paginate, :render]
+  @stage_names [:build, :compose, :measure, :paginate, :render, :validate]
 
   @event_prefixes Enum.map(@stage_names, &[:rendro, :pipeline, &1])
 

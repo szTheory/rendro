@@ -9,6 +9,10 @@ defmodule Rendro.TelemetryTest do
     :ok
   end
 
+  # Tagged-pending tests:
+  #   :pending_full_pipeline   — removed by Plan 03 once :validate emission + stage reorder ship
+  #   :pending_unified_schema  — removed by Plan 01 Task 2 once stage_stop_meta is unified
+
   defp sample_document do
     text = %Rendro.Text{content: "Hello!", font: "Helvetica", size: 12, color: {0, 0, 0}}
     block = %Rendro.Block{content: text, x: 10, y: 20}
@@ -38,11 +42,12 @@ defmodule Rendro.TelemetryTest do
   end
 
   describe "successful render emits start+stop for all stages" do
-    test "all 5 pipeline stages emit start and stop events" do
+    @tag :pending_full_pipeline
+    test "all 6 pipeline stages emit start and stop events" do
       {:ok, _pdf} = Rendro.Pipeline.run(sample_document())
       events = TelemetryHelper.collect_events()
 
-      for stage <- [:build, :measure, :paginate, :compose, :render] do
+      for stage <- [:build, :compose, :measure, :paginate, :render, :validate] do
         starts = stage_events(events, stage, :start)
         stops = stage_events(events, stage, :stop)
         assert starts != [], "expected 1 start event for #{stage}, got 0"
@@ -60,7 +65,8 @@ defmodule Rendro.TelemetryTest do
       assert length(stops) == 1
     end
 
-    test "total event count: 5 stages + 1 top-level = 12 (6 start + 6 stop)" do
+    @tag :pending_full_pipeline
+    test "total event count: 6 stages + 1 top-level = 14 (7 start + 7 stop)" do
       {:ok, _pdf} = Rendro.Pipeline.run(sample_document())
       events = TelemetryHelper.collect_events()
 
@@ -68,8 +74,8 @@ defmodule Rendro.TelemetryTest do
       stop_events = events_by_suffix(events, :stop)
       exception_events = events_by_suffix(events, :exception)
 
-      assert length(start_events) == 6
-      assert length(stop_events) == 6
+      assert length(start_events) == 7
+      assert length(stop_events) == 7
       assert exception_events == []
     end
   end
@@ -195,11 +201,12 @@ defmodule Rendro.TelemetryTest do
       end
     end
 
+    @tag :pending_full_pipeline
     test "each stage start event has the correct stage name" do
       {:ok, _pdf} = Rendro.Pipeline.run(sample_document())
       events = TelemetryHelper.collect_events()
 
-      for stage <- [:build, :measure, :paginate, :compose, :render] do
+      for stage <- [:build, :compose, :measure, :paginate, :render, :validate] do
         [start] = stage_events(events, stage, :start)
         {_event, _measurements, meta} = start
         assert meta.stage == stage
@@ -253,11 +260,12 @@ defmodule Rendro.TelemetryTest do
       assert meta.status == :error
     end
 
+    @tag :pending_full_pipeline
     test "stages after the failed stage do not emit events" do
       assert {:error, %Rendro.Error{reason: :no_pages}} = Rendro.Pipeline.run(failing_document())
       events = TelemetryHelper.collect_events()
 
-      for stage <- [:compose, :measure, :paginate, :render] do
+      for stage <- [:compose, :measure, :paginate, :render, :validate] do
         starts = stage_events(events, stage, :start)
         assert starts == [], "#{stage} should not have started after build failure"
       end
@@ -305,6 +313,7 @@ defmodule Rendro.TelemetryTest do
   end
 
   describe "event ordering" do
+    @tag :pending_full_pipeline
     test "events fire in pipeline stage order" do
       {:ok, _pdf} = Rendro.Pipeline.run(sample_document())
       events = TelemetryHelper.collect_events()
@@ -316,7 +325,7 @@ defmodule Rendro.TelemetryTest do
         end)
         |> Enum.map(fn {[:rendro, :pipeline, stage, :start], _m, _meta} -> stage end)
 
-      assert stage_starts == [:build, :measure, :paginate, :compose, :render]
+      assert stage_starts == [:build, :compose, :measure, :paginate, :render, :validate]
     end
 
     test "top-level render start fires before all stage starts" do
@@ -347,17 +356,93 @@ defmodule Rendro.TelemetryTest do
       assert render_stop_idx > last_stage_stop_idx
     end
 
+    @tag :pending_full_pipeline
     test "each stage start fires before its stop" do
       {:ok, _pdf} = Rendro.Pipeline.run(sample_document())
       events = TelemetryHelper.collect_events()
 
       event_names = Enum.map(events, fn {event, _m, _meta} -> event end)
 
-      for stage <- [:build, :measure, :paginate, :compose, :render] do
+      for stage <- [:build, :compose, :measure, :paginate, :render, :validate] do
         start_idx = Enum.find_index(event_names, &(&1 == [:rendro, :pipeline, stage, :start]))
         stop_idx = Enum.find_index(event_names, &(&1 == [:rendro, :pipeline, stage, :stop]))
         assert start_idx < stop_idx, "#{stage} start should fire before stop"
       end
+    end
+  end
+
+  describe "stage_names contract (Phase 6 OBS-01)" do
+    test "Rendro.Telemetry.stage_names/0 includes :validate in spec order" do
+      assert Rendro.Telemetry.stage_names() ==
+               [:build, :compose, :measure, :paginate, :render, :validate]
+    end
+
+    test "Rendro.Telemetry.all_event_names/0 includes :validate event names" do
+      names = Rendro.Telemetry.all_event_names()
+      assert [:rendro, :pipeline, :validate, :start] in names
+      assert [:rendro, :pipeline, :validate, :stop] in names
+      assert [:rendro, :pipeline, :validate, :exception] in names
+    end
+  end
+
+  describe "unified stop_meta schema (Phase 6 D-11)" do
+    test "all stop events carry full D-11 schema (render_id, document_type, deterministic, stage, status, page_count, byte_size)" do
+      {:ok, _pdf} = Rendro.Pipeline.run(sample_document())
+      events = TelemetryHelper.collect_events()
+
+      stop_events = events_by_suffix(events, :stop)
+      assert stop_events != []
+
+      expected_keys = [
+        :render_id,
+        :document_type,
+        :deterministic,
+        :stage,
+        :status,
+        :page_count,
+        :byte_size
+      ]
+
+      for {_event, _measurements, meta} <- stop_events do
+        for key <- expected_keys do
+          assert Map.has_key?(meta, key),
+                 "stop event missing key #{inspect(key)}: #{inspect(meta)}"
+        end
+      end
+    end
+
+    test "error-path stop_meta carries page_count from doc.pages, not 0 (MINOR-15 regression)" do
+      # 1-page doc forced to fail at :validate by setting impossible max_bytes.
+      # NOTE: until Plan 02 lands the :validate stage, this fails on the OLD
+      # max_bytes path which is attributed to :render. Tagged pending until
+      # Plan 02 ships.
+      doc = sample_document() |> put_in([Access.key(:options), :policies], max_bytes: 1)
+
+      assert {:error, %Rendro.Error{reason: :max_bytes_exceeded}} = Rendro.Pipeline.run(doc)
+      events = TelemetryHelper.collect_events()
+
+      # Find any failing stage stop and assert page_count is the doc's true page count.
+      error_stops =
+        events
+        |> events_by_suffix(:stop)
+        |> Enum.filter(fn {_e, _m, meta} -> meta.status == :error end)
+
+      assert error_stops != []
+
+      for {_e, _m, meta} <- error_stops do
+        assert meta.page_count == 1,
+               "expected page_count: 1 (length(doc.pages)) but got #{inspect(meta.page_count)} on stop meta #{inspect(meta)}"
+      end
+    end
+
+    test "error-path stop_meta includes :error map with kind and stage (D-14)" do
+      assert {:error, %Rendro.Error{}} = Rendro.Pipeline.run(failing_document())
+      events = TelemetryHelper.collect_events()
+
+      [build_stop] = stage_events(events, :build, :stop)
+      {_event, _measurements, meta} = build_stop
+      assert meta.status == :error
+      assert %{kind: :no_pages, stage: :build} = meta.error
     end
   end
 end

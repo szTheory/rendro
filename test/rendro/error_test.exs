@@ -25,4 +25,33 @@ defmodule Rendro.ErrorTest do
     assert error.reason == :no_pages
     assert is_binary(error.render_id)
   end
+
+  describe "from_stage/3 with stage :validate (Phase 6 D-09)" do
+    test ":structural_corruption emits the structural-bug guidance" do
+      err = Rendro.Error.from_stage(:validate, :structural_corruption, %{})
+      assert err.stage == :validate
+      assert err.reason == :structural_corruption
+      assert err.where == "Rendro.Pipeline.Validate"
+      assert err.what == "Post-render validation failed."
+      assert err.next =~ "PDF header/trailer missing"
+    end
+
+    test ":page_count_mismatch emits the pipeline-bug guidance" do
+      err = Rendro.Error.from_stage(:validate, :page_count_mismatch, %{})
+      assert err.stage == :validate
+      assert err.what == "Post-render validation failed."
+      assert err.next =~ "Rendered page count diverged"
+    end
+
+    test ":max_bytes_exceeded emits the policy guidance" do
+      err = Rendro.Error.from_stage(:validate, :max_bytes_exceeded, %{})
+      assert err.stage == :validate
+      assert err.next =~ ":max_bytes policy limit"
+    end
+
+    test ":validate stage where field uses Macro.camelize" do
+      err = Rendro.Error.from_stage(:validate, :structural_corruption)
+      assert err.where == "Rendro.Pipeline.Validate"
+    end
+  end
 end
