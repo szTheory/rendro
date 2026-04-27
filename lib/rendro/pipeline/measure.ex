@@ -2,7 +2,11 @@ defmodule Rendro.Pipeline.Measure do
   @moduledoc """
   Calculates dimensions for blocks that don't have explicit sizes.
 
-  Uses font metrics to compute text width and derives height from font size.
+  Operates on the normalized tree from `Rendro.Pipeline.Compose` — every
+  table row already contains `%Rendro.Block{}` entries. Measure fills
+  missing widths via font metrics and missing heights from font size.
+  Idempotent: running twice on the same input yields the same result
+  (each `block.width || ...` keeps user-supplied values).
   """
 
   alias Rendro.PDF.Font
@@ -41,13 +45,9 @@ defmodule Rendro.Pipeline.Measure do
     rows_h = length(table.rows) * row_height
     height = header_h + rows_h
 
-    # Normalize rows to blocks
-    normalized_header = if table.header, do: normalize_row(table.header), else: nil
-    normalized_rows = Enum.map(table.rows, &normalize_row/1)
-
-    # Measure row cells
-    measured_header = if normalized_header, do: measure_row(normalized_header, font), else: nil
-    measured_rows = Enum.map(normalized_rows, &measure_row(&1, font))
+    # Rows are already normalized into %Rendro.Block{} entries by Compose (D-02/D-03).
+    measured_header = if table.header, do: measure_row(table.header, font), else: nil
+    measured_rows = Enum.map(table.rows, &measure_row(&1, font))
 
     table = %{table | header: measured_header, rows: measured_rows}
     %{block | content: table, width: 500, height: height}
@@ -60,14 +60,6 @@ defmodule Rendro.Pipeline.Measure do
   end
 
   defp measure_block(block, _font), do: block
-
-  defp normalize_row(row) do
-    Enum.map(row, fn
-      %Rendro.Block{} = b -> b
-      content when is_binary(content) -> Rendro.block(Rendro.text(content))
-      other -> Rendro.block(other)
-    end)
-  end
 
   defp measure_row(row, font) do
     Enum.map(row, &measure_block(&1, font))
