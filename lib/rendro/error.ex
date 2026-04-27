@@ -105,3 +105,17 @@ defmodule Rendro.Error do
     |> Macro.camelize()
   end
 end
+
+defimpl String.Chars, for: Rendro.Error do
+  def to_string(error) do
+    """
+    Rendro Error in #{error.stage} stage:
+
+    What:  #{error.what}
+    Where: #{error.where}
+    Why:   #{error.why}
+
+    Next:  #{error.next}
+    """
+  end
+end
