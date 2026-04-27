@@ -131,7 +131,10 @@ Plans:
   1. `lib/rendro/adapters/phoenix.ex` compiles and behaves correctly when `:plug` is absent (guarded by `Code.ensure_loaded?`).
   2. `examples/phoenix_example/` boots end-to-end (Application, Endpoint, Router, Web, config) and renders a download response.
   3. Error responses from the Phoenix adapter render the structured `%Rendro.Error{}` envelope (what/where/why/next), not `inspect(reason)`.
-**Plans**: 1 plan (to be planned via `/gsd-plan-phase 7`)
+**Plans**: 1 plan
+
+Plans:
+- [ ] 07-01-PLAN.md — Harden Phoenix adapter and Example Skeleton
 
 ### Phase 8: Bounded Async + Timeout Telemetry
 **Goal**: Make `Rendro.Adapters.Oban.RenderWorker` enforce render policy bounds and make the pipeline timeout path emit `:exception` telemetry so Threadline-style audit handlers can observe timeouts.
