@@ -369,6 +369,42 @@ defmodule Rendro.TelemetryTest do
         assert start_idx < stop_idx, "#{stage} start should fire before stop"
       end
     end
+
+    test ":validate stop event fires after :render stop" do
+      {:ok, _pdf} = Rendro.Pipeline.run(sample_document())
+      events = TelemetryHelper.collect_events()
+
+      event_names = Enum.map(events, fn {event, _m, _meta} -> event end)
+
+      render_stop_idx =
+        Enum.find_index(event_names, &(&1 == [:rendro, :pipeline, :render, :stop]))
+
+      validate_stop_idx =
+        Enum.find_index(event_names, &(&1 == [:rendro, :pipeline, :validate, :stop]))
+
+      assert render_stop_idx != nil, "render stop event missing"
+      assert validate_stop_idx != nil, "validate stop event missing"
+
+      assert validate_stop_idx > render_stop_idx,
+             "expected :validate :stop after :render :stop"
+    end
+
+    test ":validate start event fires after :render stop" do
+      {:ok, _pdf} = Rendro.Pipeline.run(sample_document())
+      events = TelemetryHelper.collect_events()
+
+      event_names = Enum.map(events, fn {event, _m, _meta} -> event end)
+
+      render_stop_idx =
+        Enum.find_index(event_names, &(&1 == [:rendro, :pipeline, :render, :stop]))
+
+      validate_start_idx =
+        Enum.find_index(event_names, &(&1 == [:rendro, :pipeline, :validate, :start]))
+
+      assert render_stop_idx != nil
+      assert validate_start_idx != nil
+      assert validate_start_idx > render_stop_idx
+    end
   end
 
   describe "stage_names contract (Phase 6 OBS-01)" do
