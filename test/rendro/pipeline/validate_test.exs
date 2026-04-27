@@ -84,6 +84,24 @@ defmodule Rendro.Pipeline.ValidateTest do
       doc = sample_document()
       assert {:error, :page_count_mismatch} = Validate.run(fake_pdf, doc)
     end
+
+    test "succeeds when deterministic-mode writer sorts /Count before /Type /Pages" do
+      # In deterministic mode the writer alphabetizes dict keys, so the rendered
+      # binary has the form "<<\n/Count 1\n/Kids [...]\n/Type /Pages\n>>".
+      # The reverse-order regex must catch this — same object, different layout.
+      doc = sample_document()
+      doc = %{doc | options: %{render: [deterministic: true]}}
+      {pdf, doc} = render_through_full_pipeline(doc)
+
+      # Sanity: confirm the binary actually has the reversed order.
+      {count_pos, _} = :binary.match(pdf, "/Count")
+      {pages_pos, _} = :binary.match(pdf, "/Type /Pages")
+
+      assert count_pos < pages_pos,
+             "fixture invariant: deterministic mode should sort /Count before /Type"
+
+      assert {:ok, ^pdf} = Validate.run(pdf, doc)
+    end
   end
 
   describe "run/2 — :max_bytes_exceeded" do

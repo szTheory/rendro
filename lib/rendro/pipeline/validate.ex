@@ -45,9 +45,30 @@ defmodule Rendro.Pipeline.Validate do
   end
 
   defp parse_page_count(pdf_binary) do
+    # PDF dict entries can appear in any order; in deterministic mode the writer
+    # sorts keys alphabetically (so /Count precedes /Type). Try both orderings
+    # within the same enclosing object before declaring a mismatch.
+    cond do
+      result = match_count_after_pages(pdf_binary) -> result
+      result = match_count_before_pages(pdf_binary) -> result
+      true -> 0
+    end
+  end
+
+  defp match_count_after_pages(pdf_binary) do
     case Regex.run(~r{/Type\s+/Pages.*?/Count\s+(\d+)}s, pdf_binary, capture: :all_but_first) do
       [n] -> String.to_integer(n)
-      _ -> 0
+      _ -> nil
+    end
+  end
+
+  defp match_count_before_pages(pdf_binary) do
+    # Capture /Count N followed (within the same object dict, so before the next ">>")
+    # by /Type /Pages. The negated set [^>] keeps the lazy traversal bounded to one
+    # dict body — adversarial input with no ">>" cannot expand the match window.
+    case Regex.run(~r{/Count\s+(\d+)[^>]*?/Type\s+/Pages}s, pdf_binary, capture: :all_but_first) do
+      [n] -> String.to_integer(n)
+      _ -> nil
     end
   end
 

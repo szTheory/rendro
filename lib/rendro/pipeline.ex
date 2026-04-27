@@ -2,6 +2,11 @@ defmodule Rendro.Pipeline do
   @moduledoc """
   Orchestrates the render pipeline: build -> compose -> measure -> paginate -> render -> validate.
 
+  NOTE: The current `run_stages/3` implementation has compose and measure
+  inverted vs the canonical contract. The `:validate` stage is wired in;
+  the compose<->measure swap lands in Phase 6 Plan 03 alongside the
+  responsibility shuffle (see CHANGELOG.md).
+
   Each stage returns `{:ok, result} | {:error, reason}`. The pipeline halts
   on the first error and returns it to the caller.
 
@@ -11,7 +16,7 @@ defmodule Rendro.Pipeline do
   """
 
   alias Rendro.Error
-  alias Rendro.Pipeline.{Build, Compose, Measure, Paginate, Render}
+  alias Rendro.Pipeline.{Build, Compose, Measure, Paginate, Render, Validate}
 
   @spec run(Rendro.Document.t()) :: {:ok, binary()} | {:error, Rendro.Error.t()}
   def run(%Rendro.Document{} = doc) do
@@ -77,7 +82,8 @@ defmodule Rendro.Pipeline do
          :ok <- validate_policy(:pages, doc, policies, base_meta),
          {:ok, doc} <- span(:compose, base_meta, fn -> Compose.run(doc) end, doc),
          {:ok, pdf_binary} <- span(:render, base_meta, fn -> Render.run(doc) end, doc),
-         :ok <- validate_policy(:bytes, pdf_binary, policies, base_meta) do
+         {:ok, pdf_binary} <-
+           span(:validate, base_meta, fn -> Validate.run(pdf_binary, doc) end, doc) do
       {:ok, pdf_binary}
     end
   end
@@ -87,16 +93,6 @@ defmodule Rendro.Pipeline do
 
     if max_pages && length(pages) > max_pages do
       {:error, Error.from_stage(:paginate, :max_pages_exceeded, base_meta)}
-    else
-      :ok
-    end
-  end
-
-  defp validate_policy(:bytes, pdf_binary, policies, base_meta) do
-    max_bytes = Keyword.get(policies, :max_bytes)
-
-    if max_bytes && byte_size(pdf_binary) > max_bytes do
-      {:error, Error.from_stage(:render, :max_bytes_exceeded, base_meta)}
     else
       :ok
     end
