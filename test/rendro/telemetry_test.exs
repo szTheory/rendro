@@ -9,9 +9,10 @@ defmodule Rendro.TelemetryTest do
     :ok
   end
 
-  # Tagged-pending tests:
-  #   :pending_full_pipeline   — removed by Plan 03 once :validate emission + stage reorder ship
-  #   :pending_unified_schema  — removed by Plan 01 Task 2 once stage_stop_meta is unified
+  # Tagged-pending tests: tags retired in Phase 6 Plan 03 once the canonical
+  # stage order (build → compose → measure → paginate → render → validate)
+  # landed in `Rendro.Pipeline.run_stages/3`. The full telemetry contract is
+  # asserted live without exclusions.
 
   defp sample_document do
     text = %Rendro.Text{content: "Hello!", font: "Helvetica", size: 12, color: {0, 0, 0}}
@@ -42,7 +43,6 @@ defmodule Rendro.TelemetryTest do
   end
 
   describe "successful render emits start+stop for all stages" do
-    @tag :pending_full_pipeline
     test "all 6 pipeline stages emit start and stop events" do
       {:ok, _pdf} = Rendro.Pipeline.run(sample_document())
       events = TelemetryHelper.collect_events()
@@ -65,7 +65,6 @@ defmodule Rendro.TelemetryTest do
       assert length(stops) == 1
     end
 
-    @tag :pending_full_pipeline
     test "total event count: 6 stages + 1 top-level = 14 (7 start + 7 stop)" do
       {:ok, _pdf} = Rendro.Pipeline.run(sample_document())
       events = TelemetryHelper.collect_events()
@@ -201,7 +200,6 @@ defmodule Rendro.TelemetryTest do
       end
     end
 
-    @tag :pending_full_pipeline
     test "each stage start event has the correct stage name" do
       {:ok, _pdf} = Rendro.Pipeline.run(sample_document())
       events = TelemetryHelper.collect_events()
@@ -260,7 +258,6 @@ defmodule Rendro.TelemetryTest do
       assert meta.status == :error
     end
 
-    @tag :pending_full_pipeline
     test "stages after the failed stage do not emit events" do
       assert {:error, %Rendro.Error{reason: :no_pages}} = Rendro.Pipeline.run(failing_document())
       events = TelemetryHelper.collect_events()
@@ -313,7 +310,6 @@ defmodule Rendro.TelemetryTest do
   end
 
   describe "event ordering" do
-    @tag :pending_full_pipeline
     test "events fire in pipeline stage order" do
       {:ok, _pdf} = Rendro.Pipeline.run(sample_document())
       events = TelemetryHelper.collect_events()
@@ -356,7 +352,6 @@ defmodule Rendro.TelemetryTest do
       assert render_stop_idx > last_stage_stop_idx
     end
 
-    @tag :pending_full_pipeline
     test "each stage start fires before its stop" do
       {:ok, _pdf} = Rendro.Pipeline.run(sample_document())
       events = TelemetryHelper.collect_events()

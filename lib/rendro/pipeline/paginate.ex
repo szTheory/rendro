@@ -1,10 +1,12 @@
 defmodule Rendro.Pipeline.Paginate do
   @moduledoc """
-  Assigns content to pages respecting page boundaries.
+  Assigns content to pages respecting page boundaries, then stacks y-coordinates.
 
-  For the fixed-position API, blocks are already assigned to explicit pages
-  by the user, so this stage validates that blocks fit within the printable
-  area. The flow API will use this stage to split content across pages.
+  For the fixed-position API, blocks are already on explicit pages; this stage
+  validates fit and applies y-stacking per page. For the flow API, content is
+  split across pages (with table-row repeating headers) and then y-coordinates
+  are computed against each page's `margin_top` — never inheriting from the
+  previous page (D-04 latent bug fix).
   """
 
   @spec run(Rendro.Document.t()) :: {:ok, Rendro.Document.t()} | {:error, term()}
@@ -35,12 +37,63 @@ defmodule Rendro.Pipeline.Paginate do
         |> Enum.map(fn {page, idx} ->
           apply_page_template(page, idx, h_blocks, f_blocks)
         end)
+        |> Enum.map(&stack_block_y/1)
 
       {:ok, %{doc | pages: pages, content: []}}
     catch
       {:error, :content_overflow, details} ->
         {:error, Rendro.Error.from_stage(:paginate, :content_overflow, %{details: details})}
     end
+  end
+
+  # D-04: y-stacking absorbed from Compose, applied per page with the cursor
+  # reset to the page's margin_top so page-2 remainder rows never inherit y
+  # from page 1. Flow-content blocks all share the Block default `y: 0`, so we
+  # unconditionally assign `current_y` (matching the original `compose_page/1`
+  # design at commit 093f32c, before a regression flipped the override into a
+  # `block.y || current_y` fallthrough that froze every flow block at y=0).
+  defp stack_block_y(%Rendro.Page{blocks: blocks, margin_top: margin_top} = page) do
+    starting_y = margin_top || 0
+
+    {stacked, _} =
+      Enum.reduce(blocks, {[], starting_y}, fn block, {acc, current_y} ->
+        stacked_block = stack_table_cells(%{block | y: current_y})
+        next_y = current_y + (block.height || 0)
+        {acc ++ [stacked_block], next_y}
+      end)
+
+    %{page | blocks: stacked}
+  end
+
+  defp stack_table_cells(%Rendro.Block{content: %Rendro.Table{} = table} = block) do
+    row_height = 14.4
+    col_width = 100
+
+    header_y = block.y || 0
+
+    stacked_header =
+      if table.header, do: stack_cells(table.header, header_y, col_width), else: nil
+
+    header_offset = if table.header, do: row_height, else: 0
+
+    {stacked_rows, _} =
+      Enum.reduce(table.rows, {[], (block.y || 0) + header_offset}, fn row, {acc, y} ->
+        stacked_row = stack_cells(row, y, col_width)
+        {acc ++ [stacked_row], y + row_height}
+      end)
+
+    %{block | content: %{table | header: stacked_header, rows: stacked_rows}}
+  end
+
+  defp stack_table_cells(block), do: block
+
+  defp stack_cells(row, y, col_width) do
+    {cells, _} =
+      Enum.reduce(row, {[], 0}, fn cell, {acc, x} ->
+        {acc ++ [%{cell | x: x, y: y}], x + col_width}
+      end)
+
+    cells
   end
 
   defp paginate_block(block, [current_page | rest] = _pages, template, max_h) do
