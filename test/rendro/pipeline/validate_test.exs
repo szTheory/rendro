@@ -54,7 +54,9 @@ defmodule Rendro.Pipeline.ValidateTest do
 
     test "returns {:error, :structural_corruption} when binary lacks %%EOF trailer" do
       doc = sample_document()
-      assert {:error, :structural_corruption} = Validate.run("%PDF-1.4\nbody without trailer", doc)
+
+      assert {:error, :structural_corruption} =
+               Validate.run("%PDF-1.4\nbody without trailer", doc)
     end
 
     test "structural check rejects giant non-PDF binaries quickly (T-06-05 regression)" do
