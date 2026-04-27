@@ -42,6 +42,7 @@ defmodule Rendro.Error do
   defp what(:measure, _reason), do: "Block measurement failed while computing dimensions."
   defp what(:paginate, _reason), do: "Pagination failed while assigning content to pages."
   defp what(:render, _reason), do: "PDF serialization failed during render."
+  defp what(:validate, _reason), do: "Post-render validation failed."
   defp what(stage, _reason), do: "Render pipeline failed in stage #{inspect(stage)}."
 
   defp why(reason) when is_atom(reason),
@@ -76,6 +77,18 @@ defmodule Rendro.Error do
 
   defp next_step(:render, :timeout) do
     "Optimize document complexity or increase the :timeout policy limit."
+  end
+
+  defp next_step(:validate, :structural_corruption) do
+    "PDF header/trailer missing — internal renderer bug, please report with the input document and render_id."
+  end
+
+  defp next_step(:validate, :page_count_mismatch) do
+    "Rendered page count diverged from document page count — pipeline bug, please report with the input document and render_id."
+  end
+
+  defp next_step(:validate, :max_bytes_exceeded) do
+    "Reduce content complexity or increase the :max_bytes policy limit."
   end
 
   defp next_step(:render, _reason) do
