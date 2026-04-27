@@ -13,6 +13,7 @@ defmodule PhoenixExample.MixProject do
 
   def application do
     [
+      mod: {PhoenixExample.Application, []},
       extra_applications: [:logger]
     ]
   end
@@ -21,6 +22,7 @@ defmodule PhoenixExample.MixProject do
     [
       {:phoenix, "~> 1.7"},
       {:plug, "~> 1.14"},
+      {:bandit, "~> 1.0"},
       {:rendro, path: "../.."}
     ]
   end
