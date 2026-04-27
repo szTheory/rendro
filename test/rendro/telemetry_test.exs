@@ -386,7 +386,6 @@ defmodule Rendro.TelemetryTest do
   end
 
   describe "unified stop_meta schema (Phase 6 D-11)" do
-    @tag :pending_unified_schema
     test "all stop events carry full D-11 schema (render_id, document_type, deterministic, stage, status, page_count, byte_size)" do
       {:ok, _pdf} = Rendro.Pipeline.run(sample_document())
       events = TelemetryHelper.collect_events()
@@ -412,7 +411,6 @@ defmodule Rendro.TelemetryTest do
       end
     end
 
-    @tag :pending_unified_schema
     test "error-path stop_meta carries page_count from doc.pages, not 0 (MINOR-15 regression)" do
       # 1-page doc forced to fail at :validate by setting impossible max_bytes.
       # NOTE: until Plan 02 lands the :validate stage, this fails on the OLD
@@ -437,7 +435,6 @@ defmodule Rendro.TelemetryTest do
       end
     end
 
-    @tag :pending_unified_schema
     test "error-path stop_meta includes :error map with kind and stage (D-14)" do
       assert {:error, %Rendro.Error{}} = Rendro.Pipeline.run(failing_document())
       events = TelemetryHelper.collect_events()
