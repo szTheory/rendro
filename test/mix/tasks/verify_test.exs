@@ -49,6 +49,36 @@ defmodule Mix.Tasks.VerifyTest do
              message_index(output, "Overall: FAIL")
   end
 
+  test "run exits non-zero only after final summary output" do
+    lanes = [
+      {"DETERMINISTIC (CORE)", [{"CI", fn -> {:error, 2, "ci failed"} end}]},
+      {"ADVISORY (ADAPTERS)", [{"Phoenix Example", fn -> :ok end}]}
+    ]
+
+    Application.put_env(:rendro, :verify_test_lanes, lanes)
+
+    on_exit(fn ->
+      Application.delete_env(:rendro, :verify_test_lanes)
+    end)
+
+    {messages, exit_reason} =
+      capture_shell_messages(fn ->
+        catch_exit(Verify.run([]))
+      end)
+
+    output = Enum.join(messages, "\n")
+
+    assert exit_reason == {:shutdown, 1}
+    assert output =~ "VERIFICATION COMPLETE"
+    assert output =~ "Overall: FAIL"
+    assert output =~ "ci failed"
+    assert output =~ "[ADVISORY (ADAPTERS)] Phoenix Example: PASS"
+    refute output =~ "Docs Contract"
+
+    assert message_index(output, "VERIFICATION COMPLETE") <
+             message_index(output, "Overall: FAIL")
+  end
+
   defp capture_shell_messages(fun) do
     original_shell = Mix.shell()
     Mix.shell(Mix.Shell.Process)
