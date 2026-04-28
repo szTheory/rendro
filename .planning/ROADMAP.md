@@ -27,7 +27,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 13: Docs and Release Preflight Closure** - Remove docs-contract blind spots and make release preflight fail on dirty/tag-parity issues while exercising publish dry-run parity.
 - [x] **Phase 14: Milestone Verification Artifact Backfill** - Add milestone-grade `VERIFICATION.md` artifacts for Phases 7-11 and resync traceability/process evidence with the audit.
 - [x] **Phase 15: Async Policy Injection + Timeout Audit Closure** - Restore Oban policy injection and timeout-to-audit handoff so bounded async rendering and timeout observability match the v1 contract.
-- [ ] **Phase 16: Phoenix Error Boundary Proof** - Add committed boundary proof for the Phoenix adapter's operator-facing structured error response.
+- [x] **Phase 16: Phoenix Error Boundary Proof** - Add committed boundary proof for the Phoenix adapter's operator-facing structured error response. (completed 2026-04-28)
 - [ ] **Phase 17: Deterministic CI Gate Recovery + Traceability Resync** - Repair the live `mix ci` formatting regression and resync milestone traceability with the reopened quality gate.
 
 ## Phase Details
@@ -279,7 +279,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 16-01-PLAN.md — Update Phoenix adapter error response to JSON when negotiated
+- [x] 16-01-PLAN.md — Update Phoenix adapter error response to JSON when negotiated
 
 ### Phase 17: Deterministic CI Gate Recovery + Traceability Resync
 **Goal**: Reopen and close the current quality-gate regression by fixing the committed formatting failure and aligning requirement traceability with the actual milestone gate state.
