@@ -11,15 +11,19 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 ## Current State
 
 **Shipped Version:** v1.0 (MVP)
-The v1.0 milestone achieved its core guarantees: pure deterministic rendering, robust layout/pagination, Phoenix integration helpers, pipeline telemetry, error envelopes, and canonical CI verification contracts. Gaps identified in the artifact audit were systematically closed to ensure 100% test-backed evidence.
+The v1.0 milestone proved the core thesis: pure deterministic rendering, robust baseline layout/pagination, Phoenix integration helpers, pipeline telemetry, structured errors, and truthful CI/release verification contracts are all now shipped with committed proof.
 
-## Next Milestone Goals
+## Current Milestone: v1.1 Layout Authoring Maturity
 
-- To be defined (run `/gsd-new-milestone` to start next phase).
+**Goal:** Turn Rendro from a credible PDF engine into a credible document authoring base by making layout semantics, pagination behavior, and break diagnostics expressive enough for serious business documents.
 
----
-
-<details><summary><b>Previous Project State (v1.0 Archival)</b></summary>
+**Target features:**
+- First-class break semantics such as `keep_together`, `keep_with_next`, and explicit break directives.
+- Reusable page templates, sections, and bounded layout regions for flow documents.
+- Deterministic width-aware text measurement and flow-page geometry instead of hard-coded layout assumptions.
+- Richer table sizing and pagination behavior with row integrity, repeated headers, and explicit split policy.
+- Truthful fixed-position fit validation and operator-facing break diagnostics.
+- Canonical recipes/examples that demonstrate the new authoring surface without app-specific pagination glue.
 
 ## Requirements
 
@@ -27,53 +31,51 @@ The v1.0 milestone achieved its core guarantees: pure deterministic rendering, r
 
 - [x] Merge-blocking verification is now truthful and executable: `mix ci` covers format, compile, tests, docs, and package build, and `mix verify` separates deterministic vs advisory lanes without early exit. Validated in Phase 12: Verification Chain Closure (`QUAL-01`, `QUAL-03`, `QUAL-05`).
 - [x] Deterministic CI gate regression is fixed and traceability state perfectly mirrors the true gate status. Validated in Phase 17: Deterministic CI Gate Recovery Traceability Resync (`QUAL-01`).
+- [x] Rendro v1.0 proved pure-core rendering, baseline layout primitives, optional adapters, and truthful operational verification as a shippable MVP. Validated at milestone close in `v1.0-REQUIREMENTS.md`.
 
 ### Active
 
-- [ ] Produce deterministic PDF output from Elixir data with repeatable layout and pagination results.
-- [ ] Provide document and layout primitives for pages, blocks, tables, headers/footers, and metadata.
-- [ ] Keep the rendering core pure Elixir with no hard dependency on Chrome/Chromium or Phoenix.
-- [ ] Support two APIs on one engine: fixed-position composition and flow-based document/report composition.
-- [ ] Ship Phoenix integration helpers for preview/download workflows via optional adapters.
-- [ ] Expose telemetry events and structured, actionable error surfaces for render lifecycle operations.
-- [ ] Deliver v0.1 that makes invoice/report generation viable and testable, prioritizing pagination, tables, and headers/footers.
-- [ ] Include strong docs, executable examples, and release hygiene that make adoption and operation trustworthy.
+- [ ] Engineers can author wrapped, width-constrained flow text with deterministic line-breaking behavior.
+- [ ] Engineers can define reusable page templates, sections, and layout regions instead of relying on a single default flow page.
+- [ ] Engineers can control pagination explicitly through keep/break directives and stable overflow semantics.
+- [ ] Engineers can render serious multi-page tables with deterministic sizing and row-split behavior.
+- [ ] Operators can see why a block moved, split, or overflowed through structured diagnostics and telemetry.
+- [ ] Maintainers can prove pagination invariants with deterministic regression fixtures that remain stable as later milestones add fonts, assets, and async workflows.
 
 ### Out of Scope
 
-- Full HTML/CSS browser-compat rendering — Rendro is not trying to beat browser renderers at browser rendering.
-- Arbitrary PDF editing/parsing product scope — early focus is generation, not generalized document manipulation.
-- Broad compliance claims (for example PDF/A or PDF/UA) without validator-backed proof — no unverified claims.
-- "Complete" digital-signature support before explicit implementation and tests — defer until concrete, proven delivery.
+- HTML/CSS parity or browser-style layout behavior — Rendro remains a deterministic document engine, not a browser renderer.
+- WYSIWYG builders, hosted template editing, or app-specific layout hacks in core — they would widen surface area before the authoring contract is stable.
+- Custom font embedding, fallback chains, image/logo rendering, and broad Unicode/i18n claims — defer to the planned v1.2 typography/assets milestone.
+- Render manifests, persistence sinks, and richer async artifact lifecycle contracts — defer to the planned v1.3 async-delivery milestone.
+- Blanket PDF/A, PDF/UA, signature, or compliance claims — require validator-backed proof in the later trust/validation arc.
 
 ## Context
 
-Rendro is being positioned as a production-ready Elixir-native PDF engine that prioritizes deterministic behavior, composable APIs, and operational trust. The product thesis emphasizes truthful scope boundaries and avoids claiming capabilities that have not been implemented and verified.
+Rendro's post-v1.0 challenge is no longer engine credibility; it is authoring depth. The shipped core proves that deterministic Elixir-native PDF generation works, but the current authoring model is still narrow: flow layout is mostly vertical block stacking, tables rely on fixed constants, flow pagination uses a default page template, and break behavior is not yet expressed as first-class document intent.
 
-Architecture defaults are currently locked: pure `rendro` core, optional adapters for integrations, a data-first pipeline (`build -> compose -> measure -> paginate -> render -> validate`), and two public APIs backed by one engine. Error quality is treated as part of the product: failures should communicate what happened, where, why, and what to try next.
+That makes v1.1 the structural milestone for the rest of the epic. v1.2 needs stable measurement and layout-region contracts before fonts/assets can change metrics safely. v1.3 needs stable post-pagination structure and diagnostics before async artifact workflows can expose meaningful manifests or lifecycle metadata. If v1.1 cuts corners here, later milestones will be layering typography and operations on top of unstable pagination semantics.
 
-Operational and OSS posture is informed by recent szTheory Elixir library patterns: canonical verify lanes (`mix ci`, `mix verify.*`), docs-contract checks, an example host app in CI, optional dependency gating, package whitelist discipline, source/tag parity checks, and explicit deterministic vs advisory verification semantics.
-
-Integration opportunities are staged by lifecycle instead of hard coupling. Early adapters/recipes prioritize audit trails (`threadline`), transactional attachments (`mailglass`), and billing document workflows (`accrue`), with additional integrations deferred until core stability.
+The codebase evidence is clear about the current gaps: `Rendro.Block`, `Rendro.Table`, `Rendro.Document`, and `Rendro.Page` expose only a thin authoring surface; `Rendro.Pipeline.Measure` still uses single-font and fixed-row assumptions; `Rendro.Pipeline.Paginate` depends on a default `%Rendro.Page{}` template and simplistic split logic; and several public API fields imply more than the engine currently honors (`Text.font`, `Table.width`, `Table.border`, and footer region semantics).
 
 ## Constraints
 
-- **Tech stack**: Pure Elixir rendering core with no browser runtime dependency in core — preserves deterministic behavior and deploy simplicity.
-- **Architecture**: Core must stay decoupled from Phoenix/jobs/admin tooling — adapters are optional and must not become hidden hard dependencies.
-- **Product scope**: Deterministic layout and pagination are first-order priorities — this is the non-negotiable differentiator.
-- **Quality**: Merge-blocking verification lanes must remain green (`format`, warnings-as-errors compile, tests, docs build, package build, docs/quickstart contracts) — protects trust in public claims.
-- **Release process**: Release parity and dry-run checks are required before/after publish — avoids drift between source, docs, and package artifacts.
-- **Honesty**: Compliance and signature claims require validator-backed proof and tests before being documented — prevents deceptive scope expansion.
+- **Tech stack**: Keep the core pure Elixir with no hard dependency on Phoenix, Oban, browser runtimes, or external layout engines — preserves deterministic deployment and product boundaries.
+- **Architecture**: Extend the existing `build -> compose -> measure -> paginate -> render -> validate` pipeline instead of creating an alternate rendering path — one engine must continue to power both APIs.
+- **Product scope**: v1.1 is an authoring-contract milestone, not a typography/assets or async-ops milestone — later milestones depend on a stable layout core.
+- **Determinism**: New layout semantics must remain deterministic and fixture-verifiable — pagination decisions cannot become heuristic or time/environment dependent.
+- **Documentation honesty**: Public API fields and examples must not imply support that the writer/layout engine does not actually honor.
+- **Verification**: Merge-blocking and docs-contract proof lanes must stay truthful while pagination semantics become more complex.
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Use pure Elixir core with optional adapters | Preserve deterministic behavior, deployment portability, and clean boundaries between engine and integrations | — Pending |
-| Prioritize pagination, tables, and headers/footers in early milestones | These are essential for meaningful invoice/report use cases, not toy output | — Pending |
-| Support two APIs (fixed-position and flow) on one rendering engine | Cover precise placement and report/document workflows without splitting core behavior | — Pending |
-| Treat errors and telemetry as first-class product features | Operators need auditability and fast diagnosis to trust PDF generation in production | — Pending |
-| Enforce truthful capability claims and defer unverified compliance/signature statements | Trust depends on matching documentation to verified implementation | — Pending |
+| Make v1.1 a layout-authoring milestone before fonts/assets or async expansion | The current adoption gap is authoring depth, and both v1.2 and v1.3 depend on stable layout contracts | — Pending |
+| Add first-class break semantics instead of hiding pagination policy in ad hoc block behavior | Business documents need explicit author intent for page breaks and content grouping | — Pending |
+| Introduce reusable page templates/sections/regions for flow documents | Fonts, assets, headers/footers, and diagnostics all need stable placement surfaces | — Pending |
+| Refactor measurement/pagination around deterministic measured-layout contracts | Hard-coded constants cannot support future typography or trustworthy diagnostics | — Pending |
+| Treat break explanations as product behavior, not debug leftovers | Operators and adopters need to understand why a document split or overflowed | — Pending |
 
 ## Evolution
 
@@ -92,7 +94,5 @@ This document evolves at phase transitions and milestone boundaries.
 3. Audit Out of Scope -> reasons still valid?
 4. Update Context with current state
 
-</details>
-
 ---
-*Last updated: 2026-04-28 after Phase 17 (Deterministic CI Gate Recovery Traceability Resync) completion and v1.0 Archival.*
+*Last updated: 2026-04-28 after initializing milestone v1.1 Layout Authoring Maturity.*
