@@ -29,7 +29,8 @@ if Code.ensure_loaded?(Threadline) do
     Only telemetry metadata is forwarded. Document bodies, attachment
     binaries, and rendered PDFs are NOT included in audit events. The
     metadata fields are: `:render_id`, `:stage`, `:status`, `:page_count`,
-    `:byte_size`, `:duration`, `:document_type`, `:deterministic`.
+    `:byte_size`, `:duration`, `:document_type`, `:deterministic`, and the
+    nested `:error` map on failed renders.
 
     ## Detaching
 
@@ -107,6 +108,7 @@ if Code.ensure_loaded?(Threadline) do
         :byte_size,
         :document_type,
         :deterministic,
+        :error,
         :kind,
         :reason
       ])

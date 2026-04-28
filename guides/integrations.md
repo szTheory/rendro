@@ -116,8 +116,9 @@ On `:stop` with `status: :error` or on `:exception` it records `Threadline.recor
 
 The metadata forwarded to Threadline contains only the allowlisted telemetry keys
 (`:render_id`, `:stage`, `:status`, `:page_count`, `:byte_size`, `:duration`,
-`:document_type`, `:deterministic`). Document bodies, attachment binaries, and
-rendered PDFs are never included.
+`:document_type`, `:deterministic`) plus the nested `:error` map on failed
+renders. Document bodies, attachment binaries, and rendered PDFs are never
+included.
 
 ### Verification
 
@@ -171,41 +172,14 @@ non-`:ok` return from `track_render/2` does NOT fail the render — callers stil
 receive their `{:ok, pdf}` or `{:error, %Rendro.Error{}}`. If you require
 guaranteed audit delivery, add monitoring on Threadline's storage directly.
 
-### Known limitation: pipeline timeouts are not audited
+Timeouts are recorded through the same failed-render path as other errors.
+`Rendro.Pipeline.run/1` emits a top-level `[:rendro, :render, :stop]` event on
+timeout with `status: :error` and nested `error.kind: :timeout`, so Threadline
+records `:render_failed` and preserves the timeout subtype in metadata.
 
-Render timeouts enforced by `Rendro.Pipeline.run/1` are NOT currently audited by
-`Rendro.Adapters.Threadline`. The Pipeline wraps execution in `Task.async` and
-shuts the task down on timeout before the surrounding `:telemetry.span` can emit
-`:stop` or `:exception`. Because neither `[:rendro, :render, :stop]` nor
-`[:rendro, :render, :exception]` fires, the Threadline handler is never called and
-no audit row is written.
-
-Callers still receive `{:error, %Rendro.Error{reason: :timeout}}` from
-`Rendro.render/1`, but the corresponding audit row is absent from Threadline.
-
-**Operator mitigation:** If you rely on Threadline as a complete audit trail,
-compensate at the call site:
-
-```elixir-schematic
-case Rendro.render(doc) do
-  {:ok, pdf} ->
-    pdf
-
-  {:error, %Rendro.Error{reason: :timeout} = err} ->
-    # Manually emit an audit row so the timeout is recorded
-    Threadline.record_action(:render_failed, %{
-      reason: :timeout,
-      render_id: doc.render_id
-    })
-    {:error, err}
-
-  {:error, _} = err ->
-    err
-end
-```
-
-This is tracked as WR-01 in the Phase 05 review and is planned for a future
-Pipeline change.
+That means operators can query one failure surface (`:render_failed`) and then
+filter by the nested timeout classification instead of handling a timeout-only
+action family.
 
 ---
 
