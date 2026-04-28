@@ -84,14 +84,14 @@ Each row lists the original implementation phase and the gap-closure phase that 
 |-------------|----------------|-------------------|--------|
 | CORE-01 | Phase 1 | Phase 6 (validate stage) + Phase 11 (verify) | Done |
 | CORE-02 | Phase 1 | Phase 11 (verify) | Done |
-| CORE-03 | Phase 2 | Phase 11 (verify) | Pending |
-| CORE-04 | Phase 2 | Phase 11 (verify) | Pending |
+| CORE-03 | Phase 2 | Phase 11 (verify) | Done |
+| CORE-04 | Phase 2 | Phase 11 (verify) | Done |
 | CORE-05 | Phase 1 | Phase 11 (verify) | Done |
-| LAY-01 | Phase 2 | Phase 11 (verify) | Pending |
-| LAY-02 | Phase 2 | Phase 11 (verify) | Pending |
-| LAY-03 | Phase 2 | Phase 11 (verify) | Pending |
-| LAY-04 | Phase 2 | Phase 11 (verify) | Pending |
-| LAY-05 | Phase 2 | Phase 11 (verify) | Pending |
+| LAY-01 | Phase 2 | Phase 11 (verify) | Done |
+| LAY-02 | Phase 2 | Phase 11 (verify) | Done |
+| LAY-03 | Phase 2 | Phase 11 (verify) | Done |
+| LAY-04 | Phase 2 | Phase 11 (verify) | Done |
+| LAY-05 | Phase 2 | Phase 11 (verify) | Done |
 | ADPT-01 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) | Pending |
 | ADPT-02 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) | Pending |
 | ADPT-03 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) | Pending |
