@@ -8,13 +8,13 @@ defmodule Mix.Tasks.Verify do
   @shortdoc "Runs full verification suite with deterministic and advisory lanes"
 
   def run(_args) do
-    case run_with_lanes() do
+    case run_with_lanes(default_lanes()) do
       {:ok, _results} -> :ok
       {:error, _results} -> exit({:shutdown, 1})
     end
   end
 
-  def run_with_lanes(lanes \\ verification_lanes()) do
+  def run_with_lanes(lanes \\ default_lanes()) do
     Mix.shell().info("=== RENDRO VERIFICATION SUITE ===")
 
     results =
@@ -32,6 +32,14 @@ defmodule Mix.Tasks.Verify do
       {:error, results}
     else
       {:ok, results}
+    end
+  end
+
+  defp default_lanes do
+    if Mix.env() == :test do
+      Application.get_env(:rendro, :verify_test_lanes, verification_lanes())
+    else
+      verification_lanes()
     end
   end
 
@@ -69,13 +77,25 @@ defmodule Mix.Tasks.Verify do
         end
       rescue
         error ->
-          %{lane: lane_name, step: step_name, status: :fail, code: 1, output: Exception.message(error)}
+          %{
+            lane: lane_name,
+            step: step_name,
+            status: :fail,
+            code: 1,
+            output: Exception.message(error)
+          }
       catch
         :exit, {:shutdown, code} when code != 0 ->
           %{lane: lane_name, step: step_name, status: :fail, code: code}
 
         kind, reason ->
-          %{lane: lane_name, step: step_name, status: :fail, code: 1, output: "#{inspect(kind)}: #{inspect(reason)}"}
+          %{
+            lane: lane_name,
+            step: step_name,
+            status: :fail,
+            code: 1,
+            output: "#{inspect(kind)}: #{inspect(reason)}"
+          }
       end
 
     print_step_result(result)
