@@ -19,10 +19,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 5: Early Ecosystem Recipes** - Ship do-now integration recipes without violating core boundary constraints.
 - [ ] **Phase 6: Pipeline Telemetry Contract Fixes** - Restore the spec-stated pipeline stage order and emit the missing `:validate` telemetry event so observability matches OBS-01.
 - [ ] **Phase 7: Phoenix Adapter Hardening + Example Skeleton** - Guard the optional Phoenix adapter, complete the example app, and surface structured error envelopes through HTTP responses.
-- [ ] **Phase 8: Bounded Async + Timeout Telemetry** - Inject policy bounds into the Oban worker and emit `:exception` telemetry on render timeouts so audit handlers see them.
+- [x] **Phase 8: Bounded Async + Timeout Telemetry** - Inject policy bounds into the Oban worker and emit `:exception` telemetry on render timeouts so audit handlers see them.
 - [ ] **Phase 9: CI Scheduler + Release Hardening** - Land the CI YAML, expand the `mix ci` lane, fix `mix verify` advisory crash semantics, and harden release preflight tag/dry-run parity.
 - [ ] **Phase 10: Recipe Correctness + Traceability Sync** - Fix Mailglass custom-wrapper dispatch, return typed errors from Accrue, and resync REQUIREMENTS.md ADPT-05 status.
-- [ ] **Phase 11: Reconstruct Phase 1-4 GSD Artifacts** - Map existing tests to requirements and produce evidence-based PLAN/SUMMARY/VERIFICATION for phases 1-4 against the fixed code.
+- [x] **Phase 11: Reconstruct Phase 1-4 GSD Artifacts** - Map existing tests to requirements and produce evidence-based PLAN/SUMMARY/VERIFICATION for phases 1-4 against the fixed code.
 
 ## Phase Details
 
@@ -161,7 +161,11 @@ Plans:
   3. `mix verify` advisory lane returns a non-zero exit but does not crash with `MatchError`; example dir gets `mix deps.get` first.
   4. `release.preflight` fails on tag/version mismatch and runs `mix hex.publish --dry-run`.
   5. `verify_docs.exs` exercises code blocks containing `...` (or warns rather than silently skipping).
-**Plans**: 1 plan (to be planned via `/gsd-plan-phase 9`)
+**Plans**: 2 plans
+
+Plans:
+- [ ] 09-01-PLAN.md — Setup GitHub CI and expand mix ci pipeline
+- [ ] 09-02-PLAN.md — Hardened verification lanes and release preflight
 
 ### Phase 10: Recipe Correctness + Traceability Sync
 **Goal**: Fix the remaining Phase 5 recipe defects (Mailglass custom-wrapper dispatch, Accrue line-item discipline, Accrue date sigil leak) and resync REQUIREMENTS.md ADPT-05 status with 05-VERIFICATION.md so the traceability table tells the truth.
@@ -173,7 +177,11 @@ Plans:
   2. `Rendro.Adapters.Accrue.recipe/1` returns `{:error, {:invalid_invoice, _}}` on non-`%LineItem{}` entries instead of raising.
   3. Accrue invoice does not render `~D[...]` sigil syntax for `issued_at` (uses `Date.to_iso8601/1` or equivalent).
   4. REQUIREMENTS.md ADPT-05 row reads `[x]` / Done, matching `05-VERIFICATION.md`.
-**Plans**: 1 plan (to be planned via `/gsd-plan-phase 10`)
+**Plans**: 2 plans
+
+Plans:
+- [ ] 10-01-PLAN.md — Fix Mailglass and Accrue recipe contracts with regression tests and guide updates
+- [ ] 10-02-PLAN.md — Sync Phase 5 verification artifacts and REQUIREMENTS traceability with Phase 10 evidence
 
 ### Phase 11: Reconstruct Phase 1-4 GSD Artifacts
 **Goal**: Produce evidence-based PLAN.md, SUMMARY.md, and VERIFICATION.md for Phases 1, 2, 3, and 4 by mapping the existing source tree and test suite to each requirement, so all 23 currently-orphaned requirements have formal verification trails.
