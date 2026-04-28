@@ -23,7 +23,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 9: CI Scheduler + Release Hardening** - Land the CI YAML, expand the `mix ci` lane, fix `mix verify` advisory crash semantics, and harden release preflight tag/dry-run parity.
 - [ ] **Phase 10: Recipe Correctness + Traceability Sync** - Fix Mailglass custom-wrapper dispatch, return typed errors from Accrue, and resync REQUIREMENTS.md ADPT-05 status.
 - [x] **Phase 11: Reconstruct Phase 1-4 GSD Artifacts** - Map existing tests to requirements and produce evidence-based PLAN/SUMMARY/VERIFICATION for phases 1-4 against the fixed code.
-- [ ] **Phase 12: Verification Chain Closure** - Commit hosted CI proof, make `mix verify` complete deterministic and advisory lanes end-to-end, and close the remaining verification-lane gaps.
+- [x] **Phase 12: Verification Chain Closure** - Commit hosted CI proof, make `mix verify` complete deterministic and advisory lanes end-to-end, and close the remaining verification-lane gaps.
 - [ ] **Phase 13: Docs and Release Preflight Closure** - Remove docs-contract blind spots and make release preflight fail on dirty/tag-parity issues while exercising publish dry-run parity.
 - [ ] **Phase 14: Milestone Verification Artifact Backfill** - Add milestone-grade `VERIFICATION.md` artifacts for Phases 7-11 and resync traceability/process evidence with the audit.
 
@@ -207,11 +207,11 @@ Plans:
   1. `.github/workflows/ci.yml` is tracked in git and runs the canonical verification lane on PRs and merges.
   2. `mix verify` executes deterministic and advisory segments end-to-end and reports failures without crashing or aborting the advisory segment prematurely.
   3. Phoenix example adoption proof is exercised by committed CI evidence rather than only by local compilation state.
-**Plans**: 1/2 plans complete
+**Plans**: 2/2 plans complete
 
 Plans:
 - [x] 12-01-PLAN.md — Commit hosted CI workflow and explicit Phoenix example proof
-- [ ] 12-02-PLAN.md — Complete `mix verify` deterministic and advisory lanes end-to-end
+- [x] 12-02-PLAN.md — Complete `mix verify` deterministic and advisory lanes end-to-end
 
 ### Phase 13: Docs and Release Preflight Closure
 **Goal**: Close the remaining docs-contract and release-safety gaps so public claims and release automation are both enforced by executable checks.

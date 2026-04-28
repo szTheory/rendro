@@ -44,7 +44,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **QUAL-02**: Maintainer can validate public docs/quickstart claims with docs-contract checks in CI.
 - [x] **QUAL-03**: Maintainer can run a CI-verified Phoenix example app as executable adoption proof.
 - [ ] **QUAL-04**: Maintainer can run release preflight checks for version/tag parity and publish dry-run workflows.
-- [ ] **QUAL-05**: Maintainer can separate deterministic required lanes from advisory/provider-dependent lanes in verification output.
+- [x] **QUAL-05**: Maintainer can separate deterministic required lanes from advisory/provider-dependent lanes in verification output.
 
 ## v2 Requirements
 
@@ -105,17 +105,17 @@ Each row lists the original implementation phase and the gap-closure phase that 
 | QUAL-02 | Phase 4 | Phase 9 (verify_docs) + Phase 11 (verify) + Phase 13 (docs closure) + Phase 14 (artifact backfill) | Pending |
 | QUAL-03 | Phase 4 | Phase 7 (example app) + Phase 9 (CI) + Phase 11 (verify) + Phase 12 (verification chain) + Phase 14 (artifact backfill) | Done |
 | QUAL-04 | Phase 4 | Phase 9 (preflight) + Phase 10 (traceability) + Phase 11 (verify) + Phase 13 (release closure) + Phase 14 (artifact backfill) | Pending |
-| QUAL-05 | Phase 4 | Phase 9 (verify lanes) + Phase 11 (verify) + Phase 12 (verification chain) + Phase 14 (artifact backfill) | Pending |
+| QUAL-05 | Phase 4 | Phase 9 (verify lanes) + Phase 11 (verify) + Phase 12 (verification chain) + Phase 14 (artifact backfill) | Done |
 
 **Coverage:**
 - v1 requirements: 24 total
 - Mapped to phases: 24
 - Unmapped: 0 ✓
-- Verified (Done): 15
-- Pending verification: 9
+- Verified (Done): 16
+- Pending verification: 8
 - Partial verification: 0
 - Blocked verification: 0
 
 ---
 *Requirements defined: 2026-04-24*
-*Last updated: 2026-04-28 after Phase 12 Plan 01 hosted CI verification proof*
+*Last updated: 2026-04-28 after Phase 12 Plan 02 verification-lane closure*
