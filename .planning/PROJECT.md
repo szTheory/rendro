@@ -12,7 +12,7 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Merge-blocking verification is now truthful and executable: `mix ci` covers format, compile, tests, docs, and package build, and `mix verify` separates deterministic vs advisory lanes without early exit. Validated in Phase 12: Verification Chain Closure (`QUAL-01`, `QUAL-03`, `QUAL-05`).
 
 ### Active
 
@@ -79,4 +79,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-27 after Phase 06 (Pipeline Telemetry Contract Fixes) completion — canonical stage order restored (`build → compose → measure → paginate → render → validate`), `:validate` telemetry event now emitted, error-path stop metadata preserves `page_count`/`byte_size`; closes BLOCKER-04, BLOCKER-05, MINOR-15 against `OBS-01`/`OBS-02`/`CORE-01`.*
+*Last updated: 2026-04-28 after Phase 12 (Verification Chain Closure) completion — hosted CI now truthfully delegates to a canonical `mix ci` lane covering format, compile, tests, docs, and package build; `mix verify` completes deterministic and advisory lanes before a single final exit; closes `QUAL-01`, `QUAL-03`, and `QUAL-05`.*
