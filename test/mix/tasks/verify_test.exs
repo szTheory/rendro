@@ -9,9 +9,73 @@ defmodule Mix.Tasks.VerifyTest do
       {"ADVISORY (ADAPTERS)", [{"Phoenix Example", fn -> :ok end}]}
     ]
 
-    assert {:error, results} = Verify.run_with_lanes(lanes)
+    {messages, {:error, results}} = capture_shell_messages(fn -> Verify.run_with_lanes(lanes) end)
+    output = Enum.join(messages, "\n")
+
     assert Enum.map(results, & &1.lane) == ["DETERMINISTIC (CORE)", "ADVISORY (ADAPTERS)"]
     assert Enum.map(results, & &1.step) == ["CI", "Phoenix Example"]
     assert Enum.map(results, & &1.status) == [:fail, :pass]
+    assert output =~ "DETERMINISTIC (CORE)"
+    assert output =~ "ADVISORY (ADAPTERS)"
+    assert output =~ "Running Phoenix Example..."
+    assert output =~ "VERIFICATION COMPLETE"
+    assert String.contains?(output, "Summary:")
+    assert String.contains?(output, "Overall: FAIL")
+    assert String.contains?(output, "[ADVISORY (ADAPTERS)] Phoenix Example: PASS")
+
+    assert message_index(output, "DETERMINISTIC (CORE)") <
+             message_index(output, "ADVISORY (ADAPTERS)")
+
+    assert message_index(output, "Running Phoenix Example...") >
+             message_index(output, "DETERMINISTIC (CORE)")
+  end
+
+  test "run_with_lanes returns failing status only after summary output is printed" do
+    lanes = [
+      {"DETERMINISTIC (CORE)", [{"CI", fn -> :ok end}]},
+      {"ADVISORY (ADAPTERS)", [{"Phoenix Example", fn -> {:error, 3, "example failed"} end}]}
+    ]
+
+    {messages, {:error, results}} = capture_shell_messages(fn -> Verify.run_with_lanes(lanes) end)
+    output = Enum.join(messages, "\n")
+
+    assert Enum.map(results, & &1.status) == [:pass, :fail]
+    assert output =~ "VERIFICATION COMPLETE"
+    assert output =~ "Summary:"
+    assert output =~ "[ADVISORY (ADAPTERS)] Phoenix Example: FAIL"
+    assert output =~ "Overall: FAIL"
+
+    assert message_index(output, "VERIFICATION COMPLETE") <
+             message_index(output, "Overall: FAIL")
+  end
+
+  defp capture_shell_messages(fun) do
+    original_shell = Mix.shell()
+    Mix.shell(Mix.Shell.Process)
+
+    result =
+      try do
+        fun.()
+      after
+        Mix.shell(original_shell)
+      end
+
+    {flush_shell_messages([]), result}
+  end
+
+  defp flush_shell_messages(messages) do
+    receive do
+      {:mix_shell, _level, payload} ->
+        flush_shell_messages([IO.iodata_to_binary(payload) | messages])
+    after
+      0 -> Enum.reverse(messages)
+    end
+  end
+
+  defp message_index(output, needle) do
+    case :binary.match(output, needle) do
+      {index, _length} -> index
+      :nomatch -> flunk("expected #{inspect(needle)} to appear in #{inspect(output)}")
+    end
   end
 end
