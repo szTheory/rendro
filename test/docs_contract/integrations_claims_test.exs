@@ -27,12 +27,25 @@ defmodule Rendro.DocsContract.IntegrationsClaimsTest do
   test "optional adapters stay behind compile-time guards" do
     for {path, dependency} <- [
           {"lib/rendro/adapters/threadline.ex", "Threadline"},
+          {"lib/rendro/adapters/oban/render_worker.ex", "Oban"},
           {"lib/rendro/adapters/mailglass.ex", "Mailglass"},
           {"lib/rendro/adapters/accrue.ex", "Accrue"}
         ] do
       source = File.read!(path)
       assert source =~ "if Code.ensure_loaded?(#{dependency}) do"
     end
+  end
+
+  test "oban worker contract stays narrow and truthful" do
+    content = File.read!("guides/integrations.md")
+
+    assert content =~ ~S|"policies"|
+    assert content =~ ~S|"max_pages"|
+    assert content =~ ~S|"max_bytes"|
+    assert content =~ ~S|"timeout"|
+    assert content =~ ~r/fill only\s+missing `doc\.options\[:policies\]` keys/s
+    assert content =~ "never silently override"
+    assert content =~ "does **not** support arbitrary job-arg pass-through"
   end
 
   test "threadline timeout limitation remains truthful" do

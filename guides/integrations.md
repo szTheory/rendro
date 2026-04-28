@@ -14,6 +14,62 @@ interpreting the failure modes your code may encounter.
 
 ---
 
+## Oban
+
+`Rendro.Adapters.Oban.RenderWorker` is an optional background-worker boundary for
+teams that enqueue Rendro renders through Oban. The worker stays intentionally
+narrow: it accepts a document builder module, builder args, an output path, and
+an optional bounded-render `"policies"` map.
+
+### Job args contract
+
+The worker consumes only these job args:
+
+```elixir-schematic
+%{
+  "module" => "Elixir.MyApp.InvoiceDocument",
+  "args" => %{"invoice_id" => "inv_123"},
+  "output_path" => "/tmp/invoice.pdf",
+  "policies" => %{
+    "max_pages" => 10,
+    "max_bytes" => 2_000_000,
+    "timeout" => 15_000
+  }
+}
+```
+
+`"policies"` is optional. When present, the worker accepts only `"max_pages"`,
+`"max_bytes"`, and `"timeout"`. Unknown policy keys fail fast with a typed worker
+error tuple instead of being silently ignored.
+
+Document-authored policies remain canonical. Worker-provided policies fill only
+missing `doc.options[:policies]` keys and never silently override bounds already
+set by the document builder.
+
+The worker does **not** support arbitrary job-arg pass-through into
+`doc.options` or `Rendro.render/2`. If you need a broader async contract, build
+that normalization explicitly in your own job producer before calling Rendro.
+
+### Worker failure diagnostics
+
+Boundary misuse returns typed `{:error, reason}` tuples without crashing the
+worker process:
+
+| Error tuple | When it occurs |
+|---|---|
+| `{:error, {:missing_worker_field, field}}` | A required job arg such as `"module"`, `"args"`, or `"output_path"` is absent. |
+| `{:error, {:invalid_worker_field, field, value}}` | A required field or `"policies"` has the wrong shape. |
+| `{:error, {:unknown_worker_module, module}}` | The named builder module is not available at runtime. |
+| `{:error, {:invalid_worker_module, module}}` | The module exists but does not export `build_document/1`. |
+| `{:error, {:unknown_worker_policy, key}}` | `"policies"` contains a key outside the supported bounded-render surface. |
+| `{:error, {:invalid_worker_policy, key, value}}` | A supported policy key is present with an invalid value. |
+
+If the worker boundary succeeds but the render itself fails, the worker returns
+the underlying Rendro reason atom (for example `:max_pages_exceeded`,
+`:max_bytes_exceeded`, or `:timeout`).
+
+---
+
 ## Threadline
 
 `Rendro.Adapters.Threadline` funnels Rendro render lifecycle events into
