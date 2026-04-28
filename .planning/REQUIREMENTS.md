@@ -95,12 +95,12 @@ Each row lists the original implementation phase and the gap-closure phase that 
 | ADPT-01 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) + Phase 14 (artifact backfill) | Done |
 | ADPT-02 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) + Phase 14 (artifact backfill) | Done |
 | ADPT-03 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) + Phase 14 (artifact backfill) | Done |
-| ADPT-04 | Phase 3 | Phase 8 (fix) + Phase 11 (verify) + Phase 14 (artifact backfill) + Phase 15 (async/audit closure) | Pending |
-| ADPT-05 | Phase 5 | Phase 8 (timeout) + Phase 10 (recipe + traceability) + Phase 14 (artifact backfill) + Phase 15 (async/audit closure) | Pending |
+| ADPT-04 | Phase 3 | Phase 8 (fix) + Phase 11 (verify) + Phase 14 (artifact backfill) + Phase 15 (async/audit closure) | Done |
+| ADPT-05 | Phase 5 | Phase 8 (timeout) + Phase 10 (recipe + traceability) + Phase 14 (artifact backfill) + Phase 15 (async/audit closure) | Done |
 | OBS-01 | Phase 1 | Phase 6 (telemetry contract) + Phase 11 (verify) | Done |
 | OBS-02 | Phase 3 | Phase 6 (metrics) + Phase 8 (timeout) + Phase 11 (verify) | Done |
 | OBS-03 | Phase 1 | Phase 7 (envelope) + Phase 11 (verify) + Phase 14 (artifact backfill) + Phase 16 (boundary proof) | Pending |
-| OBS-04 | Phase 3 | Phase 8 (Oban policy) + Phase 11 (verify) + Phase 15 (async/audit closure) | Pending |
+| OBS-04 | Phase 3 | Phase 8 (Oban policy) + Phase 11 (verify) + Phase 15 (async/audit closure) | Done |
 | QUAL-01 | Phase 4 | Phase 9 (CI + alias) + Phase 11 (verify) + Phase 12 (verification chain) + Phase 14 (artifact backfill) + Phase 17 (gate recovery) | Pending |
 | QUAL-02 | Phase 4 | Phase 9 (verify_docs) + Phase 11 (verify) + Phase 13 (docs closure) + Phase 14 (artifact backfill) | Done |
 | QUAL-03 | Phase 4 | Phase 7 (example app) + Phase 9 (CI) + Phase 11 (verify) + Phase 12 (verification chain) + Phase 14 (artifact backfill) | Done |
@@ -111,8 +111,8 @@ Each row lists the original implementation phase and the gap-closure phase that 
 - v1 requirements: 24 total
 - Mapped to phases: 24
 - Unmapped: 0 ✓
-- Verified (Done): 19
-- Pending verification: 5
+- Verified (Done): 22
+- Pending verification: 2
 - Partial verification: 0
 - Blocked verification: 0
 
