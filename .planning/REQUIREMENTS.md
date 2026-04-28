@@ -92,15 +92,15 @@ Each row lists the original implementation phase and the gap-closure phase that 
 | LAY-03 | Phase 2 | Phase 11 (verify) | Done |
 | LAY-04 | Phase 2 | Phase 11 (verify) | Done |
 | LAY-05 | Phase 2 | Phase 11 (verify) | Done |
-| ADPT-01 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) | Pending |
-| ADPT-02 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) | Pending |
-| ADPT-03 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) | Pending |
-| ADPT-04 | Phase 3 | Phase 8 (fix) + Phase 11 (verify) | Pending |
+| ADPT-01 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) | Done |
+| ADPT-02 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) | Done |
+| ADPT-03 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) | Done |
+| ADPT-04 | Phase 3 | Phase 8 (fix) + Phase 11 (verify) | Done |
 | ADPT-05 | Phase 5 | Phase 8 (timeout) + Phase 10 (recipe + traceability) | Done |
 | OBS-01 | Phase 1 | Phase 6 (telemetry contract) + Phase 11 (verify) | Done |
-| OBS-02 | Phase 3 | Phase 6 (metrics) + Phase 8 (timeout) + Phase 11 (verify) | Pending |
+| OBS-02 | Phase 3 | Phase 6 (metrics) + Phase 8 (timeout) + Phase 11 (verify) | Done |
 | OBS-03 | Phase 1 | Phase 7 (envelope) + Phase 11 (verify) | Done |
-| OBS-04 | Phase 3 | Phase 8 (Oban policy) + Phase 11 (verify) | Pending |
+| OBS-04 | Phase 3 | Phase 8 (Oban policy) + Phase 11 (verify) | Done |
 | QUAL-01 | Phase 4 | Phase 9 (CI + alias) + Phase 11 (verify) | Pending |
 | QUAL-02 | Phase 4 | Phase 9 (verify_docs) + Phase 11 (verify) | Pending |
 | QUAL-03 | Phase 4 | Phase 7 (example app) + Phase 9 (CI) + Phase 11 (verify) | Pending |
