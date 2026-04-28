@@ -39,21 +39,31 @@ defmodule Rendro.Pipeline do
         Map.put(base_meta, :stage, :render)
       )
 
-      task = Task.async(fn -> run_stages_with_capture(doc, base_meta, policies) end)
+      progress_ref = make_ref()
+      owner = self()
+
+      task =
+        Task.async(fn ->
+          run_stages_with_capture(doc, base_meta, policies, owner, progress_ref)
+        end)
 
       case Task.yield(task, timeout) || Task.shutdown(task) do
         {:ok, {:ok, result}} ->
+          latest_progress_page_count(progress_ref, length(doc.pages))
           emit_render_stop(result, doc, base_meta, started_at)
           unwrap_run_result(result)
 
         {:ok, {:exception, kind, reason, stacktrace}} ->
+          latest_progress_page_count(progress_ref, length(doc.pages))
           emit_render_exception(base_meta, started_at, kind, reason, stacktrace)
           :erlang.raise(kind, reason, stacktrace)
 
         nil ->
-          result = {:error, Error.from_stage(:render, :timeout, base_meta)}
+          page_count = latest_progress_page_count(progress_ref, length(doc.pages))
+          error = Error.from_stage(:render, :timeout, base_meta)
+          result = {:error_with_page_count, error, page_count}
           emit_render_stop(result, doc, base_meta, started_at)
-          result
+          {:error, error}
       end
     end
   end
@@ -82,6 +92,18 @@ defmodule Rendro.Pipeline do
           byte_size: byte_size(pdf_binary)
         }
 
+      {:error_with_page_count, %Error{} = error, page_count} ->
+        %{
+          render_id: base_meta.render_id,
+          document_type: base_meta.document_type,
+          deterministic: base_meta.deterministic,
+          stage: error.stage,
+          status: :error,
+          page_count: page_count,
+          byte_size: 0,
+          error: %{kind: error.reason, stage: error.stage}
+        }
+
       {:error, %Error{} = error} ->
         %{
           render_id: base_meta.render_id,
@@ -93,18 +115,6 @@ defmodule Rendro.Pipeline do
           byte_size: 0,
           error: %{kind: error.reason, stage: error.stage}
         }
-    end
-  end
-
-  defp run_stages(doc, base_meta, policies) do
-    with {:ok, doc} <- span(:build, base_meta, fn -> Build.run(doc) end, doc),
-         {:ok, doc} <- span(:compose, base_meta, fn -> Compose.run(doc) end, doc),
-         {:ok, doc} <- span(:measure, base_meta, fn -> Measure.run(doc) end, doc),
-         {:ok, doc} <- span(:paginate, base_meta, fn -> Paginate.run(doc) end, doc),
-         :ok <- validate_policy(:pages, doc, policies, base_meta),
-         {:ok, pdf_binary} <- span(:render, base_meta, fn -> Render.run(doc) end, doc),
-         {:ok, pdf_binary} <- span(:validate, base_meta, fn -> Validate.run(pdf_binary, doc) end, doc) do
-      {:ok, {pdf_binary, doc}}
     end
   end
 
@@ -187,9 +197,9 @@ defmodule Rendro.Pipeline do
     end
   end
 
-  defp run_stages_with_capture(doc, base_meta, policies) do
+  defp run_stages_with_capture(doc, base_meta, policies, owner, progress_ref) do
     try do
-      {:ok, run_stages(doc, base_meta, policies)}
+      {:ok, run_stages(doc, base_meta, policies, owner, progress_ref)}
     rescue
       exception ->
         {:exception, :error, exception, __STACKTRACE__}
@@ -201,4 +211,31 @@ defmodule Rendro.Pipeline do
 
   defp unwrap_run_result({:ok, {pdf_binary, _doc}}), do: {:ok, pdf_binary}
   defp unwrap_run_result(result), do: result
+
+  defp run_stages(doc, base_meta, policies, owner, progress_ref) do
+    with {:ok, doc} <- span(:build, base_meta, fn -> Build.run(doc) end, doc),
+         {:ok, doc} <- span(:compose, base_meta, fn -> Compose.run(doc) end, doc),
+         {:ok, doc} <- span(:measure, base_meta, fn -> Measure.run(doc) end, doc),
+         {:ok, doc} <- span(:paginate, base_meta, fn -> Paginate.run(doc) end, doc),
+         :ok <- report_page_count(owner, progress_ref, doc),
+         :ok <- validate_policy(:pages, doc, policies, base_meta),
+         {:ok, pdf_binary} <- span(:render, base_meta, fn -> Render.run(doc) end, doc),
+         {:ok, pdf_binary} <- span(:validate, base_meta, fn -> Validate.run(pdf_binary, doc) end, doc) do
+      {:ok, {pdf_binary, doc}}
+    end
+  end
+
+  defp report_page_count(owner, progress_ref, %Rendro.Document{pages: pages}) do
+    send(owner, {:rendro_progress_page_count, progress_ref, length(pages)})
+    :ok
+  end
+
+  defp latest_progress_page_count(progress_ref, fallback) do
+    receive do
+      {:rendro_progress_page_count, ^progress_ref, page_count} ->
+        latest_progress_page_count(progress_ref, page_count)
+    after
+      0 -> fallback
+    end
+  end
 end
