@@ -79,4 +79,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-28 after Phase 12 (Verification Chain Closure) completion — hosted CI now truthfully delegates to a canonical `mix ci` lane covering format, compile, tests, docs, and package build; `mix verify` completes deterministic and advisory lanes before a single final exit; closes `QUAL-01`, `QUAL-03`, and `QUAL-05`.*
+*Last updated: 2026-04-28 after Phase 16 (Phoenix Error Boundary Proof) completion.
