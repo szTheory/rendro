@@ -68,4 +68,4 @@ None - no external service configuration required.
 ## Next Phase Readiness
 
 - `mix verify` and `mix release.preflight` can now be rewired to the same named docs gate.
-- The remaining gap is proof ergonomics: maintainers still need a reusable isolated command for clean tagged preflight evidence.
+- The reusable isolated proof command now exists and the exact-tag happy path is covered by the committed helper, tests, and hosted CI wiring added after this summary's original execution point.

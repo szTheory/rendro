@@ -42,3 +42,6 @@ tmp/
 # Example app artifacts
 examples/phoenix_example/_build/
 examples/phoenix_example/deps/
+
+# Runtime crash artifacts
+erl_crash.dump

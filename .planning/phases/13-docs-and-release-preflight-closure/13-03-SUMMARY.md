@@ -71,4 +71,4 @@ None - no external service configuration required.
 ## Next Phase Readiness
 
 - Phase 13 now leaves both docs-contract and release-preflight surfaces rerunnable through named commands.
-- The remaining manual proof is the real tagged happy-path run from a clean `vX.Y.Z` ref, which the new helper is designed to orchestrate.
+- The formerly manual tagged happy-path proof is now automated through the helper's `--current-version-tag` flow, its regression coverage, and the hosted `release-proof` CI job.
