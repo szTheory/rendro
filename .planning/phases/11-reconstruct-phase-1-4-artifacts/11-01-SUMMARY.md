@@ -49,7 +49,7 @@ key-decisions:
 patterns-established:
   - "Reconstructed artifacts explicitly cross-reference their own PLAN/SUMMARY/VERIFICATION filenames to keep traceability self-contained."
   - "Central requirements rows update immediately from phase verification verdicts, while coverage totals are recomputed only at final closeout."
-requirements-completed: [CORE-01, CORE-02, CORE-03, CORE-04, CORE-05, LAY-01, LAY-02, LAY-03, LAY-04, LAY-05, ADPT-01, ADPT-02, ADPT-03, ADPT-04, OBS-01, OBS-02, OBS-03, OBS-04, QUAL-01, QUAL-02, QUAL-03, QUAL-04, QUAL-05]
+requirements_completed: [CORE-01, CORE-02, CORE-03, CORE-04, CORE-05, LAY-01, LAY-02, LAY-03, LAY-04, LAY-05, ADPT-01, ADPT-02, ADPT-03, ADPT-04, OBS-01, OBS-02, OBS-03, OBS-04]
 metrics:
   duration_min: 31
   completed: 2026-04-28
