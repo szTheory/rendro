@@ -44,7 +44,7 @@ defmodule Rendro.Pipeline do
       case Task.yield(task, timeout) || Task.shutdown(task) do
         {:ok, {:ok, result}} ->
           emit_render_stop(result, doc, base_meta, started_at)
-          result
+          unwrap_run_result(result)
 
         {:ok, {:exception, kind, reason, stacktrace}} ->
           emit_render_exception(base_meta, started_at, kind, reason, stacktrace)
@@ -60,7 +60,18 @@ defmodule Rendro.Pipeline do
 
   defp build_stop_meta(result, doc, base_meta) do
     case result do
-      {:ok, pdf_binary} ->
+      {:ok, {pdf_binary, %Rendro.Document{} = final_doc}} ->
+        %{
+          render_id: base_meta.render_id,
+          document_type: base_meta.document_type,
+          deterministic: base_meta.deterministic,
+          stage: :render,
+          status: :ok,
+          page_count: length(final_doc.pages),
+          byte_size: byte_size(pdf_binary)
+        }
+
+      {:ok, pdf_binary} when is_binary(pdf_binary) ->
         %{
           render_id: base_meta.render_id,
           document_type: base_meta.document_type,
@@ -91,8 +102,9 @@ defmodule Rendro.Pipeline do
          {:ok, doc} <- span(:measure, base_meta, fn -> Measure.run(doc) end, doc),
          {:ok, doc} <- span(:paginate, base_meta, fn -> Paginate.run(doc) end, doc),
          :ok <- validate_policy(:pages, doc, policies, base_meta),
-         {:ok, pdf_binary} <- span(:render, base_meta, fn -> Render.run(doc) end, doc) do
-      span(:validate, base_meta, fn -> Validate.run(pdf_binary, doc) end, doc)
+         {:ok, pdf_binary} <- span(:render, base_meta, fn -> Render.run(doc) end, doc),
+         {:ok, pdf_binary} <- span(:validate, base_meta, fn -> Validate.run(pdf_binary, doc) end, doc) do
+      {:ok, {pdf_binary, doc}}
     end
   end
 
@@ -186,4 +198,7 @@ defmodule Rendro.Pipeline do
         {:exception, kind, reason, __STACKTRACE__}
     end
   end
+
+  defp unwrap_run_result({:ok, {pdf_binary, _doc}}), do: {:ok, pdf_binary}
+  defp unwrap_run_result(result), do: result
 end

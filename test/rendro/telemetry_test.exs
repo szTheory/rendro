@@ -189,6 +189,15 @@ defmodule Rendro.TelemetryTest do
       assert meta.byte_size > 0
       assert meta.status == :ok
     end
+
+    test "top-level render stop uses paginated page_count for flow documents" do
+      {:ok, _pdf} = Rendro.Pipeline.run(Rendro.flow([Rendro.block(Rendro.text("Flow"))]))
+      events = TelemetryHelper.collect_events()
+
+      [top_stop] = render_events(events, :stop)
+      {_event, _measurements, meta} = top_stop
+      assert meta.page_count == 1
+    end
   end
 
   describe "start event metadata" do

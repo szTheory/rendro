@@ -53,6 +53,14 @@ defmodule Rendro.Adapters.ThreadlineTest do
       refute Map.has_key?(metadata, :document)
     end
 
+    test "successful flow render forwards the paginated page_count" do
+      {:ok, _pdf} = Rendro.Pipeline.run(Rendro.flow([Rendro.block(Rendro.text("Audit flow"))]))
+
+      [{action, metadata} | _] = Mocks.threadline_calls()
+      assert action == :render_succeeded
+      assert metadata.page_count == 1
+    end
+
     test "failed render forwards :render_failed" do
       assert {:error, %Rendro.Error{}} = Rendro.Pipeline.run(failing_document())
 
