@@ -22,7 +22,7 @@ key-decisions:
 patterns-established:
   - "Verification lanes should accumulate pass/fail state per step and print one combined verdict after all planned lanes run."
   - "Mix task output regressions should be tested through injected step functions rather than full subprocess execution."
-requirements-completed: [QUAL-01, QUAL-05]
+requirements_completed: [QUAL-01, QUAL-05]
 duration: 22min
 completed: 2026-04-28
 ---

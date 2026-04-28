@@ -24,7 +24,7 @@ key-decisions:
   - Pin hosted verification to OTP 28 and Elixir 1.19.5 to match the project's declared runtime contract.
 patterns-established:
   - "Hosted proof pattern: commit a single CI workflow that runs canonical root verification first, then explicit adoption proof steps."
-requirements-completed: [QUAL-01, QUAL-03]
+requirements_completed: [QUAL-01, QUAL-03]
 duration: 2min
 completed: 2026-04-28
 ---

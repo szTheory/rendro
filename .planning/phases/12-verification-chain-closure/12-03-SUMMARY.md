@@ -28,7 +28,7 @@ key-decisions:
 patterns-established:
   - "Canonical merge-blocking requirements should be encoded directly in `mix.exs` aliases instead of being split across workflow YAML and docs."
   - "Public Mix task command-boundary tests can use a test-only env seam when internal helpers alone are insufficient to prove exit behavior."
-requirements-completed: [QUAL-01, QUAL-05]
+requirements_completed: [QUAL-01, QUAL-05]
 duration: 6min
 completed: 2026-04-28
 ---

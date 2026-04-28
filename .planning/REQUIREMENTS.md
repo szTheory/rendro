@@ -92,15 +92,15 @@ Each row lists the original implementation phase and the gap-closure phase that 
 | LAY-03 | Phase 2 | Phase 11 (verify) | Done |
 | LAY-04 | Phase 2 | Phase 11 (verify) | Done |
 | LAY-05 | Phase 2 | Phase 11 (verify) | Done |
-| ADPT-01 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) + Phase 14 (artifact backfill) | Pending |
-| ADPT-02 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) + Phase 14 (artifact backfill) | Pending |
-| ADPT-03 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) + Phase 14 (artifact backfill) | Pending |
-| ADPT-04 | Phase 3 | Phase 8 (fix) + Phase 11 (verify) + Phase 14 (artifact backfill) | Pending |
-| ADPT-05 | Phase 5 | Phase 8 (timeout) + Phase 10 (recipe + traceability) + Phase 14 (artifact backfill) | Pending |
+| ADPT-01 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) + Phase 14 (artifact backfill) | Done |
+| ADPT-02 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) + Phase 14 (artifact backfill) | Done |
+| ADPT-03 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) + Phase 14 (artifact backfill) | Done |
+| ADPT-04 | Phase 3 | Phase 8 (fix) + Phase 11 (verify) + Phase 14 (artifact backfill) | Partial |
+| ADPT-05 | Phase 5 | Phase 8 (timeout) + Phase 10 (recipe + traceability) + Phase 14 (artifact backfill) | Partial |
 | OBS-01 | Phase 1 | Phase 6 (telemetry contract) + Phase 11 (verify) | Done |
 | OBS-02 | Phase 3 | Phase 6 (metrics) + Phase 8 (timeout) + Phase 11 (verify) | Done |
-| OBS-03 | Phase 1 | Phase 7 (envelope) + Phase 11 (verify) + Phase 14 (artifact backfill) | Pending |
-| OBS-04 | Phase 3 | Phase 8 (Oban policy) + Phase 11 (verify) | Done |
+| OBS-03 | Phase 1 | Phase 7 (envelope) + Phase 11 (verify) + Phase 14 (artifact backfill) | Partial |
+| OBS-04 | Phase 3 | Phase 8 (Oban policy) + Phase 11 (verify) | Partial |
 | QUAL-01 | Phase 4 | Phase 9 (CI + alias) + Phase 11 (verify) + Phase 12 (verification chain) + Phase 14 (artifact backfill) | Done |
 | QUAL-02 | Phase 4 | Phase 9 (verify_docs) + Phase 11 (verify) + Phase 13 (docs closure) + Phase 14 (artifact backfill) | Done |
 | QUAL-03 | Phase 4 | Phase 7 (example app) + Phase 9 (CI) + Phase 11 (verify) + Phase 12 (verification chain) + Phase 14 (artifact backfill) | Done |
@@ -111,11 +111,11 @@ Each row lists the original implementation phase and the gap-closure phase that 
 - v1 requirements: 24 total
 - Mapped to phases: 24
 - Unmapped: 0 ✓
-- Verified (Done): 18
-- Pending verification: 6
-- Partial verification: 0
+- Verified (Done): 20
+- Pending verification: 0
+- Partial verification: 4
 - Blocked verification: 0
 
 ---
 *Requirements defined: 2026-04-24*
-*Last updated: 2026-04-28 after Phase 12 Plan 02 verification-lane closure*
+*Last updated: 2026-04-28 after Phase 14 Plan 04 final traceability synchronization*
