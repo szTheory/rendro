@@ -276,7 +276,10 @@ Plans:
   1. A committed Phoenix `conn`-boundary test exercises the adapter error path through an HTTP response.
   2. The HTTP error response proves the structured `Rendro.Error` envelope is preserved at the operator-facing boundary.
   3. Verification artifacts can mark `OBS-03` closed from committed evidence instead of implementation-only confidence.
-**Plans**: 0 plans
+**Plans**: 1 plan
+
+Plans:
+- [ ] 16-01-PLAN.md — Update Phoenix adapter error response to JSON when negotiated
 
 ### Phase 17: Deterministic CI Gate Recovery + Traceability Resync
 **Goal**: Reopen and close the current quality-gate regression by fixing the committed formatting failure and aligning requirement traceability with the actual milestone gate state.
