@@ -23,6 +23,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 9: CI Scheduler + Release Hardening** - Land the CI YAML, expand the `mix ci` lane, fix `mix verify` advisory crash semantics, and harden release preflight tag/dry-run parity.
 - [ ] **Phase 10: Recipe Correctness + Traceability Sync** - Fix Mailglass custom-wrapper dispatch, return typed errors from Accrue, and resync REQUIREMENTS.md ADPT-05 status.
 - [x] **Phase 11: Reconstruct Phase 1-4 GSD Artifacts** - Map existing tests to requirements and produce evidence-based PLAN/SUMMARY/VERIFICATION for phases 1-4 against the fixed code.
+- [ ] **Phase 12: Verification Chain Closure** - Commit hosted CI proof, make `mix verify` complete deterministic and advisory lanes end-to-end, and close the remaining verification-lane gaps.
+- [ ] **Phase 13: Docs and Release Preflight Closure** - Remove docs-contract blind spots and make release preflight fail on dirty/tag-parity issues while exercising publish dry-run parity.
+- [ ] **Phase 14: Milestone Verification Artifact Backfill** - Add milestone-grade `VERIFICATION.md` artifacts for Phases 7-11 and resync traceability/process evidence with the audit.
 
 ## Phase Details
 
@@ -194,6 +197,39 @@ Plans:
   3. Each VERIFICATION.md scores must-haves against the live test suite (not against intent statements).
   4. REQUIREMENTS.md traceability statuses for Phases 1-4 reflect verified evidence, not documentation drift.
 **Plans**: 1 plan (to be planned via `/gsd-plan-phase 11`)
+
+### Phase 12: Verification Chain Closure
+**Goal**: Restore trustworthy quality verification by committing the hosted CI workflow, making `mix verify` complete both deterministic and advisory lanes without aborting early, and re-proving the Phoenix example path under CI-backed evidence.
+**Depends on**: Phase 11
+**Requirements**: [QUAL-01, QUAL-03, QUAL-05]
+**Gap Closure**: Closes `INT-VERIFY-LANES`, `INT-CI-TRACKING`, and the audit flow break in verification lane separation from `.planning/v1.0-v1.0-MILESTONE-AUDIT.md`
+**Success Criteria** (what must be TRUE):
+  1. `.github/workflows/ci.yml` is tracked in git and runs the canonical verification lane on PRs and merges.
+  2. `mix verify` executes deterministic and advisory segments end-to-end and reports failures without crashing or aborting the advisory segment prematurely.
+  3. Phoenix example adoption proof is exercised by committed CI evidence rather than only by local compilation state.
+**Plans**: 0 plans
+
+### Phase 13: Docs and Release Preflight Closure
+**Goal**: Close the remaining docs-contract and release-safety gaps so public claims and release automation are both enforced by executable checks.
+**Depends on**: Phase 12
+**Requirements**: [QUAL-02, QUAL-04]
+**Gap Closure**: Closes `INT-RELEASE-PREFLIGHT` and the audit flow breaks in docs-contract verification and release preflight from `.planning/v1.0-v1.0-MILESTONE-AUDIT.md`
+**Success Criteria** (what must be TRUE):
+  1. `scripts/verify_docs.exs` no longer silently skips partial snippets that matter to public contract verification, or explicitly fails/warns in a way CI surfaces.
+  2. `mix release.preflight` fails dirty worktrees, enforces tag/version parity, and reaches publish dry-run parity checks.
+  3. Docs-contract and release-preflight checks can be rerun as evidence-backed milestone gates.
+**Plans**: 0 plans
+
+### Phase 14: Milestone Verification Artifact Backfill
+**Goal**: Produce milestone-grade verification artifacts for Phases 7 through 11 and repair traceability/process drift so audit status, summaries, and requirement rows tell the same story.
+**Depends on**: Phases 12, 13
+**Requirements**: [ADPT-01, ADPT-02, ADPT-03, ADPT-04, ADPT-05, OBS-03, QUAL-01, QUAL-02, QUAL-03, QUAL-04, QUAL-05]
+**Gap Closure**: Closes `INT-PHASE-ARTIFACTS` and the audit-noted traceability drift for later gap-closure phases from `.planning/v1.0-v1.0-MILESTONE-AUDIT.md`
+**Success Criteria** (what must be TRUE):
+  1. Phases `07`, `08`, `09`, `10`, and `11` each have milestone-grade `VERIFICATION.md` artifacts.
+  2. Summary metadata and workflow extraction fields use the naming expected by automation so evidence is discoverable.
+  3. REQUIREMENTS.md traceability for affected adapter/quality requirements matches the new artifact-backed verification state.
+**Plans**: 0 plans
 
 ## Progress
 
