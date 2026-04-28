@@ -101,18 +101,20 @@ Each row lists the original implementation phase and the gap-closure phase that 
 | OBS-02 | Phase 3 | Phase 6 (metrics) + Phase 8 (timeout) + Phase 11 (verify) | Done |
 | OBS-03 | Phase 1 | Phase 7 (envelope) + Phase 11 (verify) | Done |
 | OBS-04 | Phase 3 | Phase 8 (Oban policy) + Phase 11 (verify) | Done |
-| QUAL-01 | Phase 4 | Phase 9 (CI + alias) + Phase 11 (verify) | Pending |
-| QUAL-02 | Phase 4 | Phase 9 (verify_docs) + Phase 11 (verify) | Pending |
-| QUAL-03 | Phase 4 | Phase 7 (example app) + Phase 9 (CI) + Phase 11 (verify) | Pending |
-| QUAL-04 | Phase 4 | Phase 9 (preflight) + Phase 10 (traceability) + Phase 11 (verify) | Pending |
-| QUAL-05 | Phase 4 | Phase 9 (verify lanes) + Phase 11 (verify) | Pending |
+| QUAL-01 | Phase 4 | Phase 9 (CI + alias) + Phase 11 (verify) | Partial |
+| QUAL-02 | Phase 4 | Phase 9 (verify_docs) + Phase 11 (verify) | Partial |
+| QUAL-03 | Phase 4 | Phase 7 (example app) + Phase 9 (CI) + Phase 11 (verify) | Partial |
+| QUAL-04 | Phase 4 | Phase 9 (preflight) + Phase 10 (traceability) + Phase 11 (verify) | Blocked |
+| QUAL-05 | Phase 4 | Phase 9 (verify lanes) + Phase 11 (verify) | Partial |
 
 **Coverage:**
 - v1 requirements: 24 total
 - Mapped to phases: 24
 - Unmapped: 0 ✓
-- Verified (Done): 1
-- Pending verification: 23
+- Verified (Done): 19
+- Pending verification: 0
+- Partial verification: 4
+- Blocked verification: 1
 
 ---
 *Requirements defined: 2026-04-24*
