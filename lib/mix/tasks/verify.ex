@@ -36,11 +36,15 @@ defmodule Mix.Tasks.Verify do
   end
 
   defp default_lanes do
-    if Mix.env() == :test do
+    if test_process_running?() do
       Application.get_env(:rendro, :verify_test_lanes, verification_lanes())
     else
       verification_lanes()
     end
+  end
+
+  defp test_process_running? do
+    Mix.env() == :test and Code.ensure_loaded?(ExUnit.Server) and Process.whereis(ExUnit.Server)
   end
 
   defp verification_lanes do
