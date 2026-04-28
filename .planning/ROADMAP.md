@@ -26,7 +26,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 12: Verification Chain Closure** - Commit hosted CI proof, make `mix verify` complete deterministic and advisory lanes end-to-end, and close the remaining verification-lane gaps.
 - [x] **Phase 13: Docs and Release Preflight Closure** - Remove docs-contract blind spots and make release preflight fail on dirty/tag-parity issues while exercising publish dry-run parity.
 - [x] **Phase 14: Milestone Verification Artifact Backfill** - Add milestone-grade `VERIFICATION.md` artifacts for Phases 7-11 and resync traceability/process evidence with the audit.
-- [ ] **Phase 15: Async Policy Injection + Timeout Audit Closure** - Restore Oban policy injection and timeout-to-audit handoff so bounded async rendering and timeout observability match the v1 contract.
+- [x] **Phase 15: Async Policy Injection + Timeout Audit Closure** - Restore Oban policy injection and timeout-to-audit handoff so bounded async rendering and timeout observability match the v1 contract.
 - [ ] **Phase 16: Phoenix Error Boundary Proof** - Add committed boundary proof for the Phoenix adapter's operator-facing structured error response.
 - [ ] **Phase 17: Deterministic CI Gate Recovery + Traceability Resync** - Repair the live `mix ci` formatting regression and resync milestone traceability with the reopened quality gate.
 
@@ -260,7 +260,12 @@ Plans:
   2. Timeout failures produce the audit-visible top-level event required for Threadline-style handlers before returning the timeout error.
   3. Committed tests prove both bounded async policy injection and timeout audit handoff end-to-end.
   4. `ADPT-04`, `ADPT-05`, and `OBS-04` can be re-verified from current artifacts without relying on stale milestone summaries.
-**Plans**: 0 plans
+**Plans**: 3 plans
+
+Plans:
+- [x] 15-01-PLAN.md — Restore the Oban worker policy boundary with strict validation and worker-path proof
+- [x] 15-02-PLAN.md — Close timeout top-level telemetry and Threadline audit handoff with docs-contract proof
+- [x] 15-03-PLAN.md — Backfill Phase 15 verification artifacts and sync central requirements truth
 
 ### Phase 16: Phoenix Error Boundary Proof
 **Goal**: Convert the Phoenix adapter's structured error response from inferred behavior into a committed operator-facing boundary contract.

@@ -1,6 +1,6 @@
 ---
 phase: 15-async-policy-injection-timeout-audit-closure
-verified: 2026-04-28T20:10:03Z
+verified: 2026-04-28T20:21:00Z
 status: passed
 requirements:
   - ADPT-04
@@ -75,5 +75,5 @@ Operators can now enforce max pages, max output bytes, and render timeouts acros
 
 ---
 
-_Verified: 2026-04-28T20:10:03Z_
+_Verified: 2026-04-28T20:21:00Z_
 _Verifier: Codex_

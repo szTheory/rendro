@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: complete
-stopped_at: Completed Phase 14 verification
-last_updated: "2026-04-28T18:25:00Z"
-last_activity: 2026-04-28 -- Completed Phase 14 verification
+stopped_at: Completed Phase 15 verification
+last_updated: "2026-04-28T20:16:00Z"
+last_activity: 2026-04-28 -- Completed Phase 15 verification
 progress:
-  total_phases: 14
-  completed_phases: 14
-  total_plans: 28
-  completed_plans: 28
+  total_phases: 17
+  completed_phases: 15
+  total_plans: 31
+  completed_plans: 31
   percent: 100
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-24)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Milestone complete
+**Current focus:** Phase 15 complete; Phase 16 remains next for `OBS-03`
 
 ## Current Position
 
-Phase: 14 (milestone verification artifact backfill) — COMPLETE
+Phase: 15 (async-policy-injection-timeout-audit-closure) — COMPLETE
 Plan: Complete
 Status: Phase verified and complete
-Last activity: 2026-04-28 -- Completed Phase 14 verification
+Last activity: 2026-04-28 -- Completed Phase 15 verification
 
 Progress: [██████████] 100%
 
@@ -79,7 +79,7 @@ Recent decisions affecting current work:
 - [Init] Enforce truthful docs/release verification as a first-class quality contract.
 - Phase 1-3 reconstruction closes only from current executable proof; no runtime edits were needed beyond the Phoenix proving test.
 - Phase 4 quality/release verdicts must come from clean-worktree command results, not dirty-workspace state or untracked CI files.
-- The final requirements traceability table remains mixed: 19 Done, 4 Partial, 1 Blocked.
+- The Phase 15 closure moved `ADPT-04`, `ADPT-05`, and `OBS-04` to Done from current proof, leaving `OBS-03` and `QUAL-01` as the remaining open verification rows.
 - Keep hosted CI narrow: run mix ci first, then prove the Phoenix example path in a separate explicit workflow step.
 - Pin hosted verification to OTP 28 and Elixir 1.19.5 to match the project runtime contract.
 - Keep mix verify fail-fast only at the command boundary by returning structured per-step results and exiting once after the final summary.
@@ -124,4 +124,4 @@ Last session: 2026-04-28T18:25:00Z
 Stopped at: Completed Phase 14 verification
 Resume file: None
 
-**Planned Phase:** 14 (Milestone Verification Artifact Backfill)
+**Planned Phase:** 16 (Phoenix Error Boundary Proof)
