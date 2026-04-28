@@ -29,4 +29,12 @@ defmodule Rendro.PolicyTest do
 
     assert {:error, %Rendro.Error{reason: :timeout}} = Rendro.render(doc)
   end
+
+  test "invalid timeout policy returns a typed render error" do
+    doc = Rendro.flow([Rendro.block(Rendro.text("Hello"))])
+    doc = put_in(doc.options[:policies], timeout: "fast")
+
+    assert {:error, %Rendro.Error{stage: :render, reason: {:invalid_policy, :timeout, "fast"}}} =
+             Rendro.render(doc)
+  end
 end

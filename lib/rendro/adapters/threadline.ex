@@ -91,8 +91,12 @@ if Code.ensure_loaded?(Threadline) do
       payload = Map.put(metadata, :render_id, render_id)
 
       try do
-        _ = Threadline.record_action(action, payload)
-        :ok
+        case Threadline.record_action(action, payload) do
+          :ok -> :ok
+          {:ok, _result} -> :ok
+          {:error, reason} -> {:error, reason}
+          other -> {:error, {:unexpected_return, other}}
+        end
       rescue
         e -> {:error, {:exception, e}}
       end

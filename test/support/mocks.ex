@@ -22,6 +22,7 @@ defmodule Rendro.Test.Mocks do
   """
 
   @table :rendro_threadline_calls
+  @result_key :threadline_result
 
   @doc """
   Ensures the ETS table backing the Threadline stub exists.
@@ -57,6 +58,13 @@ defmodule Rendro.Test.Mocks do
   def reset_threadline do
     pid = test_pid()
     :ets.match_delete(@table, {pid, :_, :_, :_})
+    Process.delete(@result_key)
+    :ok
+  end
+
+  @doc "Configures the stubbed Threadline return value for the current test process."
+  def set_threadline_result(result) do
+    Process.put(@result_key, result)
     :ok
   end
 
@@ -96,7 +104,7 @@ unless Code.ensure_loaded?(Threadline) do
     """
     def record_action(action, metadata) do
       Mocks.__record_call__(action, metadata)
-      :ok
+      Process.get(:threadline_result, :ok)
     end
   end
 end

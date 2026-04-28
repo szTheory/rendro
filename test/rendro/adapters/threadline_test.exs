@@ -115,5 +115,19 @@ defmodule Rendro.Adapters.ThreadlineTest do
     test "returns :ok when Threadline.record_action returns :ok" do
       assert :ok = Adapter.track_render("render-id-1", %{action: :render_succeeded})
     end
+
+    test "returns backend errors from Threadline.record_action/2" do
+      Mocks.set_threadline_result({:error, :backend_unavailable})
+
+      assert {:error, :backend_unavailable} =
+               Adapter.track_render("render-id-2", %{action: :render_failed})
+    end
+
+    test "wraps unexpected Threadline return shapes" do
+      Mocks.set_threadline_result(:maybe)
+
+      assert {:error, {:unexpected_return, :maybe}} =
+               Adapter.track_render("render-id-3", %{action: :render_failed})
+    end
   end
 end

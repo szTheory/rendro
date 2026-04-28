@@ -30,22 +30,31 @@ defmodule Rendro.Pipeline do
       deterministic: deterministic
     }
 
-    timeout = Keyword.get(policies, :timeout, 30_000)
-    started_at = System.monotonic_time()
+    with {:ok, timeout} <- validate_timeout_policy(policies, base_meta) do
+      started_at = System.monotonic_time()
 
-    :telemetry.execute(Rendro.Telemetry.render_prefix() ++ [:start], %{}, Map.put(base_meta, :stage, :render))
+      :telemetry.execute(
+        Rendro.Telemetry.render_prefix() ++ [:start],
+        %{},
+        Map.put(base_meta, :stage, :render)
+      )
 
-    task = Task.async(fn -> run_stages(doc, base_meta, policies) end)
+      task = Task.async(fn -> run_stages_with_capture(doc, base_meta, policies) end)
 
-    case Task.yield(task, timeout) || Task.shutdown(task) do
-      {:ok, result} ->
-        emit_render_stop(result, doc, base_meta, started_at)
-        result
+      case Task.yield(task, timeout) || Task.shutdown(task) do
+        {:ok, {:ok, result}} ->
+          emit_render_stop(result, doc, base_meta, started_at)
+          result
 
-      nil ->
-        result = {:error, Error.from_stage(:render, :timeout, base_meta)}
-        emit_render_stop(result, doc, base_meta, started_at)
-        result
+        {:ok, {:exception, kind, reason, stacktrace}} ->
+          emit_render_exception(base_meta, started_at, kind, reason, stacktrace)
+          :erlang.raise(kind, reason, stacktrace)
+
+        nil ->
+          result = {:error, Error.from_stage(:render, :timeout, base_meta)}
+          emit_render_stop(result, doc, base_meta, started_at)
+          result
+      end
     end
   end
 
@@ -149,5 +158,32 @@ defmodule Rendro.Pipeline do
       %{duration: System.monotonic_time() - started_at},
       build_stop_meta(result, doc, base_meta)
     )
+  end
+
+  defp emit_render_exception(base_meta, started_at, kind, reason, stacktrace) do
+    :telemetry.execute(
+      Rendro.Telemetry.render_prefix() ++ [:exception],
+      %{duration: System.monotonic_time() - started_at},
+      Map.merge(base_meta, %{kind: kind, reason: reason, stacktrace: stacktrace, stage: :render})
+    )
+  end
+
+  defp validate_timeout_policy(policies, base_meta) do
+    case Keyword.get(policies, :timeout, 30_000) do
+      value when is_integer(value) and value >= 0 -> {:ok, value}
+      value -> {:error, Error.from_stage(:render, {:invalid_policy, :timeout, value}, base_meta)}
+    end
+  end
+
+  defp run_stages_with_capture(doc, base_meta, policies) do
+    try do
+      {:ok, run_stages(doc, base_meta, policies)}
+    rescue
+      exception ->
+        {:exception, :error, exception, __STACKTRACE__}
+    catch
+      kind, reason ->
+        {:exception, kind, reason, __STACKTRACE__}
+    end
   end
 end
