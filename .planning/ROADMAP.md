@@ -290,7 +290,10 @@ Plans:
   1. `test/scripts/release_preflight_proof_test.exs` is formatted so `mix ci` no longer fails its format check on committed repo state.
   2. The canonical deterministic CI gate is re-run and documented as green from the current checkout state.
   3. `REQUIREMENTS.md` and milestone planning artifacts no longer claim `QUAL-01` is fully closed while the gate is red.
-**Plans**: 0 plans
+**Plans**: 1 plan
+
+Plans:
+- [ ] 17-01-PLAN.md — Fix deterministic CI gate formatting regression and resync QUAL-01 traceability
 
 ## Progress
 
