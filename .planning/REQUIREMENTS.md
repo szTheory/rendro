@@ -35,7 +35,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **OBS-01**: Operator can observe telemetry events for build, compose, measure, paginate, render, and validate lifecycle steps.
 - [ ] **OBS-02**: Operator can correlate render operations with artifact metrics (duration, page count, byte size, status).
-- [ ] **OBS-03**: Operator receives structured errors that explain what happened, where it failed, why, and suggested next actions.
+- [x] **OBS-03
+**: Operator receives structured errors that explain what happened, where it failed, why, and suggested next actions.
 - [ ] **OBS-04**: Operator can enforce policy bounds for max pages, max output bytes, and render timeouts.
 
 ### Quality and Release

@@ -345,17 +345,17 @@ end
 
 All material claims in this research were verified from repo artifacts, live test runs, local runtime inspection, Hex package metadata, or official docs. [VERIFIED: this research session]
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should worker policy input live at the top level or under a nested `"policies"` key?**
-   - What we know: The phase context allows either shape, and the same context explicitly prefers a narrow documented contract. [VERIFIED: 15-CONTEXT.md]
-   - What's unclear: The final docs ergonomics and how much backward-compatibility is desired for existing unpublished examples. [VERIFIED: 15-CONTEXT.md]
-   - Recommendation: Prefer a nested `"policies"` map because it is clearer, easier to validate, and keeps unrelated top-level job metadata out of Rendro’s policy surface. [VERIFIED: 15-CONTEXT.md]
+1. **Worker policy input shape**
+   - Resolved decision: Accept worker policy input under a nested `"policies"` map.
+   - Why: This keeps Rendro's policy surface narrow, separates bounded-render input from unrelated top-level job metadata, and makes unknown-key validation straightforward. [VERIFIED: 15-CONTEXT.md]
+   - Execution implication: Plan 15-01 should document and test `"policies" => %{"max_pages" => ..., "max_bytes" => ..., "timeout" => ...}` as the canonical worker contract.
 
-2. **Should Threadline forward nested `:error` only, or nested `:error` plus convenience `:reason`?**
-   - What we know: The locked contract requires timeout classification in metadata and leaves a convenience `reason: :timeout` field to discretion. [VERIFIED: 15-CONTEXT.md]
-   - What's unclear: Whether downstream consumers need flatter keys for filtering. [VERIFIED: 15-CONTEXT.md]
-   - Recommendation: Make nested `:error` the canonical contract and add flat `:reason` only if guide examples or downstream query ergonomics clearly benefit. [VERIFIED: 15-CONTEXT.md; lib/rendro/adapters/threadline.ex]
+2. **Threadline timeout metadata shape**
+   - Resolved decision: Forward nested `:error` as the canonical audit subtype contract and do not require a flat convenience `:reason` field for Phase 15 closure.
+   - Why: The locked timeout semantics already prefer metadata-based subtype classification, and the nested error map matches the pipeline's stable failed-render schema without widening the public audit surface. [VERIFIED: 15-CONTEXT.md; lib/rendro/pipeline.ex]
+   - Execution implication: Plan 15-02 should preserve timeout filtering through nested `error.kind: :timeout` under the existing `:render_failed` action.
 
 ## Environment Availability
 

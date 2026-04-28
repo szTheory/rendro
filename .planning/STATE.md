@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Phase 16 context gathered
-last_updated: "2026-04-28T20:42:20.174Z"
+stopped_at: Completed 16-01-PLAN.md
+last_updated: "2026-04-28T21:19:24.357Z"
 last_activity: 2026-04-28 -- Completed Phase 15 verification
 progress:
   total_phases: 17
-  completed_phases: 15
-  total_plans: 31
-  completed_plans: 31
+  completed_phases: 16
+  total_plans: 32
+  completed_plans: 32
   percent: 100
 ---
 
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 
 ## Current Position
 
-Phase: 15 (async-policy-injection-timeout-audit-closure) — COMPLETE
+Phase: 16 (phoenix-error-boundary-proof) — COMPLETE
 Plan: Complete
 Status: Phase verified and complete
-Last activity: 2026-04-28 -- Completed Phase 15 verification
+Last activity: 2026-04-28 -- Completed Phase 16 execution
 
 Progress: [██████████] 100%
 
@@ -66,6 +66,7 @@ Progress: [██████████] 100%
 | Phase 14 P02 | 11 | 2 tasks | 5 files |
 | Phase 14 P03 | 11 | 2 tasks | 7 files |
 | Phase 14 P04 | 4 | 2 tasks | 10 files |
+| Phase 16 P01 | 2 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -95,6 +96,8 @@ Recent decisions affecting current work:
 - Keep Phase 10 `QUAL-04` traceability-only and retire the Phase 05 Mailglass wrapper checkpoint in favor of later automated regression proof.
 - Phase 11 needs its own milestone-grade verification artifact instead of relying on reconstructed summaries alone.
 - Central requirements rows must follow explicit verification-source precedence, with later dedicated artifacts overriding earlier reconstruction verdicts.
+- Explicitly map stable envelope fields (what, where, why, next, stage, render_id) instead of directly encoding Rendro.Error to prevent internal leakage (reason, details).
+- Use try..rescue block around Phoenix.Controller.get_format(conn) to safely fallback to text format if format resolution fails.
 
 ### Pending Todos
 
@@ -120,8 +123,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: --stopped-at
-Stopped at: Phase 16 context gathered
-Resume file: --resume-file
+Last session: 2026-04-28T21:19:23.870Z
+Stopped at: Completed 16-01-PLAN.md
+Resume file: None
 
 **Planned Phase:** 16 (Phoenix Error Boundary Proof)
