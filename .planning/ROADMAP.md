@@ -26,6 +26,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 12: Verification Chain Closure** - Commit hosted CI proof, make `mix verify` complete deterministic and advisory lanes end-to-end, and close the remaining verification-lane gaps.
 - [x] **Phase 13: Docs and Release Preflight Closure** - Remove docs-contract blind spots and make release preflight fail on dirty/tag-parity issues while exercising publish dry-run parity.
 - [x] **Phase 14: Milestone Verification Artifact Backfill** - Add milestone-grade `VERIFICATION.md` artifacts for Phases 7-11 and resync traceability/process evidence with the audit.
+- [ ] **Phase 15: Async Policy Injection + Timeout Audit Closure** - Restore Oban policy injection and timeout-to-audit handoff so bounded async rendering and timeout observability match the v1 contract.
+- [ ] **Phase 16: Phoenix Error Boundary Proof** - Add committed boundary proof for the Phoenix adapter's operator-facing structured error response.
+- [ ] **Phase 17: Deterministic CI Gate Recovery + Traceability Resync** - Repair the live `mix ci` formatting regression and resync milestone traceability with the reopened quality gate.
 
 ## Phase Details
 
@@ -246,6 +249,40 @@ Plans:
 - [x] 14-02-PLAN.md — Re-verify the Phase 09 quality chain, replace legacy validation, and reconcile summary drift
 - [x] 14-03-PLAN.md — Backfill Phase 10 verification and retire stale recipe evidence that Phase 10 already closed
 - [x] 14-04-PLAN.md — Backfill Phase 11 verification, normalize later summary metadata, and sync final requirements truth
+
+### Phase 15: Async Policy Injection + Timeout Audit Closure
+**Goal**: Close the remaining async rendering and timeout observability seams by re-injecting render bounds from Oban job args and ensuring timeout failures reach audit handlers as committed evidence-backed events.
+**Depends on**: Phase 14
+**Requirements**: [ADPT-04, ADPT-05, OBS-04]
+**Gap Closure**: Closes `INT-ASYNC-POLICY-INJECTION`, `INT-TIMEOUT-AUDIT-HANDOFF`, and the broken `Oban bounded async render` and `Render timeout to Threadline audit` flows from `.planning/v1.0-v1.0-MILESTONE-AUDIT.md`
+**Success Criteria** (what must be TRUE):
+  1. `Rendro.Adapters.Oban.RenderWorker` merges `max_pages`, `max_bytes`, and `timeout` from job args into the effective document policies before calling `Rendro.render/2`.
+  2. Timeout failures produce the audit-visible top-level event required for Threadline-style handlers before returning the timeout error.
+  3. Committed tests prove both bounded async policy injection and timeout audit handoff end-to-end.
+  4. `ADPT-04`, `ADPT-05`, and `OBS-04` can be re-verified from current artifacts without relying on stale milestone summaries.
+**Plans**: 0 plans
+
+### Phase 16: Phoenix Error Boundary Proof
+**Goal**: Convert the Phoenix adapter's structured error response from inferred behavior into a committed operator-facing boundary contract.
+**Depends on**: Phase 14
+**Requirements**: [OBS-03]
+**Gap Closure**: Closes `INT-PHOENIX-ERROR-BOUNDARY` and the broken `Phoenix operator-facing error response` flow from `.planning/v1.0-v1.0-MILESTONE-AUDIT.md`
+**Success Criteria** (what must be TRUE):
+  1. A committed Phoenix `conn`-boundary test exercises the adapter error path through an HTTP response.
+  2. The HTTP error response proves the structured `Rendro.Error` envelope is preserved at the operator-facing boundary.
+  3. Verification artifacts can mark `OBS-03` closed from committed evidence instead of implementation-only confidence.
+**Plans**: 0 plans
+
+### Phase 17: Deterministic CI Gate Recovery + Traceability Resync
+**Goal**: Reopen and close the current quality-gate regression by fixing the committed formatting failure and aligning requirement traceability with the actual milestone gate state.
+**Depends on**: Phase 14
+**Requirements**: [QUAL-01]
+**Gap Closure**: Closes `INT-CI-FORMAT-REGRESSION` and the broken `Deterministic CI gate` flow from `.planning/v1.0-v1.0-MILESTONE-AUDIT.md`
+**Success Criteria** (what must be TRUE):
+  1. `test/scripts/release_preflight_proof_test.exs` is formatted so `mix ci` no longer fails its format check on committed repo state.
+  2. The canonical deterministic CI gate is re-run and documented as green from the current checkout state.
+  3. `REQUIREMENTS.md` and milestone planning artifacts no longer claim `QUAL-01` is fully closed while the gate is red.
+**Plans**: 0 plans
 
 ## Progress
 
