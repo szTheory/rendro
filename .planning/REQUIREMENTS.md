@@ -25,9 +25,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Integrations and Adapters
 
-- [ ] **ADPT-01**: Phoenix engineer can serve rendered PDFs through download-friendly adapter helpers.
-- [ ] **ADPT-02**: Phoenix engineer can preview rendered output through Phoenix-friendly integration helpers.
-- [ ] **ADPT-03**: Maintainer can enable optional adapters without introducing hard compile/runtime dependencies in core.
+- [x] **ADPT-01**: Phoenix engineer can serve rendered PDFs through download-friendly adapter helpers.
+- [x] **ADPT-02**: Phoenix engineer can preview rendered output through Phoenix-friendly integration helpers.
+- [x] **ADPT-03**: Maintainer can enable optional adapters without introducing hard compile/runtime dependencies in core.
 - [ ] **ADPT-04**: Maintainer can use an optional job-processing adapter pattern for bounded asynchronous rendering.
 - [x] **ADPT-05**: Maintainer can provide do-now integration recipes for `threadline`, `mailglass`, and `accrue` without hard coupling.
 
