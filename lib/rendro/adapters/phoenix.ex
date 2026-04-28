@@ -21,9 +21,7 @@ if Code.ensure_loaded?(Plug.Conn) and Code.ensure_loaded?(Phoenix) do
           |> send_resp(200, binary)
 
         {:error, %Rendro.Error{} = error} ->
-          conn
-          |> put_resp_content_type("text/plain")
-          |> send_resp(500, to_string(error))
+          handle_error(conn, error)
       end
     end
 
@@ -39,9 +37,37 @@ if Code.ensure_loaded?(Plug.Conn) and Code.ensure_loaded?(Phoenix) do
           |> send_resp(200, binary)
 
         {:error, %Rendro.Error{} = error} ->
-          conn
-          |> put_resp_content_type("text/plain")
-          |> send_resp(500, to_string(error))
+          handle_error(conn, error)
+      end
+    end
+
+    defp handle_error(conn, error) do
+      format =
+        try do
+          Phoenix.Controller.get_format(conn)
+        rescue
+          _ -> "text"
+        end
+
+      if format == "json" do
+        json_body =
+          %{
+            "what" => error.what,
+            "where" => to_string(error.where),
+            "why" => to_string(error.why),
+            "next" => error.next,
+            "stage" => to_string(error.stage),
+            "render_id" => error.render_id
+          }
+          |> Phoenix.json_library().encode_to_iodata!()
+
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(500, json_body)
+      else
+        conn
+        |> put_resp_content_type("text/plain")
+        |> send_resp(500, to_string(error))
       end
     end
   end

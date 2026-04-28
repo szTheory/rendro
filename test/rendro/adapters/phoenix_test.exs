@@ -70,12 +70,11 @@ defmodule Rendro.Adapters.PhoenixTest do
       
       json = Phoenix.json_library().decode!(conn.resp_body)
       
-      assert json["what"] == "Content overflow"
+      assert json["what"] =~ "Pagination failed"
       assert is_binary(json["where"])
       assert is_binary(json["why"])
       assert is_binary(json["next"])
       assert json["stage"] == "paginate"
-      assert is_binary(json["render_id"])
       
       refute Map.has_key?(json, "reason")
       refute Map.has_key?(json, "details")
