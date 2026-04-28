@@ -25,7 +25,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 11: Reconstruct Phase 1-4 GSD Artifacts** - Map existing tests to requirements and produce evidence-based PLAN/SUMMARY/VERIFICATION for phases 1-4 against the fixed code.
 - [x] **Phase 12: Verification Chain Closure** - Commit hosted CI proof, make `mix verify` complete deterministic and advisory lanes end-to-end, and close the remaining verification-lane gaps.
 - [x] **Phase 13: Docs and Release Preflight Closure** - Remove docs-contract blind spots and make release preflight fail on dirty/tag-parity issues while exercising publish dry-run parity.
-- [ ] **Phase 14: Milestone Verification Artifact Backfill** - Add milestone-grade `VERIFICATION.md` artifacts for Phases 7-11 and resync traceability/process evidence with the audit.
+- [x] **Phase 14: Milestone Verification Artifact Backfill** - Add milestone-grade `VERIFICATION.md` artifacts for Phases 7-11 and resync traceability/process evidence with the audit.
 
 ## Phase Details
 
@@ -239,7 +239,7 @@ Plans:
   1. Phases `07`, `08`, `09`, `10`, and `11` each have milestone-grade `VERIFICATION.md` artifacts.
   2. Summary metadata and workflow extraction fields use the naming expected by automation so evidence is discoverable.
   3. REQUIREMENTS.md traceability for affected adapter/quality requirements matches the new artifact-backed verification state.
-**Plans**: 4/4 plans executed
+**Plans**: 4/4 plans complete
 
 Plans:
 - [x] 14-01-PLAN.md — Backfill Phase 07 and 08 verification/validation artifacts and normalize summary metadata
