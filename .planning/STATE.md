@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 12-02-PLAN.md
-last_updated: "2026-04-28T13:06:53.698Z"
+stopped_at: Completed 12-03-PLAN.md
+last_updated: "2026-04-28T13:49:36.398Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 14
   completed_phases: 12
-  total_plans: 20
-  completed_plans: 20
+  total_plans: 21
+  completed_plans: 21
   percent: 100
 ---
 
@@ -25,8 +25,8 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 
 ## Current Position
 
-Phase: 12 (verification-chain-closure) — EXECUTING
-Plan: 2 of 2
+Phase: 12 (verification-chain-closure) — COMPLETE
+Plan: 3 of 3
 Status: Phase complete — ready for verification
 Last activity: 2026-04-28
 
@@ -60,6 +60,7 @@ Progress: [██████████] 100%
 | Phase 11 P01 | 31 | 4 tasks | 14 files |
 | Phase 12 P01 | 2 | 1 tasks | 1 files |
 | Phase 12 P02 | 22 | 2 tasks | 2 files |
+| Phase 12 P03 | 6 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -78,6 +79,8 @@ Recent decisions affecting current work:
 - Pin hosted verification to OTP 28 and Elixir 1.19.5 to match the project runtime contract.
 - Keep mix verify fail-fast only at the command boundary by returning structured per-step results and exiting once after the final summary.
 - Use Mix.Shell.Process in tests so info and error output can be asserted in order without invoking the real verification commands.
+- Keep mix ci in MIX_ENV=test and widen ex_doc to [:dev, :test] so hosted CI stays truthful to the documented lane.
+- Allow lane injection for Mix.Tasks.Verify.run/1 only through a test-only app env seam so public shutdown behavior is deterministic to test without changing production lanes.
 
 ### Pending Todos
 
@@ -97,8 +100,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-28T13:06:53.692Z
-Stopped at: Completed 12-02-PLAN.md
+Last session: 2026-04-28T13:49:36.330Z
+Stopped at: Completed 12-03-PLAN.md
 Resume file: None
 
-**Planned Phase:** 12 (Verification Chain Closure) — 2 plans — 2026-04-28T12:55:54Z
+**Planned Phase:** 12 (Verification Chain Closure) — 3 plans — 2026-04-28T12:55:54Z

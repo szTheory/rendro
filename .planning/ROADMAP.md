@@ -207,11 +207,12 @@ Plans:
   1. `.github/workflows/ci.yml` is tracked in git and runs the canonical verification lane on PRs and merges.
   2. `mix verify` executes deterministic and advisory segments end-to-end and reports failures without crashing or aborting the advisory segment prematurely.
   3. Phoenix example adoption proof is exercised by committed CI evidence rather than only by local compilation state.
-**Plans**: 2/2 plans complete
+**Plans**: 3/3 plans complete
 
 Plans:
 - [x] 12-01-PLAN.md — Commit hosted CI workflow and explicit Phoenix example proof
 - [x] 12-02-PLAN.md — Complete `mix verify` deterministic and advisory lanes end-to-end
+- [x] 12-03-PLAN.md — Expand `mix ci` to the full QUAL-01 contract and pin the public `mix verify` shutdown boundary
 
 ### Phase 13: Docs and Release Preflight Closure
 **Goal**: Close the remaining docs-contract and release-safety gaps so public claims and release automation are both enforced by executable checks.
