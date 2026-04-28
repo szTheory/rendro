@@ -8,11 +8,25 @@ Rendro is a pure-Elixir, Phoenix-first PDF and document generation library for t
 
 Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
 
+## Current State
+
+**Shipped Version:** v1.0 (MVP)
+The v1.0 milestone achieved its core guarantees: pure deterministic rendering, robust layout/pagination, Phoenix integration helpers, pipeline telemetry, error envelopes, and canonical CI verification contracts. Gaps identified in the artifact audit were systematically closed to ensure 100% test-backed evidence.
+
+## Next Milestone Goals
+
+- To be defined (run `/gsd-new-milestone` to start next phase).
+
+---
+
+<details><summary><b>Previous Project State (v1.0 Archival)</b></summary>
+
 ## Requirements
 
 ### Validated
 
 - [x] Merge-blocking verification is now truthful and executable: `mix ci` covers format, compile, tests, docs, and package build, and `mix verify` separates deterministic vs advisory lanes without early exit. Validated in Phase 12: Verification Chain Closure (`QUAL-01`, `QUAL-03`, `QUAL-05`).
+- [x] Deterministic CI gate regression is fixed and traceability state perfectly mirrors the true gate status. Validated in Phase 17: Deterministic CI Gate Recovery Traceability Resync (`QUAL-01`).
 
 ### Active
 
@@ -78,5 +92,7 @@ This document evolves at phase transitions and milestone boundaries.
 3. Audit Out of Scope -> reasons still valid?
 4. Update Context with current state
 
+</details>
+
 ---
-*Last updated: 2026-04-28 after Phase 16 (Phoenix Error Boundary Proof) completion.
+*Last updated: 2026-04-28 after Phase 17 (Deterministic CI Gate Recovery Traceability Resync) completion and v1.0 Archival.*
