@@ -1,1 +1,0 @@
-{application,phoenix_example,[{modules,['Elixir.PhoenixExampleWeb.PDFController']},{optional_applications,[]},{applications,[kernel,stdlib,elixir,logger,phoenix,plug,rendro]},{description,"phoenix_example"},{registered,[]},{vsn,"0.1.0"}]}.

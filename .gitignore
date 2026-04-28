@@ -4,6 +4,7 @@
 /doc/
 *.ez
 rendro-*.tar
+/rendro-*/
 
 # ── GSD baseline (auto-generated) ──
 .gsd
@@ -37,4 +38,7 @@ coverage/
 .cache/
 tmp/
 .planning/
-\n# Example app artifacts\nexamples/phoenix_example/_build/\nexamples/phoenix_example/deps/\n
+
+# Example app artifacts
+examples/phoenix_example/_build/
+examples/phoenix_example/deps/
