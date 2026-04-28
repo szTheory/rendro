@@ -22,6 +22,12 @@ defmodule Rendro.Adapters.ThreadlineTest do
     %Rendro.Document{pages: [], metadata: %Rendro.Metadata{}}
   end
 
+  defp timeout_document do
+    content = for i <- 1..200, do: Rendro.block(Rendro.text("timeout #{i}", size: 12))
+    doc = Rendro.flow(content)
+    put_in(doc.options[:policies], timeout: 0)
+  end
+
   describe "telemetry to Threadline mapping" do
     test "successful render forwards :render_succeeded with PII-safe metadata" do
       {:ok, _pdf} = Rendro.Pipeline.run(sample_document())
@@ -70,6 +76,17 @@ defmodule Rendro.Adapters.ThreadlineTest do
       [{_action, metadata} | _] = Mocks.threadline_calls()
       assert is_integer(metadata.duration)
       assert metadata.duration >= 0
+    end
+
+    test "timeout failures forward :render_failed with timeout subtype metadata" do
+      assert {:error, %Rendro.Error{reason: :timeout}} = Rendro.Pipeline.run(timeout_document())
+
+      calls = Mocks.threadline_calls()
+      assert [{action, metadata} | _] = calls
+      assert action == :render_failed
+      assert metadata.status == :error
+      assert metadata.stage == :render
+      assert %{kind: :timeout, stage: :render} = metadata.error
     end
   end
 

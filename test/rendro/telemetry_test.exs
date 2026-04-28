@@ -30,6 +30,12 @@ defmodule Rendro.TelemetryTest do
     %Rendro.Document{pages: [], metadata: %Rendro.Metadata{}}
   end
 
+  defp timeout_document do
+    content = for i <- 1..200, do: Rendro.block(Rendro.text("timeout #{i}", size: 12))
+    doc = Rendro.flow(content)
+    put_in(doc.options[:policies], timeout: 0)
+  end
+
   defp events_by_suffix(events, suffix) do
     Enum.filter(events, fn {event, _m, _meta} -> List.last(event) == suffix end)
   end
@@ -278,6 +284,24 @@ defmodule Rendro.TelemetryTest do
       assert [:rendro, :render, :stop] in event_names
       assert [:rendro, :pipeline, :build, :start] in event_names
       assert [:rendro, :pipeline, :build, :stop] in event_names
+    end
+
+    test "timeout emits a top-level render stop with timeout error metadata" do
+      assert {:error, %Rendro.Error{reason: :timeout}} = Rendro.Pipeline.run(timeout_document())
+      events = TelemetryHelper.collect_events()
+
+      starts = render_events(events, :start)
+      stops = render_events(events, :stop)
+
+      assert length(starts) == 1
+      assert length(stops) == 1
+
+      [{_event, measurements, meta}] = stops
+      assert is_integer(measurements.duration)
+      assert measurements.duration >= 0
+      assert meta.status == :error
+      assert meta.stage == :render
+      assert %{kind: :timeout, stage: :render} = meta.error
     end
   end
 

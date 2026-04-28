@@ -48,13 +48,16 @@ defmodule Rendro.DocsContract.IntegrationsClaimsTest do
     assert content =~ "does **not** support arbitrary job-arg pass-through"
   end
 
-  test "threadline timeout limitation remains truthful" do
+  test "threadline timeout closure stays truthful" do
     content = for i <- 1..200, do: Rendro.block(Rendro.text("timeout me #{i}", size: 12))
     doc = Rendro.flow(content)
     doc = put_in(doc.options[:policies], timeout: 0)
 
     assert {:error, %Rendro.Error{reason: :timeout}} = Rendro.render(doc)
-    assert Mocks.threadline_calls() == []
+
+    assert [{:render_failed, metadata}] = Mocks.threadline_calls()
+    assert metadata.status == :error
+    assert %{kind: :timeout, stage: :render} = metadata.error
   end
 
   test "mailglass failure tuples match the guide contract" do
