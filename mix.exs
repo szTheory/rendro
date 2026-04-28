@@ -19,7 +19,7 @@ defmodule Rendro.MixProject do
         "Pure-Elixir, Phoenix-first PDF/document generation with deterministic layout and pagination",
       source_url: @source_url,
       docs: docs(),
-      dialyzer: [plt_add_apps: [:mix]]
+      dialyzer: [plt_add_apps: [:mix, :stream_data]]
     ]
   end
 
@@ -55,10 +55,10 @@ defmodule Rendro.MixProject do
     [
       ci: [
         "format --check-formatted",
+        "hex.build",
         "compile --warnings-as-errors",
         "test",
         "docs",
-        "hex.build",
         "credo --strict",
         "dialyzer"
       ]

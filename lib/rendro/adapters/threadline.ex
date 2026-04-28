@@ -72,7 +72,10 @@ if Code.ensure_loaded?(Threadline) do
     @spec handle_event(list(atom()), map(), map(), term()) :: :ok | {:error, term()}
     def handle_event([:rendro, :render, :stop], measurements, metadata, _config) do
       meta = build_audit_metadata(measurements, metadata)
-      action = if Map.get(metadata, :status) == :error, do: :render_failed, else: :render_succeeded
+
+      action =
+        if Map.get(metadata, :status) == :error, do: :render_failed, else: :render_succeeded
+
       track_render(meta.render_id, Map.put(meta, :action, action))
     end
 
@@ -87,12 +90,8 @@ if Code.ensure_loaded?(Threadline) do
       payload = Map.put(metadata, :render_id, render_id)
 
       try do
-        case Threadline.record_action(action, payload) do
-          :ok -> :ok
-          {:ok, _} -> :ok
-          {:error, _} = err -> err
-          other -> {:error, {:unexpected_return, other}}
-        end
+        _ = Threadline.record_action(action, payload)
+        :ok
       rescue
         e -> {:error, {:exception, e}}
       end

@@ -12,24 +12,29 @@ defmodule Rendro.Recipes do
   """
   def invoice(data) do
     # data: %{id: "...", items: [%{name: "...", qty: 1, price: 100}], ...}
-    
+
     header = [
       Rendro.block(Rendro.text("INVOICE ##{data.id}", size: 18))
     ]
-    
-    table_rows = Enum.map(data.items, fn item ->
-      [item.name, Integer.to_string(item.qty), "$#{item.price}"]
-    end)
-    
+
+    table_rows =
+      Enum.map(data.items, fn item ->
+        [item.name, Integer.to_string(item.qty), "$#{item.price}"]
+      end)
+
     table = Rendro.table(table_rows, header: ["Item", "Qty", "Price"])
-    
+
     footer = [
       Rendro.block(Rendro.text("Thank you for your business!", size: 10))
     ]
-    
-    Rendro.flow([
-      Rendro.block(Rendro.text("Date: #{data.date}")),
-      Rendro.block(table)
-    ], header: header, footer: footer)
+
+    Rendro.flow(
+      [
+        Rendro.block(Rendro.text("Date: #{data.date}")),
+        Rendro.block(table)
+      ],
+      header: header,
+      footer: footer
+    )
   end
 end

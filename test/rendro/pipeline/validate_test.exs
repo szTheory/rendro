@@ -133,7 +133,8 @@ defmodule Rendro.Pipeline.ValidateTest do
     end
 
     test "raises FunctionClauseError when second arg is not a Document" do
-      assert_raise FunctionClauseError, fn -> Validate.run("%PDF-1.4\n%%EOF\n", :not_a_doc) end
+      run = Function.capture(Validate, :run, 2)
+      assert_raise FunctionClauseError, fn -> run.("%PDF-1.4\n%%EOF\n", :not_a_doc) end
     end
   end
 end

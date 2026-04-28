@@ -8,10 +8,10 @@ defmodule Mix.Tasks.CiAliasContractTest do
 
     assert ci_steps == [
              "format --check-formatted",
+             "hex.build",
              "compile --warnings-as-errors",
              "test",
              "docs",
-             "hex.build",
              "credo --strict",
              "dialyzer"
            ]

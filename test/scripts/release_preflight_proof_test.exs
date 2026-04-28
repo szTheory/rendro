@@ -32,7 +32,9 @@ defmodule Rendro.ReleasePreflightProofTest do
           "not-a-real-tag",
           "--worktree",
           worktree
-        ], stderr_to_stdout: true)
+        ],
+        stderr_to_stdout: true
+      )
 
     assert status == 1
     assert output =~ "ref must be an exact release tag like v0.1.0"

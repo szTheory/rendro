@@ -84,14 +84,7 @@ defmodule Rendro.DeterministicTest do
       |> Enum.map(&String.trim/1)
       |> Enum.reject(&(&1 == ""))
       |> Enum.reduce({0, []}, fn line, {depth, acc} ->
-        key =
-          if depth == 0 do
-            case Regex.run(~r/^\/([A-Za-z0-9]+)/, line, capture: :all_but_first) do
-              [found] -> found
-              _ -> nil
-            end
-          end
-
+        key = top_level_key(line, depth)
         depth_delta = token_count(line, "<<") - token_count(line, ">>")
         next_depth = max(depth + depth_delta, 0)
         {next_depth, if(key, do: [key | acc], else: acc)}
@@ -99,6 +92,15 @@ defmodule Rendro.DeterministicTest do
 
     Enum.reverse(keys)
   end
+
+  defp top_level_key(line, 0) do
+    case Regex.run(~r/^\/([A-Za-z0-9]+)/, line, capture: :all_but_first) do
+      [found] -> found
+      _ -> nil
+    end
+  end
+
+  defp top_level_key(_line, _depth), do: nil
 
   defp token_count(line, token) do
     line

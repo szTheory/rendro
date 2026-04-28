@@ -40,7 +40,9 @@ defmodule Rendro.Adapters.PhoenixTest do
     end
   else
     test "phoenix adapter boundary proof is unavailable without phoenix and plug" do
-      flunk("Phoenix adapter test requires optional :phoenix and :plug deps in the test environment")
+      flunk(
+        "Phoenix adapter test requires optional :phoenix and :plug deps in the test environment"
+      )
     end
   end
 end

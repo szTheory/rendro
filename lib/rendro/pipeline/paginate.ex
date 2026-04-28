@@ -186,21 +186,24 @@ defmodule Rendro.Pipeline.Paginate do
     else
       # Calculate how many rows fit
       fit_count = floor((available_h - header_h) / row_height)
+      split_table_rows(table, rows, fit_count)
+    end
+  end
 
-      if fit_count <= 0 do
-        {nil, table}
-      else
-        {this_rows, rest_rows} = Enum.split(rows, fit_count)
+  defp split_table_rows(table, _rows, fit_count) when fit_count <= 0, do: {nil, table}
 
-        if rest_rows == [] do
-          {table, nil}
-        else
-          this_table = %{table | rows: this_rows}
-          # Repeat header on rest
-          rest_table = %{table | rows: rest_rows}
-          {this_table, rest_table}
-        end
-      end
+  defp split_table_rows(table, rows, fit_count) do
+    {this_rows, rest_rows} = Enum.split(rows, fit_count)
+
+    case rest_rows do
+      [] ->
+        {table, nil}
+
+      _ ->
+        this_table = %{table | rows: this_rows}
+        # Repeat header on rest
+        rest_table = %{table | rows: rest_rows}
+        {this_table, rest_table}
     end
   end
 end

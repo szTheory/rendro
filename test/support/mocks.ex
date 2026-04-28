@@ -87,13 +87,15 @@ unless Code.ensure_loaded?(Threadline) do
   defmodule Threadline do
     @moduledoc false
 
+    alias Rendro.Test.Mocks
+
     @doc """
     Stub for `Threadline.record_action/2`. Records the call into a shared
     ETS table keyed by the test process so cross-process telemetry handlers
     (e.g. those firing inside `Task.async`) are still observable from tests.
     """
     def record_action(action, metadata) do
-      Rendro.Test.Mocks.__record_call__(action, metadata)
+      Mocks.__record_call__(action, metadata)
       :ok
     end
   end

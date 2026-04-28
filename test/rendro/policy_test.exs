@@ -29,5 +29,4 @@ defmodule Rendro.PolicyTest do
 
     assert {:error, %Rendro.Error{reason: :timeout}} = Rendro.render(doc)
   end
-
 end

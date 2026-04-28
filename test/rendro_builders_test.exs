@@ -22,9 +22,7 @@ defmodule RendroBuildersTest do
     end
 
     test "block/2 requires content argument" do
-      assert_raise UndefinedFunctionError, fn ->
-        apply(Rendro, :block, [])
-      end
+      refute function_exported?(Rendro, :block, 0)
     end
 
     test "page/1 builds a Page struct" do

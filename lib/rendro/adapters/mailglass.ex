@@ -120,15 +120,17 @@ if Code.ensure_loaded?(Mailglass) do
     defp extract_swoosh(%{swoosh: %Swoosh.Email{} = email}), do: {:ok, email}
     defp extract_swoosh(%{email: %Swoosh.Email{} = email}), do: {:ok, email}
     defp extract_swoosh(%Swoosh.Email{} = email), do: {:ok, email}
+
     defp extract_swoosh(other) when is_struct(other),
       do: {:error, {:unrecognized_message_shape, other.__struct__}}
+
     defp extract_swoosh(other),
       do: {:error, {:unrecognized_message_shape, other}}
 
     defp put_swoosh(message, swoosh_email) do
       cond do
         function_exported?(Mailglass.Message, :update_swoosh, 2) ->
-          apply(Mailglass.Message, :update_swoosh, [message, swoosh_email])
+          Mailglass.Message.update_swoosh(message, swoosh_email)
 
         Map.has_key?(message, :swoosh) ->
           %{message | swoosh: swoosh_email}

@@ -140,9 +140,8 @@ defmodule Mix.Tasks.Verify do
 
   defp verify_phoenix_example do
     File.cd!("examples/phoenix_example", fn ->
-      with :ok <- run_system_step("mix", ["deps.get"]),
-           :ok <- run_system_step("mix", ["compile"]) do
-        :ok
+      with :ok <- run_system_step("mix", ["deps.get"]) do
+        run_system_step("mix", ["compile"])
       end
     end)
   end

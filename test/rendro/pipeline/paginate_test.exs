@@ -1,6 +1,8 @@
 defmodule Rendro.Pipeline.PaginateTest do
   use ExUnit.Case, async: true
 
+  alias Rendro.Pipeline.{Build, Compose, Measure, Paginate}
+
   alias Rendro.Pipeline.Paginate
 
   describe "run/1" do
@@ -49,10 +51,10 @@ defmodule Rendro.Pipeline.PaginateTest do
       doc = Rendro.flow(content)
 
       # Run through the full pre-paginate chain so blocks have heights:
-      {:ok, doc} = Rendro.Pipeline.Build.run(doc)
-      {:ok, doc} = Rendro.Pipeline.Compose.run(doc)
-      {:ok, doc} = Rendro.Pipeline.Measure.run(doc)
-      assert {:ok, paginated} = Rendro.Pipeline.Paginate.run(doc)
+      {:ok, doc} = Build.run(doc)
+      {:ok, doc} = Compose.run(doc)
+      {:ok, doc} = Measure.run(doc)
+      assert {:ok, paginated} = Paginate.run(doc)
 
       assert length(paginated.pages) >= 2,
              "expected ≥2 pages from 50 lines; got #{length(paginated.pages)}"
