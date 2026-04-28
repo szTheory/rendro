@@ -29,7 +29,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **ADPT-02**: Phoenix engineer can preview rendered output through Phoenix-friendly integration helpers.
 - [ ] **ADPT-03**: Maintainer can enable optional adapters without introducing hard compile/runtime dependencies in core.
 - [ ] **ADPT-04**: Maintainer can use an optional job-processing adapter pattern for bounded asynchronous rendering.
-- [ ] **ADPT-05**: Maintainer can provide do-now integration recipes for `threadline`, `mailglass`, and `accrue` without hard coupling.
+- [x] **ADPT-05**: Maintainer can provide do-now integration recipes for `threadline`, `mailglass`, and `accrue` without hard coupling.
 
 ### Observability and Safety
 
@@ -82,11 +82,11 @@ Each row lists the original implementation phase and the gap-closure phase that 
 
 | Requirement | Original Phase | Gap-Closure Phase | Status |
 |-------------|----------------|-------------------|--------|
-| CORE-01 | Phase 1 | Phase 6 (validate stage) + Phase 11 (verify) | Pending |
-| CORE-02 | Phase 1 | Phase 11 (verify) | Pending |
+| CORE-01 | Phase 1 | Phase 6 (validate stage) + Phase 11 (verify) | Done |
+| CORE-02 | Phase 1 | Phase 11 (verify) | Done |
 | CORE-03 | Phase 2 | Phase 11 (verify) | Pending |
 | CORE-04 | Phase 2 | Phase 11 (verify) | Pending |
-| CORE-05 | Phase 1 | Phase 11 (verify) | Pending |
+| CORE-05 | Phase 1 | Phase 11 (verify) | Done |
 | LAY-01 | Phase 2 | Phase 11 (verify) | Pending |
 | LAY-02 | Phase 2 | Phase 11 (verify) | Pending |
 | LAY-03 | Phase 2 | Phase 11 (verify) | Pending |
@@ -96,10 +96,10 @@ Each row lists the original implementation phase and the gap-closure phase that 
 | ADPT-02 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) | Pending |
 | ADPT-03 | Phase 3 | Phase 7 (fix) + Phase 11 (verify) | Pending |
 | ADPT-04 | Phase 3 | Phase 8 (fix) + Phase 11 (verify) | Pending |
-| ADPT-05 | Phase 5 | Phase 8 (timeout) + Phase 10 (recipe + traceability) | Pending |
-| OBS-01 | Phase 1 | Phase 6 (telemetry contract) + Phase 11 (verify) | Pending |
+| ADPT-05 | Phase 5 | Phase 8 (timeout) + Phase 10 (recipe + traceability) | Done |
+| OBS-01 | Phase 1 | Phase 6 (telemetry contract) + Phase 11 (verify) | Done |
 | OBS-02 | Phase 3 | Phase 6 (metrics) + Phase 8 (timeout) + Phase 11 (verify) | Pending |
-| OBS-03 | Phase 1 | Phase 7 (envelope) + Phase 11 (verify) | Pending |
+| OBS-03 | Phase 1 | Phase 7 (envelope) + Phase 11 (verify) | Done |
 | OBS-04 | Phase 3 | Phase 8 (Oban policy) + Phase 11 (verify) | Pending |
 | QUAL-01 | Phase 4 | Phase 9 (CI + alias) + Phase 11 (verify) | Pending |
 | QUAL-02 | Phase 4 | Phase 9 (verify_docs) + Phase 11 (verify) | Pending |
@@ -111,8 +111,8 @@ Each row lists the original implementation phase and the gap-closure phase that 
 - v1 requirements: 24 total
 - Mapped to phases: 24
 - Unmapped: 0 ✓
-- Verified (Done): 0
-- Pending verification: 24 (reset by 2026-04-26 audit; gap-closure phases 6-11 will close)
+- Verified (Done): 1
+- Pending verification: 23
 
 ---
 *Requirements defined: 2026-04-24*
