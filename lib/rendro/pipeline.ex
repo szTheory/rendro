@@ -31,20 +31,22 @@ defmodule Rendro.Pipeline do
     }
 
     timeout = Keyword.get(policies, :timeout, 30_000)
+    started_at = System.monotonic_time()
 
-    task = Task.async(fn -> execute_with_telemetry(doc, base_meta, policies) end)
+    :telemetry.execute(Rendro.Telemetry.render_prefix() ++ [:start], %{}, Map.put(base_meta, :stage, :render))
+
+    task = Task.async(fn -> run_stages(doc, base_meta, policies) end)
 
     case Task.yield(task, timeout) || Task.shutdown(task) do
-      {:ok, result} -> result
-      nil -> {:error, Error.from_stage(:render, :timeout, base_meta)}
-    end
-  end
+      {:ok, result} ->
+        emit_render_stop(result, doc, base_meta, started_at)
+        result
 
-  defp execute_with_telemetry(doc, base_meta, policies) do
-    :telemetry.span(Rendro.Telemetry.render_prefix(), Map.put(base_meta, :stage, :render), fn ->
-      result = run_stages(doc, base_meta, policies)
-      {result, build_stop_meta(result, doc, base_meta)}
-    end)
+      nil ->
+        result = {:error, Error.from_stage(:render, :timeout, base_meta)}
+        emit_render_stop(result, doc, base_meta, started_at)
+        result
+    end
   end
 
   defp build_stop_meta(result, doc, base_meta) do
@@ -140,4 +142,12 @@ defmodule Rendro.Pipeline do
   defp derive_byte_size(:render, pdf) when is_binary(pdf), do: byte_size(pdf)
   defp derive_byte_size(:validate, pdf) when is_binary(pdf), do: byte_size(pdf)
   defp derive_byte_size(_stage, _result), do: 0
+
+  defp emit_render_stop(result, doc, base_meta, started_at) do
+    :telemetry.execute(
+      Rendro.Telemetry.render_prefix() ++ [:stop],
+      %{duration: System.monotonic_time() - started_at},
+      build_stop_meta(result, doc, base_meta)
+    )
+  end
 end
