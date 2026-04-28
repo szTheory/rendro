@@ -24,7 +24,7 @@ your Threadline audit trail.
 
 1. Add `threadline` to your application's `mix.exs`:
 
-   ```elixir
+   ```elixir-schematic
    defp deps do
      [
        {:rendro, "~> 0.1"},
@@ -36,7 +36,7 @@ your Threadline audit trail.
 
 2. Attach the handler once at application start (e.g. from `Application.start/2`):
 
-   ```elixir
+   ```elixir-schematic
    defmodule MyApp.Application do
      use Application
 
@@ -68,22 +68,20 @@ rendered PDFs are never included.
 After attaching the handler, render a document and confirm the audit row arrived:
 
 ```elixir
-# In iex -S mix (with :threadline in your app's deps)
+# docs-contract: integrations-threadline-happy-path
 Rendro.Adapters.Threadline.attach()
 
-{:ok, pdf} = Rendro.render(
+{:ok, _pdf} = Rendro.render(
   Rendro.flow([Rendro.block(Rendro.text("Test invoice", size: 12))])
 )
 
-# Query Threadline's storage for the most recent action
-[action | _] = Threadline.list_actions()
-assert action.action == :render_succeeded
-assert is_binary(action.payload.render_id)
+Rendro.Adapters.Threadline.detach()
 ```
 
-To verify the failure path, force a policy violation:
+The failure-path example below is intentionally schematic. Its public contract is
+pinned by direct ExUnit semantic tests instead of by a compile-only docs lane.
 
-```elixir
+```elixir-schematic
 doc = Rendro.flow(
   [Rendro.block(Rendro.text("x", size: 12))],
   options: %{policies: [max_pages: 0]}
@@ -96,7 +94,7 @@ assert action.action == :render_failed
 
 To detach the handler (e.g. in test teardown):
 
-```elixir
+```elixir-schematic
 Rendro.Adapters.Threadline.detach()
 ```
 
@@ -132,7 +130,7 @@ Callers still receive `{:error, %Rendro.Error{reason: :timeout}}` from
 **Operator mitigation:** If you rely on Threadline as a complete audit trail,
 compensate at the call site:
 
-```elixir
+```elixir-schematic
 case Rendro.render(doc) do
   {:ok, pdf} ->
     pdf
@@ -165,7 +163,7 @@ without leaving the Rendro boundary.
 
 Add `mailglass` and `swoosh` to your application's `mix.exs`:
 
-```elixir
+```elixir-schematic
 defp deps do
   [
     {:rendro, "~> 0.1"},
@@ -176,15 +174,16 @@ defp deps do
 end
 ```
 
-The canonical pipeline is:
+The canonical pipeline is schematic because delivery depends on your own mailer
+module and deployment setup.
 
-```elixir
+```elixir-schematic
 email =
   Swoosh.Email.new()
   |> Swoosh.Email.to("customer@example.test")
   |> Swoosh.Email.subject("Your invoice")
 
-{:ok, email_with_attachment} =
+email_with_attachment =
   Rendro.Adapters.Mailglass.attach_pdf(email, doc, "invoice.pdf")
 
 MyApp.Mailer.deliver(email_with_attachment)
@@ -192,11 +191,11 @@ MyApp.Mailer.deliver(email_with_attachment)
 
 Or in a pipe:
 
-```elixir
+```elixir-schematic
 email
 |> Rendro.Adapters.Mailglass.attach_pdf(doc, "invoice.pdf")
 |> case do
-  {:ok, email_with_pdf} -> MyApp.Mailer.deliver(email_with_pdf)
+  %Swoosh.Email{} = email_with_pdf -> MyApp.Mailer.deliver(email_with_pdf)
   {:error, reason} -> handle_error(reason)
 end
 ```
@@ -206,17 +205,19 @@ end
 **Swoosh email path:**
 
 ```elixir
+# docs-contract: integrations-mailglass-swoosh
 doc = Rendro.flow([Rendro.block(Rendro.text("Invoice #001", size: 12))])
 email = Swoosh.Email.new() |> Swoosh.Email.to("test@example.test")
 
-{:ok, result} = Rendro.Adapters.Mailglass.attach_pdf(email, doc, "invoice.pdf")
+result = Rendro.Adapters.Mailglass.attach_pdf(email, doc, "invoice.pdf")
 
 # Confirm the attachment was added
 assert length(result.attachments) == 1
 [attachment | _] = result.attachments
 assert attachment.content_type == "application/pdf"
 assert attachment.filename == "invoice.pdf"
-assert binary_part(attachment.data, 0, 4) == "%PDF"
+assert {:data, pdf} = attachment.data
+assert binary_part(pdf, 0, 4) == "%PDF"
 ```
 
 **Mailglass.Message path:**
@@ -226,9 +227,11 @@ underlying Swoosh email, attaches the PDF to it, and re-wraps the result using
 `Mailglass.Message.update_swoosh/2` if that function is exported:
 
 ```elixir
+# docs-contract: integrations-mailglass-message
+doc = Rendro.flow([Rendro.block(Rendro.text("Invoice #001", size: 12))])
 message = %Mailglass.Message{swoosh: Swoosh.Email.new(), meta: %{campaign_id: "abc"}}
 
-{:ok, updated_message} = Rendro.Adapters.Mailglass.attach_pdf(message, doc, "invoice.pdf")
+updated_message = Rendro.Adapters.Mailglass.attach_pdf(message, doc, "invoice.pdf")
 
 # The Mailglass wrapper is preserved
 assert is_struct(updated_message, Mailglass.Message)
@@ -258,7 +261,7 @@ it only builds the document structure.
 
 Add `accrue` to your application's `mix.exs`:
 
-```elixir
+```elixir-schematic
 defp deps do
   [
     {:rendro, "~> 0.1"},
@@ -268,9 +271,10 @@ defp deps do
 end
 ```
 
-The recipe is opt-in and pure:
+The recipe entrypoint is pure, but this high-level application example is
+schematic because `MyApp.Billing.fetch_invoice!/1` is app-specific.
 
-```elixir
+```elixir-schematic
 invoice = MyApp.Billing.fetch_invoice!(invoice_id)
 
 {:ok, doc} = Rendro.Adapters.Accrue.recipe(invoice)
@@ -308,6 +312,7 @@ module and customize from there.
 After calling `recipe/1`, render the document and verify the output:
 
 ```elixir
+# docs-contract: integrations-accrue-verification
 invoice = %Accrue.Invoice{
   id: "INV-001",
   issued_at: ~D[2026-04-26],
@@ -353,10 +358,10 @@ detail:
 None of `threadline`, `mailglass`, or `accrue` appear in Rendro's own `mix.exs`
 dependencies. Each adapter module is wrapped in a compile-time guard:
 
-```elixir
+```elixir-schematic
 if Code.ensure_loaded?(Threadline) do
   defmodule Rendro.Adapters.Threadline do
-    # ...
+    def attach, do: :ok
   end
 end
 ```

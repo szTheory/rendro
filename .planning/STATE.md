@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 13 context gathered
-last_updated: "2026-04-28T14:26:58.314Z"
-last_activity: 2026-04-28
+status: ready
+stopped_at: Completed Phase 13 execution
+last_updated: "2026-04-28T15:07:28Z"
+last_activity: 2026-04-28 -- Phase 13 execution complete
 progress:
   total_phases: 14
-  completed_phases: 12
-  total_plans: 21
-  completed_plans: 21
-  percent: 100
+  completed_phases: 13
+  total_plans: 24
+  completed_plans: 24
+  percent: 93
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-24)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 12 — verification-chain-closure
+**Current focus:** Phase 14 — milestone verification artifact backfill
 
 ## Current Position
 
-Phase: 13
+Phase: 14
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-04-28
+Last activity: 2026-04-28 -- Phase 13 execution complete
 
-Progress: [██████████] 100%
+Progress: [█████████░] 93%
 
 ## Performance Metrics
 
@@ -82,6 +82,9 @@ Recent decisions affecting current work:
 - Use Mix.Shell.Process in tests so info and error output can be asserted in order without invoking the real verification commands.
 - Keep mix ci in MIX_ENV=test and widen ex_doc to [:dev, :test] so hosted CI stays truthful to the documented lane.
 - Allow lane injection for Mix.Tasks.Verify.run/1 only through a test-only app env seam so public shutdown behavior is deterministic to test without changing production lanes.
+- Public docs now declare explicit doctest, compile/eval, or schematic lanes instead of relying on placeholder skips.
+- `mix release.preflight` is now boundary-first: dirty trees and exact-tag mismatches fail before expensive release checks.
+- `mix docs.contract` and `scripts/release_preflight_proof.exs` are the canonical rerunnable proof surfaces for Phase 13.
 
 ### Pending Todos
 
@@ -102,7 +105,7 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: --stopped-at
-Stopped at: Phase 13 context gathered
+Stopped at: Completed Phase 13 execution
 Resume file: --resume-file
 
-**Planned Phase:** 12 (Verification Chain Closure) — 3 plans — 2026-04-28T12:55:54Z
+**Planned Phase:** 14 (Milestone Verification Artifact Backfill)

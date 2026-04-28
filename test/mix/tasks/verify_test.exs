@@ -79,6 +79,13 @@ defmodule Mix.Tasks.VerifyTest do
              message_index(output, "Overall: FAIL")
   end
 
+  test "default docs lane uses the canonical docs.contract task" do
+    source = File.read!("lib/mix/tasks/verify.ex")
+
+    assert source =~ "Mix.Task.run(\"docs.contract\")"
+    refute source =~ "Mix.Task.run(\"run\", [\"scripts/verify_docs.exs\"])"
+  end
+
   defp capture_shell_messages(fun) do
     original_shell = Mix.shell()
     Mix.shell(Mix.Shell.Process)

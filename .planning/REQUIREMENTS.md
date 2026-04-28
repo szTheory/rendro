@@ -41,9 +41,9 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Quality and Release
 
 - [x] **QUAL-01**: Maintainer can run a canonical merge-blocking verification lane (`mix ci`) including format, compile, tests, docs, and package build.
-- [ ] **QUAL-02**: Maintainer can validate public docs/quickstart claims with docs-contract checks in CI.
+- [x] **QUAL-02**: Maintainer can validate public docs/quickstart claims with docs-contract checks in CI.
 - [x] **QUAL-03**: Maintainer can run a CI-verified Phoenix example app as executable adoption proof.
-- [ ] **QUAL-04**: Maintainer can run release preflight checks for version/tag parity and publish dry-run workflows.
+- [x] **QUAL-04**: Maintainer can run release preflight checks for version/tag parity and publish dry-run workflows.
 - [x] **QUAL-05**: Maintainer can separate deterministic required lanes from advisory/provider-dependent lanes in verification output.
 
 ## v2 Requirements
@@ -102,17 +102,17 @@ Each row lists the original implementation phase and the gap-closure phase that 
 | OBS-03 | Phase 1 | Phase 7 (envelope) + Phase 11 (verify) + Phase 14 (artifact backfill) | Pending |
 | OBS-04 | Phase 3 | Phase 8 (Oban policy) + Phase 11 (verify) | Done |
 | QUAL-01 | Phase 4 | Phase 9 (CI + alias) + Phase 11 (verify) + Phase 12 (verification chain) + Phase 14 (artifact backfill) | Done |
-| QUAL-02 | Phase 4 | Phase 9 (verify_docs) + Phase 11 (verify) + Phase 13 (docs closure) + Phase 14 (artifact backfill) | Pending |
+| QUAL-02 | Phase 4 | Phase 9 (verify_docs) + Phase 11 (verify) + Phase 13 (docs closure) + Phase 14 (artifact backfill) | Done |
 | QUAL-03 | Phase 4 | Phase 7 (example app) + Phase 9 (CI) + Phase 11 (verify) + Phase 12 (verification chain) + Phase 14 (artifact backfill) | Done |
-| QUAL-04 | Phase 4 | Phase 9 (preflight) + Phase 10 (traceability) + Phase 11 (verify) + Phase 13 (release closure) + Phase 14 (artifact backfill) | Pending |
+| QUAL-04 | Phase 4 | Phase 9 (preflight) + Phase 10 (traceability) + Phase 11 (verify) + Phase 13 (release closure) + Phase 14 (artifact backfill) | Done |
 | QUAL-05 | Phase 4 | Phase 9 (verify lanes) + Phase 11 (verify) + Phase 12 (verification chain) + Phase 14 (artifact backfill) | Done |
 
 **Coverage:**
 - v1 requirements: 24 total
 - Mapped to phases: 24
 - Unmapped: 0 ✓
-- Verified (Done): 16
-- Pending verification: 8
+- Verified (Done): 18
+- Pending verification: 6
 - Partial verification: 0
 - Blocked verification: 0
 

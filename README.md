@@ -13,7 +13,10 @@ Pure-Elixir PDF generation with deterministic layout and pagination.
 
 ### Flow API (Recommended for Reports)
 
+Verified by the README compile/eval lane in `mix docs.contract`.
+
 ```elixir
+# docs-contract: readme-flow-compile
 data = %{
   id: "123",
   date: "2026-04-24",
@@ -21,31 +24,57 @@ data = %{
 }
 
 doc = Rendro.Recipes.invoice(data)
-{:ok, pdf} = Rendro.render(doc)
+{:ok, _pdf} = Rendro.render(doc)
+```
+
+When you want asserted output instead of compile-only validation, use the doctest
+lane:
+
+```iex
+iex> doc =
+...>   Rendro.fixed([
+...>     Rendro.page(blocks: [Rendro.block(Rendro.text("Receipt", size: 12), x: 36, y: 72)])
+...>   ])
+iex> {:ok, pdf} = Rendro.render(doc)
+iex> binary_part(pdf, 0, 4)
+"%PDF"
 ```
 
 ### Fixed-Position API
 
+Verified by the README compile/eval lane in `mix docs.contract`.
+
 ```elixir
+# docs-contract: readme-fixed-compile
 page = Rendro.page(blocks: [
   Rendro.block(Rendro.text("Fixed Position"), x: 100, y: 100)
 ])
 
 doc = Rendro.fixed([page])
-{:ok, pdf} = Rendro.render(doc)
+{:ok, _pdf} = Rendro.render(doc)
 ```
 
 ## Phoenix Integration
 
 Use the Phoenix adapter to serve PDFs from your controllers:
 
-```elixir
+This controller example is schematic and intentionally outside the executable
+docs-contract lane because it depends on your application's Phoenix module and
+connection setup.
+
+```elixir-schematic
 defmodule MyAppWeb.PDFController do
   use MyAppWeb, :controller
   alias Rendro.Adapters.Phoenix, as: RendroPhoenix
 
   def show(conn, _params) do
-    doc = Rendro.Recipes.invoice(%{...})
+    doc =
+      Rendro.Recipes.invoice(%{
+        id: "INV-001",
+        date: "2026-04-24",
+        items: [%{name: "Consulting", qty: 1, price: 1_500}]
+      })
+
     RendroPhoenix.preview_pdf(conn, doc)
   end
 end
@@ -66,8 +95,11 @@ verification recipes, and failure-diagnostics reference for each adapter.
 
 Protect your system from expensive render operations:
 
+Verified by the README compile/eval lane in `mix docs.contract`.
+
 ```elixir
-doc = Rendro.flow([], options: %{
+# docs-contract: readme-policies-compile
+_doc = Rendro.flow([], options: %{
   policies: [
     max_pages: 50,
     max_bytes: 1_000_000,

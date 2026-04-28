@@ -52,7 +52,7 @@ defmodule Mix.Tasks.Verify do
       {"DETERMINISTIC (CORE)",
        [
          {"CI", fn -> Mix.Task.run("ci") end},
-         {"Docs Contract", fn -> Mix.Task.run("run", ["scripts/verify_docs.exs"]) end}
+         {"Docs Contract", fn -> Mix.Task.run("docs.contract") end}
        ]},
       {"ADVISORY (ADAPTERS)",
        [

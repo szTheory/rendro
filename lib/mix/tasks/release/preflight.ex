@@ -6,29 +6,164 @@ defmodule Mix.Tasks.Release.Preflight do
   """
 
   @shortdoc "Runs preflight checks before release"
+  @phase_2_checks [
+    {"CI", ["ci"]},
+    {"Docs Contract", ["docs.contract"]},
+    {"Hex Build Unpack", ["hex.build", "--unpack"]},
+    {"Hex Publish Dry Run", ["hex.publish", "--dry-run", "--yes"]}
+  ]
 
   def run(_args) do
-    Mix.shell().info("Running release preflight checks...")
+    case run_with_context(default_context()) do
+      {:ok, _results} ->
+        :ok
 
-    # 1. Check version in mix.exs matches git tag (mocked for now)
-    version = Mix.Project.config()[:version]
-    Mix.shell().info("Current version: #{version}")
-
-    # 2. Run CI
-    Mix.shell().info("Running CI checks...")
-
-    if Mix.Task.run("ci") == :error do
-      Mix.raise("CI checks failed!")
+      {:error, _results} ->
+        exit({:shutdown, 1})
     end
-
-    # 3. Check for uncommitted changes
-    {git_status, 0} = System.cmd("git", ["status", "--short"])
-
-    if git_status != "" do
-      Mix.shell().error("Uncommitted changes detected:\n#{git_status}")
-      # In a real scenario, we might want to fail here
-    end
-
-    Mix.shell().info("Preflight checks PASSED!")
   end
+
+  def run_with_context(context) do
+    version = context.project_config[:version]
+    Mix.shell().info("=== RELEASE PREFLIGHT ===")
+    Mix.shell().info("Version: #{version}")
+    Mix.shell().info("Phase 1: boundary blockers")
+
+    phase_1_results = [
+      check_clean_worktree(context),
+      check_exact_tag(context, version),
+      check_package_metadata(context.project_config)
+    ]
+
+    Enum.each(phase_1_results, &print_result/1)
+
+    if Enum.any?(phase_1_results, &(&1.status == :fail)) do
+      print_summary(phase_1_results, [])
+      {:error, %{phase_1: phase_1_results, phase_2: []}}
+    else
+      Mix.shell().info("Phase 2: release parity checks")
+
+      phase_2_results =
+        Enum.map(@phase_2_checks, fn {name, args} ->
+          result = run_mix_check(context, name, args)
+          print_result(result)
+          result
+        end)
+
+      print_summary(phase_1_results, phase_2_results)
+
+      if Enum.any?(phase_2_results, &(&1.status == :fail)) do
+        {:error, %{phase_1: phase_1_results, phase_2: phase_2_results}}
+      else
+        {:ok, %{phase_1: phase_1_results, phase_2: phase_2_results}}
+      end
+    end
+  end
+
+  defp default_context do
+    project_config = Mix.Project.config()
+
+    command_runner =
+      Application.get_env(:rendro, :release_preflight_command_runner, &System.cmd/3)
+
+    %{
+      project_config: project_config,
+      command_runner: command_runner
+    }
+  end
+
+  defp check_clean_worktree(context) do
+    case run_command(context, "git", ["status", "--short"]) do
+      {"", 0} ->
+        pass("Clean worktree")
+
+      {output, 0} ->
+        fail("Clean worktree", "uncommitted changes detected:\n#{output}")
+
+      {output, status} ->
+        fail("Clean worktree", "git status failed (#{status})\n#{output}")
+    end
+  end
+
+  defp check_exact_tag(context, version) do
+    expected_tag = "v#{version}"
+
+    case run_command(context, "git", ["describe", "--tags", "--exact-match"]) do
+      {^expected_tag <> "\n", 0} ->
+        pass("Exact tag parity")
+
+      {actual_tag, 0} ->
+        fail("Exact tag parity", "expected #{expected_tag}, got #{String.trim(actual_tag)}")
+
+      {output, _status} ->
+        fail("Exact tag parity", "expected #{expected_tag}, got no exact tag\n#{output}")
+    end
+  end
+
+  defp check_package_metadata(project_config) do
+    package = project_config[:package] || []
+    missing = []
+    missing = if package[:licenses] in [nil, []], do: ["licenses" | missing], else: missing
+    missing = if package[:links] in [nil, %{}], do: ["links" | missing], else: missing
+
+    if missing == [] do
+      pass("Package metadata")
+    else
+      fail(
+        "Package metadata",
+        "missing metadata fields: #{missing |> Enum.reverse() |> Enum.join(", ")}"
+      )
+    end
+  end
+
+  defp run_mix_check(context, name, args) do
+    case run_command(context, "mix", args) do
+      {output, 0} ->
+        %{name: name, status: :pass, output: output, command: Enum.join(["mix" | args], " ")}
+
+      {output, status} ->
+        %{
+          name: name,
+          status: :fail,
+          output: output,
+          code: status,
+          command: Enum.join(["mix" | args], " ")
+        }
+    end
+  end
+
+  defp run_command(context, command, args) do
+    context.command_runner.(command, args, stderr_to_stdout: true)
+  end
+
+  defp print_result(%{name: name, status: :pass}) do
+    Mix.shell().info("  - #{name}: PASS")
+  end
+
+  defp print_result(%{name: name, status: :fail, output: output}) do
+    Mix.shell().error("  - #{name}: FAIL")
+    Mix.shell().error(output)
+  end
+
+  defp print_summary(phase_1_results, phase_2_results) do
+    Mix.shell().info("RELEASE PREFLIGHT COMPLETE")
+    Mix.shell().info("Summary:")
+
+    Enum.each(phase_1_results, fn %{name: name, status: status} ->
+      Mix.shell().info("  - [Phase 1] #{name}: #{String.upcase(to_string(status))}")
+    end)
+
+    Enum.each(phase_2_results, fn %{name: name, status: status} ->
+      Mix.shell().info("  - [Phase 2] #{name}: #{String.upcase(to_string(status))}")
+    end)
+
+    if Enum.any?(phase_1_results ++ phase_2_results, &(&1.status == :fail)) do
+      Mix.shell().error("Overall: FAIL")
+    else
+      Mix.shell().info("Overall: PASS")
+    end
+  end
+
+  defp pass(name), do: %{name: name, status: :pass}
+  defp fail(name, output), do: %{name: name, status: :fail, output: output}
 end

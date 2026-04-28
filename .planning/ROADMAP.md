@@ -24,7 +24,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 10: Recipe Correctness + Traceability Sync** - Fix Mailglass custom-wrapper dispatch, return typed errors from Accrue, and resync REQUIREMENTS.md ADPT-05 status.
 - [x] **Phase 11: Reconstruct Phase 1-4 GSD Artifacts** - Map existing tests to requirements and produce evidence-based PLAN/SUMMARY/VERIFICATION for phases 1-4 against the fixed code.
 - [x] **Phase 12: Verification Chain Closure** - Commit hosted CI proof, make `mix verify` complete deterministic and advisory lanes end-to-end, and close the remaining verification-lane gaps.
-- [ ] **Phase 13: Docs and Release Preflight Closure** - Remove docs-contract blind spots and make release preflight fail on dirty/tag-parity issues while exercising publish dry-run parity.
+- [x] **Phase 13: Docs and Release Preflight Closure** - Remove docs-contract blind spots and make release preflight fail on dirty/tag-parity issues while exercising publish dry-run parity.
 - [ ] **Phase 14: Milestone Verification Artifact Backfill** - Add milestone-grade `VERIFICATION.md` artifacts for Phases 7-11 and resync traceability/process evidence with the audit.
 
 ## Phase Details
@@ -223,7 +223,12 @@ Plans:
   1. `scripts/verify_docs.exs` no longer silently skips partial snippets that matter to public contract verification, or explicitly fails/warns in a way CI surfaces.
   2. `mix release.preflight` fails dirty worktrees, enforces tag/version parity, and reaches publish dry-run parity checks.
   3. Docs-contract and release-preflight checks can be rerun as evidence-backed milestone gates.
-**Plans**: 0 plans
+**Plans**: 3 plans
+
+Plans:
+- [x] 13-01-PLAN.md — Close the curated docs contract with explicit lanes, guide curation, and semantic-claim regression tests
+- [x] 13-02-PLAN.md — Rebuild `mix release.preflight` as a strict two-phase release gate with package-build parity and blocker coverage
+- [x] 13-03-PLAN.md — Add canonical docs/release proof surfaces so milestone evidence can be rerun from named commands and isolated release-like state
 
 ### Phase 14: Milestone Verification Artifact Backfill
 **Goal**: Produce milestone-grade verification artifacts for Phases 7 through 11 and repair traceability/process drift so audit status, summaries, and requirement rows tell the same story.

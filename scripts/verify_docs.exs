@@ -1,30 +1,35 @@
 # verify_docs.exs
-# Extracts Elixir code blocks from README.md and ensures they compile
+# Runs the explicit docs-contract lanes for README doctests, curated integration
+# examples, and semantic claim regressions.
 
-readme = File.read!("README.md")
-code_blocks = Regex.scan(~r/```elixir\n(.*?)```/s, readme)
+Mix.Task.run("app.start")
 
-Mix.shell().info("Verifying code blocks in README.md...")
+lanes = [
+  {"README doctest lane", ["test", "test/docs_contract/readme_doctest_test.exs"]},
+  {"Integration contract lane", ["test", "test/docs_contract/integrations_contract_test.exs"]},
+  {"Integration semantic-claims lane", ["test", "test/docs_contract/integrations_claims_test.exs"]}
+]
 
-# Provide mocks for common dependencies in docs
-defmodule MyAppWeb do
-  defmacro __using__(:controller), do: nil
+Mix.shell().info("Running explicit docs-contract lanes...")
+
+results =
+  Enum.map(lanes, fn {label, args} ->
+    Mix.shell().info("  - #{label}")
+
+    {output, status} = System.cmd("mix", args, stderr_to_stdout: true)
+
+    if status == 0 do
+      Mix.shell().info("    PASS")
+    else
+      Mix.shell().error(output)
+      Mix.shell().error("    FAIL")
+    end
+
+    {label, status}
+  end)
+
+if Enum.all?(results, fn {_label, status} -> status == 0 end) do
+  Mix.shell().info("Docs contract VERIFIED!")
+else
+  System.halt(1)
 end
-
-Enum.each(code_blocks, fn [_, code] ->
-  try do
-    Code.compile_string(code)
-    Mix.shell().info("  - Code block compiles: OK")
-  rescue
-    e ->
-      # Skip blocks that are clearly partial or need more context
-      if code =~ "..." or code =~ "%{...}" do
-        Mix.shell().info("  - Code block (partial) skipped: OK")
-      else
-        Mix.shell().error("  - Code block failed to compile:\n#{code}\n#{inspect(e)}")
-        System.halt(1)
-      end
-  end
-end)
-
-Mix.shell().info("Docs contract VERIFIED!")

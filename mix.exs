@@ -13,6 +13,7 @@ defmodule Rendro.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases(),
+      package: package(),
       name: "Rendro",
       description:
         "Pure-Elixir, Phoenix-first PDF/document generation with deterministic layout and pagination",
@@ -61,6 +62,13 @@ defmodule Rendro.MixProject do
         "credo --strict",
         "dialyzer"
       ]
+    ]
+  end
+
+  defp package do
+    [
+      licenses: ["UNLICENSED"],
+      links: %{"GitHub" => @source_url}
     ]
   end
 

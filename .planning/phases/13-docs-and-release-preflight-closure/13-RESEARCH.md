@@ -335,22 +335,19 @@ result =
 |---|-------|---------|---------------|
 | A1 | A disposable local tag in a temporary clean worktree is an acceptable way to prove the strict happy path when the active branch has no exact release tag. | Common Pitfalls / Open Questions / Environment Availability | The plan may include a proof method the maintainer does not want to use locally. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **How should the tagged happy path be proven when `HEAD` is not on `v0.1.0`?**
-   - What we know: `git describe --tags --exact-match` currently fails, so the active workspace cannot prove D-17 or D-18 as-is. [VERIFIED: git describe --tags --exact-match]
-   - What's unclear: whether the maintainer prefers a disposable local tag in a temp worktree or a CI/release-ref-only proof step. [ASSUMED]
-   - Recommendation: decide this in planning and make it an explicit terminal task, not an implicit expectation. [ASSUMED]
+1. **Tagged happy-path proof strategy**
+   - Decision: local automated verification in Phase 13 will cover the proof helper's argument validation, isolation behavior, and refusal path from the current untagged workspace. The true strict happy-path proof remains a release-grade verification step that runs only from a real exact `vX.Y.Z` ref in an isolated clean worktree or CI/release-ref context. [RESOLVED]
+   - Why: `git describe --tags --exact-match` currently fails on `HEAD`, so the active workspace cannot truthfully prove D-17 or D-18. The helper should therefore make the proof path rerunnable without pretending the current branch is a release ref. [VERIFIED: git describe --tags --exact-match] [VERIFIED: git status --short]
 
-2. **Should the docs contract remain a script entrypoint or graduate to a dedicated Mix task?**
-   - What we know: `mix verify` currently invokes `mix run scripts/verify_docs.exs`, and Phase 13 does not lock a public task name for docs verification. [VERIFIED: lib/mix/tasks/verify.ex] [VERIFIED: .planning/phases/13-docs-and-release-preflight-closure/13-CONTEXT.md]
-   - What's unclear: whether the planner values minimal churn or a more testable first-class task.
-   - Recommendation: keep the existing script as the external entrypoint unless testing pressure forces extraction behind it. [ASSUMED]
+2. **Docs-contract command surface**
+   - Decision: Phase 13 should promote docs verification to a dedicated Mix task as the canonical command surface, while preserving the existing script as an implementation entrypoint or thin compatibility layer if that keeps churn low. [RESOLVED]
+   - Why: both `mix verify` and `mix release.preflight` need one stable rerunnable docs gate so milestone evidence cannot drift across command paths. [VERIFIED: lib/mix/tasks/verify.ex] [VERIFIED: .planning/phases/13-docs-and-release-preflight-closure/13-CONTEXT.md]
 
-3. **What should be done about the Threadline timeout-audit claim mismatch between code/docs and the milestone audit?**
-   - What we know: `guides/integrations.md` says timeouts are not audited, and live `Pipeline.run/1` still returns timeout errors without emitting a top-level timeout-specific audit path that `Rendro.Adapters.Threadline` handles. [VERIFIED: guides/integrations.md] [VERIFIED: lib/rendro/pipeline.ex] [VERIFIED: lib/rendro/adapters/threadline.ex]
-   - What's unclear: whether the milestone audit is stale or whether another uncommitted fix was expected.
-   - Recommendation: trust live code and guide text for Phase 13 docs-contract tests unless a separate runtime-fix phase is reopened. [ASSUMED]
+3. **Threadline timeout-audit mismatch**
+   - Decision: trust live code plus current guide text for Phase 13 docs-contract tests and do not reopen runtime semantics here. Any milestone-audit drift should be corrected as artifact/process follow-up rather than by broadening Phase 13 scope. [RESOLVED]
+   - Why: Phase 13 is a docs/release-closure phase, and the live implementation/docs pair is the truthful contract surface to pin unless a separate runtime-fix phase is explicitly reopened. [VERIFIED: guides/integrations.md] [VERIFIED: lib/rendro/pipeline.ex] [VERIFIED: lib/rendro/adapters/threadline.ex]
 
 ## Environment Availability
 
