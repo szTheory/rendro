@@ -75,6 +75,10 @@ defmodule Rendro.Error do
     "Reduce content size or expand the declared page/region bounds; Rendro does not auto-fit overflowing content."
   end
 
+  defp next_step(:paginate, :invalid_flow_directive) do
+    "Remove flow directives from fixed-position pages or switch the content to Rendro.flow/2 so pagination directives run in the flow engine."
+  end
+
   defp next_step(:paginate, :max_pages_exceeded) do
     "Reduce document length or increase the :max_pages policy limit."
   end

@@ -213,6 +213,60 @@ defmodule Rendro.Pipeline.PaginateTest do
     end
   end
 
+  describe "typed paginate diagnostics" do
+    test "returns keep-rule details when a chained keep_with_next group cannot fit on any page" do
+      doc =
+        Rendro.flow(
+          [
+            Rendro.block(Rendro.text("Intro")),
+            Rendro.block(Rendro.text("Chapter"), keep_with_next: true),
+            Rendro.block(Rendro.text("Subhead"), keep_with_next: true),
+            Rendro.block(Rendro.text("Body"))
+          ],
+          page_template: :tiny_keep_chain,
+          page_templates: [tiny_keep_chain_template()]
+        )
+
+      assert {:error, %Rendro.Error{} = error} = paginate_flow(doc)
+
+      assert error.stage == :paginate
+      assert error.reason == :content_overflow
+      assert error.details.keep_rule == :keep_with_next
+      assert_in_delta error.details.kept_height, 43.2, 0.001
+      assert error.details.max_height == 30
+      assert error.details.page_index == 2
+      assert error.details.region == :body
+      assert error.details.overflow_source == :bounded_region
+      assert error.details.block_indexes == [1, 2, 3]
+    end
+
+    test "rejects flow directives on fixed-position pages with a typed paginate error" do
+      page =
+        %Rendro.Page{
+          blocks: [
+            %Rendro.Block{
+              content: Rendro.text("Fixed"),
+              x: 10,
+              y: 10,
+              width: 80,
+              height: 14.4,
+              break_before: true
+            }
+          ]
+        }
+
+      doc = %Rendro.Document{pages: [page], metadata: %Rendro.Metadata{}}
+
+      assert {:error, %Rendro.Error{} = error} = Paginate.run(doc)
+      assert error.stage == :paginate
+      assert error.reason == :invalid_flow_directive
+      assert error.details.directive == :break_before
+      assert error.details.page_index == 1
+      assert error.details.block_index == 0
+      assert error.next =~ "Rendro.flow/2"
+    end
+  end
+
   defp paginate_flow(doc) do
     {:ok, doc} = Build.run(doc)
     {:ok, doc} = Compose.run(doc)
@@ -248,5 +302,9 @@ defmodule Rendro.Pipeline.PaginateTest do
         }
       ]
     }
+  end
+
+  defp tiny_keep_chain_template do
+    %{flow_keep_chain_template() | name: :tiny_keep_chain, regions: [%Region{name: :body, role: :body, anchor: :flow, x: 24, y: 52, width: 372, height: 30}]}
   end
 end

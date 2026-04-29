@@ -415,6 +415,7 @@ defmodule Rendro.Pipeline.Paginate do
     pages
     |> Enum.with_index(1)
     |> Enum.each(fn {page, page_index} ->
+      validate_fixed_page_directives!(page, page_index)
       validate_page_fit!(page, page_index)
     end)
 
@@ -422,6 +423,40 @@ defmodule Rendro.Pipeline.Paginate do
   catch
     {:error, :content_overflow, details} ->
       {:error, Rendro.Error.from_stage(:paginate, :content_overflow, %{details: details})}
+
+    {:error, :invalid_flow_directive, details} ->
+      {:error, Rendro.Error.from_stage(:paginate, :invalid_flow_directive, %{details: details})}
+  end
+
+  defp validate_fixed_page_directives!(%Page{blocks: blocks}, page_index) do
+    blocks
+    |> Enum.with_index()
+    |> Enum.each(fn {block, block_index} ->
+      case invalid_fixed_page_directive(block) do
+        nil ->
+          :ok
+
+        directive ->
+          throw(
+            {:error, :invalid_flow_directive,
+             %{
+               directive: directive,
+               page_index: page_index,
+               block_index: block_index
+             }}
+          )
+      end
+    end)
+  end
+
+  defp invalid_fixed_page_directive(%Rendro.Block{} = block) do
+    cond do
+      block.break_before -> :break_before
+      block.break_after -> :break_after
+      block.keep_together -> :keep_together
+      block.keep_with_next -> :keep_with_next
+      true -> nil
+    end
   end
 
   defp validate_page_fit!(%Page{blocks: blocks} = page, page_index) do
