@@ -96,6 +96,34 @@ iex> binary_part(pdf, 0, 4)
 "%PDF"
 ```
 
+### Tables
+
+Verified by the README compile/eval lane in `mix docs.contract`.
+
+```elixir
+# docs-contract: readme-table-compile
+rows = [
+  ["Item 1", "10", "$100.00"],
+  ["Item 2", "5", "$50.00"]
+]
+
+# Explicit column rules are required. Rendro tables do not auto-size to fit content.
+table = Rendro.table(rows, 
+  header: ["Description", "Qty", "Price"],
+  columns: [{:share, 1}, {:fixed, 50}, {:fixed, 80}]
+)
+
+doc = Rendro.flow([Rendro.block(table)])
+{:ok, _pdf} = Rendro.render(doc)
+```
+
+Rendro tables are intentionally narrow and focused on deterministic data reporting:
+- **Explicit columns:** You must provide `columns:` with `{:fixed, points}` or `{:share, weight}`. There is no content-based auto-sizing.
+- **Atomic rows:** Rows do not fragment across pages. If a single row exceeds the available region height, it produces a layout error instead of silently truncating.
+- **Repeated headers:** If a table splits across pages, the `header:` row repeats automatically.
+- **No styling DSL:** There is no border, shading, or CSS-like styling DSL on the table struct itself.
+- **No continuation chrome:** There are no automatic "continued on next page" labels.
+
 ### Fixed-Position API
 
 Verified by the README compile/eval lane in `mix docs.contract`.

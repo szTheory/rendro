@@ -333,7 +333,7 @@ invoice = MyApp.Billing.fetch_invoice!(invoice_id)
 |---|---|
 | `:id` | Rendered as `"INVOICE #<id>"` in the document header. |
 | `:customer` | `.name` field extracted for `"Bill to: <name>"` in the header. |
-| `:line_items` | List of `%Accrue.LineItem{}` mapped into a table with columns Description, Qty, Unit, Subtotal. |
+| `:line_items` | List of `%Accrue.LineItem{}` mapped into a table with explicit column rules for Description, Qty, Unit, and Subtotal. Table layout semantics remain core-library behavior. |
 | `:total` | Rendered as `"Total: $<total>"` beneath the line-items table. |
 | `:issued_at` | Rendered as `"Issued: <date>"` in the header. |
 

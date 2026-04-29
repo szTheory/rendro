@@ -13,6 +13,7 @@ defmodule Rendro.DocsContract.ReadmeDoctestTest do
     assert Enum.map(fences, & &1.id) == [
              "readme-flow-compile",
              "readme-flow-breaks-compile",
+             "readme-table-compile",
              "readme-fixed-compile",
              "readme-policies-compile"
            ]
