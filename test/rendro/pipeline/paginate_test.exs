@@ -42,6 +42,29 @@ defmodule Rendro.Pipeline.PaginateTest do
       assert block.content.content == "Keep Me"
     end
 
+    test "returns structured overflow details when a fixed-position block exceeds page bounds" do
+      oversized =
+        %Rendro.Block{
+          content: Rendro.text("Outside"),
+          x: 440,
+          y: 20,
+          width: 120,
+          height: 14.4
+        }
+
+      page = %Rendro.Page{blocks: [oversized]}
+      doc = %Rendro.Document{pages: [page], metadata: %Rendro.Metadata{}}
+
+      assert {:error, %Rendro.Error{} = error} = Paginate.run(doc)
+      assert error.stage == :paginate
+      assert error.reason == :content_overflow
+      assert error.details.overflow_source == :fixed_page
+      assert error.details.page_index == 1
+      assert error.details.block_index == 0
+      assert error.details.block == %{x: 440, y: 20, width: 120, height: 14.4}
+      assert error.details.bounds == %{x: 0, y: 0, width: 451.28, height: 697.89}
+    end
+
     test "uses authored page-template geometry for flow pagination" do
       template =
         %PageTemplate{

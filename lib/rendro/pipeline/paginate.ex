@@ -14,7 +14,7 @@ defmodule Rendro.Pipeline.Paginate do
   @spec run(Rendro.Document.t()) :: {:ok, Rendro.Document.t()} | {:error, term()}
   def run(%Document{pages: pages, content: content} = doc) do
     cond do
-      pages != [] -> {:ok, doc}
+      pages != [] -> validate_fixed_pages(doc)
       content != [] or has_flow_layout?(doc) -> paginate_flow(doc)
       true -> {:error, :no_content}
     end
@@ -38,6 +38,7 @@ defmodule Rendro.Pipeline.Paginate do
         |> Enum.map(fn {page, idx} ->
           page
           |> stack_body_blocks(layout.body_region)
+          |> validate_body_region_fit!(layout.body_region, idx)
           |> apply_page_template(idx, layout)
         end)
 
@@ -158,10 +159,13 @@ defmodule Rendro.Pipeline.Paginate do
       layout.template.regions
       |> Enum.reject(&(&1.name == :body))
       |> Enum.flat_map(fn region ->
-        layout.region_blocks
-        |> Map.get(region.name, [])
-        |> replace_page_numbers(idx)
-        |> anchor_region_blocks(region, page)
+        anchored_region_blocks =
+          layout.region_blocks
+          |> Map.get(region.name, [])
+          |> replace_page_numbers(idx)
+          |> anchor_region_blocks(region, page)
+
+        maybe_validate_region_fit(anchored_region_blocks, region, page, idx, region.name)
       end)
 
     %{page | blocks: anchored_blocks ++ page.blocks}
@@ -245,6 +249,124 @@ defmodule Rendro.Pipeline.Paginate do
 
   defp relative_x(%Region{x: x}, %Page{margin_left: margin_left}), do: x - margin_left
   defp relative_y(%Region{y: y}, %Page{margin_top: margin_top}), do: y - margin_top
+
+  defp validate_fixed_pages(%Document{pages: pages} = doc) do
+    pages
+    |> Enum.with_index(1)
+    |> Enum.each(fn {page, page_index} ->
+      validate_page_fit!(page, page_index)
+    end)
+
+    {:ok, doc}
+  catch
+    {:error, :content_overflow, details} ->
+      {:error, Rendro.Error.from_stage(:paginate, :content_overflow, %{details: details})}
+  end
+
+  defp validate_page_fit!(%Page{blocks: blocks} = page, page_index) do
+    bounds = %{
+      x: 0,
+      y: 0,
+      width: usable_page_width(page),
+      height: usable_page_height(page)
+    }
+
+    validate_blocks_fit!(blocks, bounds, fn block, block_index ->
+      fixed_page_overflow_details(page_index, block_index, block, bounds)
+    end)
+  end
+
+  defp validate_body_region_fit!(%Page{blocks: blocks} = page, %Region{} = region, page_index) do
+    validate_region_fit!(blocks, region, page, page_index, :body)
+    page
+  end
+
+  defp maybe_validate_region_fit(blocks, %Region{} = region, %Page{} = page, page_index, region_name) do
+    if bounded_region?(region) do
+      validate_region_fit!(blocks, region, page, page_index, region_name)
+    else
+      blocks
+    end
+  end
+
+  defp validate_region_fit!(blocks, %Region{} = region, %Page{} = page, page_index, region_name) do
+    bounds = %{
+      x: relative_x(region, page),
+      y: relative_y(region, page),
+      width: region.width || 0,
+      height: region.height || 0
+    }
+
+    validate_blocks_fit!(blocks, bounds, fn block, block_index ->
+      region_overflow_details(page_index, block_index, block, region_name, bounds)
+    end)
+  end
+
+  defp validate_blocks_fit!(blocks, bounds, details_fun) do
+    blocks
+    |> Enum.with_index()
+    |> Enum.each(fn {block, block_index} ->
+      unless block_fits_bounds?(block, bounds) do
+        throw({:error, :content_overflow, details_fun.(block, block_index)})
+      end
+    end)
+
+    blocks
+  end
+
+  defp block_fits_bounds?(block, bounds) do
+    x = block.x || 0
+    y = block.y || 0
+    width = block.width || 0
+    height = block.height || 0
+
+    max_x = bounds.x + bounds.width
+    max_y = bounds.y + bounds.height
+
+    x >= bounds.x and y >= bounds.y and x + width <= max_x and y + height <= max_y
+  end
+
+  defp fixed_page_overflow_details(page_index, block_index, block, bounds) do
+    %{
+      overflow_source: :fixed_page,
+      page_index: page_index,
+      block_index: block_index,
+      block: block_rect(block),
+      bounds: bounds
+    }
+  end
+
+  defp region_overflow_details(page_index, block_index, block, region_name, bounds) do
+    %{
+      overflow_source: :bounded_region,
+      page_index: page_index,
+      region: region_name,
+      block_index: block_index,
+      block: block_rect(block),
+      bounds: bounds
+    }
+  end
+
+  defp block_rect(block) do
+    %{
+      x: block.x || 0,
+      y: block.y || 0,
+      width: block.width || 0,
+      height: block.height || 0
+    }
+  end
+
+  defp usable_page_width(%Page{} = page) do
+    page.width - page.margin_left - page.margin_right
+  end
+
+  defp usable_page_height(%Page{} = page) do
+    page.height - page.margin_top - page.margin_bottom
+  end
+
+  defp bounded_region?(%Region{width: width, height: height}) do
+    is_number(width) and width > 0 and is_number(height) and height > 0
+  end
 
   defp table_height(%Rendro.Table{rows: rows, header: header}) do
     row_height = 14.4

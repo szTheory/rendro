@@ -30,10 +30,14 @@ defmodule Rendro.Error do
       stage: stage,
       reason: reason,
       render_id: Map.get(context, :render_id),
-      details: %{
-        document_type: Map.get(context, :document_type),
-        deterministic: Map.get(context, :deterministic)
-      }
+      details:
+        Map.merge(
+          %{
+            document_type: Map.get(context, :document_type),
+            deterministic: Map.get(context, :deterministic)
+          },
+          Map.get(context, :details, %{})
+        )
     }
   end
 
@@ -68,7 +72,7 @@ defmodule Rendro.Error do
   end
 
   defp next_step(:paginate, :content_overflow) do
-    "Reduce the height of the failing block or increase page dimensions (margin/height)."
+    "Reduce content size or expand the declared page/region bounds; Rendro does not auto-fit overflowing content."
   end
 
   defp next_step(:paginate, :max_pages_exceeded) do
