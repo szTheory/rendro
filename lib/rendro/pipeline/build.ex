@@ -13,13 +13,12 @@ defmodule Rendro.Pipeline.Build do
 
   def run(_), do: {:error, :invalid_document}
 
-  defp validate(%Rendro.Document{pages: [], content: []}), do: {:error, :no_pages}
-
-  defp validate(%Rendro.Document{pages: pages, content: content}) do
+  defp validate(%Rendro.Document{pages: pages, content: content, sections: sections}) do
     cond do
       pages != [] -> validate_pages(pages)
       content != [] -> validate_content(content)
-      true -> {:error, :no_content}
+      sections != [] -> validate_sections(sections)
+      true -> {:error, :no_pages}
     end
   end
 
@@ -38,6 +37,19 @@ defmodule Rendro.Pipeline.Build do
         :ok -> {:cont, :ok}
         err -> {:halt, err}
       end
+    end)
+  end
+
+  defp validate_sections(sections) do
+    Enum.reduce_while(sections, :ok, fn
+      %Rendro.Section{content: content}, :ok ->
+        case validate_content(content) do
+          :ok -> {:cont, :ok}
+          err -> {:halt, err}
+        end
+
+      _, :ok ->
+        {:halt, {:error, :invalid_content_block}}
     end)
   end
 

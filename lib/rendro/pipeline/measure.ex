@@ -10,17 +10,16 @@ defmodule Rendro.Pipeline.Measure do
   """
 
   alias Rendro.PDF.Font
+  alias Rendro.Region
 
   @spec run(Rendro.Document.t()) :: {:ok, Rendro.Document.t()} | {:error, term()}
   def run(%Rendro.Document{} = doc) do
     font = Font.helvetica()
 
-    doc =
-      doc
-      |> measure_pages(font)
-      |> measure_content(font)
-
-    {:ok, doc}
+    doc
+    |> measure_pages(font)
+    |> measure_content(font)
+    |> measure_layout(font)
   end
 
   defp measure_pages(%Rendro.Document{pages: pages} = doc, font) do
@@ -64,4 +63,36 @@ defmodule Rendro.Pipeline.Measure do
   defp measure_row(row, font) do
     Enum.map(row, &measure_block(&1, font))
   end
+
+  defp measure_layout(%Rendro.Document{options: %{layout: layout}} = doc, font) do
+    measured_region_blocks =
+      Enum.into(layout.region_blocks, %{}, fn {name, blocks} ->
+        {name, Enum.map(blocks, &measure_block(&1, font))}
+      end)
+
+    measured_layout =
+      layout
+      |> Map.put(:region_blocks, measured_region_blocks)
+      |> Map.put(:body_capacity, body_capacity(layout))
+
+    if measured_layout.body_capacity <= 0 do
+      {:error, :no_body_capacity}
+    else
+      body_blocks = Map.get(measured_region_blocks, :body, [])
+      header_blocks = Map.get(measured_region_blocks, :header, [])
+      footer_blocks = Map.get(measured_region_blocks, :footer, [])
+
+      {:ok,
+       doc
+       |> put_in([Access.key(:options), :layout], measured_layout)
+       |> Map.put(:content, body_blocks)
+       |> Map.put(:header, header_blocks)
+       |> Map.put(:footer, footer_blocks)}
+    end
+  end
+
+  defp measure_layout(%Rendro.Document{} = doc, _font), do: {:ok, doc}
+
+  defp body_capacity(%{body_region: %Region{height: height}}) when is_number(height), do: height
+  defp body_capacity(_layout), do: 0
 end
