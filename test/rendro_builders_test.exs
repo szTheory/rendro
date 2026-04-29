@@ -1,7 +1,7 @@
 defmodule RendroBuildersTest do
   use ExUnit.Case, async: true
 
-  alias Rendro.{Block, Document, Metadata, Page, Text}
+  alias Rendro.{Block, Document, Metadata, Page, PageTemplate, Region, Section, Text}
 
   describe "builder functions" do
     test "text/2 builds a Text struct" do
@@ -36,9 +36,47 @@ defmodule RendroBuildersTest do
       assert page.height == 841.89
     end
 
+    test "page_template/1 builds a PageTemplate struct" do
+      template = Rendro.page_template(name: :invoice)
+      assert %PageTemplate{name: :invoice} = template
+      assert Enum.map(template.regions, & &1.name) == [:header, :body, :footer]
+    end
+
+    test "region/1 builds a Region struct" do
+      region = Rendro.region(name: :sidebar, role: :sidebar, anchor: :fixed, x: 24, y: 48)
+      assert %Region{name: :sidebar, role: :sidebar, anchor: :fixed, x: 24, y: 48} = region
+    end
+
+    test "section/1 builds a Section struct" do
+      block = Rendro.block(Rendro.text("Summary"))
+      section = Rendro.section(name: :summary, region: :body, content: [block], page_template: :invoice)
+
+      assert %Section{name: :summary, region: :body, content: [^block], page_template: :invoice} =
+               section
+    end
+
     test "document/1 builds a Document struct" do
       doc = Rendro.document()
       assert %Document{pages: [], metadata: %Metadata{}} = doc
+    end
+
+    test "flow/2 carries explicit template and section data" do
+      section = Rendro.section(name: :summary, content: [Rendro.block(Rendro.text("Section body"))])
+      template = Rendro.page_template(name: :invoice)
+      content = [Rendro.block(Rendro.text("Intro"))]
+
+      doc =
+        Rendro.flow(
+          content,
+          page_template: :invoice,
+          page_templates: [template],
+          sections: [section]
+        )
+
+      assert doc.content == content
+      assert doc.page_template == :invoice
+      assert doc.page_templates == [template]
+      assert doc.sections == [section]
     end
 
     test "metadata/1 builds a Metadata struct" do
@@ -53,6 +91,18 @@ defmodule RendroBuildersTest do
 
       assert_raise KeyError, fn ->
         Rendro.page(bogus: true)
+      end
+
+      assert_raise KeyError, fn ->
+        Rendro.page_template(bogus: true)
+      end
+
+      assert_raise KeyError, fn ->
+        Rendro.region(bogus: true)
+      end
+
+      assert_raise KeyError, fn ->
+        Rendro.section(bogus: true)
       end
 
       assert_raise KeyError, fn ->
@@ -125,6 +175,12 @@ defmodule RendroBuildersTest do
     test "struct creation is pure and repeatable" do
       a = Rendro.document(pages: [Rendro.page()])
       b = Rendro.document(pages: [Rendro.page()])
+      assert a == b
+    end
+
+    test "layout builders are deterministic" do
+      a = Rendro.page_template()
+      b = Rendro.page_template()
       assert a == b
     end
 

@@ -3,7 +3,7 @@ defmodule Rendro do
   Pure-Elixir, Phoenix-first PDF/document generation with deterministic layout and pagination.
   """
 
-  alias Rendro.{Block, Document, Metadata, Page, Pipeline, Table, Text}
+  alias Rendro.{Block, Document, Metadata, Page, PageTemplate, Pipeline, Region, Section, Table, Text}
 
   @type render_option :: {:output, Path.t()} | {:deterministic, boolean()}
   @type render_options :: [render_option()]
@@ -60,6 +60,21 @@ defmodule Rendro do
   @spec page(keyword()) :: Page.t()
   def page(attrs \\ []) do
     struct!(Page, attrs)
+  end
+
+  @spec page_template(keyword()) :: PageTemplate.t()
+  def page_template(attrs \\ []) do
+    struct!(PageTemplate, attrs)
+  end
+
+  @spec region(keyword()) :: Region.t()
+  def region(attrs \\ []) do
+    struct!(Region, attrs)
+  end
+
+  @spec section(keyword()) :: Section.t()
+  def section(attrs \\ []) do
+    struct!(Section, attrs)
   end
 
   @spec block(Text.t() | term(), keyword()) :: Block.t()
