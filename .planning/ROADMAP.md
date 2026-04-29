@@ -17,7 +17,7 @@ Rendro is progressing through iterative, verified milestones. `v1.0` proved the 
 ## Phases
 
 - [x] **Phase 18: Layout Contract and Page Template Model** - Introduce explicit flow page templates, sections, regions, and fixed-position fit validation as the foundational document layout contract.
-- [ ] **Phase 19: Deterministic Text Flow and Break Semantics** - Add width-aware text measurement plus explicit keep/break directives so pagination decisions reflect authored intent.
+- [x] **Phase 19: Deterministic Text Flow and Break Semantics** - Add width-aware text measurement plus explicit keep/break directives so pagination decisions reflect authored intent.
 - [ ] **Phase 20: Table Layout Maturity** - Replace demo-grade table sizing and split logic with deterministic multi-page table behavior fit for invoices and reports.
 - [ ] **Phase 21: Break Diagnostics and Pagination Proofs** - Make break/overflow causes observable and lock down pagination invariants with deterministic regression evidence.
 - [ ] **Phase 22: Authoring Ergonomics and Canonical Recipes** - Lift the new layout surface into recipes/examples/docs so downstream Phoenix teams can use it without ad hoc glue.
@@ -46,7 +46,7 @@ Rendro is progressing through iterative, verified milestones. `v1.0` proved the 
 Plans:
 - [x] 19-01-PLAN.md — Add wrapped-text and block break-intent contracts plus deterministic measurement.
 - [x] 19-02-PLAN.md — Enforce keep/break pagination semantics with typed failure diagnostics.
-- [ ] 19-03-PLAN.md — Render measured wrapped lines and publish truthful public examples.
+- [x] 19-03-PLAN.md — Render measured wrapped lines and publish truthful public examples.
 
 ### Phase 20: Table Layout Maturity
 **Goal**: Turn the current table primitive into a reliable business-document layout capability.
