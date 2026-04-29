@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: layout-authoring-maturity
 status: executing
-stopped_at: Completed 18-03-PLAN.md
-last_updated: "2026-04-29T01:11:04.065Z"
-last_activity: 2026-04-29 -- Phase 18 completed
+stopped_at: Completed 19-01-PLAN.md
+last_updated: "2026-04-29T19:38:45.494Z"
+last_activity: 2026-04-29 -- Completed 19-01-PLAN.md
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
-  percent: 100
+  total_plans: 6
+  completed_plans: 4
+  percent: 67
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-28)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 18 complete for `v1.1 Layout Authoring Maturity`
+**Current focus:** Phase 19 — deterministic-text-flow-and-break-semantics
 
 ## Current Position
 
-Phase: 18
-Plan: 3/3 completed
-Status: Phase 18 complete
-Last activity: 2026-04-29 -- Phase 18 completed
+Phase: 19 (deterministic-text-flow-and-break-semantics) — EXECUTING
+Plan: 2 of 3
+Status: Executing Phase 19
+Last activity: 2026-04-29 -- Completed 19-01-PLAN.md
 
-Progress: [██████████] 100%
+Progress: [███████░░░] 67%
 
 ## Performance Metrics
 
@@ -58,6 +58,7 @@ Progress: [██████████] 100%
 | Phase 18 P01 | 179 | 2 tasks | 9 files |
 | Phase 18 P02 | 9 min | 2 tasks | 9 files |
 | Phase 18 P03 | 2 min | 2 tasks | 6 files |
+| Phase 19 P01 | 5 min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,9 @@ Recent decisions affecting current work:
 - Validate fixed-position pages against the usable page box and flow regions against their declared rectangles inside Paginate so overflow stays a stage-specific contract.
 - Preserve overflow source, region, page index, and block geometry in Rendro.Error.details so public render failures stay actionable.
 - Measure table width from deterministic rendered column geometry instead of a hard-coded 500-unit width so fit validation matches real output.
+- Kept authored geometry and break intent on Rendro.Block while keeping line-height styling on Rendro.Text.
+- Stored wrapped lines in a private measured-text carrier during Measure so downstream stages can consume one deterministic line list.
+- Used newline-first whitespace wrapping with grapheme fallback for oversized tokens instead of introducing hyphenation or paragraph DSL semantics.
 
 ### Pending Todos
 
@@ -108,8 +112,8 @@ Items acknowledged and carried forward from milestone scoping:
 
 ## Session Continuity
 
-Last session: 2026-04-29T01:11:04.059Z
-Stopped at: Completed 18-03-PLAN.md
+Last session: 2026-04-29T19:38:45.487Z
+Stopped at: Completed 19-01-PLAN.md
 Resume file: None
 
-**Planned Phase:** 18 (Layout Contract and Page Template Model) — 3 plans — 2026-04-28T22:43:48.653Z
+**Planned Phase:** 19 (deterministic-text-flow-and-break-semantics) — 3 plans — 2026-04-29T19:26:06.259Z
