@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 20-01-PLAN.md
-last_updated: "2026-04-29T20:41:59.318Z"
+stopped_at: Completed 20-02-PLAN.md
+last_updated: "2026-04-29T20:47:28.745Z"
 last_activity: 2026-04-29
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 8
-  completed_plans: 7
-  percent: 88
+  completed_plans: 8
+  percent: 100
 ---
 
 # Project State
@@ -30,7 +30,7 @@ Plan: Not started
 Status: Ready to plan
 Last activity: 2026-04-29
 
-Progress: [█████████░] 88%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Progress: [█████████░] 88%
 | Phase 19 P02 | 5 min | 2 tasks | 3 files |
 | Phase 19 P03 | 6 min | 2 tasks | 7 files |
 | Phase 20 P01 | 25 | 2 tasks | 4 files |
+| Phase 20 P02 | 10 mins | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -93,6 +94,7 @@ Recent decisions affecting current work:
 - README examples teach the Phase 19 block-and-text flow path with explicit break semantics and narrow exclusions.
 - Decided to resolve layout body bounds during measurement to allow table width percentages to be relative to layout bounds.
 - Decided to let stack_cells in Paginate use absolute table coordinates directly.
+- Rejected width and border attributes on Rendro.table/2 to steer users to explicit column rules.
 
 ### Pending Todos
 
@@ -121,8 +123,8 @@ Items acknowledged and carried forward from milestone scoping:
 
 ## Session Continuity
 
-Last session: 2026-04-29T20:41:59.287Z
-Stopped at: Completed 20-01-PLAN.md
+Last session: 2026-04-29T20:47:28.734Z
+Stopped at: Completed 20-02-PLAN.md
 Resume file: None
 
 **Planned Phase:** 19 (deterministic-text-flow-and-break-semantics) — 3 plans — 2026-04-29T19:26:06.259Z
