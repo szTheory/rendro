@@ -12,6 +12,20 @@ exist and the Rendro core is entirely unaffected.
 This guide walks through enabling each adapter, verifying it works end-to-end, and
 interpreting the failure modes your code may encounter.
 
+## Core layout semantics stay in Rendro
+
+Wrapped flow text and pagination directives are core-library behavior, not
+adapter-specific behavior. Author width-constrained flow text with
+`Rendro.flow/2`, `Rendro.block/2`, and `Rendro.text/2`, then use
+`keep_together`, `keep_with_next`, `break_before`, and `break_after` on
+`Rendro.Block` when a document needs explicit break intent.
+
+Adapters such as Oban workers, audit logging hooks, and mail-delivery helpers
+only transport or observe the document you already built. They do not add a
+paragraph DSL, CSS-style fragmentation, widow/orphan control, hyphenation, or
+adapter-local break semantics. Those scope boundaries come from the Rendro core
+layout contract and remain the same regardless of delivery path.
+
 ---
 
 ## Oban
