@@ -69,6 +69,9 @@ Plans:
   3. Deterministic regression fixtures prove page assignment and break behavior, not just PDF validity.
   4. Public docs make support boundaries and failure modes truthful.
 **Plans**: 2 plans
+Plans:
+- [ ] 21-01-PLAN.md — Structural Diagnostics in Document Model & Pipeline Accumulators
+- [ ] 21-02-PLAN.md — ASCII Layout Tree Inspector & ExUnit Snapshots
 
 ### Phase 22: Authoring Ergonomics and Canonical Recipes
 **Goal**: Convert the stronger engine surface into an adoption-ready authoring experience.
