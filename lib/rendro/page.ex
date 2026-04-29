@@ -3,14 +3,18 @@ defmodule Rendro.Page do
   A page with blocks, dimensions, and margins.
   """
 
+  @default_width 595.28
+  @default_height 841.89
+  @default_margin 72
+
   @enforce_keys []
   defstruct blocks: [],
-            width: 595.28,
-            height: 841.89,
-            margin_top: 72,
-            margin_right: 72,
-            margin_bottom: 72,
-            margin_left: 72
+            width: @default_width,
+            height: @default_height,
+            margin_top: @default_margin,
+            margin_right: @default_margin,
+            margin_bottom: @default_margin,
+            margin_left: @default_margin
 
   @type t :: %__MODULE__{
           blocks: [Rendro.Block.t()],

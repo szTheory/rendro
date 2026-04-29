@@ -1,7 +1,7 @@
 defmodule Rendro.PageTest do
   use ExUnit.Case, async: true
 
-  alias Rendro.{Block, Page, Text}
+  alias Rendro.{Block, Page, PageTemplate, Region, Text}
 
   describe "struct construction" do
     test "creates with A4 defaults" do
@@ -39,6 +39,29 @@ defmodule Rendro.PageTest do
     test "rejects unknown keys" do
       assert_raise KeyError, fn ->
         struct!(Page, bogus: true)
+      end
+    end
+  end
+
+  describe "page template compatibility" do
+    test "creates a default page template with named regions" do
+      template = %PageTemplate{}
+
+      assert template.width == 595.28
+      assert template.height == 841.89
+      assert template.margin_top == 72
+      assert template.margin_right == 72
+      assert template.margin_bottom == 72
+      assert template.margin_left == 72
+      assert Enum.map(template.regions, & &1.name) == [:header, :body, :footer]
+
+      assert [%Region{role: :header}, %Region{role: :body}, %Region{role: :footer}] =
+               template.regions
+    end
+
+    test "rejects unknown template keys" do
+      assert_raise KeyError, fn ->
+        struct!(PageTemplate, bogus: true)
       end
     end
   end
