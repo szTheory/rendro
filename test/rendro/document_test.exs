@@ -10,6 +10,7 @@ defmodule Rendro.DocumentTest do
       assert doc.page_templates == []
       assert doc.page_template == nil
       assert doc.sections == []
+      assert doc.diagnostics == []
       assert doc.metadata == %Metadata{}
       assert doc.options == %{}
     end
@@ -25,6 +26,7 @@ defmodule Rendro.DocumentTest do
         page_templates: [template],
         page_template: :invoice,
         sections: [section],
+        diagnostics: [%{level: :info, type: :table_split}],
         metadata: meta,
         options: %{deterministic: true}
       }
@@ -33,6 +35,7 @@ defmodule Rendro.DocumentTest do
       assert doc.page_templates == [template]
       assert doc.page_template == :invoice
       assert doc.sections == [section]
+      assert doc.diagnostics == [%{level: :info, type: :table_split}]
       assert doc.metadata.title == "Test"
       assert doc.options.deterministic == true
     end
