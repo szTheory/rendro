@@ -155,7 +155,15 @@ defmodule Rendro.Pipeline.Measure do
   defp measure_layout(%Rendro.Document{options: %{layout: layout}} = doc, font) do
     measured_region_blocks =
       Enum.into(layout.region_blocks, %{}, fn {name, blocks} ->
-        {name, Enum.map(blocks, &measure_block(&1, font))}
+        region_width =
+          case name do
+            :body -> layout.body_region.width
+            _ -> 
+              region = Enum.find(layout.template.regions, &(&1.name == name))
+              if region, do: region.width, else: nil
+          end
+          
+        {name, Enum.map(blocks, &measure_block(&1, font, region_width))}
       end)
 
     measured_layout =

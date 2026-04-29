@@ -91,20 +91,19 @@ defmodule Rendro.Pipeline.Paginate do
   end
 
   defp stack_table_cells(%Rendro.Block{content: %Rendro.Table{} = table} = block) do
-    row_height = 14.4
-    col_width = 100
-
     header_y = block.y || 0
+    start_x = block.x || 0
+    col_widths = table.column_widths || []
 
     stacked_header =
-      if table.header, do: stack_cells(table.header, header_y, col_width), else: nil
+      if table.header, do: stack_cells(table.header, start_x, header_y, col_widths), else: nil
 
-    header_offset = if table.header, do: row_height, else: 0
+    header_offset = table.header_height || 0
 
     {stacked_rows, _} =
-      Enum.reduce(table.rows, {[], (block.y || 0) + header_offset}, fn row, {acc, y} ->
-        stacked_row = stack_cells(row, y, col_width)
-        {acc ++ [stacked_row], y + row_height}
+      Enum.reduce(Enum.zip(table.rows, table.row_heights || []), {[], header_y + header_offset}, fn {row, row_h}, {acc, y} ->
+        stacked_row = stack_cells(row, start_x, y, col_widths)
+        {acc ++ [stacked_row], y + row_h}
       end)
 
     %{block | content: %{table | header: stacked_header, rows: stacked_rows}}
@@ -112,10 +111,11 @@ defmodule Rendro.Pipeline.Paginate do
 
   defp stack_table_cells(block), do: block
 
-  defp stack_cells(row, y, col_width) do
+  defp stack_cells(row, start_x, y, col_widths) do
     {cells, _} =
-      Enum.reduce(row, {[], 0}, fn cell, {acc, x} ->
-        {acc ++ [%{cell | x: x, y: y}], x + col_width}
+      Enum.reduce(Enum.zip(row, col_widths), {[], start_x}, fn {cell, col_w}, {acc, x} ->
+        # Cell already has its width set by Measure, but its x needs stacking
+        {acc ++ [%{cell | x: x, y: y}], x + col_w}
       end)
 
     cells
@@ -241,7 +241,7 @@ defmodule Rendro.Pipeline.Paginate do
          template,
          max_h,
          current_h,
-         block_h,
+         _block_h,
          overflow_details
        ) do
     available_h = max_h - current_h
@@ -261,8 +261,18 @@ defmodule Rendro.Pipeline.Paginate do
         [%{template | blocks: [remaining_block]}, current_page | rest]
 
       remaining_table ->
-        check_overflow!(block, block_h, max_h, overflow_details)
-        [%{template | blocks: [block]}, current_page | rest]
+        if current_h == 0 do
+          impossible_row_h = List.first(table.row_heights || []) || 0
+          details = Map.merge(overflow_details, %{
+            row_index: 0, # Since we didn't split, it's the first row of this table chunk
+            row_height: impossible_row_h,
+            header_height: table.header_height || 0,
+            column_widths: table.column_widths || []
+          })
+          throw({:error, :content_overflow, details})
+        else
+          [%{template | blocks: [block]}, current_page | rest]
+        end
 
       true ->
         [%{current_page | blocks: current_page.blocks ++ [block]} | rest]
@@ -585,39 +595,46 @@ defmodule Rendro.Pipeline.Paginate do
     is_number(width) and width > 0 and is_number(height) and height > 0
   end
 
-  defp table_height(%Rendro.Table{rows: rows, header: header}) do
-    row_height = 14.4
-    header_h = if header, do: row_height, else: 0
-    header_h + length(rows) * row_height
+  defp table_height(%Rendro.Table{} = table) do
+    header_h = table.header_height || 0
+    rows_h = if table.row_heights, do: Enum.sum(table.row_heights), else: 0
+    header_h + rows_h
   end
 
-  defp split_table(%Rendro.Table{rows: rows, header: header} = table, available_h) do
-    row_height = 14.4
-    header_h = if header, do: row_height, else: 0
+  defp split_table(%Rendro.Table{} = table, available_h) do
+    header_h = table.header_height || 0
+    row_heights = table.row_heights || []
 
-    if available_h < header_h + row_height do
-      # Not even one row fits with header
+    {fit_count, _} =
+      Enum.reduce_while(row_heights, {0, header_h}, fn rh, {count, current_h} ->
+        if current_h + rh <= available_h do
+          {:cont, {count + 1, current_h + rh}}
+        else
+          {:halt, {count, current_h}}
+        end
+      end)
+
+    if fit_count == 0 do
       {nil, table}
     else
-      # Calculate how many rows fit
-      fit_count = floor((available_h - header_h) / row_height)
-      split_table_rows(table, rows, fit_count)
+      split_table_rows(table, fit_count)
     end
   end
 
-  defp split_table_rows(table, _rows, fit_count) when fit_count <= 0, do: {nil, table}
+  defp split_table_rows(table, fit_count) when fit_count <= 0, do: {nil, table}
 
-  defp split_table_rows(table, rows, fit_count) do
-    {this_rows, rest_rows} = Enum.split(rows, fit_count)
+  defp split_table_rows(table, fit_count) do
+    {this_rows, rest_rows} = Enum.split(table.rows, fit_count)
+    {this_row_heights, rest_row_heights} = if table.row_heights, do: Enum.split(table.row_heights, fit_count), else: {nil, nil}
 
     case rest_rows do
       [] ->
         {table, nil}
 
       _ ->
-        this_table = %{table | rows: this_rows}
+        this_table = %{table | rows: this_rows, row_heights: this_row_heights}
         # Repeat header on rest
-        rest_table = %{table | rows: rest_rows}
+        rest_table = %{table | rows: rest_rows, row_heights: rest_row_heights}
         {this_table, rest_table}
     end
   end

@@ -139,17 +139,17 @@ defmodule Rendro.PDF.Writer do
     Enum.map_join(page.blocks, "\n", fn block -> render_block(block, page, font) end)
   end
 
-  defp render_block(%Rendro.Block{content: %Rendro.Table{} = table} = block, page, font) do
+  defp render_block(%Rendro.Block{content: %Rendro.Table{} = table}, page, font) do
     header_ops =
       if table.header do
-        Enum.map(table.header, &render_block(&1, page, font, block.x, block.y))
+        Enum.map(table.header, &render_block(&1, page, font))
       else
         []
       end
 
     rows_ops =
       Enum.map(table.rows, fn row ->
-        Enum.map(row, &render_block(&1, page, font, block.x, block.y))
+        Enum.map(row, &render_block(&1, page, font))
       end)
 
     [header_ops | rows_ops] |> List.flatten() |> Enum.join("\n")
