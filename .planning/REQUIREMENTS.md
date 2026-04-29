@@ -8,8 +8,8 @@
 ### Text and Flow Semantics
 
 - [ ] **LAY-06**: Engineer can author wrapped text inside width-constrained flow regions with deterministic line-breaking behavior.
-- [ ] **LAY-07**: Engineer can define flow documents against explicit page templates with configurable geometry and anchored header/footer regions.
-- [ ] **LAY-08**: Engineer can compose reusable sections or bounded layout regions without dropping down to raw page coordinates for every document.
+- [x] **LAY-07**: Engineer can define flow documents against explicit page templates with configurable geometry and anchored header/footer regions.
+- [x] **LAY-08**: Engineer can compose reusable sections or bounded layout regions without dropping down to raw page coordinates for every document.
 - [ ] **LAY-09**: Engineer can control pagination through explicit keep/break directives such as `keep_together`, `keep_with_next`, and break-before/after rules.
 
 ### Table Layout
@@ -57,8 +57,8 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | LAY-06 | Phase 19 | Pending |
-| LAY-07 | Phase 18 | Pending |
-| LAY-08 | Phase 18 | Pending |
+| LAY-07 | Phase 18 | Completed |
+| LAY-08 | Phase 18 | Completed |
 | LAY-09 | Phase 19 | Pending |
 | LAY-10 | Phase 20 | Pending |
 | LAY-11 | Phase 18 | Pending |
@@ -73,4 +73,4 @@
 
 ---
 *Requirements defined: 2026-04-28*
-*Last updated: 2026-04-28 after milestone v1.1 initialization*
+*Last updated: 2026-04-29 after Phase 18 Plan 02 execution*
