@@ -38,24 +38,39 @@ defmodule Rendro.Pipeline.Measure do
     %{page | blocks: measured_blocks}
   end
 
-  defp measure_block(%Rendro.Block{content: %Rendro.Table{} = table, width: nil} = block, font) do
-    # For now, simple table measurement
-    row_height = 14.4
-    col_width = 100
-    header_h = if table.header, do: row_height, else: 0
-    rows_h = length(table.rows) * row_height
+  defp measure_block(block, font, container_width \\ nil)
+
+  defp measure_block(%Rendro.Block{content: %Rendro.Table{} = table} = block, font, container_width) do
+    width = block.width || container_width || 595.28
+    
+    col_count = max_columns(table)
+    col_widths = resolve_columns(table.columns, col_count, width)
+
+    {measured_header, header_h} = measure_table_row(table.header, col_widths, font)
+    
+    {measured_rows, row_heights} = 
+      Enum.map_reduce(table.rows, [], fn row, acc ->
+        {m_row, r_h} = measure_table_row(row, col_widths, font)
+        {m_row, [r_h | acc]}
+      end)
+      
+    row_heights = Enum.reverse(row_heights)
+    rows_h = Enum.sum(row_heights)
+    
     height = header_h + rows_h
-    width = table_width(table, col_width)
 
-    # Rows are already normalized into %Rendro.Block{} entries by Compose (D-02/D-03).
-    measured_header = if table.header, do: measure_row(table.header, font), else: nil
-    measured_rows = Enum.map(table.rows, &measure_row(&1, font))
-
-    table = %{table | header: measured_header, rows: measured_rows}
+    table = %{table | 
+      header: measured_header, 
+      rows: measured_rows,
+      column_widths: col_widths,
+      row_heights: row_heights,
+      header_height: header_h
+    }
+    
     %{block | content: table, width: width, height: height}
   end
 
-  defp measure_block(%Rendro.Block{content: %Rendro.Text{} = text} = block, font) do
+  defp measure_block(%Rendro.Block{content: %Rendro.Text{} = text} = block, font, _container_width) do
     lines = wrap_text(text.content, block.width, font, text.size)
     measured_width = measured_text_width(lines, font, text.size)
     width = block.width || measured_width
@@ -73,10 +88,68 @@ defmodule Rendro.Pipeline.Measure do
     %{block | content: measured_text, width: width, height: height}
   end
 
-  defp measure_block(block, _font), do: block
+  defp measure_block(block, _font, _container_width), do: block
 
-  defp measure_row(row, font) do
-    Enum.map(row, &measure_block(&1, font))
+  defp measure_table_row(nil, _col_widths, _font), do: {nil, 0}
+  defp measure_table_row(row, col_widths, font) do
+    measured_cells =
+      row
+      |> Enum.zip(col_widths)
+      |> Enum.map(fn {cell_block, c_width} ->
+        measure_block(%{cell_block | width: c_width}, font, c_width)
+      end)
+    
+    max_height = 
+      measured_cells
+      |> Enum.map(&(&1.height || 0))
+      |> Enum.max(fn -> 0 end)
+      
+    {measured_cells, max_height}
+  end
+
+  defp max_columns(%Rendro.Table{header: header, rows: rows}) do
+    rows
+    |> Enum.map(&length/1)
+    |> Kernel.++([if(header, do: length(header), else: 0)])
+    |> Enum.max(fn -> 0 end)
+  end
+
+  defp resolve_columns(nil, count, total_width) when count > 0 do
+    w = total_width / count
+    List.duplicate(w, count)
+  end
+  defp resolve_columns(nil, 0, _total_width), do: []
+  defp resolve_columns(columns, count, total_width) do
+    fixed_total = 
+      columns
+      |> Enum.map(fn
+        {:fixed, w} -> w
+        _ -> 0
+      end)
+      |> Enum.sum()
+      
+    shares_total =
+      columns
+      |> Enum.map(fn
+        {:share, s} -> s
+        _ -> 0
+      end)
+      |> Enum.sum()
+      
+    remaining_width = max(total_width - fixed_total, 0)
+    
+    resolved =
+      columns
+      |> Enum.map(fn
+        {:fixed, w} -> w
+        {:share, s} -> if shares_total > 0, do: remaining_width * (s / shares_total), else: 0
+      end)
+      
+    if length(resolved) < count do
+      resolved ++ List.duplicate(0, count - length(resolved))
+    else
+      Enum.take(resolved, count)
+    end
   end
 
   defp measure_layout(%Rendro.Document{options: %{layout: layout}} = doc, font) do
@@ -186,15 +259,5 @@ defmodule Rendro.Pipeline.Measure do
     lines
     |> Enum.map(&Font.text_width(font, &1, font_size))
     |> Enum.max(fn -> 0 end)
-  end
-
-  defp table_width(%Rendro.Table{header: header, rows: rows}, col_width) do
-    max_columns =
-      rows
-      |> Enum.map(&length/1)
-      |> Kernel.++([if(header, do: length(header), else: 0)])
-      |> Enum.max(fn -> 0 end)
-
-    max_columns * col_width
   end
 end

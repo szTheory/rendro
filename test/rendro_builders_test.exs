@@ -1,7 +1,7 @@
 defmodule RendroBuildersTest do
   use ExUnit.Case, async: true
 
-  alias Rendro.{Block, Document, Metadata, Page, PageTemplate, Region, Section, Text}
+  alias Rendro.{Block, Document, Metadata, Page, PageTemplate, Region, Section, Table, Text}
 
   describe "builder functions" do
     test "text/2 builds a Text struct" do
@@ -85,6 +85,20 @@ defmodule RendroBuildersTest do
     test "metadata/1 builds a Metadata struct" do
       meta = Rendro.metadata(title: "Test", author: "Agent")
       assert %Metadata{title: "Test", author: "Agent"} = meta
+    end
+
+    test "table/2 builds a Table struct and supports columns and split_policy" do
+      table = Rendro.table([["1"]], columns: [{:fixed, 100}], split_policy: :atomic)
+      assert %Table{rows: [["1"]], columns: [{:fixed, 100}], split_policy: :atomic} = table
+    end
+
+    test "table/2 rejects removed fields like width and border" do
+      assert_raise KeyError, fn ->
+        Rendro.table([["1"]], width: :fill)
+      end
+      assert_raise KeyError, fn ->
+        Rendro.table([["1"]], border: true)
+      end
     end
 
     test "builders reject unknown keys via struct!" do

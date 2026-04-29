@@ -227,5 +227,48 @@ defmodule Rendro.Pipeline.MeasureTest do
       assert constrained_block.height > unconstrained_block.height
       assert length(constrained_block.content.lines) > 1
     end
+
+    test "resolves authored column rules deterministically against block width" do
+      table = Rendro.table(
+        [["a", "b", "c"]],
+        columns: [{:fixed, 100}, {:share, 1}, {:share, 2}]
+      )
+      doc = Rendro.flow([Rendro.block(table, width: 400)])
+      
+      assert {:ok, composed} = Compose.run(doc)
+      assert {:ok, measured} = Measure.run(composed)
+      
+      [measured_block] = measured.content
+      measured_table = measured_block.content
+      
+      assert measured_block.width == 400
+      # col 1: 100 (fixed)
+      # remaining: 300
+      # col 2: 300 * (1/3) = 100
+      # col 3: 300 * (2/3) = 200
+      assert measured_table.column_widths == [100.0, 100.0, 200.0]
+    end
+
+    test "measured row height follows the tallest cell in the row" do
+      table = Rendro.table(
+        [["short", "very very very very very long text that must wrap"]],
+        columns: [{:fixed, 100}, {:fixed, 50}]
+      )
+      doc = Rendro.flow([Rendro.block(table, width: 150)])
+      
+      assert {:ok, composed} = Compose.run(doc)
+      assert {:ok, measured} = Measure.run(composed)
+      
+      [measured_block] = measured.content
+      measured_table = measured_block.content
+      
+      [row_h] = measured_table.row_heights
+      
+      # Height should be > 14.4 because it wraps
+      assert row_h > 15
+      
+      # The block height should match the row height
+      assert measured_block.height == row_h
+    end
   end
 end

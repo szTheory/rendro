@@ -7,15 +7,23 @@ defmodule Rendro.Table do
   defstruct [
     :rows,
     header: nil,
-    width: :fill,
-    border: true
+    columns: nil,
+    split_policy: :atomic,
+    # Pipeline geometry fields populated by Measure
+    column_widths: nil,
+    row_heights: nil,
+    header_height: nil
   ]
 
   @type row :: [Rendro.Block.t() | String.t()]
+  @type column_rule :: {:fixed, number()} | {:share, number()}
   @type t :: %__MODULE__{
           rows: [row()],
           header: row() | nil,
-          width: number() | :fill,
-          border: boolean()
+          columns: [column_rule()] | nil,
+          split_policy: :atomic,
+          column_widths: [number()] | nil,
+          row_heights: [number()] | nil,
+          header_height: number() | nil
         }
 end
