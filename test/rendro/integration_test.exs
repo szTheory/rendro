@@ -93,6 +93,23 @@ defmodule Rendro.IntegrationTest do
       assert pdf =~ "trailer"
       assert pdf =~ "startxref"
     end
+
+    test "returns truthful fixed-page overflow details" do
+      page =
+        Rendro.page(
+          blocks: [Rendro.block(Rendro.text("Outside the page"), x: 440, y: 20, width: 120)]
+        )
+
+      doc = Rendro.fixed([page])
+
+      assert {:error, %Rendro.Error{} = error} = Rendro.render(doc)
+      assert error.stage == :paginate
+      assert error.reason == :content_overflow
+      assert error.details.overflow_source == :fixed_page
+      assert error.details.page_index == 1
+      assert error.next =~ "expand the declared page/region bounds"
+      assert error.next =~ "does not auto-fit"
+    end
   end
 
   describe "Rendro.render/2 with :output option" do

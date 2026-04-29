@@ -31,7 +31,7 @@ defmodule Rendro.Pipeline.Paginate do
       pages =
         body_blocks
         |> Enum.reduce([%{page_template | blocks: []}], fn block, pages ->
-          paginate_block(block, pages, page_template, max_h)
+          paginate_block(block, pages, page_template, max_h, %{overflow_source: :bounded_region, region: :body})
         end)
         |> Enum.reverse()
         |> Enum.with_index(1)
@@ -104,25 +104,50 @@ defmodule Rendro.Pipeline.Paginate do
     cells
   end
 
-  defp paginate_block(block, [current_page | rest] = _pages, template, max_h) do
+  defp paginate_block(block, [current_page | rest] = _pages, template, max_h, overflow_details) do
     block_h = block.height || 0
     current_h = Enum.sum(Enum.map(current_page.blocks, &(&1.height || 0)))
+    failure_details =
+      Map.merge(overflow_details, %{
+        page_index: length(rest) + 1,
+        block_index: length(current_page.blocks)
+      })
 
     case block.content do
       %Rendro.Table{} = table when current_h + block_h > max_h ->
-        handle_table_split(block, table, current_page, rest, template, max_h, current_h, block_h)
+        handle_table_split(
+          block,
+          table,
+          current_page,
+          rest,
+          template,
+          max_h,
+          current_h,
+          block_h,
+          failure_details
+        )
 
       _ ->
         if current_h + block_h <= max_h do
           [%{current_page | blocks: current_page.blocks ++ [block]} | rest]
         else
-          check_overflow!(block_h, max_h)
+          check_overflow!(block, block_h, max_h, failure_details)
           [%{template | blocks: [block]}, current_page | rest]
         end
     end
   end
 
-  defp handle_table_split(block, table, current_page, rest, template, max_h, current_h, block_h) do
+  defp handle_table_split(
+         block,
+         table,
+         current_page,
+         rest,
+         template,
+         max_h,
+         current_h,
+         block_h,
+         overflow_details
+       ) do
     available_h = max_h - current_h
     {this_page_table, remaining_table} = split_table(table, available_h)
 
@@ -140,7 +165,7 @@ defmodule Rendro.Pipeline.Paginate do
         [%{template | blocks: [remaining_block]}, current_page | rest]
 
       remaining_table ->
-        check_overflow!(block_h, max_h)
+        check_overflow!(block, block_h, max_h, overflow_details)
         [%{template | blocks: [block]}, current_page | rest]
 
       true ->
@@ -148,9 +173,19 @@ defmodule Rendro.Pipeline.Paginate do
     end
   end
 
-  defp check_overflow!(block_h, max_h) do
+  defp check_overflow!(block, block_h, max_h, overflow_details) do
     if block_h > max_h do
-      throw({:error, :content_overflow, %{block_height: block_h, max_height: max_h}})
+      throw(
+        {:error, :content_overflow,
+         Map.merge(
+           %{
+             block_height: block_h,
+             max_height: max_h,
+             block: block_rect(block)
+           },
+           overflow_details
+         )}
+      )
     end
   end
 

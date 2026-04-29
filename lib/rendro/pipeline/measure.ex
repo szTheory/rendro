@@ -40,16 +40,18 @@ defmodule Rendro.Pipeline.Measure do
   defp measure_block(%Rendro.Block{content: %Rendro.Table{} = table, width: nil} = block, font) do
     # For now, simple table measurement
     row_height = 14.4
+    col_width = 100
     header_h = if table.header, do: row_height, else: 0
     rows_h = length(table.rows) * row_height
     height = header_h + rows_h
+    width = table_width(table, col_width)
 
     # Rows are already normalized into %Rendro.Block{} entries by Compose (D-02/D-03).
     measured_header = if table.header, do: measure_row(table.header, font), else: nil
     measured_rows = Enum.map(table.rows, &measure_row(&1, font))
 
     table = %{table | header: measured_header, rows: measured_rows}
-    %{block | content: table, width: 500, height: height}
+    %{block | content: table, width: width, height: height}
   end
 
   defp measure_block(%Rendro.Block{content: %Rendro.Text{} = text} = block, font) do
@@ -95,4 +97,14 @@ defmodule Rendro.Pipeline.Measure do
 
   defp body_capacity(%{body_region: %Region{height: height}}) when is_number(height), do: height
   defp body_capacity(_layout), do: 0
+
+  defp table_width(%Rendro.Table{header: header, rows: rows}, col_width) do
+    max_columns =
+      rows
+      |> Enum.map(&length/1)
+      |> Kernel.++([if(header, do: length(header), else: 0)])
+      |> Enum.max(fn -> 0 end)
+
+    max_columns * col_width
+  end
 end

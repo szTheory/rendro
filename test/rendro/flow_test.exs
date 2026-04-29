@@ -92,7 +92,9 @@ defmodule Rendro.FlowTest do
     assert {:error, %Rendro.Error{} = error} = Rendro.render(doc)
     assert error.stage == :paginate
     assert error.reason == :content_overflow
-    assert error.next =~ "Reduce the height"
+    assert error.details.overflow_source == :bounded_region
+    assert error.details.region == :body
+    assert error.next =~ "expand the declared page/region bounds"
   end
 
   test "headers, footers and page numbers" do
@@ -214,5 +216,44 @@ defmodule Rendro.FlowTest do
     assert length(Regex.scan(~r/\(Statement Header\) Tj/, pdf)) == 2
     assert pdf =~ "(Page 1) Tj"
     assert pdf =~ "(Page 2) Tj"
+  end
+
+  test "render/1 returns truthful bounded-region overflow details" do
+    template =
+      Rendro.page_template(
+        name: :tight_body,
+        width: 420,
+        height: 220,
+        margin_top: 20,
+        margin_right: 24,
+        margin_bottom: 20,
+        margin_left: 24,
+        regions: [
+          Rendro.region(
+            name: :body,
+            role: :body,
+            anchor: :flow,
+            x: 24,
+            y: 52,
+            width: 372,
+            height: 10
+          )
+        ]
+      )
+
+    doc =
+      Rendro.flow([Rendro.block(Rendro.text("Too tall for the body region"))],
+        page_template: :tight_body,
+        page_templates: [template]
+      )
+
+    assert {:error, %Rendro.Error{} = error} = Rendro.render(doc)
+    assert error.stage == :paginate
+    assert error.reason == :content_overflow
+    assert error.details.overflow_source == :bounded_region
+    assert error.details.region == :body
+    assert error.details.page_index == 1
+    assert error.next =~ "expand the declared page/region bounds"
+    assert error.next =~ "does not auto-fit"
   end
 end
