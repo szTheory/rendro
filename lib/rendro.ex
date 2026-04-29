@@ -94,6 +94,10 @@ defmodule Rendro do
 
   @spec table([Table.row()], keyword()) :: Table.t()
   def table(rows, attrs \\ []) do
+    if Keyword.has_key?(attrs, :width) or Keyword.has_key?(attrs, :border) do
+      raise ArgumentError, "Rendro.table/2 no longer supports :width or :border. Use explicit block width and table :columns rules instead."
+    end
+
     struct!(Table, Keyword.put(attrs, :rows, rows))
   end
 end

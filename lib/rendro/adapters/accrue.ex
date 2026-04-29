@@ -78,7 +78,8 @@ if Code.ensure_loaded?(Accrue) do
 
       table =
         Rendro.table(rows,
-          header: ["Description", "Qty", "Unit", "Subtotal"]
+          header: ["Description", "Qty", "Unit", "Subtotal"],
+          columns: [{:share, 1}, {:fixed, 40}, {:fixed, 60}, {:fixed, 60}]
         )
 
       [

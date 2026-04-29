@@ -22,7 +22,10 @@ defmodule Rendro.Recipes do
         [item.name, Integer.to_string(item.qty), "$#{item.price}"]
       end)
 
-    table = Rendro.table(table_rows, header: ["Item", "Qty", "Price"])
+    table = Rendro.table(table_rows,
+      header: ["Item", "Qty", "Price"],
+      columns: [{:share, 1}, {:fixed, 50}, {:fixed, 80}]
+    )
 
     footer = [
       Rendro.block(Rendro.text("Thank you for your business!", size: 10))

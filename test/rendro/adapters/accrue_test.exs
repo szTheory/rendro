@@ -22,12 +22,13 @@ defmodule Rendro.Adapters.AccrueTest do
       assert is_list(doc.content) and doc.content != []
     end
 
-    test "produces a document containing the invoice id and line item descriptions" do
+    test "produces a document containing the invoice id, line item descriptions, and explicit table columns" do
       {:ok, doc} = Adapter.recipe(sample_invoice())
       flat = inspect(doc, limit: :infinity, printable_limit: :infinity)
       assert flat =~ "INV-001"
       assert flat =~ "Widget"
       assert flat =~ "Gizmo"
+      assert flat =~ "columns: [share: 1, fixed: 40, fixed: 60, fixed: 60]"
     end
 
     test "the resulting document renders to a valid PDF" do

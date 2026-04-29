@@ -41,7 +41,8 @@ defmodule Rendro.FlowTest do
           ["A1", "B1"],
           ["A2", "B2"]
         ],
-        header: ["Col A", "Col B"]
+        header: ["Col A", "Col B"],
+        columns: [{:fixed, 50}, {:share, 1}]
       )
 
     doc =

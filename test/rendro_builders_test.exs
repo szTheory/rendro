@@ -93,10 +93,10 @@ defmodule RendroBuildersTest do
     end
 
     test "table/2 rejects removed fields like width and border" do
-      assert_raise KeyError, fn ->
+      assert_raise ArgumentError, ~r/no longer supports :width or :border/, fn ->
         Rendro.table([["1"]], width: :fill)
       end
-      assert_raise KeyError, fn ->
+      assert_raise ArgumentError, ~r/no longer supports :width or :border/, fn ->
         Rendro.table([["1"]], border: true)
       end
     end
