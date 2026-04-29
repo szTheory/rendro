@@ -8,13 +8,21 @@ defmodule Rendro do
   @type render_option :: {:output, Path.t()} | {:deterministic, boolean()}
   @type render_options :: [render_option()]
 
-  @spec render(Document.t()) :: {:ok, binary()} | {:error, Rendro.Error.t()}
-  def render(%Document{} = doc) do
-    Pipeline.run(doc)
+  @spec render(Document.t(), render_options()) :: {:ok, binary()} | {:error, Rendro.Error.t()}
+  def render(%Document{} = doc, opts \\ []) when is_list(opts) do
+    case render_with_diagnostics(doc, opts) do
+      {:ok, pdf_binary, _doc} -> {:ok, pdf_binary}
+      error -> error
+    end
   end
 
-  @spec render(Document.t(), render_options()) :: {:ok, binary()} | {:error, Rendro.Error.t()}
-  def render(%Document{} = doc, opts) when is_list(opts) do
+  @doc """
+  Renders the document and returns the binary along with the fully populated document struct.
+  Useful for inspecting layout or reading populated diagnostics.
+  """
+  @spec render_with_diagnostics(Document.t(), render_options()) ::
+          {:ok, binary(), Document.t()} | {:error, Rendro.Error.t()}
+  def render_with_diagnostics(%Document{} = doc, opts \\ []) when is_list(opts) do
     render_opts =
       if Keyword.get(opts, :deterministic, false),
         do: [deterministic: true],
@@ -22,10 +30,12 @@ defmodule Rendro do
 
     doc = put_in(doc.options[:render], render_opts)
 
-    with {:ok, pdf_binary} <- Pipeline.run(doc) do
+    with {:ok, pdf_binary, doc} <- Pipeline.run_with_diagnostics(doc) do
       case Keyword.get(opts, :output) do
-        nil -> {:ok, pdf_binary}
-        path -> write_output(pdf_binary, path)
+        nil -> {:ok, pdf_binary, doc}
+        path ->
+          {:ok, _} = write_output(pdf_binary, path)
+          {:ok, pdf_binary, doc}
       end
     end
   end

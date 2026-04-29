@@ -138,6 +138,26 @@ doc = Rendro.fixed([page])
 {:ok, _pdf} = Rendro.render(doc)
 ```
 
+### Inspection and Diagnostics
+
+Verified by the README compile/eval lane in `mix docs.contract`.
+
+When building documents, you may want to inspect the final laid-out structure or read warnings (like font fallbacks) generated during rendering. Rendro provides `render_with_diagnostics/2` to return the fully populated document struct alongside the PDF binary, and `Rendro.Inspector.inspect/1` to produce a human-readable layout tree.
+
+```elixir
+# docs-contract: readme-inspector-compile
+doc = Rendro.flow([Rendro.block(Rendro.text("Hello World"))])
+
+{:ok, _pdf, final_doc} = Rendro.render_with_diagnostics(doc)
+
+# Print a human-readable tree of pages, blocks, and dimensions
+IO.puts(Rendro.Inspector.inspect(final_doc))
+
+# Access structured diagnostics emitted during the pipeline
+# final_doc.diagnostics is a list of %Rendro.Document.Diagnostic{}
+_diagnostics = final_doc.diagnostics
+```
+
 ## Phoenix Integration
 
 Use the Phoenix adapter to serve PDFs from your controllers:

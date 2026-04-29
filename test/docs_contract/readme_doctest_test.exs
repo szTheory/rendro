@@ -15,6 +15,7 @@ defmodule Rendro.DocsContract.ReadmeDoctestTest do
              "readme-flow-breaks-compile",
              "readme-table-compile",
              "readme-fixed-compile",
+             "readme-inspector-compile",
              "readme-policies-compile"
            ]
 
