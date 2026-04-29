@@ -43,6 +43,10 @@ Rendro is progressing through iterative, verified milestones. `v1.0` proved the 
   3. Pagination decisions remain deterministic and testable even when content can wrap across multiple lines.
   4. Public flow APIs/examples expose these semantics clearly without leaking internal pipeline details.
 **Plans**: 3 plans
+Plans:
+- [ ] 19-01-PLAN.md — Add wrapped-text and block break-intent contracts plus deterministic measurement.
+- [ ] 19-02-PLAN.md — Enforce keep/break pagination semantics with typed failure diagnostics.
+- [ ] 19-03-PLAN.md — Render measured wrapped lines and publish truthful public examples.
 
 ### Phase 20: Table Layout Maturity
 **Goal**: Turn the current table primitive into a reliable business-document layout capability.
