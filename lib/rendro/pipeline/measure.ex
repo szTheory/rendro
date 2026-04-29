@@ -10,6 +10,7 @@ defmodule Rendro.Pipeline.Measure do
   """
 
   alias Rendro.PDF.Font
+  alias Rendro.Pipeline.MeasuredText
   alias Rendro.Region
 
   @spec run(Rendro.Document.t()) :: {:ok, Rendro.Document.t()} | {:error, term()}
@@ -55,9 +56,21 @@ defmodule Rendro.Pipeline.Measure do
   end
 
   defp measure_block(%Rendro.Block{content: %Rendro.Text{} = text} = block, font) do
-    width = block.width || Font.text_width(font, text.content, text.size)
-    height = block.height || text.size * 1.2
-    %{block | width: width, height: height}
+    lines = wrap_text(text.content, block.width, font, text.size)
+    measured_width = measured_text_width(lines, font, text.size)
+    width = block.width || measured_width
+    measured_height = text.size * text.line_height * length(lines)
+    height = block.height || measured_height
+
+    measured_text = %MeasuredText{
+      source: text,
+      lines: lines,
+      line_height: text.line_height,
+      width: measured_width,
+      height: measured_height
+    }
+
+    %{block | content: measured_text, width: width, height: height}
   end
 
   defp measure_block(block, _font), do: block
@@ -97,6 +110,76 @@ defmodule Rendro.Pipeline.Measure do
 
   defp body_capacity(%{body_region: %Region{height: height}}) when is_number(height), do: height
   defp body_capacity(_layout), do: 0
+
+  defp wrap_text(text, nil, _font, _font_size), do: String.split(text, "\n", trim: false)
+
+  defp wrap_text(text, max_width, font, font_size) do
+    text
+    |> String.split("\n", trim: false)
+    |> Enum.flat_map(&wrap_segment(&1, max_width, font, font_size))
+  end
+
+  defp wrap_segment("", _max_width, _font, _font_size), do: [""]
+
+  defp wrap_segment(segment, max_width, font, font_size) do
+    tokens = Regex.split(~r/\s+/, segment, trim: true)
+
+    case tokens do
+      [] ->
+        [""]
+
+      [token | rest] ->
+        token
+        |> split_token(max_width, font, font_size)
+        |> wrap_tokens(rest, max_width, font, font_size)
+    end
+  end
+
+  defp wrap_tokens(lines, tokens, max_width, font, font_size) do
+    Enum.reduce(tokens, lines, fn token, acc_lines ->
+      {leading_lines, [current_line]} = Enum.split(acc_lines, length(acc_lines) - 1)
+      candidate = current_line <> " " <> token
+
+      if Font.text_width(font, candidate, font_size) <= max_width do
+        leading_lines ++ [candidate]
+      else
+        acc_lines ++ split_token(token, max_width, font, font_size)
+      end
+    end)
+  end
+
+  defp split_token(token, max_width, font, font_size) do
+    {lines, current_line} =
+      Enum.reduce(String.graphemes(token), {[], ""}, fn grapheme, {lines, current_line} ->
+        candidate = current_line <> grapheme
+
+        cond do
+          current_line == "" ->
+            if Font.text_width(font, candidate, font_size) <= max_width do
+              {lines, candidate}
+            else
+              {[candidate | lines], ""}
+            end
+
+          Font.text_width(font, candidate, font_size) <= max_width ->
+            {lines, candidate}
+
+          true ->
+            {[current_line | lines], grapheme}
+        end
+      end)
+
+    case current_line do
+      "" -> Enum.reverse(lines)
+      _ -> Enum.reverse([current_line | lines])
+    end
+  end
+
+  defp measured_text_width(lines, font, font_size) do
+    lines
+    |> Enum.map(&Font.text_width(font, &1, font_size))
+    |> Enum.max(fn -> 0 end)
+  end
 
   defp table_width(%Rendro.Table{header: header, rows: rows}, col_width) do
     max_columns =
