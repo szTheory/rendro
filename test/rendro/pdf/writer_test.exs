@@ -2,6 +2,7 @@ defmodule Rendro.PDF.WriterTest do
   use ExUnit.Case, async: true
 
   alias Rendro.PDF.Writer
+  alias Rendro.Pipeline.MeasuredText
 
   defp sample_document do
     text = %Rendro.Text{content: "Hello, Rendro!", font: "Helvetica", size: 12, color: {0, 0, 0}}
@@ -159,6 +160,37 @@ defmodule Rendro.PDF.WriterTest do
 
       {:ok, pdf} = Writer.render(doc)
       assert pdf =~ "1.0000 0.0000 0.0000 rg"
+    end
+
+    test "serializes measured wrapped lines as separate text operations" do
+      source = Rendro.text("alpha beta gamma", size: 12, line_height: 1.5)
+
+      measured =
+        %MeasuredText{
+          source: source,
+          lines: ["alpha beta", "gamma"],
+          line_height: source.line_height,
+          width: 60,
+          height: 36
+        }
+
+      block = %Rendro.Block{content: measured, x: 10, y: 20, width: 60, height: 36}
+
+      page = %Rendro.Page{
+        blocks: [block],
+        width: 612,
+        height: 792,
+        margin_left: 72,
+        margin_top: 72
+      }
+
+      {:ok, pdf} = Writer.render(%Rendro.Document{pages: [page], metadata: %Rendro.Metadata{}})
+
+      assert pdf =~ "(alpha beta) Tj"
+      assert pdf =~ "(gamma) Tj"
+      assert length(Regex.scan(~r/\) Tj/, pdf)) == 2
+      assert pdf =~ "0 -18.0000 Td"
+      refute pdf =~ "(alpha beta gamma) Tj"
     end
   end
 

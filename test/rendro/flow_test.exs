@@ -2,6 +2,7 @@ defmodule Rendro.FlowTest do
   use ExUnit.Case, async: true
 
   alias Rendro.Pipeline.{Build, Compose, Measure, Paginate}
+  alias Rendro.Pipeline.MeasuredText
 
   test "flow document paginates correctly" do
     content =
@@ -185,25 +186,25 @@ defmodule Rendro.FlowTest do
     header1 =
       Enum.find(
         page1.blocks,
-        &match?(%Rendro.Block{content: %Rendro.Text{content: "Statement Header"}}, &1)
+        &match?(%Rendro.Block{content: %MeasuredText{source: %Rendro.Text{content: "Statement Header"}}}, &1)
       )
 
     header2 =
       Enum.find(
         page2.blocks,
-        &match?(%Rendro.Block{content: %Rendro.Text{content: "Statement Header"}}, &1)
+        &match?(%Rendro.Block{content: %MeasuredText{source: %Rendro.Text{content: "Statement Header"}}}, &1)
       )
 
     footer1 =
       Enum.find(
         page1.blocks,
-        &match?(%Rendro.Block{content: %Rendro.Text{content: "Page 1"}}, &1)
+        &match?(%Rendro.Block{content: %MeasuredText{source: %Rendro.Text{content: "Page 1"}}}, &1)
       )
 
     footer2 =
       Enum.find(
         page2.blocks,
-        &match?(%Rendro.Block{content: %Rendro.Text{content: "Page 2"}}, &1)
+        &match?(%Rendro.Block{content: %MeasuredText{source: %Rendro.Text{content: "Page 2"}}}, &1)
       )
 
     assert header1.y == 4
@@ -255,5 +256,34 @@ defmodule Rendro.FlowTest do
     assert error.details.page_index == 1
     assert error.next =~ "expand the declared page/region bounds"
     assert error.next =~ "does not auto-fit"
+  end
+
+  test "flow render uses measured wrapped lines and keeps page counts stable" do
+    long_line =
+      "alpha beta gamma delta epsilon zeta eta theta iota kappa lambda mu nu xi omicron pi"
+
+    content = [
+      Rendro.block(
+        Rendro.text(long_line, size: 12, line_height: 1.4),
+        width: 100,
+        keep_with_next: true
+      ),
+      Rendro.block(Rendro.text("Summary block", size: 12), break_after: true),
+      Rendro.block(Rendro.text("Next page", size: 12))
+    ]
+
+    doc = Rendro.flow(content)
+
+    assert {:ok, pdf1} = Rendro.render(doc, deterministic: true)
+    assert {:ok, pdf2} = Rendro.render(doc, deterministic: true)
+
+    wrapped_ops = Regex.scan(~r/\) Tj/, pdf1)
+
+    assert length(wrapped_ops) >= 4
+    assert pdf1 =~ "(Summary block) Tj"
+    assert pdf1 =~ "(Next page) Tj"
+    refute pdf1 =~ "(" <> long_line <> ") Tj"
+    assert length(Regex.scan(~r"/Type\s*/Page\b", pdf1)) == 2
+    assert length(Regex.scan(~r"/Type\s*/Page\b", pdf2)) == 2
   end
 end

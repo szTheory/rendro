@@ -344,6 +344,21 @@ defmodule Rendro.Pipeline.Paginate do
               }
           }
 
+        %Rendro.Pipeline.MeasuredText{source: %Rendro.Text{content: text} = source} = measured ->
+          replaced = String.replace(text, "{{page_number}}", Integer.to_string(page_num))
+
+          %{
+            block
+            | content: %{
+                measured
+                | source: %{source | content: replaced},
+                  lines:
+                    Enum.map(measured.lines, fn line ->
+                      String.replace(line, "{{page_number}}", Integer.to_string(page_num))
+                    end)
+              }
+          }
+
         _ ->
           block
       end

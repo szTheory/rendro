@@ -8,6 +8,7 @@ defmodule Rendro.PDF.Writer do
   """
 
   alias Rendro.PDF.{Font, Object}
+  alias Rendro.Pipeline.MeasuredText
 
   @pdf_header "%PDF-1.4\n%\xE2\xE3\xCF\xD3\n"
 
@@ -158,21 +159,43 @@ defmodule Rendro.PDF.Writer do
     render_block(block, page, font, 0, 0)
   end
 
+  defp render_block(%Rendro.Block{content: %MeasuredText{}} = block, page, font) do
+    render_block(block, page, font, 0, 0)
+  end
+
   defp render_block(_block, _page, _font), do: ""
 
   defp render_block(%Rendro.Block{content: %Rendro.Text{} = text} = block, page, _font, ox, oy) do
+    render_text_block(block, page, ox, oy, text, [text.content], text.line_height)
+  end
+
+  defp render_block(%Rendro.Block{content: %MeasuredText{} = text} = block, page, _font, ox, oy) do
+    render_text_block(block, page, ox, oy, text.source, text.lines, text.line_height)
+  end
+
+  defp render_text_block(block, page, ox, oy, text, lines, line_height) do
     x = block.x + ox + page.margin_left
     y = page.height - (block.y + oy) - page.margin_top - text.size
-
     {r, g, b} = text.color
     color_op = "#{format_num(r / 255)} #{format_num(g / 255)} #{format_num(b / 255)} rg"
+    line_offset = text.size * line_height
+
+    line_ops =
+      lines
+      |> Enum.with_index()
+      |> Enum.flat_map(fn {line, index} ->
+        if index == 0 do
+          ["#{format_num(x)} #{format_num(y)} Td", "(#{escape_pdf_string(line)}) Tj"]
+        else
+          ["0 #{format_num(-line_offset)} Td", "(#{escape_pdf_string(line)}) Tj"]
+        end
+      end)
 
     [
       "BT",
       color_op,
       "/F1 #{format_num(text.size)} Tf",
-      "#{format_num(x)} #{format_num(y)} Td",
-      "(#{escape_pdf_string(text.content)}) Tj",
+      line_ops,
       "ET"
     ]
     |> Enum.join("\n")
