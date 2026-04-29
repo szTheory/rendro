@@ -122,44 +122,51 @@ defmodule Rendro.Pipeline.Measure do
   defp wrap_segment("", _max_width, _font, _font_size), do: [""]
 
   defp wrap_segment(segment, max_width, font, font_size) do
-    tokens = Regex.split(~r/\s+/, segment, trim: true)
+    chunks = Regex.scan(~r/\s+|\S+/, segment) |> List.flatten()
 
-    case tokens do
+    case chunks do
       [] ->
         [""]
 
-      [token | rest] ->
-        token
-        |> split_token(max_width, font, font_size)
-        |> wrap_tokens(rest, max_width, font, font_size)
+      [chunk | rest] ->
+        chunk
+        |> split_chunk(max_width, font, font_size)
+        |> wrap_chunks(rest, max_width, font, font_size)
     end
   end
 
-  defp wrap_tokens(lines, tokens, max_width, font, font_size) do
-    Enum.reduce(tokens, lines, fn token, acc_lines ->
+  defp wrap_chunks(lines, chunks, max_width, font, font_size) do
+    Enum.reduce(chunks, lines, fn chunk, acc_lines ->
       {leading_lines, [current_line]} = Enum.split(acc_lines, length(acc_lines) - 1)
-      candidate = current_line <> " " <> token
+      candidate = current_line <> chunk
 
       if Font.text_width(font, candidate, font_size) <= max_width do
         leading_lines ++ [candidate]
       else
-        acc_lines ++ split_token(token, max_width, font, font_size)
+        acc_lines ++ split_chunk(chunk, max_width, font, font_size)
       end
     end)
   end
 
-  defp split_token(token, max_width, font, font_size) do
+  defp split_chunk(chunk, max_width, font, font_size) do
+    if Font.text_width(font, chunk, font_size) <= max_width do
+      [chunk]
+    else
+      split_graphemes(chunk, max_width, font, font_size)
+    end
+  end
+
+  defp split_graphemes(text, max_width, font, font_size) do
     {lines, current_line} =
-      Enum.reduce(String.graphemes(token), {[], ""}, fn grapheme, {lines, current_line} ->
+      Enum.reduce(String.graphemes(text), {[], ""}, fn grapheme, {lines, current_line} ->
         candidate = current_line <> grapheme
 
         cond do
+          current_line == "" and Font.text_width(font, candidate, font_size) <= max_width ->
+            {lines, candidate}
+
           current_line == "" ->
-            if Font.text_width(font, candidate, font_size) <= max_width do
-              {lines, candidate}
-            else
-              {[candidate | lines], ""}
-            end
+            {[candidate | lines], ""}
 
           Font.text_width(font, candidate, font_size) <= max_width ->
             {lines, candidate}

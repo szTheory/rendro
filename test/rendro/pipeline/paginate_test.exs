@@ -265,6 +265,43 @@ defmodule Rendro.Pipeline.PaginateTest do
       assert error.details.block_index == 0
       assert error.next =~ "Rendro.flow/2"
     end
+
+    test "rejects nested flow directives inside fixed-page tables" do
+      page =
+        %Rendro.Page{
+          blocks: [
+            %Rendro.Block{
+              content: %Rendro.Table{
+                rows: [
+                  [
+                    %Rendro.Block{
+                      content: Rendro.text("Nested fixed"),
+                      x: 0,
+                      y: 0,
+                      width: 80,
+                      height: 14.4,
+                      break_before: true
+                    }
+                  ]
+                ]
+              },
+              x: 10,
+              y: 10,
+              width: 100,
+              height: 14.4
+            }
+          ]
+        }
+
+      doc = %Rendro.Document{pages: [page], metadata: %Rendro.Metadata{}}
+
+      assert {:error, %Rendro.Error{} = error} = Paginate.run(doc)
+      assert error.stage == :paginate
+      assert error.reason == :invalid_flow_directive
+      assert error.details.directive == :break_before
+      assert error.details.page_index == 1
+      assert error.details.block_index == 0
+    end
   end
 
   defp paginate_flow(doc) do

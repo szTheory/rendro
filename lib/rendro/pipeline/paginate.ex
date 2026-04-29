@@ -470,8 +470,14 @@ defmodule Rendro.Pipeline.Paginate do
       block.break_after -> :break_after
       block.keep_together -> :keep_together
       block.keep_with_next -> :keep_with_next
+      match?(%Rendro.Table{}, block.content) -> invalid_table_directive(block.content)
       true -> nil
     end
+  end
+
+  defp invalid_table_directive(%Rendro.Table{header: header, rows: rows}) do
+    Enum.find_value(List.wrap(header), &invalid_fixed_page_directive/1) ||
+      Enum.find_value(rows, fn row -> Enum.find_value(row, &invalid_fixed_page_directive/1) end)
   end
 
   defp validate_page_fit!(%Page{blocks: blocks} = page, page_index) do

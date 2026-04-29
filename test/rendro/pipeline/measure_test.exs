@@ -161,6 +161,25 @@ defmodule Rendro.Pipeline.MeasureTest do
       assert %MeasuredText{lines: ["alpha beta", "gamma delta"]} = block.content
     end
 
+    test "preserves authored repeated whitespace when width-constrained" do
+      doc =
+        %Rendro.Document{
+          pages: [
+            %Rendro.Page{
+              blocks: [
+                Rendro.block(Rendro.text("alpha  beta", size: 12), width: 200)
+              ]
+            }
+          ],
+          metadata: %Rendro.Metadata{}
+        }
+
+      assert {:ok, result} = Measure.run(doc)
+      [block] = hd(result.pages).blocks
+
+      assert %MeasuredText{lines: ["alpha  beta"]} = block.content
+    end
+
     test "falls back to grapheme wrapping for an oversized token" do
       doc =
         %Rendro.Document{
