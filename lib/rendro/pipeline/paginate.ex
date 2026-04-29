@@ -29,10 +29,13 @@ defmodule Rendro.Pipeline.Paginate do
 
     try do
       pages =
-        body_blocks
-        |> Enum.reduce([%{page_template | blocks: []}], fn block, pages ->
-          paginate_block(block, pages, page_template, max_h, %{overflow_source: :bounded_region, region: :body})
-        end)
+        paginate_blocks(
+          body_blocks,
+          [%{page_template | blocks: []}],
+          page_template,
+          max_h,
+          %{overflow_source: :bounded_region, region: :body}
+        )
         |> Enum.reverse()
         |> Enum.with_index(1)
         |> Enum.map(fn {page, idx} ->
@@ -47,6 +50,20 @@ defmodule Rendro.Pipeline.Paginate do
       {:error, :content_overflow, details} ->
         {:error, Rendro.Error.from_stage(:paginate, :content_overflow, %{details: details})}
     end
+  end
+
+  defp paginate_blocks([], pages, _template, _max_h, _overflow_details), do: pages
+
+  defp paginate_blocks(blocks, pages, template, max_h, overflow_details) do
+    {group, remaining} = next_flow_group(blocks)
+
+    pages =
+      pages
+      |> maybe_break_before(template, group)
+      |> place_flow_group_for(group, template, max_h, overflow_details)
+      |> maybe_break_after(template, group, remaining)
+
+    paginate_blocks(remaining, pages, template, max_h, overflow_details)
   end
 
   defp has_flow_layout?(%Document{options: %{layout: _layout}}), do: true
@@ -137,6 +154,85 @@ defmodule Rendro.Pipeline.Paginate do
     end
   end
 
+  defp place_flow_group_for(pages, group, template, max_h, overflow_details) do
+    place_flow_group(group, pages, template, max_h, overflow_details)
+  end
+
+  defp place_flow_group([block], pages, template, max_h, overflow_details) do
+    if block.keep_together do
+      place_hard_group([block], pages, template, max_h, overflow_details, :keep_together)
+    else
+      paginate_block(block, pages, template, max_h, overflow_details)
+    end
+  end
+
+  defp place_flow_group(group, pages, template, max_h, overflow_details) do
+    place_hard_group(group, pages, template, max_h, overflow_details, :keep_with_next)
+  end
+
+  defp place_hard_group(group, [current_page | rest], template, max_h, overflow_details, keep_rule) do
+    group_h = Enum.sum(Enum.map(group, &(&1.height || 0)))
+    current_h = Enum.sum(Enum.map(current_page.blocks, &(&1.height || 0)))
+
+    cond do
+      current_h + group_h <= max_h ->
+        [%{current_page | blocks: current_page.blocks ++ group} | rest]
+
+      group_h <= max_h ->
+        [%{template | blocks: group}, current_page | rest]
+
+      true ->
+        throw(
+          {:error, :content_overflow,
+           keep_rule_overflow_details(
+             group,
+             group_h,
+             max_h,
+             current_page,
+             rest,
+             overflow_details,
+             keep_rule
+           )}
+        )
+    end
+  end
+
+  defp maybe_break_before([current_page | _] = pages, template, group) do
+    if hd(group).break_before and current_page.blocks != [] do
+      [%{template | blocks: []} | pages]
+    else
+      pages
+    end
+  end
+
+  defp maybe_break_after([current_page | _] = pages, template, group, remaining) do
+    if remaining != [] and List.last(group).break_after and current_page.blocks != [] do
+      [%{template | blocks: []} | pages]
+    else
+      pages
+    end
+  end
+
+  defp next_flow_group([block | rest]) do
+    if block.keep_with_next do
+      collect_keep_with_next_chain(rest, [block])
+    else
+      {[block], rest}
+    end
+  end
+
+  defp collect_keep_with_next_chain([], acc), do: {Enum.reverse(acc), []}
+
+  defp collect_keep_with_next_chain([block | rest], acc) do
+    updated = [block | acc]
+
+    if block.keep_with_next do
+      collect_keep_with_next_chain(rest, updated)
+    else
+      {Enum.reverse(updated), rest}
+    end
+  end
+
   defp handle_table_split(
          block,
          table,
@@ -187,6 +283,36 @@ defmodule Rendro.Pipeline.Paginate do
          )}
       )
     end
+  end
+
+  defp keep_rule_overflow_details(
+         group,
+         group_h,
+         max_h,
+         current_page,
+         rest,
+         overflow_details,
+         keep_rule
+       ) do
+    Map.merge(overflow_details, %{
+      keep_rule: keep_rule,
+      kept_height: group_h,
+      max_height: max_h,
+      page_index: keep_rule_page_index(current_page, rest),
+      region: Map.get(overflow_details, :region),
+      overflow_source: Map.get(overflow_details, :overflow_source),
+      block_indexes: keep_rule_block_indexes(current_page, group),
+      block: block_rect(hd(group))
+    })
+  end
+
+  defp keep_rule_page_index(%Page{blocks: []}, rest), do: length(rest) + 1
+  defp keep_rule_page_index(%Page{}, rest), do: length(rest) + 2
+
+  defp keep_rule_block_indexes(%Page{blocks: blocks}, group) do
+    start_index = length(blocks)
+    finish_index = start_index + length(group) - 1
+    Enum.to_list(start_index..finish_index)
   end
 
   defp apply_page_template(%Page{} = page, idx, layout) do

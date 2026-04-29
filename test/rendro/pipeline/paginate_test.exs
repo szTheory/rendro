@@ -2,7 +2,7 @@ defmodule Rendro.Pipeline.PaginateTest do
   use ExUnit.Case, async: true
 
   alias Rendro.{PageTemplate, Region}
-  alias Rendro.Pipeline.{Build, Compose, Measure, Paginate}
+  alias Rendro.Pipeline.{Build, Compose, Measure, MeasuredText, Paginate}
 
   alias Rendro.Pipeline.Paginate
 
@@ -125,7 +125,12 @@ defmodule Rendro.Pipeline.PaginateTest do
       line_blocks =
         Enum.map(paginated.pages, fn page ->
           Enum.filter(page.blocks, fn
-            %Rendro.Block{content: %Rendro.Text{content: <<"Line ", _::binary>>}} -> true
+            %Rendro.Block{content: %MeasuredText{source: %Rendro.Text{content: <<"Line ", _::binary>>}}} ->
+              true
+
+            %Rendro.Block{content: %Rendro.Text{content: <<"Line ", _::binary>>}} ->
+              true
+
             _ -> false
           end)
         end)
@@ -166,5 +171,82 @@ defmodule Rendro.Pipeline.PaginateTest do
       assert page2_min_y <= (page2.margin_top || 0) + 50,
              "page-2 first block y=#{page2_min_y} should be near page top (margin_top=#{page2.margin_top})"
     end
+  end
+
+  describe "flow break semantics" do
+    test "moves a chained keep_with_next group intact onto the next page" do
+      doc =
+        Rendro.flow(
+          [
+            Rendro.block(Rendro.text("Intro")),
+            Rendro.block(Rendro.text("Chapter"), keep_with_next: true),
+            Rendro.block(Rendro.text("Subhead"), keep_with_next: true),
+            Rendro.block(Rendro.text("Body"))
+          ],
+          page_template: :flow_keep_chain,
+          page_templates: [flow_keep_chain_template()]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+
+      assert length(paginated.pages) == 2
+      assert page_texts(Enum.at(paginated.pages, 0)) == ["Intro"]
+      assert page_texts(Enum.at(paginated.pages, 1)) == ["Chapter", "Subhead", "Body"]
+    end
+
+    test "forces a fresh page after a block with break_after" do
+      doc =
+        Rendro.flow(
+          [
+            Rendro.block(Rendro.text("First"), break_after: true),
+            Rendro.block(Rendro.text("Second"))
+          ],
+          page_template: :flow_keep_chain,
+          page_templates: [flow_keep_chain_template()]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+
+      assert length(paginated.pages) == 2
+      assert page_texts(Enum.at(paginated.pages, 0)) == ["First"]
+      assert page_texts(Enum.at(paginated.pages, 1)) == ["Second"]
+    end
+  end
+
+  defp paginate_flow(doc) do
+    {:ok, doc} = Build.run(doc)
+    {:ok, doc} = Compose.run(doc)
+    {:ok, doc} = Measure.run(doc)
+    Paginate.run(doc)
+  end
+
+  defp page_texts(page) do
+    Enum.map(page.blocks, fn
+      %Rendro.Block{content: %MeasuredText{source: %Rendro.Text{content: content}}} -> content
+      %Rendro.Block{content: %Rendro.Text{content: content}} -> content
+    end)
+  end
+
+  defp flow_keep_chain_template do
+    %PageTemplate{
+      name: :flow_keep_chain,
+      width: 420,
+      height: 240,
+      margin_top: 20,
+      margin_right: 24,
+      margin_bottom: 28,
+      margin_left: 24,
+      regions: [
+        %Region{
+          name: :body,
+          role: :body,
+          anchor: :flow,
+          x: 24,
+          y: 52,
+          width: 372,
+          height: 50
+        }
+      ]
+    }
   end
 end
