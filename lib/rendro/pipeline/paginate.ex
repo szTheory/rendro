@@ -9,35 +9,37 @@ defmodule Rendro.Pipeline.Paginate do
   previous page (D-04 latent bug fix).
   """
 
+  alias Rendro.{Document, Page, PageTemplate, Region}
+
   @spec run(Rendro.Document.t()) :: {:ok, Rendro.Document.t()} | {:error, term()}
-  def run(%Rendro.Document{pages: pages, content: content} = doc) do
+  def run(%Document{pages: pages, content: content} = doc) do
     cond do
       pages != [] -> {:ok, doc}
-      content != [] -> paginate_flow(doc)
+      content != [] or has_flow_layout?(doc) -> paginate_flow(doc)
       true -> {:error, :no_content}
     end
   end
 
-  defp paginate_flow(%Rendro.Document{content: content, header: h_blocks, footer: f_blocks} = doc) do
-    template = %Rendro.Page{}
-
-    header_h = Enum.sum(Enum.map(h_blocks, &(&1.height || 0)))
-    footer_h = Enum.sum(Enum.map(f_blocks, &(&1.height || 0)))
-
-    max_h = template.height - template.margin_top - template.margin_bottom - header_h - footer_h
+  defp paginate_flow(%Document{} = doc) do
+    layout = flow_layout(doc)
+    template = layout.template
+    page_template = page_from_template(template)
+    body_blocks = Map.get(layout.region_blocks, :body, doc.content)
+    max_h = layout.body_capacity
 
     try do
       pages =
-        content
-        |> Enum.reduce([%{template | blocks: []}], fn block, pages ->
-          paginate_block(block, pages, template, max_h)
+        body_blocks
+        |> Enum.reduce([%{page_template | blocks: []}], fn block, pages ->
+          paginate_block(block, pages, page_template, max_h)
         end)
         |> Enum.reverse()
         |> Enum.with_index(1)
         |> Enum.map(fn {page, idx} ->
-          apply_page_template(page, idx, h_blocks, f_blocks)
+          page
+          |> stack_body_blocks(layout.body_region)
+          |> apply_page_template(idx, layout)
         end)
-        |> Enum.map(&stack_block_y/1)
 
       {:ok, %{doc | pages: pages, content: []}}
     catch
@@ -46,18 +48,23 @@ defmodule Rendro.Pipeline.Paginate do
     end
   end
 
-  # D-04: y-stacking absorbed from Compose, applied per page with the cursor
-  # reset to the page's margin_top so page-2 remainder rows never inherit y
-  # from page 1. Flow-content blocks all share the Block default `y: 0`, so we
-  # unconditionally assign `current_y` (matching the original `compose_page/1`
-  # design at commit 093f32c, before a regression flipped the override into a
-  # `block.y || current_y` fallthrough that froze every flow block at y=0).
-  defp stack_block_y(%Rendro.Page{blocks: blocks, margin_top: margin_top} = page) do
-    starting_y = margin_top || 0
+  defp has_flow_layout?(%Document{options: %{layout: _layout}}), do: true
+  defp has_flow_layout?(%Document{}), do: false
+
+  # D-04: y-stacking stays page-local and now starts at the explicit body
+  # region origin instead of relying on implicit page margins.
+  defp stack_body_blocks(%Page{blocks: blocks} = page, %Region{} = body_region) do
+    starting_y = relative_y(body_region, page)
+    starting_x = relative_x(body_region, page)
 
     {stacked, _} =
       Enum.reduce(blocks, {[], starting_y}, fn block, {acc, current_y} ->
-        stacked_block = stack_table_cells(%{block | y: current_y})
+        stacked_block =
+          block
+          |> Map.put(:x, starting_x + block.x)
+          |> Map.put(:y, current_y)
+          |> stack_table_cells()
+
         next_y = current_y + (block.height || 0)
         {acc ++ [stacked_block], next_y}
       end)
@@ -146,10 +153,18 @@ defmodule Rendro.Pipeline.Paginate do
     end
   end
 
-  defp apply_page_template(page, idx, h_blocks, f_blocks) do
-    h = replace_page_numbers(h_blocks, idx)
-    f = replace_page_numbers(f_blocks, idx)
-    %{page | blocks: h ++ page.blocks ++ f}
+  defp apply_page_template(%Page{} = page, idx, layout) do
+    anchored_blocks =
+      layout.template.regions
+      |> Enum.reject(&(&1.name == :body))
+      |> Enum.flat_map(fn region ->
+        layout.region_blocks
+        |> Map.get(region.name, [])
+        |> replace_page_numbers(idx)
+        |> anchor_region_blocks(region, page)
+      end)
+
+    %{page | blocks: anchored_blocks ++ page.blocks}
   end
 
   defp replace_page_numbers(blocks, page_num) do
@@ -169,6 +184,67 @@ defmodule Rendro.Pipeline.Paginate do
       end
     end)
   end
+
+  defp anchor_region_blocks(blocks, %Region{} = region, %Page{} = page) do
+    start_x = relative_x(region, page)
+    start_y = relative_y(region, page)
+
+    {anchored, _} =
+      Enum.reduce(blocks, {[], start_y}, fn block, {acc, current_y} ->
+        anchored_block =
+          block
+          |> Map.put(:x, start_x + block.x)
+          |> Map.put(:y, current_y)
+          |> stack_table_cells()
+
+        next_y = current_y + (block.height || 0)
+        {acc ++ [anchored_block], next_y}
+      end)
+
+    anchored
+  end
+
+  defp flow_layout(%Document{options: %{layout: layout}}), do: layout
+
+  defp flow_layout(%Document{} = doc) do
+    template = %PageTemplate{}
+
+    body_region = %Region{
+      name: :body,
+      role: :body,
+      anchor: :flow,
+      x: template.margin_left,
+      y: template.margin_top,
+      width: template.width - template.margin_left - template.margin_right,
+      height: template.height - template.margin_top - template.margin_bottom
+    }
+
+    %{
+      template: template,
+      body_region: body_region,
+      body_capacity: body_region.height,
+      region_blocks: %{
+        body: doc.content,
+        header: doc.header,
+        footer: doc.footer
+      }
+    }
+  end
+
+  defp page_from_template(%PageTemplate{} = template) do
+    %Page{
+      width: template.width,
+      height: template.height,
+      margin_top: template.margin_top,
+      margin_right: template.margin_right,
+      margin_bottom: template.margin_bottom,
+      margin_left: template.margin_left,
+      blocks: []
+    }
+  end
+
+  defp relative_x(%Region{x: x}, %Page{margin_left: margin_left}), do: x - margin_left
+  defp relative_y(%Region{y: y}, %Page{margin_top: margin_top}), do: y - margin_top
 
   defp table_height(%Rendro.Table{rows: rows, header: header}) do
     row_height = 14.4

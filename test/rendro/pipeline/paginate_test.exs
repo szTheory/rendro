@@ -1,6 +1,7 @@
 defmodule Rendro.Pipeline.PaginateTest do
   use ExUnit.Case, async: true
 
+  alias Rendro.{PageTemplate, Region}
   alias Rendro.Pipeline.{Build, Compose, Measure, Paginate}
 
   alias Rendro.Pipeline.Paginate
@@ -39,6 +40,75 @@ defmodule Rendro.Pipeline.PaginateTest do
       [page] = result.pages
       [block] = page.blocks
       assert block.content.content == "Keep Me"
+    end
+
+    test "uses authored page-template geometry for flow pagination" do
+      template =
+        %PageTemplate{
+          name: :compact,
+          width: 420,
+          height: 240,
+          margin_top: 20,
+          margin_right: 24,
+          margin_bottom: 28,
+          margin_left: 24,
+          regions: [
+            %Region{
+              name: :header,
+              role: :header,
+              anchor: :top,
+              x: 24,
+              y: 24,
+              width: 372,
+              height: 20
+            },
+            %Region{
+              name: :body,
+              role: :body,
+              anchor: :flow,
+              x: 24,
+              y: 52,
+              width: 372,
+              height: 28.8
+            },
+            %Region{
+              name: :footer,
+              role: :footer,
+              anchor: :bottom,
+              x: 24,
+              y: 188,
+              width: 372,
+              height: 16
+            }
+          ]
+        }
+
+      doc =
+        Rendro.flow(
+          for(i <- 1..5, do: Rendro.block(Rendro.text("Line #{i}"))),
+          page_template: :compact,
+          page_templates: [template]
+        )
+
+      {:ok, doc} = Build.run(doc)
+      {:ok, doc} = Compose.run(doc)
+      {:ok, doc} = Measure.run(doc)
+      assert {:ok, paginated} = Paginate.run(doc)
+
+      assert length(paginated.pages) == 3
+      assert Enum.map(paginated.pages, & &1.width) == [420, 420, 420]
+      assert Enum.map(paginated.pages, & &1.margin_top) == [20, 20, 20]
+
+      line_blocks =
+        Enum.map(paginated.pages, fn page ->
+          Enum.filter(page.blocks, fn
+            %Rendro.Block{content: %Rendro.Text{content: <<"Line ", _::binary>>}} -> true
+            _ -> false
+          end)
+        end)
+
+      assert Enum.map(line_blocks, &length/1) == [2, 2, 1]
+      assert Enum.map(hd(line_blocks), & &1.y) == [32, 46.4]
     end
   end
 

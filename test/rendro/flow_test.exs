@@ -1,6 +1,8 @@
 defmodule Rendro.FlowTest do
   use ExUnit.Case, async: true
 
+  alias Rendro.Pipeline.{Build, Compose, Measure, Paginate}
+
   test "flow document paginates correctly" do
     content =
       for i <- 1..50 do
@@ -111,6 +113,105 @@ defmodule Rendro.FlowTest do
     assert length(Regex.scan(~r/\(My Report\) Tj/, pdf)) == 2
 
     # Page numbers
+    assert pdf =~ "(Page 1) Tj"
+    assert pdf =~ "(Page 2) Tj"
+  end
+
+  test "explicit page templates anchor repeated header and footer regions deterministically" do
+    template =
+      Rendro.page_template(
+        name: :statement,
+        width: 420,
+        height: 220,
+        margin_top: 20,
+        margin_right: 24,
+        margin_bottom: 20,
+        margin_left: 24,
+        regions: [
+          Rendro.region(
+            name: :header,
+            role: :header,
+            anchor: :top,
+            x: 24,
+            y: 24,
+            width: 372,
+            height: 20
+          ),
+          Rendro.region(
+            name: :body,
+            role: :body,
+            anchor: :flow,
+            x: 24,
+            y: 52,
+            width: 372,
+            height: 60
+          ),
+          Rendro.region(
+            name: :footer,
+            role: :footer,
+            anchor: :bottom,
+            x: 24,
+            y: 180,
+            width: 372,
+            height: 16
+          )
+        ]
+      )
+
+    content =
+      for i <- 1..8 do
+        Rendro.block(Rendro.text("Line #{i}"))
+      end
+
+    doc =
+      Rendro.flow(content,
+        page_template: :statement,
+        page_templates: [template],
+        header: [Rendro.block(Rendro.text("Statement Header"))],
+        footer: [Rendro.block(Rendro.text("Page {{page_number}}"))]
+      )
+
+    {:ok, built} = Build.run(doc)
+    {:ok, composed} = Compose.run(built)
+    {:ok, measured} = Measure.run(composed)
+    assert {:ok, paginated} = Paginate.run(measured)
+
+    assert length(paginated.pages) == 2
+
+    [page1, page2] = paginated.pages
+
+    header1 =
+      Enum.find(
+        page1.blocks,
+        &match?(%Rendro.Block{content: %Rendro.Text{content: "Statement Header"}}, &1)
+      )
+
+    header2 =
+      Enum.find(
+        page2.blocks,
+        &match?(%Rendro.Block{content: %Rendro.Text{content: "Statement Header"}}, &1)
+      )
+
+    footer1 =
+      Enum.find(
+        page1.blocks,
+        &match?(%Rendro.Block{content: %Rendro.Text{content: "Page 1"}}, &1)
+      )
+
+    footer2 =
+      Enum.find(
+        page2.blocks,
+        &match?(%Rendro.Block{content: %Rendro.Text{content: "Page 2"}}, &1)
+      )
+
+    assert header1.y == 4
+    assert header2.y == 4
+    assert footer1.y == 160
+    assert footer2.y == 160
+
+    {:ok, pdf} = Rendro.render(doc)
+    assert length(Regex.scan(~r"/Type\s*/Page\b", pdf)) == 2
+    assert length(Regex.scan(~r/\(Statement Header\) Tj/, pdf)) == 2
     assert pdf =~ "(Page 1) Tj"
     assert pdf =~ "(Page 2) Tj"
   end
