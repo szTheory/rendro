@@ -19,6 +19,18 @@ defmodule Rendro.Pipeline do
 
   @spec run(Rendro.Document.t()) :: {:ok, binary()} | {:error, Rendro.Error.t()}
   def run(%Rendro.Document{} = doc) do
+    case run_with_diagnostics(doc) do
+      {:ok, pdf_binary, _doc} -> {:ok, pdf_binary}
+      error -> error
+    end
+  end
+
+  @doc """
+  Runs the pipeline and returns the generated PDF binary along with the final paginated document
+  containing populated diagnostics.
+  """
+  @spec run_with_diagnostics(Rendro.Document.t()) :: {:ok, binary(), Rendro.Document.t()} | {:error, Rendro.Error.t()}
+  def run_with_diagnostics(%Rendro.Document{} = doc) do
     render_id = Rendro.Telemetry.generate_render_id()
     render_opts = Map.get(doc.options, :render, [])
     deterministic = Keyword.get(render_opts, :deterministic, false) == true
@@ -207,7 +219,7 @@ defmodule Rendro.Pipeline do
       {:exception, kind, reason, __STACKTRACE__}
   end
 
-  defp unwrap_run_result({:ok, {pdf_binary, _doc}}), do: {:ok, pdf_binary}
+  defp unwrap_run_result({:ok, {pdf_binary, doc}}), do: {:ok, pdf_binary, doc}
   defp unwrap_run_result(result), do: result
 
   defp run_stages(doc, base_meta, policies, owner, progress_ref) do

@@ -53,14 +53,14 @@ Phase 20 should therefore stay inside the existing `build -> compose -> measure 
 
 Public-surface cleanup is a separate but equally necessary part of the phase because current `%Rendro.Table{width, border}` fields imply capabilities the engine does not honor, and immediate business consumers already flow through `Rendro.Recipes.invoice/1` and `Rendro.Adapters.Accrue.recipe/1`. [VERIFIED: lib/rendro/table.ex, lib/rendro/recipes.ex, lib/rendro/adapters/accrue.ex, .planning/phases/20-table-layout-maturity/20-CONTEXT.md]
 
-**Primary recommendation:** implement Phase 20 as exactly two plans: first, add internal deterministic table geometry plus atomic-row pagination; second, make the public table contract truthful by narrowing builders/docs/recipes/tests around explicit column rules and unsupported-field removal or deprecation. [VERIFIED: .planning/ROADMAP.md, .planning/phases/20-table-layout-maturity/20-CONTEXT.md] [ASSUMED]
+**Primary recommendation:** implement Phase 20 as exactly two plans: first, add internal deterministic table geometry plus atomic-row pagination; second, make the public table contract truthful by narrowing builders/docs/recipes/tests around explicit column rules and immediate unsupported-field removal plus builder-level migration guidance. [VERIFIED: .planning/ROADMAP.md, .planning/phases/20-table-layout-maturity/20-CONTEXT.md] [ASSUMED]
 
 ## Recommended Decomposition
 
 Phase 20 should decompose into exactly two plans because the roadmap allocates `2 plans`, and the work naturally splits between engine semantics and public-contract truthfulness. [VERIFIED: .planning/ROADMAP.md]
 
 1. **Plan 20-01: Deterministic table geometry and pagination core.** Add explicit column-rule data on the table surface, resolve real column widths in `Measure`, compute measured row/header heights from cell blocks, paginate atomic rows with repeated headers, and return row-specific `:content_overflow` details when a single row cannot fit on a fresh page/body region. [VERIFIED: lib/rendro/table.ex, lib/rendro/pipeline/measure.ex, lib/rendro/pipeline/paginate.ex, lib/rendro/error.ex] [ASSUMED]
-2. **Plan 20-02: Truthful public surface, recipes, and proofs.** Remove or deprecate unsupported `width`/`border` affordances, update builders/README/guides/recipes/adapters to teach explicit column rules and continuation truthfulness, and add regression/docs-contract coverage that proves the supported table contract without implying styling or auto-layout features. [VERIFIED: lib/rendro/table.ex, lib/rendro.ex, README.md, guides/integrations.md, lib/rendro/recipes.ex, lib/rendro/adapters/accrue.ex, test/docs_contract/readme_doctest_test.exs] [ASSUMED]
+2. **Plan 20-02: Truthful public surface, recipes, and proofs.** Remove unsupported `width`/`border` affordances from `%Rendro.Table{}`, reject legacy builder attrs with a narrow migration message, update builders/README/guides/recipes/adapters to teach explicit column rules and continuation truthfulness, and add regression/docs-contract coverage that proves the supported table contract without implying styling or auto-layout features. [VERIFIED: lib/rendro/table.ex, lib/rendro.ex, README.md, guides/integrations.md, lib/rendro/recipes.ex, lib/rendro/adapters/accrue.ex, test/docs_contract/readme_doctest_test.exs] [ASSUMED]
 
 ## Project Constraints (from AGENTS.md)
 
@@ -170,7 +170,7 @@ test/
 ```
 [VERIFIED: current module/test layout in `lib/` and `test/`] [ASSUMED]
 
-**Recommended structural change:** keep the public surface in `lib/rendro/table.ex`, but introduce private helper structs or helper functions for resolved column geometry and measured rows instead of pushing more anonymous table metadata into raw `%Rendro.Table{}` fields. [VERIFIED: current `%Rendro.Table{}` is small and public in lib/rendro/table.ex] [ASSUMED]
+**Recommended structural change:** keep the public surface in `lib/rendro/table.ex`, but introduce private helper structs or helper functions for resolved column geometry and measured rows instead of pushing more anonymous table metadata into raw `%Rendro.Table{}` fields. The single public sizing field should be `columns`, expressed as an ordered list of deterministic rule tuples such as `{:fixed, width}` and `{:share, weight}` so authored sizing remains explicit without adding a second DSL. [VERIFIED: current `%Rendro.Table{}` is small and public in lib/rendro/table.ex, .planning/phases/20-table-layout-maturity/20-CONTEXT.md] [ASSUMED]
 
 ### Pattern 1: Resolve Column Rules During Measurement
 **What:** Resolve explicit authored column rules against the available table width during `Measure`, then use the resolved widths for every downstream stage. [VERIFIED: .planning/phases/20-table-layout-maturity/20-CONTEXT.md, lib/rendro/pipeline/measure.ex]  
@@ -276,7 +276,7 @@ throw(
 ### Pitfall 1: Two Width Systems
 **What goes wrong:** table layout tries to honor both `%Rendro.Table.width` and enclosing block/body-region width, creating contradictory geometry rules. [VERIFIED: lib/rendro/table.ex, .planning/phases/20-table-layout-maturity/20-CONTEXT.md]  
 **Why it happens:** the current public struct still exposes `width`, but D-03 says table geometry should resolve inside the enclosing width instead. [VERIFIED: lib/rendro/table.ex, .planning/phases/20-table-layout-maturity/20-CONTEXT.md]  
-**How to avoid:** make column rules the only authored sizing contract and remove or deprecate misleading top-level table width. [VERIFIED: .planning/phases/20-table-layout-maturity/20-CONTEXT.md] [ASSUMED]  
+**How to avoid:** make `columns` the only authored sizing contract and remove misleading top-level table width from the public struct. [VERIFIED: .planning/phases/20-table-layout-maturity/20-CONTEXT.md] [ASSUMED]  
 **Warning signs:** docs or builders mention both `Rendro.block(width: ...)` and `Rendro.table(width: ...)` as active controls. [VERIFIED: lib/rendro/table.ex, lib/rendro/block.ex] [ASSUMED]
 
 ### Pitfall 2: Row Count Instead of Row Height
@@ -367,17 +367,13 @@ end
 | A3 | Existing ExUnit fixtures may be sufficient without mandatory StreamData coverage in Phase 20. | Standard Stack / Validation Architecture | Determinism edges could be under-tested if example-based coverage misses combinations. |
 | A4 | OS-registered runtime state is irrelevant for Phase 20 because table semantics are code-only. | Runtime State Inventory | A hidden out-of-repo automation step would need separate documentation, though none appears in the requested project files. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **What is the narrowest truthful public syntax for explicit column rules?** [VERIFIED: .planning/phases/20-table-layout-maturity/20-CONTEXT.md]
-   What we know: the user delegated exact field naming to research-backed recommendation, but the contract must stay authored and deterministic rather than heuristic. [VERIFIED: .planning/phases/20-table-layout-maturity/20-CONTEXT.md]
-   What's unclear: whether the cleanest surface is `columns: [...]`, `column_rules: [...]`, or a helper-based builder API. [VERIFIED: lib/rendro/table.ex] [ASSUMED]
-   Recommendation: choose one explicit list field on `%Rendro.Table{}` and keep it the sole public sizing contract in Phase 20. [VERIFIED: .planning/phases/20-table-layout-maturity/20-CONTEXT.md] [ASSUMED]
+   **Resolved:** use a single public `columns: [...]` field on `%Rendro.Table{}` as the sole sizing contract in Phase 20. Each entry should be an explicit deterministic rule tuple, with the supported Phase 20 shapes limited to `{:fixed, width}` and `{:share, weight}`. This keeps sizing authored, ordered, and easy to validate while avoiding a broader helper DSL or heuristic auto-layout surface. [VERIFIED: .planning/phases/20-table-layout-maturity/20-CONTEXT.md, lib/rendro/table.ex] [ASSUMED]
 
 2. **Should unsupported table fields be removed immediately or deprecated for one phase?** [VERIFIED: .planning/phases/20-table-layout-maturity/20-CONTEXT.md]
-   What we know: D-11 requires truthful end-state behavior and allows either hard removal or deprecation. [VERIFIED: .planning/phases/20-table-layout-maturity/20-CONTEXT.md]
-   What's unclear: how much migration pain exists outside the requested repo files. [VERIFIED: `rg -n "width: :fill|border: true|Rendro.table\\(" lib test README.md guides`] [ASSUMED]
-   Recommendation: if repo call sites are limited to recipes/tests, remove immediately; if wider downstream compatibility matters, deprecate in Phase 20 with one narrow migration note. [VERIFIED: lib/rendro/recipes.ex, lib/rendro/adapters/accrue.ex, test/rendro/flow_test.exs] [ASSUMED]
+   **Resolved:** remove `width` and `border` from the public `%Rendro.Table{}` contract in Phase 20 and reject legacy builder attrs at `Rendro.table/2` with a narrow migration-oriented error message. Repo-local call sites are limited enough that immediate cleanup is feasible, and retaining no-op struct fields would continue to advertise unsupported behavior. [VERIFIED: lib/rendro/recipes.ex, lib/rendro/adapters/accrue.ex, test/rendro/flow_test.exs, .planning/phases/20-table-layout-maturity/20-CONTEXT.md] [ASSUMED]
 
 ## Validation Architecture
 
