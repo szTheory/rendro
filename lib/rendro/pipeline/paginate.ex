@@ -28,14 +28,17 @@ defmodule Rendro.Pipeline.Paginate do
     max_h = layout.body_capacity
 
     try do
-      pages =
+      {pages, diagnostics} =
         paginate_blocks(
           body_blocks,
-          [%{page_template | blocks: []}],
+          {[%{page_template | blocks: []}], []},
           page_template,
           max_h,
           %{overflow_source: :bounded_region, region: :body}
         )
+
+      pages =
+        pages
         |> Enum.reverse()
         |> Enum.with_index(1)
         |> Enum.map(fn {page, idx} ->
@@ -45,25 +48,25 @@ defmodule Rendro.Pipeline.Paginate do
           |> apply_page_template(idx, layout)
         end)
 
-      {:ok, %{doc | pages: pages, content: []}}
+      {:ok, %{doc | pages: pages, content: [], diagnostics: Enum.reverse(diagnostics) ++ doc.diagnostics}}
     catch
       {:error, :content_overflow, details} ->
         {:error, Rendro.Error.from_stage(:paginate, :content_overflow, %{details: details})}
     end
   end
 
-  defp paginate_blocks([], pages, _template, _max_h, _overflow_details), do: pages
+  defp paginate_blocks([], {pages, diagnostics}, _template, _max_h, _overflow_details), do: {pages, diagnostics}
 
-  defp paginate_blocks(blocks, pages, template, max_h, overflow_details) do
+  defp paginate_blocks(blocks, {pages, diagnostics}, template, max_h, overflow_details) do
     {group, remaining} = next_flow_group(blocks)
 
-    pages =
-      pages
+    {pages, diagnostics} =
+      {pages, diagnostics}
       |> maybe_break_before(template, group)
       |> place_flow_group_for(group, template, max_h, overflow_details)
       |> maybe_break_after(template, group, remaining)
 
-    paginate_blocks(remaining, pages, template, max_h, overflow_details)
+    paginate_blocks(remaining, {pages, diagnostics}, template, max_h, overflow_details)
   end
 
   defp has_flow_layout?(%Document{options: %{layout: _layout}}), do: true
@@ -121,7 +124,7 @@ defmodule Rendro.Pipeline.Paginate do
     cells
   end
 
-  defp paginate_block(block, [current_page | rest] = _pages, template, max_h, overflow_details) do
+  defp paginate_block(block, {[current_page | rest], diagnostics}, template, max_h, overflow_details) do
     block_h = block.height || 0
     current_h = Enum.sum(Enum.map(current_page.blocks, &(&1.height || 0)))
     failure_details =
@@ -141,45 +144,52 @@ defmodule Rendro.Pipeline.Paginate do
           max_h,
           current_h,
           block_h,
-          failure_details
+          failure_details,
+          diagnostics
         )
 
       _ ->
         if current_h + block_h <= max_h do
-          [%{current_page | blocks: current_page.blocks ++ [block]} | rest]
+          {[%{current_page | blocks: current_page.blocks ++ [block]} | rest], diagnostics}
         else
           check_overflow!(block, block_h, max_h, failure_details)
-          [%{template | blocks: [block]}, current_page | rest]
+          {[%{template | blocks: [block]}, current_page | rest], diagnostics}
         end
     end
   end
 
-  defp place_flow_group_for(pages, group, template, max_h, overflow_details) do
-    place_flow_group(group, pages, template, max_h, overflow_details)
+  defp place_flow_group_for({pages, diagnostics}, group, template, max_h, overflow_details) do
+    place_flow_group(group, {pages, diagnostics}, template, max_h, overflow_details)
   end
 
-  defp place_flow_group([block], pages, template, max_h, overflow_details) do
+  defp place_flow_group([block], {pages, diagnostics}, template, max_h, overflow_details) do
     if block.keep_together do
-      place_hard_group([block], pages, template, max_h, overflow_details, :keep_together)
+      place_hard_group([block], {pages, diagnostics}, template, max_h, overflow_details, :keep_together)
     else
-      paginate_block(block, pages, template, max_h, overflow_details)
+      paginate_block(block, {pages, diagnostics}, template, max_h, overflow_details)
     end
   end
 
-  defp place_flow_group(group, pages, template, max_h, overflow_details) do
-    place_hard_group(group, pages, template, max_h, overflow_details, :keep_with_next)
+  defp place_flow_group(group, {pages, diagnostics}, template, max_h, overflow_details) do
+    place_hard_group(group, {pages, diagnostics}, template, max_h, overflow_details, :keep_with_next)
   end
 
-  defp place_hard_group(group, [current_page | rest], template, max_h, overflow_details, keep_rule) do
+  defp place_hard_group(group, {[current_page | rest], diagnostics}, template, max_h, overflow_details, keep_rule) do
     group_h = Enum.sum(Enum.map(group, &(&1.height || 0)))
     current_h = Enum.sum(Enum.map(current_page.blocks, &(&1.height || 0)))
 
     cond do
       current_h + group_h <= max_h ->
-        [%{current_page | blocks: current_page.blocks ++ group} | rest]
+        {[%{current_page | blocks: current_page.blocks ++ group} | rest], diagnostics}
 
       group_h <= max_h ->
-        [%{template | blocks: group}, current_page | rest]
+        new_diagnostic = %{
+          level: :info,
+          type: :keep_rule_break,
+          keep_rule: keep_rule,
+          page_index: length(rest) + 2
+        }
+        {[%{template | blocks: group}, current_page | rest], [new_diagnostic | diagnostics]}
 
       true ->
         throw(
@@ -197,19 +207,19 @@ defmodule Rendro.Pipeline.Paginate do
     end
   end
 
-  defp maybe_break_before([current_page | _] = pages, template, group) do
+  defp maybe_break_before({[current_page | _] = pages, diagnostics}, template, group) do
     if hd(group).break_before and current_page.blocks != [] do
-      [%{template | blocks: []} | pages]
+      {[%{template | blocks: []} | pages], diagnostics}
     else
-      pages
+      {pages, diagnostics}
     end
   end
 
-  defp maybe_break_after([current_page | _] = pages, template, group, remaining) do
+  defp maybe_break_after({[current_page | _] = pages, diagnostics}, template, group, remaining) do
     if remaining != [] and List.last(group).break_after and current_page.blocks != [] do
-      [%{template | blocks: []} | pages]
+      {[%{template | blocks: []} | pages], diagnostics}
     else
-      pages
+      {pages, diagnostics}
     end
   end
 
@@ -242,7 +252,8 @@ defmodule Rendro.Pipeline.Paginate do
          max_h,
          current_h,
          _block_h,
-         overflow_details
+         overflow_details,
+         diagnostics
        ) do
     available_h = max_h - current_h
     {this_page_table, remaining_table} = split_table(table, available_h)
@@ -258,7 +269,15 @@ defmodule Rendro.Pipeline.Paginate do
         }
 
         current_page = %{current_page | blocks: current_page.blocks ++ [this_block]}
-        [%{template | blocks: [remaining_block]}, current_page | rest]
+        
+        new_diagnostic = %{
+          level: :info,
+          type: :table_split,
+          page_index: overflow_details.page_index,
+          reason: :insufficient_height
+        }
+        
+        {[%{template | blocks: [remaining_block]}, current_page | rest], [new_diagnostic | diagnostics]}
 
       remaining_table ->
         if current_h == 0 do
@@ -271,11 +290,11 @@ defmodule Rendro.Pipeline.Paginate do
           })
           throw({:error, :content_overflow, details})
         else
-          [%{template | blocks: [block]}, current_page | rest]
+          {[%{template | blocks: [block]}, current_page | rest], diagnostics}
         end
 
       true ->
-        [%{current_page | blocks: current_page.blocks ++ [block]} | rest]
+        {[%{current_page | blocks: current_page.blocks ++ [block]} | rest], diagnostics}
     end
   end
 

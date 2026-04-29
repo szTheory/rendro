@@ -13,7 +13,9 @@ defmodule Rendro.Adapters.Oban.RenderWorkerTest do
       doc = Rendro.flow(blocks)
 
       case Map.get(args, "doc_policies") do
-        nil -> doc
+        nil ->
+          doc
+
         policies ->
           normalized =
             Enum.map(policies, fn

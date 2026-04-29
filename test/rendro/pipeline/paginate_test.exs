@@ -233,7 +233,7 @@ defmodule Rendro.Pipeline.PaginateTest do
       first_diag = Enum.find(paginated.diagnostics, &(&1.type == :table_split))
       assert first_diag
       assert first_diag.level == :info
-      assert first_diag.page_index == 2
+      assert first_diag.page_index == 1
       assert first_diag.reason == :insufficient_height
     end
 

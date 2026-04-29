@@ -198,15 +198,13 @@ defmodule Rendro.Pipeline do
   end
 
   defp run_stages_with_capture(doc, base_meta, policies, owner, progress_ref) do
-    try do
-      {:ok, run_stages(doc, base_meta, policies, owner, progress_ref)}
-    rescue
-      exception ->
-        {:exception, :error, exception, __STACKTRACE__}
-    catch
-      kind, reason ->
-        {:exception, kind, reason, __STACKTRACE__}
-    end
+    {:ok, run_stages(doc, base_meta, policies, owner, progress_ref)}
+  rescue
+    exception ->
+      {:exception, :error, exception, __STACKTRACE__}
+  catch
+    kind, reason ->
+      {:exception, kind, reason, __STACKTRACE__}
   end
 
   defp unwrap_run_result({:ok, {pdf_binary, _doc}}), do: {:ok, pdf_binary}
@@ -220,7 +218,8 @@ defmodule Rendro.Pipeline do
          :ok <- report_page_count(owner, progress_ref, doc),
          :ok <- validate_policy(:pages, doc, policies, base_meta),
          {:ok, pdf_binary} <- span(:render, base_meta, fn -> Render.run(doc) end, doc),
-         {:ok, pdf_binary} <- span(:validate, base_meta, fn -> Validate.run(pdf_binary, doc) end, doc) do
+         {:ok, pdf_binary} <-
+           span(:validate, base_meta, fn -> Validate.run(pdf_binary, doc) end, doc) do
       {:ok, {pdf_binary, doc}}
     end
   end

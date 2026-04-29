@@ -47,7 +47,7 @@ defmodule Rendro.Adapters.PhoenixTest do
 
     test "error response uses text format by default" do
       conn = conn(:get, "/download")
-      
+
       conn = Adapter.render_pdf(conn, error_document(), "proof.pdf")
 
       assert conn.status == 500
@@ -66,16 +66,19 @@ defmodule Rendro.Adapters.PhoenixTest do
 
       assert conn.status == 500
       assert conn.state == :sent
-      assert Plug.Conn.get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
-      
+
+      assert Plug.Conn.get_resp_header(conn, "content-type") == [
+               "application/json; charset=utf-8"
+             ]
+
       json = Phoenix.json_library().decode!(conn.resp_body)
-      
+
       assert json["what"] =~ "Pagination failed"
       assert is_binary(json["where"])
       assert is_binary(json["why"])
       assert is_binary(json["next"])
       assert json["stage"] == "paginate"
-      
+
       refute Map.has_key?(json, "reason")
       refute Map.has_key?(json, "details")
     end

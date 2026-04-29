@@ -31,7 +31,10 @@ if Code.ensure_loaded?(Oban) do
     defp fetch_module(_args), do: {:error, {:missing_worker_field, :module}}
 
     defp fetch_builder_args(%{"args" => value}) when is_map(value), do: {:ok, value}
-    defp fetch_builder_args(%{"args" => value}), do: {:error, {:invalid_worker_field, :args, value}}
+
+    defp fetch_builder_args(%{"args" => value}),
+      do: {:error, {:invalid_worker_field, :args, value}}
+
     defp fetch_builder_args(_args), do: {:error, {:missing_worker_field, :args}}
 
     defp fetch_output_path(%{"output_path" => value}) when is_binary(value) and value != "",
@@ -43,7 +46,10 @@ if Code.ensure_loaded?(Oban) do
     defp fetch_output_path(_args), do: {:error, {:missing_worker_field, :output_path}}
 
     defp fetch_policies(%{"policies" => value}) when is_map(value), do: normalize_policies(value)
-    defp fetch_policies(%{"policies" => value}), do: {:error, {:invalid_worker_field, :policies, value}}
+
+    defp fetch_policies(%{"policies" => value}),
+      do: {:error, {:invalid_worker_field, :policies, value}}
+
     defp fetch_policies(_args), do: {:ok, []}
 
     defp resolve_module(module) when is_atom(module) do
