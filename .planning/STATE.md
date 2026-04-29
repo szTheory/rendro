@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Phase 20 context gathered
-last_updated: "2026-04-29T20:14:39.155Z"
+stopped_at: Completed 20-01-PLAN.md
+last_updated: "2026-04-29T20:41:59.318Z"
 last_activity: 2026-04-29
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
-  percent: 100
+  total_plans: 8
+  completed_plans: 7
+  percent: 88
 ---
 
 # Project State
@@ -30,7 +30,7 @@ Plan: Not started
 Status: Ready to plan
 Last activity: 2026-04-29
 
-Progress: [██████████] 100%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
@@ -61,6 +61,7 @@ Progress: [██████████] 100%
 | Phase 19 P01 | 5 min | 2 tasks | 6 files |
 | Phase 19 P02 | 5 min | 2 tasks | 3 files |
 | Phase 19 P03 | 6 min | 2 tasks | 7 files |
+| Phase 20 P01 | 25 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -90,6 +91,8 @@ Recent decisions affecting current work:
 - Reject flow pagination directives on fixed-position pages through the existing paginate error surface instead of silently ignoring them.
 - Rendered PDF text now serializes the measured line list directly instead of reconstructing paragraphs inside the writer.
 - README examples teach the Phase 19 block-and-text flow path with explicit break semantics and narrow exclusions.
+- Decided to resolve layout body bounds during measurement to allow table width percentages to be relative to layout bounds.
+- Decided to let stack_cells in Paginate use absolute table coordinates directly.
 
 ### Pending Todos
 
@@ -118,8 +121,8 @@ Items acknowledged and carried forward from milestone scoping:
 
 ## Session Continuity
 
-Last session: --stopped-at
-Stopped at: Phase 20 context gathered
-Resume file: --resume-file
+Last session: 2026-04-29T20:41:59.287Z
+Stopped at: Completed 20-01-PLAN.md
+Resume file: None
 
 **Planned Phase:** 19 (deterministic-text-flow-and-break-semantics) — 3 plans — 2026-04-29T19:26:06.259Z

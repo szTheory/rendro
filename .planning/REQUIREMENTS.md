@@ -14,7 +14,8 @@
 
 ### Table Layout
 
-- [ ] **LAY-10**: Engineer can render multi-page tables with deterministic column sizing, repeated headers, and explicit row-split behavior suited to invoices and reports.
+- [x] **LAY-10
+**: Engineer can render multi-page tables with deterministic column sizing, repeated headers, and explicit row-split behavior suited to invoices and reports.
 
 ### Diagnostics and Verification
 
