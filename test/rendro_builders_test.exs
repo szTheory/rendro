@@ -10,15 +10,18 @@ defmodule RendroBuildersTest do
     end
 
     test "text/2 accepts attribute overrides" do
-      text = Rendro.text("bold", font: "Courier", size: 18)
+      text = Rendro.text("bold", font: "Courier", size: 18, line_height: 1.5)
       assert text.font == "Courier"
       assert text.size == 18
+      assert text.line_height == 1.5
     end
 
     test "block/2 builds a Block with content" do
       text = Rendro.text("hello")
-      block = Rendro.block(text, x: 10, y: 20)
+      block = Rendro.block(text, x: 10, y: 20, keep_together: true, break_before: true)
       assert %Block{content: ^text, x: 10, y: 20} = block
+      assert block.keep_together
+      assert block.break_before
     end
 
     test "block/2 requires content argument" do

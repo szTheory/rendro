@@ -9,7 +9,11 @@ defmodule Rendro.Block do
     x: 0,
     y: 0,
     width: nil,
-    height: nil
+    height: nil,
+    keep_together: false,
+    keep_with_next: false,
+    break_before: false,
+    break_after: false
   ]
 
   @type t :: %__MODULE__{
@@ -17,6 +21,10 @@ defmodule Rendro.Block do
           x: number(),
           y: number(),
           width: number() | nil,
-          height: number() | nil
+          height: number() | nil,
+          keep_together: boolean(),
+          keep_with_next: boolean(),
+          break_before: boolean(),
+          break_after: boolean()
         }
 end

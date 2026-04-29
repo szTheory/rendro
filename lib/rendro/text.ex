@@ -8,13 +8,15 @@ defmodule Rendro.Text do
     :content,
     font: "Helvetica",
     size: 12,
-    color: {0, 0, 0}
+    color: {0, 0, 0},
+    line_height: 1.2
   ]
 
   @type t :: %__MODULE__{
           content: String.t(),
           font: String.t(),
           size: number(),
-          color: {non_neg_integer(), non_neg_integer(), non_neg_integer()}
+          color: {non_neg_integer(), non_neg_integer(), non_neg_integer()},
+          line_height: float()
         }
 end
