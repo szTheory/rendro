@@ -8,7 +8,7 @@ defmodule Rendro.DeterministicTest do
 
   describe "property: deterministic byte-identity" do
     property "two deterministic renders of the same document produce identical binaries" do
-      check all(doc <- document_gen(), max_runs: 100) do
+      check all(doc <- renderable_document_gen(), max_runs: 100) do
         {:ok, pdf1} = Rendro.render(doc, deterministic: true)
         {:ok, pdf2} = Rendro.render(doc, deterministic: true)
         assert pdf1 == pdf2
@@ -16,7 +16,7 @@ defmodule Rendro.DeterministicTest do
     end
 
     property "deterministic output is stable across 10 sequential renders" do
-      check all(doc <- document_gen(), max_runs: 25) do
+      check all(doc <- renderable_document_gen(), max_runs: 25) do
         {:ok, reference} = Rendro.render(doc, deterministic: true)
 
         for _ <- 1..9 do
@@ -27,7 +27,7 @@ defmodule Rendro.DeterministicTest do
     end
 
     property "non-deterministic mode produces valid PDF output" do
-      check all(doc <- document_gen(), max_runs: 50) do
+      check all(doc <- renderable_document_gen(), max_runs: 50) do
         {:ok, pdf} = Rendro.render(doc)
         assert String.starts_with?(pdf, "%PDF-1.4")
         assert String.contains?(pdf, "%%EOF")
