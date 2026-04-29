@@ -18,7 +18,7 @@
 
 ### Diagnostics and Verification
 
-- [ ] **LAY-11**: Engineer receives truthful fit validation when authored fixed-position or flow-region content cannot fit the declared page/layout bounds.
+- [x] **LAY-11**: Engineer receives truthful fit validation when authored fixed-position or flow-region content cannot fit the declared page/layout bounds.
 - [ ] **OBS-05**: Operator can inspect structured diagnostics that explain why content moved, split, or overflowed during pagination.
 - [ ] **QUAL-06**: Maintainer can verify pagination invariants and deterministic break decisions with committed regression fixtures and docs-contract proof.
 
@@ -61,7 +61,7 @@
 | LAY-08 | Phase 18 | Completed |
 | LAY-09 | Phase 19 | Pending |
 | LAY-10 | Phase 20 | Pending |
-| LAY-11 | Phase 18 | Pending |
+| LAY-11 | Phase 18 | Completed |
 | OBS-05 | Phase 21 | Pending |
 | QUAL-06 | Phase 21 | Pending |
 | LAY-12 | Phase 22 | Pending |
@@ -73,4 +73,4 @@
 
 ---
 *Requirements defined: 2026-04-28*
-*Last updated: 2026-04-29 after Phase 18 Plan 02 execution*
+*Last updated: 2026-04-29 after Phase 18 Plan 03 execution*

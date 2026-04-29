@@ -16,7 +16,7 @@ Rendro is progressing through iterative, verified milestones. `v1.0` proved the 
 
 ## Phases
 
-- [ ] **Phase 18: Layout Contract and Page Template Model** - Introduce explicit flow page templates, sections, regions, and fixed-position fit validation as the foundational document layout contract.
+- [x] **Phase 18: Layout Contract and Page Template Model** - Introduce explicit flow page templates, sections, regions, and fixed-position fit validation as the foundational document layout contract.
 - [ ] **Phase 19: Deterministic Text Flow and Break Semantics** - Add width-aware text measurement plus explicit keep/break directives so pagination decisions reflect authored intent.
 - [ ] **Phase 20: Table Layout Maturity** - Replace demo-grade table sizing and split logic with deterministic multi-page table behavior fit for invoices and reports.
 - [ ] **Phase 21: Break Diagnostics and Pagination Proofs** - Make break/overflow causes observable and lock down pagination invariants with deterministic regression evidence.
