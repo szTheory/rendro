@@ -20,8 +20,10 @@
 ### Diagnostics and Verification
 
 - [x] **LAY-11**: Engineer receives truthful fit validation when authored fixed-position or flow-region content cannot fit the declared page/layout bounds.
-- [ ] **OBS-05**: Operator can inspect structured diagnostics that explain why content moved, split, or overflowed during pagination.
-- [ ] **QUAL-06**: Maintainer can verify pagination invariants and deterministic break decisions with committed regression fixtures and docs-contract proof.
+- [x] **OBS-05
+**: Operator can inspect structured diagnostics that explain why content moved, split, or overflowed during pagination.
+- [x] **QUAL-06
+**: Maintainer can verify pagination invariants and deterministic break decisions with committed regression fixtures and docs-contract proof.
 
 ### Recipes and Authoring Ergonomics
 
