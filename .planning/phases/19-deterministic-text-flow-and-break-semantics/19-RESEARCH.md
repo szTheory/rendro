@@ -321,12 +321,15 @@ Enum.chunk_while(enum, acc, chunk_fun, after_fun)
 | A2 | Consecutive `keep_with_next` blocks should chain into one contiguous keep group that ends at the first block without `keep_with_next`. | Architecture Patterns, Common Pitfalls | Medium; this changes specific pagination behavior and test fixtures. |
 | A3 | Wrapped-line data should travel through the engine in a private measured-text carrier instead of becoming a new public authoring field. | Summary, Architecture Patterns, Common Pitfalls | Medium; a different carrier choice changes implementation shape and may affect API surface cleanliness. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Which private carrier should hold measured wrapped lines?**
-   - What we know: current writer only renders `%Rendro.Text{}` blocks as one PDF text operation, so wrapped lines need a render-visible representation. [VERIFIED: lib/rendro/pdf/writer.ex]
-   - What's unclear: whether the least-risk implementation is a private wrapper struct, block-local metadata, or another internal normalization form. [VERIFIED: lib/rendro/block.ex, lib/rendro/text.ex] [ASSUMED]
-   - Recommendation: prefer a private internal struct or wrapper content type so the public block/text contract stays narrow and docs do not expose pipeline-only fields. [ASSUMED]
+   - Resolution: use a private internal module named `Rendro.Pipeline.MeasuredText` carried as measured block content between `Measure`, `Paginate`, and `Writer`. [RESOLVED: planner output `19-01-PLAN.md`]
+   - Why this choice: it keeps `Rendro.Block` as the public geometry container, keeps `Rendro.Text` as the public style/content leaf, and avoids exposing pipeline-only wrapped-line fields on the authoring API. [VERIFIED: .planning/phases/19-deterministic-text-flow-and-break-semantics/19-CONTEXT.md, .planning/phases/19-deterministic-text-flow-and-break-semantics/19-01-PLAN.md]
+
+2. **How should chained `keep_with_next` behave?**
+   - Resolution: consecutive `keep_with_next` blocks form one contiguous keep group that ends at the first block without `keep_with_next`. [RESOLVED: planner output `19-02-PLAN.md`]
+   - Why this choice: it gives deterministic group boundaries for `A keep_with_next`, `B keep_with_next`, `C normal`, preserves the hard-constraint posture from D-09 through D-12, and yields fixture-testable behavior. [VERIFIED: .planning/phases/19-deterministic-text-flow-and-break-semantics/19-CONTEXT.md, .planning/phases/19-deterministic-text-flow-and-break-semantics/19-02-PLAN.md]
 
 ## Environment Availability
 
