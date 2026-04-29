@@ -214,6 +214,51 @@ defmodule Rendro.Pipeline.PaginateTest do
   end
 
   describe "typed paginate diagnostics" do
+    test "records table split diagnostics" do
+      table = %Rendro.Table{
+        rows: for(i <- 1..3, do: [%Rendro.Block{content: Rendro.text("Row #{i}")}]),
+        column_widths: [100]
+      }
+
+      doc =
+        Rendro.flow(
+          [Rendro.block(table)],
+          page_template: :tiny_keep_chain,
+          page_templates: [tiny_keep_chain_template()]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+      assert length(paginated.diagnostics) > 0
+      
+      first_diag = Enum.find(paginated.diagnostics, &(&1.type == :table_split))
+      assert first_diag
+      assert first_diag.level == :info
+      assert first_diag.page_index == 2
+      assert first_diag.reason == :insufficient_height
+    end
+
+    test "records keep rule break diagnostics" do
+      doc =
+        Rendro.flow(
+          [
+            Rendro.block(Rendro.text("Line 1")),
+            Rendro.block(Rendro.text("Line 2"), keep_with_next: true),
+            Rendro.block(Rendro.text("Line 3")),
+            Rendro.block(Rendro.text("Line 4"))
+          ],
+          page_template: :tiny_keep_chain,
+          page_templates: [tiny_keep_chain_template()]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+      
+      diag = Enum.find(paginated.diagnostics, &(&1.type == :keep_rule_break))
+      assert diag
+      assert diag.level == :info
+      assert diag.keep_rule == :keep_with_next
+      assert diag.page_index == 2
+    end
+
     test "returns keep-rule details when a chained keep_with_next group cannot fit on any page" do
       doc =
         Rendro.flow(
