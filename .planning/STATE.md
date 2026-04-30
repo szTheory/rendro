@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.2
-milestone_name: deterministic-typography-assets-and-honest-i18n-baseline
-status: planning
-stopped_at: Milestone v1.2 defined; ready for Phase 25 planning
-last_updated: "2026-04-30T23:59:30.000Z"
-last_activity: 2026-04-30 -- Milestone v1.2 started
+milestone_name: Deterministic Typography, Assets, and Honest I18n Baseline
+status: executing
+stopped_at: Completed 25-01-PLAN.md
+last_updated: "2026-04-30T20:24:51.521Z"
+last_activity: 2026-04-30
 progress:
-  total_phases: 5
+  total_phases: 6
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 2
+  completed_plans: 1
+  percent: 50
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-30)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Milestone v1.2 planning and Phase 25 kickoff
+**Current focus:** Phase 25 — font-registry-and-public-typography-contract
 
 ## Current Position
 
-Phase: —
-Plan: —
-Status: Milestone defined; ready to plan Phase 25
-Last activity: 2026-04-30 -- Milestone v1.2 started
+Phase: 25 (font-registry-and-public-typography-contract) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
+Last activity: 2026-04-30
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█████░░░░░] 50%
 
 ## Milestone Snapshot
 
@@ -75,6 +75,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 23 P02 | 7 min | 2 tasks | 5 files |
 | Phase 24 P01 | 4 min | 3 tasks | 9 files |
 | Phase 24 P02 | 8 min | 2 tasks | 5 files |
+| Phase 25 P01 | 5 min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -131,6 +132,8 @@ Recent decisions affecting current work:
 - Preserve Phase 21 as the historical implementation owner and use Phase 24 as the authoritative closure point for OBS-05 and QUAL-06.
 - Do not flip REQUIREMENTS.md or ROADMAP.md until 24-VERIFICATION.md exists and cites the repaired Phase 21 history.
 - Treat verification-artifact wording as executable contract surface when plan gates assert exact markdown markers.
+- Keep Helvetica as a narrow compatibility alias while moving the authored contract to logical font names.
+- Do not mark FONT-01 complete until plan 25-02 wires registry-backed selection into measurement and rendering.
 
 ### Pending Todos
 
@@ -161,8 +164,8 @@ Items acknowledged and carried forward from milestone scoping:
 
 ## Session Continuity
 
-Last session: 2026-04-30T19:14:05.490Z
-Stopped at: Archived v1.1 milestone artifacts
+Last session: 2026-04-30T20:24:51.515Z
+Stopped at: Completed 25-01-PLAN.md
 Resume file: None
 
-**Planned Phase:** Phase 25. Use `$gsd-plan-phase 25` to start execution planning.
+**Planned Phase:** 25 (Font Registry and Public Typography Contract) — 2 plans — 2026-04-30T20:11:50.237Z
