@@ -14,7 +14,7 @@
 
 ### Table Layout
 
-- [ ] **LAY-10**: Engineer can render multi-page tables with deterministic column sizing, repeated headers, and explicit row-split behavior suited to invoices and reports.
+- [x] **LAY-10**: Engineer can render multi-page tables with deterministic column sizing, repeated headers, and explicit row-split behavior suited to invoices and reports.
 
 ### Diagnostics and Verification
 
@@ -60,7 +60,7 @@
 | LAY-07 | Phase 18 | Completed |
 | LAY-08 | Phase 18 | Completed |
 | LAY-09 | Phase 19 | Completed |
-| LAY-10 | Phase 23 | Pending |
+| LAY-10 | Phase 20 + Phase 23 | Completed |
 | LAY-11 | Phase 18 | Completed |
 | OBS-05 | Phase 24 | Pending |
 | QUAL-06 | Phase 24 | Pending |
@@ -73,4 +73,7 @@
 
 ---
 *Requirements defined: 2026-04-28*
-*Last updated: 2026-04-30 after milestone gap-closure phase creation*
+`LAY-10` uses a hybrid closure model: Phase 20 shipped the table geometry and continuation core, `20-VERIFICATION.md` records that historical scope truthfully, and Phase 23 provides the authoritative runtime/verification closure in `23-VERIFICATION.md`.
+
+---
+*Last updated: 2026-04-30 after Phase 23 verification and traceability closure*

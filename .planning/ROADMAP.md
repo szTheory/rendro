@@ -18,10 +18,10 @@ Rendro is progressing through iterative, verified milestones. `v1.0` proved the 
 
 - [x] **Phase 18: Layout Contract and Page Template Model** - Introduce explicit flow page templates, sections, regions, and fixed-position fit validation as the foundational document layout contract.
 - [x] **Phase 19: Deterministic Text Flow and Break Semantics** - Add width-aware text measurement plus explicit keep/break directives so pagination decisions reflect authored intent.
-- [ ] **Phase 20: Table Layout Maturity** - Replace demo-grade table sizing and split logic with deterministic multi-page table behavior fit for invoices and reports.
+- [x] **Phase 20: Table Layout Maturity** - Delivered deterministic table geometry, repeated headers, and row-atomic continuation core; later re-verified in Phase 23 because authored split-policy runtime wiring was still open at original close.
 - [ ] **Phase 21: Break Diagnostics and Pagination Proofs** - Make break/overflow causes observable and lock down pagination invariants with deterministic regression evidence.
 - [x] **Phase 22: Authoring Ergonomics and Canonical Recipes** - Lift the new layout surface into recipes/examples/docs so downstream Phoenix teams can use it without ad hoc glue.
-- [ ] **Phase 23: Table Split Policy Runtime Wiring** - Close the remaining table contract gap by wiring authored split policy into pagination and re-verifying the phase.
+- [x] **Phase 23: Table Split Policy Runtime Wiring** - Closed the remaining table contract gap by wiring authored split policy into pagination and supplying the authoritative `LAY-10` verification closure.
 - [ ] **Phase 24: Diagnostics Verification and Traceability Closure** - Close the missing diagnostics/pagination-proof verification chain and align docs/traceability with the shipped surface.
 
 ### Phase 18: Layout Contract and Page Template Model
@@ -60,6 +60,7 @@ Plans:
   3. Repeated headers and region-aware table continuation behave predictably across page breaks.
   4. Public table surface no longer implies unsupported width/border behavior.
 **Plans**: 2 plans
+**Closure Note**: Phase 20 shipped the table geometry and continuation core, but `LAY-10` required later repair because `INT-TABLE-SPLIT-POLICY` and the missing `20-VERIFICATION.md` kept the requirement historically open until Phase 23.
 
 ### Phase 21: Break Diagnostics and Pagination Proofs
 **Goal**: Make pagination behavior explainable and durable under future milestone expansion.
@@ -102,7 +103,8 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 23-01-PLAN.md — Runtime split-policy wiring and public contract tightening
-- [ ] 23-02-PLAN.md — Re-verification and traceability closure for LAY-10
+- [x] 23-02-PLAN.md — Re-verification and traceability closure for LAY-10
+**Closure Note**: Phase 23 is the authoritative closure point for `LAY-10`: it fixed `INT-TABLE-SPLIT-POLICY`, linked the historical Phase 20 repair artifact, and synchronized roadmap/requirements state only after verification existed.
 
 ### Phase 24: Diagnostics Verification and Traceability Closure
 **Goal**: Convert the existing diagnostics/proof implementation into a fully closed milestone requirement with matching docs, validation metadata, and verification artifacts.
