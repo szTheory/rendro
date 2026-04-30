@@ -71,7 +71,7 @@ defmodule Rendro.FlowTest do
     # Should split across 2 pages.
 
     rows = for i <- 1..50, do: ["A#{i}", "B#{i}"]
-    table = Rendro.table(rows, header: ["Col A", "Col B"])
+    table = Rendro.table(rows, header: ["Col A", "Col B"], split_policy: :row_atomic)
 
     doc = Rendro.flow([Rendro.block(table)])
     {:ok, pdf} = Rendro.render(doc)

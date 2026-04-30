@@ -79,6 +79,10 @@ defmodule Rendro.Error do
     "Remove flow directives from fixed-position pages or switch the content to Rendro.flow/2 so pagination directives run in the flow engine."
   end
 
+  defp next_step(:paginate, :unsupported_table_split_policy) do
+    "Use split_policy: :row_atomic on Rendro.table/2 (temporary alias :atomic is also accepted) so table continuation semantics stay explicit."
+  end
+
   defp next_step(:paginate, :max_pages_exceeded) do
     "Reduce document length or increase the :max_pages policy limit."
   end

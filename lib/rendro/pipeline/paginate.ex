@@ -52,6 +52,9 @@ defmodule Rendro.Pipeline.Paginate do
     catch
       {:error, :content_overflow, details} ->
         {:error, Rendro.Error.from_stage(:paginate, :content_overflow, %{details: details})}
+
+      {:error, :unsupported_table_split_policy, details} ->
+        {:error, Rendro.Error.from_stage(:paginate, :unsupported_table_split_policy, %{details: details})}
     end
   end
 
@@ -135,18 +138,21 @@ defmodule Rendro.Pipeline.Paginate do
 
     case block.content do
       %Rendro.Table{} = table when current_h + block_h > max_h ->
-        handle_table_split(
-          block,
-          table,
-          current_page,
-          rest,
-          template,
-          max_h,
-          current_h,
-          block_h,
-          failure_details,
-          diagnostics
-        )
+        case table_split_policy(table, failure_details) do
+          :row_atomic ->
+            handle_table_split(
+              block,
+              table,
+              current_page,
+              rest,
+              template,
+              max_h,
+              current_h,
+              block_h,
+              failure_details,
+              diagnostics
+            )
+        end
 
       _ ->
         if current_h + block_h <= max_h do
@@ -612,6 +618,16 @@ defmodule Rendro.Pipeline.Paginate do
 
   defp bounded_region?(%Region{width: width, height: height}) do
     is_number(width) and width > 0 and is_number(height) and height > 0
+  end
+
+  defp table_split_policy(%Rendro.Table{split_policy: :row_atomic}, _details), do: :row_atomic
+  defp table_split_policy(%Rendro.Table{split_policy: :atomic}, _details), do: :row_atomic
+
+  defp table_split_policy(%Rendro.Table{split_policy: split_policy}, details) do
+    throw(
+      {:error, :unsupported_table_split_policy,
+       Map.merge(details, %{split_policy: split_policy, supported_split_policies: [:row_atomic]})}
+    )
   end
 
   defp table_height(%Rendro.Table{} = table) do

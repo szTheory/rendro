@@ -214,6 +214,72 @@ defmodule Rendro.Pipeline.PaginateTest do
   end
 
   describe "typed paginate diagnostics" do
+    test "uses authored :row_atomic split policy for table continuation" do
+      table =
+        %Rendro.Table{
+          header: [%Rendro.Block{content: Rendro.text("Header")}],
+          rows: for(i <- 1..3, do: [%Rendro.Block{content: Rendro.text("Row #{i}")}]),
+          split_policy: :row_atomic,
+          column_widths: [100]
+        }
+
+      doc =
+        Rendro.flow(
+          [Rendro.block(table)],
+          page_template: :flow_keep_chain,
+          page_templates: [flow_keep_chain_template()]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+      assert length(paginated.pages) == 2
+      assert Enum.any?(paginated.diagnostics, &(&1.type == :table_split))
+    end
+
+    test "treats the temporary :atomic alias as runtime-equivalent to :row_atomic" do
+      table =
+        %Rendro.Table{
+          header: [%Rendro.Block{content: Rendro.text("Header")}],
+          rows: for(i <- 1..3, do: [%Rendro.Block{content: Rendro.text("Row #{i}")}]),
+          split_policy: :atomic,
+          column_widths: [100]
+        }
+
+      doc =
+        Rendro.flow(
+          [Rendro.block(table)],
+          page_template: :flow_keep_chain,
+          page_templates: [flow_keep_chain_template()]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+      assert length(paginated.pages) == 2
+      assert Enum.any?(paginated.diagnostics, &(&1.type == :table_split))
+    end
+
+    test "returns a typed paginate error for unsupported table split policies" do
+      table =
+        %Rendro.Table{
+          header: [%Rendro.Block{content: Rendro.text("Header")}],
+          rows: for(i <- 1..3, do: [%Rendro.Block{content: Rendro.text("Row #{i}")}]),
+          split_policy: :whole_table,
+          column_widths: [100]
+        }
+
+      doc =
+        Rendro.flow(
+          [Rendro.block(table)],
+          page_template: :flow_keep_chain,
+          page_templates: [flow_keep_chain_template()]
+        )
+
+      assert {:error, %Rendro.Error{} = error} = paginate_flow(doc)
+      assert error.stage == :paginate
+      assert error.reason == :unsupported_table_split_policy
+      assert error.details.split_policy == :whole_table
+      assert error.details.supported_split_policies == [:row_atomic]
+      assert error.next =~ "split_policy: :row_atomic"
+    end
+
     test "records table split diagnostics" do
       table = %Rendro.Table{
         rows: for(i <- 1..3, do: [%Rendro.Block{content: Rendro.text("Row #{i}")}]),
