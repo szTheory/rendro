@@ -135,13 +135,16 @@ defmodule Rendro.Pipeline.Build do
   defp validate_table_row_fonts(_doc, nil), do: :ok
 
   defp validate_table_row_fonts(doc, row) do
-    Enum.reduce_while(row, :ok, fn block, :ok ->
-      case validate_block_fonts(doc, block) do
+    Enum.reduce_while(row, :ok, fn cell, :ok ->
+      case validate_table_cell_font(doc, cell) do
         :ok -> {:cont, :ok}
         err -> {:halt, err}
       end
     end)
   end
+
+  defp validate_table_cell_font(doc, %Rendro.Block{} = block), do: validate_block_fonts(doc, block)
+  defp validate_table_cell_font(_doc, _cell), do: :ok
 
   defp default_font_registered?(registry, default_font) do
     case FontRegistry.fetch(registry, default_font) do
