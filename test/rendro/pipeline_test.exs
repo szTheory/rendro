@@ -1,7 +1,7 @@
 defmodule Rendro.PipelineTest do
   use ExUnit.Case, async: true
 
-  alias Rendro.Pipeline
+  alias Rendro.{PageTemplate, Pipeline, Region}
 
   defp sample_document do
     text = %Rendro.Text{
@@ -88,6 +88,41 @@ defmodule Rendro.PipelineTest do
 
       assert {:ok, pdf} = Pipeline.run(doc)
       assert String.starts_with?(pdf, "%PDF-1.4")
+    end
+  end
+
+  describe "render_with_diagnostics/2" do
+    test "returns the final document with public diagnostics access" do
+      template =
+        %PageTemplate{
+          name: :public_diagnostics,
+          width: 220,
+          height: 180,
+          margin_top: 12,
+          margin_right: 12,
+          margin_bottom: 12,
+          margin_left: 12,
+          regions: [
+            %Region{name: :body, role: :body, anchor: :flow, x: 12, y: 12, width: 196, height: 28.8}
+          ]
+        }
+
+      doc =
+        Rendro.flow(
+          [
+            Rendro.block(Rendro.text("Heading"), keep_with_next: true),
+            Rendro.block(Rendro.text("Body"))
+          ],
+          page_template: :public_diagnostics,
+          page_templates: [template]
+        )
+
+      assert {:ok, pdf, final_doc} = Rendro.render_with_diagnostics(doc, deterministic: true)
+      assert is_binary(pdf)
+      assert length(final_doc.pages) == 2
+
+      assert [%{level: :info, type: :keep_rule_break, keep_rule: :keep_with_next, page_index: 2}] =
+               final_doc.diagnostics
     end
   end
 end

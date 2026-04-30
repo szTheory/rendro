@@ -232,7 +232,9 @@ defmodule Rendro.Pipeline.PaginateTest do
 
       assert {:ok, paginated} = paginate_flow(doc)
       assert length(paginated.pages) == 2
-      assert Enum.any?(paginated.diagnostics, &(&1.type == :table_split))
+
+      assert [%{level: :info, type: :table_split, page_index: 1, reason: :insufficient_height}] =
+               paginated.diagnostics
     end
 
     test "treats the temporary :atomic alias as runtime-equivalent to :row_atomic" do
@@ -253,7 +255,28 @@ defmodule Rendro.Pipeline.PaginateTest do
 
       assert {:ok, paginated} = paginate_flow(doc)
       assert length(paginated.pages) == 2
-      assert Enum.any?(paginated.diagnostics, &(&1.type == :table_split))
+
+      assert [%{level: :info, type: :table_split, page_index: 1, reason: :insufficient_height}] =
+               paginated.diagnostics
+    end
+
+    test "emits keep-rule diagnostics when a keep_with_next group moves to a fresh page" do
+      doc =
+        Rendro.flow(
+          [
+            Rendro.block(Rendro.text("Intro")),
+            Rendro.block(Rendro.text("Chapter"), keep_with_next: true),
+            Rendro.block(Rendro.text("Subhead"), keep_with_next: true),
+            Rendro.block(Rendro.text("Body"))
+          ],
+          page_template: :flow_keep_chain,
+          page_templates: [flow_keep_chain_template()]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+
+      assert [%{level: :info, type: :keep_rule_break, keep_rule: :keep_with_next, page_index: 2}] =
+               paginated.diagnostics
     end
 
     test "returns a typed paginate error for unsupported table split policies" do

@@ -63,4 +63,39 @@ defmodule Rendro.InspectorTest do
 
     assert Inspector.inspect(doc) == String.trim_trailing(expected_output)
   end
+
+  test "inspect/1 renders runtime diagnostics without requiring a message field" do
+    doc = %Document{
+      pages: [
+        %Page{
+          width: 220,
+          height: 180,
+          blocks: [
+            %Block{
+              content: %Text{content: "Heading"},
+              x: 12,
+              y: 12,
+              width: 100,
+              height: 14.4
+            }
+          ]
+        }
+      ],
+      diagnostics: [
+        %{level: :info, type: :keep_rule_break, keep_rule: :keep_with_next, page_index: 2},
+        %{level: :info, type: :table_split, page_index: 1, reason: :insufficient_height}
+      ]
+    }
+
+    expected_output = """
+    Page 1 (220x180)
+    ├── Block: Text (x: 12, y: 12, w: 100, h: 14.4)
+
+    Diagnostics:
+    - [info] keep_rule_break: keep_rule=keep_with_next, page_index=2
+    - [info] table_split: page_index=1, reason=insufficient_height
+    """
+
+    assert Inspector.inspect(doc) == String.trim_trailing(expected_output)
+  end
 end
