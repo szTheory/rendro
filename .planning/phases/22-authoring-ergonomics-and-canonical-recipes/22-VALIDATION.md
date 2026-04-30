@@ -1,28 +1,73 @@
-# Phase 22 Validation Plan
+---
+phase: 22
+slug: authoring-ergonomics-and-canonical-recipes
+status: ready
+nyquist_compliant: true
+wave_0_complete: true
+created: 2026-04-29
+updated: 2026-04-30
+---
 
-## Goal
-Convert the stronger engine surface into an adoption-ready authoring experience: pipeable builder API, tiered-composition recipes, and a Phoenix example serving a canonical invoice via the new APIs.
+# Phase 22 — Validation Strategy
 
-## Success Criteria Verification
-1. **Canonical invoice/report recipes use the new layout primitives rather than ad hoc block stacking.**
-   - Verified by: `test/rendro/document_test.exs` covering the builder API; `test/rendro/recipes/invoice_test.exs` asserting tiered-composition output (page_template + sections, no `header:`/`footer:` kwargs); `test/rendro/adapters/accrue_test.exs` asserting Accrue adapter migrated to explicit sections.
-2. **README and guides show how to compose serious business documents with the supported authoring surface.**
-   - Verified by: `grep` checks on `README.md` for the builder API (`Rendro.Document.new`), the "Tiered Composition" concept, and absence of legacy `header:`/`footer:` kwargs in primary flow documentation. Phoenix example test (`examples/phoenix_example/test/phoenix_example_web/controllers/pdf_controller_test.exs`) verifies the canonical recipe drives the rendered PDF.
+> Per-phase validation contract for the builder API, tiered-composition recipes, and the Phoenix example handoff.
 
-## Requirement → Test Map
+---
 
-| Req ID | Behavior | Test Type | Automated Command |
-|--------|----------|-----------|-------------------|
-| LAY-12 | Pipeable builder API on `Rendro.Document` accumulates metadata, templates, sections, options deterministically | unit | `mix test test/rendro/document_test.exs` |
-| LAY-12 | Canonical invoice recipe exposes tiered composition (`document/2`, `page_template/1`, `sections/2`) with named regions | unit | `mix test test/rendro/recipes/invoice_test.exs` |
-| LAY-12 | Accrue adapter recipe replaces `header:`/`footer:` kwargs with explicit `page_template` regions and sections | unit | `mix test test/rendro/adapters/accrue_test.exs` |
-| LAY-12 | Phoenix example controller serves a canonical invoice PDF via `Rendro.Recipes.Invoice` rather than a trivial single-block flow | integration | `cd examples/phoenix_example && mix test test/phoenix_example_web/controllers/pdf_controller_test.exs` |
-| LAY-12 | README documents the builder API and tiered composition; legacy `header:`/`footer:` kwargs no longer presented as primary | docs | `grep -q "Rendro.Document.new" README.md && grep -q "Tiered Composition" README.md` |
+## Test Infrastructure
+
+| Property | Value |
+|----------|-------|
+| **Framework** | ExUnit |
+| **Config file** | `test/test_helper.exs` |
+| **Quick run command** | `mix test test/rendro/document_test.exs test/rendro/recipes/invoice_test.exs test/rendro/adapters/accrue_test.exs test/docs_contract/readme_doctest_test.exs && cd examples/phoenix_example && mix test test/phoenix_example_web/controllers/pdf_controller_test.exs` |
+| **Full suite command** | `mix ci` |
+| **Estimated runtime** | ~20-30 seconds |
+
+---
 
 ## Sampling Rate
-- **Per task commit:** `mix test`
-- **Per wave merge:** `mix ci`
-- **Phase gate:** Full suite green plus `cd examples/phoenix_example && mix test` before `/gsd-verify-work`.
 
-## Verification Command
-`mix test test/rendro/document_test.exs test/rendro/recipes/invoice_test.exs test/rendro/adapters/accrue_test.exs && cd examples/phoenix_example && mix test test/phoenix_example_web/controllers/pdf_controller_test.exs`
+- **After every task commit:** run the smallest affected authoring/docs subset.
+- **After every plan wave:** run the full Phase 22 quick suite.
+- **Before `$gsd-verify-work`:** `mix ci` plus the Phoenix example controller test must be green.
+- **Max feedback latency:** 30 seconds
+
+---
+
+## Per-Task Verification Map
+
+| Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
+|---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
+| 22-01-01 | 01 | 1 | LAY-12 | T-22-01 | `Rendro.Document` exposes a pipeable builder API that accumulates templates, sections, metadata, and options deterministically. | unit | `mix test test/rendro/document_test.exs` | ✅ | ⬜ pending |
+| 22-02-01 | 02 | 2 | LAY-12 | T-22-02 | Canonical invoice and Accrue recipes use tiered composition plus explicit page-template regions instead of legacy header/footer kwargs. | unit + integration | `mix test test/rendro/recipes/invoice_test.exs test/rendro/adapters/accrue_test.exs` | ✅ | ⬜ pending |
+| 22-03-01 | 03 | 3 | LAY-12 | T-22-03 | README guidance and the Phoenix example controller teach the supported authoring surface truthfully through the canonical recipe path. | docs-contract + integration | `mix test test/docs_contract/readme_doctest_test.exs && cd examples/phoenix_example && mix test test/phoenix_example_web/controllers/pdf_controller_test.exs` | ✅ | ⬜ pending |
+
+*Status: ⬜ pending · ✅ green · ❌ red · ⚠ mixed*
+
+---
+
+## Wave 0 Requirements
+
+- [x] `test/rendro/document_test.exs`, `test/rendro/recipes/invoice_test.exs`, `test/rendro/adapters/accrue_test.exs`, and `test/docs_contract/readme_doctest_test.exs` exist for core proof.
+- [x] `examples/phoenix_example/test/phoenix_example_web/controllers/pdf_controller_test.exs` exists for the end-to-end example seam.
+- [x] No additional framework setup is required beyond the existing test projects.
+
+---
+
+## Manual-Only Verifications
+
+None. Phase 22 should close through committed ExUnit, docs-contract, and example-controller proof.
+
+---
+
+## Validation Sign-Off
+
+- [x] All tasks have automated verification coverage
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all proof surfaces referenced in research and plans
+- [x] No watch-mode flags
+- [x] Feedback latency < 60s
+- [x] `nyquist_compliant: true` set in frontmatter
+
+**Approval:** normalized to Nyquist structure on 2026-04-30.
