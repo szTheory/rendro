@@ -19,10 +19,10 @@ Rendro is progressing through iterative, verified milestones. `v1.0` proved the 
 - [x] **Phase 18: Layout Contract and Page Template Model** - Introduce explicit flow page templates, sections, regions, and fixed-position fit validation as the foundational document layout contract.
 - [x] **Phase 19: Deterministic Text Flow and Break Semantics** - Add width-aware text measurement plus explicit keep/break directives so pagination decisions reflect authored intent.
 - [x] **Phase 20: Table Layout Maturity** - Delivered deterministic table geometry, repeated headers, and row-atomic continuation core; later re-verified in Phase 23 because authored split-policy runtime wiring was still open at original close.
-- [ ] **Phase 21: Break Diagnostics and Pagination Proofs** - Make break/overflow causes observable and lock down pagination invariants with deterministic regression evidence.
+- [x] **Phase 21: Break Diagnostics and Pagination Proofs** - Historically shipped the diagnostics accumulation and inspector proof surfaces; Phase 24 later closed the missing verification chain.
 - [x] **Phase 22: Authoring Ergonomics and Canonical Recipes** - Lift the new layout surface into recipes/examples/docs so downstream Phoenix teams can use it without ad hoc glue.
 - [x] **Phase 23: Table Split Policy Runtime Wiring** - Closed the remaining table contract gap by wiring authored split policy into pagination and supplying the authoritative `LAY-10` verification closure.
-- [ ] **Phase 24: Diagnostics Verification and Traceability Closure** - Close the missing diagnostics/pagination-proof verification chain and align docs/traceability with the shipped surface.
+- [x] **Phase 24: Diagnostics Verification and Traceability Closure** - Close the missing diagnostics/pagination-proof verification chain and align docs/traceability with the shipped surface.
 
 ### Phase 18: Layout Contract and Page Template Model
 **Goal**: Establish the document-level layout structures that v1.1 and later milestones depend on.
@@ -75,6 +75,7 @@ Plans:
 Plans:
 - [x] 21-01-PLAN.md — Structural Diagnostics in Document Model & Pipeline Accumulators
 - [x] 21-02-PLAN.md — ASCII Layout Tree Inspector & ExUnit Snapshots
+**Closure Note**: Phase 21 is the historical implementation owner for `OBS-05` and `QUAL-06`: it shipped diagnostics accumulation and inspector-based pagination proofs, but the missing `21-VERIFICATION.md`, incomplete validation metadata, and README contract drift kept the requirement chain historically open until Phase 24.
 
 ### Phase 22: Authoring Ergonomics and Canonical Recipes
 **Goal**: Convert the stronger engine surface into an adoption-ready authoring experience.
@@ -116,4 +117,8 @@ Plans:
   2. Nyquist/validation metadata for the diagnostics phase is complete enough to remove the current partial audit result.
   3. Public docs describe diagnostics using the actual supported data shape.
   4. Requirement traceability for `OBS-05` and `QUAL-06` returns to a truthful closed state only after verification exists.
-**Plans**: 0 plans
+**Plans**: 2 plans
+Plans:
+- [x] 24-01-PLAN.md — Diagnostics contract repair, focused public proof, and validation normalization
+- [x] 24-02-PLAN.md — Historical repair, authoritative closure proof, and traceability synchronization
+**Closure Note**: Phase 24 is the authoritative closure point for `OBS-05` and `QUAL-06`: it repairs the missing Phase 21 verification artifact chain, cites the historical implementation owner, and synchronizes roadmap and requirement state only after `24-VERIFICATION.md` exists.
