@@ -137,9 +137,9 @@ defmodule Rendro.Pipeline.Paginate do
       })
 
     case block.content do
-      %Rendro.Table{} = table when current_h + block_h > max_h ->
+      %Rendro.Table{} = table ->
         case table_split_policy(table, failure_details) do
-          :row_atomic ->
+          :row_atomic when current_h + block_h > max_h ->
             handle_table_split(
               block,
               table,
@@ -152,6 +152,9 @@ defmodule Rendro.Pipeline.Paginate do
               failure_details,
               diagnostics
             )
+
+          :row_atomic ->
+            {[%{current_page | blocks: current_page.blocks ++ [block]} | rest], diagnostics}
         end
 
       _ ->

@@ -280,6 +280,30 @@ defmodule Rendro.Pipeline.PaginateTest do
       assert error.next =~ "split_policy: :row_atomic"
     end
 
+    test "rejects unsupported table split policies even when the table fits on the current page" do
+      table =
+        %Rendro.Table{
+          header: [%Rendro.Block{content: Rendro.text("Header")}],
+          rows: [[%Rendro.Block{content: Rendro.text("Only row")}]],
+          split_policy: :whole_table,
+          column_widths: [100]
+        }
+
+      doc =
+        Rendro.flow(
+          [Rendro.block(table)],
+          page_template: :flow_keep_chain,
+          page_templates: [flow_keep_chain_template()]
+        )
+
+      assert {:error, %Rendro.Error{} = error} = paginate_flow(doc)
+      assert error.stage == :paginate
+      assert error.reason == :unsupported_table_split_policy
+      assert error.details.split_policy == :whole_table
+      assert error.details.supported_split_policies == [:row_atomic]
+      assert error.next =~ "split_policy: :row_atomic"
+    end
+
     test "records table split diagnostics" do
       table = %Rendro.Table{
         rows: for(i <- 1..3, do: [%Rendro.Block{content: Rendro.text("Row #{i}")}]),
