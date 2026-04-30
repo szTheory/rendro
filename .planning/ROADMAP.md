@@ -99,7 +99,10 @@ Plans:
   2. Table continuation behavior changes deterministically based on authored split intent and is proven by tests.
   3. Phase 20 receives a truthful verification artifact that closes the milestone requirement chain for `LAY-10`.
   4. Roadmap and requirement traceability no longer imply the table contract is complete before the runtime gap is actually closed.
-**Plans**: 0 plans
+**Plans**: 2 plans
+Plans:
+- [x] 23-01-PLAN.md — Runtime split-policy wiring and public contract tightening
+- [ ] 23-02-PLAN.md — Re-verification and traceability closure for LAY-10
 
 ### Phase 24: Diagnostics Verification and Traceability Closure
 **Goal**: Convert the existing diagnostics/proof implementation into a fully closed milestone requirement with matching docs, validation metadata, and verification artifacts.

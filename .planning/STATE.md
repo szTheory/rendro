@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: milestone_complete
-stopped_at: Completed 22-03-PLAN.md - Phoenix example and README upgrade
-last_updated: "2026-04-30T15:55:49.893Z"
+status: executing
+stopped_at: Completed 23-01-PLAN.md
+last_updated: "2026-04-30T17:15:34.191Z"
 last_activity: 2026-04-30 -- Phase --phase execution started
 progress:
-  total_phases: 5
-  completed_phases: 6
-  total_plans: 13
-  completed_plans: 13
-  percent: 120
+  total_phases: 7
+  completed_phases: 5
+  total_plans: 15
+  completed_plans: 14
+  percent: 93
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-28)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase --phase — 22
+**Current focus:** Phase 23 — Table Split Policy Runtime Wiring
 
 ## Current Position
 
-Phase: 22
-Plan: Not started
-Status: Milestone complete
-Last activity: 2026-04-30
+Phase: 23 — EXECUTING
+Plan: 2 of 2
+Status: Ready for 23-02 execution
+Last activity: 2026-04-30 — Completed 23-01-PLAN.md
 
-Progress: [██████████] 100%
+Progress: [█████████░] 93%
 
 ## Performance Metrics
 
@@ -68,6 +68,7 @@ Progress: [██████████] 100%
 | Phase 22-authoring-ergonomics-and-canonical-recipes P22-01 | 5min | 1 tasks | 2 files |
 | Phase 22-authoring-ergonomics-and-canonical-recipes P22-02 | 2min | 2 tasks | 5 files |
 | Phase 22 P03 | 5min | 2 tasks | 6 files |
+| Phase 23 P01 | 11 min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -112,6 +113,8 @@ Recent decisions affecting current work:
 - Source-level test uses File.read! on controller to verify canonical recipe call without mocking
 - ConnCase uses import Plug.Conn + import Phoenix.ConnTest (non-deprecated form)
 - README non-runnable schematic blocks use elixir-schematic tag to avoid docs-contract enforcement
+- Fail unsupported table split policies through a typed paginate error instead of silently defaulting to row-atomic continuation.
+- Canonicalize table split_policy to :row_atomic and keep :atomic only as a temporary compatibility alias.
 
 ### Pending Todos
 
@@ -140,8 +143,8 @@ Items acknowledged and carried forward from milestone scoping:
 
 ## Session Continuity
 
-Last session: 2026-04-30T15:55:49.888Z
-Stopped at: Completed 22-03-PLAN.md - Phoenix example and README upgrade
+Last session: 2026-04-30T17:15:14.275Z
+Stopped at: Completed 23-01-PLAN.md
 Resume file: None
 
-**Planned Phase:** 22 (authoring-ergonomics-and-canonical-recipes) — 3 plans — 2026-04-30T00:00:00.000Z
+**Planned Phase:** 23 (table-split-policy-runtime-wiring) — 2 plans — 2026-04-30T00:00:00.000Z
