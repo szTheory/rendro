@@ -58,7 +58,28 @@ defmodule Rendro.Inspector do
   end
 
   defp format_diagnostic(diag) do
-    "- [#{diag.level}] #{diag.type}: #{diag.message}"
+    details =
+      case Map.get(diag, :message) do
+        nil ->
+          diag
+          |> diagnostic_details()
+          |> Enum.join(", ")
+
+        message ->
+          to_string(message)
+      end
+
+    "- [#{diag.level}] #{diag.type}: #{details}"
+  end
+
+  defp diagnostic_details(diag) do
+    [:keep_rule, :page_index, :reason]
+    |> Enum.flat_map(fn key ->
+      case Map.fetch(diag, key) do
+        {:ok, value} -> ["#{key}=#{value}"]
+        :error -> []
+      end
+    end)
   end
 
   defp format_number(nil), do: "nil"

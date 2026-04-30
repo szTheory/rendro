@@ -110,6 +110,7 @@ defmodule Rendro.PipelineTest do
       doc =
         Rendro.flow(
           [
+            Rendro.block(Rendro.text("Intro")),
             Rendro.block(Rendro.text("Heading"), keep_with_next: true),
             Rendro.block(Rendro.text("Body"))
           ],
