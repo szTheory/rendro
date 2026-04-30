@@ -27,7 +27,8 @@
 
 ### Recipes and Authoring Ergonomics
 
-- [ ] **LAY-12**: Engineer can use canonical recipes/examples that demonstrate serious invoice/report layouts through supported authoring primitives instead of ad hoc pagination glue.
+- [x] **LAY-12
+**: Engineer can use canonical recipes/examples that demonstrate serious invoice/report layouts through supported authoring primitives instead of ad hoc pagination glue.
 
 ## v2 Requirements
 

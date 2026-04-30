@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Planned 22-authoring-ergonomics-and-canonical-recipes (3 plans)
-last_updated: "2026-04-30T15:38:49.698Z"
+stopped_at: Completed 22-01-PLAN.md - pipeline builder API on Rendro.Document
+last_updated: "2026-04-30T15:43:01.265Z"
 last_activity: 2026-04-30 -- Phase --phase execution started
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 13
-  completed_plans: 10
-  percent: 77
+  completed_plans: 11
+  percent: 85
 ---
 
 # Project State
@@ -30,7 +30,7 @@ Plan: 1 of --name
 Status: Executing Phase --phase
 Last activity: 2026-04-30 -- Phase --phase execution started
 
-Progress: [██████████] 100%
+Progress: [█████████░] 85%
 
 ## Performance Metrics
 
@@ -65,6 +65,7 @@ Progress: [██████████] 100%
 | Phase 20 P02 | 10 mins | 2 tasks | 9 files |
 | Phase 21 P01 | 10m | 2 tasks | 7 files |
 | Phase 21-break-diagnostics-and-pagination-proofs P21-02-PLAN.md | 20 | 2 tasks | 4 files |
+| Phase 22-authoring-ergonomics-and-canonical-recipes P22-01 | 5min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,9 @@ Recent decisions affecting current work:
 - Added a diagnostics list to Rendro.Document to accumulate pagination info without raising exceptions or spamming telemetry.
 - Exposed Rendro.render_with_diagnostics/2 in the top-level Rendro module to allow extracting the fully populated document struct alongside the generated PDF binary, making it easier to fetch doc.diagnostics.
 - Used snapshot tests for the inspector to lock down the output format and ensure deterministic layout checks.
+- Expose pipeline builder API directly on Rendro.Document module to keep function discovery co-located with the struct definition
+- Use append semantics (list ++ [item]) for add_template/2 and add_section/2 to preserve insertion order
+- Use Map.merge/2 for put_options/2 to allow incremental option accumulation over multiple pipe stages
 
 ### Pending Todos
 
@@ -128,8 +132,8 @@ Items acknowledged and carried forward from milestone scoping:
 
 ## Session Continuity
 
-Last session: 2026-04-30T00:00:00.000Z
-Stopped at: Planned 22-authoring-ergonomics-and-canonical-recipes (3 plans)
+Last session: 2026-04-30T15:42:58.628Z
+Stopped at: Completed 22-01-PLAN.md - pipeline builder API on Rendro.Document
 Resume file: None
 
 **Planned Phase:** 22 (authoring-ergonomics-and-canonical-recipes) — 3 plans — 2026-04-30T00:00:00.000Z

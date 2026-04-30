@@ -83,6 +83,6 @@ Plans:
   3. Example documents reduce the amount of pagination glue Phoenix adopters need to write themselves.
 **Plans**: 3 plans
 Plans:
-- [ ] 22-01-PLAN.md — Add Pipeline Builder API to Rendro.Document
+- [x] 22-01-PLAN.md — Add Pipeline Builder API to Rendro.Document
 - [ ] 22-02-PLAN.md — Create Tiered Composition Invoice and Refactor Accrue Recipe
 - [ ] 22-03-PLAN.md — Update Phoenix Example Controller and README.md
