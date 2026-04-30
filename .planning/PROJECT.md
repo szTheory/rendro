@@ -10,22 +10,20 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Shipped Version:** v1.0 (MVP)
-The v1.0 milestone proved the core thesis: pure deterministic rendering, robust baseline layout/pagination, Phoenix integration helpers, pipeline telemetry, structured errors, and truthful CI/release verification contracts are all now shipped with committed proof.
+**Shipped Version:** v1.1 Layout Authoring Maturity (2026-04-30)
 
-**v1.1 in flight — Phase 22 complete:** Canonical recipes (`Rendro.Recipes.Invoice`) now compose documents through the new pipeable builder API (`Rendro.Document.new |> add_template |> set_template |> add_section`) and the Tiered Composition pattern (`document/2`, `page_template/1`, `sections/2`). The `Rendro.Adapters.Accrue` adapter and the Phoenix example controller adopt explicit `:header`/`:body`/`:footer` regions, eliminating the legacy `header:`/`footer:` kwargs from primary guidance. README leads adopters with the builder API + Tiered Composition; legacy kwargs are demoted to a backward-compat note.
+Rendro now has a stable layout-authoring contract on top of the v1.0 engine core. `v1.1` shipped explicit page templates, named regions, reusable sections, deterministic wrapped-text measurement, authored keep/break pagination semantics, truthful fit validation, runtime-consumed table split policy, structured diagnostics/proof surfaces, and canonical invoice/report guidance through recipes and the Phoenix example.
 
-## Current Milestone: v1.1 Layout Authoring Maturity
+**Previous Shipped Version:** v1.0 MVP (2026-04-28)
 
-**Goal:** Turn Rendro from a credible PDF engine into a credible document authoring base by making layout semantics, pagination behavior, and break diagnostics expressive enough for serious business documents.
+`v1.0` proved the core thesis: pure deterministic rendering, baseline layout/pagination, optional adapters, structured errors, and truthful CI/release verification contracts all ship with committed proof.
 
-**Target features:**
-- First-class break semantics such as `keep_together`, `keep_with_next`, and explicit break directives.
-- Reusable page templates, sections, and bounded layout regions for flow documents.
-- Deterministic width-aware text measurement and flow-page geometry instead of hard-coded layout assumptions.
-- Richer table sizing and pagination behavior with row integrity, repeated headers, and explicit split policy.
-- Truthful fixed-position fit validation and operator-facing break diagnostics.
-- Canonical recipes/examples that demonstrate the new authoring surface without app-specific pagination glue.
+## Next Milestone Goals
+
+- Add deterministic typography and asset support without weakening the existing layout contract.
+- Define truthful support boundaries for custom fonts, fallback chains, image/logo assets, and Unicode/i18n behavior.
+- Extend examples and verification proof so new rendering surfaces remain auditable and deterministic.
+- Decide whether first public Hex release readiness should be part of the next milestone or remain backlog until more real-world workloads are proven.
 
 ## Requirements
 
@@ -34,31 +32,24 @@ The v1.0 milestone proved the core thesis: pure deterministic rendering, robust 
 - [x] Merge-blocking verification is now truthful and executable: `mix ci` covers format, compile, tests, docs, and package build, and `mix verify` separates deterministic vs advisory lanes without early exit. Validated in Phase 12: Verification Chain Closure (`QUAL-01`, `QUAL-03`, `QUAL-05`).
 - [x] Deterministic CI gate regression is fixed and traceability state perfectly mirrors the true gate status. Validated in Phase 17: Deterministic CI Gate Recovery Traceability Resync (`QUAL-01`).
 - [x] Rendro v1.0 proved pure-core rendering, baseline layout primitives, optional adapters, and truthful operational verification as a shippable MVP. Validated at milestone close in `v1.0-REQUIREMENTS.md`.
+- [x] Rendro v1.1 proved layout-authoring maturity with explicit templates/regions, deterministic wrapped text, keep/break pagination semantics, truthful fit validation, stronger table continuation, diagnostics proof, and canonical recipes. Validated at milestone close in `v1.1-REQUIREMENTS.md`.
 
 ### Active
 
-- [ ] Engineers can author wrapped, width-constrained flow text with deterministic line-breaking behavior.
-- [ ] Engineers can define reusable page templates, sections, and layout regions instead of relying on a single default flow page.
-- [ ] Engineers can control pagination explicitly through keep/break directives and stable overflow semantics.
-- [ ] Engineers can render serious multi-page tables with deterministic sizing and row-split behavior.
-- [ ] Operators can see why a block moved, split, or overflowed through structured diagnostics and telemetry.
-- [ ] Maintainers can prove pagination invariants with deterministic regression fixtures that remain stable as later milestones add fonts, assets, and async workflows.
+- [ ] No active milestone requirements yet. Define the next milestone with `$gsd-new-milestone`.
 
 ### Out of Scope
 
 - HTML/CSS parity or browser-style layout behavior — Rendro remains a deterministic document engine, not a browser renderer.
 - WYSIWYG builders, hosted template editing, or app-specific layout hacks in core — they would widen surface area before the authoring contract is stable.
-- Custom font embedding, fallback chains, image/logo rendering, and broad Unicode/i18n claims — defer to the planned v1.2 typography/assets milestone.
-- Render manifests, persistence sinks, and richer async artifact lifecycle contracts — defer to the planned v1.3 async-delivery milestone.
+- Render manifests, persistence sinks, and richer async artifact lifecycle contracts — defer to a later async-delivery milestone.
 - Blanket PDF/A, PDF/UA, signature, or compliance claims — require validator-backed proof in the later trust/validation arc.
 
 ## Context
 
-Rendro's post-v1.0 challenge is no longer engine credibility; it is authoring depth. The shipped core proves that deterministic Elixir-native PDF generation works, but the current authoring model is still narrow: flow layout is mostly vertical block stacking, tables rely on fixed constants, flow pagination uses a default page template, and break behavior is not yet expressed as first-class document intent.
+Rendro's next challenge is no longer core authoring depth; it is rendering breadth without losing trust. The codebase now has stable layout semantics and proof surfaces, which means typography, assets, and broader public packaging can be tackled on top of a stronger base. The risk has shifted from missing author intent to overclaiming what the engine supports once fonts, fallback chains, logos, and wider release expectations enter the picture.
 
-That makes v1.1 the structural milestone for the rest of the epic. v1.2 needs stable measurement and layout-region contracts before fonts/assets can change metrics safely. v1.3 needs stable post-pagination structure and diagnostics before async artifact workflows can expose meaningful manifests or lifecycle metadata. If v1.1 cuts corners here, later milestones will be layering typography and operations on top of unstable pagination semantics.
-
-The codebase evidence is clear about the current gaps: `Rendro.Block`, `Rendro.Table`, `Rendro.Document`, and `Rendro.Page` expose only a thin authoring surface; `Rendro.Pipeline.Measure` still uses single-font and fixed-row assumptions; `Rendro.Pipeline.Paginate` depends on a default `%Rendro.Page{}` template and simplistic split logic; and several public API fields imply more than the engine currently honors (`Text.font`, `Table.width`, `Table.border`, and footer region semantics).
+That makes the next milestone a boundary-setting exercise as much as an implementation milestone. Font and asset work must preserve deterministic measurement and truthful diagnostics. A public Hex release should follow that proof, not substitute for it.
 
 ## Constraints
 
@@ -73,11 +64,25 @@ The codebase evidence is clear about the current gaps: `Rendro.Block`, `Rendro.T
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Make v1.1 a layout-authoring milestone before fonts/assets or async expansion | The current adoption gap is authoring depth, and both v1.2 and v1.3 depend on stable layout contracts | — Pending |
-| Add first-class break semantics instead of hiding pagination policy in ad hoc block behavior | Business documents need explicit author intent for page breaks and content grouping | — Pending |
-| Introduce reusable page templates/sections/regions for flow documents | Fonts, assets, headers/footers, and diagnostics all need stable placement surfaces | — Pending |
-| Refactor measurement/pagination around deterministic measured-layout contracts | Hard-coded constants cannot support future typography or trustworthy diagnostics | — Pending |
-| Treat break explanations as product behavior, not debug leftovers | Operators and adopters need to understand why a document split or overflowed | — Pending |
+| Make v1.1 a layout-authoring milestone before fonts/assets or async expansion | The current adoption gap was authoring depth, and later milestones depend on stable layout contracts | Shipped in v1.1 |
+| Add first-class break semantics instead of hiding pagination policy in ad hoc block behavior | Business documents need explicit author intent for page breaks and content grouping | Shipped in v1.1 |
+| Introduce reusable page templates/sections/regions for flow documents | Fonts, assets, headers/footers, and diagnostics need stable placement surfaces | Shipped in v1.1 |
+| Treat break explanations, diagnostics, and verification artifacts as product behavior | Operators and adopters need to understand why a document split or overflowed | Shipped in v1.1 |
+| Defer first public Hex release until support boundaries are battle-tested | Packaging ability alone is not the release bar for this library | Backlog (`Phase 999.1`) |
+
+## Archived Milestone Context
+
+<details>
+<summary>v1.1 milestone focus before ship</summary>
+
+- First-class break semantics such as `keep_together`, `keep_with_next`, and explicit break directives.
+- Reusable page templates, sections, and bounded layout regions for flow documents.
+- Deterministic width-aware text measurement and flow-page geometry instead of hard-coded layout assumptions.
+- Richer table sizing and pagination behavior with row integrity, repeated headers, and explicit split policy.
+- Truthful fixed-position fit validation and operator-facing break diagnostics.
+- Canonical recipes/examples that demonstrate the new authoring surface without app-specific pagination glue.
+
+</details>
 
 ## Evolution
 
@@ -97,4 +102,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-30 after Phase 22 (Authoring Ergonomics and Canonical Recipes) closed LAY-12.*
+*Last updated: 2026-04-30 after v1.1 milestone close.*

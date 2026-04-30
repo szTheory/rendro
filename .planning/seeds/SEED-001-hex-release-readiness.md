@@ -1,10 +1,12 @@
 ---
 id: SEED-001
-status: dormant
+status: complete
 planted: 2026-04-30T21:50:00Z
 planted_during: v1.0 / Phase 24 planning boundary
 trigger_when: when Rendro is battle-tested enough for a truthful first public Hex release
 scope: Medium
+resolved: 2026-04-30T00:00:00Z
+resolution: promoted to ROADMAP backlog as Phase 999.1 during v1.1 milestone-close preflight
 ---
 
 # SEED-001: Publish Rendro to Hex.pm when release readiness is real
@@ -53,3 +55,11 @@ Captured from session discussion: do not publish just because the package can be
 The release should wait until Rendro is battle-tested by the project’s own standards:
 deterministic layout behavior, truthful verification artifacts, realistic example value,
 and support boundaries that are honest enough for external users.
+
+## Resolution
+
+Resolved on 2026-04-30 by promoting this seed into the roadmap backlog as
+`Phase 999.1: First Hex Release Readiness (BACKLOG)`.
+
+This keeps the release-readiness work explicit for the next milestone-definition pass
+without leaving it as an unowned dormant seed that blocks milestone close.

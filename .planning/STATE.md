@@ -1,11 +1,11 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
+milestone: v1.1
+milestone_name: layout-authoring-maturity
 status: complete
-stopped_at: Phase 24 complete
-last_updated: "2026-04-30T19:18:08.066Z"
-last_activity: 2026-04-30 -- Phase 24 complete
+stopped_at: Milestone v1.1 archived; awaiting next milestone definition
+last_updated: "2026-04-30T23:59:00.000Z"
+last_activity: 2026-04-30 -- Milestone v1.1 archived
 progress:
   total_phases: 7
   completed_phases: 7
@@ -18,44 +18,47 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-28)
+See: .planning/PROJECT.md (updated 2026-04-30)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Milestone v1.1 complete
+**Current focus:** Planning the next milestone after shipping v1.1
 
 ## Current Position
 
-Phase: 24 — COMPLETE
-Plan: 2 of 2
-Status: Phase complete
-Last activity: 2026-04-30 -- Phase 24 complete
+Phase: —
+Plan: —
+Status: Planning next milestone
+Last activity: 2026-04-30 -- Milestone v1.1 archived
 
 Progress: [██████████] 100%
 
+## Milestone Snapshot
+
+- Milestone: `v1.1 Layout Authoring Maturity`
+- Phases: `18-24`
+- Plans: `17`
+- Tasks: `26`
+- Timeline: `2026-04-28` -> `2026-04-30`
+- Key accomplishments:
+  - Explicit page templates, named regions, and reusable sections now define the document-layout contract.
+  - Deterministic wrapped-text measurement and authored keep/break semantics now drive flow pagination.
+  - Table split policy now affects runtime pagination and has truthful verification closure.
+  - Diagnostics and pagination proof are public, test-backed surfaces.
+  - Canonical recipes and the Phoenix example now teach the supported authoring path.
+
 ## Performance Metrics
-
-**Velocity:**
-
-- Total plans completed: 13
-- Average duration: —
-- Total execution time: —
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 18 | 3/3 | — | — |
-| 19 | 3 | - | - |
-| 20 | 0/0 | — | — |
-| 21 | 0/0 | — | — |
-| 22 | 3 | - | - |
-| 23 | 2 | - | - |
-| 24 | 2 | - | - |
-
-**Recent Trend:**
-
-- Last 5 plans: Phase 18 P01, Phase 18 P02, Phase 18 P03
-- Trend: Phase 18 complete
+| 19 | 3/3 | — | — |
+| 20 | 2/2 | — | — |
+| 21 | 2/2 | — | — |
+| 22 | 3/3 | — | — |
+| 23 | 2/2 | — | — |
+| 24 | 2/2 | — | — |
 
 | Phase 18 P01 | 179 | 2 tasks | 9 files |
 | Phase 18 P02 | 9 min | 2 tasks | 9 files |
@@ -136,6 +139,7 @@ None yet.
 ### Blockers/Concerns
 
 - Historic v1.0 phase directories remain on disk for auditability. New roadmap numbering continues at Phase 18 to avoid collisions.
+- First public Hex release readiness is now explicit backlog scope as `Phase 999.1`; it is not yet committed as the next milestone.
 
 ## Deferred Items
 
@@ -157,7 +161,7 @@ Items acknowledged and carried forward from milestone scoping:
 ## Session Continuity
 
 Last session: 2026-04-30T19:14:05.490Z
-Stopped at: Completed 24-02-PLAN.md
+Stopped at: Archived v1.1 milestone artifacts
 Resume file: None
 
-**Planned Phase:** 24 (diagnostics-verification-and-traceability-closure) — 2 plans — 2026-04-30T00:00:00.000Z
+**Planned Phase:** None. Use `$gsd-new-milestone` to define the next milestone.
