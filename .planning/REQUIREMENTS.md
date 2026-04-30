@@ -68,7 +68,7 @@
 | LAY-11 | Phase 18 | Completed |
 | OBS-05 | Phase 21 | Pending |
 | QUAL-06 | Phase 21 | Pending |
-| LAY-12 | Phase 22 | Pending |
+| LAY-12 | Phase 22 | Complete |
 
 **Coverage:**
 - v1 requirements: 9 total
