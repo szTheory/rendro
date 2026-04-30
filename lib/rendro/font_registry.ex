@@ -20,6 +20,10 @@ defmodule Rendro.FontRegistry do
           required(:family) => built_in_family()
         }
 
+  @type resolve_error ::
+          {:unknown_logical_font, logical_name()}
+          | {:unsupported_font_reference, term()}
+
   @type t :: %__MODULE__{
           fonts: %{optional(logical_name()) => descriptor()},
           default_font: logical_name()
@@ -80,6 +84,29 @@ defmodule Rendro.FontRegistry do
   @spec helvetica() :: descriptor()
   def helvetica, do: @helvetica_descriptor
 
+  @doc """
+  Resolves an authored text font reference into one shared built-in descriptor.
+
+  The resolver only supports the registry-backed built-in fonts available in
+  Phase 25. It intentionally does not load external files, build fallback
+  chains, or expose embedding details.
+  """
+  @spec resolve(t(), Rendro.Text.font_ref(), logical_name()) ::
+          {:ok, descriptor()} | {:error, resolve_error()}
+  def resolve(%__MODULE__{} = registry, text_font_ref, document_default_font) do
+    with {:ok, logical_name} <- normalize_reference(text_font_ref, document_default_font),
+         {:ok, descriptor} <- fetch_descriptor(registry, logical_name) do
+      {:ok, descriptor}
+    end
+  end
+
+  @doc """
+  Converts a resolved built-in descriptor into the PDF font definition used by
+  downstream measurement and rendering stages.
+  """
+  @spec built_in(descriptor()) :: Rendro.PDF.Font.t()
+  def built_in(%{source: :built_in, family: :helvetica}), do: Rendro.PDF.Font.helvetica()
+
   defp built_in_descriptor(:helvetica), do: helvetica()
   defp built_in_descriptor(:Helvetica), do: helvetica()
   defp built_in_descriptor("Helvetica"), do: helvetica()
@@ -88,5 +115,19 @@ defmodule Rendro.FontRegistry do
   defp built_in_descriptor(built_in) do
     raise ArgumentError,
           "unsupported built_in font #{inspect(built_in)}; only :helvetica compatibility is available in Phase 25"
+  end
+
+  defp normalize_reference(font, _document_default_font) when is_atom(font), do: {:ok, font}
+  defp normalize_reference(font, document_default_font) when font in ["Helvetica", "helvetica"],
+    do: {:ok, document_default_font}
+
+  defp normalize_reference(font, _document_default_font),
+    do: {:error, {:unsupported_font_reference, font}}
+
+  defp fetch_descriptor(registry, logical_name) do
+    case fetch(registry, logical_name) do
+      {:ok, descriptor} -> {:ok, descriptor}
+      :error -> {:error, {:unknown_logical_font, logical_name}}
+    end
   end
 end
