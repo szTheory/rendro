@@ -24,6 +24,12 @@ defmodule Rendro.Document do
   such as `:level` and `:type` are always present, event-specific optional keys
   such as `:message`, `:page_index`, `:reason`, and `:keep_rule` may appear, and
   future additive keys are allowed.
+
+  ## Typography
+
+  Documents own the logical font registry used by authored content. The default
+  registry keeps a narrow Helvetica-compatible path available out of the box
+  while letting callers register additional logical names as pure data.
   """
 
   @enforce_keys []
@@ -33,6 +39,8 @@ defmodule Rendro.Document do
             page_template: nil,
             sections: [],
             diagnostics: [],
+            font_registry: Rendro.FontRegistry.new(),
+            default_font: Rendro.FontRegistry.default_font(),
             header: [],
             footer: [],
             metadata: %Rendro.Metadata{},
@@ -45,6 +53,8 @@ defmodule Rendro.Document do
           page_template: atom() | String.t() | nil,
           sections: [Rendro.Section.t()],
           diagnostics: [map()],
+          font_registry: Rendro.FontRegistry.t(),
+          default_font: Rendro.FontRegistry.logical_name(),
           header: [Rendro.Block.t()],
           footer: [Rendro.Block.t()],
           metadata: Rendro.Metadata.t(),
@@ -106,6 +116,40 @@ defmodule Rendro.Document do
   @spec put_metadata(t(), Rendro.Metadata.t()) :: t()
   def put_metadata(%__MODULE__{} = doc, %Rendro.Metadata{} = metadata) do
     %__MODULE__{doc | metadata: metadata}
+  end
+
+  @doc """
+  Registers a logical font name on the document's owned font registry.
+
+  ## Examples
+
+      iex> Rendro.Document.new()
+      ...> |> Rendro.Document.register_font(:body, built_in: :helvetica)
+      %Rendro.Document{
+        font_registry: %Rendro.FontRegistry{
+          fonts: %{default: %{source: :built_in, family: :helvetica}, body: %{source: :built_in, family: :helvetica}}
+        }
+      }
+
+  """
+  @spec register_font(t(), Rendro.FontRegistry.logical_name(), keyword()) :: t()
+  def register_font(%__MODULE__{} = doc, logical_name, opts)
+      when is_atom(logical_name) and is_list(opts) do
+    %__MODULE__{
+      doc
+      | font_registry: Rendro.FontRegistry.register(doc.font_registry, logical_name, opts)
+    }
+  end
+
+  @doc """
+  Sets the document default logical font.
+
+  The logical name must already be registered on the document.
+  """
+  @spec put_default_font(t(), Rendro.FontRegistry.logical_name()) :: t()
+  def put_default_font(%__MODULE__{} = doc, logical_name) when is_atom(logical_name) do
+    registry = Rendro.FontRegistry.put_default_font(doc.font_registry, logical_name)
+    %__MODULE__{doc | font_registry: registry, default_font: registry.default_font}
   end
 
   @doc """

@@ -1,7 +1,7 @@
 defmodule Rendro.DocumentTest do
   use ExUnit.Case, async: true
 
-  alias Rendro.{Document, Metadata, Page, PageTemplate, Section}
+  alias Rendro.{Document, FontRegistry, Metadata, Page, PageTemplate, Section}
 
   describe "struct construction" do
     test "creates with defaults" do
@@ -11,6 +11,8 @@ defmodule Rendro.DocumentTest do
       assert doc.page_template == nil
       assert doc.sections == []
       assert doc.diagnostics == []
+      assert doc.font_registry == FontRegistry.new()
+      assert doc.default_font == :default
       assert doc.metadata == %Metadata{}
       assert doc.options == %{}
     end
@@ -27,6 +29,8 @@ defmodule Rendro.DocumentTest do
         page_template: :invoice,
         sections: [section],
         diagnostics: [%{level: :info, type: :table_split}],
+        font_registry: Document.new().font_registry,
+        default_font: :default,
         metadata: meta,
         options: %{deterministic: true}
       }
@@ -36,6 +40,8 @@ defmodule Rendro.DocumentTest do
       assert doc.page_template == :invoice
       assert doc.sections == [section]
       assert doc.diagnostics == [%{level: :info, type: :table_split}]
+      assert doc.font_registry.default_font == :default
+      assert doc.default_font == :default
       assert doc.metadata.title == "Test"
       assert doc.options.deterministic == true
     end
@@ -57,6 +63,8 @@ defmodule Rendro.DocumentTest do
       assert doc.page_template == nil
       assert doc.sections == []
       assert doc.diagnostics == []
+      assert doc.font_registry == FontRegistry.new()
+      assert doc.default_font == :default
       assert doc.metadata == %Metadata{}
       assert doc.options == %{}
     end
@@ -138,6 +146,38 @@ defmodule Rendro.DocumentTest do
       assert doc.page_template == :report
       assert doc.sections == [section]
       assert doc.options.deterministic == true
+    end
+
+    test "documents keep a built-in Helvetica-compatible default path" do
+      doc = Document.new()
+
+      assert doc.default_font == :default
+      assert {:ok, %{source: :built_in, family: :helvetica}} =
+               FontRegistry.fetch(doc.font_registry, :default)
+    end
+
+    test "register_font/3 adds a second logical font without mutating the source document" do
+      doc = Document.new()
+      updated_doc = Document.register_font(doc, :heading, built_in: :helvetica)
+
+      assert {:ok, %{source: :built_in, family: :helvetica}} =
+               FontRegistry.fetch(updated_doc.font_registry, :heading)
+
+      assert :error = FontRegistry.fetch(doc.font_registry, :heading)
+      assert doc.default_font == :default
+      assert updated_doc.default_font == :default
+    end
+
+    test "put_default_font/2 switches the document default to a registered logical font" do
+      doc =
+        Document.new()
+        |> Document.register_font(:body, built_in: "Helvetica")
+        |> Document.put_default_font(:body)
+
+      assert doc.default_font == :body
+      assert doc.font_registry.default_font == :body
+      assert {:ok, %{source: :built_in, family: :helvetica}} =
+               FontRegistry.fetch(doc.font_registry, :body)
     end
   end
 end
