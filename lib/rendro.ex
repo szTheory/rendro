@@ -73,6 +73,23 @@ defmodule Rendro do
     struct!(Document, attrs)
   end
 
+  @doc """
+  Registers a logical font name on a document.
+  """
+  @spec register_font(Document.t(), Rendro.FontRegistry.logical_name(), keyword()) :: Document.t()
+  def register_font(%Document{} = doc, logical_name, opts)
+      when is_atom(logical_name) and is_list(opts) do
+    Document.register_font(doc, logical_name, opts)
+  end
+
+  @doc """
+  Sets the default logical font for a document.
+  """
+  @spec put_default_font(Document.t(), Rendro.FontRegistry.logical_name()) :: Document.t()
+  def put_default_font(%Document{} = doc, logical_name) when is_atom(logical_name) do
+    Document.put_default_font(doc, logical_name)
+  end
+
   @spec page(keyword()) :: Page.t()
   def page(attrs \\ []) do
     struct!(Page, attrs)
@@ -100,7 +117,10 @@ defmodule Rendro do
 
   @spec text(String.t(), keyword()) :: Text.t()
   def text(content, attrs \\ []) do
-    struct!(Text, Keyword.put(attrs, :content, content))
+    attrs
+    |> normalize_text_attrs()
+    |> Keyword.put(:content, content)
+    |> then(&struct!(Text, &1))
   end
 
   @spec metadata(keyword()) :: Metadata.t()
@@ -132,6 +152,13 @@ defmodule Rendro do
         raise ArgumentError,
               "Rendro.table/2 only supports split_policy: :row_atomic" <>
                 " (or temporary alias :atomic); got: #{inspect(split_policy)}"
+    end
+  end
+
+  defp normalize_text_attrs(attrs) do
+    case Keyword.fetch(attrs, :font) do
+      {:ok, font} -> Keyword.put(attrs, :font, Text.normalize_font(font))
+      :error -> attrs
     end
   end
 end

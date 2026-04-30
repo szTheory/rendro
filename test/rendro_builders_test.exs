@@ -9,11 +9,24 @@ defmodule RendroBuildersTest do
       assert %Text{content: "hello", font: "Helvetica"} = text
     end
 
-    test "text/2 accepts attribute overrides" do
-      text = Rendro.text("bold", font: "Courier", size: 18, line_height: 1.5)
-      assert text.font == "Courier"
+    test "text/2 accepts logical font attribute overrides" do
+      text = Rendro.text("bold", font: :heading, size: 18, line_height: 1.5)
+      assert text.font == :heading
       assert text.size == 18
       assert text.line_height == 1.5
+    end
+
+    test "text/2 keeps the narrow Helvetica compatibility path" do
+      text = Rendro.text("compat", font: "helvetica")
+      assert text.font == "Helvetica"
+    end
+
+    test "text/2 rejects arbitrary string font escape hatches" do
+      assert_raise ArgumentError,
+                   ~r/only supports logical font atoms or the narrow Helvetica compatibility aliases/,
+                   fn ->
+        Rendro.text("bold", font: "Courier")
+      end
     end
 
     test "block/2 builds a Block with content" do
@@ -61,6 +74,17 @@ defmodule RendroBuildersTest do
     test "document/1 builds a Document struct" do
       doc = Rendro.document()
       assert %Document{pages: [], metadata: %Metadata{}} = doc
+    end
+
+    test "register_font/3 and put_default_font/2 wrap the document font registry API" do
+      doc =
+        Rendro.document()
+        |> Rendro.register_font(:heading, built_in: :helvetica)
+        |> Rendro.put_default_font(:heading)
+
+      assert doc.default_font == :heading
+      assert doc.font_registry.default_font == :heading
+      assert doc.font_registry.fonts.heading == %{source: :built_in, family: :helvetica}
     end
 
     test "flow/2 carries explicit template and section data" do
