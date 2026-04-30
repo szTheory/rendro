@@ -16,6 +16,14 @@ defmodule Rendro.Document do
 
   This supports dynamic, conditional assembly during a request cycle while
   keeping each transformation a pure function over the `%Rendro.Document{}` struct.
+
+  ## Diagnostics
+
+  `diagnostics` is the developer-facing layout-debug surface for non-fatal
+  pagination and measurement events. Entries stay map-based: stable common keys
+  such as `:level` and `:type` are always present, event-specific optional keys
+  such as `:message`, `:page_index`, `:reason`, and `:keep_rule` may appear, and
+  future additive keys are allowed.
   """
 
   @enforce_keys []
@@ -41,6 +49,24 @@ defmodule Rendro.Document do
           footer: [Rendro.Block.t()],
           metadata: Rendro.Metadata.t(),
           options: %{optional(atom()) => term()}
+        }
+
+  @typedoc """
+  Developer-facing layout-debug structured maps emitted during render.
+
+  Stable common keys such as `:level` and `:type` are present on every entry.
+  Event-specific optional keys such as `:message`, `:page_index`, `:reason`,
+  and `:keep_rule` may appear depending on the pagination event. Future additive
+  keys are allowed so callers should match only on the fields they need.
+  """
+  @type diagnostic :: %{
+          required(:level) => atom(),
+          required(:type) => atom(),
+          optional(:message) => String.t(),
+          optional(:page_index) => non_neg_integer(),
+          optional(:reason) => term(),
+          optional(:keep_rule) => atom(),
+          optional(atom()) => term()
         }
 
   @doc """

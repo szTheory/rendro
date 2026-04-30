@@ -233,7 +233,11 @@ doc = Rendro.fixed([page])
 
 Verified by the README compile/eval lane in `mix docs.contract`.
 
-When building documents, you may want to inspect the final laid-out structure or read warnings (like font fallbacks) generated during rendering. Rendro provides `render_with_diagnostics/2` to return the fully populated document struct alongside the PDF binary, and `Rendro.Inspector.inspect/1` to produce a human-readable layout tree.
+When building documents, you may want to inspect the final laid-out structure or
+read warnings generated during rendering. Rendro provides
+`render_with_diagnostics/2` to return the fully populated document struct
+alongside the PDF binary, and `Rendro.Inspector.inspect/1` to produce a
+human-readable layout tree.
 
 ```elixir
 # docs-contract: readme-inspector-compile
@@ -244,10 +248,17 @@ doc = Rendro.flow([Rendro.block(Rendro.text("Hello World"))])
 # Print a human-readable tree of pages, blocks, and dimensions
 IO.puts(Rendro.Inspector.inspect(final_doc))
 
-# Access structured diagnostics emitted during the pipeline
-# final_doc.diagnostics is a list of %Rendro.Document.Diagnostic{}
+# Access structured diagnostics emitted during the pipeline.
+# final_doc.diagnostics is a list of structured maps with stable common keys
+# such as :level and :type plus event-specific optional fields.
 _diagnostics = final_doc.diagnostics
 ```
+
+`final_doc.diagnostics` stays map-based. Stable common keys such as `:level` and
+`:type` are always present, event-specific optional fields may include
+`:message`, `:page_index`, `:reason`, and `:keep_rule`, and additive future keys
+are allowed. This surface is intended for developer-facing layout-debug work,
+while telemetry remains the operational render-span surface.
 
 ## Phoenix Integration
 

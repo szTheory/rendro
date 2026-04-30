@@ -19,6 +19,12 @@ defmodule Rendro do
   @doc """
   Renders the document and returns the binary along with the fully populated document struct.
   Useful for inspecting layout or reading populated diagnostics.
+
+  `final_doc.diagnostics` is a list of user-inspectable structured maps. Stable
+  common keys such as `:level` and `:type` are present on every entry, while
+  event-specific optional keys may include `:message`, `:page_index`, `:reason`,
+  and `:keep_rule`. This is the developer-facing layout-debug surface; telemetry
+  remains the operational span surface.
   """
   @spec render_with_diagnostics(Document.t(), render_options()) ::
           {:ok, binary(), Document.t()} | {:error, Rendro.Error.t()}
