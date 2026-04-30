@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 22-02-PLAN.md - Invoice Tiered Composition recipe + Accrue adapter refactor to explicit sections
-last_updated: "2026-04-30T15:47:12Z"
+stopped_at: Completed 22-03-PLAN.md - Phoenix example and README upgrade
+last_updated: "2026-04-30T15:55:49.893Z"
 last_activity: 2026-04-30 -- Phase --phase execution started
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 13
-  completed_plans: 12
-  percent: 92
+  completed_plans: 13
+  percent: 100
 ---
 
 # Project State
@@ -30,7 +30,7 @@ Plan: 1 of --name
 Status: Executing Phase --phase
 Last activity: 2026-04-30 -- Phase --phase execution started
 
-Progress: [█████████░] 85%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -67,6 +67,7 @@ Progress: [█████████░] 85%
 | Phase 21-break-diagnostics-and-pagination-proofs P21-02-PLAN.md | 20 | 2 tasks | 4 files |
 | Phase 22-authoring-ergonomics-and-canonical-recipes P22-01 | 5min | 1 tasks | 2 files |
 | Phase 22-authoring-ergonomics-and-canonical-recipes P22-02 | 2min | 2 tasks | 5 files |
+| Phase 22 P03 | 5min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -108,6 +109,9 @@ Recent decisions affecting current work:
 - Tiered Composition pattern: document/2 (batteries-included), page_template/1 (layout), sections/2 (content) for recipe escape hatches
 - Accrue adapter uses explicit page template sections; doc.header and doc.footer remain empty; all content through named regions
 - Rendro.Recipes.invoice/1 delegates to Rendro.Recipes.Invoice.document/1 for backward compatibility
+- Source-level test uses File.read! on controller to verify canonical recipe call without mocking
+- ConnCase uses import Plug.Conn + import Phoenix.ConnTest (non-deprecated form)
+- README non-runnable schematic blocks use elixir-schematic tag to avoid docs-contract enforcement
 
 ### Pending Todos
 
@@ -136,8 +140,8 @@ Items acknowledged and carried forward from milestone scoping:
 
 ## Session Continuity
 
-Last session: 2026-04-30T15:47:12Z
-Stopped at: Completed 22-02-PLAN.md - Invoice Tiered Composition recipe + Accrue adapter refactor to explicit sections
+Last session: 2026-04-30T15:55:49.888Z
+Stopped at: Completed 22-03-PLAN.md - Phoenix example and README upgrade
 Resume file: None
 
 **Planned Phase:** 22 (authoring-ergonomics-and-canonical-recipes) — 3 plans — 2026-04-30T00:00:00.000Z

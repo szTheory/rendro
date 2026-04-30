@@ -20,7 +20,7 @@ Rendro is progressing through iterative, verified milestones. `v1.0` proved the 
 - [x] **Phase 19: Deterministic Text Flow and Break Semantics** - Add width-aware text measurement plus explicit keep/break directives so pagination decisions reflect authored intent.
 - [ ] **Phase 20: Table Layout Maturity** - Replace demo-grade table sizing and split logic with deterministic multi-page table behavior fit for invoices and reports.
 - [ ] **Phase 21: Break Diagnostics and Pagination Proofs** - Make break/overflow causes observable and lock down pagination invariants with deterministic regression evidence.
-- [ ] **Phase 22: Authoring Ergonomics and Canonical Recipes** - Lift the new layout surface into recipes/examples/docs so downstream Phoenix teams can use it without ad hoc glue.
+- [x] **Phase 22: Authoring Ergonomics and Canonical Recipes** - Lift the new layout surface into recipes/examples/docs so downstream Phoenix teams can use it without ad hoc glue.
 
 ### Phase 18: Layout Contract and Page Template Model
 **Goal**: Establish the document-level layout structures that v1.1 and later milestones depend on.
@@ -85,4 +85,4 @@ Plans:
 Plans:
 - [x] 22-01-PLAN.md — Add Pipeline Builder API to Rendro.Document
 - [x] 22-02-PLAN.md — Create Tiered Composition Invoice and Refactor Accrue Recipe
-- [ ] 22-03-PLAN.md — Update Phoenix Example Controller and README.md
+- [x] 22-03-PLAN.md — Update Phoenix Example Controller and README.md
