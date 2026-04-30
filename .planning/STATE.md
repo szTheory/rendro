@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: layout-authoring-maturity
-status: complete
-stopped_at: Milestone v1.1 archived; awaiting next milestone definition
-last_updated: "2026-04-30T23:59:00.000Z"
-last_activity: 2026-04-30 -- Milestone v1.1 archived
+milestone: v1.2
+milestone_name: deterministic-typography-assets-and-honest-i18n-baseline
+status: planning
+stopped_at: Milestone v1.2 defined; ready for Phase 25 planning
+last_updated: "2026-04-30T23:59:30.000Z"
+last_activity: 2026-04-30 -- Milestone v1.2 started
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 17
-  completed_plans: 17
-  percent: 100
+  total_phases: 5
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,30 +21,28 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-30)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Planning the next milestone after shipping v1.1
+**Current focus:** Milestone v1.2 planning and Phase 25 kickoff
 
 ## Current Position
 
 Phase: —
 Plan: —
-Status: Planning next milestone
-Last activity: 2026-04-30 -- Milestone v1.1 archived
+Status: Milestone defined; ready to plan Phase 25
+Last activity: 2026-04-30 -- Milestone v1.2 started
 
-Progress: [██████████] 100%
+Progress: [░░░░░░░░░░] 0%
 
 ## Milestone Snapshot
 
-- Milestone: `v1.1 Layout Authoring Maturity`
-- Phases: `18-24`
-- Plans: `17`
-- Tasks: `26`
-- Timeline: `2026-04-28` -> `2026-04-30`
+- Milestone: `v1.2 Deterministic Typography, Assets, and Honest I18n Baseline`
+- Phases: `25-29` (planned)
+- Plans: `0`
+- Tasks: `0`
+- Timeline: `2026-04-30` -> `TBD`
 - Key accomplishments:
-  - Explicit page templates, named regions, and reusable sections now define the document-layout contract.
-  - Deterministic wrapped-text measurement and authored keep/break semantics now drive flow pagination.
-  - Table split policy now affects runtime pagination and has truthful verification closure.
-  - Diagnostics and pagination proof are public, test-backed surfaces.
-  - Canonical recipes and the Phoenix example now teach the supported authoring path.
+  - Font registration and deterministic measurement/render integration are now the next committed capability layer.
+  - Honest fallback, Unicode boundary, and asset-handling proof are defined before public release work.
+  - First public Hex release readiness is now intentionally queued immediately after `v1.2`.
 
 ## Performance Metrics
 
@@ -91,6 +89,8 @@ Recent decisions affecting current work:
 - [v1.1 Init] Scope the next milestone around layout-authoring maturity before fonts/assets or async artifact expansion.
 - [v1.1 Init] Treat break semantics, reusable page templates/regions, and deterministic measurement contracts as prerequisites for later milestones.
 - [v1.1 Init] Defer custom fonts/assets to v1.2 and async artifact lifecycle contracts to v1.3.
+- [v1.2 Init] Make deterministic typography, assets, and honest Unicode/i18n boundaries the next active milestone.
+- [v1.2 Init] Pull first public Hex release readiness ahead of async artifact operations once the branded-document support boundary is proved.
 - Model reusable flow geometry as a separate PageTemplate struct with named Region entries instead of extending Rendro.Page.
 - Keep flow template selection explicit on Rendro.Document with page_template and page_templates fields while preserving existing header/footer compatibility.
 - Normalize sections and named regions into internal layout metadata during Compose, then keep the public Document contract unchanged.
@@ -134,12 +134,12 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+- Plan Phase 25: Font Registry and Public Typography Contract.
 
 ### Blockers/Concerns
 
-- Historic v1.0 phase directories remain on disk for auditability. New roadmap numbering continues at Phase 18 to avoid collisions.
-- First public Hex release readiness is now explicit backlog scope as `Phase 999.1`; it is not yet committed as the next milestone.
+- Historic v1.0/v1.1 phase directories remain on disk for auditability. New roadmap numbering continues at Phase 25 to avoid collisions.
+- `gsd-sdk query init.new-milestone` still reports stale milestone metadata (`v1.0`), so milestone planning should continue to trust the checked-in `.planning` truth surfaces until tooling state is reconciled.
 
 ## Deferred Items
 
@@ -149,8 +149,9 @@ Items acknowledged and carried forward from milestone scoping:
 |----------|------|--------|-------------|
 | Typography | Custom font embedding, fallback chains, and Unicode/i18n claims | Deferred to v1.2 | 2026-04-28 |
 | Assets | Image/logo embedding and asset retrieval policy | Deferred to v1.2 | 2026-04-28 |
-| Async Ops | Render manifests, persistence sinks, retry/cancel lifecycle contracts | Deferred to v1.3 | 2026-04-28 |
-| Trust | Validator-backed compliance/signature surfaces | Deferred to v1.4 | 2026-04-28 |
+| Release | First public Hex release readiness | Deferred to v1.3 | 2026-04-30 |
+| Async Ops | Render manifests, persistence sinks, retry/cancel lifecycle contracts | Deferred to v1.4 | 2026-04-28 |
+| Trust | Validator-backed compliance/signature surfaces | Deferred to v1.5 | 2026-04-28 |
 
 ## Quick Tasks Completed
 
@@ -164,4 +165,4 @@ Last session: 2026-04-30T19:14:05.490Z
 Stopped at: Archived v1.1 milestone artifacts
 Resume file: None
 
-**Planned Phase:** None. Use `$gsd-new-milestone` to define the next milestone.
+**Planned Phase:** Phase 25. Use `$gsd-plan-phase 25` to start execution planning.

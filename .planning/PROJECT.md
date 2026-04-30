@@ -18,12 +18,15 @@ Rendro now has a stable layout-authoring contract on top of the v1.0 engine core
 
 `v1.0` proved the core thesis: pure deterministic rendering, baseline layout/pagination, optional adapters, structured errors, and truthful CI/release verification contracts all ship with committed proof.
 
-## Next Milestone Goals
+## Current Milestone: v1.2 Deterministic Typography, Assets, and Honest I18n Baseline
 
-- Add deterministic typography and asset support without weakening the existing layout contract.
-- Define truthful support boundaries for custom fonts, fallback chains, image/logo assets, and Unicode/i18n behavior.
-- Extend examples and verification proof so new rendering surfaces remain auditable and deterministic.
-- Decide whether first public Hex release readiness should be part of the next milestone or remain backlog until more real-world workloads are proven.
+**Goal:** Make Rendro capable of producing branded, customer-facing documents with deterministic typography and asset handling while keeping Unicode/i18n claims narrow, test-backed, and truthful.
+
+**Target features:**
+- Deterministic font registration, resolution, measurement, and embedding for built-in and custom fonts.
+- Explicit fallback chains plus typed missing-glyph and unsupported-script diagnostics.
+- First-class image/logo asset registration and bounded rendering without remote fetching in core.
+- Branded examples and verification proof that lock the public support surface before Hex release work begins.
 
 ## Requirements
 
@@ -36,29 +39,33 @@ Rendro now has a stable layout-authoring contract on top of the v1.0 engine core
 
 ### Active
 
-- [ ] No active milestone requirements yet. Define the next milestone with `$gsd-new-milestone`.
+- [ ] Deliver deterministic font registration and runtime selection that measurement and rendering both honor.
+- [ ] Ship custom-font embedding, fallback chains, and typed missing-glyph diagnostics without broad shaping claims.
+- [ ] Introduce first-class bounded image/logo asset support suitable for branded business documents.
+- [ ] Prove the typography/asset surface through branded examples, docs-contract assertions, and deterministic regression fixtures.
 
 ### Out of Scope
 
 - HTML/CSS parity or browser-style layout behavior — Rendro remains a deterministic document engine, not a browser renderer.
 - WYSIWYG builders, hosted template editing, or app-specific layout hacks in core — they would widen surface area before the authoring contract is stable.
-- Render manifests, persistence sinks, and richer async artifact lifecycle contracts — defer to a later async-delivery milestone.
+- Render manifests, persistence sinks, and richer async artifact lifecycle contracts — defer to the later async-delivery milestone after first release readiness.
 - Blanket PDF/A, PDF/UA, signature, or compliance claims — require validator-backed proof in the later trust/validation arc.
+- Remote asset fetching, broad complex-script support, and "supports every language" positioning — defer until the engine has proof surfaces for them.
 
 ## Context
 
-Rendro's next challenge is no longer core authoring depth; it is rendering breadth without losing trust. The codebase now has stable layout semantics and proof surfaces, which means typography, assets, and broader public packaging can be tackled on top of a stronger base. The risk has shifted from missing author intent to overclaiming what the engine supports once fonts, fallback chains, logos, and wider release expectations enter the picture.
+Rendro's next challenge is no longer core authoring depth; it is rendering breadth without losing trust. The codebase now has stable layout semantics and proof surfaces, which means typography and assets can be layered in as the next real adoption surface. The risk has shifted from missing author intent to overclaiming what the engine supports once fonts, fallback chains, logos, and wider Unicode expectations enter the picture.
 
-That makes the next milestone a boundary-setting exercise as much as an implementation milestone. Font and asset work must preserve deterministic measurement and truthful diagnostics. A public Hex release should follow that proof, not substitute for it.
+That makes `v1.2` a boundary-setting capability milestone. Font and asset work must preserve deterministic measurement, pagination truth, and explicit failure semantics. A first public Hex release should follow this proof layer immediately after `v1.2`, not be substituted for it.
 
 ## Constraints
 
 - **Tech stack**: Keep the core pure Elixir with no hard dependency on Phoenix, Oban, browser runtimes, or external layout engines — preserves deterministic deployment and product boundaries.
 - **Architecture**: Extend the existing `build -> compose -> measure -> paginate -> render -> validate` pipeline instead of creating an alternate rendering path — one engine must continue to power both APIs.
-- **Product scope**: v1.1 is an authoring-contract milestone, not a typography/assets or async-ops milestone — later milestones depend on a stable layout core.
-- **Determinism**: New layout semantics must remain deterministic and fixture-verifiable — pagination decisions cannot become heuristic or time/environment dependent.
-- **Documentation honesty**: Public API fields and examples must not imply support that the writer/layout engine does not actually honor.
-- **Verification**: Merge-blocking and docs-contract proof lanes must stay truthful while pagination semantics become more complex.
+- **Product scope**: `v1.2` is a typography/assets truth milestone, not a browser-layout, remote-asset, or broad internationalization milestone.
+- **Determinism**: New measurement, fallback, and asset-placement semantics must remain deterministic and fixture-verifiable — pagination decisions cannot become heuristic or environment dependent.
+- **Documentation honesty**: Public APIs, guides, and examples must not imply shaping, RTL, or asset-fetch behavior that the engine does not actually honor.
+- **Verification**: Merge-blocking, docs-contract, and example proof lanes must stay truthful while font and asset behavior expands.
 
 ## Key Decisions
 
@@ -68,7 +75,9 @@ That makes the next milestone a boundary-setting exercise as much as an implemen
 | Add first-class break semantics instead of hiding pagination policy in ad hoc block behavior | Business documents need explicit author intent for page breaks and content grouping | Shipped in v1.1 |
 | Introduce reusable page templates/sections/regions for flow documents | Fonts, assets, headers/footers, and diagnostics need stable placement surfaces | Shipped in v1.1 |
 | Treat break explanations, diagnostics, and verification artifacts as product behavior | Operators and adopters need to understand why a document split or overflowed | Shipped in v1.1 |
-| Defer first public Hex release until support boundaries are battle-tested | Packaging ability alone is not the release bar for this library | Backlog (`Phase 999.1`) |
+| Make v1.2 a typography/assets milestone before public release work | Branded documents and truthful support boundaries are the highest-leverage adoption layer after v1.1 | Active |
+| Pull first public Hex release readiness ahead of async artifact operations | A credible first public package depends more on finished branded document support than on richer queued-delivery workflows | Active future arc |
+| Defer first public Hex release until support boundaries are battle-tested | Packaging ability alone is not the release bar for this library | Backlog (`Phase 999.1`, targeted for v1.3) |
 
 ## Archived Milestone Context
 
@@ -83,6 +92,13 @@ That makes the next milestone a boundary-setting exercise as much as an implemen
 - Canonical recipes/examples that demonstrate the new authoring surface without app-specific pagination glue.
 
 </details>
+
+## Evolution Path
+
+- `v1.2` focuses on deterministic typography, assets, and honest Unicode/i18n boundaries.
+- `v1.3` should promote first public Hex release readiness from backlog into active scope if `v1.2` closes truthfully.
+- `v1.4` should tackle async delivery and artifact operations after the public release boundary is defined.
+- `v1.5` should strengthen validator-backed trust surfaces and support-matrix evidence.
 
 ## Evolution
 
@@ -102,4 +118,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-30 after v1.1 milestone close.*
+*Last updated: 2026-04-30 after starting v1.2 milestone planning.*
