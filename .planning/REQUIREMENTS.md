@@ -7,7 +7,7 @@
 
 ### Typography
 
-- [ ] **FONT-01**: Engineer can register document fonts by logical name and select them from authored text/components without dropping into PDF-writer internals.
+- [x] **FONT-01**: Engineer can register document fonts by logical name and select them from authored text/components without dropping into PDF-writer internals.
 - [ ] **FONT-02**: Measurement, pagination, and rendering use the same resolved font metrics so custom-font documents stay deterministic.
 - [ ] **FONT-03**: Engineer can embed supported custom fonts into generated PDFs through the supported document contract.
 
@@ -49,7 +49,7 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FONT-01 | Phase 25 | Pending |
+| FONT-01 | Phase 25 | Complete |
 | FONT-02 | Phase 26 | Pending |
 | FONT-03 | Phase 26 | Pending |
 | FONT-04 | Phase 27 | Pending |
@@ -68,4 +68,4 @@
 
 ---
 *Requirements defined: 2026-04-30*
-*Last updated: 2026-04-30 after v1.2 milestone definition*
+*Last updated: 2026-04-30 after Phase 25 execution and verification*

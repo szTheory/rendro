@@ -87,13 +87,13 @@ Each task was committed atomically:
 
 ### Auto-fixed Issues
 
-**1. [Rule 1 - Bug] Completed the measured-text resolver wiring after an incomplete executor edit left `measure.ex` unbalanced**
+**1. [Rule 1 - Bug] Completed the measured-text resolver wiring and restored pre-compose table validation compatibility after an incomplete executor edit left the phase half-finished**
 - **Found during:** Task 2 verification
-- **Issue:** The initial Wave 2 execution left `measure.ex` with missing `end` terminators and an incomplete `%MeasuredText{}` transition, which blocked compilation before the final regression suite could run.
-- **Fix:** Finished the resolver-backed `Measure` control flow, added the required `resolved_font` test fixture updates, and re-ran the full phase font-focused suite.
-- **Files modified:** `lib/rendro/pipeline/measure.ex`, `test/rendro/pdf/writer_test.exs`, `test/rendro/pipeline/measure_test.exs`
-- **Verification:** `mix test test/rendro/document_test.exs test/rendro/text_test.exs test/rendro_builders_test.exs test/rendro/pipeline/measure_test.exs test/rendro/pdf/font_test.exs test/rendro/pdf/writer_test.exs`
-- **Committed in:** `b5d1ad2`
+- **Issue:** The initial Wave 2 execution left `measure.ex` with missing `end` terminators and an incomplete `%MeasuredText{}` transition, and the first full-suite pass surfaced that raw table header/cell values still reach `Build` before Compose normalizes them.
+- **Fix:** Finished the resolver-backed `Measure` control flow, updated the writer/measure tests for resolved fonts, narrowed table-cell validation in `Build` to block-backed cells, and re-ran the full suite plus docs verification.
+- **Files modified:** `lib/rendro/pipeline/build.ex`, `lib/rendro/pipeline/measure.ex`, `test/rendro/pdf/writer_test.exs`, `test/rendro/pipeline/measure_test.exs`
+- **Verification:** `mix test && mix run scripts/verify_docs.exs`
+- **Committed in:** `0e9e6e0`
 
 ---
 
