@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 22-01-PLAN.md - pipeline builder API on Rendro.Document
-last_updated: "2026-04-30T15:43:01.265Z"
+stopped_at: Completed 22-02-PLAN.md - Invoice Tiered Composition recipe + Accrue adapter refactor to explicit sections
+last_updated: "2026-04-30T15:47:12Z"
 last_activity: 2026-04-30 -- Phase --phase execution started
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 13
-  completed_plans: 11
-  percent: 85
+  completed_plans: 12
+  percent: 92
 ---
 
 # Project State
@@ -66,6 +66,7 @@ Progress: [█████████░] 85%
 | Phase 21 P01 | 10m | 2 tasks | 7 files |
 | Phase 21-break-diagnostics-and-pagination-proofs P21-02-PLAN.md | 20 | 2 tasks | 4 files |
 | Phase 22-authoring-ergonomics-and-canonical-recipes P22-01 | 5min | 1 tasks | 2 files |
+| Phase 22-authoring-ergonomics-and-canonical-recipes P22-02 | 2min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,9 @@ Recent decisions affecting current work:
 - Expose pipeline builder API directly on Rendro.Document module to keep function discovery co-located with the struct definition
 - Use append semantics (list ++ [item]) for add_template/2 and add_section/2 to preserve insertion order
 - Use Map.merge/2 for put_options/2 to allow incremental option accumulation over multiple pipe stages
+- Tiered Composition pattern: document/2 (batteries-included), page_template/1 (layout), sections/2 (content) for recipe escape hatches
+- Accrue adapter uses explicit page template sections; doc.header and doc.footer remain empty; all content through named regions
+- Rendro.Recipes.invoice/1 delegates to Rendro.Recipes.Invoice.document/1 for backward compatibility
 
 ### Pending Todos
 
@@ -132,8 +136,8 @@ Items acknowledged and carried forward from milestone scoping:
 
 ## Session Continuity
 
-Last session: 2026-04-30T15:42:58.628Z
-Stopped at: Completed 22-01-PLAN.md - pipeline builder API on Rendro.Document
+Last session: 2026-04-30T15:47:12Z
+Stopped at: Completed 22-02-PLAN.md - Invoice Tiered Composition recipe + Accrue adapter refactor to explicit sections
 Resume file: None
 
 **Planned Phase:** 22 (authoring-ergonomics-and-canonical-recipes) — 3 plans — 2026-04-30T00:00:00.000Z

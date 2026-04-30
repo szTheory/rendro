@@ -84,5 +84,5 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 22-01-PLAN.md — Add Pipeline Builder API to Rendro.Document
-- [ ] 22-02-PLAN.md — Create Tiered Composition Invoice and Refactor Accrue Recipe
+- [x] 22-02-PLAN.md — Create Tiered Composition Invoice and Refactor Accrue Recipe
 - [ ] 22-03-PLAN.md — Update Phoenix Example Controller and README.md
