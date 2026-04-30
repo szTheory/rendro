@@ -87,9 +87,22 @@ defmodule RendroBuildersTest do
       assert %Metadata{title: "Test", author: "Agent"} = meta
     end
 
-    test "table/2 builds a Table struct and supports columns and split_policy" do
+    test "table/2 builds a Table struct with canonical row-atomic split policy" do
+      table = Rendro.table([["1"]], columns: [{:fixed, 100}], split_policy: :row_atomic)
+      assert %Table{rows: [["1"]], columns: [{:fixed, 100}], split_policy: :row_atomic} = table
+    end
+
+    test "table/2 normalizes the temporary :atomic split-policy alias" do
       table = Rendro.table([["1"]], columns: [{:fixed, 100}], split_policy: :atomic)
-      assert %Table{rows: [["1"]], columns: [{:fixed, 100}], split_policy: :atomic} = table
+      assert %Table{rows: [["1"]], columns: [{:fixed, 100}], split_policy: :row_atomic} = table
+    end
+
+    test "table/2 rejects unsupported split_policy values explicitly" do
+      assert_raise ArgumentError,
+                   ~r/only supports split_policy: :row_atomic \(or temporary alias :atomic\); got: :whole_table/,
+                   fn ->
+        Rendro.table([["1"]], columns: [{:fixed, 100}], split_policy: :whole_table)
+      end
     end
 
     test "table/2 rejects removed fields like width and border" do

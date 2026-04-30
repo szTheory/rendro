@@ -108,6 +108,24 @@ defmodule Rendro do
       raise ArgumentError, "Rendro.table/2 no longer supports :width or :border. Use explicit block width and table :columns rules instead."
     end
 
-    struct!(Table, Keyword.put(attrs, :rows, rows))
+    attrs
+    |> normalize_table_attrs()
+    |> Keyword.put(:rows, rows)
+    |> then(&struct!(Table, &1))
+  end
+
+  defp normalize_table_attrs(attrs) do
+    case Keyword.get(attrs, :split_policy, :row_atomic) do
+      :row_atomic ->
+        Keyword.put(attrs, :split_policy, :row_atomic)
+
+      :atomic ->
+        Keyword.put(attrs, :split_policy, :row_atomic)
+
+      split_policy ->
+        raise ArgumentError,
+              "Rendro.table/2 only supports split_policy: :row_atomic" <>
+                " (or temporary alias :atomic); got: #{inspect(split_policy)}"
+    end
   end
 end
