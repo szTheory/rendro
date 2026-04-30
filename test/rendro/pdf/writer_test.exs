@@ -1,7 +1,7 @@
 defmodule Rendro.PDF.WriterTest do
   use ExUnit.Case, async: true
 
-  alias Rendro.PDF.Writer
+  alias Rendro.PDF.{Font, Writer}
   alias Rendro.Pipeline.MeasuredText
 
   defp sample_document do
@@ -71,7 +71,7 @@ defmodule Rendro.PDF.WriterTest do
 
     test "contains text content with Tf/Td/Tj operators" do
       {:ok, pdf} = Writer.render(sample_document())
-      assert pdf =~ "/F1"
+      assert pdf =~ "/F_DEFAULT"
       assert pdf =~ "Tf"
       assert pdf =~ "Td"
       assert pdf =~ "(Hello, Rendro!) Tj"
@@ -171,7 +171,8 @@ defmodule Rendro.PDF.WriterTest do
           lines: ["alpha beta", "gamma"],
           line_height: source.line_height,
           width: 60,
-          height: 36
+          height: 36,
+          resolved_font: Font.helvetica()
         }
 
       block = %Rendro.Block{content: measured, x: 10, y: 20, width: 60, height: 36}
@@ -191,6 +192,25 @@ defmodule Rendro.PDF.WriterTest do
       assert length(Regex.scan(~r/\) Tj/, pdf)) == 2
       assert pdf =~ "0 -18.0000 Td"
       refute pdf =~ "(alpha beta gamma) Tj"
+    end
+
+    test "renders a registered logical font through the shared font resource name" do
+      doc =
+        Rendro.document()
+        |> Rendro.register_font(:heading, built_in: :helvetica)
+        |> Map.put(:pages, [
+          %Rendro.Page{
+            blocks: [
+              %Rendro.Block{content: Rendro.text("Heading", font: :heading), x: 0, y: 0}
+            ]
+          }
+        ])
+
+      {:ok, pdf} = Writer.render(doc)
+
+      assert pdf =~ "/F_HEADING"
+      assert pdf =~ "/BaseFont /Helvetica"
+      assert pdf =~ "(Heading) Tj"
     end
   end
 

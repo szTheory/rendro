@@ -101,11 +101,29 @@ defmodule Rendro.FontRegistry do
   end
 
   @doc """
+  Resolves an authored text font reference into the concrete built-in PDF font
+  struct used by deterministic measurement and rendering.
+  """
+  @spec resolve_pdf_font(t(), Rendro.Text.font_ref(), logical_name()) ::
+          {:ok, Rendro.PDF.Font.t()} | {:error, resolve_error()}
+  def resolve_pdf_font(%__MODULE__{} = registry, text_font_ref, document_default_font) do
+    with {:ok, logical_name} <- normalize_reference(text_font_ref, document_default_font),
+         {:ok, descriptor} <- fetch_descriptor(registry, logical_name) do
+      {:ok, built_in(descriptor, logical_name)}
+    end
+  end
+
+  @doc """
   Converts a resolved built-in descriptor into the PDF font definition used by
   downstream measurement and rendering stages.
   """
   @spec built_in(descriptor()) :: Rendro.PDF.Font.t()
   def built_in(%{source: :built_in, family: :helvetica}), do: Rendro.PDF.Font.helvetica()
+
+  @spec built_in(descriptor(), logical_name()) :: Rendro.PDF.Font.t()
+  def built_in(%{source: :built_in, family: :helvetica}, logical_name) do
+    %Rendro.PDF.Font{Rendro.PDF.Font.helvetica() | name: resource_name(logical_name)}
+  end
 
   defp built_in_descriptor(:helvetica), do: helvetica()
   defp built_in_descriptor(:Helvetica), do: helvetica()
@@ -129,5 +147,13 @@ defmodule Rendro.FontRegistry do
       {:ok, descriptor} -> {:ok, descriptor}
       :error -> {:error, {:unknown_logical_font, logical_name}}
     end
+  end
+
+  defp resource_name(logical_name) do
+    logical_name
+    |> Atom.to_string()
+    |> String.upcase()
+    |> String.replace(~r/[^A-Z0-9]/u, "_")
+    |> then(&"F_#{&1}")
   end
 end

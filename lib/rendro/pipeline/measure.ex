@@ -9,102 +9,115 @@ defmodule Rendro.Pipeline.Measure do
   (each `block.width || ...` keeps user-supplied values).
   """
 
+  alias Rendro.FontRegistry
   alias Rendro.PDF.Font
   alias Rendro.Pipeline.MeasuredText
   alias Rendro.Region
 
   @spec run(Rendro.Document.t()) :: {:ok, Rendro.Document.t()} | {:error, term()}
   def run(%Rendro.Document{} = doc) do
-    font = Font.helvetica()
-
-    doc
-    |> measure_pages(font)
-    |> measure_content(font)
-    |> measure_layout(font)
+    with {:ok, pages} <- measure_pages(doc, doc.pages),
+         {:ok, content} <- measure_content(doc, doc.content),
+         {:ok, measured_doc} <- measure_layout(doc, doc.options[:layout]) do
+      {:ok, %{measured_doc | pages: pages, content: content}}
+    end
   end
 
-  defp measure_pages(%Rendro.Document{pages: pages} = doc, font) do
-    measured_pages = Enum.map(pages, &measure_page(&1, font))
-    %{doc | pages: measured_pages}
+  defp measure_pages(doc, pages) do
+    map_ok(pages, &measure_page(doc, &1))
   end
 
-  defp measure_content(%Rendro.Document{content: content} = doc, font) do
-    measured_content = Enum.map(content, &measure_block(&1, font))
-    %{doc | content: measured_content}
+  defp measure_content(doc, content) do
+    map_ok(content, &measure_block(doc, &1))
   end
 
-  defp measure_page(%Rendro.Page{blocks: blocks} = page, font) do
-    measured_blocks = Enum.map(blocks, &measure_block(&1, font))
-    %{page | blocks: measured_blocks}
+  defp measure_page(doc, %Rendro.Page{blocks: blocks} = page) do
+    with {:ok, measured_blocks} <- map_ok(blocks, &measure_block(doc, &1)) do
+      {:ok, %{page | blocks: measured_blocks}}
+    end
   end
 
-  defp measure_block(block, font, container_width \\ nil)
+  defp measure_block(doc, block, container_width \\ nil)
 
-  defp measure_block(%Rendro.Block{content: %Rendro.Table{} = table} = block, font, container_width) do
+  defp measure_block(
+         doc,
+         %Rendro.Block{content: %Rendro.Table{} = table} = block,
+         container_width
+       ) do
     width = block.width || container_width || 595.28
-    
+
     col_count = max_columns(table)
     col_widths = resolve_columns(table.columns, col_count, width)
 
-    {measured_header, header_h} = measure_table_row(table.header, col_widths, font)
-    
-    {measured_rows, row_heights} = 
-      Enum.map_reduce(table.rows, [], fn row, acc ->
-        {m_row, r_h} = measure_table_row(row, col_widths, font)
-        {m_row, [r_h | acc]}
-      end)
-      
-    row_heights = Enum.reverse(row_heights)
-    rows_h = Enum.sum(row_heights)
-    
-    height = header_h + rows_h
+    with {:ok, {measured_header, header_h}} <- measure_table_row(doc, table.header, col_widths),
+         {:ok, {measured_rows, row_heights}} <- measure_table_rows(doc, table.rows, col_widths) do
+      rows_h = Enum.sum(row_heights)
+      height = header_h + rows_h
 
-    table = %{table | 
-      header: measured_header, 
-      rows: measured_rows,
-      column_widths: col_widths,
-      row_heights: row_heights,
-      header_height: header_h
-    }
-    
-    %{block | content: table, width: width, height: height}
+      table = %{
+        table
+        | header: measured_header,
+          rows: measured_rows,
+          column_widths: col_widths,
+          row_heights: row_heights,
+          header_height: header_h
+      }
+
+      {:ok, %{block | content: table, width: width, height: height}}
+    end
   end
 
-  defp measure_block(%Rendro.Block{content: %Rendro.Text{} = text} = block, font, _container_width) do
-    lines = wrap_text(text.content, block.width, font, text.size)
-    measured_width = measured_text_width(lines, font, text.size)
-    width = block.width || measured_width
-    measured_height = text.size * text.line_height * length(lines)
-    height = block.height || measured_height
+  defp measure_block(doc, %Rendro.Block{content: %Rendro.Text{} = text} = block, _container_width) do
+    with {:ok, font} <- resolve_font(doc, text) do
+      lines = wrap_text(text.content, block.width, font, text.size)
+      measured_width = measured_text_width(lines, font, text.size)
+      width = block.width || measured_width
+      measured_height = text.size * text.line_height * length(lines)
+      height = block.height || measured_height
 
-    measured_text = %MeasuredText{
-      source: text,
-      lines: lines,
-      line_height: text.line_height,
-      width: measured_width,
-      height: measured_height
-    }
+      measured_text = %MeasuredText{
+        source: text,
+        lines: lines,
+        line_height: text.line_height,
+        width: measured_width,
+        height: measured_height,
+        resolved_font: font
+      }
 
-    %{block | content: measured_text, width: width, height: height}
+      {:ok, %{block | content: measured_text, width: width, height: height}}
+    end
   end
 
-  defp measure_block(block, _font, _container_width), do: block
+  defp measure_block(_doc, block, _container_width), do: {:ok, block}
 
-  defp measure_table_row(nil, _col_widths, _font), do: {nil, 0}
-  defp measure_table_row(row, col_widths, font) do
-    measured_cells =
-      row
-      |> Enum.zip(col_widths)
-      |> Enum.map(fn {cell_block, c_width} ->
-        measure_block(%{cell_block | width: c_width}, font, c_width)
-      end)
-    
-    max_height = 
-      measured_cells
-      |> Enum.map(&(&1.height || 0))
-      |> Enum.max(fn -> 0 end)
-      
-    {measured_cells, max_height}
+  defp measure_table_row(_doc, nil, _col_widths), do: {:ok, {nil, 0}}
+
+  defp measure_table_row(doc, row, col_widths) do
+    with {:ok, measured_cells} <-
+           row
+           |> Enum.zip(col_widths)
+           |> map_ok(fn {cell_block, c_width} ->
+             measure_block(doc, %{cell_block | width: c_width}, c_width)
+           end) do
+      max_height =
+        measured_cells
+        |> Enum.map(&(&1.height || 0))
+        |> Enum.max(fn -> 0 end)
+
+      {:ok, {measured_cells, max_height}}
+    end
+  end
+
+  defp measure_table_rows(doc, rows, col_widths) do
+    Enum.reduce_while(rows, {:ok, {[], []}}, fn row, {:ok, {measured_rows, heights}} ->
+      case measure_table_row(doc, row, col_widths) do
+        {:ok, {measured_row, row_height}} ->
+          {:cont, {:ok, {measured_rows ++ [measured_row], heights ++ [row_height]}}}
+
+        {:error, _} = err ->
+          {:halt, err}
+      end
+    end)
   end
 
   defp max_columns(%Rendro.Table{header: header, rows: rows}) do
@@ -152,42 +165,51 @@ defmodule Rendro.Pipeline.Measure do
     end
   end
 
-  defp measure_layout(%Rendro.Document{options: %{layout: layout}} = doc, font) do
-    measured_region_blocks =
-      Enum.into(layout.region_blocks, %{}, fn {name, blocks} ->
-        region_width =
-          case name do
-            :body -> layout.body_region.width
-            _ -> 
-              region = Enum.find(layout.template.regions, &(&1.name == name))
-              if region, do: region.width, else: nil
-          end
-          
-        {name, Enum.map(blocks, &measure_block(&1, font, region_width))}
-      end)
+  defp measure_layout(%Rendro.Document{} = doc, nil), do: {:ok, doc}
 
-    measured_layout =
-      layout
-      |> Map.put(:region_blocks, measured_region_blocks)
-      |> Map.put(:body_capacity, body_capacity(layout))
+  defp measure_layout(%Rendro.Document{} = doc, layout) do
+    with {:ok, measured_region_blocks} <- measure_region_blocks(doc, layout) do
+      measured_layout =
+        layout
+        |> Map.put(:region_blocks, measured_region_blocks)
+        |> Map.put(:body_capacity, body_capacity(layout))
 
-    if measured_layout.body_capacity <= 0 do
-      {:error, :no_body_capacity}
-    else
-      body_blocks = Map.get(measured_region_blocks, :body, [])
-      header_blocks = Map.get(measured_region_blocks, :header, [])
-      footer_blocks = Map.get(measured_region_blocks, :footer, [])
+      if measured_layout.body_capacity <= 0 do
+        {:error, :no_body_capacity}
+      else
+        body_blocks = Map.get(measured_region_blocks, :body, [])
+        header_blocks = Map.get(measured_region_blocks, :header, [])
+        footer_blocks = Map.get(measured_region_blocks, :footer, [])
 
-      {:ok,
-       doc
-       |> put_in([Access.key(:options), :layout], measured_layout)
-       |> Map.put(:content, body_blocks)
-       |> Map.put(:header, header_blocks)
-       |> Map.put(:footer, footer_blocks)}
+        {:ok,
+         doc
+         |> put_in([Access.key(:options), :layout], measured_layout)
+         |> Map.put(:content, body_blocks)
+         |> Map.put(:header, header_blocks)
+         |> Map.put(:footer, footer_blocks)}
+      end
     end
   end
 
-  defp measure_layout(%Rendro.Document{} = doc, _font), do: {:ok, doc}
+  defp measure_region_blocks(doc, layout) do
+    Enum.reduce_while(layout.region_blocks, {:ok, %{}}, fn {name, blocks}, {:ok, acc} ->
+      region_width =
+        case name do
+          :body -> layout.body_region.width
+          _ ->
+            region = Enum.find(layout.template.regions, &(&1.name == name))
+            if region, do: region.width, else: nil
+        end
+
+      case map_ok(blocks, &measure_block(doc, &1, region_width)) do
+        {:ok, measured_blocks} ->
+          {:cont, {:ok, Map.put(acc, name, measured_blocks)}}
+
+        {:error, _} = err ->
+          {:halt, err}
+      end
+    end)
+  end
 
   defp body_capacity(%{body_region: %Region{height: height}}) when is_number(height), do: height
   defp body_capacity(_layout), do: 0
@@ -235,6 +257,22 @@ defmodule Rendro.Pipeline.Measure do
     else
       split_graphemes(chunk, max_width, font, font_size)
     end
+  end
+
+  defp resolve_font(
+         %Rendro.Document{font_registry: registry, default_font: default_font},
+         %Rendro.Text{font: font}
+       ) do
+    FontRegistry.resolve_pdf_font(registry, font, default_font)
+  end
+
+  defp map_ok(enum, fun) do
+    Enum.reduce_while(enum, {:ok, []}, fn item, {:ok, acc} ->
+      case fun.(item) do
+        {:ok, value} -> {:cont, {:ok, acc ++ [value]}}
+        {:error, _} = err -> {:halt, err}
+      end
+    end)
   end
 
   defp split_graphemes(text, max_width, font, font_size) do

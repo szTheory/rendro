@@ -228,6 +228,25 @@ defmodule Rendro.Pipeline.MeasureTest do
       assert length(constrained_block.content.lines) > 1
     end
 
+    test "routes a registered logical font through measurement" do
+      doc =
+        Rendro.document()
+        |> Rendro.register_font(:heading, built_in: :helvetica)
+        |> Map.put(:pages, [
+          %Rendro.Page{
+            blocks: [
+              Rendro.block(Rendro.text("Heading", font: :heading), x: 0, y: 0)
+            ]
+          }
+        ])
+
+      assert {:ok, result} = Measure.run(doc)
+      [block] = hd(result.pages).blocks
+
+      assert %MeasuredText{resolved_font: %{name: "F_HEADING", base_font: "Helvetica"}} =
+               block.content
+    end
+
     test "resolves authored column rules deterministically against block width" do
       table = Rendro.table(
         [["a", "b", "c"]],
