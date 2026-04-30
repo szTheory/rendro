@@ -81,4 +81,8 @@ Plans:
   1. Canonical invoice/report recipes use the new layout primitives rather than ad hoc block stacking.
   2. README and guides show how to compose serious business documents with the supported authoring surface.
   3. Example documents reduce the amount of pagination glue Phoenix adopters need to write themselves.
-**Plans**: 2 plans
+**Plans**: 3 plans
+Plans:
+- [ ] 22-01-PLAN.md — Add Pipeline Builder API to Rendro.Document
+- [ ] 22-02-PLAN.md — Create Tiered Composition Invoice and Refactor Accrue Recipe
+- [ ] 22-03-PLAN.md — Update Phoenix Example Controller and README.md
