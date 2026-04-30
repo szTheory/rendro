@@ -78,4 +78,4 @@
 `OBS-05` and `QUAL-06` use the same hybrid closure model: Phase 21 shipped the diagnostics accumulation and inspector proof surfaces, `21-VERIFICATION.md` records that historical implementation truthfully, and Phase 24 provides the authoritative closure in `24-VERIFICATION.md`.
 
 ---
-*Last updated: 2026-04-30 after Phase 23 verification and traceability closure*
+*Last updated: 2026-04-30 after Phase 24 diagnostics verification and traceability closure*
