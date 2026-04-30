@@ -75,7 +75,7 @@ Plans:
 Plans:
 - [x] 21-01-PLAN.md — Structural Diagnostics in Document Model & Pipeline Accumulators
 - [x] 21-02-PLAN.md — ASCII Layout Tree Inspector & ExUnit Snapshots
-**Closure Note**: Phase 21 is the historical implementation owner for `OBS-05` and `QUAL-06`: it shipped diagnostics accumulation and inspector-based pagination proofs, but the missing `21-VERIFICATION.md`, incomplete validation metadata, and README contract drift kept the requirement chain historically open until Phase 24.
+**Closure Note:** Phase 21 is the historical implementation owner for `OBS-05` and `QUAL-06`: it shipped diagnostics accumulation and inspector-based pagination proofs, but the missing `21-VERIFICATION.md`, incomplete validation metadata, and README contract drift kept the requirement chain historically open until Phase 24.
 
 ### Phase 22: Authoring Ergonomics and Canonical Recipes
 **Goal**: Convert the stronger engine surface into an adoption-ready authoring experience.
@@ -121,4 +121,4 @@ Plans:
 Plans:
 - [x] 24-01-PLAN.md — Diagnostics contract repair, focused public proof, and validation normalization
 - [x] 24-02-PLAN.md — Historical repair, authoritative closure proof, and traceability synchronization
-**Closure Note**: Phase 24 is the authoritative closure point for `OBS-05` and `QUAL-06`: it repairs the missing Phase 21 verification artifact chain, cites the historical implementation owner, and synchronizes roadmap and requirement state only after `24-VERIFICATION.md` exists.
+**Closure Note:** Phase 24 is the authoritative closure point for `OBS-05` and `QUAL-06`: it repairs the missing Phase 21 verification artifact chain, cites the historical implementation owner, and synchronizes roadmap and requirement state only after `24-VERIFICATION.md` exists.
