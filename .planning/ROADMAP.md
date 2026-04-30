@@ -21,6 +21,8 @@ Rendro is progressing through iterative, verified milestones. `v1.0` proved the 
 - [ ] **Phase 20: Table Layout Maturity** - Replace demo-grade table sizing and split logic with deterministic multi-page table behavior fit for invoices and reports.
 - [ ] **Phase 21: Break Diagnostics and Pagination Proofs** - Make break/overflow causes observable and lock down pagination invariants with deterministic regression evidence.
 - [x] **Phase 22: Authoring Ergonomics and Canonical Recipes** - Lift the new layout surface into recipes/examples/docs so downstream Phoenix teams can use it without ad hoc glue.
+- [ ] **Phase 23: Table Split Policy Runtime Wiring** - Close the remaining table contract gap by wiring authored split policy into pagination and re-verifying the phase.
+- [ ] **Phase 24: Diagnostics Verification and Traceability Closure** - Close the missing diagnostics/pagination-proof verification chain and align docs/traceability with the shipped surface.
 
 ### Phase 18: Layout Contract and Page Template Model
 **Goal**: Establish the document-level layout structures that v1.1 and later milestones depend on.
@@ -86,3 +88,27 @@ Plans:
 - [x] 22-01-PLAN.md — Add Pipeline Builder API to Rendro.Document
 - [x] 22-02-PLAN.md — Create Tiered Composition Invoice and Refactor Accrue Recipe
 - [x] 22-03-PLAN.md — Update Phoenix Example Controller and README.md
+
+### Phase 23: Table Split Policy Runtime Wiring
+**Goal**: Finish the table-layout milestone contract by making authored split policy affect runtime pagination and closing the missing verification chain for Phase 20.
+**Depends on**: Phase 22
+**Requirements**: [LAY-10]
+**Gap Closure**: Closes `LAY-10`, `INT-TABLE-SPLIT-POLICY`, and the broken authored table split-policy flow called out by the v1.1 audit.
+**Success Criteria** (what must be TRUE):
+  1. `Rendro.Table.split_policy` is consumed by runtime pagination instead of remaining a dead public field.
+  2. Table continuation behavior changes deterministically based on authored split intent and is proven by tests.
+  3. Phase 20 receives a truthful verification artifact that closes the milestone requirement chain for `LAY-10`.
+  4. Roadmap and requirement traceability no longer imply the table contract is complete before the runtime gap is actually closed.
+**Plans**: 0 plans
+
+### Phase 24: Diagnostics Verification and Traceability Closure
+**Goal**: Convert the existing diagnostics/proof implementation into a fully closed milestone requirement with matching docs, validation metadata, and verification artifacts.
+**Depends on**: Phase 23
+**Requirements**: [OBS-05, QUAL-06]
+**Gap Closure**: Closes the Phase 21 verification-chain gaps plus the README diagnostics contract mismatch identified by the v1.1 audit.
+**Success Criteria** (what must be TRUE):
+  1. A Phase 21 verification artifact proves structured diagnostics and pagination-proof behavior at milestone level.
+  2. Nyquist/validation metadata for the diagnostics phase is complete enough to remove the current partial audit result.
+  3. Public docs describe diagnostics using the actual supported data shape.
+  4. Requirement traceability for `OBS-05` and `QUAL-06` returns to a truthful closed state only after verification exists.
+**Plans**: 0 plans

@@ -14,21 +14,17 @@
 
 ### Table Layout
 
-- [x] **LAY-10
-**: Engineer can render multi-page tables with deterministic column sizing, repeated headers, and explicit row-split behavior suited to invoices and reports.
+- [ ] **LAY-10**: Engineer can render multi-page tables with deterministic column sizing, repeated headers, and explicit row-split behavior suited to invoices and reports.
 
 ### Diagnostics and Verification
 
 - [x] **LAY-11**: Engineer receives truthful fit validation when authored fixed-position or flow-region content cannot fit the declared page/layout bounds.
-- [x] **OBS-05
-**: Operator can inspect structured diagnostics that explain why content moved, split, or overflowed during pagination.
-- [x] **QUAL-06
-**: Maintainer can verify pagination invariants and deterministic break decisions with committed regression fixtures and docs-contract proof.
+- [ ] **OBS-05**: Operator can inspect structured diagnostics that explain why content moved, split, or overflowed during pagination.
+- [ ] **QUAL-06**: Maintainer can verify pagination invariants and deterministic break decisions with committed regression fixtures and docs-contract proof.
 
 ### Recipes and Authoring Ergonomics
 
-- [x] **LAY-12
-**: Engineer can use canonical recipes/examples that demonstrate serious invoice/report layouts through supported authoring primitives instead of ad hoc pagination glue.
+- [x] **LAY-12**: Engineer can use canonical recipes/examples that demonstrate serious invoice/report layouts through supported authoring primitives instead of ad hoc pagination glue.
 
 ## v2 Requirements
 
@@ -64,10 +60,10 @@
 | LAY-07 | Phase 18 | Completed |
 | LAY-08 | Phase 18 | Completed |
 | LAY-09 | Phase 19 | Completed |
-| LAY-10 | Phase 20 | Pending |
+| LAY-10 | Phase 23 | Pending |
 | LAY-11 | Phase 18 | Completed |
-| OBS-05 | Phase 21 | Pending |
-| QUAL-06 | Phase 21 | Pending |
+| OBS-05 | Phase 24 | Pending |
+| QUAL-06 | Phase 24 | Pending |
 | LAY-12 | Phase 22 | Complete |
 
 **Coverage:**
@@ -77,4 +73,4 @@
 
 ---
 *Requirements defined: 2026-04-28*
-*Last updated: 2026-04-29 after Phase 19 Plan 03 execution*
+*Last updated: 2026-04-30 after milestone gap-closure phase creation*
