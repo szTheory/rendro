@@ -13,6 +13,8 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 **Shipped Version:** v1.0 (MVP)
 The v1.0 milestone proved the core thesis: pure deterministic rendering, robust baseline layout/pagination, Phoenix integration helpers, pipeline telemetry, structured errors, and truthful CI/release verification contracts are all now shipped with committed proof.
 
+**v1.1 in flight — Phase 22 complete:** Canonical recipes (`Rendro.Recipes.Invoice`) now compose documents through the new pipeable builder API (`Rendro.Document.new |> add_template |> set_template |> add_section`) and the Tiered Composition pattern (`document/2`, `page_template/1`, `sections/2`). The `Rendro.Adapters.Accrue` adapter and the Phoenix example controller adopt explicit `:header`/`:body`/`:footer` regions, eliminating the legacy `header:`/`footer:` kwargs from primary guidance. README leads adopters with the builder API + Tiered Composition; legacy kwargs are demoted to a backward-compat note.
+
 ## Current Milestone: v1.1 Layout Authoring Maturity
 
 **Goal:** Turn Rendro from a credible PDF engine into a credible document authoring base by making layout semantics, pagination behavior, and break diagnostics expressive enough for serious business documents.
@@ -95,4 +97,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-28 after initializing milestone v1.1 Layout Authoring Maturity.*
+*Last updated: 2026-04-30 after Phase 22 (Authoring Ergonomics and Canonical Recipes) closed LAY-12.*
