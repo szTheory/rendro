@@ -41,11 +41,12 @@ Planned work:
 **Depends on**: Phase 26
 **Requirements**: [FONT-04, I18N-01, I18N-02]
 
-Planned work:
+**Plans:** 3 plans
 
-- Add explicit fallback-chain resolution rules for missing glyphs.
-- Emit typed diagnostics/errors for unsupported glyph, script, or shaping scenarios.
-- Publish and test a narrow Unicode/i18n support matrix that stays honest about unsupported RTL and complex shaping behavior.
+Plans:
+- [ ] 27-01-PLAN.md — Introduce font fallback chain registration and I18n script analysis capabilities.
+- [ ] 27-02-PLAN.md — Apply fallback chains during text measurement, breaking text into font-specific runs and collecting honest i18n diagnostics.
+- [ ] 27-03-PLAN.md — Update the PDF Writer to output multi-font text runs and establish the end-to-end verification of the honest I18n matrix.
 
 #### Phase 28: Asset Registry and Deterministic Image Rendering
 **Goal**: Add first-class bounded asset support for logos and document imagery without introducing runtime fetch policy into core.
