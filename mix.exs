@@ -68,7 +68,17 @@ defmodule Rendro.MixProject do
   defp package do
     [
       licenses: ["UNLICENSED"],
-      links: %{"GitHub" => @source_url}
+      links: %{"GitHub" => @source_url},
+      files: ~w(
+        lib
+        priv/branded
+        guides
+        .formatter.exs
+        mix.exs
+        README.md
+        NOTICE
+        CHANGELOG.md
+      )
     ]
   end
 
@@ -78,7 +88,8 @@ defmodule Rendro.MixProject do
       source_url: @source_url,
       extras: [
         "README.md",
-        "guides/integrations.md"
+        "guides/integrations.md",
+        "guides/branding.md"
       ]
     ]
   end

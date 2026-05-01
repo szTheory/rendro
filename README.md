@@ -98,6 +98,11 @@ doc =
 
 The delegating alias `Rendro.Recipes.invoice/1` calls `Rendro.Recipes.Invoice.document/1` for convenience.
 
+### Branded Documents
+
+For documents that combine the canonical recipe with a registered brand font and
+logo asset, see `Rendro.Recipes.BrandedInvoice` and the [Branding guide](guides/branding.md).
+
 ## Usage Reference
 
 ### Flow API (Verified Examples)
@@ -328,4 +333,4 @@ Rendro.flow(
 )
 ```
 
-This style is still supported for existing code but mixes `doc.header` block stacking with the region system, which can produce confusing overlap (see `Rendro.Pipeline.Compose.normalize_flow_layout/1`). For all new documents, use explicit `%Rendro.Section{}` structs mapped to named `%Rendro.PageTemplate{}` regions as shown in the builder and recipe examples above.
+This style is still supported for existing code but mixes `doc.header` block stacking with the region normalization path, which can produce confusing overlap. For all new documents, use explicit `%Rendro.Section{}` structs mapped to named `%Rendro.PageTemplate{}` regions as shown in the builder and recipe examples above.
