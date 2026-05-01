@@ -3,6 +3,7 @@ defmodule Rendro.Pipeline.PaginateTest do
 
   alias Rendro.{PageTemplate, Region}
   alias Rendro.Pipeline.{Build, Compose, Measure, MeasuredText, Paginate}
+  alias Rendro.TestSupport.FontFixture
 
   alias Rendro.Pipeline.Paginate
 
@@ -137,6 +138,56 @@ defmodule Rendro.Pipeline.PaginateTest do
 
       assert Enum.map(line_blocks, &length/1) == [2, 2, 1]
       assert Enum.map(hd(line_blocks), & &1.y) == [32, 46.4]
+    end
+
+    test "paginates from embedded-font-derived measured heights deterministically" do
+      %{bytes: bytes} = FontFixture.supported_font()
+      template = embedded_wrap_template()
+      content = "alpha beta gamma delta"
+
+      built_in_doc =
+        Rendro.flow(
+          [
+            Rendro.block(Rendro.text(content, font: :default, size: 12), width: 150),
+            Rendro.block(Rendro.text(content, font: :default, size: 12), width: 150)
+          ],
+          page_template: :embedded_wrap,
+          page_templates: [template]
+        )
+
+      embedded_doc =
+        Rendro.document()
+        |> Rendro.register_embedded_font(:brand, {:binary, bytes})
+        |> Map.put(:content, [
+          Rendro.block(Rendro.text(content, font: :brand, size: 12), width: 150),
+          Rendro.block(Rendro.text(content, font: :brand, size: 12), width: 150)
+        ])
+        |> Map.put(:page_template, :embedded_wrap)
+        |> Map.put(:page_templates, [template])
+
+      assert {:ok, built_in_paginated} = paginate_flow(built_in_doc)
+      assert {:ok, embedded_paginated} = paginate_flow(embedded_doc)
+
+      assert length(built_in_paginated.pages) == 1
+      assert length(embedded_paginated.pages) == 2
+
+      [built_in_block_1, built_in_block_2] = hd(built_in_paginated.pages).blocks
+      assert built_in_block_1.content.lines == ["alpha beta gamma delta"]
+      assert built_in_block_2.content.lines == ["alpha beta gamma delta"]
+
+      embedded_page_lines =
+        Enum.map(embedded_paginated.pages, fn page ->
+          Enum.map(page.blocks, fn block -> block.content.lines end)
+        end)
+
+      embedded_line_sets = Enum.flat_map(embedded_page_lines, & &1)
+
+      assert embedded_page_lines == [[["alpha beta ", "gamma delta"]], [["alpha beta ", "gamma delta"]]]
+      assert Enum.all?(embedded_line_sets, &(length(&1) == 2))
+      assert Enum.all?(List.flatten(Enum.map(embedded_paginated.pages, & &1.blocks)), fn block ->
+               %MeasuredText{resolved_font: resolved_font, height: height} = block.content
+               resolved_font.source == :embedded and abs(height - 28.8) < 1.0e-9
+             end)
     end
   end
 
@@ -501,5 +552,28 @@ defmodule Rendro.Pipeline.PaginateTest do
 
   defp tiny_keep_chain_template do
     %{flow_keep_chain_template() | name: :tiny_keep_chain, regions: [%Region{name: :body, role: :body, anchor: :flow, x: 24, y: 52, width: 372, height: 30}]}
+  end
+
+  defp embedded_wrap_template do
+    %PageTemplate{
+      name: :embedded_wrap,
+      width: 420,
+      height: 240,
+      margin_top: 20,
+      margin_right: 24,
+      margin_bottom: 28,
+      margin_left: 24,
+      regions: [
+        %Region{
+          name: :body,
+          role: :body,
+          anchor: :flow,
+          x: 24,
+          y: 52,
+          width: 372,
+          height: 30
+        }
+      ]
+    }
   end
 end
