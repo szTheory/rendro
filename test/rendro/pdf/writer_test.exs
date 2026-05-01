@@ -169,7 +169,10 @@ defmodule Rendro.PDF.WriterTest do
       measured =
         %MeasuredText{
           source: source,
-          lines: ["alpha beta", "gamma"],
+          lines: [
+            [%{text: "alpha beta", font: Font.helvetica(), width: 60}],
+            [%{text: "gamma", font: Font.helvetica(), width: 30}]
+          ],
           line_height: source.line_height,
           width: 60,
           height: 36,

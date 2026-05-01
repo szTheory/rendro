@@ -313,42 +313,54 @@ defmodule Rendro.PDF.Writer do
   defp render_block(doc, %Rendro.Block{content: %Rendro.Text{} = text} = block, page, font_map, ox, oy) do
     case resolve_text_font(doc, text) do
       {:ok, font} ->
-        render_text_block(block, page, ox, oy, text, [text.content], text.line_height, font, font_map)
+        lines = [[%{font: font, text: text.content}]]
+        render_text_block(block, page, ox, oy, text, lines, text.line_height, font_map)
 
       {:error, _} -> ""
     end
   end
 
   defp render_block(_doc, %Rendro.Block{content: %MeasuredText{} = text} = block, page, font_map, ox, oy) do
-    render_text_block(block, page, ox, oy, text.source, text.lines, text.line_height, text.resolved_font, font_map)
+    render_text_block(block, page, ox, oy, text.source, text.lines, text.line_height, font_map)
   end
 
-  defp render_text_block(block, page, ox, oy, text, lines, line_height, font, font_map) do
+  defp render_text_block(block, page, ox, oy, text, lines, line_height, font_map) do
     x = block.x + ox + page.margin_left
     y = page.height - (block.y + oy) - page.margin_top - text.size
     {r, g, b} = text.color
     color_op = "#{format_num(r / 255)} #{format_num(g / 255)} #{format_num(b / 255)} rg"
     line_offset = text.size * line_height
-    font_name = resolved_font_name(font, font_map)
 
     line_ops =
       lines
       |> Enum.with_index()
-      |> Enum.flat_map(fn {line, index} ->
-        if index == 0 do
-          ["#{format_num(x)} #{format_num(y)} Td", "(#{escape_pdf_string(line)}) Tj"]
-        else
-          ["0 #{format_num(-line_offset)} Td", "(#{escape_pdf_string(line)}) Tj"]
-        end
+      |> Enum.flat_map(fn {runs, index} ->
+        pos_op =
+          if index == 0 do
+            "#{format_num(x)} #{format_num(y)} Td"
+          else
+            "0 #{format_num(-line_offset)} Td"
+          end
+
+        runs_ops =
+          Enum.flat_map(runs, fn run ->
+            font_name = resolved_font_name(run.font, font_map)
+            [
+              "/#{font_name} #{format_num(text.size)} Tf",
+              "(#{escape_pdf_string(run.text)}) Tj"
+            ]
+          end)
+
+        [pos_op | runs_ops]
       end)
 
     [
       "BT",
       color_op,
-      "/#{font_name} #{format_num(text.size)} Tf",
       line_ops,
       "ET"
     ]
+    |> List.flatten()
     |> Enum.join("\n")
   end
 
@@ -391,8 +403,15 @@ defmodule Rendro.PDF.Writer do
     end
   end
 
-  defp collect_block_fonts(_doc, %Rendro.Block{content: %MeasuredText{resolved_font: font}}, acc) do
-    {:ok, Map.put(acc, font.name, font)}
+  defp collect_block_fonts(_doc, %Rendro.Block{content: %MeasuredText{lines: lines}}, acc) do
+    new_acc =
+      Enum.reduce(lines, acc, fn line, line_acc ->
+        Enum.reduce(line, line_acc, fn run, run_acc ->
+          Map.put(run_acc, run.font.name, run.font)
+        end)
+      end)
+
+    {:ok, new_acc}
   end
 
   defp collect_block_fonts(_doc, %Rendro.Block{}, acc), do: {:ok, acc}

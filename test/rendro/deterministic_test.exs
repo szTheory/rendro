@@ -91,7 +91,13 @@ defmodule Rendro.DeterministicTest do
 
           line_sets =
             paginated.pages
-            |> Enum.map(fn page -> Enum.map(page.blocks, & &1.content.lines) end)
+            |> Enum.map(fn page -> 
+                 Enum.map(page.blocks, fn block -> 
+                   Enum.map(block.content.lines, fn line -> 
+                     Enum.map_join(line, "", & &1.text) 
+                   end) 
+                 end) 
+               end)
 
           resolved_fonts =
             paginated.pages

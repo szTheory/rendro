@@ -25,11 +25,18 @@ defmodule Rendro.Document do
   such as `:message`, `:page_index`, `:reason`, and `:keep_rule` may appear, and
   future additive keys are allowed.
 
-  ## Typography
+  ## Typography & Honest I18n
 
   Documents own the logical font registry used by authored content. The default
   registry keeps a narrow Helvetica-compatible path available out of the box
   while letting callers register additional logical names as pure data.
+
+  Rendro embraces an "honest I18n" model: text crossing into unsupported scripts 
+  (e.g., RTL, complex shaping) or unmapped glyphs will not silently degrade into 
+  squares or overlapping text. Instead, the rendering pipeline will explicitly trap 
+  the boundary and return an actionable `Rendro.Error`. Callers can configure 
+  fallback font chains when registering fonts to automatically substitute missing 
+  glyphs.
   """
 
   @enforce_keys []

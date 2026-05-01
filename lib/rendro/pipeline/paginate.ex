@@ -392,7 +392,9 @@ defmodule Rendro.Pipeline.Paginate do
                 | source: %{source | content: replaced},
                   lines:
                     Enum.map(measured.lines, fn line ->
-                      String.replace(line, "{{page_number}}", Integer.to_string(page_num))
+                      Enum.map(line, fn run ->
+                        %{run | text: String.replace(run.text, "{{page_number}}", Integer.to_string(page_num))}
+                      end)
                     end)
               }
           }

@@ -172,12 +172,13 @@ defmodule Rendro.Pipeline.PaginateTest do
       assert length(embedded_paginated.pages) == 2
 
       [built_in_block_1, built_in_block_2] = hd(built_in_paginated.pages).blocks
-      assert built_in_block_1.content.lines == ["alpha beta gamma delta"]
-      assert built_in_block_2.content.lines == ["alpha beta gamma delta"]
+      lines_text = fn b -> Enum.map(b.content.lines, fn l -> Enum.map_join(l, "", & &1.text) end) end
+      assert lines_text.(built_in_block_1) == ["alpha beta gamma delta"]
+      assert lines_text.(built_in_block_2) == ["alpha beta gamma delta"]
 
       embedded_page_lines =
         Enum.map(embedded_paginated.pages, fn page ->
-          Enum.map(page.blocks, fn block -> block.content.lines end)
+          Enum.map(page.blocks, lines_text)
         end)
 
       embedded_line_sets = Enum.flat_map(embedded_page_lines, & &1)

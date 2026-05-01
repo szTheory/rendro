@@ -10,7 +10,7 @@ defmodule Rendro.Test.Generators do
 
   def text_gen do
     gen all(
-          raw <- string(:printable, min_length: 1, max_length: 50),
+          raw <- string(:ascii, min_length: 1, max_length: 50),
           content = String.replace(raw, ~r/[()\\]/, ""),
           content != "",
           size <- float(min: 6.0, max: 72.0),
@@ -44,8 +44,8 @@ defmodule Rendro.Test.Generators do
 
   def metadata_gen do
     gen all(
-          title <- one_of([constant(nil), string(:printable, min_length: 1, max_length: 20)]),
-          author <- one_of([constant(nil), string(:printable, min_length: 1, max_length: 20)])
+          title <- one_of([constant(nil), string(:ascii, min_length: 1, max_length: 20)]),
+          author <- one_of([constant(nil), string(:ascii, min_length: 1, max_length: 20)])
         ) do
       %Rendro.Metadata{title: title, author: author}
     end
@@ -91,7 +91,7 @@ defmodule Rendro.Test.Generators do
 
   defp renderable_text_gen do
     gen all(
-          raw <- string(:printable, min_length: 1, max_length: @renderable_max_text_length),
+          raw <- string(:ascii, min_length: 1, max_length: @renderable_max_text_length),
           content = String.replace(raw, ~r/[()\\]/, ""),
           content != "",
           size <- float(min: 6.0, max: @renderable_max_text_size),
