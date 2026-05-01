@@ -257,6 +257,70 @@ defmodule Rendro.PDF.WriterTest do
       assert {:error, {:invalid_embedded_font, %{logical_name: :brand, reason: :unsupported_font_format}}} =
                Writer.render(doc)
     end
+
+    test "Writer correctly builds Image XObject dictionaries and streams for PNGs and JPEGs" do
+      png_bytes = <<137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, "IHDR", 100::32, 50::32>>
+      jpeg_bytes = <<0xFF, 0xD8, 0xFF, 0xC0, 0x00, 0x11, 8, 50::16, 100::16, 0>>
+
+      doc =
+        Rendro.document()
+        |> Rendro.Document.register_image(:logo_png, {:binary, png_bytes})
+        |> Rendro.Document.register_image(:photo_jpg, {:binary, jpeg_bytes})
+        |> Map.put(:pages, [
+          %Rendro.Page{
+            blocks: [
+              %Rendro.Block{content: %Rendro.Image{logical_name: :logo_png}, x: 0, y: 0, width: 100, height: 50},
+              %Rendro.Block{content: %Rendro.Image{logical_name: :photo_jpg}, x: 0, y: 50, width: 100, height: 50}
+            ]
+          }
+        ])
+
+      {:ok, pdf} = Writer.render(doc)
+
+      assert pdf =~ "/Type /XObject"
+      assert pdf =~ "/Subtype /Image"
+      
+      # PNG specifics
+      assert pdf =~ "/IM_LOGO_PNG"
+      assert pdf =~ "/Filter /FlateDecode"
+      
+      # JPEG specifics
+      assert pdf =~ "/IM_PHOTO_JPG"
+      assert pdf =~ "/Filter /DCTDecode"
+      
+      # Common Image props
+      assert pdf =~ "/Width 100"
+      assert pdf =~ "/Height 50"
+      assert pdf =~ "/ColorSpace /DeviceRGB"
+      assert pdf =~ "/BitsPerComponent 8"
+    end
+
+    test "Emits the Do (Draw Object) operator with appropriate transformation matrix (cm) for sizing" do
+      png_bytes = <<137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, "IHDR", 100::32, 50::32>>
+
+      doc =
+        Rendro.document()
+        |> Rendro.Document.register_image(:logo, {:binary, png_bytes})
+        |> Map.put(:pages, [
+          %Rendro.Page{
+            width: 612,
+            height: 792,
+            margin_left: 72,
+            margin_top: 72,
+            blocks: [
+              %Rendro.Block{content: %Rendro.Image{logical_name: :logo}, x: 10, y: 20, width: 200, height: 150}
+            ]
+          }
+        ])
+
+      {:ok, pdf} = Writer.render(doc)
+
+      # x = 10 + 72 = 82
+      # y = 792 - (20 + 0 + 150) - 72 = 792 - 170 - 72 = 550
+      # Matrix: 200 0 0 150 82 550 cm
+      assert pdf =~ "200 0 0 150 82 550 cm"
+      assert pdf =~ "/IM_LOGO Do"
+    end
   end
 
   describe "render/2 deterministic mode" do

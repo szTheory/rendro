@@ -21,18 +21,21 @@ defmodule Rendro.PDF.Writer do
   @spec render(Rendro.Document.t(), Object.serialize_opts()) :: {:ok, binary()}
   def render(%Rendro.Document{} = doc, opts) when is_list(opts) do
     with {:ok, fonts} <- collect_fonts(doc),
-         {numbered_objects, catalog_num, info_num, total_objects} <- build_objects(doc, fonts, opts) do
+         {:ok, images} <- collect_images(doc),
+         {numbered_objects, catalog_num, info_num, total_objects} <-
+           build_objects(doc, fonts, images, opts) do
       pdf = assemble({numbered_objects, catalog_num, info_num, total_objects}, catalog_num, opts)
       {:ok, IO.iodata_to_binary(pdf)}
     end
   end
 
-  defp build_objects(%Rendro.Document{pages: pages, metadata: metadata} = doc, fonts, opts) do
+  defp build_objects(%Rendro.Document{pages: pages, metadata: metadata} = doc, fonts, images, opts) do
     obj_num = 1
     catalog_num = obj_num
 
     {page_obj_nums, next_num} = allocate_page_nums(pages, obj_num + 1)
     {font_objects, next_num} = allocate_font_nums(fonts, next_num)
+    {image_objects, next_num} = allocate_image_nums(images, next_num)
     pages_num = next_num
     next_num = next_num + 1
 
@@ -40,6 +43,7 @@ defmodule Rendro.PDF.Writer do
     next_num = next_num + 1
 
     font_pdf_objects = build_font_objects(font_objects, opts)
+    image_pdf_objects = build_image_objects(image_objects, opts)
 
     page_tree_kids =
       {:array, Enum.map(page_obj_nums, fn {page_num, _} -> {:ref, page_num, 0} end)}
@@ -64,7 +68,19 @@ defmodule Rendro.PDF.Writer do
     catalog_obj = Object.indirect_object(catalog_num, 0, Object.serialize(catalog_dict, opts))
 
     font_map = doc_font_map(font_objects)
-    page_objects = build_page_objects(doc, page_obj_nums, pages_num, font_objects, font_map, opts)
+    image_map = doc_image_map(image_objects)
+
+    page_objects =
+      build_page_objects(
+        doc,
+        page_obj_nums,
+        pages_num,
+        font_objects,
+        image_objects,
+        font_map,
+        image_map,
+        opts
+      )
 
     info_dict = build_info_dict(metadata, opts)
     info_obj = Object.indirect_object(info_num, 0, Object.serialize(info_dict, opts))
@@ -74,6 +90,7 @@ defmodule Rendro.PDF.Writer do
     numbered_objects =
       [{catalog_num, catalog_obj}] ++
         font_pdf_objects ++
+        image_pdf_objects ++
         [{pages_num, pages_obj}] ++
         Enum.zip(
           Enum.flat_map(page_obj_nums, fn {p, c} -> [p, c] end),
@@ -160,7 +177,9 @@ defmodule Rendro.PDF.Writer do
          {"Type", {:name, "FontDescriptor"}},
          {"FontName", {:name, font.base_font}},
          {"Flags", 32},
-         {"FontBBox", {:array, [0, scale_font_metric(font, font.descent), 1000, scale_font_metric(font, font.ascent)]}},
+         {"FontBBox",
+          {:array,
+           [0, scale_font_metric(font, font.descent), 1000, scale_font_metric(font, font.ascent)]}},
          {"Ascent", scale_font_metric(font, font.ascent)},
          {"Descent", scale_font_metric(font, font.descent)},
          {"CapHeight", scale_font_metric(font, font.ascent)},
@@ -205,10 +224,38 @@ defmodule Rendro.PDF.Writer do
        ]}
 
     font_object =
-      {font_obj_num,
-       Object.indirect_object(font_obj_num, 0, Object.serialize(font_dict, opts))}
+      {font_obj_num, Object.indirect_object(font_obj_num, 0, Object.serialize(font_dict, opts))}
 
     [font_object, descriptor_object, widths_object, font_file_object]
+  end
+
+  defp allocate_image_nums(images, start_num) do
+    Enum.map_reduce(images, start_num, fn image, num ->
+      {%{image: image, obj_num: num}, num + 1}
+    end)
+  end
+
+  defp build_image_objects(image_allocations, opts) do
+    Enum.map(image_allocations, fn %{image: image, obj_num: obj_num} ->
+      filter =
+        case image.mime do
+          "image/jpeg" -> {:name, "DCTDecode"}
+          _ -> {:name, "FlateDecode"}
+        end
+
+      entries = [
+        {"Type", {:name, "XObject"}},
+        {"Subtype", {:name, "Image"}},
+        {"Width", image.width},
+        {"Height", image.height},
+        {"ColorSpace", {:name, "DeviceRGB"}},
+        {"BitsPerComponent", 8},
+        {"Filter", filter}
+      ]
+
+      stream = {:stream, entries, image.binary}
+      {obj_num, Object.indirect_object(obj_num, 0, Object.serialize(stream, opts))}
+    end)
   end
 
   defp embedded_widths(%Font{} = font) do
@@ -236,7 +283,8 @@ defmodule Rendro.PDF.Writer do
     scale_font_metric(metric, units_per_em)
   end
 
-  defp scale_font_metric(metric, units_per_em) when is_integer(metric) and is_integer(units_per_em) do
+  defp scale_font_metric(metric, units_per_em)
+       when is_integer(metric) and is_integer(units_per_em) do
     round(metric * 1000 / units_per_em)
   end
 
@@ -244,22 +292,35 @@ defmodule Rendro.PDF.Writer do
     Map.new(font_allocations, fn %{font: font} = allocation -> {font.name, allocation} end)
   end
 
-  defp build_page_objects(%Rendro.Document{pages: pages} = doc, page_obj_nums, pages_num, font_allocations, font_map, opts) do
+  defp doc_image_map(image_allocations) do
+    Map.new(image_allocations, fn %{image: image} = allocation -> {image.logical_name, allocation} end)
+  end
+
+  defp build_page_objects(
+         %Rendro.Document{pages: pages} = doc,
+         page_obj_nums,
+         pages_num,
+         font_allocations,
+         image_allocations,
+         font_map,
+         image_map,
+         opts
+       ) do
     Enum.zip(pages, page_obj_nums)
     |> Enum.flat_map(fn {page, {page_num, content_num}} ->
-      content_data = build_content_stream(doc, page, font_map)
+      content_data = build_content_stream(doc, page, font_map, image_map)
 
       content_stream =
         {:stream, [], content_data}
 
       content_obj = Object.indirect_object(content_num, 0, Object.serialize(content_stream, opts))
 
-      resources =
-        {:dict,
-         [
-           {"Font",
-            {:dict, font_resource_entries(font_allocations)}}
-         ]}
+      resources_dict =
+        []
+        |> maybe_add_resource("Font", font_resource_entries(font_allocations))
+        |> maybe_add_resource("XObject", image_resource_entries(image_allocations))
+
+      resources = {:dict, resources_dict}
 
       media_box =
         {:array, [0, 0, page.width, page.height]}
@@ -280,48 +341,99 @@ defmodule Rendro.PDF.Writer do
     end)
   end
 
-  defp build_content_stream(doc, %Rendro.Page{} = page, font_map) do
-    Enum.map_join(page.blocks, "\n", fn block -> render_block(doc, block, page, font_map) end)
+  defp maybe_add_resource(entries, _key, []), do: entries
+  defp maybe_add_resource(entries, key, value), do: [{key, {:dict, value}} | entries]
+
+  defp build_content_stream(doc, %Rendro.Page{} = page, font_map, image_map) do
+    Enum.map_join(page.blocks, "\n", fn block ->
+      render_block(doc, block, page, font_map, image_map)
+    end)
   end
 
-  defp render_block(doc, %Rendro.Block{content: %Rendro.Table{} = table}, page, font_map) do
+  defp render_block(doc, %Rendro.Block{content: %Rendro.Table{} = table}, page, font_map, image_map) do
     header_ops =
       if table.header do
-        Enum.map(table.header, &render_block(doc, &1, page, font_map))
+        Enum.map(table.header, &render_block(doc, &1, page, font_map, image_map))
       else
         []
       end
 
     rows_ops =
       Enum.map(table.rows, fn row ->
-        Enum.map(row, &render_block(doc, &1, page, font_map))
+        Enum.map(row, &render_block(doc, &1, page, font_map, image_map))
       end)
 
     [header_ops | rows_ops] |> List.flatten() |> Enum.join("\n")
   end
 
-  defp render_block(doc, %Rendro.Block{content: %Rendro.Text{}} = block, page, font_map) do
-    render_block(doc, block, page, font_map, 0, 0)
+  defp render_block(doc, %Rendro.Block{content: %Rendro.Text{}} = block, page, font_map, image_map) do
+    render_block(doc, block, page, font_map, image_map, 0, 0)
   end
 
-  defp render_block(doc, %Rendro.Block{content: %MeasuredText{}} = block, page, font_map) do
-    render_block(doc, block, page, font_map, 0, 0)
+  defp render_block(doc, %Rendro.Block{content: %MeasuredText{}} = block, page, font_map, image_map) do
+    render_block(doc, block, page, font_map, image_map, 0, 0)
   end
 
-  defp render_block(_doc, _block, _page, _font_map), do: ""
+  defp render_block(doc, %Rendro.Block{content: %Rendro.Image{}} = block, page, font_map, image_map) do
+    render_block(doc, block, page, font_map, image_map, 0, 0)
+  end
 
-  defp render_block(doc, %Rendro.Block{content: %Rendro.Text{} = text} = block, page, font_map, ox, oy) do
+  defp render_block(_doc, _block, _page, _font_map, _image_map), do: ""
+
+  defp render_block(
+         doc,
+         %Rendro.Block{content: %Rendro.Text{} = text} = block,
+         page,
+         font_map,
+         _image_map,
+         ox,
+         oy
+       ) do
     case resolve_text_font(doc, text) do
       {:ok, font} ->
         lines = [[%{font: font, text: text.content}]]
         render_text_block(block, page, ox, oy, text, lines, text.line_height, font_map)
 
-      {:error, _} -> ""
+      {:error, _} ->
+        ""
     end
   end
 
-  defp render_block(_doc, %Rendro.Block{content: %MeasuredText{} = text} = block, page, font_map, ox, oy) do
+  defp render_block(
+         _doc,
+         %Rendro.Block{content: %MeasuredText{} = text} = block,
+         page,
+         font_map,
+         _image_map,
+         ox,
+         oy
+       ) do
     render_text_block(block, page, ox, oy, text.source, text.lines, text.line_height, font_map)
+  end
+
+  defp render_block(
+         _doc,
+         %Rendro.Block{content: %Rendro.Image{} = image} = block,
+         page,
+         _font_map,
+         image_map,
+         ox,
+         oy
+       ) do
+    case Map.fetch(image_map, image.logical_name) do
+      {:ok, _allocation} ->
+        x = block.x + ox + page.margin_left
+        y = page.height - (block.y + oy + block.height) - page.margin_top
+        w = block.width
+        h = block.height
+
+        img_name = image_resource_name(image.logical_name)
+
+        "q\n#{format_num(w)} 0 0 #{format_num(h)} #{format_num(x)} #{format_num(y)} cm\n/#{img_name} Do\nQ"
+
+      :error ->
+        ""
+    end
   end
 
   defp render_text_block(block, page, ox, oy, text, lines, line_height, font_map) do
@@ -345,6 +457,7 @@ defmodule Rendro.PDF.Writer do
         runs_ops =
           Enum.flat_map(runs, fn run ->
             font_name = resolved_font_name(run.font, font_map)
+
             [
               "/#{font_name} #{format_num(text.size)} Tf",
               "(#{escape_pdf_string(run.text)}) Tj"
@@ -442,6 +555,84 @@ defmodule Rendro.PDF.Writer do
     end)
   end
 
+  defp collect_images(%Rendro.Document{pages: pages} = doc) do
+    pages
+    |> Enum.reduce_while({:ok, MapSet.new()}, fn page, {:ok, acc} ->
+      case collect_page_images(doc, page, acc) do
+        {:ok, page_images} -> {:cont, {:ok, page_images}}
+        {:error, _} = err -> {:halt, err}
+      end
+    end)
+    |> case do
+      {:ok, image_names} ->
+        images =
+          Enum.map(image_names, fn name ->
+            case Rendro.AssetRegistry.fetch(doc.asset_registry, name) do
+              {:ok, asset} -> Map.put(asset, :logical_name, name)
+              :error -> raise "Missing asset: #{name}"
+            end
+          end)
+          |> Enum.sort_by(& &1.logical_name)
+
+        {:ok, images}
+
+      {:error, _} = err ->
+        err
+    end
+  end
+
+  defp collect_page_images(doc, %Rendro.Page{blocks: blocks}, acc) do
+    Enum.reduce_while(blocks, {:ok, acc}, fn block, {:ok, images} ->
+      case collect_block_images(doc, block, images) do
+        {:ok, collected} -> {:cont, {:ok, collected}}
+        {:error, _} = err -> {:halt, err}
+      end
+    end)
+  end
+
+  defp collect_block_images(doc, %Rendro.Block{content: %Rendro.Table{} = table}, acc) do
+    with {:ok, acc} <- collect_row_images(doc, table.header, acc),
+         {:ok, acc} <- collect_rows_images(doc, table.rows, acc) do
+      {:ok, acc}
+    end
+  end
+
+  defp collect_block_images(_doc, %Rendro.Block{content: %Rendro.Image{} = image}, acc) do
+    {:ok, MapSet.put(acc, image.logical_name)}
+  end
+
+  defp collect_block_images(_doc, %Rendro.Block{}, acc), do: {:ok, acc}
+
+  defp collect_rows_images(doc, rows, acc) do
+    Enum.reduce_while(rows, {:ok, acc}, fn row, {:ok, images} ->
+      case collect_row_images(doc, row, images) do
+        {:ok, collected} -> {:cont, {:ok, collected}}
+        {:error, _} = err -> {:halt, err}
+      end
+    end)
+  end
+
+  defp collect_row_images(_doc, nil, acc), do: {:ok, acc}
+
+  defp collect_row_images(doc, row, acc) do
+    Enum.reduce_while(row, {:ok, acc}, fn block, {:ok, images} ->
+      case collect_block_images(doc, block, images) do
+        {:ok, collected} -> {:cont, {:ok, collected}}
+        {:error, _} = err -> {:halt, err}
+      end
+    end)
+  end
+
+  defp image_resource_entries(image_object_refs) do
+    Enum.map(image_object_refs, fn %{image: image, obj_num: obj_num} ->
+      {image_resource_name(image.logical_name), {:ref, obj_num, 0}}
+    end)
+  end
+
+  defp image_resource_name(logical_name) do
+    "IM_#{String.upcase(to_string(logical_name))}"
+  end
+
   defp resolve_text_font(
          %Rendro.Document{font_registry: registry, default_font: default_font},
          %Rendro.Text{font: font}
@@ -451,8 +642,11 @@ defmodule Rendro.PDF.Writer do
 
   defp resolved_font_name(font, font_map) do
     case Map.fetch(font_map, font.name) do
-      {:ok, _font_ref} -> font.name
-      :error -> raise ArgumentError, "missing collected PDF font resource for #{inspect(font.name)}"
+      {:ok, _font_ref} ->
+        font.name
+
+      :error ->
+        raise ArgumentError, "missing collected PDF font resource for #{inspect(font.name)}"
     end
   end
 
