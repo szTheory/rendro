@@ -9,16 +9,38 @@ defmodule Rendro.FontRegistry do
 
   @default_font :default
   @helvetica_descriptor %{source: :built_in, family: :helvetica}
+  @embedded_family_variants [:regular, :bold, :italic, :bold_italic]
 
   @enforce_keys [:fonts, :default_font]
   defstruct fonts: %{@default_font => @helvetica_descriptor}, default_font: @default_font
 
   @type logical_name :: atom()
   @type built_in_family :: :helvetica
-  @type descriptor :: %{
+  @type embedded_source_kind :: :path | :binary
+  @type embedded_variant :: :regular | :bold | :italic | :bold_italic
+  @type embedded_normalized_source ::
+          %{
+            required(:status) => :ok,
+            required(:kind) => embedded_source_kind(),
+            required(:bytes) => binary(),
+            required(:byte_size) => non_neg_integer()
+          }
+          | %{
+              required(:status) => :error,
+              required(:kind) => embedded_source_kind(),
+              required(:reason) => term()
+            }
+  @type built_in_descriptor :: %{
           required(:source) => :built_in,
           required(:family) => built_in_family()
         }
+  @type embedded_descriptor :: %{
+          required(:source) => :embedded,
+          required(:source_kind) => embedded_source_kind(),
+          required(:variant) => embedded_variant(),
+          required(:source_data) => embedded_normalized_source()
+        }
+  @type descriptor :: built_in_descriptor() | embedded_descriptor()
 
   @type resolve_error ::
           {:unknown_logical_font, logical_name()}
@@ -53,6 +75,50 @@ defmodule Rendro.FontRegistry do
       |> built_in_descriptor()
 
     %__MODULE__{registry | fonts: Map.put(registry.fonts, logical_name, descriptor)}
+  end
+
+  @doc """
+  Registers a logical font name against an explicit embedded font source.
+  """
+  @spec register_embedded(t(), logical_name(), {:path, Path.t()} | {:binary, binary()}) :: t()
+  def register_embedded(%__MODULE__{} = registry, logical_name, source)
+      when is_atom(logical_name) do
+    descriptor = embedded_descriptor(source, :regular)
+    %__MODULE__{registry | fonts: Map.put(registry.fonts, logical_name, descriptor)}
+  end
+
+  @doc """
+  Registers a narrow four-variant embedded font family.
+
+  The root logical name resolves to the `:regular` face and the helper also
+  registers `:<family>_bold`, `:<family>_italic`, and `:<family>_bold_italic`.
+  """
+  @spec register_embedded_family(
+          t(),
+          logical_name(),
+          %{required(embedded_variant()) => {:path, Path.t()} | {:binary, binary()}}
+        ) :: t()
+  def register_embedded_family(%__MODULE__{} = registry, family_name, variants)
+      when is_atom(family_name) and is_map(variants) do
+    validate_embedded_family!(family_name, variants)
+
+    registrations = [
+      {family_name, embedded_descriptor(Map.fetch!(variants, :regular), :regular)},
+      {variant_logical_name(family_name, :bold),
+       embedded_descriptor(Map.fetch!(variants, :bold), :bold)},
+      {variant_logical_name(family_name, :italic),
+       embedded_descriptor(Map.fetch!(variants, :italic), :italic)},
+      {variant_logical_name(family_name, :bold_italic),
+       embedded_descriptor(Map.fetch!(variants, :bold_italic), :bold_italic)}
+    ]
+
+    %__MODULE__{
+      registry
+      | fonts:
+          Enum.reduce(registrations, registry.fonts, fn {logical_name, descriptor}, fonts ->
+            Map.put(fonts, logical_name, descriptor)
+          end)
+    }
   end
 
   @doc """
@@ -125,6 +191,14 @@ defmodule Rendro.FontRegistry do
     %Rendro.PDF.Font{Rendro.PDF.Font.helvetica() | name: resource_name(logical_name)}
   end
 
+  @spec variant_logical_name(logical_name(), embedded_variant()) :: logical_name()
+  def variant_logical_name(family_name, :regular) when is_atom(family_name), do: family_name
+
+  def variant_logical_name(family_name, variant)
+      when is_atom(family_name) and variant in @embedded_family_variants do
+    :"#{family_name}_#{variant}"
+  end
+
   defp built_in_descriptor(:helvetica), do: helvetica()
   defp built_in_descriptor(:Helvetica), do: helvetica()
   defp built_in_descriptor("Helvetica"), do: helvetica()
@@ -142,6 +216,65 @@ defmodule Rendro.FontRegistry do
   defp normalize_reference(font, _document_default_font),
     do: {:error, {:unsupported_font_reference, font}}
 
+  defp embedded_descriptor(source, variant) when variant in @embedded_family_variants do
+    %{
+      source: :embedded,
+      source_kind: embedded_source_kind!(source),
+      variant: variant,
+      source_data: normalize_embedded_source(source)
+    }
+  end
+
+  defp embedded_source_kind!({:path, _path}), do: :path
+  defp embedded_source_kind!({:binary, _bytes}), do: :binary
+
+  defp embedded_source_kind!(source) do
+    raise ArgumentError,
+          "embedded fonts require {:path, path} or {:binary, bytes}; got: #{inspect(source)}"
+  end
+
+  defp normalize_embedded_source({:path, path}) when is_binary(path) do
+    case File.read(path) do
+      {:ok, bytes} ->
+        %{status: :ok, kind: :path, bytes: :binary.copy(bytes), byte_size: byte_size(bytes)}
+
+      {:error, reason} ->
+        %{status: :error, kind: :path, reason: {:file_read_failed, reason}}
+    end
+  end
+
+  defp normalize_embedded_source({:binary, bytes}) when is_binary(bytes) do
+    copied = :binary.copy(bytes)
+    %{status: :ok, kind: :binary, bytes: copied, byte_size: byte_size(copied)}
+  end
+
+  defp normalize_embedded_source({:path, path}) do
+    raise ArgumentError, "embedded font paths must be binaries; got: #{inspect(path)}"
+  end
+
+  defp normalize_embedded_source({:binary, bytes}) do
+    raise ArgumentError, "embedded font binary sources must be binaries; got: #{inspect(bytes)}"
+  end
+
+  defp validate_embedded_family!(family_name, variants) do
+    keys = Map.keys(variants)
+    missing = @embedded_family_variants -- keys
+    extra = keys -- @embedded_family_variants
+
+    if missing != [] or extra != [] do
+      raise Rendro.FontRegistry.EmbeddedFontFamilyError,
+        family_name: family_name,
+        missing_variants: missing,
+        extra_variants: extra,
+        provided_kinds: provided_kinds(variants),
+        reason: :incomplete_embedded_family
+    end
+  end
+
+  defp provided_kinds(variants) do
+    Map.new(variants, fn {variant, source} -> {variant, embedded_source_kind!(source)} end)
+  end
+
   defp fetch_descriptor(registry, logical_name) do
     case fetch(registry, logical_name) do
       {:ok, descriptor} -> {:ok, descriptor}
@@ -155,5 +288,32 @@ defmodule Rendro.FontRegistry do
     |> String.upcase()
     |> String.replace(~r/[^A-Z0-9]/u, "_")
     |> then(&"F_#{&1}")
+  end
+end
+
+defmodule Rendro.FontRegistry.EmbeddedFontFamilyError do
+  defexception [:message, :family_name, :missing_variants, :extra_variants, :provided_kinds, :reason]
+
+  @impl true
+  def exception(opts) do
+    family_name = Keyword.fetch!(opts, :family_name)
+    missing_variants = Keyword.get(opts, :missing_variants, [])
+    extra_variants = Keyword.get(opts, :extra_variants, [])
+    provided_kinds = Keyword.get(opts, :provided_kinds, %{})
+    reason = Keyword.get(opts, :reason, :incomplete_embedded_family)
+
+    message =
+      "embedded font family #{inspect(family_name)} is invalid: " <>
+        "missing=#{inspect(missing_variants)} extra=#{inspect(extra_variants)} " <>
+        "provided_kinds=#{inspect(provided_kinds)} reason=#{inspect(reason)}"
+
+    %__MODULE__{
+      family_name: family_name,
+      missing_variants: missing_variants,
+      extra_variants: extra_variants,
+      provided_kinds: provided_kinds,
+      reason: reason,
+      message: message
+    }
   end
 end

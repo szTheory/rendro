@@ -142,6 +142,39 @@ defmodule Rendro.Document do
   end
 
   @doc """
+  Registers a logical name against an explicit embedded font source.
+  """
+  @spec register_embedded_font(
+          t(),
+          Rendro.FontRegistry.logical_name(),
+          {:path, Path.t()} | {:binary, binary()}
+        ) :: t()
+  def register_embedded_font(%__MODULE__{} = doc, logical_name, source)
+      when is_atom(logical_name) do
+    %__MODULE__{
+      doc
+      | font_registry: Rendro.FontRegistry.register_embedded(doc.font_registry, logical_name, source)
+    }
+  end
+
+  @doc """
+  Registers a four-variant embedded font family on the document.
+  """
+  @spec register_embedded_font_family(
+          t(),
+          Rendro.FontRegistry.logical_name(),
+          %{required(Rendro.FontRegistry.embedded_variant()) => {:path, Path.t()} | {:binary, binary()}}
+        ) :: t()
+  def register_embedded_font_family(%__MODULE__{} = doc, family_name, variants)
+      when is_atom(family_name) and is_map(variants) do
+    %__MODULE__{
+      doc
+      | font_registry:
+          Rendro.FontRegistry.register_embedded_family(doc.font_registry, family_name, variants)
+    }
+  end
+
+  @doc """
   Sets the document default logical font.
 
   The logical name must already be registered on the document.

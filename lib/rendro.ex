@@ -90,6 +90,32 @@ defmodule Rendro do
     Document.put_default_font(doc, logical_name)
   end
 
+  @doc """
+  Registers an explicit embedded font source on a document.
+  """
+  @spec register_embedded_font(
+          Document.t(),
+          Rendro.FontRegistry.logical_name(),
+          {:path, Path.t()} | {:binary, binary()}
+        ) :: Document.t()
+  def register_embedded_font(%Document{} = doc, logical_name, source)
+      when is_atom(logical_name) do
+    Document.register_embedded_font(doc, logical_name, source)
+  end
+
+  @doc """
+  Registers a four-variant embedded font family on a document.
+  """
+  @spec register_embedded_font_family(
+          Document.t(),
+          Rendro.FontRegistry.logical_name(),
+          %{required(Rendro.FontRegistry.embedded_variant()) => {:path, Path.t()} | {:binary, binary()}}
+        ) :: Document.t()
+  def register_embedded_font_family(%Document{} = doc, family_name, variants)
+      when is_atom(family_name) and is_map(variants) do
+    Document.register_embedded_font_family(doc, family_name, variants)
+  end
+
   @spec page(keyword()) :: Page.t()
   def page(attrs \\ []) do
     struct!(Page, attrs)

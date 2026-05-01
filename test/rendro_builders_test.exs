@@ -2,6 +2,7 @@ defmodule RendroBuildersTest do
   use ExUnit.Case, async: true
 
   alias Rendro.{Block, Document, Metadata, Page, PageTemplate, Region, Section, Table, Text}
+  alias Rendro.FontRegistry.EmbeddedFontFamilyError
 
   describe "builder functions" do
     test "text/2 builds a Text struct" do
@@ -85,6 +86,53 @@ defmodule RendroBuildersTest do
       assert doc.default_font == :heading
       assert doc.font_registry.default_font == :heading
       assert doc.font_registry.fonts.heading == %{source: :built_in, family: :helvetica}
+    end
+
+    test "register_embedded_font/3 wraps document embedded-font registration" do
+      bytes = <<5, 4, 3, 2, 1>>
+
+      doc =
+        Rendro.document()
+        |> Rendro.register_embedded_font(:brand, {:binary, bytes})
+
+      assert doc.font_registry.fonts.brand.source == :embedded
+      assert doc.font_registry.fonts.brand.source_kind == :binary
+      assert doc.font_registry.fonts.brand.source_data.bytes == bytes
+    end
+
+    test "register_embedded_font_family/3 registers all four narrow variants explicitly" do
+      bytes = <<9, 8, 7>>
+
+      doc =
+        Rendro.document()
+        |> Rendro.register_embedded_font_family(:brand, %{
+          regular: {:binary, bytes},
+          bold: {:binary, bytes},
+          italic: {:binary, bytes},
+          bold_italic: {:binary, bytes}
+        })
+
+      assert Map.has_key?(doc.font_registry.fonts, :brand)
+      assert Map.has_key?(doc.font_registry.fonts, :brand_bold)
+      assert Map.has_key?(doc.font_registry.fonts, :brand_italic)
+      assert Map.has_key?(doc.font_registry.fonts, :brand_bold_italic)
+      assert doc.font_registry.fonts.brand_bold.variant == :bold
+    end
+
+    test "register_embedded_font_family/3 exposes missing variant details" do
+      error =
+        assert_raise EmbeddedFontFamilyError, fn ->
+          Rendro.document()
+          |> Rendro.register_embedded_font_family(:brand, %{
+            regular: {:binary, <<1>>},
+            italic: {:binary, <<2>>},
+            bold_italic: {:binary, <<3>>}
+          })
+        end
+
+      assert error.family_name == :brand
+      assert error.missing_variants == [:bold]
+      assert error.provided_kinds == %{regular: :binary, italic: :binary, bold_italic: :binary}
     end
 
     test "flow/2 carries explicit template and section data" do

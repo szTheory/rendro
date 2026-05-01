@@ -2,6 +2,7 @@ defmodule Rendro.DocumentTest do
   use ExUnit.Case, async: true
 
   alias Rendro.{Document, FontRegistry, Metadata, Page, PageTemplate, Section}
+  alias Rendro.FontRegistry.EmbeddedFontFamilyError
 
   describe "struct construction" do
     test "creates with defaults" do
@@ -178,6 +179,55 @@ defmodule Rendro.DocumentTest do
       assert doc.font_registry.default_font == :body
       assert {:ok, %{source: :built_in, family: :helvetica}} =
                FontRegistry.fetch(doc.font_registry, :body)
+    end
+
+    test "register_embedded_font/3 eagerly normalizes path input into owned bytes" do
+      path = Path.join(System.tmp_dir!(), "rendro-embedded-path-#{System.unique_integer([:positive])}.ttf")
+      bytes = <<0, 1, 2, 3, 4, 5, 6, 7>>
+      File.write!(path, bytes)
+
+      doc = Document.new() |> Document.register_embedded_font(:brand, {:path, path})
+
+      assert {:ok,
+              %{
+                source: :embedded,
+                source_kind: :path,
+                variant: :regular,
+                source_data: %{status: :ok, kind: :path, bytes: ^bytes, byte_size: 8}
+              }} = FontRegistry.fetch(doc.font_registry, :brand)
+
+      refute get_in(doc.font_registry.fonts[:brand], [:source_data, :path])
+      File.rm!(path)
+    end
+
+    test "register_embedded_font/3 stores binary input as owned pure data" do
+      bytes = <<10, 20, 30, 40>>
+      doc = Document.new() |> Document.register_embedded_font(:brand, {:binary, bytes})
+
+      assert {:ok,
+              %{
+                source: :embedded,
+                source_kind: :binary,
+                source_data: %{status: :ok, kind: :binary, bytes: ^bytes, byte_size: 4}
+              }} = FontRegistry.fetch(doc.font_registry, :brand)
+    end
+
+    test "register_embedded_font_family/3 fails before partial registration with typed details" do
+      bytes = <<1, 2, 3>>
+
+      error =
+        assert_raise EmbeddedFontFamilyError, fn ->
+          Document.new()
+          |> Document.register_embedded_font_family(:brand, %{
+            regular: {:binary, bytes},
+            bold: {:path, "/tmp/brand-bold.ttf"}
+          })
+        end
+
+      assert error.family_name == :brand
+      assert error.reason == :incomplete_embedded_family
+      assert error.missing_variants == [:italic, :bold_italic]
+      assert error.provided_kinds == %{regular: :binary, bold: :path}
     end
   end
 end
