@@ -1,6 +1,6 @@
 defmodule Rendro.PDF.Font do
   @moduledoc """
-  Built-in PDF Type1 font definitions and glyph width metrics.
+  PDF font definitions and glyph width metrics.
 
   Provides Helvetica (the PDF standard sans-serif) with per-glyph widths
   from the Adobe Font Metrics specification. Widths are in units of 1/1000
@@ -9,11 +9,35 @@ defmodule Rendro.PDF.Font do
 
   @type t :: %__MODULE__{
           name: String.t(),
+          source: :built_in | :embedded,
+          subtype: :type1 | :truetype,
+          logical_name: atom() | nil,
           base_font: String.t(),
+          source_kind: :built_in | :path | :binary,
+          embedded?: boolean(),
+          font_bytes: binary() | nil,
+          units_per_em: pos_integer(),
+          ascent: integer(),
+          descent: integer(),
+          default_width: non_neg_integer(),
           widths: %{non_neg_integer() => non_neg_integer()}
         }
 
-  defstruct [:name, :base_font, widths: %{}]
+  defstruct [
+    :name,
+    :source,
+    :subtype,
+    :logical_name,
+    :base_font,
+    :source_kind,
+    :embedded?,
+    :font_bytes,
+    :units_per_em,
+    :ascent,
+    :descent,
+    :default_width,
+    widths: %{}
+  ]
 
   @helvetica_widths %{
     32 => 278,
@@ -117,17 +141,46 @@ defmodule Rendro.PDF.Font do
   def helvetica do
     %__MODULE__{
       name: "F1",
+      source: :built_in,
+      subtype: :type1,
+      logical_name: nil,
       base_font: "Helvetica",
+      source_kind: :built_in,
+      embedded?: false,
+      font_bytes: nil,
+      units_per_em: 1000,
+      ascent: 718,
+      descent: -207,
+      default_width: 556,
       widths: @helvetica_widths
     }
   end
 
+  @spec embedded(keyword()) :: t()
+  def embedded(opts) when is_list(opts) do
+    %__MODULE__{
+      name: Keyword.fetch!(opts, :name),
+      source: :embedded,
+      subtype: :truetype,
+      logical_name: Keyword.fetch!(opts, :logical_name),
+      base_font: Keyword.fetch!(opts, :base_font),
+      source_kind: Keyword.fetch!(opts, :source_kind),
+      embedded?: true,
+      font_bytes: Keyword.fetch!(opts, :font_bytes),
+      units_per_em: Keyword.fetch!(opts, :units_per_em),
+      ascent: Keyword.fetch!(opts, :ascent),
+      descent: Keyword.fetch!(opts, :descent),
+      default_width: Keyword.fetch!(opts, :default_width),
+      widths: Keyword.fetch!(opts, :widths)
+    }
+  end
+
   @spec text_width(t(), String.t(), number()) :: float()
-  def text_width(%__MODULE__{widths: widths}, text, font_size) do
+  def text_width(%__MODULE__{widths: widths, default_width: default_width}, text, font_size) do
     text
     |> String.to_charlist()
     |> Enum.reduce(0, fn char, acc ->
-      acc + Map.get(widths, char, 556)
+      acc + Map.get(widths, char, default_width || 556)
     end)
     |> Kernel.*(font_size / 1000)
   end

@@ -38,13 +38,20 @@ defmodule Rendro.FontRegistry do
           required(:source) => :embedded,
           required(:source_kind) => embedded_source_kind(),
           required(:variant) => embedded_variant(),
-          required(:source_data) => embedded_normalized_source()
+          required(:source_data) => embedded_normalized_source(),
+          optional(:pdf_font) => Rendro.PDF.Font.t()
         }
   @type descriptor :: built_in_descriptor() | embedded_descriptor()
 
   @type resolve_error ::
           {:unknown_logical_font, logical_name()}
           | {:unsupported_font_reference, term()}
+          | {:invalid_embedded_font,
+             %{
+               required(:logical_name) => logical_name(),
+               required(:source_kind) => embedded_source_kind(),
+               required(:reason) => term()
+             }}
 
   @type t :: %__MODULE__{
           fonts: %{optional(logical_name()) => descriptor()},
@@ -130,6 +137,27 @@ defmodule Rendro.FontRegistry do
   end
 
   @doc """
+  Preflights embedded font registrations into cached PDF font descriptors.
+  """
+  @spec preflight(t()) :: {:ok, t()} | {:error, resolve_error()}
+  def preflight(%__MODULE__{} = registry) do
+    registry.fonts
+    |> Enum.reduce_while({:ok, %{}}, fn {logical_name, descriptor}, {:ok, acc} ->
+      case preflight_descriptor(logical_name, descriptor) do
+        {:ok, updated_descriptor} ->
+          {:cont, {:ok, Map.put(acc, logical_name, updated_descriptor)}}
+
+        {:error, _} = error ->
+          {:halt, error}
+      end
+    end)
+    |> case do
+      {:ok, fonts} -> {:ok, %__MODULE__{registry | fonts: fonts}}
+      {:error, _} = error -> error
+    end
+  end
+
+  @doc """
   Sets the registry default to a previously registered logical font name.
   """
   @spec put_default_font(t(), logical_name()) :: t()
@@ -174,8 +202,9 @@ defmodule Rendro.FontRegistry do
           {:ok, Rendro.PDF.Font.t()} | {:error, resolve_error()}
   def resolve_pdf_font(%__MODULE__{} = registry, text_font_ref, document_default_font) do
     with {:ok, logical_name} <- normalize_reference(text_font_ref, document_default_font),
-         {:ok, descriptor} <- fetch_descriptor(registry, logical_name) do
-      {:ok, built_in(descriptor, logical_name)}
+         {:ok, descriptor} <- fetch_descriptor(registry, logical_name),
+         {:ok, pdf_font} <- to_pdf_font(logical_name, descriptor) do
+      {:ok, pdf_font}
     end
   end
 
@@ -280,6 +309,56 @@ defmodule Rendro.FontRegistry do
       {:ok, descriptor} -> {:ok, descriptor}
       :error -> {:error, {:unknown_logical_font, logical_name}}
     end
+  end
+
+  defp preflight_descriptor(_logical_name, %{source: :built_in} = descriptor), do: {:ok, descriptor}
+
+  defp preflight_descriptor(_logical_name, %{source: :embedded, pdf_font: %Rendro.PDF.Font{}} = descriptor),
+    do: {:ok, descriptor}
+
+  defp preflight_descriptor(logical_name, %{source: :embedded, source_kind: source_kind, source_data: %{status: :error, reason: reason}}) do
+    {:error, invalid_embedded_font_error(logical_name, source_kind, reason)}
+  end
+
+  defp preflight_descriptor(
+         logical_name,
+         %{source: :embedded, source_kind: source_kind, source_data: %{status: :ok, bytes: bytes}} = descriptor
+       ) do
+    case Rendro.PDF.FontParser.parse(bytes) do
+      {:ok, parsed} ->
+        pdf_font =
+          Rendro.PDF.Font.embedded(
+            name: resource_name(logical_name),
+            logical_name: logical_name,
+            base_font: parsed.base_font,
+            source_kind: source_kind,
+            font_bytes: bytes,
+            units_per_em: parsed.units_per_em,
+            ascent: parsed.ascent,
+            descent: parsed.descent,
+            default_width: parsed.default_width,
+            widths: parsed.widths
+          )
+
+        {:ok, Map.put(descriptor, :pdf_font, pdf_font)}
+
+      {:error, reason} ->
+        {:error, invalid_embedded_font_error(logical_name, source_kind, reason)}
+    end
+  end
+
+  defp to_pdf_font(logical_name, %{source: :built_in} = descriptor), do: {:ok, built_in(descriptor, logical_name)}
+  defp to_pdf_font(_logical_name, %{source: :embedded, pdf_font: %Rendro.PDF.Font{} = pdf_font}), do: {:ok, pdf_font}
+
+  defp to_pdf_font(logical_name, %{source: :embedded} = descriptor) do
+    with {:ok, descriptor} <- preflight_descriptor(logical_name, descriptor),
+         %Rendro.PDF.Font{} = pdf_font <- Map.fetch!(descriptor, :pdf_font) do
+      {:ok, pdf_font}
+    end
+  end
+
+  defp invalid_embedded_font_error(logical_name, source_kind, reason) do
+    {:invalid_embedded_font, %{logical_name: logical_name, source_kind: source_kind, reason: reason}}
   end
 
   defp resource_name(logical_name) do

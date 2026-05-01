@@ -7,8 +7,10 @@ defmodule Rendro.Pipeline.Build do
 
   @spec run(Rendro.Document.t()) :: {:ok, Rendro.Document.t()} | {:error, term()}
   def run(%Rendro.Document{pages: pages} = doc) when is_list(pages) do
-    case validate(doc) do
-      :ok -> {:ok, normalize(doc)}
+    with {:ok, doc} <- preflight_font_registry(doc),
+         :ok <- validate(doc) do
+      {:ok, normalize(doc)}
+    else
       {:error, _} = err -> err
     end
   end
@@ -102,8 +104,8 @@ defmodule Rendro.Pipeline.Build do
          %Rendro.Document{font_registry: registry, default_font: default_font},
          %Rendro.Block{content: %Rendro.Text{font: font}}
        ) do
-    case FontRegistry.resolve(registry, font, default_font) do
-      {:ok, _descriptor} ->
+    case FontRegistry.resolve_pdf_font(registry, font, default_font) do
+      {:ok, _font} ->
         :ok
 
       {:error, {:unknown_logical_font, logical_name}} ->
@@ -111,6 +113,9 @@ defmodule Rendro.Pipeline.Build do
 
       {:error, {:unsupported_font_reference, font_ref}} ->
         {:error, {:invalid_text_font, font_ref}}
+
+      {:error, {:invalid_embedded_font, _details} = reason} ->
+        {:error, reason}
     end
   end
 
@@ -165,6 +170,16 @@ defmodule Rendro.Pipeline.Build do
 
   defp validate_page(%Rendro.Page{}), do: {:error, :invalid_page_dimensions}
   defp validate_page(_), do: {:error, :invalid_page}
+
+  defp preflight_font_registry(%Rendro.Document{font_registry: registry} = doc) do
+    case FontRegistry.preflight(registry) do
+      {:ok, preflighted_registry} ->
+        {:ok, %{doc | font_registry: preflighted_registry}}
+
+      {:error, _} = error ->
+        error
+    end
+  end
 
   defp normalize(%Rendro.Document{metadata: nil} = doc) do
     %{doc | metadata: %Rendro.Metadata{}}
