@@ -9,7 +9,7 @@
 
 - [x] **FONT-01**: Engineer can register document fonts by logical name and select them from authored text/components without dropping into PDF-writer internals.
 - [ ] **FONT-02**: Measurement, pagination, and rendering use the same resolved font metrics so custom-font documents stay deterministic.
-- [ ] **FONT-03**: Engineer can embed supported custom fonts into generated PDFs through the supported document contract.
+- [x] **FONT-03**: Engineer can embed supported custom fonts into generated PDFs through the supported document contract.
 
 ### Fallback and I18n Boundaries
 
@@ -51,7 +51,7 @@
 |-------------|-------|--------|
 | FONT-01 | Phase 25 | Complete |
 | FONT-02 | Phase 26 | Pending |
-| FONT-03 | Phase 26 | Pending |
+| FONT-03 | Phase 26 | Complete |
 | FONT-04 | Phase 27 | Pending |
 | I18N-01 | Phase 27 | Pending |
 | I18N-02 | Phase 27 | Pending |
@@ -68,4 +68,4 @@
 
 ---
 *Requirements defined: 2026-04-30*
-*Last updated: 2026-04-30 after Phase 25 execution and verification*
+*Last updated: 2026-05-01 after Phase 26 Plan 01 execution and verification*

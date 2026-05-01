@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Deterministic Typography, Assets, and Honest I18n Baseline
-status: verifying
-stopped_at: Completed 25-01-PLAN.md
-last_updated: "2026-04-30T20:35:38.063Z"
-last_activity: 2026-04-30 -- Phase 25 execution and verification checks passed
+status: executing
+stopped_at: Completed 26-01-PLAN.md
+last_updated: "2026-05-01T01:27:40.210Z"
+last_activity: 2026-05-01
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
-  percent: 100
+  total_plans: 5
+  completed_plans: 3
+  percent: 60
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-30)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 25 — font-registry-and-public-typography-contract
+**Current focus:** Phase 26 — deterministic-font-metrics-and-pdf-embedding
 
 ## Current Position
 
-Phase: 25 (font-registry-and-public-typography-contract) — VERIFYING
-Plan: 2 of 2
-Status: Phase 25 execution complete; verification checks passed
-Last activity: 2026-04-30 -- Phase 25 execution and verification checks passed
+Phase: 26 (deterministic-font-metrics-and-pdf-embedding) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-05-01
 
-Progress: [██████████] 100%
+Progress: [██████░░░░] 60%
 
 ## Milestone Snapshot
 
@@ -76,6 +76,7 @@ Progress: [██████████] 100%
 | Phase 24 P01 | 4 min | 3 tasks | 9 files |
 | Phase 24 P02 | 8 min | 2 tasks | 5 files |
 | Phase 25 P01 | 5 min | 2 tasks | 7 files |
+| Phase 26 P01 | 16 min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -134,6 +135,9 @@ Recent decisions affecting current work:
 - Treat verification-artifact wording as executable contract surface when plan gates assert exact markdown markers.
 - Keep Helvetica as a narrow compatibility alias while moving the authored contract to logical font names.
 - Do not mark FONT-01 complete until plan 25-02 wires registry-backed selection into measurement and rendering.
+- Keep embedded font registration separate from built-in registration to preserve explicit product scope.
+- Normalize tagged font sources into owned bytes at registration so later stages never reopen filesystem paths.
+- Use Build as the deterministic embedded-font preflight boundary and cache parsed metrics on the registry for stage reuse.
 
 ### Pending Todos
 
@@ -164,8 +168,8 @@ Items acknowledged and carried forward from milestone scoping:
 
 ## Session Continuity
 
-Last session: 2026-04-30T20:24:51.515Z
-Stopped at: Completed 25-01-PLAN.md
+Last session: 2026-05-01T01:27:40.199Z
+Stopped at: Completed 26-01-PLAN.md
 Resume file: None
 
 **Planned Phase:** 25 (Font Registry and Public Typography Contract) — 2 plans — 2026-04-30T20:11:50.237Z
