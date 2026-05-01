@@ -36,5 +36,28 @@ defmodule Rendro.Pipeline.RenderTest do
       assert pdf =~ "trailer"
       assert pdf =~ "%%EOF"
     end
+
+    test "handles images and delegates to PDF.Writer for drawing" do
+      png_bytes = <<137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, "IHDR", 100::32, 50::32>>
+
+      doc =
+        Rendro.document()
+        |> Rendro.Document.register_image(:logo_png, {:binary, png_bytes})
+        |> Map.put(:pages, [
+          %Rendro.Page{
+            width: 612,
+            height: 792,
+            margin_left: 72,
+            margin_top: 72,
+            blocks: [
+              %Rendro.Block{content: %Rendro.Image{logical_name: :logo_png}, x: 10, y: 20, width: 200, height: 150}
+            ]
+          }
+        ])
+
+      {:ok, pdf} = Render.run(doc)
+
+      assert pdf =~ "/IM_LOGO_PNG Do"
+    end
   end
 end
