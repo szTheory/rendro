@@ -83,6 +83,17 @@ defmodule Rendro.DocsContract.IntegrationsClaimsTest do
     assert {:error, {:invalid_invoice, :not_an_invoice}} = Accrue.recipe(:not_an_invoice)
   end
 
+  test "phase 26 typography claims stay narrow and truthful" do
+    requirements = File.read!(".planning/REQUIREMENTS.md")
+    roadmap = File.read!(".planning/ROADMAP.md")
+    readme = File.read!("README.md")
+
+    assert requirements =~ "Engineer can embed supported custom fonts into generated PDFs"
+    assert roadmap =~ "focused regression coverage"
+    refute readme =~ "supports every language"
+    refute readme =~ "fallback chain"
+  end
+
   defp sample_document do
     text = %Rendro.Text{content: "Invoice", font: "Helvetica", size: 12, color: {0, 0, 0}}
     block = %Rendro.Block{content: text, x: 10, y: 20}
