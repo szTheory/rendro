@@ -32,14 +32,14 @@ defmodule Rendro.PDF.Writer do
     catalog_num = obj_num
 
     {page_obj_nums, next_num} = allocate_page_nums(pages, obj_num + 1)
-    {font_object_refs, next_num} = allocate_font_nums(fonts, next_num)
+    {font_objects, next_num} = allocate_font_nums(fonts, next_num)
     pages_num = next_num
     next_num = next_num + 1
 
     info_num = next_num
     next_num = next_num + 1
 
-    font_objects = build_font_objects(font_object_refs, opts)
+    font_pdf_objects = build_font_objects(font_objects, opts)
 
     page_tree_kids =
       {:array, Enum.map(page_obj_nums, fn {page_num, _} -> {:ref, page_num, 0} end)}
@@ -63,23 +63,24 @@ defmodule Rendro.PDF.Writer do
 
     catalog_obj = Object.indirect_object(catalog_num, 0, Object.serialize(catalog_dict, opts))
 
-    font_map = doc_font_map(font_object_refs)
-    page_objects = build_page_objects(doc, page_obj_nums, pages_num, font_object_refs, font_map, opts)
+    font_map = doc_font_map(font_objects)
+    page_objects = build_page_objects(doc, page_obj_nums, pages_num, font_objects, font_map, opts)
 
     info_dict = build_info_dict(metadata, opts)
     info_obj = Object.indirect_object(info_num, 0, Object.serialize(info_dict, opts))
 
     total_objects = next_num
-    objects = [catalog_obj | font_objects] ++ [pages_obj | page_objects] ++ [info_obj]
 
-    {Enum.zip(
-       [catalog_num] ++
-         Enum.map(font_object_refs, fn {_font, obj_num} -> obj_num end) ++
-         [pages_num] ++
-         Enum.flat_map(page_obj_nums, fn {p, c} -> [p, c] end) ++
-         [info_num],
-       objects
-     ), catalog_num, info_num, total_objects}
+    numbered_objects =
+      [{catalog_num, catalog_obj}] ++
+        font_pdf_objects ++
+        [{pages_num, pages_obj}] ++
+        Enum.zip(
+          Enum.flat_map(page_obj_nums, fn {p, c} -> [p, c] end),
+          page_objects
+        ) ++ [{info_num, info_obj}]
+
+    {numbered_objects, catalog_num, info_num, total_objects}
   end
 
   defp allocate_page_nums(pages, start_num) do
@@ -95,29 +96,155 @@ defmodule Rendro.PDF.Writer do
 
   defp allocate_font_nums(fonts, start_num) do
     Enum.map_reduce(fonts, start_num, fn font, num ->
-      {{font, num}, num + 1}
+      allocation =
+        if font.embedded? do
+          %{
+            font: font,
+            font_obj_num: num,
+            descriptor_obj_num: num + 1,
+            widths_obj_num: num + 2,
+            font_file_obj_num: num + 3
+          }
+        else
+          %{font: font, font_obj_num: num}
+        end
+
+      {allocation, next_font_num(allocation)}
     end)
   end
 
-  defp build_font_objects(font_object_refs, opts) do
-    Enum.map(font_object_refs, fn {font, obj_num} ->
-      font_dict =
-        {:dict,
-         [
-           {"Type", {:name, "Font"}},
-           {"Subtype", {:name, "Type1"}},
-           {"BaseFont", {:name, font.base_font}}
-         ]}
+  defp next_font_num(%{font_file_obj_num: obj_num}), do: obj_num + 1
+  defp next_font_num(%{font_obj_num: obj_num}), do: obj_num + 1
 
-      Object.indirect_object(obj_num, 0, Object.serialize(font_dict, opts))
+  defp build_font_objects(font_allocations, opts) do
+    Enum.flat_map(font_allocations, fn allocation ->
+      build_font_object(allocation, opts)
     end)
   end
 
-  defp doc_font_map(font_object_refs) do
-    Map.new(font_object_refs, fn {font, obj_num} -> {font.name, {font, obj_num}} end)
+  defp build_font_object(%{font: %Font{embedded?: false} = font, font_obj_num: obj_num}, opts) do
+    font_dict =
+      {:dict,
+       [
+         {"Type", {:name, "Font"}},
+         {"Subtype", {:name, "Type1"}},
+         {"BaseFont", {:name, font.base_font}}
+       ]}
+
+    [{obj_num, Object.indirect_object(obj_num, 0, Object.serialize(font_dict, opts))}]
   end
 
-  defp build_page_objects(%Rendro.Document{pages: pages} = doc, page_obj_nums, pages_num, font_object_refs, font_map, opts) do
+  defp build_font_object(
+         %{
+           font: %Font{embedded?: true} = font,
+           font_obj_num: font_obj_num,
+           descriptor_obj_num: descriptor_obj_num,
+           widths_obj_num: widths_obj_num,
+           font_file_obj_num: font_file_obj_num
+         },
+         opts
+       ) do
+    {first_char, last_char, widths} = embedded_widths(font)
+
+    widths_object =
+      {widths_obj_num,
+       Object.indirect_object(
+         widths_obj_num,
+         0,
+         Object.serialize({:array, widths}, opts)
+       )}
+
+    descriptor_dict =
+      {:dict,
+       [
+         {"Type", {:name, "FontDescriptor"}},
+         {"FontName", {:name, font.base_font}},
+         {"Flags", 32},
+         {"FontBBox", {:array, [0, scale_font_metric(font, font.descent), 1000, scale_font_metric(font, font.ascent)]}},
+         {"Ascent", scale_font_metric(font, font.ascent)},
+         {"Descent", scale_font_metric(font, font.descent)},
+         {"CapHeight", scale_font_metric(font, font.ascent)},
+         {"ItalicAngle", 0},
+         {"StemV", 80},
+         {"FontFile2", {:ref, font_file_obj_num, 0}}
+       ]}
+
+    descriptor_object =
+      {descriptor_obj_num,
+       Object.indirect_object(
+         descriptor_obj_num,
+         0,
+         Object.serialize(descriptor_dict, opts)
+       )}
+
+    font_file_stream =
+      {:stream,
+       [
+         {"Subtype", {:name, "OpenType"}}
+       ], font.font_bytes}
+
+    font_file_object =
+      {font_file_obj_num,
+       Object.indirect_object(
+         font_file_obj_num,
+         0,
+         Object.serialize(font_file_stream, opts)
+       )}
+
+    font_dict =
+      {:dict,
+       [
+         {"Type", {:name, "Font"}},
+         {"Subtype", {:name, "TrueType"}},
+         {"BaseFont", {:name, font.base_font}},
+         {"FirstChar", first_char},
+         {"LastChar", last_char},
+         {"Widths", {:ref, widths_obj_num, 0}},
+         {"FontDescriptor", {:ref, descriptor_obj_num, 0}},
+         {"Encoding", {:name, "WinAnsiEncoding"}}
+       ]}
+
+    font_object =
+      {font_obj_num,
+       Object.indirect_object(font_obj_num, 0, Object.serialize(font_dict, opts))}
+
+    [font_object, descriptor_object, widths_object, font_file_object]
+  end
+
+  defp embedded_widths(%Font{} = font) do
+    encoded_widths =
+      32..255
+      |> Enum.filter(&Map.has_key?(font.widths, &1))
+
+    {first_char, last_char} =
+      case encoded_widths do
+        [] -> {32, 255}
+        _ -> {Enum.min(encoded_widths), Enum.max(encoded_widths)}
+      end
+
+    widths =
+      Enum.map(first_char..last_char, fn codepoint ->
+        font.widths
+        |> Map.get(codepoint, font.default_width)
+        |> scale_font_metric(font.units_per_em)
+      end)
+
+    {first_char, last_char, widths}
+  end
+
+  defp scale_font_metric(%Font{units_per_em: units_per_em}, metric) do
+    scale_font_metric(metric, units_per_em)
+  end
+
+  defp scale_font_metric(metric, units_per_em) when is_integer(metric) and is_integer(units_per_em) do
+    round(metric * 1000 / units_per_em)
+  end
+
+  defp doc_font_map(font_allocations) do
+    Map.new(font_allocations, fn %{font: font} = allocation -> {font.name, allocation} end)
+  end
+
+  defp build_page_objects(%Rendro.Document{pages: pages} = doc, page_obj_nums, pages_num, font_allocations, font_map, opts) do
     Enum.zip(pages, page_obj_nums)
     |> Enum.flat_map(fn {page, {page_num, content_num}} ->
       content_data = build_content_stream(doc, page, font_map)
@@ -131,7 +258,7 @@ defmodule Rendro.PDF.Writer do
         {:dict,
          [
            {"Font",
-            {:dict, font_resource_entries(font_object_refs)}}
+            {:dict, font_resource_entries(font_allocations)}}
          ]}
 
       media_box =
@@ -291,7 +418,7 @@ defmodule Rendro.PDF.Writer do
   end
 
   defp font_resource_entries(font_object_refs) do
-    Enum.map(font_object_refs, fn {font, obj_num} ->
+    Enum.map(font_object_refs, fn %{font: font, font_obj_num: obj_num} ->
       {font.name, {:ref, obj_num, 0}}
     end)
   end
@@ -306,7 +433,7 @@ defmodule Rendro.PDF.Writer do
   defp resolved_font_name(font, font_map) do
     case Map.fetch(font_map, font.name) do
       {:ok, _font_ref} -> font.name
-      :error -> Font.helvetica().name
+      :error -> raise ArgumentError, "missing collected PDF font resource for #{inspect(font.name)}"
     end
   end
 

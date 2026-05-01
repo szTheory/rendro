@@ -3,6 +3,7 @@ defmodule Rendro.PDF.WriterTest do
 
   alias Rendro.PDF.{Font, Writer}
   alias Rendro.Pipeline.MeasuredText
+  alias Rendro.TestSupport.FontFixture
 
   defp sample_document do
     text = %Rendro.Text{content: "Hello, Rendro!", font: "Helvetica", size: 12, color: {0, 0, 0}}
@@ -211,6 +212,47 @@ defmodule Rendro.PDF.WriterTest do
       assert pdf =~ "/F_HEADING"
       assert pdf =~ "/BaseFont /Helvetica"
       assert pdf =~ "(Heading) Tj"
+    end
+
+    test "embeds a supported custom font through explicit PDF font objects" do
+      %{bytes: bytes} = FontFixture.supported_font()
+
+      doc =
+        Rendro.document()
+        |> Rendro.register_embedded_font(:brand, {:binary, bytes})
+        |> Map.put(:pages, [
+          %Rendro.Page{
+            blocks: [
+              %Rendro.Block{content: Rendro.text("Brand heading", font: :brand), x: 0, y: 0}
+            ]
+          }
+        ])
+
+      assert {:ok, pdf} = Writer.render(doc, deterministic: true)
+
+      assert pdf =~ "/F_BRAND"
+      assert pdf =~ "/Subtype /TrueType"
+      assert pdf =~ "/FontDescriptor"
+      assert pdf =~ "/FontFile2"
+      assert pdf =~ "/Encoding /WinAnsiEncoding"
+      assert pdf =~ "(Brand heading) Tj"
+      refute pdf =~ "/BaseFont /Helvetica"
+    end
+
+    test "fails for an invalid explicit embedded font instead of falling back to a built-in face" do
+      doc =
+        Rendro.document()
+        |> Rendro.register_embedded_font(:brand, {:binary, "not-a-font"})
+        |> Map.put(:pages, [
+          %Rendro.Page{
+            blocks: [
+              %Rendro.Block{content: Rendro.text("Brand heading", font: :brand), x: 0, y: 0}
+            ]
+          }
+        ])
+
+      assert {:error, {:invalid_embedded_font, %{logical_name: :brand, reason: :unsupported_font_format}}} =
+               Writer.render(doc)
     end
   end
 
