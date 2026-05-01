@@ -7,6 +7,10 @@ defmodule Rendro.Pipeline.MeasureTest do
   alias Rendro.Pipeline.MeasuredText
   alias Rendro.TestSupport.FontFixture
 
+  defp lines_text(%MeasuredText{lines: lines}) do
+    Enum.map(lines, fn line -> Enum.map_join(line, "", & &1.text) end)
+  end
+
   describe "run/1" do
     test "computes width and height for blocks with nil dimensions" do
       text = %Rendro.Text{content: "Hello", font: "Helvetica", size: 12, color: {0, 0, 0}}
@@ -21,7 +25,7 @@ defmodule Rendro.Pipeline.MeasureTest do
       assert is_number(measured_block.width)
       assert measured_block.width > 0
       assert measured_block.height == 12 * 1.2
-      assert %MeasuredText{lines: ["Hello"]} = measured_block.content
+      assert lines_text(measured_block.content) == ["Hello"]
     end
 
     test "preserves explicit width, fills in nil height" do
@@ -138,9 +142,8 @@ defmodule Rendro.Pipeline.MeasureTest do
       [first_block] = hd(first.pages).blocks
       [second_block] = hd(second.pages).blocks
 
-      assert %MeasuredText{lines: lines} = first_block.content
-      assert lines == second_block.content.lines
-      assert length(lines) > 1
+      assert lines_text(first_block.content) == lines_text(second_block.content)
+      assert length(first_block.content.lines) > 1
     end
 
     test "preserves explicit newlines as distinct measured lines" do
@@ -159,7 +162,7 @@ defmodule Rendro.Pipeline.MeasureTest do
       assert {:ok, result} = Measure.run(doc)
       [block] = hd(result.pages).blocks
 
-      assert %MeasuredText{lines: ["alpha beta", "gamma delta"]} = block.content
+      assert lines_text(block.content) == ["alpha beta", "gamma delta"]
     end
 
     test "preserves authored repeated whitespace when width-constrained" do
@@ -178,7 +181,7 @@ defmodule Rendro.Pipeline.MeasureTest do
       assert {:ok, result} = Measure.run(doc)
       [block] = hd(result.pages).blocks
 
-      assert %MeasuredText{lines: ["alpha  beta"]} = block.content
+      assert lines_text(block.content) == ["alpha  beta"]
     end
 
     test "falls back to grapheme wrapping for an oversized token" do
@@ -196,7 +199,7 @@ defmodule Rendro.Pipeline.MeasureTest do
 
       assert {:ok, result} = Measure.run(doc)
       [block] = hd(result.pages).blocks
-      assert %MeasuredText{lines: lines} = block.content
+      lines = lines_text(block.content)
 
       assert length(lines) > 1
       assert Enum.all?(lines, &(String.length(&1) >= 1))
@@ -282,13 +285,12 @@ defmodule Rendro.Pipeline.MeasureTest do
       [built_in_block] = hd(built_in_result.pages).blocks
       [embedded_block] = hd(embedded_result.pages).blocks
 
-      assert %MeasuredText{lines: ["alpha beta gamma delta"], resolved_font: built_in_font} =
-               built_in_block.content
+      assert lines_text(built_in_block.content) == ["alpha beta gamma delta"]
+      assert %MeasuredText{resolved_font: built_in_font} = built_in_block.content
 
-      assert %MeasuredText{lines: embedded_lines, resolved_font: embedded_font} =
-               embedded_block.content
+      assert lines_text(embedded_block.content) == ["alpha beta ", "gamma delta"]
+      assert %MeasuredText{resolved_font: embedded_font} = embedded_block.content
 
-      assert embedded_lines == ["alpha beta ", "gamma delta"]
       assert_in_delta embedded_block.height, 28.8, 1.0e-9
       assert embedded_block.height > built_in_block.height
       assert embedded_font.source == :embedded
@@ -311,10 +313,6 @@ defmodule Rendro.Pipeline.MeasureTest do
       measured_table = measured_block.content
       
       assert measured_block.width == 400
-      # col 1: 100 (fixed)
-      # remaining: 300
-      # col 2: 300 * (1/3) = 100
-      # col 3: 300 * (2/3) = 200
       assert measured_table.column_widths == [100.0, 100.0, 200.0]
     end
 
@@ -333,10 +331,7 @@ defmodule Rendro.Pipeline.MeasureTest do
       
       [row_h] = measured_table.row_heights
       
-      # Height should be > 14.4 because it wraps
       assert row_h > 15
-      
-      # The block height should match the row height
       assert measured_block.height == row_h
     end
   end

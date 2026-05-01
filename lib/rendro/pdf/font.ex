@@ -184,4 +184,14 @@ defmodule Rendro.PDF.Font do
     end)
     |> Kernel.*(font_size / 1000)
   end
+
+  @doc """
+  Checks if the font has explicitly defined glyphs for all codepoints in the text.
+  """
+  @spec has_glyph?(t(), String.t()) :: boolean()
+  def has_glyph?(%__MODULE__{widths: widths}, text) when is_binary(text) do
+    text
+    |> String.to_charlist()
+    |> Enum.all?(&Map.has_key?(widths, &1))
+  end
 end

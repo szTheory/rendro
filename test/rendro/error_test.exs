@@ -26,6 +26,22 @@ defmodule Rendro.ErrorTest do
     assert is_binary(error.render_id)
   end
 
+  describe "from_stage/3 with stage :measure (Phase 27)" do
+    test ":unsupported_glyph emits fallback guidance" do
+      err = Rendro.Error.from_stage(:measure, {:unsupported_glyph, "A"}, %{})
+      assert err.stage == :measure
+      assert err.why == "Missing glyph for character: A"
+      assert err.next =~ "appropriate fallback font"
+    end
+
+    test ":unsupported_script emits shaping boundary guidance" do
+      err = Rendro.Error.from_stage(:measure, {:unsupported_script, :rtl_required}, %{})
+      assert err.stage == :measure
+      assert err.why == "Unsupported script boundary: rtl required"
+      assert err.next =~ "Rendro does not currently support complex text shaping or RTL boundaries"
+    end
+  end
+
   describe "from_stage/3 with stage :validate (Phase 6 D-09)" do
     test ":structural_corruption emits the structural-bug guidance" do
       err = Rendro.Error.from_stage(:validate, :structural_corruption, %{})

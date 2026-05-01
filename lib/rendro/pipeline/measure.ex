@@ -68,9 +68,10 @@ defmodule Rendro.Pipeline.Measure do
   end
 
   defp measure_block(doc, %Rendro.Block{content: %Rendro.Text{} = text} = block, _container_width) do
-    with {:ok, resolved_font} <- resolve_font(doc, text) do
-      lines = wrap_text(text.content, block.width, resolved_font, text.size)
-      measured_width = measured_text_width(lines, resolved_font, text.size)
+    with [] <- Rendro.I18n.Analyzer.analyze(text.content),
+         {:ok, font_chain} <- resolve_font_chain(doc, text),
+         {:ok, lines} <- wrap_text(text.content, block.width, font_chain, text.size) do
+      measured_width = measured_text_width(lines)
       width = block.width || measured_width
       measured_height = text.size * text.line_height * length(lines)
       height = block.height || measured_height
@@ -81,10 +82,16 @@ defmodule Rendro.Pipeline.Measure do
         line_height: text.line_height,
         width: measured_width,
         height: measured_height,
-        resolved_font: resolved_font
+        resolved_font: hd(font_chain)
       }
 
       {:ok, %{block | content: measured_text, width: width, height: height}}
+    else
+      [%{type: :unsupported_script, reason: reason} | _] ->
+        {:error, {:unsupported_script, reason}}
+
+      {:error, _} = err ->
+        err
     end
   end
 
@@ -214,56 +221,89 @@ defmodule Rendro.Pipeline.Measure do
   defp body_capacity(%{body_region: %Region{height: height}}) when is_number(height), do: height
   defp body_capacity(_layout), do: 0
 
-  defp wrap_text(text, nil, _font, _font_size), do: String.split(text, "\n", trim: false)
 
-  defp wrap_text(text, max_width, font, font_size) do
+  defp wrap_text(text, nil, font_chain, font_size) do
     text
     |> String.split("\n", trim: false)
-    |> Enum.flat_map(&wrap_segment(&1, max_width, font, font_size))
-  end
-
-  defp wrap_segment("", _max_width, _font, _font_size), do: [""]
-
-  defp wrap_segment(segment, max_width, font, font_size) do
-    chunks = Regex.scan(~r/\s+|\S+/, segment) |> List.flatten()
-
-    case chunks do
-      [] ->
-        [""]
-
-      [chunk | rest] ->
-        chunk
-        |> split_chunk(max_width, font, font_size)
-        |> wrap_chunks(rest, max_width, font, font_size)
-    end
-  end
-
-  defp wrap_chunks(lines, chunks, max_width, font, font_size) do
-    Enum.reduce(chunks, lines, fn chunk, acc_lines ->
-      {leading_lines, [current_line]} = Enum.split(acc_lines, length(acc_lines) - 1)
-      candidate = current_line <> chunk
-
-      if Font.text_width(font, candidate, font_size) <= max_width do
-        leading_lines ++ [candidate]
-      else
-        acc_lines ++ split_chunk(chunk, max_width, font, font_size)
+    |> Enum.reduce_while({:ok, []}, fn segment, {:ok, lines} ->
+      case measure_text_into_runs(segment, font_chain, font_size) do
+        {:ok, runs} -> {:cont, {:ok, lines ++ [runs]}}
+        err -> {:halt, err}
       end
     end)
   end
 
-  defp split_chunk(chunk, max_width, font, font_size) do
-    if Font.text_width(font, chunk, font_size) <= max_width do
-      [chunk]
-    else
-      split_graphemes(chunk, max_width, font, font_size)
+  defp wrap_text(text, max_width, font_chain, font_size) do
+    text
+    |> String.split("\n", trim: false)
+    |> Enum.reduce_while({:ok, []}, fn segment, {:ok, lines} ->
+      case wrap_segment(segment, max_width, font_chain, font_size) do
+        {:ok, segment_lines} -> {:cont, {:ok, lines ++ segment_lines}}
+        err -> {:halt, err}
+      end
+    end)
+  end
+
+  defp wrap_segment("", _max_width, _font_chain, _font_size), do: {:ok, [[]]}
+
+  defp wrap_segment(segment, max_width, font_chain, font_size) do
+    chunks = Regex.scan(~r/\s+|\S+/, segment) |> List.flatten()
+
+    case chunks do
+      [] ->
+        {:ok, [[]]}
+
+      [chunk | rest] ->
+        with {:ok, split_lines} <- split_chunk(chunk, max_width, font_chain, font_size),
+             {:ok, wrapped_lines} <- wrap_chunks(split_lines, rest, max_width, font_chain, font_size) do
+          {:ok, wrapped_lines}
+        end
     end
   end
 
-  defp resolve_font(
+  defp wrap_chunks(lines, chunks, max_width, font_chain, font_size) do
+    Enum.reduce_while(chunks, {:ok, lines}, fn chunk, {:ok, acc_lines} ->
+      {leading_lines, [current_line]} = Enum.split(acc_lines, length(acc_lines) - 1)
+      
+      case measure_text_into_runs(chunk, font_chain, font_size) do
+        {:ok, chunk_runs} ->
+          candidate_line = merge_runs(current_line, chunk_runs)
+          candidate_width = runs_width(candidate_line)
+
+          if candidate_width <= max_width do
+            {:cont, {:ok, leading_lines ++ [candidate_line]}}
+          else
+            case split_chunk(chunk, max_width, font_chain, font_size) do
+              {:ok, chunk_lines} ->
+                {:cont, {:ok, acc_lines ++ chunk_lines}}
+              err -> {:halt, err}
+            end
+          end
+          
+        err ->
+          {:halt, err}
+      end
+    end)
+  end
+
+  defp split_chunk(chunk, max_width, font_chain, font_size) do
+    case measure_text_into_runs(chunk, font_chain, font_size) do
+      {:ok, chunk_runs} ->
+        if runs_width(chunk_runs) <= max_width do
+          {:ok, [chunk_runs]}
+        else
+          split_graphemes(chunk, max_width, font_chain, font_size)
+        end
+      err ->
+        err
+    end
+  end
+
+  defp resolve_font_chain(
          %Rendro.Document{font_registry: registry, default_font: default_font},
          %Rendro.Text{font: font}
        ) do
-    FontRegistry.resolve_pdf_font(registry, font, default_font)
+    FontRegistry.resolve_pdf_font_chain(registry, font, default_font)
   end
 
   defp map_ok(enum, fun) do
@@ -275,35 +315,112 @@ defmodule Rendro.Pipeline.Measure do
     end)
   end
 
-  defp split_graphemes(text, max_width, font, font_size) do
-    {lines, current_line} =
-      Enum.reduce(String.graphemes(text), {[], ""}, fn grapheme, {lines, current_line} ->
-        candidate = current_line <> grapheme
+  defp split_graphemes(text, max_width, font_chain, font_size) do
+    result =
+      Enum.reduce_while(String.graphemes(text), {:ok, {[], []}}, fn grapheme, {:ok, {lines, current_line}} ->
+        case find_font_for_grapheme(grapheme, font_chain) do
+          {:ok, font} ->
+            width = Font.text_width(font, grapheme, font_size)
+            grapheme_run = [%{font: font, text: grapheme, width: width}]
+            
+            candidate_line = merge_runs(current_line, grapheme_run)
+            
+            cond do
+              current_line == [] and width <= max_width ->
+                {:cont, {:ok, {lines, candidate_line}}}
 
-        cond do
-          current_line == "" and Font.text_width(font, candidate, font_size) <= max_width ->
-            {lines, candidate}
+              current_line == [] ->
+                {:cont, {:ok, {[candidate_line | lines], []}}}
 
-          current_line == "" ->
-            {[candidate | lines], ""}
+              runs_width(candidate_line) <= max_width ->
+                {:cont, {:ok, {lines, candidate_line}}}
 
-          Font.text_width(font, candidate, font_size) <= max_width ->
-            {lines, candidate}
+              true ->
+                {:cont, {:ok, {[current_line | lines], grapheme_run}}}
+            end
 
-          true ->
-            {[current_line | lines], grapheme}
+          :error ->
+            {:halt, {:error, {:unsupported_glyph, grapheme}}}
         end
       end)
 
-    case current_line do
-      "" -> Enum.reverse(lines)
-      _ -> Enum.reverse([current_line | lines])
+    case result do
+      {:ok, {lines, current_line}} ->
+        final_lines = 
+          case current_line do
+            [] -> Enum.reverse(lines)
+            _ -> Enum.reverse([current_line | lines])
+          end
+        {:ok, final_lines}
+
+      err ->
+        err
     end
   end
 
-  defp measured_text_width(lines, font, font_size) do
+  defp measured_text_width(lines) do
     lines
-    |> Enum.map(&Font.text_width(font, &1, font_size))
+    |> Enum.map(&runs_width/1)
     |> Enum.max(fn -> 0 end)
+  end
+
+  defp measure_text_into_runs(text, font_chain, font_size) do
+    result =
+      Enum.reduce_while(String.graphemes(text), {:ok, []}, fn grapheme, {:ok, runs} ->
+        case find_font_for_grapheme(grapheme, font_chain) do
+          {:ok, font} ->
+            width = Font.text_width(font, grapheme, font_size)
+            {:cont, {:ok, append_to_runs(runs, font, grapheme, width)}}
+
+          :error ->
+            {:halt, {:error, {:unsupported_glyph, grapheme}}}
+        end
+      end)
+      
+    case result do
+      {:ok, runs} -> {:ok, Enum.reverse(runs)}
+      err -> err
+    end
+  end
+
+  defp find_font_for_grapheme(grapheme, font_chain) do
+    Enum.find_value(font_chain, :error, fn font ->
+      if Font.has_glyph?(font, grapheme) do
+        {:ok, font}
+      else
+        nil
+      end
+    end)
+  end
+
+  defp append_to_runs([], font, text, width) do
+    [%{font: font, text: text, width: width}]
+  end
+  defp append_to_runs([%{font: f, text: t, width: w} | rest], font, text, width) when f == font do
+    [%{font: f, text: t <> text, width: w + width} | rest]
+  end
+  defp append_to_runs(runs, font, text, width) do
+    [%{font: font, text: text, width: width} | runs]
+  end
+
+  defp merge_runs(runs1, []) do
+    runs1
+  end
+  defp merge_runs([], runs2) do
+    runs2
+  end
+  defp merge_runs(runs1, runs2) do
+    last_run1 = List.last(runs1)
+    [first_run2 | rest2] = runs2
+    if last_run1.font == first_run2.font do
+      merged_run = %{font: last_run1.font, text: last_run1.text <> first_run2.text, width: last_run1.width + first_run2.width}
+      Enum.slice(runs1, 0, length(runs1) - 1) ++ [merged_run] ++ rest2
+    else
+      runs1 ++ runs2
+    end
+  end
+
+  defp runs_width(runs) do
+    Enum.reduce(runs, 0, fn run, acc -> acc + run.width end)
   end
 end

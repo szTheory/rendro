@@ -49,6 +49,10 @@ defmodule Rendro.Error do
   defp what(:validate, _reason), do: "Post-render validation failed."
   defp what(stage, _reason), do: "Render pipeline failed in stage #{inspect(stage)}."
 
+  defp why({:unsupported_glyph, char}), do: "Missing glyph for character: #{char}"
+  defp why({:unsupported_script, reason}) when is_atom(reason),
+    do: "Unsupported script boundary: #{reason |> Atom.to_string() |> String.replace("_", " ")}"
+
   defp why(reason) when is_atom(reason),
     do: reason |> Atom.to_string() |> String.replace("_", " ")
 
@@ -69,6 +73,14 @@ defmodule Rendro.Error do
 
   defp next_step(:measure, :no_body_capacity) do
     "Increase the body region height or reduce reserved header/footer regions so flow content has usable space."
+  end
+
+  defp next_step(:measure, {:unsupported_glyph, _char}) do
+    "Register an appropriate fallback font that contains the missing character using the fallbacks: [...] option."
+  end
+
+  defp next_step(:measure, {:unsupported_script, _reason}) do
+    "Rendro does not currently support complex text shaping or RTL boundaries. Ensure input text falls within supported Unicode boundaries."
   end
 
   defp next_step(:paginate, :content_overflow) do
