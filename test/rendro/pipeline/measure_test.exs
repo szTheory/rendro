@@ -299,6 +299,64 @@ defmodule Rendro.Pipeline.MeasureTest do
       assert embedded_font.base_font != built_in_font.base_font
     end
 
+    test "measures image missing height from intrinsic aspect ratio" do
+      doc = %Rendro.Document{
+        asset_registry: %Rendro.AssetRegistry{
+          assets: %{logo: %{binary: <<0>>, width: 400, height: 200, mime: "image/png"}}
+        },
+        pages: [
+          %Rendro.Page{
+            blocks: [
+              %Rendro.Block{content: %Rendro.Image{logical_name: :logo}, width: 200}
+            ]
+          }
+        ],
+        metadata: %Rendro.Metadata{}
+      }
+
+      assert {:ok, result} = Measure.run(doc)
+      [block] = hd(result.pages).blocks
+      assert block.width == 200
+      assert block.height == 100
+    end
+
+    test "measures image missing width from intrinsic aspect ratio" do
+      doc = %Rendro.Document{
+        asset_registry: %Rendro.AssetRegistry{
+          assets: %{logo: %{binary: <<0>>, width: 400, height: 200, mime: "image/png"}}
+        },
+        pages: [
+          %Rendro.Page{
+            blocks: [
+              %Rendro.Block{content: %Rendro.Image{logical_name: :logo}, height: 50}
+            ]
+          }
+        ],
+        metadata: %Rendro.Metadata{}
+      }
+
+      assert {:ok, result} = Measure.run(doc)
+      [block] = hd(result.pages).blocks
+      assert block.width == 100
+      assert block.height == 50
+    end
+
+    test "fails image measurement if logical_name is not found in AssetRegistry" do
+      doc = %Rendro.Document{
+        asset_registry: %Rendro.AssetRegistry{},
+        pages: [
+          %Rendro.Page{
+            blocks: [
+              %Rendro.Block{content: %Rendro.Image{logical_name: :unknown}, width: 200}
+            ]
+          }
+        ],
+        metadata: %Rendro.Metadata{}
+      }
+
+      assert {:error, {:missing_asset, :unknown}} = Measure.run(doc)
+    end
+
     test "resolves authored column rules deterministically against block width" do
       table = Rendro.table(
         [["a", "b", "c"]],

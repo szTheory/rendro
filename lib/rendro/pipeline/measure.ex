@@ -95,6 +95,42 @@ defmodule Rendro.Pipeline.Measure do
     end
   end
 
+  defp measure_block(doc, %Rendro.Block{content: %Rendro.Image{} = image} = block, _container_width) do
+    with {:ok, %{width: intrinsic_w, height: intrinsic_h}} <-
+           Rendro.AssetRegistry.fetch(doc.asset_registry, image.logical_name) do
+      aspect_ratio = intrinsic_w / intrinsic_h
+
+      {width, height} =
+        case {block.width, block.height, image.fit} do
+          {nil, nil, {fit_w, fit_h}} ->
+            fit_aspect = fit_w / fit_h
+
+            if aspect_ratio > fit_aspect do
+              {fit_w, fit_w / aspect_ratio}
+            else
+              {fit_h * aspect_ratio, fit_h}
+            end
+
+          {w, nil, nil} when not is_nil(w) ->
+            {w, w / aspect_ratio}
+
+          {nil, h, nil} when not is_nil(h) ->
+            {h * aspect_ratio, h}
+
+          {w, h, nil} when not is_nil(w) and not is_nil(h) ->
+            {w, h}
+
+          _ ->
+            {intrinsic_w, intrinsic_h}
+        end
+
+      {:ok, %{block | width: width, height: height}}
+    else
+      :error ->
+        {:error, {:missing_asset, image.logical_name}}
+    end
+  end
+
   defp measure_block(_doc, block, _container_width), do: {:ok, block}
 
   defp measure_table_row(_doc, nil, _col_widths), do: {:ok, {nil, 0}}
