@@ -68,9 +68,9 @@ defmodule Rendro.Pipeline.Measure do
   end
 
   defp measure_block(doc, %Rendro.Block{content: %Rendro.Text{} = text} = block, _container_width) do
-    with {:ok, font} <- resolve_font(doc, text) do
-      lines = wrap_text(text.content, block.width, font, text.size)
-      measured_width = measured_text_width(lines, font, text.size)
+    with {:ok, resolved_font} <- resolve_font(doc, text) do
+      lines = wrap_text(text.content, block.width, resolved_font, text.size)
+      measured_width = measured_text_width(lines, resolved_font, text.size)
       width = block.width || measured_width
       measured_height = text.size * text.line_height * length(lines)
       height = block.height || measured_height
@@ -81,7 +81,7 @@ defmodule Rendro.Pipeline.Measure do
         line_height: text.line_height,
         width: measured_width,
         height: measured_height,
-        resolved_font: font
+        resolved_font: resolved_font
       }
 
       {:ok, %{block | content: measured_text, width: width, height: height}}

@@ -5,6 +5,7 @@ defmodule Rendro.Pipeline.MeasureTest do
   alias Rendro.Pipeline.Compose
   alias Rendro.Pipeline.Measure
   alias Rendro.Pipeline.MeasuredText
+  alias Rendro.TestSupport.FontFixture
 
   describe "run/1" do
     test "computes width and height for blocks with nil dimensions" do
@@ -245,6 +246,55 @@ defmodule Rendro.Pipeline.MeasureTest do
 
       assert %MeasuredText{resolved_font: %{name: "F_HEADING", base_font: "Helvetica"}} =
                block.content
+    end
+
+    test "uses embedded font metrics for deterministic wrapping and carries the resolved font" do
+      %{bytes: bytes} = FontFixture.supported_font()
+      constrained_width = 150
+      content = "alpha beta gamma delta"
+
+      built_in_doc =
+        %Rendro.Document{
+          pages: [
+            %Rendro.Page{
+              blocks: [
+                Rendro.block(Rendro.text(content, font: :default, size: 12), width: constrained_width)
+              ]
+            }
+          ],
+          metadata: %Rendro.Metadata{}
+        }
+
+      embedded_doc =
+        Rendro.document()
+        |> Rendro.register_embedded_font(:brand, {:binary, bytes})
+        |> Map.put(:pages, [
+          %Rendro.Page{
+            blocks: [
+              Rendro.block(Rendro.text(content, font: :brand, size: 12), width: constrained_width)
+            ]
+          }
+        ])
+
+      assert {:ok, built_in_result} = Measure.run(built_in_doc)
+      assert {:ok, embedded_result} = Measure.run(embedded_doc)
+
+      [built_in_block] = hd(built_in_result.pages).blocks
+      [embedded_block] = hd(embedded_result.pages).blocks
+
+      assert %MeasuredText{lines: ["alpha beta gamma delta"], resolved_font: built_in_font} =
+               built_in_block.content
+
+      assert %MeasuredText{lines: embedded_lines, resolved_font: embedded_font} =
+               embedded_block.content
+
+      assert embedded_lines == ["alpha beta ", "gamma delta"]
+      assert_in_delta embedded_block.height, 28.8, 1.0e-9
+      assert embedded_block.height > built_in_block.height
+      assert embedded_font.source == :embedded
+      assert embedded_font.logical_name == :brand
+      assert embedded_font.name == "F_BRAND"
+      assert embedded_font.base_font != built_in_font.base_font
     end
 
     test "resolves authored column rules deterministically against block width" do
