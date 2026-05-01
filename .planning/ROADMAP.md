@@ -52,6 +52,7 @@ Plans:
 **Goal**: Add first-class bounded asset support for logos and document imagery without introducing runtime fetch policy into core.
 **Depends on**: Phase 27
 **Requirements**: [ASSET-01, ASSET-02, ASSET-03]
+**Progress**: 3/3 plans complete (`28-01-SUMMARY.md`, `28-02-SUMMARY.md`, `28-03-SUMMARY.md`)
 
 Planned work:
 

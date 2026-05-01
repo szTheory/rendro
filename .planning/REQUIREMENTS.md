@@ -24,7 +24,8 @@
 **: Engineer can register local or in-memory image/logo assets through a first-class document API instead of ad hoc block tuples.
 - [x] **ASSET-02
 **: Engineer can place supported assets with deterministic bounds suitable for branded invoices, statements, and reports.
-- [ ] **ASSET-03**: Unsupported asset references, formats, or sizing conditions fail through typed validation or render diagnostics rather than silent fallback.
+- [x] **ASSET-03
+**: Unsupported asset references, formats, or sizing conditions fail through typed validation or render diagnostics rather than silent fallback.
 
 ### Recipes and Verification
 
