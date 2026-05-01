@@ -48,6 +48,7 @@ defmodule Rendro.Document do
             diagnostics: [],
             font_registry: Rendro.FontRegistry.new(),
             default_font: Rendro.FontRegistry.default_font(),
+            asset_registry: Rendro.AssetRegistry.new(),
             header: [],
             footer: [],
             metadata: %Rendro.Metadata{},
@@ -62,6 +63,7 @@ defmodule Rendro.Document do
           diagnostics: [map()],
           font_registry: Rendro.FontRegistry.t(),
           default_font: Rendro.FontRegistry.logical_name(),
+          asset_registry: Rendro.AssetRegistry.t(),
           header: [Rendro.Block.t()],
           footer: [Rendro.Block.t()],
           metadata: Rendro.Metadata.t(),
@@ -178,6 +180,22 @@ defmodule Rendro.Document do
       doc
       | font_registry:
           Rendro.FontRegistry.register_embedded_family(doc.font_registry, family_name, variants)
+    }
+  end
+
+  @doc """
+  Registers an image asset on the document's owned asset registry.
+  """
+  @spec register_image(
+          t(),
+          atom(),
+          {:path, Path.t()} | {:binary, binary()}
+        ) :: t()
+  def register_image(%__MODULE__{} = doc, logical_name, source)
+      when is_atom(logical_name) do
+    %__MODULE__{
+      doc
+      | asset_registry: Rendro.AssetRegistry.register_image(doc.asset_registry, logical_name, source)
     }
   end
 

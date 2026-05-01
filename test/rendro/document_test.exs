@@ -14,6 +14,7 @@ defmodule Rendro.DocumentTest do
       assert doc.diagnostics == []
       assert doc.font_registry == FontRegistry.new()
       assert doc.default_font == :default
+      assert doc.asset_registry == Rendro.AssetRegistry.new()
       assert doc.metadata == %Metadata{}
       assert doc.options == %{}
     end
@@ -32,6 +33,7 @@ defmodule Rendro.DocumentTest do
         diagnostics: [%{level: :info, type: :table_split}],
         font_registry: Document.new().font_registry,
         default_font: :default,
+        asset_registry: Rendro.AssetRegistry.new(),
         metadata: meta,
         options: %{deterministic: true}
       }
@@ -43,6 +45,7 @@ defmodule Rendro.DocumentTest do
       assert doc.diagnostics == [%{level: :info, type: :table_split}]
       assert doc.font_registry.default_font == :default
       assert doc.default_font == :default
+      assert doc.asset_registry == Rendro.AssetRegistry.new()
       assert doc.metadata.title == "Test"
       assert doc.options.deterministic == true
     end
@@ -66,8 +69,17 @@ defmodule Rendro.DocumentTest do
       assert doc.diagnostics == []
       assert doc.font_registry == FontRegistry.new()
       assert doc.default_font == :default
+      assert doc.asset_registry == Rendro.AssetRegistry.new()
       assert doc.metadata == %Metadata{}
       assert doc.options == %{}
+    end
+
+    test "register_image/3 delegates to asset registry" do
+      bytes = Base.decode64!("iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVQIW2NkYGD4z8DAwMgAI0AMADjKAu09+3WTAAAAAElFTkSuQmCC")
+      doc = Document.new() |> Document.register_image(:logo, {:binary, bytes})
+
+      assert {:ok, %{width: 2, height: 2, mime: "image/png"}} = 
+               Rendro.AssetRegistry.fetch(doc.asset_registry, :logo)
     end
 
     test "new/1 accepts keyword opts and returns populated Document struct" do
