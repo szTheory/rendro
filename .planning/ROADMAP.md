@@ -28,6 +28,7 @@ Planned work:
 **Goal**: Make resolved font selection drive both measurement/pagination and final PDF embedding deterministically.
 **Depends on**: Phase 25
 **Requirements**: [FONT-02, FONT-03]
+**Progress**: 2/3 plans complete (`26-01-SUMMARY.md`, `26-02-SUMMARY.md`)
 
 Planned work:
 

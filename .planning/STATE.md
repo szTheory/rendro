@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Deterministic Typography, Assets, and Honest I18n Baseline
 status: executing
-stopped_at: Completed 26-01-PLAN.md
-last_updated: "2026-05-01T01:27:40.210Z"
+stopped_at: Completed 26-02-PLAN.md
+last_updated: "2026-05-01T01:33:36.068Z"
 last_activity: 2026-05-01
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 5
-  completed_plans: 3
-  percent: 60
+  completed_plans: 4
+  percent: 80
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-30)
 ## Current Position
 
 Phase: 26 (deterministic-font-metrics-and-pdf-embedding) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-05-01
 
-Progress: [██████░░░░] 60%
+Progress: [████████░░] 80%
 
 ## Milestone Snapshot
 
@@ -77,6 +77,7 @@ Progress: [██████░░░░] 60%
 | Phase 24 P02 | 8 min | 2 tasks | 5 files |
 | Phase 25 P01 | 5 min | 2 tasks | 7 files |
 | Phase 26 P01 | 16 min | 2 tasks | 10 files |
+| Phase 26 P02 | 1 min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -138,6 +139,8 @@ Recent decisions affecting current work:
 - Keep embedded font registration separate from built-in registration to preserve explicit product scope.
 - Normalize tagged font sources into owned bytes at registration so later stages never reopen filesystem paths.
 - Use Build as the deterministic embedded-font preflight boundary and cache parsed metrics on the registry for stage reuse.
+- Kept the measurement algorithm unchanged and tightened proof around the existing shared resolved-font seam instead of forking an embedded-font codepath.
+- Proved pagination parity with focused regressions rather than modifying paginate internals that already consumed measured heights correctly.
 
 ### Pending Todos
 
@@ -168,8 +171,8 @@ Items acknowledged and carried forward from milestone scoping:
 
 ## Session Continuity
 
-Last session: 2026-05-01T01:27:40.199Z
-Stopped at: Completed 26-01-PLAN.md
+Last session: 2026-05-01T01:33:36.061Z
+Stopped at: Completed 26-02-PLAN.md
 Resume file: None
 
 **Planned Phase:** 25 (Font Registry and Public Typography Contract) — 2 plans — 2026-04-30T20:11:50.237Z
