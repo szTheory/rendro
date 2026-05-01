@@ -14,6 +14,10 @@ defmodule PhoenixExampleWeb.PDFControllerTest do
       %{name: "Support Plan", qty: 1, price: 500}
     ]
   }
+  @branded_invoice_data Map.put(@invoice_data, :brand, %{
+                          font_name: :brand_heading,
+                          logo_name: :company_logo
+                        })
 
   describe "GET /download" do
     # Test 1: HTTP 200 with application/pdf content-type
@@ -64,6 +68,33 @@ defmodule PhoenixExampleWeb.PDFControllerTest do
     end
   end
 
+  describe "GET /branded/download" do
+    test "returns 200 with application/pdf content-type and PDF magic bytes", %{conn: conn} do
+      conn = get(conn, "/branded/download")
+      assert conn.status == 200
+      assert get_resp_header(conn, "content-type") |> hd() =~ "application/pdf"
+      assert binary_part(conn.resp_body, 0, 5) == "%PDF-"
+    end
+  end
+
+  describe "BrandedInvoice recipe structural assertions" do
+    test "document registers the branded font, logo, and logo region" do
+      doc = Rendro.Recipes.BrandedInvoice.document(@branded_invoice_data)
+
+      assert %Rendro.Document{} = doc
+      assert doc.page_template == :branded_invoice
+      assert [template] = doc.page_templates
+
+      region_names = Enum.map(template.regions, & &1.name)
+      assert :logo in region_names
+      assert length(template.regions) >= 4
+
+      assert Map.has_key?(doc.font_registry.fonts, @branded_invoice_data.brand.font_name)
+      assert match?(%{source: :embedded}, doc.font_registry.fonts[@branded_invoice_data.brand.font_name])
+      assert Map.has_key?(doc.asset_registry.assets, @branded_invoice_data.brand.logo_name)
+    end
+  end
+
   describe "Source-level check: controller uses canonical recipe" do
     # Test 2: The controller source invokes Rendro.Recipes.Invoice.document/2 and
     # does not contain the legacy Rendro.flow literal.
@@ -101,6 +132,8 @@ defmodule PhoenixExampleWeb.PDFControllerTest do
       source = File.read!(source_path)
       assert source =~ "Rendro.Recipes.Invoice.document",
              "Controller must call Rendro.Recipes.Invoice.document/2"
+      assert source =~ "Rendro.Recipes.BrandedInvoice.document",
+             "Controller must call Rendro.Recipes.BrandedInvoice.document/1"
       refute source =~ ~r/Rendro\.flow\(\[/,
              "Controller must not use legacy Rendro.flow([ ... ])"
     end
