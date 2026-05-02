@@ -50,6 +50,7 @@ defmodule Rendro.Error do
   defp what(stage, _reason), do: "Render pipeline failed in stage #{inspect(stage)}."
 
   defp why({:unsupported_glyph, char}), do: "Missing glyph for character: #{char}"
+
   defp why({:unsupported_script, reason}) when is_atom(reason),
     do: "Unsupported script boundary: #{reason |> Atom.to_string() |> String.replace("_", " ")}"
 

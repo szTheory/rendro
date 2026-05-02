@@ -254,7 +254,8 @@ defmodule Rendro.PDF.WriterTest do
           }
         ])
 
-      assert {:error, {:invalid_embedded_font, %{logical_name: :brand, reason: :unsupported_font_format}}} =
+      assert {:error,
+              {:invalid_embedded_font, %{logical_name: :brand, reason: :unsupported_font_format}}} =
                Writer.render(doc)
     end
 
@@ -269,8 +270,20 @@ defmodule Rendro.PDF.WriterTest do
         |> Map.put(:pages, [
           %Rendro.Page{
             blocks: [
-              %Rendro.Block{content: %Rendro.Image{logical_name: :logo_png}, x: 0, y: 0, width: 100, height: 50},
-              %Rendro.Block{content: %Rendro.Image{logical_name: :photo_jpg}, x: 0, y: 50, width: 100, height: 50}
+              %Rendro.Block{
+                content: %Rendro.Image{logical_name: :logo_png},
+                x: 0,
+                y: 0,
+                width: 100,
+                height: 50
+              },
+              %Rendro.Block{
+                content: %Rendro.Image{logical_name: :photo_jpg},
+                x: 0,
+                y: 50,
+                width: 100,
+                height: 50
+              }
             ]
           }
         ])
@@ -279,15 +292,15 @@ defmodule Rendro.PDF.WriterTest do
 
       assert pdf =~ "/Type /XObject"
       assert pdf =~ "/Subtype /Image"
-      
+
       # PNG specifics
       assert pdf =~ "/IM_LOGO_PNG"
       assert pdf =~ "/Filter /FlateDecode"
-      
+
       # JPEG specifics
       assert pdf =~ "/IM_PHOTO_JPG"
       assert pdf =~ "/Filter /DCTDecode"
-      
+
       # Common Image props
       assert pdf =~ "/Width 100"
       assert pdf =~ "/Height 50"
@@ -308,7 +321,13 @@ defmodule Rendro.PDF.WriterTest do
             margin_left: 72,
             margin_top: 72,
             blocks: [
-              %Rendro.Block{content: %Rendro.Image{logical_name: :logo}, x: 10, y: 20, width: 200, height: 150}
+              %Rendro.Block{
+                content: %Rendro.Image{logical_name: :logo},
+                x: 10,
+                y: 20,
+                width: 200,
+                height: 150
+              }
             ]
           }
         ])

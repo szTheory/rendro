@@ -261,7 +261,9 @@ defmodule Rendro.Pipeline.MeasureTest do
           pages: [
             %Rendro.Page{
               blocks: [
-                Rendro.block(Rendro.text(content, font: :default, size: 12), width: constrained_width)
+                Rendro.block(Rendro.text(content, font: :default, size: 12),
+                  width: constrained_width
+                )
               ]
             }
           ],
@@ -358,37 +360,41 @@ defmodule Rendro.Pipeline.MeasureTest do
     end
 
     test "resolves authored column rules deterministically against block width" do
-      table = Rendro.table(
-        [["a", "b", "c"]],
-        columns: [{:fixed, 100}, {:share, 1}, {:share, 2}]
-      )
+      table =
+        Rendro.table(
+          [["a", "b", "c"]],
+          columns: [{:fixed, 100}, {:share, 1}, {:share, 2}]
+        )
+
       doc = Rendro.flow([Rendro.block(table, width: 400)])
-      
+
       assert {:ok, composed} = Compose.run(doc)
       assert {:ok, measured} = Measure.run(composed)
-      
+
       [measured_block] = measured.content
       measured_table = measured_block.content
-      
+
       assert measured_block.width == 400
       assert measured_table.column_widths == [100.0, 100.0, 200.0]
     end
 
     test "measured row height follows the tallest cell in the row" do
-      table = Rendro.table(
-        [["short", "very very very very very long text that must wrap"]],
-        columns: [{:fixed, 100}, {:fixed, 50}]
-      )
+      table =
+        Rendro.table(
+          [["short", "very very very very very long text that must wrap"]],
+          columns: [{:fixed, 100}, {:fixed, 50}]
+        )
+
       doc = Rendro.flow([Rendro.block(table, width: 150)])
-      
+
       assert {:ok, composed} = Compose.run(doc)
       assert {:ok, measured} = Measure.run(composed)
-      
+
       [measured_block] = measured.content
       measured_table = measured_block.content
-      
+
       [row_h] = measured_table.row_heights
-      
+
       assert row_h > 15
       assert measured_block.height == row_h
     end

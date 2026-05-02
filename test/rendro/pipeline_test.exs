@@ -103,7 +103,15 @@ defmodule Rendro.PipelineTest do
           margin_bottom: 12,
           margin_left: 12,
           regions: [
-            %Region{name: :body, role: :body, anchor: :flow, x: 12, y: 12, width: 196, height: 28.8}
+            %Region{
+              name: :body,
+              role: :body,
+              anchor: :flow,
+              x: 12,
+              y: 12,
+              width: 196,
+              height: 28.8
+            }
           ]
         }
 

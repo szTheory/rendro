@@ -26,8 +26,8 @@ defmodule RendroBuildersTest do
       assert_raise ArgumentError,
                    ~r/only supports logical font atoms or the narrow Helvetica compatibility aliases/,
                    fn ->
-        Rendro.text("bold", font: "Courier")
-      end
+                     Rendro.text("bold", font: "Courier")
+                   end
     end
 
     test "block/2 builds a Block with content" do
@@ -66,7 +66,9 @@ defmodule RendroBuildersTest do
 
     test "section/1 builds a Section struct" do
       block = Rendro.block(Rendro.text("Summary"))
-      section = Rendro.section(name: :summary, region: :body, content: [block], page_template: :invoice)
+
+      section =
+        Rendro.section(name: :summary, region: :body, content: [block], page_template: :invoice)
 
       assert %Section{name: :summary, region: :body, content: [^block], page_template: :invoice} =
                section
@@ -136,7 +138,9 @@ defmodule RendroBuildersTest do
     end
 
     test "flow/2 carries explicit template and section data" do
-      section = Rendro.section(name: :summary, content: [Rendro.block(Rendro.text("Section body"))])
+      section =
+        Rendro.section(name: :summary, content: [Rendro.block(Rendro.text("Section body"))])
+
       template = Rendro.page_template(name: :invoice)
       content = [Rendro.block(Rendro.text("Intro"))]
 
@@ -173,14 +177,15 @@ defmodule RendroBuildersTest do
       assert_raise ArgumentError,
                    ~r/only supports split_policy: :row_atomic \(or temporary alias :atomic\); got: :whole_table/,
                    fn ->
-        Rendro.table([["1"]], columns: [{:fixed, 100}], split_policy: :whole_table)
-      end
+                     Rendro.table([["1"]], columns: [{:fixed, 100}], split_policy: :whole_table)
+                   end
     end
 
     test "table/2 rejects removed fields like width and border" do
       assert_raise ArgumentError, ~r/no longer supports :width or :border/, fn ->
         Rendro.table([["1"]], width: :fill)
       end
+
       assert_raise ArgumentError, ~r/no longer supports :width or :border/, fn ->
         Rendro.table([["1"]], border: true)
       end

@@ -127,9 +127,7 @@ defmodule Rendro.PDF.FontTest do
       doc =
         Rendro.document(
           pages: [
-            Rendro.page(
-              blocks: [Rendro.block(Rendro.text("Restricted", font: :brand))]
-            )
+            Rendro.page(blocks: [Rendro.block(Rendro.text("Restricted", font: :brand))])
           ]
         )
         |> Rendro.register_embedded_font(:brand, {:binary, FontFixture.restricted_font(bytes)})

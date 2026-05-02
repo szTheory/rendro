@@ -29,7 +29,12 @@ defmodule Rendro.PDF.Writer do
     end
   end
 
-  defp build_objects(%Rendro.Document{pages: pages, metadata: metadata} = doc, fonts, images, opts) do
+  defp build_objects(
+         %Rendro.Document{pages: pages, metadata: metadata} = doc,
+         fonts,
+         images,
+         opts
+       ) do
     obj_num = 1
     catalog_num = obj_num
 
@@ -293,7 +298,9 @@ defmodule Rendro.PDF.Writer do
   end
 
   defp doc_image_map(image_allocations) do
-    Map.new(image_allocations, fn %{image: image} = allocation -> {image.logical_name, allocation} end)
+    Map.new(image_allocations, fn %{image: image} = allocation ->
+      {image.logical_name, allocation}
+    end)
   end
 
   defp build_page_objects(
@@ -350,7 +357,13 @@ defmodule Rendro.PDF.Writer do
     end)
   end
 
-  defp render_block(doc, %Rendro.Block{content: %Rendro.Table{} = table}, page, font_map, image_map) do
+  defp render_block(
+         doc,
+         %Rendro.Block{content: %Rendro.Table{} = table},
+         page,
+         font_map,
+         image_map
+       ) do
     header_ops =
       if table.header do
         Enum.map(table.header, &render_block(doc, &1, page, font_map, image_map))
@@ -366,15 +379,33 @@ defmodule Rendro.PDF.Writer do
     [header_ops | rows_ops] |> List.flatten() |> Enum.join("\n")
   end
 
-  defp render_block(doc, %Rendro.Block{content: %Rendro.Text{}} = block, page, font_map, image_map) do
+  defp render_block(
+         doc,
+         %Rendro.Block{content: %Rendro.Text{}} = block,
+         page,
+         font_map,
+         image_map
+       ) do
     render_block(doc, block, page, font_map, image_map, 0, 0)
   end
 
-  defp render_block(doc, %Rendro.Block{content: %MeasuredText{}} = block, page, font_map, image_map) do
+  defp render_block(
+         doc,
+         %Rendro.Block{content: %MeasuredText{}} = block,
+         page,
+         font_map,
+         image_map
+       ) do
     render_block(doc, block, page, font_map, image_map, 0, 0)
   end
 
-  defp render_block(doc, %Rendro.Block{content: %Rendro.Image{}} = block, page, font_map, image_map) do
+  defp render_block(
+         doc,
+         %Rendro.Block{content: %Rendro.Image{}} = block,
+         page,
+         font_map,
+         image_map
+       ) do
     render_block(doc, block, page, font_map, image_map, 0, 0)
   end
 

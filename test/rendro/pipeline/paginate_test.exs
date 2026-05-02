@@ -126,13 +126,16 @@ defmodule Rendro.Pipeline.PaginateTest do
       line_blocks =
         Enum.map(paginated.pages, fn page ->
           Enum.filter(page.blocks, fn
-            %Rendro.Block{content: %MeasuredText{source: %Rendro.Text{content: <<"Line ", _::binary>>}}} ->
+            %Rendro.Block{
+              content: %MeasuredText{source: %Rendro.Text{content: <<"Line ", _::binary>>}}
+            } ->
               true
 
             %Rendro.Block{content: %Rendro.Text{content: <<"Line ", _::binary>>}} ->
               true
 
-            _ -> false
+            _ ->
+              false
           end)
         end)
 
@@ -172,7 +175,11 @@ defmodule Rendro.Pipeline.PaginateTest do
       assert length(embedded_paginated.pages) == 2
 
       [built_in_block_1, built_in_block_2] = hd(built_in_paginated.pages).blocks
-      lines_text = fn b -> Enum.map(b.content.lines, fn l -> Enum.map_join(l, "", & &1.text) end) end
+
+      lines_text = fn b ->
+        Enum.map(b.content.lines, fn l -> Enum.map_join(l, "", & &1.text) end)
+      end
+
       assert lines_text.(built_in_block_1) == ["alpha beta gamma delta"]
       assert lines_text.(built_in_block_2) == ["alpha beta gamma delta"]
 
@@ -183,8 +190,13 @@ defmodule Rendro.Pipeline.PaginateTest do
 
       embedded_line_sets = Enum.flat_map(embedded_page_lines, & &1)
 
-      assert embedded_page_lines == [[["alpha beta ", "gamma delta"]], [["alpha beta ", "gamma delta"]]]
+      assert embedded_page_lines == [
+               [["alpha beta ", "gamma delta"]],
+               [["alpha beta ", "gamma delta"]]
+             ]
+
       assert Enum.all?(embedded_line_sets, &(length(&1) == 2))
+
       assert Enum.all?(List.flatten(Enum.map(embedded_paginated.pages, & &1.blocks)), fn block ->
                %MeasuredText{resolved_font: resolved_font, height: height} = block.content
                resolved_font.source == :embedded and abs(height - 28.8) < 1.0e-9
@@ -394,7 +406,7 @@ defmodule Rendro.Pipeline.PaginateTest do
 
       assert {:ok, paginated} = paginate_flow(doc)
       assert length(paginated.diagnostics) > 0
-      
+
       first_diag = Enum.find(paginated.diagnostics, &(&1.type == :table_split))
       assert first_diag
       assert first_diag.level == :info
@@ -416,7 +428,7 @@ defmodule Rendro.Pipeline.PaginateTest do
         )
 
       assert {:ok, paginated} = paginate_flow(doc)
-      
+
       diag = Enum.find(paginated.diagnostics, &(&1.type == :keep_rule_break))
       assert diag
       assert diag.level == :info
@@ -552,7 +564,13 @@ defmodule Rendro.Pipeline.PaginateTest do
   end
 
   defp tiny_keep_chain_template do
-    %{flow_keep_chain_template() | name: :tiny_keep_chain, regions: [%Region{name: :body, role: :body, anchor: :flow, x: 24, y: 52, width: 372, height: 30}]}
+    %{
+      flow_keep_chain_template()
+      | name: :tiny_keep_chain,
+        regions: [
+          %Region{name: :body, role: :body, anchor: :flow, x: 24, y: 52, width: 372, height: 30}
+        ]
+    }
   end
 
   defp embedded_wrap_template do

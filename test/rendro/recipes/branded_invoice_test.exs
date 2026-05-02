@@ -128,24 +128,38 @@ defmodule Rendro.Recipes.BrandedInvoiceTest do
       assert pdf =~ "/Height 64"
       assert pdf =~ "/Count 1"
 
-      header_block =
+      text_blocks =
         final_doc.pages
         |> hd()
         |> Map.fetch!(:blocks)
-        |> Enum.find(fn block ->
-          match?(%Rendro.Pipeline.MeasuredText{}, block.content) and
-            Enum.any?(block.content.lines, fn line ->
-              Enum.any?(line, &(&1.text == "Rendro, Inc."))
-            end)
+        |> Enum.filter(&match?(%Rendro.Pipeline.MeasuredText{}, &1.content))
+
+      block_lines = fn block ->
+        Enum.map(block.content.lines, fn line -> Enum.map_join(line, "", & &1.text) end)
+      end
+
+      brand_block =
+        Enum.find(text_blocks, fn block ->
+          Enum.any?(block.content.lines, fn line ->
+            Enum.any?(line, &(&1.text == "Rendro, Inc."))
+          end)
         end)
 
-      assert header_block
+      id_block =
+        Enum.find(text_blocks, fn block ->
+          Enum.any?(block.content.lines, fn line ->
+            Enum.any?(line, &String.starts_with?(&1.text, "Invoice #"))
+          end)
+        end)
 
-      lines = Enum.map(header_block.content.lines, fn line -> Enum.map_join(line, "", & &1.text) end)
+      assert brand_block, "expected a measured block containing the brand line"
+      assert id_block, "expected a measured block containing the invoice id line"
 
-      assert hd(lines) == "Rendro, Inc."
-      assert Enum.join(tl(lines), "") == "Invoice #INV-2026-042"
-      assert length(tl(lines)) > 1
+      # Brand and invoice id are now independent blocks. Each renders on a
+      # single line — the id stays intact (no mid-token grapheme split) and
+      # the brand keeps its prominence. Pins UAT Gap 2 fix.
+      assert block_lines.(brand_block) == ["Rendro, Inc."]
+      assert block_lines.(id_block) == ["Invoice #INV-2026-042"]
     end
   end
 
@@ -160,7 +174,8 @@ defmodule Rendro.Recipes.BrandedInvoiceTest do
 
   describe "Rendro.Recipes.branded_invoice/1 delegate" do
     test "delegates to BrandedInvoice.document/1" do
-      assert Rendro.Recipes.branded_invoice(sample_data()) == BrandedInvoice.document(sample_data())
+      assert Rendro.Recipes.branded_invoice(sample_data()) ==
+               BrandedInvoice.document(sample_data())
     end
   end
 end

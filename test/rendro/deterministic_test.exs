@@ -91,13 +91,13 @@ defmodule Rendro.DeterministicTest do
 
           line_sets =
             paginated.pages
-            |> Enum.map(fn page -> 
-                 Enum.map(page.blocks, fn block -> 
-                   Enum.map(block.content.lines, fn line -> 
-                     Enum.map_join(line, "", & &1.text) 
-                   end) 
-                 end) 
-               end)
+            |> Enum.map(fn page ->
+              Enum.map(page.blocks, fn block ->
+                Enum.map(block.content.lines, fn line ->
+                  Enum.map_join(line, "", & &1.text)
+                end)
+              end)
+            end)
 
           resolved_fonts =
             paginated.pages
@@ -108,7 +108,11 @@ defmodule Rendro.DeterministicTest do
 
       [{reference_lines, reference_pages, reference_fonts, reference_pdf} | rest] = runs
 
-      assert reference_lines == [[["alpha beta ", "gamma delta"]], [["alpha beta ", "gamma delta"]]]
+      assert reference_lines == [
+               [["alpha beta ", "gamma delta"]],
+               [["alpha beta ", "gamma delta"]]
+             ]
+
       assert reference_pages == 2
       assert Enum.all?(reference_fonts, &(&1.source == :embedded and &1.logical_name == :brand))
 
@@ -121,6 +125,7 @@ defmodule Rendro.DeterministicTest do
       Enum.each(rest, fn {line_sets, page_count, fonts, pdf} ->
         assert line_sets == reference_lines
         assert page_count == reference_pages
+
         assert Enum.map(fonts, &{&1.base_font, &1.logical_name, &1.name}) ==
                  Enum.map(reference_fonts, &{&1.base_font, &1.logical_name, &1.name})
 
@@ -146,7 +151,15 @@ defmodule Rendro.DeterministicTest do
       margin_bottom: 0,
       margin_left: 0,
       regions: [
-        %Rendro.Region{name: :body, role: :body, anchor: :flow, x: 0, y: 0, width: 200, height: 45}
+        %Rendro.Region{
+          name: :body,
+          role: :body,
+          anchor: :flow,
+          x: 0,
+          y: 0,
+          width: 200,
+          height: 45
+        }
       ]
     }
   end

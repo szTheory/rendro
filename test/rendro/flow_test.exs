@@ -187,25 +187,41 @@ defmodule Rendro.FlowTest do
     header1 =
       Enum.find(
         page1.blocks,
-        &match?(%Rendro.Block{content: %MeasuredText{source: %Rendro.Text{content: "Statement Header"}}}, &1)
+        &match?(
+          %Rendro.Block{
+            content: %MeasuredText{source: %Rendro.Text{content: "Statement Header"}}
+          },
+          &1
+        )
       )
 
     header2 =
       Enum.find(
         page2.blocks,
-        &match?(%Rendro.Block{content: %MeasuredText{source: %Rendro.Text{content: "Statement Header"}}}, &1)
+        &match?(
+          %Rendro.Block{
+            content: %MeasuredText{source: %Rendro.Text{content: "Statement Header"}}
+          },
+          &1
+        )
       )
 
     footer1 =
       Enum.find(
         page1.blocks,
-        &match?(%Rendro.Block{content: %MeasuredText{source: %Rendro.Text{content: "Page 1"}}}, &1)
+        &match?(
+          %Rendro.Block{content: %MeasuredText{source: %Rendro.Text{content: "Page 1"}}},
+          &1
+        )
       )
 
     footer2 =
       Enum.find(
         page2.blocks,
-        &match?(%Rendro.Block{content: %MeasuredText{source: %Rendro.Text{content: "Page 2"}}}, &1)
+        &match?(
+          %Rendro.Block{content: %MeasuredText{source: %Rendro.Text{content: "Page 2"}}},
+          &1
+        )
       )
 
     assert header1.y == 4

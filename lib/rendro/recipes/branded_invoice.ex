@@ -49,10 +49,42 @@ defmodule Rendro.Recipes.BrandedInvoice do
     defaults = [
       name: :branded_invoice,
       regions: [
-        Rendro.region(name: :logo, role: :custom, anchor: :fixed, x: 72, y: 72, width: 64, height: 64),
-        Rendro.region(name: :header, role: :header, anchor: :top, x: 152, y: 72, width: 371.28, height: 112),
-        Rendro.region(name: :body, role: :body, anchor: :flow, x: 72, y: 200, width: 451.28, height: 569.89),
-        Rendro.region(name: :footer, role: :footer, anchor: :bottom, x: 72, y: 769.89, width: 451.28, height: 0)
+        Rendro.region(
+          name: :logo,
+          role: :custom,
+          anchor: :fixed,
+          x: 72,
+          y: 72,
+          width: 64,
+          height: 64
+        ),
+        Rendro.region(
+          name: :header,
+          role: :header,
+          anchor: :top,
+          x: 152,
+          y: 72,
+          width: 371.28,
+          height: 112
+        ),
+        Rendro.region(
+          name: :body,
+          role: :body,
+          anchor: :flow,
+          x: 72,
+          y: 200,
+          width: 451.28,
+          height: 569.89
+        ),
+        Rendro.region(
+          name: :footer,
+          role: :footer,
+          anchor: :bottom,
+          x: 72,
+          y: 769.89,
+          width: 451.28,
+          height: 0
+        )
       ]
     ]
 
@@ -114,14 +146,18 @@ defmodule Rendro.Recipes.BrandedInvoice do
   end
 
   defp header_section(%{brand: %{font_name: font_name}, id: id, date: date}) do
+    # Industry-standard invoice typography: brand is the heading, invoice id
+    # is subordinate metadata. Stacking brand/id/date as three independent
+    # blocks lets each size to its natural text width — `Rendro.Pipeline.Paginate`
+    # fit-validates each block against the `:header` region (371.28pt) so any
+    # future regression (longer id, new locale label) surfaces as a typed
+    # `:content_overflow` error rather than a silent grapheme split.
     Rendro.section(
       name: :branded_invoice_header,
       region: :header,
       content: [
-        Rendro.block(
-          Rendro.text("Rendro, Inc.\nInvoice ##{id}", font: font_name, size: 18),
-          width: 260
-        ),
+        Rendro.block(Rendro.text("Rendro, Inc.", font: font_name, size: 18)),
+        Rendro.block(Rendro.text("Invoice ##{id}", font: font_name, size: 12)),
         Rendro.block(Rendro.text("Date: #{date}", size: 10))
       ]
     )
@@ -173,6 +209,7 @@ defmodule Rendro.Recipes.BrandedInvoice do
   end
 
   defp validate_data!(_data) do
-    raise ArgumentError, "data.brand is required and must include atom :font_name and :logo_name keys"
+    raise ArgumentError,
+          "data.brand is required and must include atom :font_name and :logo_name keys"
   end
 end

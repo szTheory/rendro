@@ -65,6 +65,7 @@ defmodule Rendro.Adapters.AccrueTest do
   describe "source-level contract" do
     test "accrue.ex does not reference header: or footer: as Rendro.flow/2 kwargs" do
       source = File.read!("lib/rendro/adapters/accrue.ex")
+
       # Ensure no legacy 'header: <var>' or 'footer: <var>' keyword args are passed to Rendro.flow/2
       refute source =~ ~r/Rendro\.flow\([^)]*header:/
       refute source =~ ~r/Rendro\.flow\([^)]*footer:/

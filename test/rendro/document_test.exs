@@ -75,10 +75,14 @@ defmodule Rendro.DocumentTest do
     end
 
     test "register_image/3 delegates to asset registry" do
-      bytes = Base.decode64!("iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVQIW2NkYGD4z8DAwMgAI0AMADjKAu09+3WTAAAAAElFTkSuQmCC")
+      bytes =
+        Base.decode64!(
+          "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVQIW2NkYGD4z8DAwMgAI0AMADjKAu09+3WTAAAAAElFTkSuQmCC"
+        )
+
       doc = Document.new() |> Document.register_image(:logo, {:binary, bytes})
 
-      assert {:ok, %{width: 2, height: 2, mime: "image/png"}} = 
+      assert {:ok, %{width: 2, height: 2, mime: "image/png"}} =
                Rendro.AssetRegistry.fetch(doc.asset_registry, :logo)
     end
 
@@ -165,6 +169,7 @@ defmodule Rendro.DocumentTest do
       doc = Document.new()
 
       assert doc.default_font == :default
+
       assert {:ok, %{source: :built_in, family: :helvetica}} =
                FontRegistry.fetch(doc.font_registry, :default)
     end
@@ -189,12 +194,18 @@ defmodule Rendro.DocumentTest do
 
       assert doc.default_font == :body
       assert doc.font_registry.default_font == :body
+
       assert {:ok, %{source: :built_in, family: :helvetica}} =
                FontRegistry.fetch(doc.font_registry, :body)
     end
 
     test "register_embedded_font/3 eagerly normalizes path input into owned bytes" do
-      path = Path.join(System.tmp_dir!(), "rendro-embedded-path-#{System.unique_integer([:positive])}.ttf")
+      path =
+        Path.join(
+          System.tmp_dir!(),
+          "rendro-embedded-path-#{System.unique_integer([:positive])}.ttf"
+        )
+
       bytes = <<0, 1, 2, 3, 4, 5, 6, 7>>
       File.write!(path, bytes)
 

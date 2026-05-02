@@ -22,13 +22,20 @@ defmodule Rendro.I18n.AnalyzerTest do
 
     test "Devanagari/Khmer return complex shaping diagnostic" do
       devanagari_text = "नमस्ते दुनिया"
-      assert [%{type: :unsupported_script, reason: :complex_shaping_required}] = Analyzer.analyze(devanagari_text)
+
+      assert [%{type: :unsupported_script, reason: :complex_shaping_required}] =
+               Analyzer.analyze(devanagari_text)
 
       khmer_text = "សួស្តី​ពិភពលោក"
-      assert [%{type: :unsupported_script, reason: :complex_shaping_required}] = Analyzer.analyze(khmer_text)
 
-      thai_text = "សួស្តី" # Note: actual Thai "สวัสดี"
-      assert [%{type: :unsupported_script, reason: :complex_shaping_required}] = Analyzer.analyze(thai_text)
+      assert [%{type: :unsupported_script, reason: :complex_shaping_required}] =
+               Analyzer.analyze(khmer_text)
+
+      # Note: actual Thai "สวัสดี"
+      thai_text = "សួស្តី"
+
+      assert [%{type: :unsupported_script, reason: :complex_shaping_required}] =
+               Analyzer.analyze(thai_text)
     end
 
     test "Does not spam: returns maximum one of each diagnostic type per analysis call" do

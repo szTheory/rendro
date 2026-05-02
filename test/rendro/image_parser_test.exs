@@ -3,10 +3,14 @@ defmodule Rendro.ImageParserTest do
   alias Rendro.ImageParser
 
   # 2x2 PNG
-  @png_bytes Base.decode64!("iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVQIW2NkYGD4z8DAwMgAI0AMADjKAu09+3WTAAAAAElFTkSuQmCC")
-  
+  @png_bytes Base.decode64!(
+               "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVQIW2NkYGD4z8DAwMgAI0AMADjKAu09+3WTAAAAAElFTkSuQmCC"
+             )
+
   # 1x1 JPEG
-  @jpeg_bytes Base.decode64!("/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=")
+  @jpeg_bytes Base.decode64!(
+                "/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA="
+              )
 
   describe "parse/1" do
     test "extracts width, height, and mime from valid PNG bytes" do

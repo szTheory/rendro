@@ -1,5 +1,6 @@
 defmodule Mix.Tasks.Rendro.VisualUat do
   use Mix.Task
+  @compile {:no_warn_undefined, Req}
 
   @shortdoc "Verify a branded PDF preview by Claude vision and update phase UAT"
 
@@ -72,8 +73,7 @@ defmodule Mix.Tasks.Rendro.VisualUat do
   defp fetch_api_key do
     case System.get_env("ANTHROPIC_API_KEY") do
       nil ->
-        {:error,
-         "ANTHROPIC_API_KEY is not set. Export it before running mix rendro.visual_uat."}
+        {:error, "ANTHROPIC_API_KEY is not set. Export it before running mix rendro.visual_uat."}
 
       "" ->
         {:error,
@@ -120,7 +120,12 @@ defmodule Mix.Tasks.Rendro.VisualUat do
     doc = Rendro.Recipes.BrandedInvoice.document(@invoice_fixture)
 
     with {:ok, pdf_binary} <- Rendro.render(doc, deterministic: true) do
-      tmp_pdf = Path.join(System.tmp_dir!(), "rendro-visual-uat-#{:erlang.unique_integer([:positive])}.pdf")
+      tmp_pdf =
+        Path.join(
+          System.tmp_dir!(),
+          "rendro-visual-uat-#{:erlang.unique_integer([:positive])}.pdf"
+        )
+
       File.write!(tmp_pdf, pdf_binary)
 
       png_basename = "29-branded-preview"
@@ -128,7 +133,8 @@ defmodule Mix.Tasks.Rendro.VisualUat do
 
       Mix.shell().info("Rasterising page 1 to PNG (#{@raster_dpi} dpi) via pdftoppm...")
 
-      case System.cmd("pdftoppm",
+      case System.cmd(
+             "pdftoppm",
              ["-png", "-r", Integer.to_string(@raster_dpi), "-singlefile", tmp_pdf, out_prefix],
              stderr_to_stdout: true
            ) do
@@ -156,10 +162,10 @@ defmodule Mix.Tasks.Rendro.VisualUat do
            ],
            receive_timeout: 60_000
          ) do
-      {:ok, %Req.Response{status: 200, body: body}} ->
+      {:ok, %{status: 200, body: body}} ->
         parse_verdict(body)
 
-      {:ok, %Req.Response{status: status, body: body}} ->
+      {:ok, %{status: status, body: body}} ->
         {:error, "Anthropic API returned HTTP #{status}:\n#{inspect(body)}"}
 
       {:error, exception} ->
@@ -217,8 +223,7 @@ defmodule Mix.Tasks.Rendro.VisualUat do
   defp verdict_tool do
     %{
       name: "report_verdict",
-      description:
-        "Report the visual verification verdict for the branded invoice preview.",
+      description: "Report the visual verification verdict for the branded invoice preview.",
       input_schema: %{
         type: "object",
         properties: %{
@@ -396,7 +401,10 @@ defmodule Mix.Tasks.Rendro.VisualUat do
   defp print_verdict(verdict, png_path, uat_path) do
     Mix.shell().info("")
     Mix.shell().info("Visual UAT verdict (#{verdict.model})")
-    Mix.shell().info("  logo_present:             #{verdict.logo_present}  (#{verdict.logo_notes})")
+
+    Mix.shell().info(
+      "  logo_present:             #{verdict.logo_present}  (#{verdict.logo_notes})"
+    )
 
     Mix.shell().info(
       "  header_uses_branded_font: #{verdict.header_uses_branded_font}  (#{verdict.header_notes})"

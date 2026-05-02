@@ -162,7 +162,8 @@ defmodule Rendro.Document do
       when is_atom(logical_name) do
     %__MODULE__{
       doc
-      | font_registry: Rendro.FontRegistry.register_embedded(doc.font_registry, logical_name, source)
+      | font_registry:
+          Rendro.FontRegistry.register_embedded(doc.font_registry, logical_name, source)
     }
   end
 
@@ -172,7 +173,10 @@ defmodule Rendro.Document do
   @spec register_embedded_font_family(
           t(),
           Rendro.FontRegistry.logical_name(),
-          %{required(Rendro.FontRegistry.embedded_variant()) => {:path, Path.t()} | {:binary, binary()}}
+          %{
+            required(Rendro.FontRegistry.embedded_variant()) =>
+              {:path, Path.t()} | {:binary, binary()}
+          }
         ) :: t()
   def register_embedded_font_family(%__MODULE__{} = doc, family_name, variants)
       when is_atom(family_name) and is_map(variants) do
@@ -195,7 +199,8 @@ defmodule Rendro.Document do
       when is_atom(logical_name) do
     %__MODULE__{
       doc
-      | asset_registry: Rendro.AssetRegistry.register_image(doc.asset_registry, logical_name, source)
+      | asset_registry:
+          Rendro.AssetRegistry.register_image(doc.asset_registry, logical_name, source)
     }
   end
 

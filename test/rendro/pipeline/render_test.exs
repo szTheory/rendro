@@ -50,7 +50,13 @@ defmodule Rendro.Pipeline.RenderTest do
             margin_left: 72,
             margin_top: 72,
             blocks: [
-              %Rendro.Block{content: %Rendro.Image{logical_name: :logo_png}, x: 10, y: 20, width: 200, height: 150}
+              %Rendro.Block{
+                content: %Rendro.Image{logical_name: :logo_png},
+                x: 10,
+                y: 20,
+                width: 200,
+                height: 150
+              }
             ]
           }
         ])

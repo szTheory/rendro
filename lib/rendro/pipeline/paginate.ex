@@ -48,17 +48,25 @@ defmodule Rendro.Pipeline.Paginate do
           |> apply_page_template(idx, layout)
         end)
 
-      {:ok, %{doc | pages: pages, content: [], diagnostics: Enum.reverse(diagnostics) ++ doc.diagnostics}}
+      {:ok,
+       %{
+         doc
+         | pages: pages,
+           content: [],
+           diagnostics: Enum.reverse(diagnostics) ++ doc.diagnostics
+       }}
     catch
       {:error, :content_overflow, details} ->
         {:error, Rendro.Error.from_stage(:paginate, :content_overflow, %{details: details})}
 
       {:error, :unsupported_table_split_policy, details} ->
-        {:error, Rendro.Error.from_stage(:paginate, :unsupported_table_split_policy, %{details: details})}
+        {:error,
+         Rendro.Error.from_stage(:paginate, :unsupported_table_split_policy, %{details: details})}
     end
   end
 
-  defp paginate_blocks([], {pages, diagnostics}, _template, _max_h, _overflow_details), do: {pages, diagnostics}
+  defp paginate_blocks([], {pages, diagnostics}, _template, _max_h, _overflow_details),
+    do: {pages, diagnostics}
 
   defp paginate_blocks(blocks, {pages, diagnostics}, template, max_h, overflow_details) do
     {group, remaining} = next_flow_group(blocks)
@@ -107,10 +115,14 @@ defmodule Rendro.Pipeline.Paginate do
     header_offset = table.header_height || 0
 
     {stacked_rows, _} =
-      Enum.reduce(Enum.zip(table.rows, table.row_heights || []), {[], header_y + header_offset}, fn {row, row_h}, {acc, y} ->
-        stacked_row = stack_cells(row, start_x, y, col_widths)
-        {acc ++ [stacked_row], y + row_h}
-      end)
+      Enum.reduce(
+        Enum.zip(table.rows, table.row_heights || []),
+        {[], header_y + header_offset},
+        fn {row, row_h}, {acc, y} ->
+          stacked_row = stack_cells(row, start_x, y, col_widths)
+          {acc ++ [stacked_row], y + row_h}
+        end
+      )
 
     %{block | content: %{table | header: stacked_header, rows: stacked_rows}}
   end
@@ -127,9 +139,16 @@ defmodule Rendro.Pipeline.Paginate do
     cells
   end
 
-  defp paginate_block(block, {[current_page | rest], diagnostics}, template, max_h, overflow_details) do
+  defp paginate_block(
+         block,
+         {[current_page | rest], diagnostics},
+         template,
+         max_h,
+         overflow_details
+       ) do
     block_h = block.height || 0
     current_h = Enum.sum(Enum.map(current_page.blocks, &(&1.height || 0)))
+
     failure_details =
       Map.merge(overflow_details, %{
         page_index: length(rest) + 1,
@@ -173,17 +192,38 @@ defmodule Rendro.Pipeline.Paginate do
 
   defp place_flow_group([block], {pages, diagnostics}, template, max_h, overflow_details) do
     if block.keep_together do
-      place_hard_group([block], {pages, diagnostics}, template, max_h, overflow_details, :keep_together)
+      place_hard_group(
+        [block],
+        {pages, diagnostics},
+        template,
+        max_h,
+        overflow_details,
+        :keep_together
+      )
     else
       paginate_block(block, {pages, diagnostics}, template, max_h, overflow_details)
     end
   end
 
   defp place_flow_group(group, {pages, diagnostics}, template, max_h, overflow_details) do
-    place_hard_group(group, {pages, diagnostics}, template, max_h, overflow_details, :keep_with_next)
+    place_hard_group(
+      group,
+      {pages, diagnostics},
+      template,
+      max_h,
+      overflow_details,
+      :keep_with_next
+    )
   end
 
-  defp place_hard_group(group, {[current_page | rest], diagnostics}, template, max_h, overflow_details, keep_rule) do
+  defp place_hard_group(
+         group,
+         {[current_page | rest], diagnostics},
+         template,
+         max_h,
+         overflow_details,
+         keep_rule
+       ) do
     group_h = Enum.sum(Enum.map(group, &(&1.height || 0)))
     current_h = Enum.sum(Enum.map(current_page.blocks, &(&1.height || 0)))
 
@@ -198,6 +238,7 @@ defmodule Rendro.Pipeline.Paginate do
           keep_rule: keep_rule,
           page_index: length(rest) + 2
         }
+
         {[%{template | blocks: group}, current_page | rest], [new_diagnostic | diagnostics]}
 
       true ->
@@ -278,25 +319,30 @@ defmodule Rendro.Pipeline.Paginate do
         }
 
         current_page = %{current_page | blocks: current_page.blocks ++ [this_block]}
-        
+
         new_diagnostic = %{
           level: :info,
           type: :table_split,
           page_index: overflow_details.page_index,
           reason: :insufficient_height
         }
-        
-        {[%{template | blocks: [remaining_block]}, current_page | rest], [new_diagnostic | diagnostics]}
+
+        {[%{template | blocks: [remaining_block]}, current_page | rest],
+         [new_diagnostic | diagnostics]}
 
       remaining_table ->
         if current_h == 0 do
           impossible_row_h = List.first(table.row_heights || []) || 0
-          details = Map.merge(overflow_details, %{
-            row_index: 0, # Since we didn't split, it's the first row of this table chunk
-            row_height: impossible_row_h,
-            header_height: table.header_height || 0,
-            column_widths: table.column_widths || []
-          })
+
+          details =
+            Map.merge(overflow_details, %{
+              # Since we didn't split, it's the first row of this table chunk
+              row_index: 0,
+              row_height: impossible_row_h,
+              header_height: table.header_height || 0,
+              column_widths: table.column_widths || []
+            })
+
           throw({:error, :content_overflow, details})
         else
           {[%{template | blocks: [block]}, current_page | rest], diagnostics}
@@ -393,7 +439,15 @@ defmodule Rendro.Pipeline.Paginate do
                   lines:
                     Enum.map(measured.lines, fn line ->
                       Enum.map(line, fn run ->
-                        %{run | text: String.replace(run.text, "{{page_number}}", Integer.to_string(page_num))}
+                        %{
+                          run
+                          | text:
+                              String.replace(
+                                run.text,
+                                "{{page_number}}",
+                                Integer.to_string(page_num)
+                              )
+                        }
                       end)
                     end)
               }
@@ -538,7 +592,13 @@ defmodule Rendro.Pipeline.Paginate do
     page
   end
 
-  defp maybe_validate_region_fit(blocks, %Region{} = region, %Page{} = page, page_index, region_name) do
+  defp maybe_validate_region_fit(
+         blocks,
+         %Region{} = region,
+         %Page{} = page,
+         page_index,
+         region_name
+       ) do
     if bounded_region?(region) do
       validate_region_fit!(blocks, region, page, page_index, region_name)
     else
@@ -665,7 +725,9 @@ defmodule Rendro.Pipeline.Paginate do
 
   defp split_table_rows(table, fit_count) do
     {this_rows, rest_rows} = Enum.split(table.rows, fit_count)
-    {this_row_heights, rest_row_heights} = if table.row_heights, do: Enum.split(table.row_heights, fit_count), else: {nil, nil}
+
+    {this_row_heights, rest_row_heights} =
+      if table.row_heights, do: Enum.split(table.row_heights, fit_count), else: {nil, nil}
 
     case rest_rows do
       [] ->

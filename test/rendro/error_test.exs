@@ -38,7 +38,9 @@ defmodule Rendro.ErrorTest do
       err = Rendro.Error.from_stage(:measure, {:unsupported_script, :rtl_required}, %{})
       assert err.stage == :measure
       assert err.why == "Unsupported script boundary: rtl required"
-      assert err.next =~ "Rendro does not currently support complex text shaping or RTL boundaries"
+
+      assert err.next =~
+               "Rendro does not currently support complex text shaping or RTL boundaries"
     end
   end
 

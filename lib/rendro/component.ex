@@ -20,7 +20,8 @@ defmodule Rendro.Component do
     fit = Keyword.get(opts, :fit)
 
     if is_nil(width) and is_nil(height) and is_nil(fit) do
-      raise ArgumentError, "Image component requires at least one constraint: :width, :height, or :fit"
+      raise ArgumentError,
+            "Image component requires at least one constraint: :width, :height, or :fit"
     end
 
     %Rendro.Block{

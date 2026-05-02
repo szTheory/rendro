@@ -3,7 +3,18 @@ defmodule Rendro do
   Pure-Elixir, Phoenix-first PDF/document generation with deterministic layout and pagination.
   """
 
-  alias Rendro.{Block, Document, Metadata, Page, PageTemplate, Pipeline, Region, Section, Table, Text}
+  alias Rendro.{
+    Block,
+    Document,
+    Metadata,
+    Page,
+    PageTemplate,
+    Pipeline,
+    Region,
+    Section,
+    Table,
+    Text
+  }
 
   @type render_option :: {:output, Path.t()} | {:deterministic, boolean()}
   @type render_options :: [render_option()]
@@ -38,7 +49,9 @@ defmodule Rendro do
 
     with {:ok, pdf_binary, doc} <- Pipeline.run_with_diagnostics(doc) do
       case Keyword.get(opts, :output) do
-        nil -> {:ok, pdf_binary, doc}
+        nil ->
+          {:ok, pdf_binary, doc}
+
         path ->
           {:ok, _} = write_output(pdf_binary, path)
           {:ok, pdf_binary, doc}
@@ -109,7 +122,10 @@ defmodule Rendro do
   @spec register_embedded_font_family(
           Document.t(),
           Rendro.FontRegistry.logical_name(),
-          %{required(Rendro.FontRegistry.embedded_variant()) => {:path, Path.t()} | {:binary, binary()}}
+          %{
+            required(Rendro.FontRegistry.embedded_variant()) =>
+              {:path, Path.t()} | {:binary, binary()}
+          }
         ) :: Document.t()
   def register_embedded_font_family(%Document{} = doc, family_name, variants)
       when is_atom(family_name) and is_map(variants) do
@@ -157,7 +173,8 @@ defmodule Rendro do
   @spec table([Table.row()], keyword()) :: Table.t()
   def table(rows, attrs \\ []) do
     if Keyword.has_key?(attrs, :width) or Keyword.has_key?(attrs, :border) do
-      raise ArgumentError, "Rendro.table/2 no longer supports :width or :border. Use explicit block width and table :columns rules instead."
+      raise ArgumentError,
+            "Rendro.table/2 no longer supports :width or :border. Use explicit block width and table :columns rules instead."
     end
 
     attrs

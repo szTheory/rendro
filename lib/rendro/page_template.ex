@@ -16,7 +16,15 @@ defmodule Rendro.PageTemplate do
             margin_bottom: @default_margin,
             margin_left: @default_margin,
             regions: [
-              %Rendro.Region{name: :header, role: :header, anchor: :top, x: 72, y: 72, width: 451.28, height: 0},
+              %Rendro.Region{
+                name: :header,
+                role: :header,
+                anchor: :top,
+                x: 72,
+                y: 72,
+                width: 451.28,
+                height: 0
+              },
               %Rendro.Region{
                 name: :body,
                 role: :body,

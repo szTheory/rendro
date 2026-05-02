@@ -95,7 +95,11 @@ defmodule Rendro.Pipeline.Measure do
     end
   end
 
-  defp measure_block(doc, %Rendro.Block{content: %Rendro.Image{} = image} = block, _container_width) do
+  defp measure_block(
+         doc,
+         %Rendro.Block{content: %Rendro.Image{} = image} = block,
+         _container_width
+       ) do
     with {:ok, %{width: intrinsic_w, height: intrinsic_h}} <-
            Rendro.AssetRegistry.fetch(doc.asset_registry, image.logical_name) do
       aspect_ratio = intrinsic_w / intrinsic_h
@@ -174,16 +178,18 @@ defmodule Rendro.Pipeline.Measure do
     w = total_width / count
     List.duplicate(w, count)
   end
+
   defp resolve_columns(nil, 0, _total_width), do: []
+
   defp resolve_columns(columns, count, total_width) do
-    fixed_total = 
+    fixed_total =
       columns
       |> Enum.map(fn
         {:fixed, w} -> w
         _ -> 0
       end)
       |> Enum.sum()
-      
+
     shares_total =
       columns
       |> Enum.map(fn
@@ -191,16 +197,16 @@ defmodule Rendro.Pipeline.Measure do
         _ -> 0
       end)
       |> Enum.sum()
-      
+
     remaining_width = max(total_width - fixed_total, 0)
-    
+
     resolved =
       columns
       |> Enum.map(fn
         {:fixed, w} -> w
         {:share, s} -> if shares_total > 0, do: remaining_width * (s / shares_total), else: 0
       end)
-      
+
     if length(resolved) < count do
       resolved ++ List.duplicate(0, count - length(resolved))
     else
@@ -238,7 +244,9 @@ defmodule Rendro.Pipeline.Measure do
     Enum.reduce_while(layout.region_blocks, {:ok, %{}}, fn {name, blocks}, {:ok, acc} ->
       region_width =
         case name do
-          :body -> layout.body_region.width
+          :body ->
+            layout.body_region.width
+
           _ ->
             region = Enum.find(layout.template.regions, &(&1.name == name))
             if region, do: region.width, else: nil
@@ -256,7 +264,6 @@ defmodule Rendro.Pipeline.Measure do
 
   defp body_capacity(%{body_region: %Region{height: height}}) when is_number(height), do: height
   defp body_capacity(_layout), do: 0
-
 
   defp wrap_text(text, nil, font_chain, font_size) do
     text
@@ -291,7 +298,8 @@ defmodule Rendro.Pipeline.Measure do
 
       [chunk | rest] ->
         with {:ok, split_lines} <- split_chunk(chunk, max_width, font_chain, font_size),
-             {:ok, wrapped_lines} <- wrap_chunks(split_lines, rest, max_width, font_chain, font_size) do
+             {:ok, wrapped_lines} <-
+               wrap_chunks(split_lines, rest, max_width, font_chain, font_size) do
           {:ok, wrapped_lines}
         end
     end
@@ -300,7 +308,7 @@ defmodule Rendro.Pipeline.Measure do
   defp wrap_chunks(lines, chunks, max_width, font_chain, font_size) do
     Enum.reduce_while(chunks, {:ok, lines}, fn chunk, {:ok, acc_lines} ->
       {leading_lines, [current_line]} = Enum.split(acc_lines, length(acc_lines) - 1)
-      
+
       case measure_text_into_runs(chunk, font_chain, font_size) do
         {:ok, chunk_runs} ->
           candidate_line = merge_runs(current_line, chunk_runs)
@@ -312,10 +320,12 @@ defmodule Rendro.Pipeline.Measure do
             case split_chunk(chunk, max_width, font_chain, font_size) do
               {:ok, chunk_lines} ->
                 {:cont, {:ok, acc_lines ++ chunk_lines}}
-              err -> {:halt, err}
+
+              err ->
+                {:halt, err}
             end
           end
-          
+
         err ->
           {:halt, err}
       end
@@ -330,6 +340,7 @@ defmodule Rendro.Pipeline.Measure do
         else
           split_graphemes(chunk, max_width, font_chain, font_size)
         end
+
       err ->
         err
     end
@@ -353,14 +364,15 @@ defmodule Rendro.Pipeline.Measure do
 
   defp split_graphemes(text, max_width, font_chain, font_size) do
     result =
-      Enum.reduce_while(String.graphemes(text), {:ok, {[], []}}, fn grapheme, {:ok, {lines, current_line}} ->
+      Enum.reduce_while(String.graphemes(text), {:ok, {[], []}}, fn grapheme,
+                                                                    {:ok, {lines, current_line}} ->
         case find_font_for_grapheme(grapheme, font_chain) do
           {:ok, font} ->
             width = Font.text_width(font, grapheme, font_size)
             grapheme_run = [%{font: font, text: grapheme, width: width}]
-            
+
             candidate_line = merge_runs(current_line, grapheme_run)
-            
+
             cond do
               current_line == [] and width <= max_width ->
                 {:cont, {:ok, {lines, candidate_line}}}
@@ -382,11 +394,12 @@ defmodule Rendro.Pipeline.Measure do
 
     case result do
       {:ok, {lines, current_line}} ->
-        final_lines = 
+        final_lines =
           case current_line do
             [] -> Enum.reverse(lines)
             _ -> Enum.reverse([current_line | lines])
           end
+
         {:ok, final_lines}
 
       err ->
@@ -412,7 +425,7 @@ defmodule Rendro.Pipeline.Measure do
             {:halt, {:error, {:unsupported_glyph, grapheme}}}
         end
       end)
-      
+
     case result do
       {:ok, runs} -> {:ok, Enum.reverse(runs)}
       err -> err
@@ -432,9 +445,11 @@ defmodule Rendro.Pipeline.Measure do
   defp append_to_runs([], font, text, width) do
     [%{font: font, text: text, width: width}]
   end
+
   defp append_to_runs([%{font: f, text: t, width: w} | rest], font, text, width) when f == font do
     [%{font: f, text: t <> text, width: w + width} | rest]
   end
+
   defp append_to_runs(runs, font, text, width) do
     [%{font: font, text: text, width: width} | runs]
   end
@@ -442,14 +457,22 @@ defmodule Rendro.Pipeline.Measure do
   defp merge_runs(runs1, []) do
     runs1
   end
+
   defp merge_runs([], runs2) do
     runs2
   end
+
   defp merge_runs(runs1, runs2) do
     last_run1 = List.last(runs1)
     [first_run2 | rest2] = runs2
+
     if last_run1.font == first_run2.font do
-      merged_run = %{font: last_run1.font, text: last_run1.text <> first_run2.text, width: last_run1.width + first_run2.width}
+      merged_run = %{
+        font: last_run1.font,
+        text: last_run1.text <> first_run2.text,
+        width: last_run1.width + first_run2.width
+      }
+
       Enum.slice(runs1, 0, length(runs1) - 1) ++ [merged_run] ++ rest2
     else
       runs1 ++ runs2

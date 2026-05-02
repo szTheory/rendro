@@ -136,7 +136,8 @@ defmodule Rendro.PDF.FontParser do
       {:error, :missing_required_metrics}
     else
       metrics =
-        for <<advance_width::16, _lsb::signed-16 <- binary_part(hmtx, 0, required_bytes)>>, do: advance_width
+        for <<advance_width::16, _lsb::signed-16 <- binary_part(hmtx, 0, required_bytes)>>,
+          do: advance_width
 
       last_width = List.last(metrics)
 
@@ -160,7 +161,10 @@ defmodule Rendro.PDF.FontParser do
     end
   end
 
-  defp parse_embeddability(<<_version::16, _avg_width::signed-16, _weight_class::16, _width_class::16, fs_type::16, _::binary>>) do
+  defp parse_embeddability(
+         <<_version::16, _avg_width::signed-16, _weight_class::16, _width_class::16, fs_type::16,
+           _::binary>>
+       ) do
     if (fs_type &&& 0x0002) == 0, do: :ok, else: {:error, :non_embeddable_font}
   end
 
@@ -196,7 +200,9 @@ defmodule Rendro.PDF.FontParser do
          <<platform_id::16, encoding_id::16, offset::32, rest::binary>>,
          acc
        ) do
-    parse_encoding_records(rest, [%{platform_id: platform_id, encoding_id: encoding_id, offset: offset} | acc])
+    parse_encoding_records(rest, [
+      %{platform_id: platform_id, encoding_id: encoding_id, offset: offset} | acc
+    ])
   end
 
   defp record_priority(%{platform_id: 3, encoding_id: 10}), do: 0
@@ -230,7 +236,13 @@ defmodule Rendro.PDF.FontParser do
     if seg_count == 0 or byte_size(rest) + 14 < length or byte_size(rest) < needed_bytes do
       {:error, :missing_character_map}
     else
-      subtable = binary_part(<<4::16, length::16, 0::16, seg_count_x2::16, 0::16, 0::16, 0::16, rest::binary>>, 0, length)
+      subtable =
+        binary_part(
+          <<4::16, length::16, 0::16, seg_count_x2::16, 0::16, 0::16, 0::16, rest::binary>>,
+          0,
+          length
+        )
+
       parse_format_4_subtable(subtable, seg_count)
     end
   end
@@ -366,8 +378,8 @@ defmodule Rendro.PDF.FontParser do
   defp parse_name_records(<<>>, acc), do: Enum.reverse(acc)
 
   defp parse_name_records(
-         <<platform_id::16, encoding_id::16, language_id::16, name_id::16, length::16,
-           offset::16, rest::binary>>,
+         <<platform_id::16, encoding_id::16, language_id::16, name_id::16, length::16, offset::16,
+           rest::binary>>,
          acc
        ) do
     parse_name_records(rest, [

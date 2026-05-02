@@ -29,7 +29,8 @@ defmodule Rendro.Pipeline do
   Runs the pipeline and returns the generated PDF binary along with the final paginated document
   containing populated diagnostics.
   """
-  @spec run_with_diagnostics(Rendro.Document.t()) :: {:ok, binary(), Rendro.Document.t()} | {:error, Rendro.Error.t()}
+  @spec run_with_diagnostics(Rendro.Document.t()) ::
+          {:ok, binary(), Rendro.Document.t()} | {:error, Rendro.Error.t()}
   def run_with_diagnostics(%Rendro.Document{} = doc) do
     render_id = Rendro.Telemetry.generate_render_id()
     render_opts = Map.get(doc.options, :render, [])

@@ -9,7 +9,7 @@ Rendro has shipped two verified milestones. `v1.0` proved the pure-core renderin
 ### Milestone v1.2: Deterministic Typography, Assets, and Honest I18n Baseline
 
 **Status:** Active
-**Planned Phases:** 25-29
+**Planned Phases:** 25-30
 
 `v1.2` should make Rendro capable of producing branded, customer-facing PDFs without weakening the deterministic layout contract. The milestone is intentionally about capability truth, not broad internationalization claims or release mechanics.
 
@@ -71,10 +71,28 @@ Planned work:
 - Extend docs-contract, regression, and example-proof coverage around the public support surface.
 - Capture the remaining first-public-release blockers so `v1.3` can focus on publishability rather than re-deriving scope.
 
+Gap-closure plans (added during 2026-05-01 visual UAT):
+
+- [ ] 29-08-header-wrap-gap-fix-PLAN.md — Close UAT Gap 2 by widening the branded invoice header block (B612 Regular at size 18) so the invoice id stays on a single line. Logo gap (Gap 1) deferred to Phase 30.
+
+#### Phase 30: Visually Correct PNG Image Rendering
+**Goal**: Make registered PNG image assets actually render visibly on the page so the asset surface delivered in `v1.2` is truthful, not just structurally present.
+**Depends on**: Phase 29
+**Requirements**: [ASSET-04]
+
+Planned work:
+
+- Replace the current `build_image_objects` path in `lib/rendro/pdf/writer.ex` so PNG XObject streams contain valid `/FlateDecode` payloads (decoded RGB samples, or IDAT pass-through with explicit `/DecodeParms /Predictor 15 /Colors N /BitsPerComponent 8 /Columns W`).
+- Honor PNG color types correctly: RGB → `/DeviceRGB`; RGBA → `/DeviceRGB` + `/SMask`; Gray/Gray+α → `/DeviceGray` (+ `/SMask`); Indexed → `/Indexed [/DeviceRGB N <palette>]`.
+- Add a rasterize-and-decode regression class (e.g. via `pdftoppm` + targeted pixel sampling) so the existing structural/byte-substring tests are paired with at least one test that proves the image actually paints. This closes the test-class blind spot that allowed the bug to ship through phases 28 and 29.
+- Re-run the phase 29 visual UAT (`mix rendro.visual_uat 29`) and confirm the branded preview now passes the logo criterion before closing.
+
+**Source**: Surfaced 2026-05-01 during Phase 29 visual UAT (Claude vision verdict on `29-branded-preview.png`). See [`.planning/phases/29-branded-recipes-docs-and-proof-closure/29-HUMAN-UAT.md`](/Users/jon/projects/rendro/.planning/phases/29-branded-recipes-docs-and-proof-closure/29-HUMAN-UAT.md) Gap 1 for the full root cause and fix direction.
+
 ## Milestones
 
 - <details><summary><b>Milestone v1.2</b> (Planned)</summary>
-  Deterministic typography, assets, and honest Unicode/i18n boundaries for branded business documents. Planned phases: 25-29.
+  Deterministic typography, assets, and honest Unicode/i18n boundaries for branded business documents. Planned phases: 25-30.
   </details>
 
 - <details><summary><b>Milestone v1.0</b> (Shipped 2026-04-28)</summary>
@@ -101,3 +119,12 @@ Planned work:
 **Notes**:
 - Existing release preflight coverage already exercises `mix hex.build --unpack` and `mix hex.publish --dry-run --yes`.
 - This is now the intended `v1.3` milestone theme if `v1.2` closes truthfully.
+
+**v1.3 readiness blockers** (captured during Phase 29 closure):
+- `mix.exs` `:licenses` is `["UNLICENSED"]`; pick an SPDX-valid value and ship a matching top-level `LICENSE` file.
+- Hex package metadata audit: `:description`, `:source_url`, `:links`, and maintainer-facing release copy.
+- README badge state for CI, Hex.pm, and HexDocs.
+- ExDoc `groups_for_extras` decision now that the guide count exceeds two.
+- `usage_rules.md` artifact decision for first public release support boundaries.
+- Public API stability scan and deprecation-policy document before publication.
+- `mix hex.publish --dry-run` preflight remains part of the release proof path.

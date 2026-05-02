@@ -45,7 +45,8 @@ defmodule Rendro.Pipeline.Build do
       sections != [] ->
         validate_sections(doc, sections)
 
-      true -> {:error, :no_pages}
+      true ->
+        {:error, :no_pages}
     end
   end
 
@@ -148,7 +149,9 @@ defmodule Rendro.Pipeline.Build do
     end)
   end
 
-  defp validate_table_cell_font(doc, %Rendro.Block{} = block), do: validate_block_fonts(doc, block)
+  defp validate_table_cell_font(doc, %Rendro.Block{} = block),
+    do: validate_block_fonts(doc, block)
+
   defp validate_table_cell_font(_doc, _cell), do: :ok
 
   defp default_font_registered?(registry, default_font) do

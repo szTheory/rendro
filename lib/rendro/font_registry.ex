@@ -64,7 +64,8 @@ defmodule Rendro.FontRegistry do
   Returns a registry seeded with the built-in Helvetica-compatible default entry.
   """
   @spec new() :: t()
-  def new, do: %__MODULE__{fonts: %{@default_font => @helvetica_descriptor}, default_font: @default_font}
+  def new,
+    do: %__MODULE__{fonts: %{@default_font => @helvetica_descriptor}, default_font: @default_font}
 
   @doc """
   Returns the default logical font name used by new documents.
@@ -83,7 +84,7 @@ defmodule Rendro.FontRegistry do
       |> Keyword.fetch!(:built_in)
       |> built_in_descriptor()
 
-    descriptor = 
+    descriptor =
       case Keyword.fetch(opts, :fallbacks) do
         {:ok, fallbacks} when is_list(fallbacks) -> Map.put(descriptor, :fallbacks, fallbacks)
         _ -> descriptor
@@ -95,12 +96,13 @@ defmodule Rendro.FontRegistry do
   @doc """
   Registers a logical font name against an explicit embedded font source.
   """
-  @spec register_embedded(t(), logical_name(), {:path, Path.t()} | {:binary, binary()}, keyword()) :: t()
+  @spec register_embedded(t(), logical_name(), {:path, Path.t()} | {:binary, binary()}, keyword()) ::
+          t()
   def register_embedded(%__MODULE__{} = registry, logical_name, source, opts \\ [])
       when is_atom(logical_name) and is_list(opts) do
     descriptor = embedded_descriptor(source, :regular)
 
-    descriptor = 
+    descriptor =
       case Keyword.fetch(opts, :fallbacks) do
         {:ok, fallbacks} when is_list(fallbacks) -> Map.put(descriptor, :fallbacks, fallbacks)
         _ -> descriptor
@@ -177,7 +179,7 @@ defmodule Rendro.FontRegistry do
   defp validate_fallbacks(registry) do
     Enum.reduce_while(registry.fonts, :ok, fn {logical_name, descriptor}, :ok ->
       fallbacks = Map.get(descriptor, :fallbacks, [])
-      
+
       case Enum.find(fallbacks, fn fallback -> not Map.has_key?(registry.fonts, fallback) end) do
         nil -> {:cont, :ok}
         missing -> {:halt, {:error, {:missing_fallback_target, missing, logical_name}}}
@@ -251,18 +253,26 @@ defmodule Rendro.FontRegistry do
   defp resolve_chain(registry, logical_name, visited, acc) do
     with {:ok, descriptor} <- fetch_descriptor(registry, logical_name),
          {:ok, pdf_font} <- to_pdf_font(logical_name, descriptor) do
-      
       acc = acc ++ [pdf_font]
       fallbacks = Map.get(descriptor, :fallbacks, [])
 
       # Depth-first or breadth-first? For a simple chain, depth-first (recursing on fallbacks in order).
       # If a font has multiple fallbacks, we iterate through them.
       # To prevent cycle issues and just linearize the chain:
-      Enum.reduce_while(fallbacks, {:ok, acc, visited}, fn fallback_name, {:ok, current_acc, current_visited} ->
+      Enum.reduce_while(fallbacks, {:ok, acc, visited}, fn fallback_name,
+                                                           {:ok, current_acc, current_visited} ->
         if fallback_name in current_visited do
-          {:halt, {:error, {:fallback_cycle_detected, Enum.reverse([fallback_name | current_visited]) |> Enum.reverse()}}}
+          {:halt,
+           {:error,
+            {:fallback_cycle_detected,
+             Enum.reverse([fallback_name | current_visited]) |> Enum.reverse()}}}
         else
-          case resolve_chain(registry, fallback_name, [fallback_name | current_visited], current_acc) do
+          case resolve_chain(
+                 registry,
+                 fallback_name,
+                 [fallback_name | current_visited],
+                 current_acc
+               ) do
             {:ok, new_acc} -> {:cont, {:ok, new_acc, [fallback_name | current_visited]}}
             {:error, _} = err -> {:halt, err}
           end
@@ -284,7 +294,11 @@ defmodule Rendro.FontRegistry do
 
   @spec built_in(descriptor(), logical_name()) :: Rendro.PDF.Font.t()
   def built_in(%{source: :built_in, family: :helvetica}, logical_name) do
-    %Rendro.PDF.Font{Rendro.PDF.Font.helvetica() | name: resource_name(logical_name), logical_name: logical_name}
+    %Rendro.PDF.Font{
+      Rendro.PDF.Font.helvetica()
+      | name: resource_name(logical_name),
+        logical_name: logical_name
+    }
   end
 
   @spec variant_logical_name(logical_name(), embedded_variant()) :: logical_name()
@@ -306,6 +320,7 @@ defmodule Rendro.FontRegistry do
   end
 
   defp normalize_reference(font, _document_default_font) when is_atom(font), do: {:ok, font}
+
   defp normalize_reference(font, document_default_font) when font in ["Helvetica", "helvetica"],
     do: {:ok, document_default_font}
 
@@ -378,18 +393,27 @@ defmodule Rendro.FontRegistry do
     end
   end
 
-  defp preflight_descriptor(_logical_name, %{source: :built_in} = descriptor), do: {:ok, descriptor}
-
-  defp preflight_descriptor(_logical_name, %{source: :embedded, pdf_font: %Rendro.PDF.Font{}} = descriptor),
+  defp preflight_descriptor(_logical_name, %{source: :built_in} = descriptor),
     do: {:ok, descriptor}
 
-  defp preflight_descriptor(logical_name, %{source: :embedded, source_kind: source_kind, source_data: %{status: :error, reason: reason}}) do
+  defp preflight_descriptor(
+         _logical_name,
+         %{source: :embedded, pdf_font: %Rendro.PDF.Font{}} = descriptor
+       ),
+       do: {:ok, descriptor}
+
+  defp preflight_descriptor(logical_name, %{
+         source: :embedded,
+         source_kind: source_kind,
+         source_data: %{status: :error, reason: reason}
+       }) do
     {:error, invalid_embedded_font_error(logical_name, source_kind, reason)}
   end
 
   defp preflight_descriptor(
          logical_name,
-         %{source: :embedded, source_kind: source_kind, source_data: %{status: :ok, bytes: bytes}} = descriptor
+         %{source: :embedded, source_kind: source_kind, source_data: %{status: :ok, bytes: bytes}} =
+           descriptor
        ) do
     case Rendro.PDF.FontParser.parse(bytes) do
       {:ok, parsed} ->
@@ -414,8 +438,11 @@ defmodule Rendro.FontRegistry do
     end
   end
 
-  defp to_pdf_font(logical_name, %{source: :built_in} = descriptor), do: {:ok, built_in(descriptor, logical_name)}
-  defp to_pdf_font(_logical_name, %{source: :embedded, pdf_font: %Rendro.PDF.Font{} = pdf_font}), do: {:ok, pdf_font}
+  defp to_pdf_font(logical_name, %{source: :built_in} = descriptor),
+    do: {:ok, built_in(descriptor, logical_name)}
+
+  defp to_pdf_font(_logical_name, %{source: :embedded, pdf_font: %Rendro.PDF.Font{} = pdf_font}),
+    do: {:ok, pdf_font}
 
   defp to_pdf_font(logical_name, %{source: :embedded} = descriptor) do
     with {:ok, descriptor} <- preflight_descriptor(logical_name, descriptor),
@@ -425,7 +452,8 @@ defmodule Rendro.FontRegistry do
   end
 
   defp invalid_embedded_font_error(logical_name, source_kind, reason) do
-    {:invalid_embedded_font, %{logical_name: logical_name, source_kind: source_kind, reason: reason}}
+    {:invalid_embedded_font,
+     %{logical_name: logical_name, source_kind: source_kind, reason: reason}}
   end
 
   defp resource_name(logical_name) do
@@ -438,7 +466,14 @@ defmodule Rendro.FontRegistry do
 end
 
 defmodule Rendro.FontRegistry.EmbeddedFontFamilyError do
-  defexception [:message, :family_name, :missing_variants, :extra_variants, :provided_kinds, :reason]
+  defexception [
+    :message,
+    :family_name,
+    :missing_variants,
+    :extra_variants,
+    :provided_kinds,
+    :reason
+  ]
 
   @impl true
   def exception(opts) do
