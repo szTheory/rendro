@@ -45,3 +45,5 @@ examples/phoenix_example/deps/
 
 # Runtime crash artifacts
 erl_crash.dump
+
+.env

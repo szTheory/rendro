@@ -47,7 +47,8 @@ defmodule Rendro.MixProject do
       {:stream_data, "~> 1.3", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.40", only: [:dev, :test], runtime: false}
+      {:ex_doc, "~> 0.40", only: [:dev, :test], runtime: false},
+      {:req, "~> 0.5", only: [:dev, :test]}
     ]
   end
 
