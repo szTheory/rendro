@@ -73,7 +73,7 @@ Planned work:
 
 Gap-closure plans (added during 2026-05-01 visual UAT):
 
-- [ ] 29-08-header-wrap-gap-fix-PLAN.md — Close UAT Gap 2 by widening the branded invoice header block (B612 Regular at size 18) so the invoice id stays on a single line. Logo gap (Gap 1) deferred to Phase 30.
+- [x] 29-08-header-wrap-gap-fix-PLAN.md — Close UAT Gap 2 by widening the branded invoice header block (B612 Regular at size 18) so the invoice id stays on a single line. Logo gap (Gap 1) deferred to Phase 30.
 
 #### Phase 30: Visually Correct PNG Image Rendering
 **Goal**: Make registered PNG image assets actually render visibly on the page so the asset surface delivered in `v1.2` is truthful, not just structurally present.
