@@ -80,6 +80,13 @@ Gap-closure plans (added during 2026-05-01 visual UAT):
 **Depends on**: Phase 29
 **Requirements**: [ASSET-04]
 
+**Plans:** 3 plans
+
+Plans:
+- [ ] 30-01-PLAN.md — Implement PNG chunk parsing, filtering, and alpha separation utilities.
+- [ ] 30-02-PLAN.md — Update PDF Writer to use the PNG utility and add rasterization tests.
+- [ ] 30-03-PLAN.md — Run Phase 29 visual UAT to verify the fix.
+
 Planned work:
 
 - Replace the current `build_image_objects` path in `lib/rendro/pdf/writer.ex` so PNG XObject streams contain valid `/FlateDecode` payloads (decoded RGB samples, or IDAT pass-through with explicit `/DecodeParms /Predictor 15 /Colors N /BitsPerComponent 8 /Columns W`).
