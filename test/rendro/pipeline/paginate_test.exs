@@ -405,7 +405,7 @@ defmodule Rendro.Pipeline.PaginateTest do
         )
 
       assert {:ok, paginated} = paginate_flow(doc)
-      assert length(paginated.diagnostics) > 0
+      assert paginated.diagnostics != []
 
       first_diag = Enum.find(paginated.diagnostics, &(&1.type == :table_split))
       assert first_diag
