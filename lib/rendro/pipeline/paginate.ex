@@ -105,8 +105,8 @@ defmodule Rendro.Pipeline.Paginate do
   end
 
   defp stack_table_cells(%Rendro.Block{content: %Rendro.Table{} = table} = block) do
-    header_y = block.y || 0
-    start_x = block.x || 0
+    header_y = block.y
+    start_x = block.x
     col_widths = table.column_widths || []
 
     stacked_header =
