@@ -18,6 +18,7 @@ defmodule Rendro.MixProject do
       description:
         "Pure-Elixir, Phoenix-first PDF/document generation with deterministic layout and pagination",
       source_url: @source_url,
+      homepage_url: @source_url,
       docs: docs(),
       dialyzer: [plt_add_apps: [:mix, :stream_data]]
     ]
@@ -68,7 +69,7 @@ defmodule Rendro.MixProject do
 
   defp package do
     [
-      licenses: ["UNLICENSED"],
+      licenses: ["MIT"],
       links: %{"GitHub" => @source_url},
       files: ~w(
         lib
@@ -77,6 +78,7 @@ defmodule Rendro.MixProject do
         .formatter.exs
         mix.exs
         README.md
+        LICENSE
         NOTICE
         CHANGELOG.md
       )
