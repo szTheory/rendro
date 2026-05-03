@@ -10,17 +10,21 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Shipped Version:** v1.1 Layout Authoring Maturity (2026-04-30)
+**Shipped Version:** v1.3 First Public Hex Release Readiness (2026-05-03)
+
+Rendro now has licensing, metadata, API stability policy, and release preflight mechanics in place.
 
 Rendro now has a stable layout-authoring contract on top of the v1.0 engine core. `v1.1` shipped explicit page templates, named regions, reusable sections, deterministic wrapped-text measurement, authored keep/break pagination semantics, truthful fit validation, runtime-consumed table split policy, structured diagnostics/proof surfaces, and canonical invoice/report guidance through recipes and the Phoenix example.
 
-**Previous Shipped Version:** v1.0 MVP (2026-04-28)
+**Previous Shipped Version:** v1.2 Deterministic Typography (2026-05-03)
+
+`v1.2` delivered typography, assets, and honest Unicode boundaries.
 
 `v1.0` proved the core thesis: pure deterministic rendering, baseline layout/pagination, optional adapters, structured errors, and truthful CI/release verification contracts all ship with committed proof.
 
-## Current Milestone: v1.2 Deterministic Typography, Assets, and Honest I18n Baseline
+## Current Milestone: v1.4 Async Delivery and Artifact Operations
 
-**Goal:** Make Rendro capable of producing branded, customer-facing documents with deterministic typography and asset handling while keeping Unicode/i18n claims narrow, test-backed, and truthful.
+**Goal:** Add queued render lifecycle, artifact metadata, and persistence/sink contracts.
 
 **Target features:**
 - Deterministic font registration, resolution, measurement, and embedding for built-in and custom fonts.
@@ -32,6 +36,9 @@ Rendro now has a stable layout-authoring contract on top of the v1.0 engine core
 
 ### Validated
 
+- [x] Rendro v1.2 delivered deterministic typography, assets, and honest Unicode boundaries. Validated at milestone close in `v1.2-REQUIREMENTS.md`.
+- [x] Rendro v1.3 delivered first public hex release readiness. Validated at milestone close in `v1.3-REQUIREMENTS.md`.
+
 - [x] Merge-blocking verification is now truthful and executable: `mix ci` covers format, compile, tests, docs, and package build, and `mix verify` separates deterministic vs advisory lanes without early exit. Validated in Phase 12: Verification Chain Closure (`QUAL-01`, `QUAL-03`, `QUAL-05`).
 - [x] Deterministic CI gate regression is fixed and traceability state perfectly mirrors the true gate status. Validated in Phase 17: Deterministic CI Gate Recovery Traceability Resync (`QUAL-01`).
 - [x] Rendro v1.0 proved pure-core rendering, baseline layout primitives, optional adapters, and truthful operational verification as a shippable MVP. Validated at milestone close in `v1.0-REQUIREMENTS.md`.
@@ -39,10 +46,8 @@ Rendro now has a stable layout-authoring contract on top of the v1.0 engine core
 
 ### Active
 
-- [ ] Deliver deterministic font registration and runtime selection that measurement and rendering both honor.
-- [ ] Ship custom-font embedding, fallback chains, and typed missing-glyph diagnostics without broad shaping claims.
-- [ ] Introduce first-class bounded image/logo asset support suitable for branded business documents.
-- [ ] Prove the typography/asset surface through branded examples, docs-contract assertions, and deterministic regression fixtures.
+- [ ] Add queued render lifecycle and artifact metadata.
+- [ ] Implement persistence/sink contracts.
 
 ### Out of Scope
 
@@ -118,4 +123,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-30 after starting v1.2 milestone planning.*
+*Last updated: 2026-05-03 after v1.3 milestone complete.*

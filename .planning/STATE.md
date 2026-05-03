@@ -2,15 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: First Public Hex Release Readiness
-status: complete
-stopped_at: Phase 33 Release Preflight and Proof complete
-last_updated: "2026-05-03T12:00:00.000Z"
-last_activity: 2026-05-03 -- Phase 33 Release Preflight and Proof complete
+status: completed
+last_updated: "2026-05-03T21:08:09.477Z"
+last_activity: 2026-05-03
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 19
-  completed_plans: 19
+  total_phases: 3
+  completed_phases: 3
+  total_plans: 3
+  completed_plans: 3
   percent: 100
 ---
 
@@ -28,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-30)
 Phase: 33
 Plan: None
 Status: complete
-Last activity: 2026-05-03 -- Phase 33 Release Preflight and Proof complete
+Last activity: 2026-05-03
 
 Progress: [----------] 100%
 
@@ -131,3 +130,11 @@ Recent decisions affecting current work:
 ### Blockers/Concerns
 
 - Historic v1.0, v1.1, and v1.2 phase directories remain on disk for auditability. New roadmap numbering continues at Phase 31 to avoid collisions.
+
+## Deferred Items
+
+Items acknowledged and deferred at milestone close on 2026-05-03:
+
+| Category | Item | Status |
+|----------|------|--------|
+| verification_gaps | 29-VERIFICATION.md | human_needed |
