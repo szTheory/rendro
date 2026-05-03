@@ -83,13 +83,27 @@ defmodule Mix.Tasks.Release.PreflightTest do
 
     fn command, args, _opts ->
       send(test_pid, {:preflight_command, command, args})
+
       if command == "mix" and args == ["hex.build", "--unpack"] do
         File.mkdir_p!("rendro-0.1.0/guides")
-        Enum.each(["LICENSE", "README.md", "CHANGELOG.md", "guides/api_stability.md", "guides/branding.md", "guides/integrations.md"], fn file ->
-          File.touch!(Path.join("rendro-0.1.0", file))
-        end)
+
+        Enum.each(
+          [
+            "LICENSE",
+            "README.md",
+            "CHANGELOG.md",
+            "guides/api_stability.md",
+            "guides/branding.md",
+            "guides/integrations.md"
+          ],
+          fn file ->
+            File.touch!(Path.join("rendro-0.1.0", file))
+          end
+        )
+
         File.touch!("rendro-0.1.0.tar")
       end
+
       Map.fetch!(responses, {command, args})
     end
   end
