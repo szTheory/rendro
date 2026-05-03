@@ -1,28 +1,10 @@
 defmodule Rendro.TestSupport.FontFixture do
   @moduledoc false
 
-  @candidate_paths [
-    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-    "/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf",
-    "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf",
-    "/opt/homebrew/Library/Homebrew/vendor/portable-ruby/4.0.3/lib/ruby/gems/4.0.0/gems/rdoc-7.0.3/lib/rdoc/generator/template/darkfish/fonts/Lato-Regular.ttf",
-    "/opt/homebrew/Library/Homebrew/vendor/portable-ruby/4.0.3/lib/ruby/gems/4.0.0/gems/rdoc-7.0.3/lib/rdoc/generator/template/darkfish/fonts/SourceCodePro-Regular.ttf",
-    "/opt/homebrew/Cellar/tesseract/5.5.0/share/tessdata/pdf.ttf"
-  ]
-
   @spec supported_font() :: %{path: Path.t(), bytes: binary()}
   def supported_font do
-    case Enum.find(@candidate_paths, &File.exists?/1) do
-      nil ->
-        raise """
-        no supported test font fixture found.
-        looked in:
-        #{Enum.map_join(@candidate_paths, "\n", &"  - #{&1}")}
-        """
-
-      path ->
-        %{path: path, bytes: File.read!(path)}
-    end
+    path = Path.join(:code.priv_dir(:rendro), "branded/fonts/B612-Regular.ttf")
+    %{path: path, bytes: File.read!(path)}
   end
 
   @spec restricted_font(binary()) :: binary()
