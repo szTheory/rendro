@@ -36,8 +36,17 @@ defmodule Rendro.AssetRegistry do
       end
 
     case Rendro.ImageParser.parse(binary) do
-      {:ok, %{width: width, height: height, mime: mime}} ->
-        asset = %{binary: binary, width: width, height: height, mime: mime}
+      {:ok, %{width: width, height: height, mime: mime} = info} ->
+        asset = %{
+          binary: binary,
+          width: width,
+          height: height,
+          mime: mime,
+          bit_depth: Map.get(info, :bit_depth),
+          color_type: Map.get(info, :color_type),
+          interlace: Map.get(info, :interlace)
+        }
+
         %__MODULE__{registry | assets: Map.put(registry.assets, logical_name, asset)}
 
       {:error, reason} ->

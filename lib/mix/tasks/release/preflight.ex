@@ -32,7 +32,8 @@ defmodule Mix.Tasks.Release.Preflight do
     phase_1_results = [
       check_clean_worktree(context),
       check_exact_tag(context, version),
-      check_package_metadata(context.project_config)
+      check_package_metadata(context.project_config),
+      check_hex_artifacts(context, version)
     ]
 
     Enum.each(phase_1_results, &print_result/1)
@@ -113,6 +114,42 @@ defmodule Mix.Tasks.Release.Preflight do
         "Package metadata",
         "missing metadata fields: #{missing |> Enum.reverse() |> Enum.join(", ")}"
       )
+    end
+  end
+
+  defp check_hex_artifacts(context, version) do
+    case run_command(context, "mix", ["hex.build", "--unpack"]) do
+      {_output, 0} ->
+        dir = "rendro-#{version}"
+
+        required_files = [
+          "LICENSE",
+          "README.md",
+          "CHANGELOG.md",
+          "guides/api_stability.md",
+          "guides/branding.md",
+          "guides/integrations.md"
+        ]
+
+        missing_files =
+          Enum.reject(required_files, fn file ->
+            File.exists?(Path.join(dir, file))
+          end)
+
+        File.rm_rf!(dir)
+        File.rm(dir <> ".tar")
+
+        if missing_files == [] do
+          pass("Hex Build Artifacts")
+        else
+          fail(
+            "Hex Build Artifacts",
+            "missing files in unpacked artifact: #{Enum.join(missing_files, ", ")}"
+          )
+        end
+
+      {output, status} ->
+        fail("Hex Build Artifacts", "hex.build failed (#{status})\n#{output}")
     end
   end
 

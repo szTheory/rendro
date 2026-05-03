@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: First Public Hex Release Readiness
-status: planning
-stopped_at: Milestone v1.2 completed
+status: complete
+stopped_at: Phase 33 Release Preflight and Proof complete
 last_updated: "2026-05-03T12:00:00.000Z"
-last_activity: 2026-05-03 -- Milestone v1.2 complete
+last_activity: 2026-05-03 -- Phase 33 Release Preflight and Proof complete
 progress:
   total_phases: 7
-  completed_phases: 4
+  completed_phases: 7
   total_plans: 19
-  completed_plans: 18
-  percent: 95
+  completed_plans: 19
+  percent: 100
 ---
 
 # Project State
@@ -21,27 +21,26 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-30)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase --phase — 29
+**Current focus:** Phase --phase — 33
 
 ## Current Position
 
-Phase: 31
+Phase: 33
 Plan: None
-Status: planning
-Last activity: 2026-05-03 -- Milestone v1.3 roadmap and requirements created
+Status: complete
+Last activity: 2026-05-03 -- Phase 33 Release Preflight and Proof complete
 
-Progress: [----------] 0%
+Progress: [----------] 100%
 
 ## Milestone Snapshot
 
 - Milestone: `v1.3 First Public Hex Release Readiness`
-- Phases: `31-33` (planned)
-- Plans: `0`
-- Tasks: `0`
+- Phases: `31-33`
+- Plans: `1`
+- Tasks: `2`
 - Timeline: `2026-05-03` -> `TBD`
 - Key accomplishments:
-  - `v1.2` completed successfully, delivering deterministic typography, assets, and honest Unicode boundaries.
-  - Transitioning from internal proven core to an adoption-ready open-source package.
+  - `v1.3` completed successfully, delivering public hex release readiness with exact asset verification and preflight checks.
 
 ## Performance Metrics
 
@@ -56,32 +55,6 @@ Progress: [----------] 0%
 | 22 | 3/3 | — | — |
 | 23 | 2/2 | — | — |
 | 24 | 2/2 | — | — |
-
-| Phase 18 P01 | 179 | 2 tasks | 9 files |
-| Phase 18 P02 | 9 min | 2 tasks | 9 files |
-| Phase 18 P03 | 2 min | 2 tasks | 6 files |
-| Phase 19 P01 | 5 min | 2 tasks | 6 files |
-| Phase 19 P02 | 5 min | 2 tasks | 3 files |
-| Phase 19 P03 | 6 min | 2 tasks | 7 files |
-| Phase 20 P01 | 25 | 2 tasks | 4 files |
-| Phase 20 P02 | 10 mins | 2 tasks | 9 files |
-| Phase 21 P01 | 10m | 2 tasks | 7 files |
-| Phase 21-break-diagnostics-and-pagination-proofs P21-02-PLAN.md | 20 | 2 tasks | 4 files |
-| Phase 22-authoring-ergonomics-and-canonical-recipes P22-01 | 5min | 1 tasks | 2 files |
-| Phase 22-authoring-ergonomics-and-canonical-recipes P22-02 | 2min | 2 tasks | 5 files |
-| Phase 22 P03 | 5min | 2 tasks | 6 files |
-| Phase 23 P01 | 11 min | 2 tasks | 7 files |
-| Phase 23 P02 | 7 min | 2 tasks | 5 files |
-| Phase 24 P01 | 4 min | 3 tasks | 9 files |
-| Phase 24 P02 | 8 min | 2 tasks | 5 files |
-| Phase 25 P01 | 5 min | 2 tasks | 7 files |
-| Phase 26 P01 | 16 min | 2 tasks | 10 files |
-| Phase 26 P02 | 1 min | 2 tasks | 3 files |
-| Phase 26 P03 | 4 min | 2 tasks | 4 files |
-| Phase 28 P01 | 15 min | 2 tasks | 4 files |
-| Phase 28 P02 | 10 | 2 tasks | 5 files |
-| Phase 28-asset-registry-and-deterministic-image-rendering P03 | 10m | 2 tasks | 3 files |
-| Phase 31 P01 | 15 min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -153,35 +126,8 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Plan Phase 31: Licensing and Hex Metadata.
+- None.
 
 ### Blockers/Concerns
 
 - Historic v1.0, v1.1, and v1.2 phase directories remain on disk for auditability. New roadmap numbering continues at Phase 31 to avoid collisions.
-- `gsd-sdk query init.new-milestone` still reports stale milestone metadata (`v1.0`), so milestone planning should continue to trust the checked-in `.planning` truth surfaces until tooling state is reconciled.
-
-## Deferred Items
-
-Items acknowledged and carried forward from milestone scoping:
-
-| Category | Item | Status | Deferred At |
-|----------|------|--------|-------------|
-| Async Ops | Render manifests, persistence sinks, retry/cancel lifecycle contracts | Deferred to v1.4 | 2026-04-28 |
-| Trust | Validator-backed compliance/signature surfaces | Deferred to v1.5 | 2026-04-28 |
-
-## Quick Tasks Completed
-
-| Date | ID | Task | Status | Verification |
-|------|----|------|--------|--------------|
-| 2026-04-28 | 260428-hsl | Fix PR #1 CI format failures and rerun verification | complete | `mix ci`; `examples/phoenix_example` compile |
-
-## Session Continuity
-
-Last session: 2026-05-03T12:00:00.000Z
-Stopped at: Milestone v1.3 Roadmap planned
-Resume file: .planning/milestones/v1.3-ROADMAP.md
-
-**Planned Phase:** 31 (Licensing and Hex Metadata) — 0 plans — 2026-05-03T12:00:00.000Z
-OADMAP.md
-
-**Planned Phase:** 31 (Licensing and Hex Metadata) — 0 plans — 2026-05-03T12:00:00.000Z

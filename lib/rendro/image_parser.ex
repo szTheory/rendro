@@ -25,8 +25,19 @@ defmodule Rendro.ImageParser do
   @spec parse(binary()) ::
           {:ok, %{width: pos_integer(), height: pos_integer(), mime: String.t()}}
           | {:error, term()}
-  def parse(<<@png_signature, _length::32, "IHDR", width::32, height::32, _rest::binary>>) do
-    {:ok, %{width: width, height: height, mime: "image/png"}}
+  def parse(
+        <<@png_signature, _length::32, "IHDR", width::32, height::32, bit_depth::8, color_type::8,
+          _comp::8, _filter::8, interlace::8, _crc::32, _rest::binary>>
+      ) do
+    {:ok,
+     %{
+       width: width,
+       height: height,
+       mime: "image/png",
+       bit_depth: bit_depth,
+       color_type: color_type,
+       interlace: interlace
+     }}
   end
 
   def parse(<<@jpeg_signature, rest::binary>>) do

@@ -26,6 +26,11 @@ Plans:
 **Goal:** Polish the public-facing documentation surfaces and explicitly declare the project's API stability policy.
 **Requirements:** [REL-03, REL-04, REL-05]
 
+**Plans:** 1/1 plans
+
+Plans:
+- [x] 32-01-PLAN.md — Explicit Support Boundaries and README Badges
+
 Planned work:
 - Update `mix.exs` to configure `groups_for_extras` for ExDoc, rationally organizing guides and references.
 - Add status badges (CI, Hex.pm version, HexDocs) to the top of `README.md`.
@@ -36,7 +41,8 @@ Planned work:
 **Goal:** Verify the release artifacts and dry-run the Hex publication process.
 **Requirements:** [REL-06]
 
-Planned work:
+Plans:
+- [x] 33-01-PLAN.md — Release Preflight and Proof
 - Extend the `mix release.preflight` task (or CI equivalent) to include `mix hex.publish --dry-run`.
 - Verify that the generated Hex package includes the necessary files (e.g., `LICENSE`, `README.md`, `usage_rules.md`) via `mix hex.build --unpack`.
 - Ensure all CI workflows and visual UAT checks pass cleanly on the finalized release surface.

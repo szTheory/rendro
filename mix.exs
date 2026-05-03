@@ -92,7 +92,17 @@ defmodule Rendro.MixProject do
       extras: [
         "README.md",
         "guides/integrations.md",
-        "guides/branding.md"
+        "guides/branding.md",
+        "guides/api_stability.md"
+      ],
+      groups_for_extras: [
+        Guides: [
+          "guides/branding.md",
+          "guides/integrations.md"
+        ],
+        Policies: [
+          "guides/api_stability.md"
+        ]
       ]
     ]
   end

@@ -260,7 +260,10 @@ defmodule Rendro.PDF.WriterTest do
     end
 
     test "Writer correctly builds Image XObject dictionaries and streams for PNGs and JPEGs" do
-      png_bytes = <<137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, "IHDR", 100::32, 50::32>>
+      png_bytes =
+        <<137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, "IHDR", 100::32, 50::32, 8, 2, 0, 0, 0,
+          0::32, 0, 0, 0, 0, "IDAT", 0::32>>
+
       jpeg_bytes = <<0xFF, 0xD8, 0xFF, 0xC0, 0x00, 0x11, 8, 50::16, 100::16, 0>>
 
       doc =
@@ -309,7 +312,9 @@ defmodule Rendro.PDF.WriterTest do
     end
 
     test "Emits the Do (Draw Object) operator with appropriate transformation matrix (cm) for sizing" do
-      png_bytes = <<137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, "IHDR", 100::32, 50::32>>
+      png_bytes =
+        <<137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, "IHDR", 100::32, 50::32, 8, 2, 0, 0, 0,
+          0::32, 0, 0, 0, 0, "IDAT", 0::32>>
 
       doc =
         Rendro.document()

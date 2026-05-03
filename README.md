@@ -1,5 +1,9 @@
 # Rendro
 
+[![CI](https://github.com/szTheory/rendro/actions/workflows/ci.yml/badge.svg)](https://github.com/szTheory/rendro/actions/workflows/ci.yml)
+[![Hex.pm](https://img.shields.io/hexpm/v/rendro.svg)](https://hex.pm/packages/rendro)
+[![HexDocs](https://img.shields.io/badge/hex--docs-purple.svg)](https://hexdocs.pm/rendro)
+
 Pure-Elixir PDF generation with deterministic layout and pagination.
 
 ## Features

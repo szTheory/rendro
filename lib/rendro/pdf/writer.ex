@@ -8,7 +8,7 @@ defmodule Rendro.PDF.Writer do
   """
 
   alias Rendro.FontRegistry
-  alias Rendro.PDF.{Font, Object}
+  alias Rendro.PDF.{Font, Object, PNG}
   alias Rendro.Pipeline.MeasuredText
 
   @pdf_header "%PDF-1.4\n%\xE2\xE3\xCF\xD3\n"
@@ -236,32 +236,101 @@ defmodule Rendro.PDF.Writer do
 
   defp allocate_image_nums(images, start_num) do
     Enum.map_reduce(images, start_num, fn image, num ->
-      {%{image: image, obj_num: num}, num + 1}
+      if image.mime == "image/png" and image.color_type in [4, 6] do
+        {%{image: image, obj_num: num, smask_obj_num: num + 1}, num + 2}
+      else
+        {%{image: image, obj_num: num}, num + 1}
+      end
     end)
   end
 
   defp build_image_objects(image_allocations, opts) do
-    Enum.map(image_allocations, fn %{image: image, obj_num: obj_num} ->
-      filter =
-        case image.mime do
-          "image/jpeg" -> {:name, "DCTDecode"}
-          _ -> {:name, "FlateDecode"}
-        end
-
-      entries = [
-        {"Type", {:name, "XObject"}},
-        {"Subtype", {:name, "Image"}},
-        {"Width", image.width},
-        {"Height", image.height},
-        {"ColorSpace", {:name, "DeviceRGB"}},
-        {"BitsPerComponent", 8},
-        {"Filter", filter}
-      ]
-
-      stream = {:stream, entries, image.binary}
-      {obj_num, Object.indirect_object(obj_num, 0, Object.serialize(stream, opts))}
+    Enum.flat_map(image_allocations, fn alloc ->
+      build_image_object(alloc, opts)
     end)
   end
+
+  defp build_image_object(%{image: %{mime: "image/jpeg"} = image, obj_num: obj_num}, opts) do
+    entries = [
+      {"Type", {:name, "XObject"}},
+      {"Subtype", {:name, "Image"}},
+      {"Width", image.width},
+      {"Height", image.height},
+      {"ColorSpace", {:name, "DeviceRGB"}},
+      {"BitsPerComponent", 8},
+      {"Filter", {:name, "DCTDecode"}}
+    ]
+
+    stream = {:stream, entries, image.binary}
+    [{obj_num, Object.indirect_object(obj_num, 0, Object.serialize(stream, opts))}]
+  end
+
+  defp build_image_object(%{image: %{mime: "image/png"} = image} = alloc, opts) do
+    obj_num = alloc.obj_num
+
+    case PNG.process_for_pdf(image.binary) do
+      {:split, color_stream_data, alpha_stream_data, color_space} ->
+        smask_obj_num = alloc.smask_obj_num
+
+        color_stream =
+          {:stream,
+           [
+             {"Type", {:name, "XObject"}},
+             {"Subtype", {:name, "Image"}},
+             {"Width", image.width},
+             {"Height", image.height},
+             {"ColorSpace", format_color_space(color_space)},
+             {"BitsPerComponent", image.bit_depth},
+             {"Filter", {:name, "FlateDecode"}},
+             {"SMask", {:ref, smask_obj_num, 0}}
+           ], color_stream_data}
+
+        smask_stream =
+          {:stream,
+           [
+             {"Type", {:name, "XObject"}},
+             {"Subtype", {:name, "Image"}},
+             {"Width", image.width},
+             {"Height", image.height},
+             {"ColorSpace", {:name, "DeviceGray"}},
+             {"BitsPerComponent", image.bit_depth},
+             {"Filter", {:name, "FlateDecode"}}
+           ], alpha_stream_data}
+
+        [
+          {obj_num, Object.indirect_object(obj_num, 0, Object.serialize(color_stream, opts))},
+          {smask_obj_num,
+           Object.indirect_object(smask_obj_num, 0, Object.serialize(smask_stream, opts))}
+        ]
+
+      {:pass_through, idat, decode_parms, color_space} ->
+        pdf_decode_parms =
+          {:dict, Enum.map(decode_parms, fn {k, v} -> {to_string(k), v} end)}
+
+        entries = [
+          {"Type", {:name, "XObject"}},
+          {"Subtype", {:name, "Image"}},
+          {"Width", image.width},
+          {"Height", image.height},
+          {"ColorSpace", format_color_space(color_space)},
+          {"BitsPerComponent", image.bit_depth},
+          {"Filter", {:name, "FlateDecode"}},
+          {"DecodeParms", pdf_decode_parms}
+        ]
+
+        stream = {:stream, entries, idat}
+        [{obj_num, Object.indirect_object(obj_num, 0, Object.serialize(stream, opts))}]
+
+      {:error, reason} ->
+        raise "Failed to process PNG image: #{inspect(reason)}"
+    end
+  end
+
+  defp format_color_space([:Indexed, base, max_index, palette]) do
+    {:array, [{:name, "Indexed"}, format_color_space(base), max_index, {:string, palette}]}
+  end
+
+  defp format_color_space(cs), do: cs
 
   defp embedded_widths(%Font{} = font) do
     encoded_widths =
