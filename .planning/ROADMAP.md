@@ -1,36 +1,64 @@
-# Roadmap: Rendro
+# Rendro Long-Term Roadmap: "Batteries Included" Production PDF Platform
 
-## Overview
+This roadmap defines the overarching epic arcs required to make Rendro the feature-complete, production-ready document generation standard for Elixir SaaS applications. It acts as the strategic memory for planning future milestones.
 
-Rendro has shipped three verified milestones. `v1.0` proved the pure-core rendering and trust contract; `v1.1` shipped the layout-authoring maturity needed for serious document composition. `v1.2` delivered deterministic typography, assets, and honest Unicode/i18n boundaries. `v1.3` delivered First Public Hex Release Readiness. The next milestone should be `v1.4` for Async Delivery and Artifact Operations.
+## Core Mandates & DNA (The "Why")
+- **Pure Elixir:** No headless Chrome/Chromium dependency in core.
+- **Deterministic Layout:** Reliable layout, pagination, and reproducible output bytes.
+- **Operational Trust:** Telemetry, bounded execution (policies), and structured diagnostic errors.
+- **Integration over Coupling:** Core remains pure; ecosystem value is delivered through optional adapters and canonical recipes.
 
-## Milestones
+---
 
-- <details><summary>✅ <b>Milestone v1.3: First Public Hex Release Readiness</b> — SHIPPED 2026-05-03</summary>
-  Licensing, Hex Metadata, Documentation and Support Boundaries, Release Preflight and Proof. Planned phases: 31-33.
-  See [.planning/milestones/v1.3-ROADMAP.md](milestones/v1.3-ROADMAP.md) for full phase details.
-  </details>
+## Milestone 1: Core Ecosystem Integrations (Do Now)
+**Focus:** Bridge Rendro into the standard operational and communication flows of a Phoenix SaaS app. Prove that Rendro fits seamlessly into existing business requirements.
 
-- <details><summary><b>Milestone v1.2</b> (Shipped 2026-05-03)</summary>
-  Deterministic typography, assets, and honest Unicode/i18n boundaries for branded business documents. Planned phases: 25-30.
-  See [.planning/milestones/v1.2-ROADMAP.md](milestones/v1.2-ROADMAP.md) for full phase details.
-  </details>
+* **Threadline (Audit Trail):**
+  * Implement `Rendro.Audit` behaviors and an optional `threadline` adapter.
+  * Capture and persist lifecycle events: template published, render succeeded, render failed (with redacted error metadata).
+* **Mailglass (Transactional Email):**
+  * Create a reliable attachments recipe.
+  * Build a `rendro_mailglass` bridge (`render_to_binary` + attachment helper + preview flow).
+* **Accrue (Billing & Invoicing):**
+  * Develop robust billing-document recipes (invoices, statements).
+  * Ensure deterministic artifact hashing, naming, and operator verification checklists.
 
-- <details><summary><b>Milestone v1.0</b> (Shipped 2026-04-28)</summary>
-  MVP delivered. Core pure rendering, layout primitives, Phoenix adapters, rigorous CI verification.
-  See [.planning/milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) for full phase details.
-  </details>
+## Milestone 2: Advanced Layout & Typography (Core Maturation)
+**Focus:** Address remaining core layout and presentation needs to support complex business documents, while strictly maintaining the deterministic pure-Elixir rendering engine constraint.
 
-- <details><summary><b>Milestone v1.1</b> (Shipped 2026-04-30)</summary>
-  Layout authoring maturity delivered: explicit page templates and regions, deterministic wrapped text and keep/break semantics, stronger table continuation, public diagnostics/proof surfaces, and canonical recipes.
-  See [.planning/milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full phase details.
-  </details>
+* **Typography & i18n:**
+  * Advanced font subsetting, shaping, and fallback strategies.
+  * Expanded internationalization (i18n) support for diverse character sets and text directionality.
+* **Robust Flow Enhancements:**
+  * Advanced table handling (complex column sharing, nested data, explicit cell fragmentation).
+  * Expanded pagination controls and block-level break semantics (widow/orphan management).
+* **Core Hardening:**
+  * Extensive edge-case testing for nested flows and fixed-position hybrid documents.
 
-## Next Milestones
+## Milestone 3: Operational Tooling & Admin UX (Soon)
+**Focus:** Provide high-trust operational governance and operator tooling for managing document generation at scale, leveraging sibling `szTheory` libraries.
 
-- **Milestone v1.4: Async Delivery and Artifact Operations** — Add queued render lifecycle, artifact metadata, and persistence/sink contracts.
-- **Milestone v1.5: Validation and Trust Surfaces** — Add validator-backed support evidence and stronger machine-readable trust/reporting surfaces.
+* **Rulestead (Rollouts & Governance):**
+  * Feature-flag hooks for template version rollouts and graceful degradation.
+  * Controlled fallback behaviors and runtime renderer toggles for expensive features.
+* **Sigra (Admin Security):**
+  * Cookbooks for secure admin/operator workflows.
+  * MFA and step-up auth patterns for template management, approvals, and overrides.
+* **Lattice_Stripe (Billing Narratives):**
+  * Applied examples and integrations for Stripe-adjacent customer documents (receipts, statements, dispute packs).
 
-## Backlog
+## Milestone 4: Strategic Adjacencies & Ecosystem Tooling (Track)
+**Focus:** Expand the footprint of Rendro into specialized domains and automated development workflows.
 
-*(No backlog items currently planned)*
+* **Scrypath (Artifact Indexing):**
+  * Searchable render and template artifact indexing.
+  * Operational lookup and admin search UX.
+* **Kiln (Automated Quality):**
+  * Autonomous generation and testing of document fixtures.
+  * Automated template regression loops and visual tracking.
+* **Lockspire (API Auth):**
+  * Delegated OAuth/OIDC for document services in embedded product contexts.
+  * Future optional API mode for headless document generation as a service.
+
+---
+*Note: This roadmap is intended to be a live document to guide future milestones. Refer to `prompts/rendro-integration-opportunities.md`, `prompts/rendro-gsd-seed.md`, and `prompts/rendro-oss-dna.md` for deeper context on decision weightings and architectural constraints.*
