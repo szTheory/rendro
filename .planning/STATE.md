@@ -1,11 +1,11 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.2
-milestone_name: Deterministic Typography, Assets, and Honest I18n Baseline
-status: executing
-stopped_at: Phase 29 awaiting human verification
-last_updated: "2026-05-02T14:42:45.436Z"
-last_activity: 2026-05-02 -- Phase --phase execution started
+milestone: v1.3
+milestone_name: First Public Hex Release Readiness
+status: planning
+stopped_at: Milestone v1.2 completed
+last_updated: "2026-05-03T12:00:00.000Z"
+last_activity: 2026-05-03 -- Milestone v1.2 complete
 progress:
   total_phases: 7
   completed_phases: 4
@@ -25,24 +25,23 @@ See: .planning/PROJECT.md (updated 2026-04-30)
 
 ## Current Position
 
-Phase: --phase (29) — EXECUTING
-Plan: 1 of --name
-Status: Executing Phase --phase
-Last activity: 2026-05-02 -- Phase --phase execution started
+Phase: 31
+Plan: None
+Status: planning
+Last activity: 2026-05-03 -- Milestone v1.3 roadmap and requirements created
 
-Progress: [██████████] 100%
+Progress: [----------] 0%
 
 ## Milestone Snapshot
 
-- Milestone: `v1.2 Deterministic Typography, Assets, and Honest I18n Baseline`
-- Phases: `25-29` (planned)
+- Milestone: `v1.3 First Public Hex Release Readiness`
+- Phases: `31-33` (planned)
 - Plans: `0`
 - Tasks: `0`
-- Timeline: `2026-04-30` -> `TBD`
+- Timeline: `2026-05-03` -> `TBD`
 - Key accomplishments:
-  - Font registration and deterministic measurement/render integration are now the next committed capability layer.
-  - Honest fallback, Unicode boundary, and asset-handling proof are defined before public release work.
-  - First public Hex release readiness is now intentionally queued immediately after `v1.2`.
+  - `v1.2` completed successfully, delivering deterministic typography, assets, and honest Unicode boundaries.
+  - Transitioning from internal proven core to an adoption-ready open-source package.
 
 ## Performance Metrics
 
@@ -82,6 +81,7 @@ Progress: [██████████] 100%
 | Phase 28 P01 | 15 min | 2 tasks | 4 files |
 | Phase 28 P02 | 10 | 2 tasks | 5 files |
 | Phase 28-asset-registry-and-deterministic-image-rendering P03 | 10m | 2 tasks | 3 files |
+| Phase 31 P01 | 15 min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -153,11 +153,11 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Plan Phase 25: Font Registry and Public Typography Contract.
+- Plan Phase 31: Licensing and Hex Metadata.
 
 ### Blockers/Concerns
 
-- Historic v1.0/v1.1 phase directories remain on disk for auditability. New roadmap numbering continues at Phase 25 to avoid collisions.
+- Historic v1.0, v1.1, and v1.2 phase directories remain on disk for auditability. New roadmap numbering continues at Phase 31 to avoid collisions.
 - `gsd-sdk query init.new-milestone` still reports stale milestone metadata (`v1.0`), so milestone planning should continue to trust the checked-in `.planning` truth surfaces until tooling state is reconciled.
 
 ## Deferred Items
@@ -166,9 +166,6 @@ Items acknowledged and carried forward from milestone scoping:
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| Typography | Custom font embedding, fallback chains, and Unicode/i18n claims | Deferred to v1.2 | 2026-04-28 |
-| Assets | Image/logo embedding and asset retrieval policy | Deferred to v1.2 | 2026-04-28 |
-| Release | First public Hex release readiness | Deferred to v1.3 | 2026-04-30 |
 | Async Ops | Render manifests, persistence sinks, retry/cancel lifecycle contracts | Deferred to v1.4 | 2026-04-28 |
 | Trust | Validator-backed compliance/signature surfaces | Deferred to v1.5 | 2026-04-28 |
 
@@ -180,8 +177,11 @@ Items acknowledged and carried forward from milestone scoping:
 
 ## Session Continuity
 
-Last session: 2026-05-01T21:16:00.000Z
-Stopped at: Phase 29 awaiting human verification
-Resume file: .planning/phases/29-branded-recipes-docs-and-proof-closure/29-HUMAN-UAT.md
+Last session: 2026-05-03T12:00:00.000Z
+Stopped at: Milestone v1.3 Roadmap planned
+Resume file: .planning/milestones/v1.3-ROADMAP.md
 
-**Planned Phase:** 25 (Font Registry and Public Typography Contract) — 2 plans — 2026-04-30T20:11:50.237Z
+**Planned Phase:** 31 (Licensing and Hex Metadata) — 0 plans — 2026-05-03T12:00:00.000Z
+OADMAP.md
+
+**Planned Phase:** 31 (Licensing and Hex Metadata) — 0 plans — 2026-05-03T12:00:00.000Z
