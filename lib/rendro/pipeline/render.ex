@@ -1,7 +1,5 @@
 defmodule Rendro.Pipeline.Render do
-  @moduledoc """
-  Converts a paginated document into PDF binary via the Writer.
-  """
+  @moduledoc false
 
   alias Rendro.PDF.Writer
 

@@ -1,17 +1,5 @@
 defmodule Rendro.Pipeline.Validate do
-  @moduledoc """
-  Trailing post-render checks for the Rendro pipeline.
-
-  Three checks run in order:
-
-  1. **Structural sanity** — the rendered binary starts with `%PDF-` and contains `%%EOF`.
-  2. **Page-count parity** — the PDF's `/Type /Pages /Count N` matches `length(doc.pages)`.
-  3. **`:max_bytes` policy** — `byte_size(pdf) <= policies[:max_bytes]` when set.
-
-  `Validate.run/2` is identity-on-success: the input binary is returned unchanged.
-  Failure cases return bare atom reasons; the orchestrator's `span/4` wraps them
-  in `%Rendro.Error{}` via `Rendro.Error.from_stage(:validate, reason, base_meta)`.
-  """
+  @moduledoc false
 
   @pdf_header "%PDF-"
   @pdf_trailer "%%EOF"

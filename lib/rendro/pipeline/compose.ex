@@ -1,12 +1,5 @@
 defmodule Rendro.Pipeline.Compose do
-  @moduledoc """
-  Assembles the logical document tree.
-
-  Walks pages and blocks, normalizes table rows so every cell is a
-  `%Rendro.Block{}` (D-02), and attaches header/footer templates.
-  Compose does NOT assign y-coordinates or compute heights — those
-  are Paginate's and Measure's responsibilities.
-  """
+  @moduledoc false
 
   alias Rendro.{Document, PageTemplate, Region, Section}
 

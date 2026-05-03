@@ -1,7 +1,5 @@
 defmodule Rendro.Metadata do
-  @moduledoc """
-  Document metadata: title, author, creator, dates, and custom fields.
-  """
+  @moduledoc false
 
   @enforce_keys []
   defstruct [

@@ -1,11 +1,5 @@
 defmodule Rendro.Branded do
-  @moduledoc """
-  Path helpers for Rendro's shipped branded demo assets.
-
-  These demo assets are provided for examples and recipe proofs only. They are
-  NOT a built-in font or default logo, and callers must still register them on
-  each `%Rendro.Document{}` through the public document APIs.
-  """
+  @moduledoc false
 
   @doc """
   Returns the absolute path to the shipped B612 Regular demo font.

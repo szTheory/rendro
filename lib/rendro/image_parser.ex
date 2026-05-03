@@ -1,7 +1,5 @@
 defmodule Rendro.ImageParser do
-  @moduledoc """
-  Pure functional parser for extracting intrinsic bounds and mime types from image binaries.
-  """
+  @moduledoc false
 
   @png_signature <<137, 80, 78, 71, 13, 10, 26, 10>>
   @jpeg_signature <<0xFF, 0xD8>>

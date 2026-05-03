@@ -1,13 +1,5 @@
 defmodule Rendro.Pipeline.Paginate do
-  @moduledoc """
-  Assigns content to pages respecting page boundaries, then stacks y-coordinates.
-
-  For the fixed-position API, blocks are already on explicit pages; this stage
-  validates fit and applies y-stacking per page. For the flow API, content is
-  split across pages (with table-row repeating headers) and then y-coordinates
-  are computed against each page's `margin_top` — never inheriting from the
-  previous page (D-04 latent bug fix).
-  """
+  @moduledoc false
 
   alias Rendro.{Document, Page, PageTemplate, Region}
 

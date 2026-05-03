@@ -87,7 +87,14 @@ defmodule Rendro.MixProject do
 
   defp docs do
     [
-      main: "Rendro",
+      main: "readme",
+      skip_undefined_reference_warnings_on: [
+        "guides/branding.md",
+        "guides/integrations.md",
+        "lib/rendro/document.ex",
+        "lib/rendro/font_registry.ex",
+        "lib/rendro.ex"
+      ],
       source_url: @source_url,
       extras: [
         "README.md",
@@ -102,6 +109,41 @@ defmodule Rendro.MixProject do
         ],
         Policies: [
           "guides/api_stability.md"
+        ]
+      ],
+      groups_for_modules: [
+        "Core Builder API": [
+          Rendro,
+          Rendro.Document,
+          Rendro.PageTemplate,
+          Rendro.Section,
+          Rendro.Block,
+          Rendro.Region,
+          Rendro.Text,
+          Rendro.Table,
+          Rendro.Image,
+          Rendro.Page
+        ],
+        "Canonical Recipes": [
+          Rendro.Recipes,
+          Rendro.Recipes.Invoice,
+          Rendro.Recipes.BrandedInvoice
+        ],
+        "Ecosystem Adapters": [
+          Rendro.Adapters.Phoenix,
+          Rendro.Adapters.Oban.RenderWorker,
+          Rendro.Adapters.Threadline,
+          Rendro.Adapters.Mailglass,
+          Rendro.Adapters.Accrue
+        ],
+        "Inspection & Observability": [
+          Rendro.Inspector,
+          Rendro.Error,
+          Rendro.Telemetry
+        ],
+        Registries: [
+          Rendro.FontRegistry,
+          Rendro.AssetRegistry
         ]
       ]
     ]

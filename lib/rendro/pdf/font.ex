@@ -1,11 +1,5 @@
 defmodule Rendro.PDF.Font do
-  @moduledoc """
-  PDF font definitions and glyph width metrics.
-
-  Provides Helvetica (the PDF standard sans-serif) with per-glyph widths
-  from the Adobe Font Metrics specification. Widths are in units of 1/1000
-  of the font's em-square; multiply by font_size/1000 to get point widths.
-  """
+  @moduledoc false
 
   @type t :: %__MODULE__{
           name: String.t(),

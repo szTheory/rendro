@@ -1,8 +1,5 @@
 defmodule Rendro.I18n.Analyzer do
-  @moduledoc """
-  Provides I18n script analysis capabilities to detect unsupported script boundaries,
-  such as Right-To-Left (RTL) scripts and Complex Shaping scripts.
-  """
+  @moduledoc false
 
   @type diagnostic :: %{type: :unsupported_script, reason: atom()}
 

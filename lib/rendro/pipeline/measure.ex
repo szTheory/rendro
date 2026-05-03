@@ -1,13 +1,5 @@
 defmodule Rendro.Pipeline.Measure do
-  @moduledoc """
-  Calculates dimensions for blocks that don't have explicit sizes.
-
-  Operates on the normalized tree from `Rendro.Pipeline.Compose` — every
-  table row already contains `%Rendro.Block{}` entries. Measure fills
-  missing widths via font metrics and missing heights from font size.
-  Idempotent: running twice on the same input yields the same result
-  (each `block.width || ...` keeps user-supplied values).
-  """
+  @moduledoc false
 
   alias Rendro.FontRegistry
   alias Rendro.PDF.Font

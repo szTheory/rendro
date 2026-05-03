@@ -1,7 +1,5 @@
 defmodule Rendro.Pipeline.Build do
-  @moduledoc """
-  Validates and normalizes a Document struct for the render pipeline.
-  """
+  @moduledoc false
 
   alias Rendro.FontRegistry
 

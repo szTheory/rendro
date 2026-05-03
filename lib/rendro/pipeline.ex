@@ -1,18 +1,5 @@
 defmodule Rendro.Pipeline do
-  @moduledoc """
-  Orchestrates the render pipeline: build -> compose -> measure -> paginate -> render -> validate.
-
-  Each stage returns `{:ok, result} | {:error, reason}`. The pipeline halts
-  on the first error and returns it to the caller.
-
-  All stages are instrumented with `:telemetry.span/3`. A top-level
-  `[:rendro, :render]` span wraps the full pipeline, and each stage emits
-  `[:rendro, :pipeline, :stage_name]` events.
-
-  The `:max_pages` policy guard runs after `:paginate` and before `:render`
-  (page count is final after pagination); the `:max_bytes` policy guard
-  runs inside the `:validate` stage (output size is only knowable post-render).
-  """
+  @moduledoc false
 
   alias Rendro.Error
   alias Rendro.Pipeline.{Build, Compose, Measure, Paginate, Render, Validate}

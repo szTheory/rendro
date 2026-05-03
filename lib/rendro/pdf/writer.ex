@@ -1,11 +1,5 @@
 defmodule Rendro.PDF.Writer do
-  @moduledoc """
-  Serializes a `Rendro.Document` into a valid PDF 1.4 binary.
-
-  Builds the complete PDF structure: header, indirect object body,
-  cross-reference table, and trailer with catalog root. Each page
-  gets a content stream with Tf/Td/Tj text operators for its blocks.
-  """
+  @moduledoc false
 
   alias Rendro.FontRegistry
   alias Rendro.PDF.{Font, Object, PNG}

@@ -1,11 +1,5 @@
 defmodule Rendro.PDF.Object do
-  @moduledoc """
-  PDF value type serialization per PDF 1.4 spec.
-
-  Converts Elixir terms into their PDF binary representations:
-  integers, floats, booleans, names, strings, arrays, dictionaries,
-  streams, and indirect object references.
-  """
+  @moduledoc false
 
   @type ref :: {non_neg_integer(), non_neg_integer()}
 
