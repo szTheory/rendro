@@ -74,7 +74,9 @@ defmodule Rendro.Pipeline.Measure do
         line_height: text.line_height,
         width: measured_width,
         height: measured_height,
-        resolved_font: hd(font_chain)
+        resolved_font: hd(font_chain),
+        widows: text.widows,
+        orphans: text.orphans
       }
 
       {:ok, %{block | content: measured_text, width: width, height: height}}

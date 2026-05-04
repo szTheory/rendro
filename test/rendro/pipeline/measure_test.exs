@@ -26,6 +26,8 @@ defmodule Rendro.Pipeline.MeasureTest do
       assert measured_block.width > 0
       assert measured_block.height == 12 * 1.2
       assert lines_text(measured_block.content) == ["Hello"]
+      assert measured_block.content.widows == 2
+      assert measured_block.content.orphans == 2
     end
 
     test "preserves explicit width, fills in nil height" do
