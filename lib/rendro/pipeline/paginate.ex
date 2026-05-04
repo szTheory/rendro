@@ -168,6 +168,24 @@ defmodule Rendro.Pipeline.Paginate do
             {[%{current_page | blocks: current_page.blocks ++ [block]} | rest], diagnostics}
         end
 
+      %Rendro.Pipeline.MeasuredText{} = text ->
+        if current_h + block_h > max_h do
+          handle_text_split(
+            block,
+            text,
+            current_page,
+            rest,
+            template,
+            max_h,
+            current_h,
+            block_h,
+            failure_details,
+            diagnostics
+          )
+        else
+          {[%{current_page | blocks: current_page.blocks ++ [block]} | rest], diagnostics}
+        end
+
       _ ->
         if current_h + block_h <= max_h do
           {[%{current_page | blocks: current_page.blocks ++ [block]} | rest], diagnostics}
@@ -342,6 +360,77 @@ defmodule Rendro.Pipeline.Paginate do
 
       true ->
         {[%{current_page | blocks: current_page.blocks ++ [block]} | rest], diagnostics}
+    end
+  end
+
+  defp handle_text_split(
+         block,
+         text,
+         current_page,
+         rest,
+         template,
+         max_h,
+         current_h,
+         block_h,
+         overflow_details,
+         diagnostics
+       ) do
+    available_h = max_h - current_h
+    total_lines = length(text.lines)
+
+    if total_lines == 0 do
+      if current_h == 0 do
+        check_overflow!(block, block_h, max_h, overflow_details)
+      else
+        {[%{template | blocks: [block]}, current_page | rest], diagnostics}
+      end
+    else
+      line_height_pt = text.height / total_lines
+      lines_fitting = if line_height_pt > 0, do: floor(available_h / line_height_pt), else: 0
+
+      lines_fitting =
+        if total_lines - lines_fitting < text.widows do
+          max(0, total_lines - text.widows)
+        else
+          lines_fitting
+        end
+
+      can_split? = lines_fitting >= max(1, text.orphans)
+
+      cond do
+        can_split? and lines_fitting < total_lines ->
+          {this_page_lines, remaining_lines} = Enum.split(text.lines, lines_fitting)
+
+          this_block = %{
+            block
+            | content: %{text | lines: this_page_lines, height: length(this_page_lines) * line_height_pt},
+              height: length(this_page_lines) * line_height_pt
+          }
+
+          remaining_block = %{
+            block
+            | content: %{text | lines: remaining_lines, height: length(remaining_lines) * line_height_pt},
+              height: length(remaining_lines) * line_height_pt
+          }
+
+          current_page = %{current_page | blocks: current_page.blocks ++ [this_block]}
+
+          new_diagnostic = %{
+            level: :info,
+            type: :text_split,
+            page_index: overflow_details.page_index
+          }
+
+          {[%{template | blocks: [remaining_block]}, current_page | rest],
+           [new_diagnostic | diagnostics]}
+
+        true ->
+          if current_h == 0 do
+            check_overflow!(block, block_h, max_h, overflow_details)
+          else
+            {[%{template | blocks: [block]}, current_page | rest], diagnostics}
+          end
+      end
     end
   end
 

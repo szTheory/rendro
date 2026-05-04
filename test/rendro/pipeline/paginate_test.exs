@@ -630,15 +630,19 @@ defmodule Rendro.Pipeline.PaginateTest do
     end
     
     test "re-checks orphans constraint after widows adjustment" do
-      # 5 lines total, body height fits 4 lines.
-      # Widows = 2 (needs 2 on next page). So it reduces lines on page 1 from 4 to 3.
+      # 5 lines total. Body height is 80.
+      # On page 1: "Previous line" takes ~14.4, leaving ~65.6 available.
+      # 65.6 fits 4 lines (4 * 14.4 = 57.6).
+      # Widows = 2 (needs 2 on next page). Total=5, fitting=4. So we need 2 on next page,
+      # which means we can only put 5 - 2 = 3 lines on page 1.
       # But Orphans = 4 (needs 4 on page 1). So 3 is not enough for orphans!
       # It must push the entire block to the next page.
+      # On page 2: full 80 height available, 5 lines (72.0) will fit perfectly.
       template = %{
         tiny_keep_chain_template()
         | name: :medium_height_4,
           regions: [
-            %Region{name: :body, role: :body, anchor: :flow, x: 24, y: 52, width: 372, height: 60}
+            %Region{name: :body, role: :body, anchor: :flow, x: 24, y: 52, width: 372, height: 80}
           ]
       }
       
