@@ -253,31 +253,6 @@ defmodule Rendro.PDF.Writer do
 
   defp format_color_space(cs), do: cs
 
-  defp embedded_widths(%Font{} = font) do
-    encoded_widths =
-      32..255
-      |> Enum.filter(&Map.has_key?(font.widths, &1))
-
-    {first_char, last_char} =
-      case encoded_widths do
-        [] -> {32, 255}
-        _ -> {Enum.min(encoded_widths), Enum.max(encoded_widths)}
-      end
-
-    widths =
-      Enum.map(first_char..last_char, fn codepoint ->
-        font.widths
-        |> Map.get(codepoint, font.default_width)
-        |> scale_font_metric(font.units_per_em)
-      end)
-
-    {first_char, last_char, widths}
-  end
-
-  defp scale_font_metric(%Font{units_per_em: units_per_em}, metric) do
-    scale_font_metric(metric, units_per_em)
-  end
-
   defp scale_font_metric(metric, units_per_em)
        when is_integer(metric) and is_integer(units_per_em) do
     round(metric * 1000 / units_per_em)

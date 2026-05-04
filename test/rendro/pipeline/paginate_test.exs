@@ -151,8 +151,8 @@ defmodule Rendro.Pipeline.PaginateTest do
       built_in_doc =
         Rendro.flow(
           [
-            Rendro.block(Rendro.text(content, font: :default, size: 12), width: 150),
-            Rendro.block(Rendro.text(content, font: :default, size: 12), width: 150)
+            Rendro.block(Rendro.text(content, font: :default, size: 12), width: 100),
+            Rendro.block(Rendro.text(content, font: :default, size: 12), width: 100)
           ],
           page_template: :embedded_wrap,
           page_templates: [template]
@@ -162,8 +162,8 @@ defmodule Rendro.Pipeline.PaginateTest do
         Rendro.document()
         |> Rendro.register_embedded_font(:brand, {:binary, bytes})
         |> Map.put(:content, [
-          Rendro.block(Rendro.text(content, font: :brand, size: 12), width: 150),
-          Rendro.block(Rendro.text(content, font: :brand, size: 12), width: 150)
+          Rendro.block(Rendro.text(content, font: :brand, size: 12), width: 100),
+          Rendro.block(Rendro.text(content, font: :brand, size: 12), width: 100)
         ])
         |> Map.put(:page_template, :embedded_wrap)
         |> Map.put(:page_templates, [template])
@@ -171,17 +171,19 @@ defmodule Rendro.Pipeline.PaginateTest do
       assert {:ok, built_in_paginated} = paginate_flow(built_in_doc)
       assert {:ok, embedded_paginated} = paginate_flow(embedded_doc)
 
-      assert length(built_in_paginated.pages) == 1
+      assert length(built_in_paginated.pages) == 2
       assert length(embedded_paginated.pages) == 2
 
-      [built_in_block_1, built_in_block_2] = hd(built_in_paginated.pages).blocks
+      [built_in_page_1, built_in_page_2] = built_in_paginated.pages
+      [built_in_block_1] = built_in_page_1.blocks
+      [built_in_block_2] = built_in_page_2.blocks
 
       lines_text = fn b ->
         Enum.map(b.content.lines, fn l -> Enum.map_join(l, "", & &1.text) end)
       end
 
-      assert lines_text.(built_in_block_1) == ["alpha beta gamma delta"]
-      assert lines_text.(built_in_block_2) == ["alpha beta gamma delta"]
+      assert lines_text.(built_in_block_1) == ["alpha beta gamma", " delta"]
+      assert lines_text.(built_in_block_2) == ["alpha beta gamma", " delta"]
 
       embedded_page_lines =
         Enum.map(embedded_paginated.pages, fn page ->

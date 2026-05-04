@@ -360,7 +360,12 @@ defmodule Rendro.Pipeline.Measure do
                                                                     {:ok, {lines, current_line}} ->
         case find_font_for_grapheme(grapheme, font_chain) do
           {:ok, font} ->
-            width = Font.text_width(font, grapheme, font_size)
+            {:ok, glyphs} = Rendro.Text.Shaper.shape(font, grapheme)
+            width =
+              glyphs
+              |> Enum.reduce(0, fn g, acc -> acc + g.x_advance end)
+              |> Kernel.*(font_size / font.units_per_em)
+
             grapheme_run = [%{font: font, text: grapheme, width: width}]
 
             candidate_line = merge_runs(current_line, grapheme_run)
@@ -406,12 +411,51 @@ defmodule Rendro.Pipeline.Measure do
   end
 
   defp measure_text_into_runs(text, font_chain, font_size) do
+    bidi_runs = Rendro.Text.Bidi.split_runs(text)
+
     result =
-      Enum.reduce_while(String.graphemes(text), {:ok, []}, fn grapheme, {:ok, runs} ->
+      Enum.reduce_while(bidi_runs, {:ok, []}, fn bidi_run, {:ok, acc_runs} ->
+        case resolve_fonts_for_run(bidi_run.text, font_chain) do
+          {:ok, font_runs} ->
+            measured =
+              Enum.map(font_runs, fn {font, sub_text} ->
+                {:ok, glyphs} = Rendro.Text.Shaper.shape(font, sub_text)
+                
+                width =
+                  glyphs
+                  |> Enum.reduce(0, fn g, acc -> acc + g.x_advance end)
+                  |> Kernel.*(font_size / font.units_per_em)
+                  
+                %{font: font, text: sub_text, width: width}
+              end)
+
+            {:cont, {:ok, acc_runs ++ measured}}
+
+          {:error, _} = err ->
+            {:halt, err}
+        end
+      end)
+
+    case result do
+      {:ok, runs} -> {:ok, merge_contiguous_runs(runs)}
+      err -> err
+    end
+  end
+
+  defp merge_contiguous_runs(runs) do
+    Enum.reduce(runs, [], fn run, acc ->
+      merge_runs(acc, [run])
+    end)
+  end
+
+  defp resolve_fonts_for_run(text, font_chain) do
+    result =
+      text
+      |> String.graphemes()
+      |> Enum.reduce_while({:ok, []}, fn grapheme, {:ok, acc} ->
         case find_font_for_grapheme(grapheme, font_chain) do
           {:ok, font} ->
-            width = Font.text_width(font, grapheme, font_size)
-            {:cont, {:ok, append_to_runs(runs, font, grapheme, width)}}
+            {:cont, {:ok, append_font_run(acc, font, grapheme)}}
 
           :error ->
             {:halt, {:error, {:unsupported_glyph, grapheme}}}
@@ -424,6 +468,10 @@ defmodule Rendro.Pipeline.Measure do
     end
   end
 
+  defp append_font_run([], font, text), do: [{font, text}]
+  defp append_font_run([{f, t} | rest], font, text) when f == font, do: [{f, t <> text} | rest]
+  defp append_font_run(runs, font, text), do: [{font, text} | runs]
+
   defp find_font_for_grapheme(grapheme, font_chain) do
     Enum.find_value(font_chain, :error, fn font ->
       if Font.has_glyph?(font, grapheme) do
@@ -432,18 +480,6 @@ defmodule Rendro.Pipeline.Measure do
         nil
       end
     end)
-  end
-
-  defp append_to_runs([], font, text, width) do
-    [%{font: font, text: text, width: width}]
-  end
-
-  defp append_to_runs([%{font: f, text: t, width: w} | rest], font, text, width) when f == font do
-    [%{font: f, text: t <> text, width: w + width} | rest]
-  end
-
-  defp append_to_runs(runs, font, text, width) do
-    [%{font: font, text: text, width: width} | runs]
   end
 
   defp merge_runs(runs1, []) do

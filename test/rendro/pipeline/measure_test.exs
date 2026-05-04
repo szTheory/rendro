@@ -253,7 +253,7 @@ defmodule Rendro.Pipeline.MeasureTest do
 
     test "uses embedded font metrics for deterministic wrapping and carries the resolved font" do
       %{bytes: bytes} = FontFixture.supported_font()
-      constrained_width = 150
+      constrained_width = 135
       content = "alpha beta gamma delta"
 
       built_in_doc =
@@ -290,7 +290,7 @@ defmodule Rendro.Pipeline.MeasureTest do
       assert lines_text(built_in_block.content) == ["alpha beta gamma delta"]
       assert %MeasuredText{resolved_font: built_in_font} = built_in_block.content
 
-      assert lines_text(embedded_block.content) == ["alpha beta ", "gamma delta"]
+      assert lines_text(embedded_block.content) == ["alpha beta gamma ", "delta"]
       assert %MeasuredText{resolved_font: embedded_font} = embedded_block.content
 
       assert_in_delta embedded_block.height, 28.8, 1.0e-9

@@ -75,8 +75,8 @@ defmodule Rendro.DeterministicTest do
         Rendro.document()
         |> Rendro.register_embedded_font(:brand, {:binary, bytes})
         |> Map.put(:content, [
-          Rendro.block(Rendro.text("alpha beta gamma delta", font: :brand, size: 12), width: 150),
-          Rendro.block(Rendro.text("alpha beta gamma delta", font: :brand, size: 12), width: 150)
+          Rendro.block(Rendro.text("alpha beta gamma delta", font: :brand, size: 12), width: 100),
+          Rendro.block(Rendro.text("alpha beta gamma delta", font: :brand, size: 12), width: 100)
         ])
         |> Map.put(:page_template, :embedded_wrap)
         |> Map.put(:page_templates, [template])

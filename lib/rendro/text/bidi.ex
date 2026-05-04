@@ -10,8 +10,14 @@ defmodule Rendro.Text.Bidi do
     do_split(text, nil, <<>>, <<>>, [])
   end
 
-  defp do_split(<<>>, nil, _acc, _neutral_acc, runs), do: Enum.reverse(runs)
+  defp do_split(<<>>, nil, _acc, <<>>, runs), do: Enum.reverse(runs)
   
+  defp do_split(<<>>, nil, _acc, neutral_acc, runs) do
+    # Pure neutral string defaults to Latin LTR
+    state = %{script: :latn, direction: :ltr}
+    Enum.reverse([build_run(state, neutral_acc) | runs])
+  end
+
   defp do_split(<<>>, current_state, acc, neutral_acc, runs) do
     # At the end of the string, any trailing neutrals attach to the last strong run
     Enum.reverse([build_run(current_state, acc <> neutral_acc) | runs])
