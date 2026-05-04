@@ -16,7 +16,9 @@ defmodule Rendro.Text do
     font: "Helvetica",
     size: 12,
     color: {0, 0, 0},
-    line_height: 1.2
+    line_height: 1.2,
+    widows: 2,
+    orphans: 2
   ]
 
   @type logical_font_name :: atom()
@@ -28,7 +30,9 @@ defmodule Rendro.Text do
           font: font_ref(),
           size: number(),
           color: {non_neg_integer(), non_neg_integer(), non_neg_integer()},
-          line_height: float()
+          line_height: float(),
+          widows: non_neg_integer(),
+          orphans: non_neg_integer()
         }
 
   @doc """

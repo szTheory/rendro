@@ -10,6 +10,8 @@ defmodule Rendro.TextTest do
       assert text.font == Text.default_font()
       assert text.size == 12
       assert text.color == {0, 0, 0}
+      assert text.widows == 2
+      assert text.orphans == 2
     end
 
     test "creates with all fields using a logical font reference" do
@@ -17,13 +19,17 @@ defmodule Rendro.TextTest do
         content: "styled",
         font: :heading,
         size: 24,
-        color: {255, 0, 0}
+        color: {255, 0, 0},
+        widows: 3,
+        orphans: 4
       }
 
       assert text.content == "styled"
       assert text.font == :heading
       assert text.size == 24
       assert text.color == {255, 0, 0}
+      assert text.widows == 3
+      assert text.orphans == 4
     end
   end
 
