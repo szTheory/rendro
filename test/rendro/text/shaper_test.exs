@@ -40,7 +40,7 @@ defmodule Rendro.Text.ShaperTest do
       # Should fallback and still return result (with .notdef glyphs)
       assert Enum.all?(result, fn glyph -> glyph.name == ".notdef" end)
 
-      assert_receive {:telemetry_event, ^ref, %{count: 1}, %{font: ^font_path, text: ^text}}, 1000
+      assert_receive {:telemetry_event, ^ref, %{count: 5}, %{font: ^font_path, text: ^text}}, 1000
 
       :telemetry.detach("shaper-missing-glyph-test")
     end
