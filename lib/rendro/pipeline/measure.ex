@@ -38,11 +38,16 @@ defmodule Rendro.Pipeline.Measure do
        ) do
     width = block.width || container_width || 595.28
 
-    col_count = max_columns(table)
+    normalized_header = normalize_header(table.header)
+    normalized_rows = normalize_rows(table.rows)
+
+    col_count = max_columns(normalized_header, normalized_rows)
     col_widths = resolve_columns(table.columns, col_count, width)
 
-    with {:ok, {measured_header, header_h}} <- measure_table_row(doc, table.header, col_widths),
-         {:ok, {measured_rows, row_heights}} <- measure_table_rows(doc, table.rows, col_widths) do
+    with {:ok, {measured_header, header_h}} <-
+           measure_table_header(doc, normalized_header, col_widths),
+         {:ok, {measured_rows, row_heights, grid_layout}} <-
+           project_and_measure_grid(doc, normalized_rows, col_widths) do
       rows_h = Enum.sum(row_heights)
       height = header_h + rows_h
 
@@ -52,7 +57,8 @@ defmodule Rendro.Pipeline.Measure do
           rows: measured_rows,
           column_widths: col_widths,
           row_heights: row_heights,
-          header_height: header_h
+          header_height: header_h,
+          _grid_layout: grid_layout
       }
 
       {:ok, %{block | content: table, width: width, height: height}}
@@ -131,41 +137,191 @@ defmodule Rendro.Pipeline.Measure do
 
   defp measure_block(_doc, block, _container_width), do: {:ok, block}
 
-  defp measure_table_row(_doc, nil, _col_widths), do: {:ok, {nil, 0}}
+  defp normalize_header(nil), do: nil
 
-  defp measure_table_row(doc, row, col_widths) do
-    with {:ok, measured_cells} <-
-           row
-           |> Enum.zip(col_widths)
-           |> map_ok(fn {cell_block, c_width} ->
-             measure_block(doc, %{cell_block | width: c_width}, c_width)
-           end) do
-      max_height =
-        measured_cells
-        |> Enum.map(&(&1.height || 0))
-        |> Enum.max(fn -> 0 end)
-
-      {:ok, {measured_cells, max_height}}
-    end
+  defp normalize_header(header) do
+    [row] = normalize_rows([header])
+    row
   end
 
-  defp measure_table_rows(doc, rows, col_widths) do
-    Enum.reduce_while(rows, {:ok, {[], []}}, fn row, {:ok, {measured_rows, heights}} ->
-      case measure_table_row(doc, row, col_widths) do
-        {:ok, {measured_row, row_height}} ->
-          {:cont, {:ok, {measured_rows ++ [measured_row], heights ++ [row_height]}}}
+  defp normalize_rows(rows) do
+    Enum.map(rows, fn
+      %Rendro.Row{} = row ->
+        %{row | cells: normalize_cells(row.cells)}
 
-        {:error, _} = err ->
-          {:halt, err}
-      end
+      cells when is_list(cells) ->
+        %Rendro.Row{cells: normalize_cells(cells)}
     end)
   end
 
-  defp max_columns(%Rendro.Table{header: header, rows: rows}) do
-    rows
-    |> Enum.map(&length/1)
-    |> Kernel.++([if(header, do: length(header), else: 0)])
-    |> Enum.max(fn -> 0 end)
+  defp normalize_cells(cells) do
+    Enum.map(cells, fn
+      %Rendro.Cell{} = cell -> cell
+      content -> %Rendro.Cell{content: content}
+    end)
+  end
+
+  defp max_columns(header, rows) do
+    row_cols =
+      Enum.map(rows, fn row ->
+        Enum.reduce(row.cells, 0, fn c, acc -> acc + c.colspan end)
+      end)
+
+    header_cols =
+      if header do
+        Enum.reduce(header.cells, 0, fn c, acc -> acc + c.colspan end)
+      else
+        0
+      end
+
+    [header_cols | row_cols] |> Enum.max(fn -> 0 end)
+  end
+
+  defp measure_table_header(_doc, nil, _col_widths), do: {:ok, {nil, 0}}
+
+  defp measure_table_header(doc, header, col_widths) do
+    case project_and_measure_grid(doc, [header], col_widths) do
+      {:ok, {[measured_header], [header_h], _grid}} ->
+        {:ok, {measured_header, header_h}}
+
+      {:error, _} = err ->
+        err
+    end
+  end
+
+  defp project_and_measure_grid(_doc, [], _col_widths), do: {:ok, {[], [], []}}
+
+  defp project_and_measure_grid(doc, rows, col_widths) do
+    col_count = length(col_widths)
+
+    total_cells =
+      Enum.reduce(rows, 0, fn row, acc ->
+        acc + Enum.reduce(row.cells, 0, fn c, acc2 -> acc2 + c.rowspan * c.colspan end)
+      end)
+
+    if total_cells > 100_000 do
+      {:error, :grid_too_large}
+    else
+      do_build_grid(doc, rows, col_widths, col_count)
+    end
+  end
+
+  defp do_build_grid(doc, rows, col_widths, col_count) do
+    result =
+      Enum.reduce_while(Enum.with_index(rows), {:ok, {%{}, [], []}}, fn {row, r},
+                                                                        {:ok,
+                                                                         {grid, m_rows, r_heights}} ->
+        case fill_row_cells(doc, row, r, col_widths, grid, col_count) do
+          {:ok, {new_grid, measured_cells, row_height}} ->
+            measured_row = %{row | cells: measured_cells, height: row_height}
+            {:cont, {:ok, {new_grid, m_rows ++ [measured_row], r_heights ++ [row_height]}}}
+
+          {:error, _} = err ->
+            {:halt, err}
+        end
+      end)
+
+    case result do
+      {:ok, {grid_map, measured_rows, row_heights}} ->
+        grid_layout =
+          for r <- 0..(length(rows) - 1) do
+            for c <- 0..(col_count - 1) do
+              Map.get(grid_map, {r, c}, %{is_continuation: false, cell: nil})
+            end
+          end
+
+        {:ok, {measured_rows, row_heights, grid_layout}}
+
+      err ->
+        err
+    end
+  end
+
+  defp fill_row_cells(doc, row, r, col_widths, grid, col_count) do
+    state = {:ok, {grid, [], 0, 0}}
+
+    Enum.reduce_while(row.cells, state, fn cell, {:ok, {g, m_cells, c, max_h}} ->
+      next_c = find_next_empty_col(g, r, c, col_count)
+
+      if next_c >= col_count do
+        {:cont, {:ok, {g, m_cells ++ [cell], next_c, max_h}}}
+      else
+        cell_width = calculate_cell_width(col_widths, next_c, cell.colspan)
+
+        block_to_measure =
+          case cell.content do
+            %Rendro.Block{} = b ->
+              %{b | width: cell_width}
+
+            str when is_binary(str) ->
+              %Rendro.Block{content: %Rendro.Text{content: str}, width: cell_width}
+
+            other ->
+              %Rendro.Block{content: other, width: cell_width}
+          end
+
+        case measure_block(doc, block_to_measure, cell_width) do
+          {:ok, measured_block} ->
+            measured_cell = %{
+              cell
+              | content: measured_block,
+                x: 0,
+                y: 0,
+                width: cell_width,
+                height: measured_block.height
+            }
+
+            new_g =
+              for r_offset <- 0..(cell.rowspan - 1),
+                  c_offset <- 0..(cell.colspan - 1),
+                  reduce: g do
+                acc_g ->
+                  is_cont = r_offset > 0 or c_offset > 0
+
+                  cell_data = %{
+                    is_continuation: is_cont,
+                    cell: measured_cell,
+                    ref_r: r,
+                    ref_c: next_c
+                  }
+
+                  Map.put(acc_g, {r + r_offset, next_c + c_offset}, cell_data)
+              end
+
+            new_max_h = max(max_h, measured_block.height || 0)
+
+            {:cont, {:ok, {new_g, m_cells ++ [measured_cell], next_c + cell.colspan, new_max_h}}}
+
+          {:error, _} = err ->
+            {:halt, err}
+        end
+      end
+    end)
+    |> case do
+      {:ok, {final_grid, final_m_cells, _final_c, final_max_h}} ->
+        {:ok, {final_grid, final_m_cells, final_max_h}}
+
+      err ->
+        err
+    end
+  end
+
+  defp find_next_empty_col(grid, r, c, col_count) do
+    if c >= col_count do
+      c
+    else
+      if Map.has_key?(grid, {r, c}) do
+        find_next_empty_col(grid, r, c + 1, col_count)
+      else
+        c
+      end
+    end
+  end
+
+  defp calculate_cell_width(col_widths, start_c, colspan) do
+    col_widths
+    |> Enum.slice(start_c, colspan)
+    |> Enum.sum()
   end
 
   defp resolve_columns(nil, count, total_width) when count > 0 do
@@ -363,6 +519,7 @@ defmodule Rendro.Pipeline.Measure do
         case find_font_for_grapheme(grapheme, font_chain) do
           {:ok, font} ->
             {:ok, glyphs} = Rendro.Text.Shaper.shape(font, grapheme)
+
             width =
               glyphs
               |> Enum.reduce(0, fn g, acc -> acc + g.x_advance end)
@@ -422,12 +579,12 @@ defmodule Rendro.Pipeline.Measure do
             measured =
               Enum.map(font_runs, fn {font, sub_text} ->
                 {:ok, glyphs} = Rendro.Text.Shaper.shape(font, sub_text)
-                
+
                 width =
                   glyphs
                   |> Enum.reduce(0, fn g, acc -> acc + g.x_advance end)
                   |> Kernel.*(font_size / font.units_per_em)
-                  
+
                 %{font: font, text: sub_text, width: width}
               end)
 

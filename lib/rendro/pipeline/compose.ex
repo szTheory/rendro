@@ -34,13 +34,32 @@ defmodule Rendro.Pipeline.Compose do
 
   defp compose_block(block), do: block
 
-  defp normalize_row(row) do
+  defp normalize_row(%Rendro.Row{} = row) do
+    %{row | cells: normalize_row(row.cells)}
+  end
+
+  defp normalize_row(row) when is_list(row) do
     Enum.map(row, fn
-      %Rendro.Block{} = b -> b
-      content when is_binary(content) -> Rendro.block(Rendro.text(content))
-      other -> Rendro.block(other)
+      %Rendro.Cell{} = cell ->
+        %{cell | content: normalize_cell_content(cell.content)}
+
+      %Rendro.Block{} = b ->
+        b
+
+      content when is_binary(content) ->
+        Rendro.block(Rendro.text(content))
+
+      other ->
+        Rendro.block(other)
     end)
   end
+
+  defp normalize_cell_content(%Rendro.Block{} = b), do: b
+
+  defp normalize_cell_content(content) when is_binary(content),
+    do: Rendro.block(Rendro.text(content))
+
+  defp normalize_cell_content(other), do: Rendro.block(other)
 
   defp normalize_flow_layout(%Document{pages: [_ | _]} = doc), do: doc
 

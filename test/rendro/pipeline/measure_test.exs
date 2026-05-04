@@ -401,4 +401,67 @@ defmodule Rendro.Pipeline.MeasureTest do
       assert measured_block.height == row_h
     end
   end
+
+  describe "Grid Projection" do
+    test "measure_block/3 normalizes lists into Row/Cell structs and builds 2D Grid" do
+      table = %Rendro.Table{
+        rows: [
+          ["A", "B"],
+          %Rendro.Row{cells: [%Rendro.Cell{content: "C"}, "D"]}
+        ],
+        columns: [{:fixed, 50}, {:fixed, 50}]
+      }
+
+      doc = Rendro.flow([Rendro.block(table, width: 100)])
+      assert {:ok, composed} = Compose.run(doc)
+      assert {:ok, measured} = Measure.run(composed)
+
+      measured_table = hd(measured.content).content
+
+      assert [row1, row2] = measured_table.rows
+      assert %Rendro.Row{} = row1
+      assert [%Rendro.Cell{content: %Rendro.Block{content: %MeasuredText{}}}, %Rendro.Cell{}] = row1.cells
+      
+      assert %Rendro.Row{} = row2
+      assert [%Rendro.Cell{}, %Rendro.Cell{}] = row2.cells
+
+      assert is_list(measured_table._grid_layout)
+      assert length(measured_table._grid_layout) == 2
+      assert length(hd(measured_table._grid_layout)) == 2
+    end
+
+    test "spanning cells generate continuation grid slots" do
+      table = %Rendro.Table{
+        rows: [
+          [%Rendro.Cell{content: "Spans 2x2", colspan: 2, rowspan: 2}],
+          []
+        ],
+        columns: [{:fixed, 50}, {:fixed, 50}]
+      }
+
+      doc = Rendro.flow([Rendro.block(table, width: 100)])
+      assert {:ok, composed} = Compose.run(doc)
+      assert {:ok, measured} = Measure.run(composed)
+
+      measured_table = hd(measured.content).content
+      grid = measured_table._grid_layout
+      
+      assert [row1, row2] = grid
+      assert [%{is_continuation: false, cell: _}, %{is_continuation: true}] = row1
+      assert [%{is_continuation: true}, %{is_continuation: true}] = row2
+    end
+
+    test "tables exceeding maximum cell limit return error" do
+      table = %Rendro.Table{
+        rows: [
+          [%Rendro.Cell{content: "Huge", colspan: 1000, rowspan: 101}]
+        ],
+        columns: [{:fixed, 10}]
+      }
+
+      doc = Rendro.flow([Rendro.block(table, width: 100)])
+      assert {:ok, composed} = Compose.run(doc)
+      assert {:error, :grid_too_large} = Measure.run(composed)
+    end
+  end
 end
