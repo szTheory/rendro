@@ -51,8 +51,8 @@ defmodule Mix.Tasks.Verify do
     [
       {"DETERMINISTIC (CORE)",
        [
-         {"CI", fn -> Mix.Task.run("ci") end},
-         {"Docs Contract", fn -> Mix.Task.run("docs.contract") end}
+         {"CI", fn -> run_system_step("mix", ["ci"]) end},
+         {"Docs Contract", fn -> run_system_step("mix", ["docs.contract"]) end}
        ]},
       {"ADVISORY (ADAPTERS)",
        [

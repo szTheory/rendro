@@ -82,7 +82,7 @@ defmodule Mix.Tasks.VerifyTest do
   test "default docs lane uses the canonical docs.contract task" do
     source = File.read!("lib/mix/tasks/verify.ex")
 
-    assert source =~ "Mix.Task.run(\"docs.contract\")"
+    assert source =~ "run_system_step(\"mix\", [\"docs.contract\"])"
     refute source =~ "Mix.Task.run(\"run\", [\"scripts/verify_docs.exs\"])"
   end
 

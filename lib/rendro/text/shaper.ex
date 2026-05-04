@@ -34,7 +34,7 @@ defmodule Rendro.Text.Shaper do
       when is_binary(bytes) and is_binary(text) do
     # Use a cached temp file for shaping
     hash = :crypto.hash(:sha256, bytes) |> Base.encode16()
-    temp_dir = System.tmp_dir!() || "/tmp"
+    temp_dir = System.tmp_dir() || "/tmp"
     font_path = Path.join(temp_dir, "rendro_font_#{hash}.ttf")
 
     unless File.exists?(font_path) do

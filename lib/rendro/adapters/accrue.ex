@@ -1,9 +1,13 @@
 if Code.ensure_loaded?(Accrue) do
   defmodule Rendro.Adapters.Accrue do
     @moduledoc """
-    Optional Accrue billing-document recipe that transforms an
-    `Accrue.Invoice` struct into a `Rendro.Document` ready to be passed to
-    `Rendro.render/1`.
+    Canonical, deterministic billing-document recipe tailored for the `accrue`
+    financial library.
+
+    This optional adapter transforms an `Accrue.Invoice` struct into a
+    `Rendro.Document` ready to be rendered into a deterministic artifact.
+    It guarantees a stable layout for invoices, statements, and financial
+    documents, ensuring exact, repeatable pagination and formatting across runs.
 
     This module is only compiled when `Accrue` is available at compile
     time (via `Code.ensure_loaded?/1`). If `:accrue` is not in your
@@ -13,8 +17,15 @@ if Code.ensure_loaded?(Accrue) do
     ## Usage
 
         invoice = MyApp.Billing.fetch_invoice!(invoice_id)
+        
+        # 1. Build the canonical Document using this Accrue recipe
         {:ok, doc} = Rendro.Adapters.Accrue.recipe(invoice)
-        {:ok, pdf} = Rendro.render(doc)
+        
+        # 2. Render deterministically to an Artifact
+        {:ok, artifact} = Rendro.render_to_artifact(doc, deterministic: true)
+        
+        # 3. Store the immutable financial artifact
+        {:ok, _path} = Rendro.Storage.Local.put(artifact, path: "/tmp/invoice.pdf")
 
     ## Contract
 

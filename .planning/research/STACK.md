@@ -1,29 +1,45 @@
-# Research: Stack for v1.1 Layout Authoring Maturity
+# Technology Stack
 
-## Recommendation
+**Project:** Rendro
+**Researched:** 2026-05-04
 
-Keep v1.1 on the current Elixir/Phoenix-first stack. Do not introduce Phoenix, Oban, browser, or native-layout dependencies into core. Treat this milestone as an internal layout-contract and engine-refactor milestone, not a dependency-expansion milestone.
+## Recommended Stack
 
-## Current Stack Truth
+### Core Framework
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| Elixir | 1.15+ | Core Rendering | Maintained project constraint. Pure core, no NIFs. |
 
-- Core runtime already matches the product boundary: pure Elixir rendering with optional adapters only.
-- The current measurement path uses built-in Helvetica metrics from `Rendro.PDF.Font`.
-- The current layout gaps are in internal data modeling and pipeline behavior, not in missing integration libraries.
+### Async & Operations (Optional Adapters)
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| Oban | ~> 2.17 | Async Job Queue | The standard for Elixir background jobs. Idempotent and reliable. |
+| Threadline | latest | Audit Trails | "Do Now" integration for tracking template changes and render outcomes. |
 
-## Suggested Stack Posture
+### Ecosystem Integrations (Optional Adapters / Recipes)
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| Mailglass | latest | Transactional Email | "Do Now" integration for attaching generated PDFs to emails. |
+| Accrue | latest | Billing & Invoicing | "Do Now" integration for deterministic financial document generation. |
 
-- **Core runtime**: stay on Elixir 1.19.5 / OTP 28 contract already documented for the project.
-- **Layout engine**: extend internal structs and pipeline modules (`Build`, `Compose`, `Measure`, `Paginate`, `Render`) rather than pulling in third-party layout engines.
-- **Testing**: increase deterministic regression fixtures in ExUnit around pagination invariants, break decisions, and layout diagnostics.
-- **Optional tooling**: only add helper modules if they preserve pure-core determinism and are justified by repeated internal complexity, not by feature marketing.
+## Installation
 
-## What Not To Add In v1.1
+Rendro's philosophy mandates that these dependencies remain **optional**.
 
-- Browser/HTML renderers
-- Font/image runtime dependencies
-- Storage, queue, or persistence abstractions in core
-- External validator binaries
+```elixir
+# In a user's mix.exs
+defp deps do
+  [
+    {:rendro, "~> 1.x"},
+    # Optional extensions chosen by the consumer
+    {:rendro_oban, "~> 0.1"},
+    {:threadline, "~> x.x"},
+    {:mailglass, "~> x.x"}
+  ]
+end
+```
 
-## Why
-
-The milestone's leverage is in stabilizing layout semantics. Extra dependencies would widen surface area without solving the core problem that current measurement and pagination still depend on hard-coded assumptions.
+## Sources
+- `prompts/rendro-integration-opportunities.md`
+- `prompts/rendro-oss-dna.md`
+- `.planning/EPIC.md`

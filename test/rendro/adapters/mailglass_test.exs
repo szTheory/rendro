@@ -98,6 +98,29 @@ defmodule Rendro.Adapters.MailglassTest do
     end
   end
 
+  describe "attach_artifact/3" do
+    test "attaches an artifact binary directly to the email" do
+      email = Swoosh.Email.new()
+
+      artifact = %Rendro.Artifact{
+        binary: <<"%PDF-1.4\n">>,
+        hash: "dummyhash",
+        diagnostics: [],
+        metadata: %{}
+      }
+
+      result = Adapter.attach_artifact(email, artifact, "receipt.pdf")
+
+      assert %Swoosh.Email{} = result
+      assert length(result.attachments) == 1
+
+      [attachment] = result.attachments
+      assert attachment.filename == "receipt.pdf"
+      assert attachment.content_type == "application/pdf"
+      assert {:data, <<"%PDF-1.4\n">>} = attachment.data
+    end
+  end
+
   describe "attach_pdf/3 with Mailglass.Message input" do
     test "unwraps and re-wraps Mailglass.Message via update_swoosh/2" do
       message = %Mailglass.Message{swoosh: Swoosh.Email.new(), meta: %{template: :invoice}}

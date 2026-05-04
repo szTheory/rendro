@@ -1,5 +1,11 @@
 defmodule Rendro.Audit do
-  @moduledoc false
+  @moduledoc """
+  Behavior for rendering audit trails and lifecycle telemetry.
+
+  Defines the contract for persisting or forwarding `Rendro` render events
+  (starts, stops, exceptions) to external systems (e.g. `Threadline`, logs)
+  without coupling core rendering logic to those systems.
+  """
 
   @typedoc "Stable identifier for a single render invocation"
   @type render_id :: String.t()

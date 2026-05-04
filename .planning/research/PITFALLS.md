@@ -1,30 +1,38 @@
-# Research: Pitfalls for v1.1 Layout Authoring Maturity
+# Domain Pitfalls
 
-## Primary Risks
+**Domain:** Async Document Generation & SaaS Integration
+**Researched:** 2026-05-04
 
-### Premature Typography Work
+## Critical Pitfalls
 
-Adding custom fonts or asset placement before page templates, regions, and deterministic measurement stabilize would create churn and invalidate pagination assumptions in the middle of the milestone arc.
+Mistakes that cause rewrites or major issues.
 
-### Public Surface Drift
+### Pitfall 1: Core Contamination
+**What goes wrong:** Adding `oban`, `ecto`, or `aws` as hard dependencies in `mix.exs` to support async/storage features.
+**Why it happens:** It is easier to write tightly coupled code than properly inverted interfaces.
+**Consequences:** Rendro cannot be used by teams using Exq, pure ETS, or on-premise deployments. The project loses its "pure core" identity.
+**Prevention:** Strictly enforce the Behavior/Adapter pattern. All integrations must live in `lib/rendro/adapters/` (if optional dependencies) or separate packages.
+**Detection:** CI should fail if `mix.exs` adds non-rendering production dependencies.
 
-Several public fields already imply behavior the engine does not fully honor (`Text.font`, `Table.width`, `Table.border`, footer semantics). v1.1 must either implement or narrow these contracts so docs and structs stay truthful.
+### Pitfall 2: Opaque Async Failures
+**What goes wrong:** A document fails to render in an Oban background job, but the error is lost or useless.
+**Why it happens:** Layout errors are complex and nested; default Elixir exceptions might truncate context in Oban logs.
+**Consequences:** Operators cannot debug why a specific invoice failed to generate at 2 AM.
+**Prevention:** Enhance `Rendro.Error` to serialize cleanly for `threadline` audit logs. Ensure the Oban adapter explicitly catches and structures layout errors.
 
-### Ad Hoc Pagination Rules
+## Moderate Pitfalls
 
-If keep/break behavior is implemented as special cases instead of explicit data semantics, later milestones will inherit fragile pagination logic that is hard to test and explain.
+### Pitfall 1: Leaking Artifact State
+**What goes wrong:** Re-rendering the same document asynchronously yields a different PDF hash because of timestamps.
+**Prevention:** Expose deterministic timestamps and random seeds in the `Rendro.Document` construct so async workers can reproduce exact bytes.
 
-### Table Work That Stops At Demo Quality
+## Phase-Specific Warnings
 
-Multi-page tables are already central to Rendro's positioning. A partial refactor that preserves fixed row heights or simplistic split rules would leave the biggest adoption gap mostly open.
+| Phase Topic | Likely Pitfall | Mitigation |
+|-------------|---------------|------------|
+| Artifact Manifests | Manifest metadata is too tied to a specific storage backend. | Keep manifest fields purely descriptive (hash, size, MIME type). |
+| Oban Worker | Worker requires entire Ecto structs as arguments. | Serialize arguments to primitive maps/IDs; refetch inside worker. |
+| `threadline` Integration | Audit logs become too noisy (logging every tiny step). | Limit audit events to high-level outcomes: Start, Success, Structured Failure. |
 
-### Diagnostics That Don’t Preserve Cause
-
-If break/overflow reasoning is only logged or partially surfaced, operators and future async workflows will not have enough context to debug production layout failures.
-
-## Prevention Strategy
-
-- Keep v1.1 focused on authoring semantics and deterministic measurement.
-- Add requirement-level regression fixtures for page assignment and split behavior.
-- Update recipes/docs only after the engine contracts are truthful.
-- Explicitly defer fonts/assets and async artifact lifecycle work instead of leaking them into the milestone.
+## Sources
+- `.planning/EPIC.md` ("Keep pure core and optional adapters as hard architectural boundary.")

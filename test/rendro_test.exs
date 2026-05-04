@@ -1,6 +1,13 @@
 defmodule RendroTest do
   use ExUnit.Case
 
+  defp sample_doc do
+    text = Rendro.text("Hello, test!", size: 12, font: "Helvetica", color: {0, 0, 0})
+    block = Rendro.block(text, x: 10, y: 20)
+    page = Rendro.page(blocks: [block])
+    Rendro.document(pages: [page], metadata: Rendro.metadata(title: "Test"))
+  end
+
   test "module exists" do
     assert Code.ensure_loaded?(Rendro)
   end
@@ -13,14 +20,21 @@ defmodule RendroTest do
     assert function_exported?(Rendro, :render, 2)
   end
 
-  describe "render/2 deterministic mode" do
-    defp sample_doc do
-      text = Rendro.text("Hello, deterministic!", size: 12, font: "Helvetica", color: {0, 0, 0})
-      block = Rendro.block(text, x: 10, y: 20)
-      page = Rendro.page(blocks: [block])
-      Rendro.document(pages: [page], metadata: Rendro.metadata(title: "Test"))
-    end
+  describe "render_to_artifact/2" do
+    test "yields an Artifact struct with binary, hash, and metadata" do
+      doc = sample_doc()
+      {:ok, artifact} = Rendro.render_to_artifact(doc, deterministic: true)
 
+      assert %Rendro.Artifact{} = artifact
+      assert is_binary(artifact.binary)
+      # SHA-256 hex length
+      assert String.length(artifact.hash) == 64
+      assert artifact.metadata.deterministic == true
+      assert artifact.metadata.page_count == 1
+    end
+  end
+
+  describe "render/2 deterministic mode" do
     test "deterministic renders produce identical binaries through public API" do
       doc = sample_doc()
       {:ok, pdf1} = Rendro.render(doc, deterministic: true)

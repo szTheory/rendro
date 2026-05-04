@@ -253,11 +253,6 @@ defmodule Rendro.PDF.Writer do
 
   defp format_color_space(cs), do: cs
 
-  defp scale_font_metric(metric, units_per_em)
-       when is_integer(metric) and is_integer(units_per_em) do
-    round(metric * 1000 / units_per_em)
-  end
-
   defp doc_font_map(font_allocations) do
     Map.new(font_allocations, fn %{font: font} = allocation -> {font.name, allocation} end)
   end

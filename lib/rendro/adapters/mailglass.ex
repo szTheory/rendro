@@ -48,6 +48,25 @@ if Code.ensure_loaded?(Mailglass) do
     @content_type "application/pdf"
 
     @doc """
+    Attaches a rendered `Rendro.Artifact` as a PDF to `email_or_message`.
+
+    Returns the modified email/message on success, or `{:error, error}` if
+    the target is invalid.
+    """
+    @spec attach_artifact(term(), Rendro.Artifact.t(), String.t()) ::
+            term()
+            | {:error, Rendro.Error.t()}
+            | {:error, {:unrecognized_message_shape, atom() | term()}}
+    def attach_artifact(
+          email_or_message,
+          %Rendro.Artifact{binary: binary},
+          filename \\ @default_filename
+        )
+        when is_binary(filename) do
+      attach_binary(email_or_message, binary, filename)
+    end
+
+    @doc """
     Renders `document` and attaches it to `email_or_message` as a PDF.
 
     Returns the modified email/message on success, or `{:error, error}` if

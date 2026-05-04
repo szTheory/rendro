@@ -16,12 +16,12 @@ if Code.ensure_loaded?(Oban) do
     def perform(%Oban.Job{args: args}) when is_map(args) do
       with {:ok, module} <- fetch_module(args),
            {:ok, builder_args} <- fetch_builder_args(args),
-           {:ok, output_path} <- fetch_output_path(args),
+           {:ok, storage_mod, storage_opts} <- fetch_storage(args),
            {:ok, policies} <- fetch_policies(args),
            {:ok, doc} <- build_document(module, builder_args) do
         doc
         |> inject_missing_policies(policies)
-        |> render_document(output_path)
+        |> render_and_store(storage_mod, storage_opts)
       end
     end
 
@@ -37,13 +37,60 @@ if Code.ensure_loaded?(Oban) do
 
     defp fetch_builder_args(_args), do: {:error, {:missing_worker_field, :args}}
 
-    defp fetch_output_path(%{"output_path" => value}) when is_binary(value) and value != "",
-      do: {:ok, value}
+    defp fetch_storage(%{"storage_module" => mod_val} = args) do
+      opts_val = Map.get(args, "storage_opts", %{})
 
-    defp fetch_output_path(%{"output_path" => value}),
+      with {:ok, mod} <- resolve_storage_module(mod_val),
+           {:ok, opts} <- resolve_storage_opts(opts_val) do
+        {:ok, mod, opts}
+      end
+    end
+
+    defp fetch_storage(%{"output_path" => value}) when is_binary(value) and value != "" do
+      {:ok, Rendro.Storage.Local, [path: value]}
+    end
+
+    defp fetch_storage(%{"output_path" => value}),
       do: {:error, {:invalid_worker_field, :output_path, value}}
 
-    defp fetch_output_path(_args), do: {:error, {:missing_worker_field, :output_path}}
+    defp fetch_storage(_args), do: {:error, {:missing_worker_field, :output_path}}
+
+    defp resolve_storage_module(module) when is_binary(module) do
+      module
+      |> module_name_candidates()
+      |> Enum.find_value(fn candidate ->
+        try do
+          candidate
+          |> String.to_existing_atom()
+          |> validate_storage_module(module)
+        rescue
+          ArgumentError -> nil
+        end
+      end)
+      |> case do
+        nil -> {:error, {:unknown_worker_storage, module}}
+        result -> result
+      end
+    end
+
+    defp resolve_storage_module(value),
+      do: {:error, {:invalid_worker_field, :storage_module, value}}
+
+    defp resolve_storage_opts(opts) when is_map(opts) do
+      # Convert string keys to atoms safely
+      normalized = Enum.map(opts, fn {k, v} -> {String.to_atom(k), v} end)
+      {:ok, normalized}
+    end
+
+    defp resolve_storage_opts(opts), do: {:error, {:invalid_worker_field, :storage_opts, opts}}
+
+    defp validate_storage_module(module, module_input) do
+      cond do
+        not Code.ensure_loaded?(module) -> {:error, {:unknown_worker_storage, module_input}}
+        not function_exported?(module, :put, 2) -> {:error, {:invalid_worker_storage, module}}
+        true -> {:ok, module}
+      end
+    end
 
     defp fetch_policies(%{"policies" => value}) when is_map(value), do: normalize_policies(value)
 
@@ -141,10 +188,16 @@ if Code.ensure_loaded?(Oban) do
       put_in(doc.options[:policies], merged)
     end
 
-    defp render_document(doc, output_path) do
-      case Rendro.render(doc, output: output_path) do
-        {:ok, _binary} -> :ok
-        {:error, error} -> {:error, error.reason}
+    defp render_and_store(doc, storage_mod, storage_opts) do
+      case Rendro.render_to_artifact(doc) do
+        {:ok, artifact} ->
+          case storage_mod.put(artifact, storage_opts) do
+            {:ok, _identifier} -> :ok
+            {:error, error} -> {:error, {:storage_error, error}}
+          end
+
+        {:error, error} ->
+          {:error, error.reason}
       end
     end
 

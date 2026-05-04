@@ -4,6 +4,7 @@ defmodule Rendro do
   """
 
   alias Rendro.{
+    Artifact,
     Block,
     Document,
     Metadata,
@@ -24,6 +25,26 @@ defmodule Rendro do
     case render_with_diagnostics(doc, opts) do
       {:ok, pdf_binary, _doc} -> {:ok, pdf_binary}
       error -> error
+    end
+  end
+
+  @doc """
+  Renders the document and returns a `Rendro.Artifact` which contains the PDF
+  binary, a deterministic hash, diagnostics, and metadata.
+  """
+  @spec render_to_artifact(Document.t(), render_options()) ::
+          {:ok, Artifact.t()} | {:error, Rendro.Error.t()}
+  def render_to_artifact(%Document{} = doc, opts \\ []) when is_list(opts) do
+    case render_with_diagnostics(doc, opts) do
+      {:ok, pdf_binary, final_doc} ->
+        metadata = %{
+          deterministic: Keyword.get(opts, :deterministic, false)
+        }
+
+        {:ok, Artifact.new(pdf_binary, final_doc, metadata)}
+
+      error ->
+        error
     end
   end
 

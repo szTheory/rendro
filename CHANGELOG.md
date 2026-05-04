@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `Rendro.Artifact` struct and `Rendro.render_to_artifact/2` to encapsulate generation results (binary, hash, diagnostics, metadata).
+- `Rendro.Storage` behavior for persisting generated artifacts to external systems.
+- `Rendro.Audit` behavior defining the contract for logging render events and lifecycle telemetry.
+- Optional adapter `Rendro.Adapters.Accrue` for building deterministic billing documents.
+- Optional adapter `Rendro.Adapters.Mailglass` for seamless attachment of artifacts to transactional emails.
+- Optional adapter `Rendro.Adapters.Oban.RenderWorker` for reliable asynchronous document generation and storage.
 - `[:rendro, :pipeline, :validate, :start | :stop | :exception]` telemetry events for the new trailing post-render validation stage. The stage performs PDF structural sanity checks (`%PDF-` header, `%%EOF` trailer), page-count parity (PDF `/Type /Pages /Count N` vs `length(doc.pages)`), and the `:max_bytes` policy enforcement formerly inlined after `:render`. Closes BLOCKER-04 from `.planning/v1.0-MILESTONE-AUDIT.md`.
 - `Rendro.Pipeline.Validate` module exposing `run/2 :: (binary(), Rendro.Document.t()) -> {:ok, binary()} | {:error, atom()}`.
 - `Rendro.Error` `:validate`-stage `what`/`next_step` clauses for `:structural_corruption`, `:page_count_mismatch`, and `:max_bytes_exceeded` (D-09).
