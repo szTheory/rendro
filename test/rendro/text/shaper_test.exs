@@ -12,7 +12,7 @@ defmodule Rendro.Text.ShaperTest do
       text = "Hello"
 
       assert {:ok, result} = Shaper.shape(font, text)
-      
+
       # Should return a list of glyph structures
       assert [%{name: "H", x_advance: advance} | _] = result
       assert is_integer(advance)
@@ -40,7 +40,7 @@ defmodule Rendro.Text.ShaperTest do
       )
 
       assert {:ok, result} = Shaper.shape(font, text)
-      
+
       # Should fallback and still return result (with .notdef glyphs)
       assert Enum.all?(result, fn glyph -> glyph.name == ".notdef" end)
 

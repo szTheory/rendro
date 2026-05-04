@@ -17,6 +17,7 @@ defmodule Rendro.Text.Shaper do
       |> String.graphemes()
       |> Enum.map(fn grapheme ->
         width = Rendro.PDF.Font.text_width(font, grapheme, 1000) |> round()
+
         %{
           name: grapheme,
           x_advance: width,
@@ -25,20 +26,21 @@ defmodule Rendro.Text.Shaper do
           y_offset: 0
         }
       end)
-    
+
     {:ok, glyphs}
   end
 
-  def shape(%Rendro.PDF.Font{source: :embedded, font_bytes: bytes}, text) when is_binary(bytes) and is_binary(text) do
+  def shape(%Rendro.PDF.Font{source: :embedded, font_bytes: bytes}, text)
+      when is_binary(bytes) and is_binary(text) do
     # Use a cached temp file for shaping
     hash = :crypto.hash(:sha256, bytes) |> Base.encode16()
     temp_dir = System.tmp_dir!() || "/tmp"
     font_path = Path.join(temp_dir, "rendro_font_#{hash}.ttf")
-    
+
     unless File.exists?(font_path) do
       File.write!(font_path, bytes)
     end
-    
+
     # Use HarfbuzzEx.get! to quickly shape the text and return all glyph information.
     glyphs = HarfbuzzEx.get!(font_path, text, :all)
 

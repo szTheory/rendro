@@ -18,7 +18,7 @@ defmodule Rendro.TableTest do
     test "Table default values for new fields" do
       table = %Rendro.Table{rows: []}
       assert table.split_policy == :row_atomic
-      assert table.repeat_header == false
+      assert table.repeat_header == true
       assert table.decoration_break == :slice
     end
 

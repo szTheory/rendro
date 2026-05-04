@@ -331,14 +331,18 @@ defmodule Rendro.PDF.Writer do
        ) do
     header_ops =
       if table.header do
-        Enum.map(table.header, &render_block(doc, &1, page, font_map, image_map))
+        Enum.map(table.header.cells, fn %Rendro.Cell{content: block} ->
+          render_block(doc, block, page, font_map, image_map)
+        end)
       else
         []
       end
 
     rows_ops =
-      Enum.map(table.rows, fn row ->
-        Enum.map(row, &render_block(doc, &1, page, font_map, image_map))
+      Enum.map(table.rows, fn %Rendro.Row{cells: cells} ->
+        Enum.map(cells, fn %Rendro.Cell{content: block} ->
+          render_block(doc, block, page, font_map, image_map)
+        end)
       end)
 
     [header_ops | rows_ops] |> List.flatten() |> Enum.join("\n")
@@ -553,8 +557,8 @@ defmodule Rendro.PDF.Writer do
 
   defp collect_row_fonts(_doc, nil, acc), do: {:ok, acc}
 
-  defp collect_row_fonts(doc, row, acc) do
-    Enum.reduce_while(row, {:ok, acc}, fn block, {:ok, fonts} ->
+  defp collect_row_fonts(doc, %Rendro.Row{cells: cells}, acc) do
+    Enum.reduce_while(cells, {:ok, acc}, fn %Rendro.Cell{content: block}, {:ok, fonts} ->
       case collect_block_fonts(doc, block, fonts) do
         {:ok, collected} -> {:cont, {:ok, collected}}
         {:error, _} = err -> {:halt, err}
@@ -627,8 +631,8 @@ defmodule Rendro.PDF.Writer do
 
   defp collect_row_images(_doc, nil, acc), do: {:ok, acc}
 
-  defp collect_row_images(doc, row, acc) do
-    Enum.reduce_while(row, {:ok, acc}, fn block, {:ok, images} ->
+  defp collect_row_images(doc, %Rendro.Row{cells: cells}, acc) do
+    Enum.reduce_while(cells, {:ok, acc}, fn %Rendro.Cell{content: block}, {:ok, images} ->
       case collect_block_images(doc, block, images) do
         {:ok, collected} -> {:cont, {:ok, collected}}
         {:error, _} = err -> {:halt, err}

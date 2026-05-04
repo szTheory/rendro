@@ -121,7 +121,11 @@ defmodule Rendro.Pipeline.Paginate do
 
   defp stack_table_cells(block), do: block
 
-  defp stack_cells(row, start_x, y, col_widths) do
+  defp stack_cells(%Rendro.Row{} = row, start_x, y, col_widths) do
+    %{row | cells: stack_cells(row.cells, start_x, y, col_widths)}
+  end
+
+  defp stack_cells(row, start_x, y, col_widths) when is_list(row) do
     {cells, _} =
       Enum.reduce(Enum.zip(row, col_widths), {[], start_x}, fn {cell, col_w}, {acc, x} ->
         # Cell already has its width set by Measure, but its x needs stacking
@@ -150,7 +154,7 @@ defmodule Rendro.Pipeline.Paginate do
     case block.content do
       %Rendro.Table{} = table ->
         case table_split_policy(table, failure_details) do
-          :row_atomic when current_h + block_h > max_h ->
+          policy when policy in [:row_atomic, :fragment] and current_h + block_h > max_h ->
             handle_table_split(
               block,
               table,
@@ -164,7 +168,7 @@ defmodule Rendro.Pipeline.Paginate do
               diagnostics
             )
 
-          :row_atomic ->
+          policy when policy in [:row_atomic, :fragment] ->
             {[%{current_page | blocks: current_page.blocks ++ [block]} | rest], diagnostics}
         end
 
@@ -397,39 +401,45 @@ defmodule Rendro.Pipeline.Paginate do
 
       can_split? = lines_fitting >= max(1, text.orphans)
 
-      cond do
-        can_split? and lines_fitting < total_lines ->
-          {this_page_lines, remaining_lines} = Enum.split(text.lines, lines_fitting)
+      if can_split? and lines_fitting < total_lines do
+        {this_page_lines, remaining_lines} = Enum.split(text.lines, lines_fitting)
 
-          this_block = %{
-            block
-            | content: %{text | lines: this_page_lines, height: length(this_page_lines) * line_height_pt},
-              height: length(this_page_lines) * line_height_pt
-          }
+        this_block = %{
+          block
+          | content: %{
+              text
+              | lines: this_page_lines,
+                height: length(this_page_lines) * line_height_pt
+            },
+            height: length(this_page_lines) * line_height_pt
+        }
 
-          remaining_block = %{
-            block
-            | content: %{text | lines: remaining_lines, height: length(remaining_lines) * line_height_pt},
-              height: length(remaining_lines) * line_height_pt
-          }
+        remaining_block = %{
+          block
+          | content: %{
+              text
+              | lines: remaining_lines,
+                height: length(remaining_lines) * line_height_pt
+            },
+            height: length(remaining_lines) * line_height_pt
+        }
 
-          current_page = %{current_page | blocks: current_page.blocks ++ [this_block]}
+        current_page = %{current_page | blocks: current_page.blocks ++ [this_block]}
 
-          new_diagnostic = %{
-            level: :info,
-            type: :text_split,
-            page_index: overflow_details.page_index
-          }
+        new_diagnostic = %{
+          level: :info,
+          type: :text_split,
+          page_index: overflow_details.page_index
+        }
 
-          {[%{template | blocks: [remaining_block]}, current_page | rest],
-           [new_diagnostic | diagnostics]}
-
-        true ->
-          if current_h == 0 do
-            check_overflow!(block, block_h, max_h, overflow_details)
-          else
-            {[%{template | blocks: [block]}, current_page | rest], diagnostics}
-          end
+        {[%{template | blocks: [remaining_block]}, current_page | rest],
+         [new_diagnostic | diagnostics]}
+      else
+        if current_h == 0 do
+          check_overflow!(block, block_h, max_h, overflow_details)
+        else
+          {[%{template | blocks: [block]}, current_page | rest], diagnostics}
+        end
       end
     end
   end
@@ -768,11 +778,15 @@ defmodule Rendro.Pipeline.Paginate do
 
   defp table_split_policy(%Rendro.Table{split_policy: :row_atomic}, _details), do: :row_atomic
   defp table_split_policy(%Rendro.Table{split_policy: :atomic}, _details), do: :row_atomic
+  defp table_split_policy(%Rendro.Table{split_policy: :fragment}, _details), do: :fragment
 
   defp table_split_policy(%Rendro.Table{split_policy: split_policy}, details) do
     throw(
       {:error, :unsupported_table_split_policy,
-       Map.merge(details, %{split_policy: split_policy, supported_split_policies: [:row_atomic]})}
+       Map.merge(details, %{
+         split_policy: split_policy,
+         supported_split_policies: [:row_atomic, :fragment]
+       })}
     )
   end
 
@@ -780,6 +794,76 @@ defmodule Rendro.Pipeline.Paginate do
     header_h = table.header_height || 0
     rows_h = if table.row_heights, do: Enum.sum(table.row_heights), else: 0
     header_h + rows_h
+  end
+
+  defp split_table(%Rendro.Table{split_policy: :fragment} = table, available_h) do
+    header_h = table.header_height || 0
+    row_heights = table.row_heights || []
+
+    {fit_count, remaining_h} =
+      Enum.reduce_while(row_heights, {0, available_h - header_h}, fn rh, {count, current_avail} ->
+        if rh <= current_avail do
+          {:cont, {count + 1, current_avail - rh}}
+        else
+          {:halt, {count, current_avail}}
+        end
+      end)
+
+    if fit_count == 0 and remaining_h <= 0 do
+      {nil, table}
+    else
+      {this_rows, rest_rows} = Enum.split(table.rows, fit_count)
+
+      {this_rh, rest_rh} =
+        if table.row_heights, do: Enum.split(table.row_heights, fit_count), else: {nil, nil}
+
+      case rest_rows do
+        [] ->
+          {table, nil}
+
+        [crossing_row | tail_rows] ->
+          [crossing_rh | tail_rh] = rest_rh || [0 | []]
+
+          # Attempt to slice crossing_row horizontally at remaining_h
+          {this_slice, rem_slice, this_slice_h, rem_slice_h} =
+            slice_row(crossing_row, crossing_rh, remaining_h)
+
+          if this_slice do
+            this_table_rows = this_rows ++ [this_slice]
+            this_table_rh = if table.row_heights, do: this_rh ++ [this_slice_h], else: nil
+
+            rem_table_rows = if rem_slice, do: [rem_slice | tail_rows], else: tail_rows
+
+            rem_table_rh =
+              if table.row_heights,
+                do: if(rem_slice, do: [rem_slice_h | tail_rh], else: tail_rh),
+                else: nil
+
+            this_table = %{table | rows: this_table_rows, row_heights: this_table_rh}
+
+            rest_table =
+              if rem_table_rows == [] do
+                nil
+              else
+                if table.repeat_header do
+                  %{table | rows: rem_table_rows, row_heights: rem_table_rh}
+                else
+                  %{
+                    table
+                    | rows: rem_table_rows,
+                      row_heights: rem_table_rh,
+                      header: nil,
+                      header_height: 0
+                  }
+                end
+              end
+
+            {this_table, rest_table}
+          else
+            split_table_rows(table, fit_count)
+          end
+      end
+    end
   end
 
   defp split_table(%Rendro.Table{} = table, available_h) do
@@ -816,9 +900,131 @@ defmodule Rendro.Pipeline.Paginate do
 
       _ ->
         this_table = %{table | rows: this_rows, row_heights: this_row_heights}
-        # Repeat header on rest
-        rest_table = %{table | rows: rest_rows, row_heights: rest_row_heights}
+
+        rest_table =
+          if table.repeat_header do
+            %{table | rows: rest_rows, row_heights: rest_row_heights}
+          else
+            %{
+              table
+              | rows: rest_rows,
+                row_heights: rest_row_heights,
+                header: nil,
+                header_height: 0
+            }
+          end
+
         {this_table, rest_table}
+    end
+  end
+
+  defp split_block(
+         %Rendro.Block{content: %Rendro.Pipeline.MeasuredText{} = text} = block,
+         available_h
+       ) do
+    total_lines = length(text.lines)
+
+    if total_lines == 0 do
+      if available_h >= (block.height || 0) do
+        {block, nil}
+      else
+        {nil, block}
+      end
+    else
+      line_height_pt = text.height / total_lines
+      lines_fitting = if line_height_pt > 0, do: floor(available_h / line_height_pt), else: 0
+
+      lines_fitting =
+        if total_lines - lines_fitting < text.widows do
+          max(0, total_lines - text.widows)
+        else
+          lines_fitting
+        end
+
+      can_split? = lines_fitting >= max(1, text.orphans)
+
+      if can_split? and lines_fitting < total_lines do
+        {this_page_lines, remaining_lines} = Enum.split(text.lines, lines_fitting)
+
+        this_block = %{
+          block
+          | content: %{
+              text
+              | lines: this_page_lines,
+                height: length(this_page_lines) * line_height_pt
+            },
+            height: length(this_page_lines) * line_height_pt
+        }
+
+        remaining_block = %{
+          block
+          | content: %{
+              text
+              | lines: remaining_lines,
+                height: length(remaining_lines) * line_height_pt
+            },
+            height: length(remaining_lines) * line_height_pt
+        }
+
+        {this_block, remaining_block}
+      else
+        if available_h >= (block.height || 0) do
+          {block, nil}
+        else
+          {nil, block}
+        end
+      end
+    end
+  end
+
+  defp split_block(%Rendro.Block{} = block, available_h) do
+    if (block.height || 0) <= available_h do
+      {block, nil}
+    else
+      {nil, block}
+    end
+  end
+
+  defp slice_row(%Rendro.Row{} = row, _row_h, available_h) do
+    results =
+      Enum.map(row.cells, fn cell ->
+        {tb, rb} = split_block(cell.content, available_h)
+
+        rem_cell =
+          if rb do
+            %{cell | content: rb, height: rb.height}
+          else
+            empty_block = %Rendro.Block{
+              content: %Rendro.Text{content: ""},
+              width: cell.width,
+              height: 0
+            }
+
+            %{cell | content: empty_block, height: 0}
+          end
+
+        if tb do
+          {%{cell | content: tb, height: tb.height}, rem_cell}
+        else
+          {nil, %{cell | content: cell.content, height: cell.height}}
+        end
+      end)
+
+    if Enum.any?(results, fn {tb, _rb} -> tb == nil end) do
+      {nil, nil, 0, 0}
+    else
+      this_cells = Enum.map(results, fn {tb, _rb} -> tb end)
+      rem_cells = Enum.map(results, fn {_tb, rb} -> rb end)
+
+      this_h = Enum.max(Enum.map(this_cells, &(&1.height || 0)), fn -> 0 end)
+      rem_h = Enum.max(Enum.map(rem_cells, &(&1.height || 0)), fn -> 0 end)
+
+      {
+        %{row | cells: this_cells},
+        %{row | cells: rem_cells},
+        this_h,
+        rem_h
+      }
     end
   end
 end

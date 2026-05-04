@@ -31,7 +31,9 @@ defmodule Rendro.PDF.CidFont do
          {"DescendantFonts", {:array, [{:ref, cid_font_obj_num, 0}]}}
        ]}
 
-    type0_obj = {type0_obj_num, Object.indirect_object(type0_obj_num, 0, Object.serialize(type0_dict, opts))}
+    type0_obj =
+      {type0_obj_num,
+       Object.indirect_object(type0_obj_num, 0, Object.serialize(type0_dict, opts))}
 
     # CIDFontType2 Dictionary
     cid_font_dict =
@@ -51,7 +53,9 @@ defmodule Rendro.PDF.CidFont do
          {"W", {:ref, widths_obj_num, 0}}
        ]}
 
-    cid_font_obj = {cid_font_obj_num, Object.indirect_object(cid_font_obj_num, 0, Object.serialize(cid_font_dict, opts))}
+    cid_font_obj =
+      {cid_font_obj_num,
+       Object.indirect_object(cid_font_obj_num, 0, Object.serialize(cid_font_dict, opts))}
 
     # FontDescriptor Dictionary
     descriptor_dict =
@@ -62,7 +66,12 @@ defmodule Rendro.PDF.CidFont do
          {"Flags", 32},
          {"FontBBox",
           {:array,
-           [0, scale_metric(font.descent, font.units_per_em), 1000, scale_metric(font.ascent, font.units_per_em)]}},
+           [
+             0,
+             scale_metric(font.descent, font.units_per_em),
+             1000,
+             scale_metric(font.ascent, font.units_per_em)
+           ]}},
          {"Ascent", scale_metric(font.ascent, font.units_per_em)},
          {"Descent", scale_metric(font.descent, font.units_per_em)},
          {"CapHeight", scale_metric(font.ascent, font.units_per_em)},
@@ -71,11 +80,16 @@ defmodule Rendro.PDF.CidFont do
          {"FontFile2", {:ref, font_file_obj_num, 0}}
        ]}
 
-    descriptor_obj = {descriptor_obj_num, Object.indirect_object(descriptor_obj_num, 0, Object.serialize(descriptor_dict, opts))}
+    descriptor_obj =
+      {descriptor_obj_num,
+       Object.indirect_object(descriptor_obj_num, 0, Object.serialize(descriptor_dict, opts))}
 
     # Widths Array
     widths = build_widths_array(font)
-    widths_obj = {widths_obj_num, Object.indirect_object(widths_obj_num, 0, Object.serialize({:array, widths}, opts))}
+
+    widths_obj =
+      {widths_obj_num,
+       Object.indirect_object(widths_obj_num, 0, Object.serialize({:array, widths}, opts))}
 
     # FontFile Stream
     font_file_stream =
@@ -85,7 +99,9 @@ defmodule Rendro.PDF.CidFont do
          {"Length1", byte_size(font.font_bytes)}
        ], font.font_bytes}
 
-    font_file_obj = {font_file_obj_num, Object.indirect_object(font_file_obj_num, 0, Object.serialize(font_file_stream, opts))}
+    font_file_obj =
+      {font_file_obj_num,
+       Object.indirect_object(font_file_obj_num, 0, Object.serialize(font_file_stream, opts))}
 
     [type0_obj, cid_font_obj, descriptor_obj, widths_obj, font_file_obj]
   end
@@ -93,7 +109,7 @@ defmodule Rendro.PDF.CidFont do
   defp build_widths_array(%Font{} = font) do
     # The /W array can be [ c [ w1 w2 ... ] ]
     # We will just generate [ 0 [ w0 w1 w2 ... ] ] up to the max encoded glyph
-    
+
     max_glyph =
       if map_size(font.widths) > 0 do
         font.widths |> Map.keys() |> Enum.max()

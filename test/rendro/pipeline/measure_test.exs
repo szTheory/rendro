@@ -420,8 +420,10 @@ defmodule Rendro.Pipeline.MeasureTest do
 
       assert [row1, row2] = measured_table.rows
       assert %Rendro.Row{} = row1
-      assert [%Rendro.Cell{content: %Rendro.Block{content: %MeasuredText{}}}, %Rendro.Cell{}] = row1.cells
-      
+
+      assert [%Rendro.Cell{content: %Rendro.Block{content: %MeasuredText{}}}, %Rendro.Cell{}] =
+               row1.cells
+
       assert %Rendro.Row{} = row2
       assert [%Rendro.Cell{}, %Rendro.Cell{}] = row2.cells
 
@@ -445,7 +447,7 @@ defmodule Rendro.Pipeline.MeasureTest do
 
       measured_table = hd(measured.content).content
       grid = measured_table._grid_layout
-      
+
       assert [row1, row2] = grid
       assert [%{is_continuation: false, cell: _}, %{is_continuation: true}] = row1
       assert [%{is_continuation: true}, %{is_continuation: true}] = row2

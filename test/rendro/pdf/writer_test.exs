@@ -176,6 +176,8 @@ defmodule Rendro.PDF.WriterTest do
           line_height: source.line_height,
           width: 60,
           height: 36,
+          widows: 2,
+          orphans: 2,
           resolved_font: Font.helvetica()
         }
 

@@ -9,7 +9,7 @@ defmodule Rendro.Table do
     header: nil,
     columns: nil,
     split_policy: :row_atomic,
-    repeat_header: false,
+    repeat_header: true,
     decoration_break: :slice,
     # Pipeline geometry fields populated by Measure
     column_widths: nil,

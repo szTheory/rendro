@@ -365,7 +365,7 @@ defmodule Rendro.Pipeline.PaginateTest do
       assert error.stage == :paginate
       assert error.reason == :unsupported_table_split_policy
       assert error.details.split_policy == :whole_table
-      assert error.details.supported_split_policies == [:row_atomic]
+      assert error.details.supported_split_policies == [:row_atomic, :fragment]
       assert error.next =~ "split_policy: :row_atomic"
     end
 
@@ -389,7 +389,7 @@ defmodule Rendro.Pipeline.PaginateTest do
       assert error.stage == :paginate
       assert error.reason == :unsupported_table_split_policy
       assert error.details.split_policy == :whole_table
-      assert error.details.supported_split_policies == [:row_atomic]
+      assert error.details.supported_split_policies == [:row_atomic, :fragment]
       assert error.next =~ "split_policy: :row_atomic"
     end
 
@@ -566,7 +566,7 @@ defmodule Rendro.Pipeline.PaginateTest do
     test "respects orphans constraint: pushes entire block if it would leave orphans" do
       # 4 lines total, body region height 20 (fits 1 line)
       # Orphans constraint is 2. So it can't split leaving 1 line on page 1.
-      # Must push entirely to page 2 (and then what? It will overflow on page 2 since height is 20, we expect an overflow error on page 2).
+      # Must push entirely to page 2 and error on overflow.
       template = %{
         tiny_keep_chain_template()
         | name: :tiny_height,
@@ -628,7 +628,7 @@ defmodule Rendro.Pipeline.PaginateTest do
       assert length(block1.content.lines) == 2
       assert length(block2.content.lines) == 2
     end
-    
+
     test "re-checks orphans constraint after widows adjustment" do
       # 5 lines total. Body height is 80.
       # On page 1: "Previous line" takes ~14.4, leaving ~65.6 available.
@@ -645,12 +645,15 @@ defmodule Rendro.Pipeline.PaginateTest do
             %Region{name: :body, role: :body, anchor: :flow, x: 24, y: 52, width: 372, height: 80}
           ]
       }
-      
+
       doc =
         Rendro.flow(
           [
-            Rendro.block(Rendro.text("Previous line")), # takes up 1 line (approx 14.4 height). Leaves ~45 height (fits 3 lines).
-            Rendro.block(Rendro.text("Line 1\nLine 2\nLine 3\nLine 4\nLine 5", widows: 3, orphans: 3))
+            # takes up 1 line (approx 14.4 height). Leaves ~45 height (fits 3 lines).
+            Rendro.block(Rendro.text("Previous line")),
+            Rendro.block(
+              Rendro.text("Line 1\nLine 2\nLine 3\nLine 4\nLine 5", widows: 3, orphans: 3)
+            )
           ],
           page_template: :medium_height_4,
           page_templates: [template]
@@ -659,18 +662,20 @@ defmodule Rendro.Pipeline.PaginateTest do
       # 1st block takes 14.4. Remaining height ~45.6 (fits 3 lines).
       # So we try to fit 3 lines of block 2.
       # Widows=3. Total=5. 5 - 3 = 2. So we can only fit 2 lines on page 1.
-      # But orphans=3! So fitting 2 lines violates orphans. 
+      # But orphans=3! So fitting 2 lines violates orphans.
       # It should push the whole block 2 to next page.
-      
+
       assert {:ok, paginated} = paginate_flow(doc)
       assert length(paginated.pages) == 2
-      
+
       page1 = Enum.at(paginated.pages, 0)
       page2 = Enum.at(paginated.pages, 1)
-      
-      assert length(page1.blocks) == 1 # Only "Previous line"
-      assert length(page2.blocks) == 1 # The whole 5 lines
-      
+
+      # Only "Previous line"
+      assert length(page1.blocks) == 1
+      # The whole 5 lines
+      assert length(page2.blocks) == 1
+
       [block2] = page2.blocks
       assert length(block2.content.lines) == 5
     end
@@ -744,5 +749,82 @@ defmodule Rendro.Pipeline.PaginateTest do
         }
       ]
     }
+  end
+
+  describe "Table Fragmentation (:fragment policy)" do
+    test "slices the 2D grid horizontally at available_h" do
+      table = %Rendro.Table{
+        rows: for(i <- 1..3, do: [%Rendro.Block{content: Rendro.text("Row #{i}")}]),
+        split_policy: :fragment,
+        column_widths: [100]
+      }
+
+      doc =
+        Rendro.flow(
+          [Rendro.block(table)],
+          page_template: :tiny_keep_chain,
+          page_templates: [tiny_keep_chain_template()]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+      assert length(paginated.pages) == 2
+
+      # The first page should have the first part of the table
+      page1 = Enum.at(paginated.pages, 0)
+      [block1] = page1.blocks
+      assert length(block1.content.rows) < 3
+
+      page2 = Enum.at(paginated.pages, 1)
+      [block2] = page2.blocks
+      assert block2.content.rows != []
+    end
+
+    test "continuation tables include the header if repeat_header: true" do
+      table = %Rendro.Table{
+        header: [%Rendro.Block{content: Rendro.text("Header")}],
+        rows: for(i <- 1..3, do: [%Rendro.Block{content: Rendro.text("Row #{i}")}]),
+        split_policy: :fragment,
+        repeat_header: true,
+        column_widths: [100]
+      }
+
+      doc =
+        Rendro.flow(
+          [Rendro.block(table)],
+          page_template: :flow_keep_chain,
+          page_templates: [flow_keep_chain_template()]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+      assert length(paginated.pages) == 2
+
+      page2 = Enum.at(paginated.pages, 1)
+      [block2] = page2.blocks
+      # The continued table on page 2 should have the header
+      assert block2.content.header != nil
+      %Rendro.Row{cells: [header_cell]} = block2.content.header
+      assert header_cell.content.content.source.content == "Header"
+    end
+
+    test "border definitions respect decoration_break: :slice" do
+      table = %Rendro.Table{
+        rows: for(i <- 1..3, do: [%Rendro.Block{content: Rendro.text("Row #{i}")}]),
+        split_policy: :fragment,
+        decoration_break: :slice,
+        column_widths: [100]
+      }
+
+      doc =
+        Rendro.flow(
+          [Rendro.block(table)],
+          page_template: :tiny_keep_chain,
+          page_templates: [tiny_keep_chain_template()]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+      page1 = Enum.at(paginated.pages, 0)
+      [block1] = page1.blocks
+      assert block1.content.decoration_break == :slice
+    end
   end
 end

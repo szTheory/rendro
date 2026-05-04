@@ -27,7 +27,7 @@ defmodule Rendro.PDF.FontSubsetterTest do
     assert {:ok, subset_bytes} = FontSubsetter.subset(bytes, [50, 100, 150])
 
     assert {:ok, parsed} = FontParser.parse(subset_bytes)
-    
+
     # We should have fewer than original glyphs if the max used is 150 (plus components).
     # Original B612 has many more than 150 glyphs.
     assert byte_size(subset_bytes) < byte_size(bytes)

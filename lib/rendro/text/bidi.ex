@@ -11,7 +11,7 @@ defmodule Rendro.Text.Bidi do
   end
 
   defp do_split(<<>>, nil, _acc, <<>>, runs), do: Enum.reverse(runs)
-  
+
   defp do_split(<<>>, nil, _acc, neutral_acc, runs) do
     # Pure neutral string defaults to Latin LTR
     state = %{script: :latn, direction: :ltr}
@@ -40,7 +40,8 @@ defmodule Rendro.Text.Bidi do
         # Accumulate neutral chars separately
         do_split(rest, current_state, acc, neutral_acc <> <<cp::utf8>>, runs)
 
-      char_state.script == current_state.script and char_state.direction == current_state.direction ->
+      char_state.script == current_state.script and
+          char_state.direction == current_state.direction ->
         # Same strong state, flush neutrals into the accumulator and add the char
         do_split(rest, current_state, acc <> neutral_acc <> <<cp::utf8>>, <<>>, runs)
 
@@ -63,8 +64,8 @@ defmodule Rendro.Text.Bidi do
 
   defp resolve_state(cp) do
     script_name = UnicodeData.Script.script_from_codepoint(cp)
-    
-    script_tag = 
+
+    script_tag =
       if script_name in ["Common", "Inherited", "Unknown"] do
         :common
       else
@@ -72,8 +73,8 @@ defmodule Rendro.Text.Bidi do
       end
 
     bidi_class = UnicodeData.Bidi.bidi_class(cp)
-    
-    direction = 
+
+    direction =
       case bidi_class do
         "L" -> :ltr
         "R" -> :rtl
@@ -87,7 +88,7 @@ defmodule Rendro.Text.Bidi do
   defp build_run(state, text) do
     script = if state.script == :common, do: :latn, else: state.script
     direction = if state.direction == :neutral, do: :ltr, else: state.direction
-    
+
     %{text: text, script: script, direction: direction}
   end
 end
