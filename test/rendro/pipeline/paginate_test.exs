@@ -528,6 +528,150 @@ defmodule Rendro.Pipeline.PaginateTest do
     end
   end
 
+  describe "predictive text splitting" do
+    test "splits a MeasuredText block across pages" do
+      # Create a template with a body region that holds exactly 2 lines of text
+      # at 14.4 line height (e.g. height 30)
+      doc =
+        Rendro.flow(
+          [
+            Rendro.block(Rendro.text("Line 1\nLine 2\nLine 3\nLine 4", widows: 1, orphans: 1))
+          ],
+          page_template: :tiny_keep_chain,
+          page_templates: [tiny_keep_chain_template()]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+      assert length(paginated.pages) == 2
+
+      page1 = Enum.at(paginated.pages, 0)
+      page2 = Enum.at(paginated.pages, 1)
+
+      assert length(page1.blocks) == 1
+      assert length(page2.blocks) == 1
+
+      [block1] = page1.blocks
+      [block2] = page2.blocks
+
+      assert length(block1.content.lines) == 2
+      assert length(block2.content.lines) == 2
+
+      # Check for diagnostics
+      diag = Enum.find(paginated.diagnostics, &(&1.type == :text_split))
+      assert diag
+      assert diag.level == :info
+      assert diag.page_index == 1
+    end
+
+    test "respects orphans constraint: pushes entire block if it would leave orphans" do
+      # 4 lines total, body region height 20 (fits 1 line)
+      # Orphans constraint is 2. So it can't split leaving 1 line on page 1.
+      # Must push entirely to page 2 (and then what? It will overflow on page 2 since height is 20, we expect an overflow error on page 2).
+      template = %{
+        tiny_keep_chain_template()
+        | name: :tiny_height,
+          regions: [
+            %Region{name: :body, role: :body, anchor: :flow, x: 24, y: 52, width: 372, height: 20}
+          ]
+      }
+
+      doc =
+        Rendro.flow(
+          [
+            Rendro.block(Rendro.text("Line 1\nLine 2\nLine 3\nLine 4", widows: 1, orphans: 2))
+          ],
+          page_template: :tiny_height,
+          page_templates: [template]
+        )
+
+      assert {:error, %Rendro.Error{} = error} = paginate_flow(doc)
+      assert error.reason == :content_overflow
+      # It failed on the first page initially pushing to page 2? Wait, the unfittable rule:
+      # If current_h == 0 and it can't split, throw error.
+      # On page 1, current_h is 0, so it will throw content_overflow immediately, right?
+      # Or it tries to push to next page. The logic: if current_h > 0, we can push to next page.
+      # If current_h == 0, we are already at the top of the page. If it can't fit/split, it's an error.
+      assert error.details.page_index == 1
+    end
+
+    test "respects widows constraint: reduces lines on current page" do
+      # 4 lines total, body height fits 3 lines.
+      # Widows = 2 (meaning we need at least 2 lines on the next page).
+      # It should split after 2 lines, pushing 2 to the next page.
+      template = %{
+        tiny_keep_chain_template()
+        | name: :medium_height,
+          regions: [
+            %Region{name: :body, role: :body, anchor: :flow, x: 24, y: 52, width: 372, height: 45}
+          ]
+      }
+
+      doc =
+        Rendro.flow(
+          [
+            Rendro.block(Rendro.text("Line 1\nLine 2\nLine 3\nLine 4", widows: 2, orphans: 1))
+          ],
+          page_template: :medium_height,
+          page_templates: [template]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+      assert length(paginated.pages) == 2
+
+      page1 = Enum.at(paginated.pages, 0)
+      page2 = Enum.at(paginated.pages, 1)
+
+      [block1] = page1.blocks
+      [block2] = page2.blocks
+
+      # Should be 2 and 2, not 3 and 1
+      assert length(block1.content.lines) == 2
+      assert length(block2.content.lines) == 2
+    end
+    
+    test "re-checks orphans constraint after widows adjustment" do
+      # 5 lines total, body height fits 4 lines.
+      # Widows = 2 (needs 2 on next page). So it reduces lines on page 1 from 4 to 3.
+      # But Orphans = 4 (needs 4 on page 1). So 3 is not enough for orphans!
+      # It must push the entire block to the next page.
+      template = %{
+        tiny_keep_chain_template()
+        | name: :medium_height_4,
+          regions: [
+            %Region{name: :body, role: :body, anchor: :flow, x: 24, y: 52, width: 372, height: 60}
+          ]
+      }
+      
+      doc =
+        Rendro.flow(
+          [
+            Rendro.block(Rendro.text("Previous line")), # takes up 1 line (approx 14.4 height). Leaves ~45 height (fits 3 lines).
+            Rendro.block(Rendro.text("Line 1\nLine 2\nLine 3\nLine 4\nLine 5", widows: 3, orphans: 3))
+          ],
+          page_template: :medium_height_4,
+          page_templates: [template]
+        )
+
+      # 1st block takes 14.4. Remaining height ~45.6 (fits 3 lines).
+      # So we try to fit 3 lines of block 2.
+      # Widows=3. Total=5. 5 - 3 = 2. So we can only fit 2 lines on page 1.
+      # But orphans=3! So fitting 2 lines violates orphans. 
+      # It should push the whole block 2 to next page.
+      
+      assert {:ok, paginated} = paginate_flow(doc)
+      assert length(paginated.pages) == 2
+      
+      page1 = Enum.at(paginated.pages, 0)
+      page2 = Enum.at(paginated.pages, 1)
+      
+      assert length(page1.blocks) == 1 # Only "Previous line"
+      assert length(page2.blocks) == 1 # The whole 5 lines
+      
+      [block2] = page2.blocks
+      assert length(block2.content.lines) == 5
+    end
+  end
+
   defp paginate_flow(doc) do
     {:ok, doc} = Build.run(doc)
     {:ok, doc} = Compose.run(doc)
