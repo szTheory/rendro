@@ -117,9 +117,10 @@ defmodule Rendro.PDF.Writer do
           %{
             font: font,
             font_obj_num: num,
-            descriptor_obj_num: num + 1,
-            widths_obj_num: num + 2,
-            font_file_obj_num: num + 3
+            cid_font_obj_num: num + 1,
+            descriptor_obj_num: num + 2,
+            widths_obj_num: num + 3,
+            font_file_obj_num: num + 4
           }
         else
           %{font: font, font_obj_num: num}
@@ -150,82 +151,8 @@ defmodule Rendro.PDF.Writer do
     [{obj_num, Object.indirect_object(obj_num, 0, Object.serialize(font_dict, opts))}]
   end
 
-  defp build_font_object(
-         %{
-           font: %Font{embedded?: true} = font,
-           font_obj_num: font_obj_num,
-           descriptor_obj_num: descriptor_obj_num,
-           widths_obj_num: widths_obj_num,
-           font_file_obj_num: font_file_obj_num
-         },
-         opts
-       ) do
-    {first_char, last_char, widths} = embedded_widths(font)
-
-    widths_object =
-      {widths_obj_num,
-       Object.indirect_object(
-         widths_obj_num,
-         0,
-         Object.serialize({:array, widths}, opts)
-       )}
-
-    descriptor_dict =
-      {:dict,
-       [
-         {"Type", {:name, "FontDescriptor"}},
-         {"FontName", {:name, font.base_font}},
-         {"Flags", 32},
-         {"FontBBox",
-          {:array,
-           [0, scale_font_metric(font, font.descent), 1000, scale_font_metric(font, font.ascent)]}},
-         {"Ascent", scale_font_metric(font, font.ascent)},
-         {"Descent", scale_font_metric(font, font.descent)},
-         {"CapHeight", scale_font_metric(font, font.ascent)},
-         {"ItalicAngle", 0},
-         {"StemV", 80},
-         {"FontFile2", {:ref, font_file_obj_num, 0}}
-       ]}
-
-    descriptor_object =
-      {descriptor_obj_num,
-       Object.indirect_object(
-         descriptor_obj_num,
-         0,
-         Object.serialize(descriptor_dict, opts)
-       )}
-
-    font_file_stream =
-      {:stream,
-       [
-         {"Subtype", {:name, "OpenType"}}
-       ], font.font_bytes}
-
-    font_file_object =
-      {font_file_obj_num,
-       Object.indirect_object(
-         font_file_obj_num,
-         0,
-         Object.serialize(font_file_stream, opts)
-       )}
-
-    font_dict =
-      {:dict,
-       [
-         {"Type", {:name, "Font"}},
-         {"Subtype", {:name, "TrueType"}},
-         {"BaseFont", {:name, font.base_font}},
-         {"FirstChar", first_char},
-         {"LastChar", last_char},
-         {"Widths", {:ref, widths_obj_num, 0}},
-         {"FontDescriptor", {:ref, descriptor_obj_num, 0}},
-         {"Encoding", {:name, "WinAnsiEncoding"}}
-       ]}
-
-    font_object =
-      {font_obj_num, Object.indirect_object(font_obj_num, 0, Object.serialize(font_dict, opts))}
-
-    [font_object, descriptor_object, widths_object, font_file_object]
+  defp build_font_object(%{font: %Font{embedded?: true}} = allocation, opts) do
+    Rendro.PDF.CidFont.build_objects(allocation.font, allocation, opts)
   end
 
   defp allocate_image_nums(images, start_num) do
@@ -554,7 +481,7 @@ defmodule Rendro.PDF.Writer do
 
             [
               "/#{font_name} #{format_num(text.size)} Tf",
-              "(#{escape_pdf_string(run.text)}) Tj"
+              "#{encode_text(run.font, run.text)} Tj"
             ]
           end)
 
@@ -569,6 +496,23 @@ defmodule Rendro.PDF.Writer do
     ]
     |> List.flatten()
     |> Enum.join("\n")
+  end
+
+  defp encode_text(%Rendro.PDF.Font{embedded?: true} = font, text) do
+    hex_glyphs =
+      text
+      |> String.to_charlist()
+      |> Enum.map(fn codepoint ->
+        glyph_id = Map.get(font.cmap || %{}, codepoint, 0)
+        :io_lib.format("~4.16.0B", [glyph_id]) |> to_string()
+      end)
+      |> Enum.join("")
+
+    "<#{hex_glyphs}>"
+  end
+
+  defp encode_text(%Rendro.PDF.Font{embedded?: false}, text) do
+    "(#{escape_pdf_string(text)})"
   end
 
   defp collect_fonts(%Rendro.Document{pages: pages} = doc) do

@@ -234,11 +234,11 @@ defmodule Rendro.PDF.WriterTest do
       assert {:ok, pdf} = Writer.render(doc, deterministic: true)
 
       assert pdf =~ "/F_BRAND"
-      assert pdf =~ "/Subtype /TrueType"
+      assert pdf =~ "/Subtype /Type0"
+      assert pdf =~ "/Subtype /CIDFontType2"
       assert pdf =~ "/FontDescriptor"
       assert pdf =~ "/FontFile2"
-      assert pdf =~ "/Encoding /WinAnsiEncoding"
-      assert pdf =~ "(Brand heading) Tj"
+      assert pdf =~ "<002300530042004F004500010049004600420045004A004F0048> Tj"
       refute pdf =~ "/BaseFont /Helvetica"
     end
 

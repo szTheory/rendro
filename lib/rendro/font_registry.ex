@@ -428,7 +428,8 @@ defmodule Rendro.FontRegistry do
             ascent: parsed.ascent,
             descent: parsed.descent,
             default_width: parsed.default_width,
-            widths: parsed.widths
+            widths: parsed.widths,
+            cmap: parsed.cmap
           )
 
         {:ok, Map.put(descriptor, :pdf_font, pdf_font)}

@@ -11,7 +11,8 @@ defmodule Rendro.PDF.FontParser do
              ascent: integer(),
              descent: integer(),
              default_width: non_neg_integer(),
-             widths: %{non_neg_integer() => non_neg_integer()}
+             widths: %{non_neg_integer() => non_neg_integer()},
+             cmap: %{non_neg_integer() => non_neg_integer()}
            }}
           | {:error, term()}
   def parse(bytes) when is_binary(bytes) do
@@ -39,7 +40,8 @@ defmodule Rendro.PDF.FontParser do
          ascent: ascent,
          descent: descent,
          default_width: default_width(widths, widths_by_glyph),
-         widths: widths
+         widths: widths,
+         cmap: codepoint_to_glyph
        }}
     else
       %{} = widths when map_size(widths) == 0 -> {:error, :missing_character_map}

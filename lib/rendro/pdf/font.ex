@@ -14,7 +14,8 @@ defmodule Rendro.PDF.Font do
           ascent: integer(),
           descent: integer(),
           default_width: non_neg_integer(),
-          widths: %{non_neg_integer() => non_neg_integer()}
+          widths: %{non_neg_integer() => non_neg_integer()},
+          cmap: %{non_neg_integer() => non_neg_integer()} | nil
         }
 
   defstruct [
@@ -30,7 +31,8 @@ defmodule Rendro.PDF.Font do
     :ascent,
     :descent,
     :default_width,
-    widths: %{}
+    widths: %{},
+    cmap: nil
   ]
 
   @helvetica_widths %{
@@ -165,7 +167,8 @@ defmodule Rendro.PDF.Font do
       ascent: Keyword.fetch!(opts, :ascent),
       descent: Keyword.fetch!(opts, :descent),
       default_width: Keyword.fetch!(opts, :default_width),
-      widths: Keyword.fetch!(opts, :widths)
+      widths: Keyword.fetch!(opts, :widths),
+      cmap: Keyword.fetch!(opts, :cmap)
     }
   end
 
