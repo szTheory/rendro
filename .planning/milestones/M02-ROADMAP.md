@@ -1,13 +1,13 @@
 # Milestone 2: Advanced Layout & Typography (ROADMAP)
 
 ## Phases
-- [ ] **Phase 1: Complex Text & i18n Foundations** - Support diverse character sets and font subsetting end-to-end.
-- [ ] **Phase 2: Advanced Block Pagination** - Prevent widows and orphans in document flow.
-- [ ] **Phase 3: Advanced Table Layout & Fragmentation** - Render complex multi-page tables with explicit cell fragmentation.
+- [ ] **Phase 35: Complex Text & i18n Foundations** - Support diverse character sets and font subsetting end-to-end.
+- [ ] **Phase 36: Advanced Block Pagination** - Prevent widows and orphans in document flow.
+- [ ] **Phase 37: Advanced Table Layout & Fragmentation** - Render complex multi-page tables with explicit cell fragmentation.
 
 ## Phase Details
 
-### Phase 1: Complex Text & i18n Foundations
+### Phase 35: Complex Text & i18n Foundations
 **Goal**: Users can render documents with mixed character sets and complex scripts correctly without bloating PDF size.
 **Depends on**: Nothing
 **Requirements**: Typography, i18n
@@ -24,9 +24,9 @@
   - **Validate**: Ensure binary checksum consistency across multi-script documents.
 **Plans**: TBD
 
-### Phase 2: Advanced Block Pagination
+### Phase 36: Advanced Block Pagination
 **Goal**: Users can control how text blocks break across page boundaries, avoiding visual artifacts.
-**Depends on**: Phase 1
+**Depends on**: Phase 35
 **Requirements**: Pagination (Widows/Orphans)
 **Success Criteria** (what must be TRUE):
   1. User can configure widow and orphan prevention at the block level.
@@ -41,9 +41,9 @@
   - **Validate**: Verify edge-case page boundary tests pass deterministically.
 **Plans**: TBD
 
-### Phase 3: Advanced Table Layout & Fragmentation
+### Phase 37: Advanced Table Layout & Fragmentation
 **Goal**: Users can generate complex data tables that fragment seamlessly and predictably across multiple pages.
-**Depends on**: Phase 2
+**Depends on**: Phase 36
 **Requirements**: Advanced Layout, Pagination (Table Fragmentation)
 **Success Criteria** (what must be TRUE):
   1. User can generate a multi-page PDF with a continuous data table proving correct table continuation.
