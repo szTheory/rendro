@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-30)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase --phase — 33
+**Current focus:** Phase --phase — 35
 
 ## Current Position
 
-Phase: 33
+Phase: 35
 Plan: None
 Status: complete
-Last activity: 2026-05-03
+Last activity: 2026-05-04
 
 Progress: [----------] 100%
 
@@ -54,6 +54,7 @@ Progress: [----------] 100%
 | 22 | 3/3 | — | — |
 | 23 | 2/2 | — | — |
 | 24 | 2/2 | — | — |
+| 35 | 5/5 | — | — |
 
 ## Accumulated Context
 
@@ -122,6 +123,12 @@ Recent decisions affecting current work:
 - Locked the public proof surface to repeated-run layout/resource parity instead of expanding the support claim into broad byte-identity or fallback promises.
 - Maps Asset Registry images to XObjects
 - Uses PDF `cm` matrix for scaling into the measured geometry
+- Implemented exact HarfBuzz widths for accurate text measurement.
+- Adjusted layout and wrapping tests to account for the narrower and more precise HarfBuzz character widths.
+- Embedded true HarfBuzz measured runs using deterministic text run objects with no manual word-wrap patching inside Writer.
+- Passed Hex-encoded raw glyph IDs through the measurement and rendering pipelines to ensure 100% exact CID mappings.
+- Confirmed that existing logic seamlessly handled text run shapes from HarfBuzz by relying on the exact boundaries captured in MeasuredText runs.
+- Verified that Validate, Paginate, and Render are exactly aligned with the upstream layout and CID output metrics with no additional codebase drift.
 
 ### Pending Todos
 
