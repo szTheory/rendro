@@ -7,7 +7,8 @@ Mix.Task.run("app.start")
 lanes = [
   {"README doctest lane", ["test", "test/docs_contract/readme_doctest_test.exs"]},
   {"Integration contract lane", ["test", "test/docs_contract/integrations_contract_test.exs"]},
-  {"Integration semantic-claims lane", ["test", "test/docs_contract/integrations_claims_test.exs"]}
+  {"Integration semantic-claims lane", ["test", "test/docs_contract/integrations_claims_test.exs"]},
+  {"Forms semantic-claims lane", ["test", "test/docs_contract/forms_claims_test.exs"]}
 ]
 
 Mix.shell().info("Running explicit docs-contract lanes...")

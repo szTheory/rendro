@@ -21,6 +21,10 @@ defmodule Rendro.PDF.WriterTest do
       Rendro.form_field(
         Keyword.get(attrs, :name, "email"),
         Keyword.get(attrs, :value, "jon@example.com"),
+        type: Keyword.get(attrs, :type, :text),
+        checked: Keyword.get(attrs, :checked, false),
+        group: Keyword.get(attrs, :group),
+        export_value: Keyword.get(attrs, :export_value, "Yes"),
         x: Keyword.get(attrs, :x, 10),
         y: Keyword.get(attrs, :y, 20),
         width: Keyword.get(attrs, :width, 180),
@@ -39,6 +43,44 @@ defmodule Rendro.PDF.WriterTest do
     %Rendro.Document{
       pages: [page],
       metadata: %Rendro.Metadata{title: "Form Document"}
+    }
+  end
+
+  defp radio_group_document do
+    email =
+      Rendro.form_field("contact_email", "",
+        type: :radio,
+        group: "contact",
+        export_value: "email",
+        checked: true,
+        x: 10,
+        y: 20,
+        width: 20,
+        height: 20
+      )
+
+    phone =
+      Rendro.form_field("contact_phone", "",
+        type: :radio,
+        group: "contact",
+        export_value: "phone",
+        x: 40,
+        y: 20,
+        width: 20,
+        height: 20
+      )
+
+    %Rendro.Document{
+      pages: [
+        %Rendro.Page{
+          width: 612,
+          height: 792,
+          margin_left: 72,
+          margin_top: 72,
+          blocks: [email, phone]
+        }
+      ],
+      metadata: %Rendro.Metadata{title: "Radio Form Document"}
     }
   end
 
@@ -123,6 +165,48 @@ defmodule Rendro.PDF.WriterTest do
       assert pdf =~ "/V (Jon \\(Admin\\) \\\\\\\\ QA)"
       assert pdf =~ "/Helv 12 Tf"
       assert pdf =~ "(Jon \\(Admin\\) \\\\\\\\ QA) Tj"
+      refute pdf =~ "/NeedAppearances"
+    end
+
+    test "serializes checkbox widgets as deterministic button fields" do
+      {:ok, pdf} =
+        Writer.render(
+          form_field_document(
+            name: "terms",
+            type: :checkbox,
+            checked: true,
+            export_value: "Yes",
+            value: "",
+            width: 20,
+            height: 20
+          ),
+          deterministic: true
+        )
+
+      assert pdf =~ "/Subtype /Widget"
+      assert pdf =~ "/FT /Btn"
+      assert pdf =~ "/T (terms)"
+      assert pdf =~ "/V /Yes"
+      assert pdf =~ "/AS /Yes"
+      assert pdf =~ "/Off "
+      assert pdf =~ "/Rect [82 680 102 700]"
+      refute pdf =~ "/NeedAppearances"
+    end
+
+    test "serializes radio widgets as one grouped button field with child widgets" do
+      {:ok, pdf} = Writer.render(radio_group_document(), deterministic: true)
+
+      assert pdf =~ "/FT /Btn"
+      assert pdf =~ "/T (contact)"
+      assert pdf =~ "/Ff 49152"
+      assert pdf =~ "/Kids ["
+      assert pdf =~ "/V /email"
+      assert pdf =~ "/Parent "
+      assert pdf =~ "/AS /email"
+      assert pdf =~ "/Off "
+      assert pdf =~ "/Rect [82 680 102 700]"
+      assert pdf =~ "/Rect [112 680 132 700]"
+      assert length(Regex.scan(~r|/Subtype /Widget|, pdf)) == 2
       refute pdf =~ "/NeedAppearances"
     end
 

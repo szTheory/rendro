@@ -1,6 +1,8 @@
 defmodule Rendro.Adapters.PopplerTest do
   use ExUnit.Case, async: true
+
   alias Rendro.Adapters.Poppler
+  alias Rendro.Test.FormSupportFixture
 
   describe "validate/1" do
     test "returns missing executable when pdfinfo is not installed, or skips if installed" do
@@ -69,6 +71,24 @@ defmodule Rendro.Adapters.PopplerTest do
 
           assert {:ok, metadata} = Poppler.validate(path)
           assert is_map(metadata)
+
+          File.rm!(path)
+      end
+    end
+
+    test "validates the representative supported-forms fixture" do
+      case System.find_executable("pdfinfo") do
+        nil ->
+          IO.puts("Skipping forms fixture validation test: pdfinfo not installed")
+          :ok
+
+        _executable ->
+          path = Path.join(System.tmp_dir!(), "forms_#{System.unique_integer([:positive])}.pdf")
+          FormSupportFixture.write_fixture(path)
+
+          assert {:ok, metadata} = Poppler.validate(path)
+          assert is_map(metadata)
+          assert metadata["Pages"] == "1"
 
           File.rm!(path)
       end

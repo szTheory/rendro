@@ -45,6 +45,7 @@ defmodule Rendro.PDF.Writer do
 
     font_pdf_objects = build_font_objects(font_objects, opts)
     image_pdf_objects = build_image_objects(image_objects, opts)
+    form_field_pdf_objects = build_radio_group_objects(form_field_objects, opts)
 
     page_tree_kids =
       {:array, Enum.map(page_obj_nums, fn {page_num, _} -> {:ref, page_num, 0} end)}
@@ -89,6 +90,7 @@ defmodule Rendro.PDF.Writer do
       ([{catalog_num, catalog_obj}] ++
          font_pdf_objects ++
          image_pdf_objects ++
+         form_field_pdf_objects ++
          [{pages_num, pages_obj}] ++
          page_objects ++
          [{info_num, info_obj}])
@@ -164,16 +166,94 @@ defmodule Rendro.PDF.Writer do
   end
 
   defp allocate_form_field_nums(form_fields, start_num) do
-    Enum.map_reduce(form_fields, start_num, fn form_field, num ->
-      allocation = %{
-        block: form_field.block,
-        field: form_field.field,
-        page_index: form_field.page_index,
-        widget_obj_num: num,
-        appearance_obj_num: num + 1
-      }
+    {families, radio_groups} =
+      Enum.reduce(form_fields, {[], %{}}, fn form_field, {families, radio_groups} ->
+        case form_field.field.type do
+          :radio ->
+            key = {:radio_group, form_field.field.group}
 
-      {allocation, num + 2}
+            if Map.has_key?(radio_groups, key) do
+              {families, Map.update!(radio_groups, key, &(&1 ++ [form_field]))}
+            else
+              {[key | families], Map.put(radio_groups, key, [form_field])}
+            end
+
+          _ ->
+            {[{:standalone, form_field} | families], radio_groups}
+        end
+      end)
+
+    Enum.map_reduce(Enum.reverse(families), start_num, fn
+      {:standalone, form_field}, num ->
+        {allocate_standalone_form_field(form_field, num), next_form_field_num(form_field, num)}
+
+      radio_group_key, num ->
+        allocation = allocate_radio_group(Map.fetch!(radio_groups, radio_group_key), num)
+        {allocation, next_radio_group_num(allocation)}
+    end)
+  end
+
+  defp allocate_standalone_form_field(form_field, num) do
+    base = %{
+      type: form_field.field.type,
+      field_obj_num: num,
+      block: form_field.block,
+      field: form_field.field,
+      page_index: form_field.page_index,
+      widget_obj_num: num
+    }
+
+    case form_field.field.type do
+      :checkbox ->
+        Map.merge(base, %{
+          checked_appearance_obj_num: num + 1,
+          unchecked_appearance_obj_num: num + 2
+        })
+
+      _ ->
+        Map.put(base, :appearance_obj_num, num + 1)
+    end
+  end
+
+  defp next_form_field_num(%{field: %{type: :checkbox}}, num), do: num + 3
+  defp next_form_field_num(_form_field, num), do: num + 2
+
+  defp allocate_radio_group([first | _] = widgets, num) do
+    {widget_allocations, next_num} =
+      Enum.map_reduce(widgets, num + 1, fn widget, widget_num ->
+        allocation = %{
+          type: :radio,
+          block: widget.block,
+          field: widget.field,
+          page_index: widget.page_index,
+          parent_obj_num: num,
+          widget_obj_num: widget_num,
+          checked_appearance_obj_num: widget_num + 1,
+          unchecked_appearance_obj_num: widget_num + 2
+        }
+
+        {allocation, widget_num + 3}
+      end)
+
+    checked_widget = Enum.find(widget_allocations, & &1.field.checked)
+
+    %{
+      type: :radio_group,
+      group: first.field.group,
+      field_obj_num: num,
+      value: if(checked_widget, do: checked_widget.field.export_value, else: "Off"),
+      widgets: widget_allocations,
+      next_num: next_num
+    }
+  end
+
+  defp next_radio_group_num(%{next_num: next_num}), do: next_num
+
+  defp build_radio_group_objects(form_field_allocations, opts) do
+    form_field_allocations
+    |> Enum.filter(&(&1.type == :radio_group))
+    |> Enum.map(fn allocation ->
+      {allocation.field_obj_num, build_radio_group_field_object(allocation, opts)}
     end)
   end
 
@@ -297,12 +377,7 @@ defmodule Rendro.PDF.Writer do
       content_obj = Object.indirect_object(content_num, 0, Object.serialize(content_stream, opts))
 
       {annot_refs, form_objects} =
-        build_form_field_objects(
-          page,
-          page_num,
-          Enum.filter(form_field_allocations, &(&1.page_index == page_index)),
-          opts
-        )
+        build_form_field_objects(page, page_num, form_field_allocations, page_index, opts)
 
       resources_dict =
         []
@@ -679,41 +754,108 @@ defmodule Rendro.PDF.Writer do
     "IM_#{String.upcase(to_string(logical_name))}"
   end
 
-  defp build_form_field_objects(_page, _page_num, [], _opts), do: {[], []}
+  defp build_form_field_objects(page, page_num, form_field_allocations, page_index, opts) do
+    page_allocations = page_form_field_allocations(form_field_allocations, page_index)
 
-  defp build_form_field_objects(page, page_num, form_field_allocations, opts) do
-    Enum.map_reduce(form_field_allocations, [], fn allocation, acc ->
-      rect = form_field_rect(page, allocation.block)
+    case page_allocations do
+      [] ->
+        {[], []}
 
-      widget_obj =
-        build_widget_annotation_object(
-          allocation.widget_obj_num,
-          page_num,
-          allocation.appearance_obj_num,
-          rect,
-          allocation.field
-        )
+      _ ->
+        Enum.map_reduce(page_allocations, [], fn allocation, acc ->
+          rect = form_field_rect(page, allocation.block)
 
-      appearance_obj =
-        build_form_field_appearance_object(
-          allocation.appearance_obj_num,
-          rect_width(rect),
-          rect_height(rect),
-          allocation.field,
-          opts
-        )
+          {widget_obj, appearance_objects} =
+            build_widget_objects(allocation, page_num, rect, opts)
 
-      widget_ref = {:ref, allocation.widget_obj_num, 0}
+          widget_ref = {:ref, allocation.widget_obj_num, 0}
 
-      {
-        widget_ref,
-        acc ++
-          [
-            {allocation.widget_obj_num, widget_obj},
-            {allocation.appearance_obj_num, appearance_obj}
-          ]
-      }
+          {
+            widget_ref,
+            acc ++ [{allocation.widget_obj_num, widget_obj} | appearance_objects]
+          }
+        end)
+    end
+  end
+
+  defp page_form_field_allocations(form_field_allocations, page_index) do
+    Enum.flat_map(form_field_allocations, fn
+      %{type: :radio_group, widgets: widgets} ->
+        Enum.filter(widgets, &(&1.page_index == page_index))
+
+      %{page_index: ^page_index} = allocation ->
+        [allocation]
+
+      _ ->
+        []
     end)
+  end
+
+  defp build_widget_objects(%{type: :text} = allocation, page_num, rect, opts) do
+    widget_obj =
+      build_widget_annotation_object(
+        allocation.widget_obj_num,
+        page_num,
+        allocation.appearance_obj_num,
+        rect,
+        allocation.field
+      )
+
+    appearance_obj =
+      build_form_field_appearance_object(
+        allocation.appearance_obj_num,
+        rect_width(rect),
+        rect_height(rect),
+        allocation.field,
+        opts
+      )
+
+    {widget_obj, [{allocation.appearance_obj_num, appearance_obj}]}
+  end
+
+  defp build_widget_objects(%{type: :checkbox} = allocation, page_num, rect, opts) do
+    widget_obj =
+      build_checkbox_widget_annotation_object(
+        allocation.widget_obj_num,
+        page_num,
+        allocation.checked_appearance_obj_num,
+        allocation.unchecked_appearance_obj_num,
+        rect,
+        allocation.field
+      )
+
+    appearance_objects =
+      build_checkbox_appearance_objects(
+        allocation,
+        rect_width(rect),
+        rect_height(rect),
+        opts
+      )
+
+    {widget_obj, appearance_objects}
+  end
+
+  defp build_widget_objects(%{type: :radio} = allocation, page_num, rect, opts) do
+    widget_obj =
+      build_radio_widget_annotation_object(
+        allocation.widget_obj_num,
+        page_num,
+        allocation.parent_obj_num,
+        allocation.checked_appearance_obj_num,
+        allocation.unchecked_appearance_obj_num,
+        rect,
+        allocation.field
+      )
+
+    appearance_objects =
+      build_radio_appearance_objects(
+        allocation,
+        rect_width(rect),
+        rect_height(rect),
+        opts
+      )
+
+    {widget_obj, appearance_objects}
   end
 
   defp build_widget_annotation_object(widget_obj_num, page_num, appearance_obj_num, rect, field) do
@@ -743,6 +885,101 @@ defmodule Rendro.PDF.Writer do
     Object.indirect_object(widget_obj_num, 0, {:raw, widget_dict}, [])
   end
 
+  defp build_checkbox_widget_annotation_object(
+         widget_obj_num,
+         page_num,
+         checked_appearance_obj_num,
+         unchecked_appearance_obj_num,
+         rect,
+         field
+       ) do
+    rect_serialized = IO.iodata_to_binary(Object.serialize({:array, rect}, []))
+    checked_state = button_state_name(field.export_value)
+    current_state = if(field.checked, do: checked_state, else: "Off")
+
+    widget_dict = [
+      "<<\n",
+      "/Type /Annot\n",
+      "/Subtype /Widget\n",
+      "/FT /Btn\n",
+      "/Rect ",
+      rect_serialized,
+      "\n/T ",
+      pdf_literal_string(field.name),
+      "\n/V ",
+      Object.serialize({:name, current_state}, []),
+      "\n/AS ",
+      Object.serialize({:name, current_state}, []),
+      "\n/AP <<\n/N <<\n",
+      Object.serialize({:name, checked_state}, []),
+      " ",
+      Integer.to_string(checked_appearance_obj_num),
+      " 0 R\n",
+      "/Off ",
+      Integer.to_string(unchecked_appearance_obj_num),
+      " 0 R\n>>\n>>\n/P ",
+      Integer.to_string(page_num),
+      " 0 R\n>>"
+    ]
+
+    Object.indirect_object(widget_obj_num, 0, {:raw, widget_dict}, [])
+  end
+
+  defp build_radio_widget_annotation_object(
+         widget_obj_num,
+         page_num,
+         parent_obj_num,
+         checked_appearance_obj_num,
+         unchecked_appearance_obj_num,
+         rect,
+         field
+       ) do
+    rect_serialized = IO.iodata_to_binary(Object.serialize({:array, rect}, []))
+    checked_state = button_state_name(field.export_value)
+    current_state = if(field.checked, do: checked_state, else: "Off")
+
+    widget_dict = [
+      "<<\n",
+      "/Type /Annot\n",
+      "/Subtype /Widget\n",
+      "/Rect ",
+      rect_serialized,
+      "\n/Parent ",
+      Integer.to_string(parent_obj_num),
+      " 0 R\n/AS ",
+      Object.serialize({:name, current_state}, []),
+      "\n/AP <<\n/N <<\n",
+      Object.serialize({:name, checked_state}, []),
+      " ",
+      Integer.to_string(checked_appearance_obj_num),
+      " 0 R\n",
+      "/Off ",
+      Integer.to_string(unchecked_appearance_obj_num),
+      " 0 R\n>>\n>>\n/P ",
+      Integer.to_string(page_num),
+      " 0 R\n>>"
+    ]
+
+    Object.indirect_object(widget_obj_num, 0, {:raw, widget_dict}, [])
+  end
+
+  defp build_radio_group_field_object(allocation, opts) do
+    kids =
+      {:array, Enum.map(allocation.widgets, fn widget -> {:ref, widget.widget_obj_num, 0} end)}
+
+    field_dict =
+      {:dict,
+       [
+         {"FT", {:name, "Btn"}},
+         {"T", {:string, allocation.group}},
+         {"Ff", 49_152},
+         {"Kids", kids},
+         {"V", {:name, button_state_name(allocation.value)}}
+       ]}
+
+    Object.indirect_object(allocation.field_obj_num, 0, Object.serialize(field_dict, opts))
+  end
+
   defp build_form_field_appearance_object(obj_num, width, height, field, opts) do
     stream =
       {:stream,
@@ -752,6 +989,60 @@ defmodule Rendro.PDF.Writer do
          {"BBox", {:array, [0, 0, width, height]}},
          {"Resources", {:dict, [{"Font", {:dict, [{"Helv", helvetica_font_dict()}]}}]}}
        ], build_form_field_appearance_stream(width, height, field)}
+
+    Object.indirect_object(obj_num, 0, Object.serialize(stream, opts))
+  end
+
+  defp build_checkbox_appearance_objects(allocation, width, height, opts) do
+    [
+      {allocation.checked_appearance_obj_num,
+       build_button_appearance_object(
+         allocation.checked_appearance_obj_num,
+         width,
+         height,
+         build_checkbox_appearance_stream(width, height, true),
+         opts
+       )},
+      {allocation.unchecked_appearance_obj_num,
+       build_button_appearance_object(
+         allocation.unchecked_appearance_obj_num,
+         width,
+         height,
+         build_checkbox_appearance_stream(width, height, false),
+         opts
+       )}
+    ]
+  end
+
+  defp build_radio_appearance_objects(allocation, width, height, opts) do
+    [
+      {allocation.checked_appearance_obj_num,
+       build_button_appearance_object(
+         allocation.checked_appearance_obj_num,
+         width,
+         height,
+         build_radio_appearance_stream(width, height, true),
+         opts
+       )},
+      {allocation.unchecked_appearance_obj_num,
+       build_button_appearance_object(
+         allocation.unchecked_appearance_obj_num,
+         width,
+         height,
+         build_radio_appearance_stream(width, height, false),
+         opts
+       )}
+    ]
+  end
+
+  defp build_button_appearance_object(obj_num, width, height, stream_data, opts) do
+    stream =
+      {:stream,
+       [
+         {"Type", {:name, "XObject"}},
+         {"Subtype", {:name, "Form"}},
+         {"BBox", {:array, [0, 0, width, height]}}
+       ], stream_data}
 
     Object.indirect_object(obj_num, 0, Object.serialize(stream, opts))
   end
@@ -789,6 +1080,146 @@ defmodule Rendro.PDF.Writer do
       "ET\nQ"
     ]
     |> IO.iodata_to_binary()
+  end
+
+  defp build_checkbox_appearance_stream(width, height, checked?) do
+    mark =
+      if checked? do
+        inset = 4.0
+
+        [
+          "1.5 w\n",
+          format_num(inset),
+          " ",
+          format_num(inset),
+          " m\n",
+          format_num(width - inset),
+          " ",
+          format_num(height - inset),
+          " l\nS\n",
+          format_num(inset),
+          " ",
+          format_num(height - inset),
+          " m\n",
+          format_num(width - inset),
+          " ",
+          format_num(inset),
+          " l\nS\n"
+        ]
+      else
+        []
+      end
+
+    [
+      "q\n",
+      "1 1 1 rg\n",
+      "0 0 ",
+      format_num(width),
+      " ",
+      format_num(height),
+      " re\nf\n",
+      "0 0 0 RG\n",
+      "1 w\n",
+      "0.5 0.5 ",
+      format_num(width - 1.0),
+      " ",
+      format_num(height - 1.0),
+      " re\nS\n",
+      mark,
+      "Q"
+    ]
+    |> IO.iodata_to_binary()
+  end
+
+  defp build_radio_appearance_stream(width, height, checked?) do
+    outer = circle_path(width, height, 1.5)
+
+    inner =
+      if checked? do
+        circle_path(width, height, min(width, height) * 0.27)
+      else
+        []
+      end
+
+    [
+      "q\n",
+      "1 1 1 rg\n",
+      outer,
+      "f\n",
+      "0 0 0 RG\n",
+      "1 w\n",
+      outer,
+      "S\n",
+      if(checked?, do: ["0 g\n", inner, "f\n"], else: []),
+      "Q"
+    ]
+    |> IO.iodata_to_binary()
+  end
+
+  defp circle_path(width, height, inset) do
+    radius = max(min(width, height) / 2.0 - inset, 1.0)
+    center_x = width / 2.0
+    center_y = height / 2.0
+    control = radius * 0.5522847498
+    left = center_x - radius
+    right = center_x + radius
+    top = center_y + radius
+    bottom = center_y - radius
+
+    [
+      format_num(center_x),
+      " ",
+      format_num(top),
+      " m\n",
+      format_num(center_x + control),
+      " ",
+      format_num(top),
+      " ",
+      format_num(right),
+      " ",
+      format_num(center_y + control),
+      " ",
+      format_num(right),
+      " ",
+      format_num(center_y),
+      " c\n",
+      format_num(right),
+      " ",
+      format_num(center_y - control),
+      " ",
+      format_num(center_x + control),
+      " ",
+      format_num(bottom),
+      " ",
+      format_num(center_x),
+      " ",
+      format_num(bottom),
+      " c\n",
+      format_num(center_x - control),
+      " ",
+      format_num(bottom),
+      " ",
+      format_num(left),
+      " ",
+      format_num(center_y - control),
+      " ",
+      format_num(left),
+      " ",
+      format_num(center_y),
+      " c\n",
+      format_num(left),
+      " ",
+      format_num(center_y + control),
+      " ",
+      format_num(center_x - control),
+      " ",
+      format_num(top),
+      " ",
+      format_num(center_x),
+      " ",
+      format_num(top),
+      " c\n"
+    ]
   end
 
   defp form_field_rect(page, block) do
@@ -897,6 +1328,9 @@ defmodule Rendro.PDF.Writer do
 
   defp pdf_literal_string(str), do: ["(", escape_pdf_string(str), ")"]
 
+  defp button_state_name("Off"), do: "Off"
+  defp button_state_name(value), do: encode_pdf_name(value)
+
   defp helvetica_font_dict do
     {:dict,
      [
@@ -910,9 +1344,7 @@ defmodule Rendro.PDF.Writer do
     do: [{"Type", {:name, "Catalog"}}, {"Pages", {:ref, pages_num, 0}}]
 
   defp maybe_add_acro_form_entry(pages_num, form_field_allocations) do
-    field_refs =
-      {:array,
-       Enum.map(form_field_allocations, fn %{widget_obj_num: obj_num} -> {:ref, obj_num, 0} end)}
+    field_refs = {:array, Enum.map(form_field_allocations, &{:ref, &1.field_obj_num, 0})}
 
     acro_form =
       {:dict,
@@ -1020,5 +1452,19 @@ defmodule Rendro.PDF.Writer do
     |> String.replace("\\", "\\\\")
     |> String.replace("(", "\\(")
     |> String.replace(")", "\\)")
+  end
+
+  defp encode_pdf_name(name) do
+    name
+    |> to_string()
+    |> String.to_charlist()
+    |> Enum.map(fn char ->
+      if char in ?A..?Z or char in ?a..?z or char in ?0..?9 or char in [?-, ?_, ?.] do
+        <<char>>
+      else
+        "#" <> String.upcase(Integer.to_string(char, 16) |> String.pad_leading(2, "0"))
+      end
+    end)
+    |> IO.iodata_to_binary()
   end
 end

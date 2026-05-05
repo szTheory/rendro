@@ -22,3 +22,13 @@ When an API is deprecated:
 1. It will be marked with Elixir's `@deprecated` attribute.
 2. It will continue to function without breaking for at least one minor release in the `0.x.x` era, or one major release in the `1.x.x` era.
 3. The documentation will clearly point to the recommended replacement.
+
+## Interactive Forms Support Boundary
+
+Rendro supports authored AcroForm text fields, checkboxes, and radio groups.
+
+Structural validation through `pdfinfo`/Poppler proves PDF structure only. It does not prove interactive viewer behavior.
+
+Apple Preview is supported for this phase based on the recorded Phase 47 viewer checklist. Adobe Acrobat Reader remains `unverified` until the same checklist records passing open, visible default state, edit/toggle, and save behavior.
+
+Other viewers are not part of Rendro's supported contract unless `priv/support_matrix.json` later records proof-backed support for them.

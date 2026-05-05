@@ -7,13 +7,50 @@
       ]
     }
   },
-  "surfaces": {
-    "validated": [
-      "structural_integrity"
-    ],
-    "experimental": []
+  "forms": {
+    "widgets": {
+      "text": "supported",
+      "checkbox": "supported",
+      "radio": "supported",
+      "signature": "unsupported"
+    },
+    "behaviors": {
+      "prefilled_values": "supported",
+      "authored_appearance": "supported",
+      "hierarchical_field_names": "unsupported",
+      "need_appearances": "unsupported",
+      "xfa": "unsupported",
+      "external_pdf_filling": "unsupported"
+    },
+    "viewers": {
+      "adobe_acrobat_reader": {
+        "status": "unverified",
+        "proof": [
+          "open",
+          "default_state_visible",
+          "edit_or_toggle",
+          "save"
+        ]
+      },
+      "apple_preview": {
+        "status": "supported",
+        "proof": [
+          "open",
+          "default_state_visible",
+          "edit_or_toggle",
+          "save"
+        ]
+      },
+      "chrome_pdfium": {
+        "status": "unverified"
+      },
+      "pdfjs": {
+        "status": "unverified"
+      }
+    }
   },
   "unsupported": [
-    "full_pdf_compliance"
+    "full_pdf_compliance",
+    "digital_signatures"
   ]
 }

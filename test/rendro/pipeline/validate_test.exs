@@ -2,7 +2,7 @@ defmodule Rendro.Pipeline.ValidateTest do
   use ExUnit.Case, async: true
 
   alias Rendro.Pipeline.Validate
-  alias Rendro.{Document, Page, Block, Text}
+  alias Rendro.{Block, Document, FormField, Page, Text}
 
   defp sample_document do
     doc = Document.new()
@@ -37,6 +37,47 @@ defmodule Rendro.Pipeline.ValidateTest do
 
       assert :invalid_block_bounds in errors
       assert {:missing_required_key, :content} in errors
+    end
+
+    test "aggregates form semantic failures alongside other validation errors" do
+      doc =
+        %Document{
+          pages: [
+            %Page{
+              width: 500,
+              height: 500,
+              blocks: [
+                %Block{content: %FormField{name: "contact"}},
+                %Block{
+                  content: %FormField{
+                    name: "contact_email",
+                    type: :radio,
+                    group: "contact",
+                    export_value: "email"
+                  }
+                },
+                %Block{
+                  content: %FormField{
+                    name: "contact_phone",
+                    type: :radio,
+                    group: "contact",
+                    export_value: "email"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+
+      assert {:error,
+              %Rendro.Error{
+                stage: :validate,
+                reason: :structural_corruption,
+                details: %{errors: errors}
+              }} = Validate.run(doc)
+
+      assert {:duplicate_form_field_name, "contact"} in errors
+      assert {:duplicate_radio_export_value, "contact", "email"} in errors
     end
 
     test "stress test: traverses a deeply nested AST with acceptable performance" do

@@ -97,10 +97,16 @@ defmodule Rendro.Pipeline.Measure do
 
   defp measure_block(
          _doc,
-         %Rendro.Block{content: %Rendro.FormField{}} = block,
+         %Rendro.Block{content: %Rendro.FormField{} = field} = block,
          _container_width
        ) do
-    {:ok, %{block | width: block.width || 150.0, height: block.height || 20.0}}
+    {default_width, default_height} =
+      case field.type do
+        type when type in [:checkbox, :radio] -> {20.0, 20.0}
+        _ -> {150.0, 20.0}
+      end
+
+    {:ok, %{block | width: block.width || default_width, height: block.height || default_height}}
   end
 
   defp measure_block(

@@ -189,7 +189,9 @@ defmodule Rendro do
 
   @spec form_field(String.t(), String.t(), keyword()) :: Block.t()
   def form_field(name, value \\ "", attrs \\ []) do
-    {field_attrs, block_attrs} = Keyword.split(attrs, [:font, :size])
+    {field_attrs, block_attrs} =
+      Keyword.split(attrs, [:font, :size, :type, :checked, :group, :export_value])
+
     field = struct!(FormField, Keyword.merge(field_attrs, name: name, value: value))
     struct!(Block, Keyword.put(block_attrs, :content, field))
   end

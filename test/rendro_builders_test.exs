@@ -1,7 +1,19 @@
 defmodule RendroBuildersTest do
   use ExUnit.Case, async: true
 
-  alias Rendro.{Block, Document, FormField, Metadata, Page, PageTemplate, Region, Section, Table, Text}
+  alias Rendro.{
+    Block,
+    Document,
+    FormField,
+    Metadata,
+    Page,
+    PageTemplate,
+    Region,
+    Section,
+    Table,
+    Text
+  }
+
   alias Rendro.FontRegistry.EmbeddedFontFamilyError
   alias Rendro.Pipeline.Measure
 
@@ -39,6 +51,30 @@ defmodule RendroBuildersTest do
       assert field.value == "jon@example.com"
       assert field.font == "Helvetica"
       assert field.size == 12
+    end
+
+    test "form_field/3 accepts checkbox and radio widget attributes" do
+      checkbox =
+        Rendro.form_field("terms", "", type: :checkbox, checked: true, export_value: "On", x: 5)
+
+      radio =
+        Rendro.form_field(
+          "contact_method",
+          "",
+          type: :radio,
+          group: "contact",
+          export_value: "email"
+        )
+
+      assert %Block{content: %FormField{} = checkbox_field, x: 5} = checkbox
+      assert checkbox_field.type == :checkbox
+      assert checkbox_field.checked
+      assert checkbox_field.export_value == "On"
+
+      assert %Block{content: %FormField{} = radio_field} = radio
+      assert radio_field.type == :radio
+      assert radio_field.group == "contact"
+      assert radio_field.export_value == "email"
     end
 
     test "block/2 builds a Block with content" do
@@ -256,6 +292,33 @@ defmodule RendroBuildersTest do
 
       assert block.width == 240.0
       assert block.height == 32.0
+    end
+
+    test "uses square fallback dimensions for checkbox and radio widgets" do
+      doc =
+        %Document{
+          pages: [
+            %Page{
+              blocks: [
+                Rendro.form_field("agree", "", type: :checkbox),
+                Rendro.form_field("contact", "",
+                  type: :radio,
+                  group: "contact",
+                  export_value: "email"
+                )
+              ]
+            }
+          ],
+          metadata: %Metadata{}
+        }
+
+      assert {:ok, measured} = Measure.run(doc)
+      [checkbox, radio] = hd(measured.pages).blocks
+
+      assert checkbox.width == 20.0
+      assert checkbox.height == 20.0
+      assert radio.width == 20.0
+      assert radio.height == 20.0
     end
   end
 
