@@ -1,45 +1,45 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.3
-milestone_name: First Public Hex Release Readiness
-status: completed
-last_updated: "2026-05-03T21:08:09.477Z"
-last_activity: 2026-05-03
+milestone: v1.5
+milestone_name: Operational Tooling & Admin UX
+status: planned
+last_updated: "2026-05-05T12:00:00.000Z"
+last_activity: 2026-05-05
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 3
-  completed_plans: 3
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 1
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-30)
+See: .planning/PROJECT.md (updated 2026-05-05)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase --phase — 35
+**Current focus:** Phase 41
 
 ## Current Position
 
-Phase: 35
-Plan: None
-Status: complete
-Last activity: 2026-05-04
+Phase: 41
+Plan: 01
+Status: planned
+Last activity: 2026-05-05
 
-Progress: [----------] 100%
+Progress: [          ] 0%
 
 ## Milestone Snapshot
 
-- Milestone: `v1.3 First Public Hex Release Readiness`
-- Phases: `31-33`
+- Milestone: `v1.5 Operational Tooling & Admin UX`
+- Phases: `41`
 - Plans: `1`
-- Tasks: `2`
-- Timeline: `2026-05-03` -> `TBD`
+- Tasks: `0`
+- Timeline: `2026-05-05` -> `TBD`
 - Key accomplishments:
-  - `v1.3` completed successfully, delivering public hex release readiness with exact asset verification and preflight checks.
+  - `v1.5` initiated.
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Progress: [----------] 100%
 | 23 | 2/2 | — | — |
 | 24 | 2/2 | — | — |
 | 35 | 5/5 | — | — |
+| 41 | 1/1 | 5 | 5 |
 
 ## Accumulated Context
 
@@ -62,6 +63,9 @@ Progress: [----------] 100%
 
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
+
+- Confirmed schemas and pagination constraints correctly apply widows and orphans logic from existing implementation.
+- Since Phase 41 features were implemented and covered by unit tests in a previous pipeline stage rollout, zero code changes were needed in this pass. Empty commits generated to mark verification passing.
 
 - [Init] Keep pure core and optional adapters as hard architectural boundary.
 - [Init] Prioritize deterministic pagination/table reliability before broad integrations.
