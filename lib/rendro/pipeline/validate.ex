@@ -2,9 +2,9 @@ defmodule Rendro.Pipeline.Validate do
   @moduledoc false
 
   alias Rendro.Document
-  alias Rendro.Rules.{CheckReferences, CheckBounds, CheckRequiredKeys}
+  alias Rendro.Rules.{CheckBounds, CheckFormFields, CheckReferences, CheckRequiredKeys}
 
-  @default_rules [CheckReferences, CheckBounds, CheckRequiredKeys]
+  @default_rules [CheckReferences, CheckBounds, CheckRequiredKeys, CheckFormFields]
 
   @spec run(Rendro.Document.t()) :: {:ok, Rendro.Document.t()} | {:error, Rendro.Error.t()}
   def run(%Document{} = doc) do
