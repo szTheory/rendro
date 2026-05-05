@@ -59,23 +59,29 @@ defmodule Rendro.Pipeline.PaginateNestedTest do
       )
 
     assert {:ok, paginated} = paginate_flow(doc)
-    
+
     assert length(paginated.pages) >= 2
-    
+
     page1 = Enum.at(paginated.pages, 0)
     page2 = Enum.at(paginated.pages, 1)
 
     [block1] = page1.blocks
     assert %Rendro.Table{} = outer_table_part1 = block1.content
     assert length(outer_table_part1.rows) == 2
-    
-    [_, %Rendro.Row{cells: [%Rendro.Cell{content: %Rendro.Block{content: inner_table_part1}}]}] = outer_table_part1.rows
+
+    [_, %Rendro.Row{cells: [%Rendro.Cell{content: %Rendro.Block{content: inner_table_part1}}]}] =
+      outer_table_part1.rows
+
     assert length(inner_table_part1.rows) == 3
 
     [block2] = page2.blocks
     assert %Rendro.Table{} = outer_table_part2 = block2.content
-    
-    [%Rendro.Row{cells: [%Rendro.Cell{content: %Rendro.Block{content: inner_table_part2}}]} | _rest] = outer_table_part2.rows
+
+    [
+      %Rendro.Row{cells: [%Rendro.Cell{content: %Rendro.Block{content: inner_table_part2}}]}
+      | _rest
+    ] = outer_table_part2.rows
+
     assert length(inner_table_part2.rows) == 2
   end
 end

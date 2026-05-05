@@ -20,11 +20,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-05)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 41
+**Current focus:** Phase 43
 
 ## Current Position
 
-Phase: 42
+Phase: 43
 Plan: 01
 Status: planned
 Last activity: 2026-05-05

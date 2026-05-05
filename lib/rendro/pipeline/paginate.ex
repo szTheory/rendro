@@ -693,5 +693,4 @@ defmodule Rendro.Pipeline.Paginate do
        })}
     )
   end
-
 end

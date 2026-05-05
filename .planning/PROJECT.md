@@ -10,7 +10,11 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Shipped Version:** v1.3 First Public Hex Release Readiness (2026-05-03)
+**Shipped Version:** v1.4 Async Delivery and Artifact Operations (2026-05-05)
+
+Rendro now has a queued render lifecycle, artifact metadata, and persistence/sink contracts. It implements optional integrations (`Accrue`, `Mailglass`, `Oban.RenderWorker`) to power production async/delivery workflows and supports advanced table fragmentation DSL.
+
+**Previous Shipped Version:** v1.3 First Public Hex Release Readiness (2026-05-03)
 
 Rendro now has licensing, metadata, API stability policy, and release preflight mechanics in place.
 
@@ -22,20 +26,22 @@ Rendro now has a stable layout-authoring contract on top of the v1.0 engine core
 
 `v1.0` proved the core thesis: pure deterministic rendering, baseline layout/pagination, optional adapters, structured errors, and truthful CI/release verification contracts all ship with committed proof.
 
-## Current Milestone: v1.4 Async Delivery and Artifact Operations
+## Current Milestone: v1.5 Operational Tooling & Admin UX
 
-**Goal:** Add queued render lifecycle, artifact metadata, and persistence/sink contracts.
+**Goal:** Provide high-trust operational governance and operator tooling for managing document generation at scale.
 
 **Target features:**
-- Deterministic font registration, resolution, measurement, and embedding for built-in and custom fonts.
-- Explicit fallback chains plus typed missing-glyph and unsupported-script diagnostics.
-- First-class image/logo asset registration and bounded rendering without remote fetching in core.
-- Branded examples and verification proof that lock the public support surface before Hex release work begins.
+- Feature-flag hooks for template version rollouts and graceful degradation.
+- Controlled fallback behaviors and runtime renderer toggles for expensive features.
+- Cookbooks for secure admin/operator workflows.
+- MFA and step-up auth patterns for template management, approvals, and overrides.
+- Applied examples and integrations for Stripe-adjacent customer documents.
 
 ## Requirements
 
 ### Validated
 
+- [x] Rendro v1.4 delivered Async Delivery and Artifact Operations, including a queued render lifecycle, artifact metadata, and persistence/sink contracts. Validated at milestone close in `v1.4-MILESTONE-AUDIT.md`.
 - [x] Rendro v1.2 delivered deterministic typography, assets, and honest Unicode boundaries. Validated at milestone close in `v1.2-REQUIREMENTS.md`.
 - [x] Rendro v1.3 delivered first public hex release readiness. Validated at milestone close in `v1.3-REQUIREMENTS.md`.
 
@@ -46,8 +52,9 @@ Rendro now has a stable layout-authoring contract on top of the v1.0 engine core
 
 ### Active
 
-- [ ] Add queued render lifecycle and artifact metadata.
-- [ ] Implement persistence/sink contracts.
+- [ ] Provide high-trust operational governance and operator tooling.
+- [ ] Implement feature-flag hooks for template version rollouts.
+- [ ] Add cookbooks for secure admin/operator workflows.
 
 ### Out of Scope
 

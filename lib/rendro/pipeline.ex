@@ -217,9 +217,8 @@ defmodule Rendro.Pipeline do
          {:ok, doc} <- span(:paginate, base_meta, fn -> Paginate.run(doc) end, doc),
          :ok <- report_page_count(owner, progress_ref, doc),
          :ok <- validate_policy(:pages, doc, policies, base_meta),
-         {:ok, pdf_binary} <- span(:render, base_meta, fn -> Render.run(doc) end, doc),
-         {:ok, pdf_binary} <-
-           span(:validate, base_meta, fn -> Validate.run(pdf_binary, doc) end, doc) do
+         {:ok, doc} <- span(:validate, base_meta, fn -> Validate.run(doc) end, doc),
+         {:ok, pdf_binary} <- span(:render, base_meta, fn -> Render.run(doc) end, doc) do
       {:ok, {pdf_binary, doc}}
     end
   end

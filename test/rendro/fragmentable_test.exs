@@ -54,7 +54,8 @@ defmodule Rendro.FragmentableTest do
     assert length(tb.rows) == 2
     assert tb.row_heights == [40, 40]
 
-    assert rb.header_height == 20 # repeat_header is true, but table split returns it with original table structure. Wait, split_table puts header_height: 20 on both? Yes, if repeat_header is true.
+    # repeat_header is true, but table split returns it with original table structure. Wait, split_table puts header_height: 20 on both? Yes, if repeat_header is true.
+    assert rb.header_height == 20
     assert length(rb.rows) == 1
     assert rb.row_heights == [40]
   end

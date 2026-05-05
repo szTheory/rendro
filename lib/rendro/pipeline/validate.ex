@@ -1,73 +1,64 @@
 defmodule Rendro.Pipeline.Validate do
   @moduledoc false
 
-  @pdf_header "%PDF-"
-  @pdf_trailer "%%EOF"
+  alias Rendro.Document
+  alias Rendro.Rules.{CheckReferences, CheckBounds, CheckRequiredKeys}
 
-  @spec run(binary(), Rendro.Document.t()) :: {:ok, binary()} | {:error, atom()}
-  def run(pdf_binary, %Rendro.Document{} = doc) when is_binary(pdf_binary) do
-    with :ok <- check_structural(pdf_binary),
-         :ok <- check_page_count(pdf_binary, doc),
-         :ok <- check_max_bytes(pdf_binary, doc) do
-      {:ok, pdf_binary}
+  @default_rules [CheckReferences, CheckBounds, CheckRequiredKeys]
+
+  @spec run(Rendro.Document.t()) :: {:ok, Rendro.Document.t()} | {:error, Rendro.Error.t()}
+  def run(%Document{} = doc) do
+    rules = Application.get_env(:rendro, :validation_rules, @default_rules)
+
+    case walk(doc, doc, rules) do
+      [] ->
+        {:ok, doc}
+
+      errors ->
+        {:error,
+         Rendro.Error.from_stage(:validate, :structural_corruption, %{details: %{errors: errors}})}
     end
   end
 
-  defp check_structural(pdf_binary) do
-    cond do
-      not String.starts_with?(pdf_binary, @pdf_header) ->
-        {:error, :structural_corruption}
+  defp walk(node, doc, rules) do
+    node_errors =
+      Enum.flat_map(rules, fn rule ->
+        case rule.check(node, doc) do
+          :ok -> []
+          {:error, reason} -> [reason]
+          {:errors, reasons} -> reasons
+        end
+      end)
 
-      not String.contains?(pdf_binary, @pdf_trailer) ->
-        {:error, :structural_corruption}
-
-      true ->
-        :ok
-    end
+    child_errors = walk_children(node, doc, rules)
+    node_errors ++ child_errors
   end
 
-  defp check_page_count(pdf_binary, %Rendro.Document{pages: pages}) do
-    expected = length(pages)
-    actual = parse_page_count(pdf_binary)
-    if actual == expected, do: :ok, else: {:error, :page_count_mismatch}
+  defp walk_children(%Document{pages: pages}, doc, rules) do
+    Enum.flat_map(pages, &walk(&1, doc, rules))
   end
 
-  defp parse_page_count(pdf_binary) do
-    # PDF dict entries can appear in any order; in deterministic mode the writer
-    # sorts keys alphabetically (so /Count precedes /Type). Try both orderings
-    # within the same enclosing object before declaring a mismatch.
-    cond do
-      result = match_count_after_pages(pdf_binary) -> result
-      result = match_count_before_pages(pdf_binary) -> result
-      true -> 0
-    end
+  defp walk_children(%Rendro.Page{blocks: blocks}, doc, rules) do
+    Enum.flat_map(blocks, &walk(&1, doc, rules))
   end
 
-  defp match_count_after_pages(pdf_binary) do
-    case Regex.run(~r{/Type\s+/Pages.*?/Count\s+(\d+)}s, pdf_binary, capture: :all_but_first) do
-      [n] -> String.to_integer(n)
-      _ -> nil
-    end
+  defp walk_children(%Rendro.Block{content: content}, doc, rules) do
+    walk(content, doc, rules)
   end
 
-  defp match_count_before_pages(pdf_binary) do
-    # Capture /Count N followed (within the same object dict, so before the next ">>")
-    # by /Type /Pages. The negated set [^>] keeps the lazy traversal bounded to one
-    # dict body — adversarial input with no ">>" cannot expand the match window.
-    case Regex.run(~r{/Count\s+(\d+)[^>]*?/Type\s+/Pages}s, pdf_binary, capture: :all_but_first) do
-      [n] -> String.to_integer(n)
-      _ -> nil
-    end
+  defp walk_children(%Rendro.Table{header: header, rows: rows}, doc, rules) do
+    header_errors = if header, do: walk(header, doc, rules), else: []
+    row_errors = Enum.flat_map(rows, &walk(&1, doc, rules))
+    header_errors ++ row_errors
   end
 
-  defp check_max_bytes(pdf_binary, %Rendro.Document{options: options}) do
-    policies = Map.get(options, :policies, [])
-    max_bytes = Keyword.get(policies, :max_bytes)
-
-    cond do
-      is_nil(max_bytes) -> :ok
-      byte_size(pdf_binary) > max_bytes -> {:error, :max_bytes_exceeded}
-      true -> :ok
-    end
+  defp walk_children(%Rendro.Row{cells: cells}, doc, rules) do
+    Enum.flat_map(cells, &walk(&1, doc, rules))
   end
+
+  defp walk_children(%Rendro.Cell{content: content}, doc, rules) do
+    walk(content, doc, rules)
+  end
+
+  defp walk_children(_, _doc, _rules), do: []
 end
