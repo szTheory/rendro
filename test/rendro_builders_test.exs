@@ -1,8 +1,9 @@
 defmodule RendroBuildersTest do
   use ExUnit.Case, async: true
 
-  alias Rendro.{Block, Document, Metadata, Page, PageTemplate, Region, Section, Table, Text}
+  alias Rendro.{Block, Document, FormField, Metadata, Page, PageTemplate, Region, Section, Table, Text}
   alias Rendro.FontRegistry.EmbeddedFontFamilyError
+  alias Rendro.Pipeline.Measure
 
   describe "builder functions" do
     test "text/2 builds a Text struct" do
@@ -28,6 +29,16 @@ defmodule RendroBuildersTest do
                    fn ->
                      Rendro.text("bold", font: "Courier")
                    end
+    end
+
+    test "form_field/3 builds a Block containing a FormField" do
+      block = Rendro.form_field("email", "jon@example.com", x: 10, y: 20)
+
+      assert %Block{content: %FormField{} = field, x: 10, y: 20} = block
+      assert field.name == "email"
+      assert field.value == "jon@example.com"
+      assert field.font == "Helvetica"
+      assert field.size == 12
     end
 
     test "block/2 builds a Block with content" do
@@ -215,6 +226,36 @@ defmodule RendroBuildersTest do
       assert_raise KeyError, fn ->
         Rendro.document(bogus: true)
       end
+    end
+  end
+
+  describe "form field measurement" do
+    test "applies fallback dimensions when none are authored" do
+      doc =
+        %Document{
+          pages: [%Page{blocks: [Rendro.form_field("email")]}],
+          metadata: %Metadata{}
+        }
+
+      assert {:ok, measured} = Measure.run(doc)
+      [block] = hd(measured.pages).blocks
+
+      assert block.width == 150.0
+      assert block.height == 20.0
+    end
+
+    test "preserves explicit dimensions when measuring form fields" do
+      doc =
+        %Document{
+          pages: [%Page{blocks: [Rendro.form_field("email", "", width: 240.0, height: 32.0)]}],
+          metadata: %Metadata{}
+        }
+
+      assert {:ok, measured} = Measure.run(doc)
+      [block] = hd(measured.pages).blocks
+
+      assert block.width == 240.0
+      assert block.height == 32.0
     end
   end
 
