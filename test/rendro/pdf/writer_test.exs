@@ -95,6 +95,37 @@ defmodule Rendro.PDF.WriterTest do
       refute pdf =~ "/AcroForm"
     end
 
+    test "serializes widget annotations and normal appearance streams for text fields" do
+      {:ok, pdf} =
+        Writer.render(
+          form_field_document(
+            name: "contact (primary) \\\\ field",
+            value: "Jon (Admin) \\\\ QA",
+            x: 10,
+            y: 20,
+            width: 180,
+            height: 24,
+            page_width: 612,
+            page_height: 792,
+            margin_left: 72,
+            margin_top: 72
+          ),
+          deterministic: true
+        )
+
+      assert pdf =~ "/Annots ["
+      assert pdf =~ "/Subtype /Widget"
+      assert pdf =~ "/FT /Tx"
+      assert pdf =~ "/AP <<"
+      assert pdf =~ "/N "
+      assert pdf =~ "/Rect [82 676 262 700]"
+      assert pdf =~ "/T (contact \\(primary\\) \\\\\\\\ field)"
+      assert pdf =~ "/V (Jon \\(Admin\\) \\\\\\\\ QA)"
+      assert pdf =~ "/Helv 12 Tf"
+      assert pdf =~ "(Jon \\(Admin\\) \\\\\\\\ QA) Tj"
+      refute pdf =~ "/NeedAppearances"
+    end
+
     test "contains Pages object" do
       {:ok, pdf} = Writer.render(sample_document())
       assert pdf =~ "/Type /Pages"
