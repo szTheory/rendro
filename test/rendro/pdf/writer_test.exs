@@ -16,6 +16,32 @@ defmodule Rendro.PDF.WriterTest do
     }
   end
 
+  defp form_field_document(attrs \\ []) do
+    field =
+      Rendro.form_field(
+        Keyword.get(attrs, :name, "email"),
+        Keyword.get(attrs, :value, "jon@example.com"),
+        x: Keyword.get(attrs, :x, 10),
+        y: Keyword.get(attrs, :y, 20),
+        width: Keyword.get(attrs, :width, 180),
+        height: Keyword.get(attrs, :height, 24)
+      )
+
+    page =
+      %Rendro.Page{
+        width: Keyword.get(attrs, :page_width, 612),
+        height: Keyword.get(attrs, :page_height, 792),
+        margin_left: Keyword.get(attrs, :margin_left, 72),
+        margin_top: Keyword.get(attrs, :margin_top, 72),
+        blocks: [field]
+      }
+
+    %Rendro.Document{
+      pages: [page],
+      metadata: %Rendro.Metadata{title: "Form Document"}
+    }
+  end
+
   describe "render/1" do
     test "returns {:ok, binary} tuple" do
       doc = sample_document()
@@ -49,6 +75,24 @@ defmodule Rendro.PDF.WriterTest do
     test "contains Catalog object" do
       {:ok, pdf} = Writer.render(sample_document())
       assert pdf =~ "/Type /Catalog"
+    end
+
+    test "injects an AcroForm dictionary into the catalog when form fields exist" do
+      {:ok, pdf} = Writer.render(form_field_document())
+
+      assert pdf =~ "/AcroForm <<"
+      assert pdf =~ "/Fields ["
+      assert pdf =~ "/DA (/Helv 12 Tf 0 g)"
+      assert pdf =~ "/DR <<"
+      assert pdf =~ "/Font <<"
+      assert pdf =~ "/Helv <<"
+      assert pdf =~ "/BaseFont /Helvetica"
+    end
+
+    test "does not inject AcroForm into the catalog when no form fields exist" do
+      {:ok, pdf} = Writer.render(sample_document())
+
+      refute pdf =~ "/AcroForm"
     end
 
     test "contains Pages object" do
