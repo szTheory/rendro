@@ -7,6 +7,7 @@ defmodule Rendro do
     Artifact,
     Block,
     Document,
+    FormField,
     Metadata,
     Page,
     PageTemplate,
@@ -184,6 +185,13 @@ defmodule Rendro do
     |> normalize_text_attrs()
     |> Keyword.put(:content, content)
     |> then(&struct!(Text, &1))
+  end
+
+  @spec form_field(String.t(), String.t(), keyword()) :: Block.t()
+  def form_field(name, value \\ "", attrs \\ []) do
+    {field_attrs, block_attrs} = Keyword.split(attrs, [:font, :size])
+    field = struct!(FormField, Keyword.merge(field_attrs, name: name, value: value))
+    struct!(Block, Keyword.put(block_attrs, :content, field))
   end
 
   @spec metadata(keyword()) :: Metadata.t()

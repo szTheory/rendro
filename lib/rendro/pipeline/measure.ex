@@ -96,6 +96,14 @@ defmodule Rendro.Pipeline.Measure do
   end
 
   defp measure_block(
+         _doc,
+         %Rendro.Block{content: %Rendro.FormField{}} = block,
+         _container_width
+       ) do
+    {:ok, %{block | width: block.width || 150.0, height: block.height || 20.0}}
+  end
+
+  defp measure_block(
          doc,
          %Rendro.Block{content: %Rendro.Image{} = image} = block,
          _container_width
