@@ -86,14 +86,13 @@ defmodule Rendro.PDF.Writer do
     total_objects = next_num
 
     numbered_objects =
-      [{catalog_num, catalog_obj}] ++
-        font_pdf_objects ++
-        image_pdf_objects ++
-        [{pages_num, pages_obj}] ++
-        Enum.zip(
-          Enum.flat_map(page_obj_nums, fn {p, c} -> [p, c] end),
-          page_objects
-        ) ++ [{info_num, info_obj}]
+      ([{catalog_num, catalog_obj}] ++
+         font_pdf_objects ++
+         image_pdf_objects ++
+         [{pages_num, pages_obj}] ++
+         page_objects ++
+         [{info_num, info_obj}])
+      |> Enum.sort_by(&elem(&1, 0))
 
     {numbered_objects, catalog_num, info_num, total_objects}
   end
@@ -282,19 +281,28 @@ defmodule Rendro.PDF.Writer do
          pages_num,
          font_allocations,
          image_allocations,
-         _form_field_allocations,
+         form_field_allocations,
          font_map,
          image_map,
          opts
        ) do
     Enum.zip(pages, page_obj_nums)
-    |> Enum.flat_map(fn {page, {page_num, content_num}} ->
+    |> Enum.with_index()
+    |> Enum.flat_map(fn {{page, {page_num, content_num}}, page_index} ->
       content_data = build_content_stream(doc, page, font_map, image_map)
 
       content_stream =
         {:stream, [], content_data}
 
       content_obj = Object.indirect_object(content_num, 0, Object.serialize(content_stream, opts))
+
+      {annot_refs, form_objects} =
+        build_form_field_objects(
+          page,
+          page_num,
+          Enum.filter(form_field_allocations, &(&1.page_index == page_index)),
+          opts
+        )
 
       resources_dict =
         []
@@ -307,23 +315,35 @@ defmodule Rendro.PDF.Writer do
         {:array, [0, 0, page.width, page.height]}
 
       page_dict =
-        {:dict,
-         [
-           {"Type", {:name, "Page"}},
-           {"Parent", {:ref, pages_num, 0}},
-           {"MediaBox", media_box},
-           {"Contents", {:ref, content_num, 0}},
-           {"Resources", resources}
-         ]}
+        {:dict, maybe_add_annots_entry(pages_num, content_num, media_box, resources, annot_refs)}
 
       page_obj = Object.indirect_object(page_num, 0, Object.serialize(page_dict, opts))
 
-      [page_obj, content_obj]
+      [{page_num, page_obj}, {content_num, content_obj}] ++ form_objects
     end)
   end
 
   defp maybe_add_resource(entries, _key, []), do: entries
   defp maybe_add_resource(entries, key, value), do: [{key, {:dict, value}} | entries]
+
+  defp maybe_add_annots_entry(pages_num, content_num, media_box, resources, []) do
+    base_page_entries(pages_num, content_num, media_box, resources)
+  end
+
+  defp maybe_add_annots_entry(pages_num, content_num, media_box, resources, annot_refs) do
+    base_page_entries(pages_num, content_num, media_box, resources) ++
+      [{"Annots", {:array, annot_refs}}]
+  end
+
+  defp base_page_entries(pages_num, content_num, media_box, resources) do
+    [
+      {"Type", {:name, "Page"}},
+      {"Parent", {:ref, pages_num, 0}},
+      {"MediaBox", media_box},
+      {"Contents", {:ref, content_num, 0}},
+      {"Resources", resources}
+    ]
+  end
 
   defp build_content_stream(doc, %Rendro.Page{} = page, font_map, image_map) do
     Enum.map_join(page.blocks, "\n", fn block ->
@@ -659,6 +679,127 @@ defmodule Rendro.PDF.Writer do
     "IM_#{String.upcase(to_string(logical_name))}"
   end
 
+  defp build_form_field_objects(_page, _page_num, [], _opts), do: {[], []}
+
+  defp build_form_field_objects(page, page_num, form_field_allocations, opts) do
+    Enum.map_reduce(form_field_allocations, [], fn allocation, acc ->
+      rect = form_field_rect(page, allocation.block)
+
+      widget_obj =
+        build_widget_annotation_object(
+          allocation.widget_obj_num,
+          page_num,
+          allocation.appearance_obj_num,
+          rect,
+          allocation.field
+        )
+
+      appearance_obj =
+        build_form_field_appearance_object(
+          allocation.appearance_obj_num,
+          rect_width(rect),
+          rect_height(rect),
+          allocation.field,
+          opts
+        )
+
+      widget_ref = {:ref, allocation.widget_obj_num, 0}
+
+      {
+        widget_ref,
+        acc ++
+          [
+            {allocation.widget_obj_num, widget_obj},
+            {allocation.appearance_obj_num, appearance_obj}
+          ]
+      }
+    end)
+  end
+
+  defp build_widget_annotation_object(widget_obj_num, page_num, appearance_obj_num, rect, field) do
+    rect_serialized = IO.iodata_to_binary(Object.serialize({:array, rect}, []))
+    default_appearance = pdf_literal_string("/Helv #{format_num(field.size)} Tf 0 g")
+
+    widget_dict = [
+      "<<\n",
+      "/Type /Annot\n",
+      "/Subtype /Widget\n",
+      "/FT /Tx\n",
+      "/Rect ",
+      rect_serialized,
+      "\n/T ",
+      pdf_literal_string(field.name),
+      "\n/V ",
+      pdf_literal_string(field.value),
+      "\n/DA ",
+      default_appearance,
+      "\n/AP <<\n/N ",
+      Integer.to_string(appearance_obj_num),
+      " 0 R\n>>\n/P ",
+      Integer.to_string(page_num),
+      " 0 R\n>>"
+    ]
+
+    Object.indirect_object(widget_obj_num, 0, {:raw, widget_dict}, [])
+  end
+
+  defp build_form_field_appearance_object(obj_num, width, height, field, opts) do
+    stream =
+      {:stream,
+       [
+         {"Type", {:name, "XObject"}},
+         {"Subtype", {:name, "Form"}},
+         {"BBox", {:array, [0, 0, width, height]}},
+         {"Resources", {:dict, [{"Font", {:dict, [{"Helv", helvetica_font_dict()}]}}]}}
+       ], build_form_field_appearance_stream(width, height, field)}
+
+    Object.indirect_object(obj_num, 0, Object.serialize(stream, opts))
+  end
+
+  defp build_form_field_appearance_stream(width, height, field) do
+    inset_x = 2
+    baseline_y = max(2.0, (height - field.size) / 2.0)
+
+    [
+      "q\n",
+      "1 1 1 rg\n",
+      "0 0 ",
+      format_num(width),
+      " ",
+      format_num(height),
+      " re\nf\n",
+      "0 0 0 RG\n",
+      "0 0 ",
+      format_num(width),
+      " ",
+      format_num(height),
+      " re\nS\n",
+      "BT\n",
+      "/Helv ",
+      format_num(field.size),
+      " Tf\n",
+      "0 g\n",
+      format_num(inset_x),
+      " ",
+      format_num(baseline_y),
+      " Td\n",
+      "(",
+      escape_pdf_string(field.value),
+      ") Tj\n",
+      "ET\nQ"
+    ]
+    |> IO.iodata_to_binary()
+  end
+
+  defp form_field_rect(page, block) do
+    x = block.x + page.margin_left
+    y = page.height - (block.y + block.height) - page.margin_top
+    [x, y, x + block.width, y + block.height]
+  end
+
+  defp rect_width([left, _bottom, right, _top]), do: right - left
+  defp rect_height([_left, bottom, _right, top]), do: top - bottom
+
   defp collect_form_fields(%Rendro.Document{pages: pages}) do
     pages
     |> Enum.with_index()
@@ -677,7 +818,10 @@ defmodule Rendro.PDF.Writer do
     header_fields ++ row_fields
   end
 
-  defp collect_block_form_fields(%Rendro.Block{content: %Rendro.FormField{} = field} = block, page_index) do
+  defp collect_block_form_fields(
+         %Rendro.Block{content: %Rendro.FormField{} = field} = block,
+         page_index
+       ) do
     [%{block: block, field: field, page_index: page_index}]
   end
 
@@ -751,12 +895,24 @@ defmodule Rendro.PDF.Writer do
   defp maybe_add(entries, _key, nil), do: entries
   defp maybe_add(entries, key, value), do: [{key, {:string, value}} | entries]
 
+  defp pdf_literal_string(str), do: ["(", escape_pdf_string(str), ")"]
+
+  defp helvetica_font_dict do
+    {:dict,
+     [
+       {"Type", {:name, "Font"}},
+       {"Subtype", {:name, "Type1"}},
+       {"BaseFont", {:name, "Helvetica"}}
+     ]}
+  end
+
   defp maybe_add_acro_form_entry(pages_num, []),
     do: [{"Type", {:name, "Catalog"}}, {"Pages", {:ref, pages_num, 0}}]
 
   defp maybe_add_acro_form_entry(pages_num, form_field_allocations) do
     field_refs =
-      {:array, Enum.map(form_field_allocations, fn %{widget_obj_num: obj_num} -> {:ref, obj_num, 0} end)}
+      {:array,
+       Enum.map(form_field_allocations, fn %{widget_obj_num: obj_num} -> {:ref, obj_num, 0} end)}
 
     acro_form =
       {:dict,
@@ -769,13 +925,7 @@ defmodule Rendro.PDF.Writer do
              {"Font",
               {:dict,
                [
-                 {"Helv",
-                  {:dict,
-                   [
-                     {"Type", {:name, "Font"}},
-                     {"Subtype", {:name, "Type1"}},
-                     {"BaseFont", {:name, "Helvetica"}}
-                   ]}}
+                 {"Helv", helvetica_font_dict()}
                ]}}
            ]}}
        ]}
