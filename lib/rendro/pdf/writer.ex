@@ -29,12 +29,14 @@ defmodule Rendro.PDF.Writer do
          images,
          opts
        ) do
+    form_fields = collect_form_fields(doc)
     obj_num = 1
     catalog_num = obj_num
 
     {page_obj_nums, next_num} = allocate_page_nums(pages, obj_num + 1)
     {font_objects, next_num} = allocate_font_nums(fonts, next_num)
     {image_objects, next_num} = allocate_image_nums(images, next_num)
+    {form_field_objects, next_num} = allocate_form_field_nums(form_fields, next_num)
     pages_num = next_num
     next_num = next_num + 1
 
@@ -58,11 +60,7 @@ defmodule Rendro.PDF.Writer do
     pages_obj = Object.indirect_object(pages_num, 0, Object.serialize(pages_dict, opts))
 
     catalog_dict =
-      {:dict,
-       [
-         {"Type", {:name, "Catalog"}},
-         {"Pages", {:ref, pages_num, 0}}
-       ]}
+      {:dict, maybe_add_acro_form_entry(pages_num, form_field_objects)}
 
     catalog_obj = Object.indirect_object(catalog_num, 0, Object.serialize(catalog_dict, opts))
 
@@ -76,6 +74,7 @@ defmodule Rendro.PDF.Writer do
         pages_num,
         font_objects,
         image_objects,
+        form_field_objects,
         font_map,
         image_map,
         opts
@@ -162,6 +161,20 @@ defmodule Rendro.PDF.Writer do
       else
         {%{image: image, obj_num: num}, num + 1}
       end
+    end)
+  end
+
+  defp allocate_form_field_nums(form_fields, start_num) do
+    Enum.map_reduce(form_fields, start_num, fn form_field, num ->
+      allocation = %{
+        block: form_field.block,
+        field: form_field.field,
+        page_index: form_field.page_index,
+        widget_obj_num: num,
+        appearance_obj_num: num + 1
+      }
+
+      {allocation, num + 2}
     end)
   end
 
@@ -269,6 +282,7 @@ defmodule Rendro.PDF.Writer do
          pages_num,
          font_allocations,
          image_allocations,
+         _form_field_allocations,
          font_map,
          image_map,
          opts
@@ -645,6 +659,38 @@ defmodule Rendro.PDF.Writer do
     "IM_#{String.upcase(to_string(logical_name))}"
   end
 
+  defp collect_form_fields(%Rendro.Document{pages: pages}) do
+    pages
+    |> Enum.with_index()
+    |> Enum.flat_map(fn {%Rendro.Page{blocks: blocks}, page_index} ->
+      collect_page_form_fields(blocks, page_index)
+    end)
+  end
+
+  defp collect_page_form_fields(blocks, page_index) do
+    Enum.flat_map(blocks, &collect_block_form_fields(&1, page_index))
+  end
+
+  defp collect_block_form_fields(%Rendro.Block{content: %Rendro.Table{} = table}, page_index) do
+    header_fields = collect_row_form_fields(table.header, page_index)
+    row_fields = Enum.flat_map(table.rows, &collect_row_form_fields(&1, page_index))
+    header_fields ++ row_fields
+  end
+
+  defp collect_block_form_fields(%Rendro.Block{content: %Rendro.FormField{} = field} = block, page_index) do
+    [%{block: block, field: field, page_index: page_index}]
+  end
+
+  defp collect_block_form_fields(%Rendro.Block{}, _page_index), do: []
+
+  defp collect_row_form_fields(nil, _page_index), do: []
+
+  defp collect_row_form_fields(%Rendro.Row{cells: cells}, page_index) do
+    Enum.flat_map(cells, fn %Rendro.Cell{content: block} ->
+      collect_block_form_fields(block, page_index)
+    end)
+  end
+
   defp resolve_text_font(
          %Rendro.Document{font_registry: registry, default_font: default_font},
          %Rendro.Text{font: font}
@@ -704,6 +750,42 @@ defmodule Rendro.PDF.Writer do
 
   defp maybe_add(entries, _key, nil), do: entries
   defp maybe_add(entries, key, value), do: [{key, {:string, value}} | entries]
+
+  defp maybe_add_acro_form_entry(pages_num, []),
+    do: [{"Type", {:name, "Catalog"}}, {"Pages", {:ref, pages_num, 0}}]
+
+  defp maybe_add_acro_form_entry(pages_num, form_field_allocations) do
+    field_refs =
+      {:array, Enum.map(form_field_allocations, fn %{widget_obj_num: obj_num} -> {:ref, obj_num, 0} end)}
+
+    acro_form =
+      {:dict,
+       [
+         {"Fields", field_refs},
+         {"DA", {:string, "/Helv 12 Tf 0 g"}},
+         {"DR",
+          {:dict,
+           [
+             {"Font",
+              {:dict,
+               [
+                 {"Helv",
+                  {:dict,
+                   [
+                     {"Type", {:name, "Font"}},
+                     {"Subtype", {:name, "Type1"}},
+                     {"BaseFont", {:name, "Helvetica"}}
+                   ]}}
+               ]}}
+           ]}}
+       ]}
+
+    [
+      {"Type", {:name, "Catalog"}},
+      {"Pages", {:ref, pages_num, 0}},
+      {"AcroForm", acro_form}
+    ]
+  end
 
   defp assemble(
          {numbered_objects, catalog_num, info_num, _total_objects},
