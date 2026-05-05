@@ -1,8 +1,8 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.5
-milestone_name: Operational Tooling & Admin UX
-status: planned
+milestone_name: Validation and Trust Surfaces
+status: completed
 last_updated: "2026-05-05T12:00:00.000Z"
 last_activity: 2026-05-05
 progress:
@@ -33,7 +33,7 @@ Progress: [          ] 0%
 
 ## Milestone Snapshot
 
-- Milestone: `v1.5 Operational Tooling & Admin UX`
+- Milestone: `v1.5 Validation and Trust Surfaces`
 - Phases: `42`
 - Plans: `1`
 - Tasks: `0`

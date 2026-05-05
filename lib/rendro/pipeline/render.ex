@@ -16,9 +16,6 @@ defmodule Rendro.Pipeline.Render do
         else
           {:ok, pdf_binary}
         end
-
-      error ->
-        error
     end
   end
 end

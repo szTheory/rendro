@@ -35,17 +35,16 @@ This roadmap defines the overarching epic arcs required to make Rendro the featu
 * **Core Hardening:**
   * Extensive edge-case testing for nested flows and fixed-position hybrid documents.
 
-## Milestone 3: Operational Tooling & Admin UX (Soon)
-**Focus:** Provide high-trust operational governance and operator tooling for managing document generation at scale, leveraging sibling `szTheory` libraries.
+## Milestone 3: Validation and Trust Surfaces (Soon)
+**Focus:** Strengthen the evidence and support surface around produced PDFs without pretending to offer universal compliance.
 
-* **Rulestead (Rollouts & Governance):**
-  * Feature-flag hooks for template version rollouts and graceful degradation.
-  * Controlled fallback behaviors and runtime renderer toggles for expensive features.
-* **Sigra (Admin Security):**
-  * Cookbooks for secure admin/operator workflows.
-  * MFA and step-up auth patterns for template management, approvals, and overrides.
-* **Lattice_Stripe (Billing Narratives):**
-  * Applied examples and integrations for Stripe-adjacent customer documents (receipts, statements, dispute packs).
+* **Optional Validator Adapters:**
+  * Advisory verification lanes.
+  * Validation reports that attach cleanly to artifact metadata.
+* **Structural Validation:**
+  * Stronger structural validation and preflight reporting.
+* **Support Matrix:**
+  * Machine-readable support matrix for validated, experimental, and unsupported surfaces.
 
 ## Milestone 4: Strategic Adjacencies & Ecosystem Tooling (Track)
 **Focus:** Expand the footprint of Rendro into specialized domains and automated development workflows.

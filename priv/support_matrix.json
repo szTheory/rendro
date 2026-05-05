@@ -1,0 +1,19 @@
+{
+  "validators": {
+    "pdfinfo": {
+      "version": "22+",
+      "validates": [
+        "structural_integrity"
+      ]
+    }
+  },
+  "surfaces": {
+    "validated": [
+      "structural_integrity"
+    ],
+    "experimental": []
+  },
+  "unsupported": [
+    "full_pdf_compliance"
+  ]
+}

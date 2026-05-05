@@ -26,16 +26,15 @@ Rendro now has a stable layout-authoring contract on top of the v1.0 engine core
 
 `v1.0` proved the core thesis: pure deterministic rendering, baseline layout/pagination, optional adapters, structured errors, and truthful CI/release verification contracts all ship with committed proof.
 
-## Current Milestone: v1.5 Operational Tooling & Admin UX
+## Current Milestone: v1.5 Validation and Trust Surfaces
 
-**Goal:** Provide high-trust operational governance and operator tooling for managing document generation at scale.
+**Goal:** Strengthen the evidence and support surface around produced PDFs without pretending to offer universal compliance.
 
 **Target features:**
-- Feature-flag hooks for template version rollouts and graceful degradation.
-- Controlled fallback behaviors and runtime renderer toggles for expensive features.
-- Cookbooks for secure admin/operator workflows.
-- MFA and step-up auth patterns for template management, approvals, and overrides.
-- Applied examples and integrations for Stripe-adjacent customer documents.
+- Optional validator adapters and advisory verification lanes.
+- Stronger structural validation and preflight reporting.
+- Machine-readable support matrix for validated, experimental, and unsupported surfaces.
+- Validation reports that attach cleanly to artifact metadata and release docs.
 
 ## Requirements
 
@@ -52,9 +51,10 @@ Rendro now has a stable layout-authoring contract on top of the v1.0 engine core
 
 ### Active
 
-- [ ] Provide high-trust operational governance and operator tooling.
-- [ ] Implement feature-flag hooks for template version rollouts.
-- [ ] Add cookbooks for secure admin/operator workflows.
+- [ ] Strengthen the evidence and support surface around produced PDFs.
+- [ ] Implement optional validator adapters and advisory verification lanes.
+- [ ] Add stronger structural validation and preflight reporting.
+- [ ] Provide machine-readable support matrix.
 
 ### Out of Scope
 
