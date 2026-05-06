@@ -99,7 +99,8 @@ defmodule Rendro.Adapters.PopplerTest do
       Application.put_env(:rendro, :pdfinfo_executable_finder, fn "pdfinfo" -> "/tmp/pdfinfo" end)
 
       Application.put_env(:rendro, :pdfinfo_command_runner, fn "/tmp/pdfinfo", _args, _opts ->
-        {"Syntax Error: Couldn't find trailer dictionary\nSyntax Error: Couldn't read xref table", 1}
+        {"Syntax Error: Couldn't find trailer dictionary\nSyntax Error: Couldn't read xref table",
+         1}
       end)
 
       assert {:error, {:invalid_pdf, :structural_invalidity}} = Poppler.validate("corrupt.pdf")

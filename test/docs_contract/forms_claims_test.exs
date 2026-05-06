@@ -44,6 +44,8 @@ defmodule Rendro.DocsContract.FormsClaimsTest do
 
   test "the canonical docs verification script includes the forms claims lane" do
     script = File.read!("scripts/verify_docs.exs")
-    assert script =~ ~s|{"Forms semantic-claims lane", ["test", "test/docs_contract/forms_claims_test.exs"]}|
+
+    assert script =~
+             ~s|{"Forms semantic-claims lane", ["test", "test/docs_contract/forms_claims_test.exs"]}|
   end
 end

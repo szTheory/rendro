@@ -11,7 +11,14 @@ defmodule Rendro.Test.FormSupportFixture do
           margin_top: 72,
           blocks: [
             Rendro.form_field("email", "jon@example.test", x: 72, y: 96, width: 220, height: 24),
-            Rendro.form_field("terms", "", type: :checkbox, checked: true, x: 72, y: 136, width: 20, height: 20),
+            Rendro.form_field("terms", "",
+              type: :checkbox,
+              checked: true,
+              x: 72,
+              y: 136,
+              width: 20,
+              height: 20
+            ),
             Rendro.form_field("contact_email", "",
               type: :radio,
               group: "contact",

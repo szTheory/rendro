@@ -126,9 +126,16 @@ defmodule Rendro.DocsContract.EmbeddedArtifactClaimsTest do
              ~s|{"Embedded artifact semantic-claims lane", ["test", "test/docs_contract/embedded_artifact_claims_test.exs"]}|
 
     # Existing lanes must remain present.
-    assert script =~ ~s|{"README doctest lane", ["test", "test/docs_contract/readme_doctest_test.exs"]}|
-    assert script =~ ~s|{"Integration contract lane", ["test", "test/docs_contract/integrations_contract_test.exs"]}|
-    assert script =~ ~s|{"Integration semantic-claims lane", ["test", "test/docs_contract/integrations_claims_test.exs"]}|
-    assert script =~ ~s|{"Forms semantic-claims lane", ["test", "test/docs_contract/forms_claims_test.exs"]}|
+    assert script =~
+             ~s|{"README doctest lane", ["test", "test/docs_contract/readme_doctest_test.exs"]}|
+
+    assert script =~
+             ~s|{"Integration contract lane", ["test", "test/docs_contract/integrations_contract_test.exs"]}|
+
+    assert script =~
+             ~s|{"Integration semantic-claims lane", ["test", "test/docs_contract/integrations_claims_test.exs"]}|
+
+    assert script =~
+             ~s|{"Forms semantic-claims lane", ["test", "test/docs_contract/forms_claims_test.exs"]}|
   end
 end

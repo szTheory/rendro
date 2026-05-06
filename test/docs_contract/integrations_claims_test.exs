@@ -56,7 +56,10 @@ defmodule Rendro.DocsContract.IntegrationsClaimsTest do
     assert content =~ "does **not** support arbitrary job-arg pass-through"
     assert content =~ "does **not** accept password or protection fields in job args"
     assert content =~ "Persist only business identifiers in Oban args."
-    assert content =~ "Resolve protection secrets at execution time inside your application boundary."
+
+    assert content =~
+             "Resolve protection secrets at execution time inside your application boundary."
+
     assert content =~ "`render_to_artifact -> Protect.password -> store/deliver`"
     assert content =~ "release-tail contract for Phoenix and Mailglass users"
   end
@@ -120,7 +123,9 @@ defmodule Rendro.DocsContract.IntegrationsClaimsTest do
              "Protected delivery uses `Rendro.Adapters.Mailglass.attach_artifact/3` with an already-protected `%Rendro.Artifact{}`."
 
     assert guide =~ "Mailglass does not need to know the passwords"
-    assert source =~ "attach_pdf/3` is the render-and-attach convenience path for unprotected PDFs."
+
+    assert source =~
+             "attach_pdf/3` is the render-and-attach convenience path for unprotected PDFs."
 
     assert source =~
              "Protected delivery must pass an already-protected `%Rendro.Artifact{}` to `attach_artifact/3`."

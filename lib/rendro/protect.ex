@@ -154,8 +154,7 @@ defmodule Rendro.Protect do
             {:error, Error.from_stage(:protect, {:invalid_option, key, :empty}, %{})}
 
           String.contains?(value, ["\n", "\r", <<0>>]) ->
-            {:error,
-             Error.from_stage(:protect, {:invalid_option, key, :unsafe_characters}, %{})}
+            {:error, Error.from_stage(:protect, {:invalid_option, key, :unsafe_characters}, %{})}
 
           true ->
             {:ok, value}

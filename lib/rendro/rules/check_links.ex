@@ -14,7 +14,8 @@ defmodule Rendro.Rules.CheckLinks do
     validate_uri(uri)
   end
 
-  def check(%Link{target: {:page, page_number}}, %Document{} = doc) when is_integer(page_number) do
+  def check(%Link{target: {:page, page_number}}, %Document{} = doc)
+      when is_integer(page_number) do
     if page_number > 0 and page_number <= length(doc.pages) do
       :ok
     else
@@ -22,7 +23,9 @@ defmodule Rendro.Rules.CheckLinks do
     end
   end
 
-  def check(%Link{target: {:page, page_number}}, _doc), do: {:error, {:invalid_link_page, page_number}}
+  def check(%Link{target: {:page, page_number}}, _doc),
+    do: {:error, {:invalid_link_page, page_number}}
+
   def check(%Link{target: target}, _doc), do: {:error, {:invalid_link_target, target}}
   def check(_, _doc), do: :ok
 

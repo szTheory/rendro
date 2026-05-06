@@ -70,7 +70,8 @@ defmodule Rendro.Error do
     do: "Protection adapter #{inspect(adapter)} failed: qpdf exited with status #{exit_code}"
 
   defp why({:adapter_failure, adapter, {:command_failed, error_module}}),
-    do: "Protection adapter #{inspect(adapter)} failed: command runner crashed with #{inspect(error_module)}"
+    do:
+      "Protection adapter #{inspect(adapter)} failed: command runner crashed with #{inspect(error_module)}"
 
   defp why({:adapter_failure, adapter, reason}),
     do: "Protection adapter #{inspect(adapter)} failed: #{inspect(reason)}"

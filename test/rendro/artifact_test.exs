@@ -41,6 +41,7 @@ defmodule Rendro.ArtifactTest do
     assert wrapped.diagnostics == [%{type: :warning}]
     assert wrapped.metadata.page_count == 2
     assert wrapped.metadata.deterministic == false
+
     assert wrapped.metadata.protection == %{
              algorithm: :aes_256,
              advisory_permissions: [:print],

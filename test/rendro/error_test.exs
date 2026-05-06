@@ -97,7 +97,10 @@ defmodule Rendro.ErrorTest do
         )
 
       assert err.stage == :protect
-      assert err.why == "Protection adapter Rendro.Adapters.Qpdf failed: qpdf exited with status 2"
+
+      assert err.why ==
+               "Protection adapter Rendro.Adapters.Qpdf failed: qpdf exited with status 2"
+
       assert err.next =~ "adapter stderr/output"
     end
   end

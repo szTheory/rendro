@@ -19,7 +19,9 @@ defmodule Rendro.DocsContract.ProtectionClaimsTest do
     assert matrix =~ ~s|"boundaries"|
     assert matrix =~ ~s|"external_hook_only": "supported"|
     assert matrix =~ ~s|"persisted_async_job_args_passwords": "unsupported"|
-    assert matrix =~ ~s|"delivery_and_storage_seams_transport_artifacts_not_passwords": "supported"|
+
+    assert matrix =~
+             ~s|"delivery_and_storage_seams_transport_artifacts_not_passwords": "supported"|
 
     assert matrix =~
              ~r/"protection".*?"viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
@@ -46,9 +48,13 @@ defmodule Rendro.DocsContract.ProtectionClaimsTest do
     assert guide =~ "Rendro v1.10 supports only `:aes_256`"
     assert guide =~ "Advisory permissions are an honor-system PDF flag surface"
     assert guide =~ "Protection is not compliance, not tamper evidence, and not digital signing."
-    assert guide =~ "Delivery and storage seams should transport already-protected artifacts, not password material."
+
+    assert guide =~
+             "Delivery and storage seams should transport already-protected artifacts, not password material."
+
     assert guide =~
              "Phase 53 does not introduce a first-party protected worker or orchestration API."
+
     assert guide =~ "If validation succeeds only with `owner_password`"
     assert guide =~ "Apple Preview is `supported` for the `protection` surface"
     assert guide =~ "`save_and_reopen_readability`"
@@ -62,10 +68,15 @@ defmodule Rendro.DocsContract.ProtectionClaimsTest do
   test "integrations guide keeps protection secrets out of persisted job args and delivery seams" do
     guide = File.read!("guides/integrations.md")
 
-    assert guide =~ "The worker also does **not** accept password or protection fields in job args."
+    assert guide =~
+             "The worker also does **not** accept password or protection fields in job args."
+
     assert guide =~ "Protection secrets do not belong in persisted Oban args."
     assert guide =~ "Persist only business identifiers in Oban args."
-    assert guide =~ "Resolve protection secrets at execution time inside your application boundary."
+
+    assert guide =~
+             "Resolve protection secrets at execution time inside your application boundary."
+
     assert guide =~ "`render_to_artifact -> Protect.password -> store/deliver`"
     assert guide =~ "application-owned secret boundary before storage or delivery."
     assert guide =~ "`Rendro.Adapters.Mailglass.attach_artifact/3`"

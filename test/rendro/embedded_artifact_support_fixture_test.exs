@@ -56,7 +56,11 @@ defmodule Rendro.EmbeddedArtifactSupportFixtureTest do
     end
 
     test "writes the fixture to a stable path on disk" do
-      path = Path.join(System.tmp_dir!(), "embedded_artifact_fixture_#{System.unique_integer([:positive])}.pdf")
+      path =
+        Path.join(
+          System.tmp_dir!(),
+          "embedded_artifact_fixture_#{System.unique_integer([:positive])}.pdf"
+        )
 
       assert ^path = EmbeddedArtifactSupportFixture.write_fixture(path)
       assert File.exists?(path)

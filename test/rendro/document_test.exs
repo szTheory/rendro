@@ -1,7 +1,16 @@
 defmodule Rendro.DocumentTest do
   use ExUnit.Case, async: true
 
-  alias Rendro.{Document, EmbeddedFileRegistry, FontRegistry, Metadata, Page, PageTemplate, Section}
+  alias Rendro.{
+    Document,
+    EmbeddedFileRegistry,
+    FontRegistry,
+    Metadata,
+    Page,
+    PageTemplate,
+    Section
+  }
+
   alias Rendro.FontRegistry.EmbeddedFontFamilyError
 
   describe "struct construction" do

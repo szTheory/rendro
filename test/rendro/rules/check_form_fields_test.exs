@@ -139,7 +139,12 @@ defmodule Rendro.Rules.CheckFormFieldsTest do
     test "rejects duplicate radio export values in one group" do
       doc =
         form_document([
-          %FormField{name: "contact_email", type: :radio, group: "contact", export_value: "email"},
+          %FormField{
+            name: "contact_email",
+            type: :radio,
+            group: "contact",
+            export_value: "email"
+          },
           %FormField{name: "contact_phone", type: :radio, group: "contact", export_value: "email"}
         ])
 
@@ -167,8 +172,18 @@ defmodule Rendro.Rules.CheckFormFieldsTest do
         form_document([
           %FormField{name: "contact"},
           %FormField{name: "billing.email"},
-          %FormField{name: "contact_email", type: :radio, group: "contact", export_value: "email"},
-          %FormField{name: "contact_phone", type: :radio, group: "contact", export_value: "email"},
+          %FormField{
+            name: "contact_email",
+            type: :radio,
+            group: "contact",
+            export_value: "email"
+          },
+          %FormField{
+            name: "contact_phone",
+            type: :radio,
+            group: "contact",
+            export_value: "email"
+          },
           %FormField{
             name: "contact_sms",
             type: :radio,

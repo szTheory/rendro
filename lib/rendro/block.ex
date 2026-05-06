@@ -17,7 +17,8 @@ defmodule Rendro.Block do
   ]
 
   @type t :: %__MODULE__{
-          content: Rendro.Text.t() | Rendro.Table.t() | Rendro.FormField.t() | Rendro.Link.t() | term(),
+          content:
+            Rendro.Text.t() | Rendro.Table.t() | Rendro.FormField.t() | Rendro.Link.t() | term(),
           x: number(),
           y: number(),
           width: number() | nil,

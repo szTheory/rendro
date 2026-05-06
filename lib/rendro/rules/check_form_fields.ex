@@ -69,16 +69,19 @@ defmodule Rendro.Rules.CheckFormFields do
               not (is_binary(export_value) and byte_size(export_value) > 0),
        do: {:error, {:invalid_form_field_export_value, export_value}}
 
-  defp check_export_value_contract(%FormField{type: :checkbox, value: value}) when not is_binary(value),
-    do: {:error, {:invalid_form_field_value, value}}
+  defp check_export_value_contract(%FormField{type: :checkbox, value: value})
+       when not is_binary(value),
+       do: {:error, {:invalid_form_field_value, value}}
 
-  defp check_export_value_contract(%FormField{type: :radio, value: value}) when not is_binary(value),
-    do: {:error, {:invalid_form_field_value, value}}
+  defp check_export_value_contract(%FormField{type: :radio, value: value})
+       when not is_binary(value),
+       do: {:error, {:invalid_form_field_value, value}}
 
   defp check_export_value_contract(%FormField{}), do: :ok
 
   defp duplicate_form_field_names(%Document{} = doc) do
     fields = collect_form_fields(doc)
+
     group_names =
       fields
       |> Enum.filter(&(&1.type == :radio))
@@ -86,7 +89,10 @@ defmodule Rendro.Rules.CheckFormFields do
       |> Enum.filter(&valid_identity?/1)
       |> Enum.uniq()
 
-    (fields |> Enum.map(& &1.name) |> Enum.filter(&valid_identity?/1) |> Kernel.++(group_names))
+    fields
+    |> Enum.map(& &1.name)
+    |> Enum.filter(&valid_identity?/1)
+    |> Kernel.++(group_names)
     |> duplicate_strings()
     |> Enum.map(&{:duplicate_form_field_name, &1})
   end

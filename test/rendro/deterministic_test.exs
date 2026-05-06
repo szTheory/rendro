@@ -94,8 +94,10 @@ defmodule Rendro.DeterministicTest do
       {:ok, pdf2} = Rendro.render(doc, deterministic: true)
 
       assert pdf1 == pdf2
+
       assert annotation_offsets(pdf1, ["/URI (https://example.com/alpha)", "/Dest [4 0 R /Fit]"]) ==
                annotation_offsets(pdf2, ["/URI (https://example.com/alpha)", "/Dest [4 0 R /Fit]"])
+
       assert pdf1 =~ "(Alpha link) Tj"
       assert pdf1 =~ "(Beta table) Tj"
     end
@@ -262,7 +264,9 @@ defmodule Rendro.DeterministicTest do
       Rendro.block(beta_table, x: 10, y: 60, width: 120, height: 24)
       |> Rendro.link(page: 2)
 
-    target = %Rendro.Page{blocks: [%Rendro.Block{content: Rendro.text("Target page"), x: 0, y: 0}]}
+    target = %Rendro.Page{
+      blocks: [%Rendro.Block{content: Rendro.text("Target page"), x: 0, y: 0}]
+    }
 
     %Rendro.Document{
       pages: [

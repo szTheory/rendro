@@ -27,8 +27,8 @@ defmodule Rendro.PDF.Writer do
          %Rendro.Document{pages: pages, metadata: metadata} = doc,
          fonts,
          images,
-       opts
-      ) do
+         opts
+       ) do
     form_fields = collect_form_fields(doc)
     embedded_files = collect_embedded_files(doc)
     link_annotations = collect_link_annotations(doc)
@@ -40,7 +40,10 @@ defmodule Rendro.PDF.Writer do
     {image_objects, next_num} = allocate_image_nums(images, next_num)
     {form_field_objects, next_num} = allocate_form_field_nums(form_fields, next_num)
     {embedded_file_objects, next_num} = allocate_embedded_file_nums(embedded_files, next_num)
-    {link_annotation_objects, next_num} = allocate_link_annotation_nums(link_annotations, next_num)
+
+    {link_annotation_objects, next_num} =
+      allocate_link_annotation_nums(link_annotations, next_num)
+
     pages_num = next_num
     next_num = next_num + 1
 
@@ -292,7 +295,10 @@ defmodule Rendro.PDF.Writer do
          opts
        ) do
     params =
-      [{"Size", embedded_file.byte_size}, {"CheckSum", {:hex_string, :crypto.hash(:md5, embedded_file.bytes)}}]
+      [
+        {"Size", embedded_file.byte_size},
+        {"CheckSum", {:hex_string, :crypto.hash(:md5, embedded_file.bytes)}}
+      ]
       |> maybe_add_pdf_entry("CreationDate", maybe_format_pdf_date(embedded_file[:created_at]))
       |> maybe_add_pdf_entry("ModDate", maybe_format_pdf_date(embedded_file[:modified_at]))
 
@@ -872,7 +878,13 @@ defmodule Rendro.PDF.Writer do
     end
   end
 
-  defp build_link_annotation_objects(page, page_obj_nums, link_annotation_allocations, page_index, opts) do
+  defp build_link_annotation_objects(
+         page,
+         page_obj_nums,
+         link_annotation_allocations,
+         page_index,
+         opts
+       ) do
     page_allocations = page_link_annotation_allocations(link_annotation_allocations, page_index)
 
     case page_allocations do

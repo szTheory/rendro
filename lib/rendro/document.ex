@@ -220,7 +220,12 @@ defmodule Rendro.Document do
     %__MODULE__{
       doc
       | embedded_file_registry:
-          Rendro.EmbeddedFileRegistry.register(doc.embedded_file_registry, logical_name, source, metadata)
+          Rendro.EmbeddedFileRegistry.register(
+            doc.embedded_file_registry,
+            logical_name,
+            source,
+            metadata
+          )
     }
   end
 

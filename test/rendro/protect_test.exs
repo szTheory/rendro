@@ -56,6 +56,7 @@ defmodule Rendro.ProtectTest do
     assert protected.binary == "%PDF-sample::protected"
     assert protected.metadata.page_count == 1
     assert protected.metadata.deterministic == false
+
     assert protected.metadata.protection == %{
              algorithm: :aes_256,
              advisory_permissions: [:copy, :print],
@@ -265,6 +266,7 @@ defmodule Rendro.ProtectTest do
              )
 
     assert artifact.metadata.deterministic == false
+
     assert artifact.metadata.protection == %{
              algorithm: :aes_256,
              advisory_permissions: [],

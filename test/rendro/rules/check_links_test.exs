@@ -16,13 +16,26 @@ defmodule Rendro.Rules.CheckLinksTest do
       page_doc =
         %Document{
           pages: [
-            %Page{width: 500, height: 500, blocks: [link_block(%Link{content: %Text{content: "One"}, target: {:page, 2}})]},
+            %Page{
+              width: 500,
+              height: 500,
+              blocks: [link_block(%Link{content: %Text{content: "One"}, target: {:page, 2}})]
+            },
             %Page{width: 500, height: 500, blocks: []}
           ]
         }
 
-      assert :ok = CheckLinks.check(uri_doc.pages |> hd() |> Map.fetch!(:blocks) |> hd() |> Map.fetch!(:content), uri_doc)
-      assert :ok = CheckLinks.check(page_doc.pages |> hd() |> Map.fetch!(:blocks) |> hd() |> Map.fetch!(:content), page_doc)
+      assert :ok =
+               CheckLinks.check(
+                 uri_doc.pages |> hd() |> Map.fetch!(:blocks) |> hd() |> Map.fetch!(:content),
+                 uri_doc
+               )
+
+      assert :ok =
+               CheckLinks.check(
+                 page_doc.pages |> hd() |> Map.fetch!(:blocks) |> hd() |> Map.fetch!(:content),
+                 page_doc
+               )
     end
 
     test "rejects malformed relative hostless and unsupported-scheme URIs with typed tuples" do
@@ -48,13 +61,20 @@ defmodule Rendro.Rules.CheckLinksTest do
       doc =
         %Document{
           pages: [
-            %Page{width: 500, height: 500, blocks: [link_block(%Link{content: %Text{content: "Jump"}, target: {:page, 3}})]},
+            %Page{
+              width: 500,
+              height: 500,
+              blocks: [link_block(%Link{content: %Text{content: "Jump"}, target: {:page, 3}})]
+            },
             %Page{width: 500, height: 500, blocks: []}
           ]
         }
 
       assert {:error, {:invalid_link_page, 3}} =
-               CheckLinks.check(doc.pages |> hd() |> Map.fetch!(:blocks) |> hd() |> Map.fetch!(:content), doc)
+               CheckLinks.check(
+                 doc.pages |> hd() |> Map.fetch!(:blocks) |> hd() |> Map.fetch!(:content),
+                 doc
+               )
     end
 
     test "rejects links wrapping form fields" do
@@ -74,9 +94,15 @@ defmodule Rendro.Rules.CheckLinksTest do
               width: 500,
               height: 500,
               blocks: [
-                link_block(%Link{content: %Text{content: "Mail"}, target: {:uri, "mailto:jon@example.com"}}),
+                link_block(%Link{
+                  content: %Text{content: "Mail"},
+                  target: {:uri, "mailto:jon@example.com"}
+                }),
                 link_block(%Link{content: %Text{content: "Jump"}, target: {:page, 4}}),
-                link_block(%Link{content: %FormField{name: "email"}, target: {:uri, "https://example.com"}})
+                link_block(%Link{
+                  content: %FormField{name: "email"},
+                  target: {:uri, "https://example.com"}
+                })
               ]
             },
             %Page{width: 500, height: 500, blocks: []}

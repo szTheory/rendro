@@ -21,7 +21,8 @@ defmodule Rendro.Storage.Local do
               {:error, reason} -> {:error, reason}
             end
 
-          {:error, reason} -> {:error, reason}
+          {:error, reason} ->
+            {:error, reason}
         end
 
       :error ->
@@ -107,7 +108,10 @@ defmodule Rendro.Storage.Local do
   defp sanitize_protection(protection) when is_map(protection) do
     %{}
     |> maybe_put(:algorithm, Map.get(protection, :algorithm))
-    |> maybe_put(:advisory_permissions, sanitize_permissions(Map.get(protection, :advisory_permissions)))
+    |> maybe_put(
+      :advisory_permissions,
+      sanitize_permissions(Map.get(protection, :advisory_permissions))
+    )
     |> maybe_put(:has_open_password, Map.get(protection, :has_open_password))
     |> maybe_put(:has_owner_password, Map.get(protection, :has_owner_password))
   end

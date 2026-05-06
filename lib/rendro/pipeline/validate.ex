@@ -2,6 +2,7 @@ defmodule Rendro.Pipeline.Validate do
   @moduledoc false
 
   alias Rendro.Document
+
   alias Rendro.Rules.{
     CheckBounds,
     CheckEmbeddedFiles,

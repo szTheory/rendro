@@ -175,7 +175,8 @@ defmodule Rendro.PDF.WriterTest do
       measured =
         %MeasuredText{
           source: source,
-          lines: Enum.map(lines, fn text -> [%{text: text, font: Font.helvetica(), width: 60}] end),
+          lines:
+            Enum.map(lines, fn text -> [%{text: text, font: Font.helvetica(), width: 60}] end),
           line_height: source.line_height,
           width: 60,
           height: length(lines) * 18,
@@ -190,8 +191,20 @@ defmodule Rendro.PDF.WriterTest do
 
     %Rendro.Document{
       pages: [
-        %Rendro.Page{width: 612, height: 792, margin_left: 72, margin_top: 72, blocks: [fragment.(["alpha beta ", "gamma"], 20)]},
-        %Rendro.Page{width: 612, height: 792, margin_left: 72, margin_top: 72, blocks: [fragment.(["delta"], 20)]}
+        %Rendro.Page{
+          width: 612,
+          height: 792,
+          margin_left: 72,
+          margin_top: 72,
+          blocks: [fragment.(["alpha beta ", "gamma"], 20)]
+        },
+        %Rendro.Page{
+          width: 612,
+          height: 792,
+          margin_left: 72,
+          margin_top: 72,
+          blocks: [fragment.(["delta"], 20)]
+        }
       ],
       metadata: %Rendro.Metadata{title: "Linked Fragment Document"}
     }
@@ -286,7 +299,9 @@ defmodule Rendro.PDF.WriterTest do
       assert pdf =~ "/Size 8"
       assert pdf =~ "/CheckSum <E5EBD4C02CEFBE7955977C67ADA242B7>"
       assert pdf =~ "/CreationDate (D:20260505140000Z)"
-      refute pdf =~ "/Params <<\n/CheckSum <E5EBD4C02CEFBE7955977C67ADA242B7>\n/CreationDate (D:20260505140000Z)\n/ModDate (D:20000101000000Z)"
+
+      refute pdf =~
+               "/Params <<\n/CheckSum <E5EBD4C02CEFBE7955977C67ADA242B7>\n/CreationDate (D:20260505140000Z)\n/ModDate (D:20000101000000Z)"
     end
 
     test "does not widen page annotations into file attachment annotations" do
@@ -402,7 +417,9 @@ defmodule Rendro.PDF.WriterTest do
 
     test "emits one link annotation per paginated fragment" do
       {:ok, pdf} =
-        Writer.render(linked_fragment_document(uri: "https://example.com/docs"), deterministic: true)
+        Writer.render(linked_fragment_document(uri: "https://example.com/docs"),
+          deterministic: true
+        )
 
       assert length(Regex.scan(~r|/Subtype /Link|, pdf)) == 2
       assert length(Regex.scan(~r|/URI \(https://example.com/docs\)|, pdf)) == 2
@@ -411,7 +428,9 @@ defmodule Rendro.PDF.WriterTest do
 
     test "preserves visible linked table rendering while emitting a separate link annotation" do
       {:ok, pdf} =
-        Writer.render(linked_table_document(uri: "https://example.com/table"), deterministic: true)
+        Writer.render(linked_table_document(uri: "https://example.com/table"),
+          deterministic: true
+        )
 
       assert pdf =~ "/Subtype /Link"
       assert pdf =~ "/URI (https://example.com/table)"

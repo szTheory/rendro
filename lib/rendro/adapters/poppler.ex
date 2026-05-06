@@ -84,6 +84,7 @@ defmodule Rendro.Adapters.Poppler do
 
   defp classify_failure(output, exit_code, opts) do
     text = output |> to_string() |> String.trim() |> String.downcase()
+
     password_supplied? =
       present_password?(Keyword.get(opts, :open_password)) or
         present_password?(Keyword.get(opts, :owner_password))

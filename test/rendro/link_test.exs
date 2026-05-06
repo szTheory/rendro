@@ -21,16 +21,14 @@ defmodule Rendro.LinkTest do
       assert %Block{
                width: 180,
                height: height,
-               content:
-                 %Link{
-                   target: {:uri, "https://example.com/guide"},
-                   content:
-                     %MeasuredText{
-                       source: %Rendro.Text{content: "Read the guide"},
-                       lines: [[%{text: "Read the guide"} | _]],
-                       height: measured_height
-                     }
+               content: %Link{
+                 target: {:uri, "https://example.com/guide"},
+                 content: %MeasuredText{
+                   source: %Rendro.Text{content: "Read the guide"},
+                   lines: [[%{text: "Read the guide"} | _]],
+                   height: measured_height
                  }
+               }
              } = measured_block
 
       assert is_number(height)
@@ -53,18 +51,21 @@ defmodule Rendro.LinkTest do
       assert %Block{
                width: 200,
                height: 28,
-               content:
-                 %Link{
-                   target: {:page, 3},
-                   content: %MeasuredText{}
-                 }
+               content: %Link{
+                 target: {:page, 3},
+                 content: %MeasuredText{}
+               }
              } = measured_block
     end
   end
 
   describe "fragmentation" do
     test "splits linked measured text into two link-wrapped fragments" do
-      linked_text = %Link{content: measured_text(["Line 1", "Line 2", "Line 3"]), target: {:page, 2}}
+      linked_text = %Link{
+        content: measured_text(["Line 1", "Line 2", "Line 3"]),
+        target: {:page, 2}
+      }
+
       block = %Block{content: linked_text, width: 180, height: 36}
 
       assert {
@@ -103,5 +104,6 @@ defmodule Rendro.LinkTest do
     }
   end
 
-  defp line_run(text), do: %{font: %Font{name: "F1", base_font: "Helvetica"}, text: text, width: 60}
+  defp line_run(text),
+    do: %{font: %Font{name: "F1", base_font: "Helvetica"}, text: text, width: 60}
 end

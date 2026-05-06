@@ -70,12 +70,12 @@ defmodule Rendro.EndToEndPipelineTest do
 
     # 5. Threadline audit (implicitly tested via telemetry attachments,
     # but the pipeline completed without crashing, proving deterministic success).
-
   end
 
   test "protected artifacts can be retrieved, protected inside the app boundary, and delivered" do
     storage_path =
       Path.join(System.tmp_dir!(), "e2e_protected_invoice_#{:rand.uniform(100_000)}.pdf")
+
     on_exit(fn -> Local.delete(storage_path, []) end)
 
     job = %Oban.Job{
@@ -125,6 +125,5 @@ defmodule Rendro.EndToEndPipelineTest do
     assert {:data, protected_binary} = attachment.data
     assert protected_binary == protected_reload.binary
     assert protected_binary =~ "::protected"
-
   end
 end
