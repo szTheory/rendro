@@ -50,8 +50,27 @@ defimpl Rendro.Fragmentable, for: Rendro.Block do
     header_h + rows_h
   end
 
+  defp height_for(%Rendro.Link{content: content}), do: height_for(content)
   defp height_for(%{height: h}), do: h || 0
   defp height_for(_), do: 0
+end
+
+defimpl Rendro.Fragmentable, for: Rendro.Link do
+  def split(%Rendro.Link{content: content} = link, available_h) do
+    if Rendro.Fragmentable.impl_for(content) do
+      case Rendro.Fragmentable.split(content, available_h) do
+        {nil, _} ->
+          {nil, link}
+
+        {this_content, rem_content} ->
+          this_link = %{link | content: this_content}
+          rem_link = if rem_content, do: %{link | content: rem_content}, else: nil
+          {this_link, rem_link}
+      end
+    else
+      {nil, link}
+    end
+  end
 end
 
 defimpl Rendro.Fragmentable, for: Rendro.Pipeline.MeasuredText do

@@ -69,11 +69,11 @@ defmodule Rendro.LinkTest do
 
       assert {
                %Block{
-                 height: 24,
+                 height: 24.0,
                  content: %Link{target: {:page, 2}, content: %MeasuredText{lines: [_, _]}}
                },
                %Block{
-                 height: 12,
+                 height: 12.0,
                  content: %Link{target: {:page, 2}, content: %MeasuredText{lines: [_]}}
                }
              } = Rendro.Fragmentable.split(block, 24)
