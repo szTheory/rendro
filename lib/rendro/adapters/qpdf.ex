@@ -103,7 +103,9 @@ defmodule Rendro.Adapters.Qpdf do
   end
 
   defp write_private_file(path, contents) do
-    with :ok <- File.write(path, contents),
+    File.rm(path)
+
+    with :ok <- File.write(path, contents, [:write, :exclusive, {:mode, 0o600}]),
          :ok <- File.chmod(path, 0o600) do
       :ok
     end
