@@ -33,6 +33,19 @@ defmodule Rendro.Pipeline.Measure do
 
   defp measure_block(
          doc,
+         %Rendro.Block{content: %Rendro.Link{content: inner_content} = link} = block,
+         container_width
+       ) do
+    nested_block = %Rendro.Block{block | content: inner_content}
+
+    with {:ok, measured_nested_block} <- measure_block(doc, nested_block, container_width) do
+      measured_link = %{link | content: measured_nested_block.content}
+      {:ok, %{measured_nested_block | content: measured_link}}
+    end
+  end
+
+  defp measure_block(
+         doc,
          %Rendro.Block{content: %Rendro.Table{} = table} = block,
          container_width
        ) do
