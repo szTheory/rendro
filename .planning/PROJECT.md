@@ -10,9 +10,13 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Shipped Version:** v1.9 Embedded Artifact Surfaces (2026-05-06)
+**Shipped Version:** v1.10 Protected Delivery Hooks & Encryption Boundaries (2026-05-06)
 
-Rendro now supports document-level embedded files with explicit, deterministic metadata and curated link annotations limited to `http`/`https` URIs and in-document page targets. The writer emits deterministic `/EmbeddedFile`, `/Filespec`, `/Names`, and `/AF` catalog wiring and serializes `/Link` annotations through the existing page `/Annots` seam without named destinations or generic action dictionaries. Public claims are backed by structural proof through Poppler and recorded manual viewer evidence in Adobe Acrobat Reader and Apple Preview.
+Rendro now supports artifact-first password-to-open protection through `Rendro.Protect` and the first-party optional `qpdf` adapter, with AES-256-only public semantics, password-safe error/audit boundaries, password-aware Poppler structural validation, proof-backed Apple Preview support for the `protection` surface, and release-readiness gates that keep the canonical protected-delivery recipe truthful.
+
+**Previous Shipped Version:** v1.9 Embedded Artifact Surfaces (2026-05-06)
+
+Rendro supports document-level embedded files with explicit, deterministic metadata and curated link annotations limited to `http`/`https` URIs and in-document page targets. The writer emits deterministic `/EmbeddedFile`, `/Filespec`, `/Names`, and `/AF` catalog wiring and serializes `/Link` annotations through the existing page `/Annots` seam without named destinations or generic action dictionaries. Public claims are backed by structural proof through Poppler and recorded manual viewer evidence in Adobe Acrobat Reader and Apple Preview.
 
 **Previous Shipped Version:** v1.8 Interactive PDF Forms (2026-05-05)
 
@@ -28,22 +32,24 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 **Foundation Already Shipped:** v1.3 release readiness, v1.2 typography/assets truth, v1.1 layout-authoring maturity, and v1.0 deterministic core rendering.
 
-## Current Milestone: v1.10 Protected Delivery Hooks & Encryption Boundaries
+## Current Milestone
 
-**Goal:** Add a truthful PDF protection story without overclaiming permissions-based security or destabilizing deterministic core rendering.
+No milestone is active right now. `v1.10` is shipped and verified; the next milestone should be defined fresh before more scoped implementation work begins.
 
-**Target features:**
-- External protection hooks first — post-processing or adapter seams that wrap rendered artifacts before any native PDF encryption surface lands in core.
-- Narrow protection claims — distinguish password-to-open, advisory permissions, and explicitly unsupported compliance/archive narratives across docs and `priv/support_matrix.json`.
-- Proof-backed support boundaries — extend the Poppler structural lane plus recorded manual viewer evidence to any new protection surface before promotion.
-- Existing artifact seams remain the integration path — protected artifacts must flow cleanly through Mailglass/storage patterns without pushing credentials into persisted async job args.
+## Next Milestone Goals
 
-**Why now:** With embedded artifact surfaces shipped in v1.9, the next coherent step is protection without taking on the heavier cryptographic-trust contract of digital signing.
+**Next candidate:** v2.0 Signature Fields & External Signing Preparation
+
+**Direction:**
+- Add unsigned signature-field authoring only if it fits the existing authored-form model truthfully.
+- Add deterministic preparation seams for external signing without claiming in-core cryptographic trust.
+- Keep PAdES/LTV/TSA/OCSP/CRL and broad compliance claims deferred until a separately-bounded proof-backed milestone.
 
 ## Requirements
 
 ### Validated
 
+- [x] Rendro v1.10 delivered artifact-first password protection, a first-party optional `qpdf` adapter, password-aware structural validation, protected-artifact-safe delivery seams, proof-backed protection support language, and release-ready protection proof. Shipped at exact tag `v0.1.0`.
 - [x] Rendro v1.9 delivered deterministic authored document-level embedded files and curated link annotations (`http`/`https` URIs and in-document page targets only), with one proof-backed support contract published across `priv/support_matrix.json` and `guides/api_stability.md`, structural proof through the Poppler lane, and recorded manual viewer evidence in Adobe Acrobat Reader (both surfaces) and Apple Preview (links). Validated at milestone close in `v1.9-MILESTONE-AUDIT.md`.
 - [x] Rendro v1.8 delivered deterministic authored interactive PDF forms for text fields, checkboxes, and radio groups, along with truthful forms support boundaries. Validated at milestone close in `v1.8-MILESTONE-AUDIT.md`.
 - [x] Rendro v1.5 delivered validator-backed trust surfaces, structural validation, and a machine-readable support matrix. Validated at milestone close in `v1.5-MILESTONE-AUDIT.md`.
@@ -57,9 +63,9 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-- [ ] v1.10 will introduce a truthful PDF protection story through an external artifact-first hook, with narrow password-to-open and advisory-permissions claims rather than blanket "secure PDF" marketing.
-- [ ] v1.10 will support only AES-256 on the public protection surface and will continue to defer native in-core encryption.
-- [ ] v1.10 will preserve the existing deterministic core pipeline and the optional-adapter boundary as non-negotiable.
+- [ ] Define the next milestone through fresh context, requirements, and roadmap artifacts before starting new implementation work.
+- [ ] Keep signing preparation narrower than cryptographic signing claims when `v2.0` is scoped.
+- [ ] Continue expanding viewer support only through recorded proof and support-matrix promotion.
 
 ### Out of Scope
 
@@ -73,7 +79,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 Rendro has now shipped four authored PDF surfaces inside one deterministic pipeline: static content (v1.0–v1.2), interactive forms (v1.8), document-level embedded files (v1.9), and curated link annotations (v1.9). `v1.9` proved that the core writer's existing allocation, catalog-injection, and `/Annots` seams can absorb new authored object kinds without creating parallel rendering paths or widening the public contract beyond recorded evidence.
 
-`v1.10` will keep the trust-model expansion gradual: external protection hooks before any native encryption work, password-to-open and advisory-permissions framing before broader compliance narratives, and proof-backed validation before any in-core encryption surface ships. Digital signatures, PAdES, LTV, and TSA/OCSP/CRL claims remain explicitly deferred to a later milestone with their own separately-bounded cryptographic-trust contract.
+`v1.10` proved that Rendro can expand its trust surfaces without widening the core rendering contract: protection shipped through external hooks first, password-to-open and advisory-permissions claims stayed narrow, and support promotion stayed tied to proof. The next milestone should preserve that pattern by treating signing preparation as a separate trust boundary rather than an incremental extension of protection.
 
 ## Constraints
 
@@ -125,7 +131,7 @@ Rendro has now shipped four authored PDF surfaces inside one deterministic pipel
 
 ## Evolution Path
 
-- `v1.10` should introduce protected delivery hooks and a narrow encryption-boundary story through external hooks first, with proof-backed validation before any in-core encryption surface expands.
+- `v2.0` should introduce signature preparation through narrow authored fields and external-signing seams, not broad cryptographic or compliance claims.
 - Signature work should remain a later milestone and should separate unsigned field authoring and external-signing preparation from actual cryptographic-signature claims (PAdES, LTV, TSA/OCSP/CRL stay deferred).
 - Viewer support should continue to expand only when manual proof is recorded and reflected in `priv/support_matrix.json` (e.g., promoting Apple Preview × `embedded_files` if a future Preview release surfaces document-level embedded files).
 - The core deterministic pipeline and the optional-adapter boundary remain non-negotiable.
@@ -148,4 +154,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-06 — v1.10 milestone scope locked via /gsd-new-milestone.*
+*Last updated: 2026-05-06 after v1.10 milestone close.*

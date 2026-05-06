@@ -59,7 +59,7 @@ This roadmap defines the strategic arcs that turn Rendro into the production-rea
 * **Truthful Artifact Boundaries:**
   * Support-matrix and proof updates that distinguish structural validity from viewer discoverability and policy behavior.
 
-## Milestone 6: Protected Delivery Hooks & Encryption Boundaries (Next)
+## Milestone 6: Protected Delivery Hooks & Encryption Boundaries (Completed)
 **Focus:** Add a truthful PDF protection story without overclaiming permissions-based security or destabilizing deterministic core rendering.
 
 * **External Protection Hooks First:**
@@ -69,7 +69,7 @@ This roadmap defines the strategic arcs that turn Rendro into the production-rea
 * **Support-Boundary Discipline:**
   * Proof-backed validation before any native encryption story expands.
 
-## Milestone 7: Signature Fields & External Signing Preparation
+## Milestone 7: Signature Fields & External Signing Preparation (Next)
 **Focus:** Add narrow signing preparation surfaces while keeping actual cryptographic trust operations explicit and separately bounded.
 
 * **Unsigned Signature Fields:**

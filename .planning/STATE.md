@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.10
 milestone_name: protected-delivery-hooks-and-encryption-boundaries
-status: active
-last_updated: "2026-05-06T19:00:00Z"
-last_activity: 2026-05-06 — recorded Apple Preview protection proof, synced release-tail docs/contracts, and verified the new preflight gate
+status: between_milestones
+last_updated: "2026-05-06T20:30:00Z"
+last_activity: 2026-05-06 — v1.10 archived after exact-tag release verification passed
 progress:
   total_phases: 4
   completed_phases: 3
@@ -20,20 +20,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-06 after v1.9 close)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Finish milestone verification and publish sequencing from a now-complete v1.10 implementation.
+**Current focus:** Start the next milestone definition from a shipped and release-verified v1.10 baseline.
 
 ## Current Position
 
-Phase: 54 — proof-closure-and-release-tail
-Plan: 54-01 / 54-02 complete
-Status: Phases 51 through 54 are implemented; remaining work is milestone verification, clean-worktree staging, and exact-tag publish proof
-Last activity: 2026-05-06 — Apple Preview protection proof recorded, support claims synced, and release-tail preflight/docs checks implemented
+Phase: none active
+Plan: none active
+Status: Milestone v1.10 is shipped and archived; no new milestone has been defined yet
+Last activity: 2026-05-06 — exact-tag release proof passed and milestone close bookkeeping completed
 
 Progress: [==========] 100%
 
 ## Milestone Snapshot
 
-- Milestone: `v1.10 Protected Delivery Hooks & Encryption Boundaries` (implementation complete; final verification and publish hygiene remain).
+- Milestone: `v1.10 Protected Delivery Hooks & Encryption Boundaries` (shipped and release-verified at `v0.1.0`).
 - Last shipped: `v1.9 Embedded Artifact Surfaces (2026-05-06)` — see `milestones/v1.9-ROADMAP.md`.
 - Phase numbering continues from v1.9 — v1.10 starts at Phase 51.
 
@@ -65,8 +65,8 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 
 ### Pending Todos
 
-- Prepare the publish/ship step from the verified `v0.1.0` release candidate.
-- Optionally collapse the final release-candidate commit train if a cleaner public history is desired before publish.
+- Define the next milestone through fresh context, requirements, and roadmap artifacts.
+- Publish `v0.1.0` from the verified release tag if it has not been pushed to external registries yet.
 
 ### Blockers/Concerns
 

@@ -1,5 +1,22 @@
 # Milestones
 
+## v1.10 Protected Delivery Hooks & Encryption Boundaries (Shipped: 2026-05-06)
+
+**Phases completed:** 4 phases (51, 52, 53, 54)
+
+**Key accomplishments:**
+
+- Added an artifact-first `Rendro.Protect` boundary for password-to-open protection without widening the deterministic render pipeline.
+- Shipped a first-party optional `qpdf` adapter with AES-256-only public semantics, curated advisory-permission mapping, and typed redacted failures.
+- Extended the Poppler structural lane to validate protected PDFs with caller-supplied passwords and locked the real-tool path behind explicit proof.
+- Preserved protected-artifact delivery/storage seams without persisting password material and published one canonical recipe: `render_to_artifact -> Protect.password -> store/deliver`.
+- Published a dedicated `protection` support contract and promoted only the first proof-backed viewer pair: Apple Preview for the `protection` surface.
+- Closed the release tail with changelog/readiness guidance, a preflight gate for the canonical recipe, and a passing isolated tagged proof lane.
+
+**Close note:** release verification passed at exact tag `v0.1.0` via `mix ci`, `mix release.preflight`, and `scripts/release_preflight_proof.exs`.
+
+---
+
 ## v1.9 Embedded Artifact Surfaces (Shipped: 2026-05-06)
 
 **Phases completed:** 3 phases (48, 49, 50)
