@@ -109,6 +109,91 @@ defmodule Rendro.PDF.WriterTest do
     )
   end
 
+  defp linked_text_document(target_opts, block_overrides \\ [], page_overrides \\ []) do
+    block =
+      Rendro.block(
+        Rendro.text("Linked Hello", font: "Helvetica", size: 12),
+        Keyword.merge([x: 10, y: 20, width: 100, height: 24], block_overrides)
+      )
+      |> Rendro.link(target_opts)
+
+    page = struct!(Rendro.Page, Keyword.merge([blocks: [block]], page_overrides))
+
+    %Rendro.Document{
+      pages: [page],
+      metadata: %Rendro.Metadata{title: "Linked Text Document"}
+    }
+  end
+
+  defp linked_table_document(target_opts) do
+    table =
+      %Rendro.Table{
+        rows: [
+          %Rendro.Row{
+            cells: [
+              %Rendro.Cell{
+                content:
+                  Rendro.block(
+                    Rendro.text("Cell Alpha", font: "Helvetica", size: 12),
+                    x: 0,
+                    y: 0,
+                    width: 120,
+                    height: 24
+                  ),
+                width: 120,
+                height: 24
+              }
+            ]
+          }
+        ],
+        row_heights: [24],
+        split_policy: :none,
+        repeat_header: false
+      }
+
+    block =
+      Rendro.block(table, x: 10, y: 20, width: 120, height: 24)
+      |> Rendro.link(target_opts)
+
+    %Rendro.Document{
+      pages: [%Rendro.Page{blocks: [block]}],
+      metadata: %Rendro.Metadata{title: "Linked Table Document"}
+    }
+  end
+
+  defp linked_fragment_document(target_opts) do
+    page_template = %Rendro.PageTemplate{
+      name: :linked_body,
+      width: 612,
+      height: 792,
+      margin_top: 0,
+      margin_right: 0,
+      margin_bottom: 0,
+      margin_left: 0,
+      regions: [
+        %Rendro.Region{
+          name: :body,
+          role: :body,
+          anchor: :flow,
+          x: 0,
+          y: 0,
+          width: 200,
+          height: 45
+        }
+      ]
+    }
+
+    text = String.duplicate("alpha beta gamma delta ", 8)
+
+    Rendro.document()
+    |> Map.put(:content, [
+      Rendro.block(Rendro.text(text, font: "Helvetica", size: 12), width: 100)
+      |> Rendro.link(target_opts)
+    ])
+    |> Map.put(:page_template, :linked_body)
+    |> Map.put(:page_templates, [page_template])
+  end
+
   describe "render/1" do
     test "returns {:ok, binary} tuple" do
       doc = sample_document()
@@ -278,6 +363,56 @@ defmodule Rendro.PDF.WriterTest do
       assert pdf =~ "/Rect [112 680 132 700]"
       assert length(Regex.scan(~r|/Subtype /Widget|, pdf)) == 2
       refute pdf =~ "/NeedAppearances"
+    end
+
+    test "serializes external URI links as /Link annotations while preserving visible text output" do
+      {:ok, pdf} =
+        Writer.render(
+          linked_text_document(uri: "https://example.com/Path?q=Keep%20This#frag"),
+          deterministic: true
+        )
+
+      assert pdf =~ "/Annots ["
+      assert pdf =~ "/Subtype /Link"
+      assert pdf =~ "/A <<"
+      assert pdf =~ "/S /URI"
+      assert pdf =~ "/URI (https://example.com/Path?q=Keep%20This#frag)"
+      assert pdf =~ "/Rect [82 676 182 700]"
+      assert pdf =~ "(Linked Hello) Tj"
+      refute pdf =~ "/Subtype /FileAttachment"
+      refute pdf =~ "/QuadPoints"
+      refute pdf =~ "/Dest /"
+      refute pdf =~ "/GoTo"
+    end
+
+    test "serializes internal page links as direct /Dest arrays" do
+      doc = linked_text_document(page: 2)
+      page_2 = %Rendro.Page{blocks: [%Rendro.Block{content: %Rendro.Text{content: "Page 2"}}]}
+      {:ok, pdf} = Writer.render(%{doc | pages: doc.pages ++ [page_2]}, deterministic: true)
+
+      assert pdf =~ "/Subtype /Link"
+      assert pdf =~ "/Dest [4 0 R /Fit]"
+      refute pdf =~ "/A <<"
+      refute pdf =~ "/GoTo"
+      refute pdf =~ "/D ["
+    end
+
+    test "emits one link annotation per paginated fragment" do
+      {:ok, pdf} =
+        Writer.render(linked_fragment_document(uri: "https://example.com/docs"), deterministic: true)
+
+      assert length(Regex.scan(~r|/Subtype /Link|, pdf)) == 2
+      assert length(Regex.scan(~r|/URI \(https://example.com/docs\)|, pdf)) == 2
+      assert pdf =~ "(alpha beta ) Tj"
+    end
+
+    test "preserves visible linked table rendering while emitting a separate link annotation" do
+      {:ok, pdf} =
+        Writer.render(linked_table_document(uri: "https://example.com/table"), deterministic: true)
+
+      assert pdf =~ "/Subtype /Link"
+      assert pdf =~ "/URI (https://example.com/table)"
+      assert pdf =~ "(Cell Alpha) Tj"
     end
 
     test "contains Pages object" do
