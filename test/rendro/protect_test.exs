@@ -1,6 +1,7 @@
 defmodule Rendro.ProtectTest do
   use ExUnit.Case, async: true
 
+  alias Rendro.Adapters.Qpdf
   alias Rendro.{Artifact, Protect}
 
   defmodule FakeAdapter do
@@ -172,6 +173,35 @@ defmodule Rendro.ProtectTest do
     assert error.details.has_owner_password == true
     refute Map.has_key?(error.details, :open_password)
     refute Map.has_key?(error.details, :owner_password)
+  end
+
+  test "qpdf-backed failures redact passwords and runner output from the public error" do
+    Application.put_env(:rendro, :qpdf_executable_finder, fn "qpdf" -> "/tmp/fake-qpdf" end)
+
+    Application.put_env(:rendro, :qpdf_command_runner, fn "/tmp/fake-qpdf", [_argfile], _opts ->
+      {"stderr mentions open-secret and owner-secret", 2}
+    end)
+
+    on_exit(fn ->
+      Application.delete_env(:rendro, :qpdf_executable_finder)
+      Application.delete_env(:rendro, :qpdf_command_runner)
+    end)
+
+    assert {:error, %Rendro.Error{} = error} =
+             Protect.password(sample_artifact(),
+               adapter: Qpdf,
+               open_password: "open-secret",
+               owner_password: "owner-secret"
+             )
+
+    assert error.stage == :protect
+    assert error.reason == {:adapter_failure, Qpdf, {:qpdf_failed, 2}}
+    refute error.why =~ "open-secret"
+    refute error.why =~ "owner-secret"
+    refute inspect(error.reason) =~ "open-secret"
+    refute inspect(error.reason) =~ "owner-secret"
+    refute inspect(error.details) =~ "open-secret"
+    refute inspect(error.details) =~ "owner-secret"
   end
 
   test "render_protected/3 composes render_to_artifact and protect" do

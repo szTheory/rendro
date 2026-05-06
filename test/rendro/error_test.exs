@@ -88,5 +88,17 @@ defmodule Rendro.ErrorTest do
       assert err.why == "Invalid protection option algorithm: :aes_128"
       assert err.next =~ "algorithm: :aes_256"
     end
+
+    test "adapter qpdf failures stay actionable without surfacing raw stderr" do
+      err =
+        Rendro.Error.from_stage(
+          :protect,
+          {:adapter_failure, Rendro.Adapters.Qpdf, {:qpdf_failed, 2}}
+        )
+
+      assert err.stage == :protect
+      assert err.why == "Protection adapter Rendro.Adapters.Qpdf failed: qpdf exited with status 2"
+      assert err.next =~ "adapter stderr/output"
+    end
   end
 end
