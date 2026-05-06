@@ -3,8 +3,16 @@ defmodule Rendro.EndToEndPipelineTest do
 
   alias Rendro.Adapters.Oban.RenderWorker
   alias Rendro.Artifact
+  alias Rendro.Protect
   alias Rendro.Storage.Local
   alias Rendro.Adapters.Mailglass
+
+  defmodule FakeProtectAdapter do
+    @behaviour Rendro.Protect.Adapter
+
+    @impl true
+    def protect(%Artifact{binary: binary}, _opts), do: {:ok, binary <> "::protected"}
+  end
 
   # 1. The application's Oban Builder bridging args to the Accrue recipe
   defmodule AppInvoiceBuilder do
@@ -61,6 +69,58 @@ defmodule Rendro.EndToEndPipelineTest do
 
     # 5. Threadline audit (implicitly tested via telemetry attachments,
     # but the pipeline completed without crashing, proving deterministic success).
+
+    File.rm!(storage_path)
+  end
+
+  test "protected artifacts can be retrieved, protected inside the app boundary, and delivered" do
+    storage_path =
+      Path.join(System.tmp_dir!(), "e2e_protected_invoice_#{:rand.uniform(100_000)}.pdf")
+
+    job = %Oban.Job{
+      args: %{
+        "module" => Atom.to_string(AppInvoiceBuilder),
+        "args" => %{"id" => "INV-E2E-2", "customer" => "Protected Corp", "total" => 2200},
+        "storage_module" => Atom.to_string(Local),
+        "storage_opts" => %{"path" => storage_path}
+      }
+    }
+
+    assert :ok = RenderWorker.perform(job)
+    assert {:ok, %Artifact{} = reloaded} = Local.get(storage_path, [])
+    assert is_binary(reloaded.binary)
+    assert String.starts_with?(reloaded.binary, "%PDF-")
+    assert reloaded.metadata == %{}
+
+    {:ok, protected} =
+      Protect.password(reloaded,
+        adapter: FakeProtectAdapter,
+        open_password: "open-secret",
+        owner_password: "owner-secret",
+        advisory_permissions: [:print]
+      )
+
+    assert {:ok, ^storage_path} = Local.put(protected, path: storage_path)
+    assert {:ok, %Artifact{} = protected_reload} = Local.get(storage_path, [])
+
+    assert protected_reload.metadata.deterministic == false
+
+    assert protected_reload.metadata.protection == %{
+             algorithm: :aes_256,
+             advisory_permissions: [:print],
+             has_open_password: true,
+             has_owner_password: true
+           }
+
+    email = Swoosh.Email.new()
+    email_with_pdf = Mailglass.attach_artifact(email, protected_reload, "invoice-protected.pdf")
+
+    assert length(email_with_pdf.attachments) == 1
+    [attachment] = email_with_pdf.attachments
+    assert attachment.filename == "invoice-protected.pdf"
+    assert {:data, protected_binary} = attachment.data
+    assert protected_binary == protected_reload.binary
+    assert protected_binary =~ "::protected"
 
     File.rm!(storage_path)
   end
