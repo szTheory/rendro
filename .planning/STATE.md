@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.10
 milestone_name: protected-delivery-hooks-and-encryption-boundaries
-status: planning
-last_updated: "2026-05-06T06:00:00.000Z"
+status: active
+last_updated: "2026-05-06T10:39:09Z"
 last_activity: 2026-05-06
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 8
+  completed_plans: 1
+  percent: 13
 ---
 
 # Project State
@@ -24,12 +24,12 @@ See: .planning/PROJECT.md (updated 2026-05-06 after v1.9 close)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-05-06 — Milestone v1.10 started
+Phase: 51 — protection-api-contract-and-validation
+Plan: 51-02
+Status: 51-01 completed; ready for metadata/redaction follow-on work
+Last activity: 2026-05-06 — completed 51-01 protection contract and qpdf runtime hardening
 
-Progress: [          ] 0%
+Progress: [=         ] 13%
 
 ## Milestone Snapshot
 
@@ -45,7 +45,9 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table. Decisions for the next milestone (v1.10) will be added as planning begins.
+- Keep protection option normalization inside `Rendro.Protect` so the canonical public seam stays explicit and artifact-first.
+- Redact qpdf process failures to exit-status or exception-module tuples so passwords and raw stderr never escape typed `:protect` errors.
+- Keep qpdf executable lookup and command execution injectable while guaranteeing temp-dir cleanup on every adapter path.
 
 ### Roadmap Evolution
 
@@ -55,7 +57,8 @@ Decisions are logged in PROJECT.md Key Decisions table. Decisions for the next m
 
 ### Pending Todos
 
-- Define v1.10 REQUIREMENTS.md and ROADMAP.md (in-flight via `/gsd-new-milestone`).
+- Finish v1.10 runtime verification and manual viewer proof for the new `protection` family.
+- Close release-preflight updates and publish the next Hex version after milestone verification passes.
 
 ### Blockers/Concerns
 
