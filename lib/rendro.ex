@@ -12,6 +12,7 @@ defmodule Rendro do
     Metadata,
     Page,
     PageTemplate,
+    Protect,
     Pipeline,
     Region,
     Section,
@@ -217,6 +218,19 @@ defmodule Rendro do
   @spec link(Block.t(), keyword()) :: Block.t()
   def link(%Block{} = block, opts) when is_list(opts) do
     %Block{block | content: %Link{content: block.content, target: normalize_link_target(opts)}}
+  end
+
+  @doc """
+  Renders the document to an artifact and then applies the configured
+  protection adapter.
+  """
+  @spec render_protected(Document.t(), render_options(), keyword()) ::
+          {:ok, Artifact.t()} | {:error, Rendro.Error.t()}
+  def render_protected(%Document{} = doc, render_opts \\ [], protect_opts)
+      when is_list(render_opts) and is_list(protect_opts) do
+    with {:ok, artifact} <- render_to_artifact(doc, render_opts) do
+      Protect.password(artifact, protect_opts)
+    end
   end
 
   @spec metadata(keyword()) :: Metadata.t()

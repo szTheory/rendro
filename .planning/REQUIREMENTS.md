@@ -13,19 +13,19 @@
 
 ### Adapter and Validation Boundaries
 
-- [ ] **ADAPT-01**: Rendro ships a first-party `qpdf` protection adapter that remains an optional runtime executable rather than a hard dependency.
-- [ ] **ADAPT-02**: Poppler structural validation can validate protected PDFs when the caller supplies the appropriate password.
+- [x] **ADAPT-01**: Rendro ships a first-party `qpdf` protection adapter that remains an optional runtime executable rather than a hard dependency.
+- [x] **ADAPT-02**: Poppler structural validation can validate protected PDFs when the caller supplies the appropriate password.
 - [x] **ADAPT-03**: Existing artifact-delivery seams continue to work with already-protected artifacts without learning password material themselves.
 
 ### Truthful Support Boundaries
 
 - [x] **TRUST-01**: `priv/support_matrix.json` publishes a dedicated `protection` family covering password-to-open, advisory permissions, unsupported native encryption, and unsupported compliance/signature narratives.
 - [x] **TRUST-02**: Public docs distinguish password-to-open from advisory permissions and explicitly state that protection is not digital signing, tamper evidence, or PDF/A/compliance support.
-- [ ] **TRUST-03**: New viewer rows for protection default to `unverified` until manual proof is recorded.
+- [x] **TRUST-03**: New viewer rows for protection default to `unverified` until manual proof is recorded.
 
 ### Release Tail
 
-- [ ] **RELEASE-01**: The milestone closes with release-preflight guidance and changelog/readiness updates so Rendro can be published for downstream `mailglass` consumption immediately after proof closes.
+- [x] **RELEASE-01**: The milestone closes with release-preflight guidance and changelog/readiness updates so Rendro can be published for downstream `mailglass` consumption immediately after proof closes.
 
 ## Deferred Beyond v1.10
 
@@ -50,13 +50,13 @@
 | PROTECT-01 | Phase 51 | Complete |
 | PROTECT-02 | Phase 51 | Complete |
 | PROTECT-03 | Phase 51 | Complete |
-| ADAPT-01 | Phase 52 | In Progress |
-| ADAPT-02 | Phase 52 | In Progress |
+| ADAPT-01 | Phase 52 | Complete |
+| ADAPT-02 | Phase 52 | Complete |
 | ADAPT-03 | Phase 53 | Complete |
 | TRUST-01 | Phase 53 | Complete |
 | TRUST-02 | Phase 53 | Complete |
-| TRUST-03 | Phase 54 | Pending |
-| RELEASE-01 | Phase 54 | Pending |
+| TRUST-03 | Phase 54 | Complete |
+| RELEASE-01 | Phase 54 | Complete |
 
 **Coverage:**
 - v1.10 requirements: 10 total
@@ -65,4 +65,4 @@
 
 ---
 *Requirements defined: 2026-05-06*
-*Last updated: 2026-05-06 after Phase 53 execution*
+*Last updated: 2026-05-06 after Phase 52 proof verification and Phase 54 proof kickoff*

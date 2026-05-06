@@ -118,8 +118,7 @@ defmodule Rendro.Adapters.Qpdf do
       yes_no_arg("--extract", :copy in permissions),
       yes_no_arg("--annotate", :annotate in permissions),
       yes_no_arg("--form", :fill_forms in permissions),
-      yes_no_arg("--assemble", :assemble in permissions),
-      yes_no_arg("--accessibility", :extract_for_accessibility in permissions)
+      yes_no_arg("--assemble", :assemble in permissions)
     ]
   end
 

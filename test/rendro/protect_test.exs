@@ -30,6 +30,17 @@ defmodule Rendro.ProtectTest do
     }
   end
 
+  test "publishes only the truthful six advisory permissions" do
+    assert Protect.supported_permissions() == [
+             :annotate,
+             :assemble,
+             :copy,
+             :fill_forms,
+             :modify,
+             :print
+           ]
+  end
+
   test "protects an artifact with minimal password-safe metadata and marks the result non-deterministic" do
     {:ok, protected} =
       Protect.password(sample_artifact(),
@@ -179,6 +190,20 @@ defmodule Rendro.ProtectTest do
              )
 
     assert error.reason == {:unknown_permissions, [:launch]}
+  end
+
+  test "rejects extract_for_accessibility at the public boundary" do
+    assert {:error, %Rendro.Error{} = error} =
+             Protect.password(sample_artifact(),
+               adapter: FakeAdapter,
+               open_password: "open-secret",
+               owner_password: "owner-secret",
+               advisory_permissions: [:extract_for_accessibility]
+             )
+
+    assert error.stage == :protect
+    assert error.reason == {:unknown_permissions, [:extract_for_accessibility]}
+    refute_receive {:fake_adapter_called, _}
   end
 
   test "wraps adapter failures in a protect-stage Rendro.Error" do

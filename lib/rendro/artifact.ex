@@ -33,4 +33,23 @@ defmodule Rendro.Artifact do
       metadata: Map.put(base_metadata, :page_count, length(Map.get(doc, :pages, [])))
     }
   end
+
+  @doc """
+  Wraps a transformed binary in a new artifact while preserving diagnostics and
+  merging metadata from the source artifact.
+  """
+  @spec wrap(binary(), t(), map()) :: t()
+  def wrap(pdf_binary, %__MODULE__{} = source, metadata_updates \\ %{}) do
+    %__MODULE__{
+      binary: pdf_binary,
+      hash: hash_binary(pdf_binary),
+      diagnostics: source.diagnostics,
+      metadata: Map.merge(source.metadata, metadata_updates)
+    }
+  end
+
+  defp hash_binary(pdf_binary) do
+    :crypto.hash(:sha256, pdf_binary)
+    |> Base.encode16(case: :lower)
+  end
 end

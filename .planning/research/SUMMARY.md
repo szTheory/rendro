@@ -1,46 +1,35 @@
-# Research Summary: Rendro Async Delivery & Ecosystem Expansion
+# Research Summary: Rendro v1.10 Protected Delivery Hooks & Encryption Boundaries
 
-**Domain:** Async Document Generation & SaaS Integration
-**Researched:** 2026-05-04
+**Domain:** PDF protection for a deterministic, pure-Elixir, Phoenix-first document engine
+**Researched:** 2026-05-06
 **Overall confidence:** HIGH
 
 ## Executive Summary
 
-Rendro's pure-Elixir layout and typography core has been hardened in milestones v1.4 and v1.5. The next major adoption hurdle for SaaS teams is operationalizing PDF generation—specifically, how to reliably enqueue generation jobs, store the resulting artifacts, and hand them off to delivery pipelines (like email) while maintaining a strict audit trail. 
+Rendro should ship `v1.10` as an **external-hook-first** protection milestone. The render pipeline and writer remain unchanged; protection happens after rendering on `%Rendro.Artifact{}` through an optional executable boundary such as `qpdf`. This delivers the practical downstream need for password-to-open PDFs without forcing cryptographic non-determinism into the core engine.
 
-This research focuses on the **Async Delivery and Artifact Operations** milestone. It naturally incorporates the high-priority "Do Now" integrations from the `szTheory` ecosystem (`threadline`, `mailglass`, `accrue`). By defining strict adapter boundaries, Rendro can support complex production workflows (billing batches, audited statements, email attachments) without polluting its pure core.
+## Locked Recommendations
 
-## Key Findings
-
-**Stack:** Optional Oban adapters for async work; `threadline`, `mailglass`, and `accrue` for ecosystem capabilities.
-**Architecture:** Strict Adapter/Behavior pattern where core emits pure data (Artifacts/Manifests) and optional packages handle side-effects (storage, queues, delivery).
-**Critical pitfall:** Core contamination—accidentally adding `ecto`, `oban`, or `aws` as hard dependencies instead of leveraging optional adapter boundaries.
+- **Public API shape:** artifact-first (`Rendro.Protect.password/2`), not `Rendro.render/2` options
+- **Algorithm scope:** AES-256 only on the public protection surface
+- **Boundary posture:** advisory permissions are published as advisory only, never as hard security
+- **Validation posture:** Poppler structural validation remains separate from viewer proof; all new protection viewer rows start `unverified`
+- **Native encryption:** deferred; do not include in `v1.10`
 
 ## Implications for Roadmap
 
-Based on research and existing Epic constraints, suggested phase structure for this milestone:
+1. **Phase 51:** Protection API contract, typed validation, and password redaction
+2. **Phase 52:** `qpdf` adapter plus password-aware Poppler validation
+3. **Phase 53:** Delivery threading for protected artifacts plus support-matrix/docs closure
+4. **Phase 54:** Manual proof closure and release-preflight tail
 
-1. **Phase: Artifact Operations & Manifests** - Define the pure data structures for generation results (hashes, metadata, diagnostics) to allow safe handoffs.
-2. **Phase: Async Worker Boundaries (Oban)** - Establish the standard pattern and optional adapter for enqueueing idempotent render jobs.
-3. **Phase: Ecosystem Integrations (Do Now)** - Implement the `threadline` audit behavior, `mailglass` attachment recipe, and `accrue` billing document patterns.
+## Critical Risks
 
-**Phase ordering rationale:**
-- Artifact structure must exist before we can safely queue it.
-- Async boundaries must be defined before we can build robust billing/delivery integrations that rely on them.
+- Leaking passwords into artifact metadata, audit payloads, or persisted async job args
+- Overclaiming advisory permissions as enforced security
+- Publishing viewer claims before recorded manual evidence exists
+- Reopening native encryption scope before the external-hook contract is settled
 
-**Research flags for phases:**
-- Phase 2: Needs careful design to ensure the Oban worker adapter doesn't force a specific storage backend.
-- Phase 3: Integration with `threadline` requires defining a clear `Rendro.Audit` behavior.
+## Milestone Posture
 
-## Confidence Assessment
-
-| Area | Confidence | Notes |
-|------|------------|-------|
-| Stack | HIGH | Elixir/Oban ecosystem is standard and well-understood. |
-| Features | HIGH | JTBD clearly mapped in `rendro-integration-opportunities.md`. |
-| Architecture | HIGH | Adapter pattern is well-established in Elixir (e.g., Swoosh). |
-| Pitfalls | HIGH | Core contamination is a known risk in library design. |
-
-## Gaps to Address
-
-- **Storage Interfaces:** How should the Oban worker hand off the PDF bytes to long-term storage (S3/GCS) without making AWS/GCP a dependency? (Likely requires a simple `Rendro.Storage` behavior).
+This milestone is the right next step after `v1.9` because it extends downstream delivery usefulness without broadening Rendro into signatures, compliance, or native cryptographic trust operations. It should end in a releasable state so the next Hex version can be consumed immediately by `mailglass`.

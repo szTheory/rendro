@@ -14,7 +14,6 @@ defmodule Rendro.Protect do
     :annotate,
     :assemble,
     :copy,
-    :extract_for_accessibility,
     :fill_forms,
     :modify,
     :print
@@ -27,7 +26,6 @@ defmodule Rendro.Protect do
           | :annotate
           | :fill_forms
           | :assemble
-          | :extract_for_accessibility
 
   @type option ::
           {:adapter, module()}

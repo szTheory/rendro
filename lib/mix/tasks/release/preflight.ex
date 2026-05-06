@@ -33,6 +33,7 @@ defmodule Mix.Tasks.Release.Preflight do
       check_clean_worktree(context),
       check_exact_tag(context, version),
       check_package_metadata(context.project_config),
+      check_changelog_release_tail(context),
       check_hex_artifacts(context, version)
     ]
 
@@ -114,6 +115,29 @@ defmodule Mix.Tasks.Release.Preflight do
         "Package metadata",
         "missing metadata fields: #{missing |> Enum.reverse() |> Enum.join(", ")}"
       )
+    end
+  end
+
+  defp check_changelog_release_tail(context) do
+    changelog_path = Map.get(context, :changelog_path, "CHANGELOG.md")
+
+    with {:ok, changelog} <- File.read(changelog_path),
+         true <- String.contains?(changelog, "## [0.1.0] - Unreleased"),
+         true <-
+           String.contains?(
+             changelog,
+             "`render_to_artifact -> Protect.password -> store/deliver`"
+           ) do
+      pass("Changelog release tail")
+    else
+      false ->
+        fail(
+          "Changelog release tail",
+          "CHANGELOG.md is missing the current release-tail protected-delivery pointer"
+        )
+
+      {:error, reason} ->
+        fail("Changelog release tail", "unable to read CHANGELOG.md: #{inspect(reason)}")
     end
   end
 

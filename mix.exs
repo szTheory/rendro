@@ -136,7 +136,12 @@ defmodule Rendro.MixProject do
           Rendro.Adapters.Oban.RenderWorker,
           Rendro.Adapters.Threadline,
           Rendro.Adapters.Mailglass,
-          Rendro.Adapters.Accrue
+          Rendro.Adapters.Accrue,
+          Rendro.Adapters.Qpdf
+        ],
+        Protection: [
+          Rendro.Protect,
+          Rendro.Protect.Adapter
         ],
         "Inspection & Observability": [
           Rendro.Inspector,

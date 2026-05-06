@@ -1,7 +1,7 @@
 defmodule Rendro.DocsContract.ProtectionClaimsTest do
   use ExUnit.Case, async: true
 
-  test "support matrix publishes the narrow protection family and leaves viewers unverified" do
+  test "support matrix publishes the narrow protection family and promotes only the proven protection viewer" do
     matrix = File.read!("priv/support_matrix.json")
 
     assert matrix =~ ~s|"protection"|
@@ -25,7 +25,12 @@ defmodule Rendro.DocsContract.ProtectionClaimsTest do
              ~r/"protection".*?"viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
 
     assert matrix =~
-             ~r/"protection".*?"viewers".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+             ~r/"protection".*?"viewers".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
+
+    assert matrix =~ ~s|"opens_with_open_password"|
+    assert matrix =~ ~s|"advisory_print_behavior"|
+    assert matrix =~ ~s|"advisory_copy_behavior"|
+    assert matrix =~ ~s|"save_and_reopen_readability"|
 
     refute matrix =~ ~s|"native_encryption": "supported"|
     refute matrix =~ ~s|"digital_signatures": "supported"|
@@ -45,7 +50,9 @@ defmodule Rendro.DocsContract.ProtectionClaimsTest do
     assert guide =~
              "Phase 53 does not introduce a first-party protected worker or orchestration API."
     assert guide =~ "If validation succeeds only with `owner_password`"
-    assert guide =~ "All `protection` viewer rows remain `unverified`"
+    assert guide =~ "Apple Preview is `supported` for the `protection` surface"
+    assert guide =~ "`save_and_reopen_readability`"
+    assert guide =~ "Adobe Acrobat Reader remains `unverified`"
 
     refute guide =~ "secure PDF"
     refute guide =~ "tamper-proof"

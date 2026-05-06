@@ -171,12 +171,12 @@ defmodule Rendro.Phase54.ProtectedViewerProofFixture do
           Rendro.block(
             Rendro.text("Protected validation", size: 12),
             x: 36,
-            y: 720
+            y: 72
           ),
           Rendro.block(
             Rendro.text("Phase 54 viewer proof fixture", size: 10),
             x: 36,
-            y: 696
+            y: 96
           )
         ]
       )

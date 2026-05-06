@@ -1,125 +1,128 @@
 defmodule Rendro.Adapters.PopplerTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   alias Rendro.Adapters.Poppler
-  alias Rendro.Test.EmbeddedArtifactSupportFixture
-  alias Rendro.Test.FormSupportFixture
 
-  describe "validate/1" do
-    test "returns missing executable when pdfinfo is not installed, or skips if installed" do
-      case System.find_executable("pdfinfo") do
-        nil ->
-          assert {:error, {:missing_executable, "pdfinfo"}} = Poppler.validate("dummy.pdf")
+  setup do
+    on_exit(fn ->
+      Application.delete_env(:rendro, :pdfinfo_executable_finder)
+      Application.delete_env(:rendro, :pdfinfo_command_runner)
+    end)
 
-        _ ->
-          IO.puts("Skipping missing executable test: pdfinfo is installed")
-          :ok
-      end
+    :ok
+  end
+
+  describe "validate/2" do
+    test "returns missing executable when pdfinfo is unavailable, even with password opts" do
+      Application.put_env(:rendro, :pdfinfo_executable_finder, fn "pdfinfo" -> nil end)
+
+      assert {:error, {:missing_executable, "pdfinfo"}} =
+               Poppler.validate("dummy.pdf",
+                 open_password: "open-secret",
+                 owner_password: "owner-secret"
+               )
     end
 
-    test "returns invalid_pdf for corrupt file" do
-      case System.find_executable("pdfinfo") do
-        nil ->
-          IO.puts("Skipping corrupt file test: pdfinfo not installed")
-          :ok
+    test "uses only the open password when both passwords are provided" do
+      Application.put_env(:rendro, :pdfinfo_executable_finder, fn "pdfinfo" -> "/tmp/pdfinfo" end)
 
-        _executable ->
-          path = Path.join(System.tmp_dir!(), "corrupt_#{System.unique_integer([:positive])}.pdf")
-          File.write!(path, "not a pdf")
+      Application.put_env(:rendro, :pdfinfo_command_runner, fn "/tmp/pdfinfo", args, _opts ->
+        assert args == ["-upw", "open-secret", "protected.pdf"]
+        {"Pages: 1\nEncrypted: yes\n", 0}
+      end)
 
-          assert {:error, {:invalid_pdf, error_msg}} = Poppler.validate(path)
-          assert is_binary(error_msg)
-
-          File.rm!(path)
-      end
+      assert {:ok, %{"Encrypted" => "yes", "Pages" => "1"}} =
+               Poppler.validate("protected.pdf",
+                 open_password: "open-secret",
+                 owner_password: "owner-secret"
+               )
     end
 
-    test "returns metadata map for valid pdf" do
-      case System.find_executable("pdfinfo") do
-        nil ->
-          IO.puts("Skipping valid pdf test: pdfinfo not installed")
-          :ok
+    test "falls back to owner password only when the open password is absent or blank" do
+      Application.put_env(:rendro, :pdfinfo_executable_finder, fn "pdfinfo" -> "/tmp/pdfinfo" end)
 
-        _executable ->
-          path = Path.join(System.tmp_dir!(), "valid_#{System.unique_integer([:positive])}.pdf")
+      Application.put_env(:rendro, :pdfinfo_command_runner, fn "/tmp/pdfinfo", args, _opts ->
+        assert args == ["-opw", "owner-secret", "protected.pdf"]
+        {"Pages: 1\nEncrypted: yes\n", 0}
+      end)
 
-          # Minimal valid PDF
-          valid_pdf = """
-          %PDF-1.4
-          1 0 obj
-          << /Type /Catalog /Pages 2 0 R >>
-          endobj
-          2 0 obj
-          << /Type /Pages /Kids [3 0 R] /Count 1 >>
-          endobj
-          3 0 obj
-          << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] >>
-          endobj
-          xref
-          0 4
-          0000000000 65535 f 
-          0000000009 00000 n 
-          0000000058 00000 n 
-          0000000115 00000 n 
-          trailer
-          << /Size 4 /Root 1 0 R >>
-          startxref
-          186
-          %%EOF
-          """
-
-          File.write!(path, valid_pdf)
-
-          assert {:ok, metadata} = Poppler.validate(path)
-          assert is_map(metadata)
-
-          File.rm!(path)
-      end
+      assert {:ok, %{"Encrypted" => "yes", "Pages" => "1"}} =
+               Poppler.validate("protected.pdf",
+                 open_password: "   ",
+                 owner_password: "owner-secret"
+               )
     end
 
-    test "validates the representative supported-forms fixture" do
-      case System.find_executable("pdfinfo") do
-        nil ->
-          IO.puts("Skipping forms fixture validation test: pdfinfo not installed")
-          :ok
+    test "passes no password flags when neither password is present" do
+      Application.put_env(:rendro, :pdfinfo_executable_finder, fn "pdfinfo" -> "/tmp/pdfinfo" end)
 
-        _executable ->
-          path = Path.join(System.tmp_dir!(), "forms_#{System.unique_integer([:positive])}.pdf")
-          FormSupportFixture.write_fixture(path)
+      Application.put_env(:rendro, :pdfinfo_command_runner, fn "/tmp/pdfinfo", args, _opts ->
+        assert args == ["plain.pdf"]
+        {"Pages: 1\nEncrypted: no\n", 0}
+      end)
 
-          assert {:ok, metadata} = Poppler.validate(path)
-          assert is_map(metadata)
-          assert metadata["Pages"] == "1"
-
-          File.rm!(path)
-      end
+      assert {:ok, %{"Encrypted" => "no", "Pages" => "1"}} = Poppler.validate("plain.pdf")
     end
 
-    test "validates the representative embedded-artifact support fixture" do
-      # Phase 50 D-10..D-14: Poppler proves PDF structure only. This lane
-      # does NOT prove embedded-file discoverability, extract/save behavior,
-      # external-link handoff, or internal-page navigation. Those claims
-      # require the manual viewer proof lane in 50-VALIDATION.md.
-      case System.find_executable("pdfinfo") do
-        nil ->
-          IO.puts("Skipping embedded-artifact fixture validation test: pdfinfo not installed")
-          :ok
+    test "normalizes password-required failures without exposing raw stderr" do
+      Application.put_env(:rendro, :pdfinfo_executable_finder, fn "pdfinfo" -> "/tmp/pdfinfo" end)
 
-        _executable ->
-          path =
-            Path.join(
-              System.tmp_dir!(),
-              "embedded_artifact_#{System.unique_integer([:positive])}.pdf"
-            )
+      Application.put_env(:rendro, :pdfinfo_command_runner, fn "/tmp/pdfinfo", _args, _opts ->
+        {"Command Line Error: Incorrect password or password required for encrypted document", 1}
+      end)
 
-          EmbeddedArtifactSupportFixture.write_fixture(path)
+      assert {:error, {:invalid_pdf, :password_required}} = Poppler.validate("protected.pdf")
+    end
 
-          assert {:ok, metadata} = Poppler.validate(path)
-          assert is_map(metadata)
-          assert metadata["Pages"] == "2"
+    test "treats poppler's incorrect-password wording as password_required when no password was supplied" do
+      Application.put_env(:rendro, :pdfinfo_executable_finder, fn "pdfinfo" -> "/tmp/pdfinfo" end)
 
-          File.rm!(path)
-      end
+      Application.put_env(:rendro, :pdfinfo_command_runner, fn "/tmp/pdfinfo", _args, _opts ->
+        {"Command Line Error: Incorrect password", 1}
+      end)
+
+      assert {:error, {:invalid_pdf, :password_required}} = Poppler.validate("protected.pdf")
+    end
+
+    test "normalizes incorrect-password failures without exposing raw stderr" do
+      Application.put_env(:rendro, :pdfinfo_executable_finder, fn "pdfinfo" -> "/tmp/pdfinfo" end)
+
+      Application.put_env(:rendro, :pdfinfo_command_runner, fn "/tmp/pdfinfo", _args, _opts ->
+        {"Command Line Error: Incorrect password", 1}
+      end)
+
+      assert {:error, {:invalid_pdf, :incorrect_password}} =
+               Poppler.validate("protected.pdf", open_password: "wrong-secret")
+    end
+
+    test "normalizes corrupt-file failures to structural_invalidity" do
+      Application.put_env(:rendro, :pdfinfo_executable_finder, fn "pdfinfo" -> "/tmp/pdfinfo" end)
+
+      Application.put_env(:rendro, :pdfinfo_command_runner, fn "/tmp/pdfinfo", _args, _opts ->
+        {"Syntax Error: Couldn't find trailer dictionary\nSyntax Error: Couldn't read xref table", 1}
+      end)
+
+      assert {:error, {:invalid_pdf, :structural_invalidity}} = Poppler.validate("corrupt.pdf")
+    end
+
+    test "normalizes unexpected tool failures to tool_failure" do
+      Application.put_env(:rendro, :pdfinfo_executable_finder, fn "pdfinfo" -> "/tmp/pdfinfo" end)
+
+      Application.put_env(:rendro, :pdfinfo_command_runner, fn "/tmp/pdfinfo", _args, _opts ->
+        {"Poppler crashed in /tmp/secret-path", 99}
+      end)
+
+      assert {:error, {:invalid_pdf, :tool_failure}} = Poppler.validate("protected.pdf")
+    end
+
+    test "returns tool_failure when the runner raises" do
+      Application.put_env(:rendro, :pdfinfo_executable_finder, fn "pdfinfo" -> "/tmp/pdfinfo" end)
+
+      Application.put_env(:rendro, :pdfinfo_command_runner, fn "/tmp/pdfinfo", _args, _opts ->
+        raise RuntimeError, "boom"
+      end)
+
+      assert {:error, {:invalid_pdf, :tool_failure}} = Poppler.validate("protected.pdf")
     end
   end
 end

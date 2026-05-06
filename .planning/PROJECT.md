@@ -36,7 +36,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 - External protection hooks first — post-processing or adapter seams that wrap rendered artifacts before any native PDF encryption surface lands in core.
 - Narrow protection claims — distinguish password-to-open, advisory permissions, and explicitly unsupported compliance/archive narratives across docs and `priv/support_matrix.json`.
 - Proof-backed support boundaries — extend the Poppler structural lane plus recorded manual viewer evidence to any new protection surface before promotion.
-- Native encryption gated on proof — land only if demand is proven and a non-deterministic output mode is explicitly accepted; otherwise stay external-hooks-only.
+- Existing artifact seams remain the integration path — protected artifacts must flow cleanly through Mailglass/storage patterns without pushing credentials into persisted async job args.
 
 **Why now:** With embedded artifact surfaces shipped in v1.9, the next coherent step is protection without taking on the heavier cryptographic-trust contract of digital signing.
 
@@ -57,8 +57,8 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-- [ ] v1.10 will introduce a truthful PDF protection story through external protection hooks first, with narrow password-to-open and advisory-permissions claims rather than blanket "secure PDF" marketing.
-- [ ] v1.10 will keep native PDF encryption gated on proof-backed validation before any in-core encryption surface expands.
+- [ ] v1.10 will introduce a truthful PDF protection story through an external artifact-first hook, with narrow password-to-open and advisory-permissions claims rather than blanket "secure PDF" marketing.
+- [ ] v1.10 will support only AES-256 on the public protection surface and will continue to defer native in-core encryption.
 - [ ] v1.10 will preserve the existing deterministic core pipeline and the optional-adapter boundary as non-negotiable.
 
 ### Out of Scope

@@ -59,6 +59,7 @@ defmodule Rendro.Adapters.QpdfTest do
       assert Enum.member?(rest, "--print=full")
       assert Enum.member?(rest, "--extract=y")
       assert Enum.member?(rest, "--modify=none")
+      refute Enum.any?(rest, &String.starts_with?(&1, "--accessibility"))
       assert Enum.member?(rest, "--")
 
       output_path = List.last(rest)

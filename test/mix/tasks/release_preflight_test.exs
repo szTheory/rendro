@@ -78,6 +78,55 @@ defmodule Mix.Tasks.Release.PreflightTest do
     assert_received {:preflight_command, "mix", ["hex.publish", "--dry-run", "--yes"]}
   end
 
+  test "fails before phase 2 when the changelog release-tail pointer is missing" do
+    changelog_path =
+      Path.join(
+        System.tmp_dir!(),
+        "rendro-preflight-changelog-#{System.unique_integer([:positive])}.md"
+      )
+
+    File.write!(changelog_path, """
+    # Changelog
+
+    ## [0.1.0] - Unreleased
+
+    ### Added
+
+    - protection support without the canonical release-tail pointer
+    """)
+
+    on_exit(fn ->
+      File.rm_rf(changelog_path)
+    end)
+
+    runner =
+      command_runner_for(%{
+        {"git", ["status", "--short"]} => {"", 0},
+        {"git", ["describe", "--tags", "--exact-match"]} => {"v0.1.0\n", 0},
+        {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0}
+      })
+
+    {messages, result} =
+      capture_shell_messages(fn ->
+        Preflight.run_with_context(%{
+          project_config: [
+            version: "0.1.0",
+            package: [licenses: ["Apache-2.0"], links: %{"GitHub" => "https://example.test"}]
+          ],
+          command_runner: runner,
+          changelog_path: changelog_path
+        })
+      end)
+
+    output = Enum.join(messages, "\n")
+
+    assert match?({:error, _}, result)
+    assert output =~ "Changelog release tail: FAIL"
+    assert output =~ "CHANGELOG.md is missing the current release-tail protected-delivery pointer"
+    refute output =~ "Phase 2: release parity checks"
+    refute_received {:preflight_command, "mix", ["ci"]}
+  end
+
   defp command_runner_for(responses) do
     test_pid = self()
 

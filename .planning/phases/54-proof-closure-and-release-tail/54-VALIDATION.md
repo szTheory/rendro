@@ -34,8 +34,8 @@ created: 2026-05-06
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
 | 54-01-01 | 01 | 1 | TRUST-03 | T-54-01, T-54-02, T-54-04 | The proof scaffold names the locked five checks, records the Phase 52 plus host-tool gate explicitly, and provides a repeatable protected-fixture generator entrypoint. | script / planning | `mix run scripts/protected_viewer_proof_fixture.exs --dry-run --output /tmp/rendro-phase54-proof.pdf && rg -n "opens_with_open_password|displays_authored_content_correctly|advisory_print_behavior|advisory_copy_behavior|save_and_reopen_readability|Phase 52|qpdf|pdfinfo" .planning/phases/54-proof-closure-and-release-tail/54-VALIDATION.md` | ✅ | ✅ green |
-| 54-01-02 | 01 | 1 | TRUST-03 | T-54-02, T-54-03 | The manual proof sheet contains at least one completed viewer row with the required metadata and does not use owner-password-only success as a promotion basis. | manual + regex check | `rg -nP '^\| (Adobe Acrobat Reader|Apple Preview) \| (?!pending \|)([^|]+) \| (?!pending \|)([^|]+) \| (?!pending \|)([^|]+) \| (?!pending \|)([^|]+) \| (pass|fail) \| (pass|fail) \| (pass|fail) \| (pass|fail) \| (pass|fail) \| (supported|unverified) \| (?! pending)([^|]+) \|$' .planning/phases/54-proof-closure-and-release-tail/54-VALIDATION.md` after the human checkpoint review | ✅ | ⬜ pending |
-| 54-01-03 | 01 | 1 | TRUST-03 | T-54-01, T-54-03 | Any per-viewer promotion is synced across the support matrix, API-stability guide, and protection docs-contract assertions with no drift. | docs-contract | `mix test test/docs_contract/protection_claims_test.exs && mix docs.contract` | ✅ | ⬜ pending |
+| 54-01-02 | 01 | 1 | TRUST-03 | T-54-02, T-54-03 | The manual proof sheet contains at least one completed viewer row with the required metadata and does not use owner-password-only success as a promotion basis. | manual + regex check | `rg -nP '^\| (Adobe Acrobat Reader|Apple Preview) \| (?!pending \|)([^|]+) \| (?!pending \|)([^|]+) \| (?!pending \|)([^|]+) \| (?!pending \|)([^|]+) \| (pass|fail) \| (pass|fail) \| (pass|fail) \| (pass|fail) \| (pass|fail) \| (supported|unverified) \| (?! pending)([^|]+) \|$' .planning/phases/54-proof-closure-and-release-tail/54-VALIDATION.md` after the human checkpoint review | ✅ | ✅ green |
+| 54-01-03 | 01 | 1 | TRUST-03 | T-54-01, T-54-03 | Any per-viewer promotion is synced across the support matrix, API-stability guide, and protection docs-contract assertions with no drift. | docs-contract | `mix test test/docs_contract/protection_claims_test.exs && mix docs.contract` | ✅ | ✅ green |
 | 54-02-01 | 02 | 2 | RELEASE-01 | T-54-06, T-54-08 | Release-tail wording stays pointer-thin and directs users back to the canonical protected-delivery recipe without introducing a second integration story. | docs-contract | `mix test test/docs_contract/integrations_claims_test.exs` | ✅ | ⬜ pending |
 | 54-02-02 | 02 | 2 | RELEASE-01 | T-54-05, T-54-07 | Release readiness is executable through preflight plus isolated exact-tag proof, and the worktree proof path remains the canonical final publish gate. | unit / script | `mix test test/mix/tasks/release_preflight_test.exs test/scripts/release_preflight_proof_test.exs` | ✅ | ⬜ pending |
 
@@ -45,7 +45,7 @@ created: 2026-05-06
 
 - [x] `.planning/phases/54-proof-closure-and-release-tail/54-VALIDATION.md` records the five required protection checks and the per-viewer evidence table
 - [x] Phase 52 completion or explicit dependency checkpoint is in place before any viewer-promotion execution
-- [ ] `qpdf` is installed or otherwise available on the execution host for real protected viewer proof
+- [x] `qpdf` is installed or otherwise available on the execution host for real protected viewer proof
 - [ ] `test/docs_contract/protection_claims_test.exs` is updated for any post-proof viewer promotion outcome
 - [ ] `test/docs_contract/integrations_claims_test.exs` and release-preflight tests cover any new release-tail wording or executable readiness check
 - [ ] Release-tail wording has an executable guardrail if new publish-tail prose is introduced
@@ -84,12 +84,18 @@ Required per-viewer metadata:
 - Result
 - One short notes field
 
+## Operator Notes
+
+- 2026-05-06: Representative proof fixture generated successfully at `/tmp/rendro-phase54-proof.pdf`.
+- 2026-05-06: Operator confirmed password-to-open behavior worked for the generated fixture. This records only `opens_with_open_password` evidence; it is not yet enough to promote any viewer row without viewer metadata and the remaining four checklist results.
+- 2026-05-06: Apple Preview 11.0 on macOS 26.4.1 completed the locked five-check proof lane for `/tmp/rendro-phase54-proof.pdf`: open-password access worked, authored content displayed correctly, Preview prompted for the owner password before restricted copy, print remained restricted, and a saved copy reopened successfully.
+
 ## Manual Proof Record
 
 | Viewer | Version | OS | Fixture | Date | opens_with_open_password | displays_authored_content_correctly | advisory_print_behavior | advisory_copy_behavior | save_and_reopen_readability | Result | Notes |
 |--------|---------|----|---------|------|---------------------------|-------------------------------------|-------------------------|------------------------|-----------------------------|--------|-------|
-| Adobe Acrobat Reader | pending | pending | pending | pending | pending | pending | pending | pending | pending | unverified | Waiting for accepted Phase 52 completion, `qpdf`, and a generated representative fixture. |
-| Apple Preview | pending | pending | pending | pending | pending | pending | pending | pending | pending | unverified | Waiting for accepted Phase 52 completion, `qpdf`, and a generated representative fixture. |
+| Adobe Acrobat Reader | pending | pending | pending | pending | pending | pending | pending | pending | pending | unverified | Fixture is generated; waiting for viewer-specific metadata and the remaining checklist results. |
+| Apple Preview | 11.0 | macOS 26.4.1 | /tmp/rendro-phase54-proof.pdf | 2026-05-06 | pass | pass | pass | pass | pass | supported | Opened with `open-secret`, displayed authored text, blocked restricted copy/print behavior without the owner password, and the saved copy reopened successfully. |
 
 ## Threat References
 
@@ -103,7 +109,7 @@ Required per-viewer metadata:
 
 ## Validation Sign-Off
 
-- [ ] All tasks have automated verification coverage or explicit manual-only verification
+- [x] All tasks have automated verification coverage or explicit manual-only verification
 - [ ] Sampling continuity is preserved across proof and release-tail slices
 - [ ] Wave 0 covers the missing dependency/host-tool prerequisites
 - [ ] No watch-mode flags

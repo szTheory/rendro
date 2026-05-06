@@ -158,7 +158,7 @@ defmodule Rendro.Error do
   end
 
   defp next_step(:protect, {:unknown_permissions, _permissions}) do
-    "Use only supported advisory permissions: :print, :copy, :modify, :annotate, :fill_forms, :assemble, :extract_for_accessibility."
+    "Use only supported advisory permissions: :print, :copy, :modify, :annotate, :fill_forms, :assemble."
   end
 
   defp next_step(:protect, {:missing_executable, "qpdf"}) do

@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `Rendro.Protect.password/2` and `Rendro.render_protected/3` for artifact-first AES-256 password-to-open protection through optional external adapters.
+- `Rendro.Adapters.Qpdf` as the first-party external protection adapter, keeping `qpdf` as an optional runtime executable instead of a hard dependency.
+- Password-aware `Rendro.Adapters.Poppler.validate/2` support so protected PDFs can still participate in the structural validation lane.
+- A new `protection` family in `priv/support_matrix.json` plus docs-contract coverage for advisory-permissions wording and unsupported compliance/signature claims.
+- Proof-backed Apple Preview support for the `protection` surface, with release guidance that points downstream users back to the canonical `render_to_artifact -> Protect.password -> store/deliver` recipe instead of persisting passwords in Oban or pushing them into Mailglass.
 - `Rendro.Artifact` struct and `Rendro.render_to_artifact/2` to encapsulate generation results (binary, hash, diagnostics, metadata).
 - `Rendro.Storage` behavior for persisting generated artifacts to external systems.
 - `Rendro.Audit` behavior defining the contract for logging render events and lifecycle telemetry.

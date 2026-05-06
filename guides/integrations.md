@@ -72,6 +72,8 @@ The canonical protected-delivery recipe is
 delivery, render the artifact in your worker and apply `Rendro.Protect.password/2`
 in an application-owned secret boundary before storage or delivery.
 
+That recipe is also the release-tail contract for Phoenix and Mailglass users: keep passwords out of persisted Oban args, keep protection inside your application-owned secret boundary, and let Mailglass transport already-protected artifacts rather than password material.
+
 ### Worker failure diagnostics
 
 Boundary misuse returns typed `{:error, reason}` tuples without crashing the

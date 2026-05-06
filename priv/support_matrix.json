@@ -130,19 +130,21 @@
       "adobe_acrobat_reader": {
         "status": "unverified",
         "proof": [
-          "opens_with_user_password",
+          "opens_with_open_password",
           "displays_authored_content_correctly",
-          "honors_advisory_print_flag",
-          "honors_advisory_copy_flag"
+          "advisory_print_behavior",
+          "advisory_copy_behavior",
+          "save_and_reopen_readability"
         ]
       },
       "apple_preview": {
-        "status": "unverified",
+        "status": "supported",
         "proof": [
-          "opens_with_user_password",
+          "opens_with_open_password",
           "displays_authored_content_correctly",
-          "honors_advisory_print_flag",
-          "honors_advisory_copy_flag"
+          "advisory_print_behavior",
+          "advisory_copy_behavior",
+          "save_and_reopen_readability"
         ]
       }
     }

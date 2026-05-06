@@ -58,6 +58,7 @@ defmodule Rendro.DocsContract.IntegrationsClaimsTest do
     assert content =~ "Persist only business identifiers in Oban args."
     assert content =~ "Resolve protection secrets at execution time inside your application boundary."
     assert content =~ "`render_to_artifact -> Protect.password -> store/deliver`"
+    assert content =~ "release-tail contract for Phoenix and Mailglass users"
   end
 
   test "threadline timeout closure stays truthful" do

@@ -73,4 +73,8 @@ Delivery and storage seams should transport already-protected artifacts, not pas
 
 Phase 53 does not introduce a first-party protected worker or orchestration API.
 
-Structural validation through `pdfinfo`/Poppler proves that a protected PDF remains structurally readable when a password is supplied to the validator. If validation succeeds only with `owner_password`, that proves structural decryptability fallback rather than the normative password-to-open path. It does not prove viewer behavior. All `protection` viewer rows remain `unverified` in `priv/support_matrix.json` until a recorded checklist promotes a named viewer.
+Structural validation through `pdfinfo`/Poppler proves that a protected PDF remains structurally readable when a password is supplied to the validator. If validation succeeds only with `owner_password`, that proves structural decryptability fallback rather than the normative password-to-open path. It does not prove viewer behavior.
+
+Apple Preview is `supported` for the `protection` surface based on the recorded Phase 54 checklist for version 11.0 on macOS 26.4.1. That proof confirms `opens_with_open_password`, `displays_authored_content_correctly`, `advisory_print_behavior`, `advisory_copy_behavior`, and `save_and_reopen_readability` for the representative protected fixture.
+
+Adobe Acrobat Reader remains `unverified` until the same five-check protection checklist is recorded for that viewer. Other `protection` viewers remain `unverified` in `priv/support_matrix.json` until a recorded checklist promotes a named viewer.
