@@ -8,6 +8,7 @@ defmodule Rendro do
     Block,
     Document,
     FormField,
+    Link,
     Metadata,
     Page,
     PageTemplate,
@@ -210,6 +211,14 @@ defmodule Rendro do
     struct!(Block, Keyword.put(block_attrs, :content, field))
   end
 
+  @doc """
+  Wraps exactly one authored block with a curated external URI or internal page target.
+  """
+  @spec link(Block.t(), keyword()) :: Block.t()
+  def link(%Block{} = block, opts) when is_list(opts) do
+    %Block{block | content: %Link{content: block.content, target: normalize_link_target(opts)}}
+  end
+
   @spec metadata(keyword()) :: Metadata.t()
   def metadata(attrs \\ []) do
     struct!(Metadata, attrs)
@@ -247,6 +256,29 @@ defmodule Rendro do
     case Keyword.fetch(attrs, :font) do
       {:ok, font} -> Keyword.put(attrs, :font, Text.normalize_font(font))
       :error -> attrs
+    end
+  end
+
+  defp normalize_link_target(opts) do
+    target_opts = Keyword.take(opts, [:uri, :page])
+    unsupported_keys = opts |> Keyword.keys() |> Kernel.--([:uri, :page])
+
+    cond do
+      unsupported_keys != [] ->
+        raise ArgumentError,
+              "Rendro.link/2 received unsupported link options: #{inspect(unsupported_keys)}"
+
+      Keyword.has_key?(target_opts, :uri) and Keyword.has_key?(target_opts, :page) ->
+        raise ArgumentError, "Rendro.link/2 requires exactly one of :uri or :page"
+
+      Keyword.has_key?(target_opts, :uri) ->
+        {:uri, Keyword.fetch!(target_opts, :uri)}
+
+      Keyword.has_key?(target_opts, :page) ->
+        {:page, Keyword.fetch!(target_opts, :page)}
+
+      true ->
+        raise ArgumentError, "Rendro.link/2 requires exactly one of :uri or :page"
     end
   end
 end
