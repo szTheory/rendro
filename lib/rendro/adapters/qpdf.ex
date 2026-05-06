@@ -8,7 +8,15 @@ defmodule Rendro.Adapters.Qpdf do
 
   @behaviour Rendro.Protect.Adapter
 
-  @spec protect(Rendro.Artifact.t(), map()) :: {:ok, binary()} | {:error, term()}
+  @type protect_opts :: %{
+          required(:algorithm) => :aes_256,
+          required(:advisory_permissions) => [Rendro.Protect.permission()],
+          required(:open_password) => String.t(),
+          required(:owner_password) => String.t(),
+          optional(atom()) => term()
+        }
+
+  @spec protect(Rendro.Artifact.t(), protect_opts()) :: {:ok, binary()} | {:error, term()}
   def protect(%Rendro.Artifact{} = artifact, opts) when is_map(opts) do
     with {:ok, executable} <- find_executable(),
          {:ok, tmp_dir} <- make_tmp_dir() do
@@ -39,6 +47,8 @@ defmodule Rendro.Adapters.Qpdf do
     end
   end
 
+  @spec protect_with_tmp_dir(String.t(), String.t(), binary(), protect_opts()) ::
+          {:ok, binary()} | {:error, term()}
   defp protect_with_tmp_dir(executable, tmp_dir, binary, opts) do
     with {:ok, input_path, output_path} <- write_input_paths(tmp_dir, binary),
          {:ok, argfile_path} <- write_argfile(tmp_dir, input_path, output_path, opts),
@@ -47,6 +57,7 @@ defmodule Rendro.Adapters.Qpdf do
     end
   end
 
+  @spec run_qpdf(String.t(), String.t(), String.t()) :: {:ok, binary()} | {:error, term()}
   defp run_qpdf(executable, argfile_path, output_path) do
     case run_command(executable, ["@" <> argfile_path]) do
       {:error, _reason} = error ->
@@ -60,6 +71,7 @@ defmodule Rendro.Adapters.Qpdf do
     end
   end
 
+  @spec make_tmp_dir() :: {:ok, String.t()} | {:error, File.posix() | :badarg}
   defp make_tmp_dir do
     path =
       Path.join(
@@ -75,6 +87,8 @@ defmodule Rendro.Adapters.Qpdf do
     end
   end
 
+  @spec write_input_paths(String.t(), binary()) ::
+          {:ok, String.t(), String.t()} | {:error, term()}
   defp write_input_paths(tmp_dir, binary) do
     input_path = Path.join(tmp_dir, "input.pdf")
     output_path = Path.join(tmp_dir, "output.pdf")
@@ -85,16 +99,18 @@ defmodule Rendro.Adapters.Qpdf do
     end
   end
 
+  @spec write_argfile(String.t(), String.t(), String.t(), protect_opts()) ::
+          {:ok, String.t()} | {:error, term()}
   defp write_argfile(tmp_dir, input_path, output_path, opts) do
     argfile_path = Path.join(tmp_dir, "qpdf.args")
 
     args =
       [
         "--encrypt",
-        opts.open_password,
-        opts.owner_password,
+        Map.fetch!(opts, :open_password),
+        Map.fetch!(opts, :owner_password),
         "256"
-      ] ++ permission_args(opts.advisory_permissions) ++ ["--", input_path, output_path]
+      ] ++ permission_args(Map.fetch!(opts, :advisory_permissions)) ++ ["--", input_path, output_path]
 
     case write_private_file(argfile_path, Enum.join(args, "\n") <> "\n") do
       :ok -> {:ok, argfile_path}
@@ -102,15 +118,17 @@ defmodule Rendro.Adapters.Qpdf do
     end
   end
 
+  @spec write_private_file(Path.t(), iodata()) :: :ok | {:error, term()}
   defp write_private_file(path, contents) do
     File.rm(path)
 
-    with :ok <- File.write(path, contents, [:write, :exclusive, {:mode, 0o600}]),
+    with :ok <- File.write(path, contents, [:write, :exclusive, :binary]),
          :ok <- File.chmod(path, 0o600) do
       :ok
     end
   end
 
+  @spec permission_args([Rendro.Protect.permission()]) :: [String.t()]
   defp permission_args(permissions) do
     [
       print_arg(permissions),
@@ -122,14 +140,17 @@ defmodule Rendro.Adapters.Qpdf do
     ]
   end
 
+  @spec print_arg([Rendro.Protect.permission()]) :: String.t()
   defp print_arg(permissions) do
     if :print in permissions, do: "--print=full", else: "--print=none"
   end
 
+  @spec modify_arg([Rendro.Protect.permission()]) :: String.t()
   defp modify_arg(permissions) do
     if :modify in permissions, do: "--modify=all", else: "--modify=none"
   end
 
+  @spec yes_no_arg(String.t(), boolean()) :: String.t()
   defp yes_no_arg(flag, true), do: "#{flag}=y"
   defp yes_no_arg(flag, false), do: "#{flag}=n"
 end
