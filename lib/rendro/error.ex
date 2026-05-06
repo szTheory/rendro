@@ -47,12 +47,27 @@ defmodule Rendro.Error do
   defp what(:paginate, _reason), do: "Pagination failed while assigning content to pages."
   defp what(:render, _reason), do: "PDF serialization failed during render."
   defp what(:validate, _reason), do: "Post-render validation failed."
+  defp what(:protect, _reason), do: "PDF protection failed while wrapping the rendered artifact."
   defp what(stage, _reason), do: "Render pipeline failed in stage #{inspect(stage)}."
 
   defp why({:unsupported_glyph, char}), do: "Missing glyph for character: #{char}"
 
   defp why({:unsupported_script, reason}) when is_atom(reason),
     do: "Unsupported script boundary: #{reason |> Atom.to_string() |> String.replace("_", " ")}"
+
+  defp why({:missing_required_option, option}),
+    do: "Missing required protection option: #{option}"
+
+  defp why({:invalid_option, option, value}),
+    do: "Invalid protection option #{option}: #{inspect(value)}"
+
+  defp why({:unknown_permissions, permissions}),
+    do: "Unknown advisory permissions: #{Enum.map_join(permissions, ", ", &to_string/1)}"
+
+  defp why({:missing_executable, executable}), do: "Missing executable: #{executable}"
+
+  defp why({:adapter_failure, adapter, reason}),
+    do: "Protection adapter #{inspect(adapter)} failed: #{inspect(reason)}"
 
   defp why(reason) when is_atom(reason),
     do: reason |> Atom.to_string() |> String.replace("_", " ")
@@ -120,6 +135,34 @@ defmodule Rendro.Error do
     "Reduce content complexity or increase the :max_bytes policy limit."
   end
 
+  defp next_step(:protect, {:missing_required_option, :open_password}) do
+    "Pass a non-empty :open_password so the protected PDF has a password-to-open boundary."
+  end
+
+  defp next_step(:protect, {:missing_required_option, :owner_password}) do
+    "Pass a non-empty :owner_password; Rendro requires an explicit owner password for AES-256 protection."
+  end
+
+  defp next_step(:protect, {:invalid_option, :algorithm, _value}) do
+    "Use algorithm: :aes_256. External protection in this version does not expose weaker or legacy algorithms."
+  end
+
+  defp next_step(:protect, {:invalid_option, :advisory_permissions, _value}) do
+    "Pass advisory_permissions as a list of atoms such as [:print, :copy]."
+  end
+
+  defp next_step(:protect, {:unknown_permissions, _permissions}) do
+    "Use only supported advisory permissions: :print, :copy, :modify, :annotate, :fill_forms, :assemble, :extract_for_accessibility."
+  end
+
+  defp next_step(:protect, {:missing_executable, "qpdf"}) do
+    "Install qpdf on the host or select a different protection adapter before calling Rendro.Protect.password/2."
+  end
+
+  defp next_step(:protect, {:adapter_failure, _adapter, _reason}) do
+    "Inspect the adapter stderr/output and rerun with the same protection options after correcting the host-level qpdf issue."
+  end
+
   defp next_step(:render, _reason) do
     "Inspect telemetry events for the same render_id and verify PDF object generation inputs."
   end
@@ -129,9 +172,15 @@ defmodule Rendro.Error do
   end
 
   defp stage_module_suffix(stage) do
-    stage
-    |> Atom.to_string()
-    |> Macro.camelize()
+    case stage do
+      :protect ->
+        "Protect"
+
+      _ ->
+        stage
+        |> Atom.to_string()
+        |> Macro.camelize()
+    end
   end
 end
 
