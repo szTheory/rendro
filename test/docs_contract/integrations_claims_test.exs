@@ -11,7 +11,15 @@ defmodule Rendro.DocsContract.IntegrationsClaimsTest do
   alias Rendro.Adapters.Accrue
   alias Rendro.Adapters.Mailglass, as: MailglassAdapter
   alias Rendro.Adapters.Threadline
+  alias Rendro.Protect
   alias Rendro.Test.Mocks
+
+  defmodule FakeProtectAdapter do
+    @behaviour Rendro.Protect.Adapter
+
+    @impl true
+    def protect(%Rendro.Artifact{binary: binary}, _opts), do: {:ok, binary <> "::protected"}
+  end
 
   setup do
     Mocks.reset_threadline()
@@ -46,6 +54,10 @@ defmodule Rendro.DocsContract.IntegrationsClaimsTest do
     assert content =~ ~r/fill only\s+missing `doc\.options\[:policies\]` keys/s
     assert content =~ "never silently override"
     assert content =~ "does **not** support arbitrary job-arg pass-through"
+    assert content =~ "does **not** accept password or protection fields in job args"
+    assert content =~ "Persist only business identifiers in Oban args."
+    assert content =~ "Resolve protection secrets at execution time inside your application boundary."
+    assert content =~ "`render_to_artifact -> Protect.password -> store/deliver`"
   end
 
   test "threadline timeout closure stays truthful" do
@@ -77,6 +89,46 @@ defmodule Rendro.DocsContract.IntegrationsClaimsTest do
 
     assert {:error, {:unrecognized_message_shape, DocsContractMailglassWrapper.Message}} =
              MailglassAdapter.attach_pdf(wrapper, document, "invoice.pdf")
+  end
+
+  test "mailglass can transport a protected artifact without receiving passwords" do
+    email = Swoosh.Email.new() |> Swoosh.Email.to("customer@example.test")
+    {:ok, artifact} = Rendro.render_to_artifact(sample_document(), deterministic: true)
+
+    {:ok, protected} =
+      Protect.password(artifact,
+        adapter: FakeProtectAdapter,
+        open_password: "open-secret",
+        owner_password: "owner-secret",
+        advisory_permissions: [:print]
+      )
+
+    result = MailglassAdapter.attach_artifact(email, protected, "invoice.pdf")
+
+    assert %Swoosh.Email{} = result
+    [attachment] = result.attachments
+    assert {:data, pdf} = attachment.data
+    assert pdf =~ "::protected"
+  end
+
+  test "mailglass docs keep protected delivery transport-only" do
+    guide = File.read!("guides/integrations.md")
+    source = File.read!("lib/rendro/adapters/mailglass.ex")
+
+    assert guide =~
+             "Protected delivery uses `Rendro.Adapters.Mailglass.attach_artifact/3` with an already-protected `%Rendro.Artifact{}`."
+
+    assert guide =~ "Mailglass does not need to know the passwords"
+    assert source =~ "attach_pdf/3` is the render-and-attach convenience path for unprotected PDFs."
+
+    assert source =~
+             "Protected delivery must pass an already-protected `%Rendro.Artifact{}` to `attach_artifact/3`."
+
+    assert source =~ "Mailglass never accepts, persists, derives, or manages password material."
+
+    refute guide =~ "attach_protected_pdf/4"
+    refute source =~ "attach_protected_pdf/4"
+    refute source =~ "protect:"
   end
 
   test "accrue invalid invoice contract stays truthful" do
