@@ -80,6 +80,51 @@ defmodule Rendro.Pipeline.ValidateTest do
       assert {:duplicate_radio_export_value, "contact", "email"} in errors
     end
 
+    test "aggregates embedded-file semantic failures alongside other validation errors" do
+      doc =
+        %Document{
+          embedded_file_registry: %Rendro.EmbeddedFileRegistry{
+            files: %{
+              invoice_csv: %{
+                logical_name: :invoice_csv,
+                source_kind: :binary,
+                bytes: "a,b\n1,2\n",
+                byte_size: 8,
+                filename: "invoice.csv",
+                mime_type: "text/csv"
+              },
+              backup_csv: %{
+                logical_name: :backup_csv,
+                source_kind: :binary,
+                bytes: "x,y\n3,4\n",
+                byte_size: 8,
+                filename: "invoice.csv",
+                mime_type: ""
+              }
+            }
+          },
+          pages: [
+            %Page{
+              width: 500,
+              height: 500,
+              blocks: [%Block{content: nil, x: "not a number", y: 20, width: 100, height: 20}]
+            }
+          ]
+        }
+
+      assert {:error,
+              %Rendro.Error{
+                stage: :validate,
+                reason: :structural_corruption,
+                details: %{errors: errors}
+              }} = Validate.run(doc)
+
+      assert :invalid_block_bounds in errors
+      assert {:missing_required_key, :content} in errors
+      assert {:duplicate_embedded_file_name, "invoice.csv"} in errors
+      assert {:invalid_embedded_file_mime_type, ""} in errors
+    end
+
     test "stress test: traverses a deeply nested AST with acceptable performance" do
       doc = Document.new()
       doc = Document.register_font(doc, :helvetica, built_in: :helvetica)
