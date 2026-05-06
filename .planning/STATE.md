@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.10
 milestone_name: protected-delivery-hooks-and-encryption-boundaries
 status: planning
-last_updated: "2026-05-06T05:00:00.000Z"
+last_updated: "2026-05-06T06:00:00.000Z"
 last_activity: 2026-05-06
 progress:
   total_phases: 0
@@ -24,18 +24,18 @@ See: .planning/PROJECT.md (updated 2026-05-06 after v1.9 close)
 
 ## Current Position
 
-Phase: TBD (next milestone planning)
-Plan: TBD
-Status: v1.9 archived; ready for /gsd-new-milestone
-Last activity: 2026-05-06
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-06 — Milestone v1.10 started
 
 Progress: [          ] 0%
 
 ## Milestone Snapshot
 
-- Milestone: `v1.10 Protected Delivery Hooks & Encryption Boundaries` (planning)
-- Last shipped: `v1.9 Embedded Artifact Surfaces (2026-05-06)` — see `milestones/v1.9-ROADMAP.md`
-- Next: scope v1.10 through `/gsd-new-milestone` (questioning → research → requirements → roadmap).
+- Milestone: `v1.10 Protected Delivery Hooks & Encryption Boundaries` (planning — scope locked, requirements pending).
+- Last shipped: `v1.9 Embedded Artifact Surfaces (2026-05-06)` — see `milestones/v1.9-ROADMAP.md`.
+- Phase numbering continues from v1.9 — v1.10 starts at Phase 51.
 
 ## Performance Metrics
 
@@ -55,7 +55,7 @@ Decisions are logged in PROJECT.md Key Decisions table. Decisions for the next m
 
 ### Pending Todos
 
-- Scope v1.10 via `/gsd-new-milestone` (questioning → research → requirements → roadmap).
+- Define v1.10 REQUIREMENTS.md and ROADMAP.md (in-flight via `/gsd-new-milestone`).
 
 ### Blockers/Concerns
 

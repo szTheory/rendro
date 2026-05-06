@@ -28,16 +28,17 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 **Foundation Already Shipped:** v1.3 release readiness, v1.2 typography/assets truth, v1.1 layout-authoring maturity, and v1.0 deterministic core rendering.
 
-## Next Milestone: v1.10 Protected Delivery Hooks & Encryption Boundaries
+## Current Milestone: v1.10 Protected Delivery Hooks & Encryption Boundaries
 
 **Goal:** Add a truthful PDF protection story without overclaiming permissions-based security or destabilizing deterministic core rendering.
 
-**Target focus:**
-- External protection hooks first (post-processing or adapter seams) before any native encryption story.
-- Narrow security claims that distinguish password-to-open, advisory permissions, and unsupported compliance/archive narratives.
-- Support-boundary discipline with proof-backed validation before any native encryption surface expands.
+**Target features:**
+- External protection hooks first — post-processing or adapter seams that wrap rendered artifacts before any native PDF encryption surface lands in core.
+- Narrow protection claims — distinguish password-to-open, advisory permissions, and explicitly unsupported compliance/archive narratives across docs and `priv/support_matrix.json`.
+- Proof-backed support boundaries — extend the Poppler structural lane plus recorded manual viewer evidence to any new protection surface before promotion.
+- Native encryption gated on proof — land only if demand is proven and a non-deterministic output mode is explicitly accepted; otherwise stay external-hooks-only.
 
-**Why now:** With embedded artifact surfaces shipped, the next coherent step is protection without taking on the heavier cryptographic-trust contract of digital signing.
+**Why now:** With embedded artifact surfaces shipped in v1.9, the next coherent step is protection without taking on the heavier cryptographic-trust contract of digital signing.
 
 ## Requirements
 
@@ -147,4 +148,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-06 after v1.9 milestone close.*
+*Last updated: 2026-05-06 — v1.10 milestone scope locked via /gsd-new-milestone.*
