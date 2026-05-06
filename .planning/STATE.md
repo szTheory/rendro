@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.10
 milestone_name: protected-delivery-hooks-and-encryption-boundaries
 status: active
-last_updated: "2026-05-06T10:39:09Z"
-last_activity: 2026-05-06
+last_updated: "2026-05-06T10:46:42.276Z"
+last_activity: 2026-05-06 — completed 51-02 metadata redaction and docs-contract closure
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 8
-  completed_plans: 1
-  percent: 13
+  completed_plans: 2
+  percent: 25
 ---
 
 # Project State
@@ -26,10 +26,10 @@ See: .planning/PROJECT.md (updated 2026-05-06 after v1.9 close)
 
 Phase: 51 — protection-api-contract-and-validation
 Plan: 51-02
-Status: 51-01 completed; ready for metadata/redaction follow-on work
-Last activity: 2026-05-06 — completed 51-01 protection contract and qpdf runtime hardening
+Status: 51-02 completed; Phase 51 ready for downstream qpdf validation and delivery work
+Last activity: 2026-05-06 — completed 51-02 metadata redaction and docs-contract closure
 
-Progress: [=         ] 13%
+Progress: [==        ] 25%
 
 ## Milestone Snapshot
 
@@ -48,6 +48,9 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 - Keep protection option normalization inside `Rendro.Protect` so the canonical public seam stays explicit and artifact-first.
 - Redact qpdf process failures to exit-status or exception-module tuples so passwords and raw stderr never escape typed `:protect` errors.
 - Keep qpdf executable lookup and command execution injectable while guaranteeing temp-dir cleanup on every adapter path.
+- [Phase 51]: Keep protected output as a normal %Rendro.Artifact{} with one narrow metadata.protection contract.
+- [Phase 51]: Recurse through nested maps and lists when scrubbing audit metadata so protection secrets never cross audit boundaries.
+- [Phase 51]: Keep protected-delivery docs artifact-first so Oban args and Mailglass transport never persist passwords.
 
 ### Roadmap Evolution
 
@@ -76,3 +79,4 @@ Items deferred at v1.9 milestone close on 2026-05-06:
 | signatures | Digital signatures and compliance-oriented signing claims | deferred to v2.0+ |
 | docs | Regenerate `49-VERIFICATION.md` and refresh stale `wave_0_complete` flags on `49`/`50` `VALIDATION.md` | tech debt accepted at v1.9 close |
 | docs | Standardize SUMMARY frontmatter shape (explicit `requirements:` list across all plans) | tech debt accepted at v1.9 close |
+| Phase 51 P02 | 2 min | 2 tasks | 7 files |
