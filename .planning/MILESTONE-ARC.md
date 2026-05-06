@@ -18,11 +18,11 @@
   - Broad compliance or archival claims
   - Marketing PDF permissions as hard security
 
-## Recommended Next Candidates
+## Active Milestone
 
 ### v2.0 Signature Fields & External Signing Preparation
 
-- **Status:** candidate
+- **Status:** active
 - **Why after v1.10:** Signature work is a higher-trust, higher-surprise surface that should follow the newly-shipped protection boundaries rather than overlap them.
 - **Scope recommendation:**
   - Unsigned signature-field authoring in core
@@ -32,6 +32,10 @@
   - Core key custody
   - PAdES/LTV/OCSP/CRL/TSA support
   - Broad compliance claims
+
+## Follow-On Direction
+
+- Keep any post-`v2.0` milestone focused on proof-backed cryptographic-signature and compliance work only if the unsigned-field and signing-preparation contract proves stable in real usage.
 
 ## Arc Rules
 

@@ -1,10 +1,10 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.10
-milestone_name: protected-delivery-hooks-and-encryption-boundaries
-status: between_milestones
-last_updated: "2026-05-06T20:30:00Z"
-last_activity: 2026-05-06 — v1.10 archived after exact-tag release verification passed
+milestone: v2.0
+milestone_name: signature-fields-and-external-signing-preparation
+status: defining_requirements
+last_updated: "2026-05-06T21:15:00Z"
+last_activity: 2026-05-06 — v2.0 started with research-backed milestone scoping
 progress:
   total_phases: 4
   completed_phases: 3
@@ -20,22 +20,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-06 after v1.9 close)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Start the next milestone definition from a shipped and release-verified v1.10 baseline.
+**Current focus:** Define and plan `v2.0 Signature Fields & External Signing Preparation` from a shipped and release-verified v1.10 baseline.
 
 ## Current Position
 
-Phase: none active
-Plan: none active
-Status: Milestone v1.10 is shipped and archived; no new milestone has been defined yet
-Last activity: 2026-05-06 — exact-tag release proof passed and milestone close bookkeeping completed
+Phase: Not started (defining requirements)
+Plan: -
+Status: Defining requirements and roadmap for `v2.0 Signature Fields & External Signing Preparation`
+Last activity: 2026-05-06 — milestone goals confirmed and research completed
 
 Progress: [==========] 100%
 
 ## Milestone Snapshot
 
-- Milestone: `v1.10 Protected Delivery Hooks & Encryption Boundaries` (shipped and release-verified at `v0.2.0`).
-- Last shipped: `v1.9 Embedded Artifact Surfaces (2026-05-06)` — see `milestones/v1.9-ROADMAP.md`.
-- Phase numbering continues from v1.9 — v1.10 starts at Phase 51.
+- Active milestone: `v2.0 Signature Fields & External Signing Preparation` (requirements and roadmap in progress).
+- Last shipped: `v1.10 Protected Delivery Hooks & Encryption Boundaries (2026-05-06)` — see `milestones/v1.10-ROADMAP.md`.
+- Phase numbering continues from v1.10 — v2.0 starts at Phase 55.
 
 ## Performance Metrics
 
@@ -60,12 +60,12 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 ### Roadmap Evolution
 
 - `v1.9` closed 2026-05-06 as a shipped milestone — embedded artifact surfaces (document-level embedded files + curated links).
-- `v1.10` is the next milestone — protected delivery hooks and encryption boundaries (external hooks first, narrow security claims, proof-backed validation before any in-core encryption).
-- `v2.0` remains reserved for signature fields and external signing preparation; PAdES/LTV/TSA/OCSP/CRL stay further deferred.
+- `v1.10` closed 2026-05-06 as a shipped milestone — protected delivery hooks and encryption boundaries (external hooks first, narrow security claims, proof-backed validation before any in-core encryption).
+- `v2.0` is now active — signature fields and external signing preparation, with PAdES/LTV/TSA/OCSP/CRL still deferred.
 
 ### Pending Todos
 
-- Define the next milestone through fresh context, requirements, and roadmap artifacts.
+- Finalize `v2.0` requirements and phase roadmap.
 - Publish `v0.2.0` from the verified release tag if it has not been pushed to external registries yet.
 
 ### Blockers/Concerns
