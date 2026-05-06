@@ -5,6 +5,7 @@ defmodule RendroBuildersTest do
     Block,
     Document,
     FormField,
+    Link,
     Metadata,
     Page,
     PageTemplate,
@@ -75,6 +76,81 @@ defmodule RendroBuildersTest do
       assert radio_field.type == :radio
       assert radio_field.group == "contact"
       assert radio_field.export_value == "email"
+    end
+
+    test "link/2 wraps a block with an explicit URI target" do
+      text = Rendro.text("Read the guide")
+      block = Rendro.block(text, x: 10, y: 20, width: 180, height: 24)
+
+      linked = Rendro.link(block, uri: "https://example.com/guide")
+
+      assert %Block{
+               x: 10,
+               y: 20,
+               width: 180,
+               height: 24,
+               content: %Link{content: ^text, target: {:uri, "https://example.com/guide"}}
+             } = linked
+    end
+
+    test "link/2 wraps a block with an explicit page target and preserves geometry flags" do
+      text = Rendro.text("Jump to appendix")
+
+      block =
+        Rendro.block(text,
+          x: 12,
+          y: 32,
+          width: 200,
+          height: 28,
+          keep_together: true,
+          keep_with_next: true,
+          break_before: true,
+          break_after: true
+        )
+
+      linked = Rendro.link(block, page: 3)
+
+      assert %Block{
+               x: 12,
+               y: 32,
+               width: 200,
+               height: 28,
+               keep_together: true,
+               keep_with_next: true,
+               break_before: true,
+               break_after: true,
+               content: %Link{content: ^text, target: {:page, 3}}
+             } = linked
+    end
+
+    test "link/2 rejects missing target options" do
+      block = Rendro.block(Rendro.text("Missing target"))
+
+      assert_raise ArgumentError, ~r/exactly one of :uri or :page/, fn ->
+        Rendro.link(block, [])
+      end
+    end
+
+    test "link/2 rejects multiple target options" do
+      block = Rendro.block(Rendro.text("Too many targets"))
+
+      assert_raise ArgumentError, ~r/exactly one of :uri or :page/, fn ->
+        Rendro.link(block, uri: "https://example.com", page: 2)
+      end
+    end
+
+    test "link/2 rejects unsupported target options" do
+      block = Rendro.block(Rendro.text("Unsupported target"))
+
+      assert_raise ArgumentError, ~r/unsupported link options/, fn ->
+        Rendro.link(block, to: "https://example.com")
+      end
+    end
+
+    test "link/2 requires an authored block" do
+      assert_raise FunctionClauseError, fn ->
+        Rendro.link(Rendro.text("not wrapped"), uri: "https://example.com")
+      end
     end
 
     test "block/2 builds a Block with content" do
