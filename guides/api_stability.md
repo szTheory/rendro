@@ -32,3 +32,21 @@ Structural validation through `pdfinfo`/Poppler proves PDF structure only. It do
 Apple Preview is supported for this phase based on the recorded Phase 47 viewer checklist. Adobe Acrobat Reader remains `unverified` until the same checklist records passing open, visible default state, edit/toggle, and save behavior.
 
 Other viewers are not part of Rendro's supported contract unless `priv/support_matrix.json` later records proof-backed support for them.
+
+## Embedded Files Support Boundary
+
+Rendro supports document-level embedded files with explicit metadata.
+
+Embedded files live inside the PDF binary and are distinct from delivery, email, or download attachments handled by Rendro adapters outside the PDF. Document-level embedded files carry authored filename, MIME type, description, and authored timestamps; page-level file attachment annotations are not part of the supported surface.
+
+Structural validation through `pdfinfo`/Poppler proves PDF structure only. It does not prove viewer behavior for embedded files or links. Viewer support for discoverability, opening or extracting, and saving or extracting embedded files is tracked separately in `priv/support_matrix.json` and is only named when a recorded checklist exists for that viewer.
+
+## Curated Links Support Boundary
+
+Rendro supports authored links for external `http`/`https` URIs and internal page destinations.
+
+Other URI schemes, named destinations, and broader action dictionaries are not part of the supported link surface. Curated links are authored and deterministic; viewer behavior for external URI handoff and internal page navigation is tracked separately and only named when a recorded checklist exists.
+
+## Embedded Artifact Viewer Posture
+
+All `embedded_files` and `links` viewer statuses remain `unverified` in `priv/support_matrix.json` until a recorded checklist promotes a named viewer. Promotion requires recorded evidence (viewer name, version when easily available, OS, fixture, date checked, and per-behavior pass/fail) in the phase validation record; no viewer is implicitly supported by structural validity alone.
