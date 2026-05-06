@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-05-06T01:18:55.265Z"
+status: verifying
+last_updated: "2026-05-06T01:25:47.202Z"
 last_activity: 2026-05-06
 progress:
   total_phases: 45
-  completed_phases: 42
+  completed_phases: 43
   total_plans: 95
-  completed_plans: 96
+  completed_plans: 97
   percent: 100
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-05)
 
 Phase: 48 (embedded-file-core-surface) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-05-06
 
 Progress: [----------] 0%
@@ -53,6 +53,7 @@ Progress: [----------] 0%
 | 46 | 2/2 | 4 | 2 |
 | 47 | 3/3 | 6 | 2 |
 | Phase 48 P01 | 4min | 2 tasks | 10 files |
+| Phase 48 P02 | 5min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,8 @@ Recent decisions affecting current work:
 - Deferred native encryption and digital signatures until later milestones with their own proof-backed trust contracts.
 - [Phase 48]: Embedded file metadata is validated in Rendro.Pipeline.Validate with tuple errors rather than registration-time exceptions. — Keeps malformed authored state in the standard validate-stage error envelope before any writer work begins.
 - [Phase 48]: Embedded files now live on the document in a dedicated registry instead of metadata.custom or writer-owned state. — Preserves the existing registry-backed authored-input pattern and keeps serialization logic separate from authoring state.
+- [Phase 48]: Embedded files extend the existing writer allocation/build funnel instead of adding an inline serializer or separate PDF surface. — Preserves one deterministic object-planning seam in the core writer.
+- [Phase 48]: Attachment catalog wiring stays document-level only: /Names, /EmbeddedFiles, and /AF are emitted without any page-level file-attachment annotations. — Matches the phase threat model and prevents generic annotation scope creep.
 
 ### Roadmap Evolution
 
