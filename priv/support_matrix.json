@@ -49,6 +49,60 @@
       }
     }
   },
+  "embedded_files": {
+    "capabilities": {
+      "document_level": "supported"
+    },
+    "behaviors": {
+      "explicit_metadata": "supported",
+      "authored_timestamps": "supported",
+      "page_attachment_annotations": "unsupported"
+    },
+    "viewers": {
+      "adobe_acrobat_reader": {
+        "status": "unverified",
+        "proof": [
+          "discoverable",
+          "open_or_extract",
+          "save_or_extract"
+        ]
+      },
+      "apple_preview": {
+        "status": "unverified",
+        "proof": [
+          "discoverable",
+          "open_or_extract",
+          "save_or_extract"
+        ]
+      }
+    }
+  },
+  "links": {
+    "targets": {
+      "external_uri_http_https": "supported",
+      "internal_page": "supported",
+      "named_destinations": "unsupported"
+    },
+    "behaviors": {
+      "fragment_rectangles": "supported"
+    },
+    "viewers": {
+      "adobe_acrobat_reader": {
+        "status": "unverified",
+        "proof": [
+          "external_uri_handoff",
+          "internal_page_navigation"
+        ]
+      },
+      "apple_preview": {
+        "status": "unverified",
+        "proof": [
+          "external_uri_handoff",
+          "internal_page_navigation"
+        ]
+      }
+    }
+  },
   "unsupported": [
     "full_pdf_compliance",
     "digital_signatures"
