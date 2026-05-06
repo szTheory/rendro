@@ -2,6 +2,7 @@ defmodule Rendro.LinkTest do
   use ExUnit.Case, async: true
 
   alias Rendro.{Block, Document, Link, Page}
+  alias Rendro.PDF.Font
   alias Rendro.Pipeline.{Measure, MeasuredText}
 
   describe "measurement" do
@@ -60,4 +61,47 @@ defmodule Rendro.LinkTest do
              } = measured_block
     end
   end
+
+  describe "fragmentation" do
+    test "splits linked measured text into two link-wrapped fragments" do
+      linked_text = %Link{content: measured_text(["Line 1", "Line 2", "Line 3"]), target: {:page, 2}}
+      block = %Block{content: linked_text, width: 180, height: 36}
+
+      assert {
+               %Block{
+                 height: 24,
+                 content: %Link{target: {:page, 2}, content: %MeasuredText{lines: [_, _]}}
+               },
+               %Block{
+                 height: 12,
+                 content: %Link{target: {:page, 2}, content: %MeasuredText{lines: [_]}}
+               }
+             } = Rendro.Fragmentable.split(block, 24)
+    end
+
+    test "keeps unsplittable linked content in the existing nil-or-component contract" do
+      block = %Block{
+        content: %Link{content: "static", target: {:uri, "https://example.com/guide"}},
+        width: 180,
+        height: 36
+      }
+
+      assert {nil, ^block} = Rendro.Fragmentable.split(block, 24)
+    end
+  end
+
+  defp measured_text(lines) do
+    %MeasuredText{
+      source: Rendro.text(Enum.join(lines, "\n")),
+      lines: Enum.map(lines, &[line_run(&1)]),
+      line_height: 1.2,
+      width: 180,
+      height: length(lines) * 12,
+      resolved_font: %Font{name: "F1", base_font: "Helvetica"},
+      widows: 1,
+      orphans: 1
+    }
+  end
+
+  defp line_run(text), do: %{font: %Font{name: "F1", base_font: "Helvetica"}, text: text, width: 60}
 end
