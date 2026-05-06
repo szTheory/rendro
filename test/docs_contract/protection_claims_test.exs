@@ -16,12 +16,19 @@ defmodule Rendro.DocsContract.ProtectionClaimsTest do
     assert matrix =~ ~s|"tamper_evidence": "unsupported"|
     assert matrix =~ ~s|"pdf_a_compliance": "unsupported"|
     assert matrix =~ ~s|"digital_signatures": "unsupported"|
+    assert matrix =~ ~s|"boundaries"|
+    assert matrix =~ ~s|"external_hook_only": "supported"|
+    assert matrix =~ ~s|"persisted_async_job_args_passwords": "unsupported"|
+    assert matrix =~ ~s|"delivery_and_storage_seams_transport_artifacts_not_passwords": "supported"|
 
     assert matrix =~
              ~r/"protection".*?"viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
 
     assert matrix =~
              ~r/"protection".*?"viewers".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+
+    refute matrix =~ ~s|"native_encryption": "supported"|
+    refute matrix =~ ~s|"digital_signatures": "supported"|
   end
 
   test "api stability guide uses narrow, truthful protection wording" do
@@ -34,6 +41,7 @@ defmodule Rendro.DocsContract.ProtectionClaimsTest do
     assert guide =~ "Rendro v1.10 supports only `:aes_256`"
     assert guide =~ "Advisory permissions are an honor-system PDF flag surface"
     assert guide =~ "Protection is not compliance, not tamper evidence, and not digital signing."
+    assert guide =~ "If validation succeeds only with `owner_password`"
     assert guide =~ "All `protection` viewer rows remain `unverified`"
 
     refute guide =~ "secure PDF"
