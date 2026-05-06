@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.10
 milestone_name: protected-delivery-hooks-and-encryption-boundaries
 status: active
-last_updated: "2026-05-06T10:46:42.276Z"
-last_activity: 2026-05-06 — completed 51-02 metadata redaction and docs-contract closure
+last_updated: "2026-05-06T17:10:37Z"
+last_activity: 2026-05-06 — completed Phase 53 protected delivery threading and truthful support closure
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 2
   total_plans: 8
-  completed_plans: 2
-  percent: 25
+  completed_plans: 4
+  percent: 50
 ---
 
 # Project State
@@ -20,20 +20,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-06 after v1.9 close)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Planning next milestone — v1.10 Protected Delivery Hooks & Encryption Boundaries.
+**Current focus:** Finish Phase 52 qpdf/poppler validation so Phase 54 proof closure can begin on a verified base.
 
 ## Current Position
 
-Phase: 51 — protection-api-contract-and-validation
-Plan: 51-02
-Status: 51-02 completed; Phase 51 ready for downstream qpdf validation and delivery work
-Last activity: 2026-05-06 — completed 51-02 metadata redaction and docs-contract closure
+Phase: 52 — qpdf-adapter-and-structural-validation
+Plan: 52-01 / 52-02 pending
+Status: Phase 53 completed out of order; Phase 52 remains the next incomplete dependency before proof closure
+Last activity: 2026-05-06 — completed Phase 53 runtime and support-contract closure
 
-Progress: [==        ] 25%
+Progress: [=====     ] 50%
 
 ## Milestone Snapshot
 
-- Milestone: `v1.10 Protected Delivery Hooks & Encryption Boundaries` (planning — scope locked, requirements pending).
+- Milestone: `v1.10 Protected Delivery Hooks & Encryption Boundaries` (active implementation — Phases 51 and 53 complete; Phases 52 and 54 remaining).
 - Last shipped: `v1.9 Embedded Artifact Surfaces (2026-05-06)` — see `milestones/v1.9-ROADMAP.md`.
 - Phase numbering continues from v1.9 — v1.10 starts at Phase 51.
 
@@ -51,6 +51,8 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 - [Phase 51]: Keep protected output as a normal %Rendro.Artifact{} with one narrow metadata.protection contract.
 - [Phase 51]: Recurse through nested maps and lists when scrubbing audit metadata so protection secrets never cross audit boundaries.
 - [Phase 51]: Keep protected-delivery docs artifact-first so Oban args and Mailglass transport never persist passwords.
+- [Phase 53]: Keep `Rendro.Storage` narrow while `Rendro.Storage.Local` preserves only safe protected-artifact metadata in a first-party sidecar.
+- [Phase 53]: Publish one canonical protected-delivery recipe: `render_to_artifact -> Protect.password -> store/deliver`, with identifiers-only async args and transport-only Mailglass docs.
 
 ### Roadmap Evolution
 

@@ -15,12 +15,12 @@
 
 - [ ] **ADAPT-01**: Rendro ships a first-party `qpdf` protection adapter that remains an optional runtime executable rather than a hard dependency.
 - [ ] **ADAPT-02**: Poppler structural validation can validate protected PDFs when the caller supplies the appropriate password.
-- [ ] **ADAPT-03**: Existing artifact-delivery seams continue to work with already-protected artifacts without learning password material themselves.
+- [x] **ADAPT-03**: Existing artifact-delivery seams continue to work with already-protected artifacts without learning password material themselves.
 
 ### Truthful Support Boundaries
 
-- [ ] **TRUST-01**: `priv/support_matrix.json` publishes a dedicated `protection` family covering password-to-open, advisory permissions, unsupported native encryption, and unsupported compliance/signature narratives.
-- [ ] **TRUST-02**: Public docs distinguish password-to-open from advisory permissions and explicitly state that protection is not digital signing, tamper evidence, or PDF/A/compliance support.
+- [x] **TRUST-01**: `priv/support_matrix.json` publishes a dedicated `protection` family covering password-to-open, advisory permissions, unsupported native encryption, and unsupported compliance/signature narratives.
+- [x] **TRUST-02**: Public docs distinguish password-to-open from advisory permissions and explicitly state that protection is not digital signing, tamper evidence, or PDF/A/compliance support.
 - [ ] **TRUST-03**: New viewer rows for protection default to `unverified` until manual proof is recorded.
 
 ### Release Tail
@@ -52,9 +52,9 @@
 | PROTECT-03 | Phase 51 | Complete |
 | ADAPT-01 | Phase 52 | In Progress |
 | ADAPT-02 | Phase 52 | In Progress |
-| ADAPT-03 | Phase 53 | In Progress |
-| TRUST-01 | Phase 53 | In Progress |
-| TRUST-02 | Phase 53 | In Progress |
+| ADAPT-03 | Phase 53 | Complete |
+| TRUST-01 | Phase 53 | Complete |
+| TRUST-02 | Phase 53 | Complete |
 | TRUST-03 | Phase 54 | Pending |
 | RELEASE-01 | Phase 54 | Pending |
 
@@ -65,4 +65,4 @@
 
 ---
 *Requirements defined: 2026-05-06*
-*Last updated: 2026-05-06 after v1.10 implementation kickoff*
+*Last updated: 2026-05-06 after Phase 53 execution*
