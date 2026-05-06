@@ -19,7 +19,7 @@ defmodule Rendro.Storage.LocalTest do
     assert {:ok, %Artifact{} = reloaded} = Local.get(path, [])
     assert reloaded.binary == artifact.binary
     assert reloaded.hash == artifact.hash
-    assert reloaded.metadata == %{}
+    assert reloaded.metadata == %{deterministic: true}
 
     assert :ok = Local.delete(path, [])
     refute File.exists?(path)
@@ -50,11 +50,24 @@ defmodule Rendro.Storage.LocalTest do
              has_owner_password: true
            }
 
-    sidecar = File.read!(sidecar_path(path))
-    refute sidecar =~ "open-secret"
-    refute sidecar =~ "owner-secret"
-    refute sidecar =~ "open_password"
-    refute sidecar =~ "owner_password"
+    sidecar =
+      path
+      |> sidecar_path()
+      |> File.read!()
+      |> :erlang.binary_to_term()
+
+    assert sidecar == %{
+             deterministic: false,
+             protection: %{
+               algorithm: :aes_256,
+               advisory_permissions: [:copy, :print],
+               has_open_password: true,
+               has_owner_password: true
+             }
+           }
+
+    refute inspect(sidecar) =~ "open-secret"
+    refute inspect(sidecar) =~ "owner-secret"
   end
 
   test "delete removes both the artifact and sidecar" do
@@ -105,5 +118,5 @@ defmodule Rendro.Storage.LocalTest do
     path
   end
 
-  defp sidecar_path(path), do: path <> ".metadata.json"
+  defp sidecar_path(path), do: path <> ".metadata"
 end
