@@ -27,10 +27,11 @@ defmodule Rendro.PDF.Writer do
          %Rendro.Document{pages: pages, metadata: metadata} = doc,
          fonts,
          images,
-         opts
-       ) do
+       opts
+      ) do
     form_fields = collect_form_fields(doc)
     embedded_files = collect_embedded_files(doc)
+    link_annotations = collect_link_annotations(doc)
     obj_num = 1
     catalog_num = obj_num
 
@@ -39,6 +40,7 @@ defmodule Rendro.PDF.Writer do
     {image_objects, next_num} = allocate_image_nums(images, next_num)
     {form_field_objects, next_num} = allocate_form_field_nums(form_fields, next_num)
     {embedded_file_objects, next_num} = allocate_embedded_file_nums(embedded_files, next_num)
+    {link_annotation_objects, next_num} = allocate_link_annotation_nums(link_annotations, next_num)
     pages_num = next_num
     next_num = next_num + 1
 
@@ -82,6 +84,7 @@ defmodule Rendro.PDF.Writer do
         font_objects,
         image_objects,
         form_field_objects,
+        link_annotation_objects,
         font_map,
         image_map,
         opts
@@ -203,6 +206,12 @@ defmodule Rendro.PDF.Writer do
   defp allocate_embedded_file_nums(embedded_files, start_num) do
     Enum.map_reduce(embedded_files, start_num, fn embedded_file, num ->
       {%{embedded_file: embedded_file, stream_obj_num: num, file_spec_obj_num: num + 1}, num + 2}
+    end)
+  end
+
+  defp allocate_link_annotation_nums(link_annotations, start_num) do
+    Enum.map_reduce(link_annotations, start_num, fn annotation, num ->
+      {Map.put(annotation, :obj_num, num), num + 1}
     end)
   end
 
@@ -417,6 +426,7 @@ defmodule Rendro.PDF.Writer do
          font_allocations,
          image_allocations,
          form_field_allocations,
+         link_annotation_allocations,
          font_map,
          image_map,
          opts
@@ -431,8 +441,19 @@ defmodule Rendro.PDF.Writer do
 
       content_obj = Object.indirect_object(content_num, 0, Object.serialize(content_stream, opts))
 
-      {annot_refs, form_objects} =
+      {form_annot_refs, form_objects} =
         build_form_field_objects(page, page_num, form_field_allocations, page_index, opts)
+
+      {link_annot_refs, link_objects} =
+        build_link_annotation_objects(
+          page,
+          page_obj_nums,
+          link_annotation_allocations,
+          page_index,
+          opts
+        )
+
+      annot_refs = form_annot_refs ++ link_annot_refs
 
       resources_dict =
         []
@@ -449,7 +470,7 @@ defmodule Rendro.PDF.Writer do
 
       page_obj = Object.indirect_object(page_num, 0, Object.serialize(page_dict, opts))
 
-      [{page_num, page_obj}, {content_num, content_obj}] ++ form_objects
+      [{page_num, page_obj}, {content_num, content_obj}] ++ form_objects ++ link_objects
     end)
   end
 
@@ -505,6 +526,16 @@ defmodule Rendro.PDF.Writer do
       end)
 
     [header_ops | rows_ops] |> List.flatten() |> Enum.join("\n")
+  end
+
+  defp render_block(
+         doc,
+         %Rendro.Block{content: %Rendro.Link{content: inner}} = block,
+         page,
+         font_map,
+         image_map
+       ) do
+    render_block(doc, %{block | content: inner}, page, font_map, image_map)
   end
 
   defp render_block(
@@ -686,6 +717,10 @@ defmodule Rendro.PDF.Writer do
     end
   end
 
+  defp collect_block_fonts(doc, %Rendro.Block{content: %Rendro.Link{content: inner}}, acc) do
+    collect_block_fonts(doc, %Rendro.Block{content: inner}, acc)
+  end
+
   defp collect_block_fonts(doc, %Rendro.Block{content: %Rendro.Text{} = text}, acc) do
     with {:ok, font} <- resolve_text_font(doc, text) do
       {:ok, Map.put(acc, font.name, font)}
@@ -773,6 +808,10 @@ defmodule Rendro.PDF.Writer do
     end
   end
 
+  defp collect_block_images(doc, %Rendro.Block{content: %Rendro.Link{content: inner}}, acc) do
+    collect_block_images(doc, %Rendro.Block{content: inner}, acc)
+  end
+
   defp collect_block_images(_doc, %Rendro.Block{content: %Rendro.Image{} = image}, acc) do
     {:ok, MapSet.put(acc, image.logical_name)}
   end
@@ -831,6 +870,67 @@ defmodule Rendro.PDF.Writer do
           }
         end)
     end
+  end
+
+  defp build_link_annotation_objects(page, page_obj_nums, link_annotation_allocations, page_index, opts) do
+    page_allocations = page_link_annotation_allocations(link_annotation_allocations, page_index)
+
+    case page_allocations do
+      [] ->
+        {[], []}
+
+      _ ->
+        Enum.map_reduce(page_allocations, [], fn allocation, acc ->
+          rect = form_field_rect(page, allocation.block)
+
+          link_obj =
+            build_link_annotation_object(
+              allocation.obj_num,
+              rect,
+              allocation.target,
+              page_obj_nums,
+              opts
+            )
+
+          link_ref = {:ref, allocation.obj_num, 0}
+
+          {link_ref, acc ++ [{allocation.obj_num, link_obj}]}
+        end)
+    end
+  end
+
+  defp page_link_annotation_allocations(link_annotation_allocations, page_index) do
+    Enum.filter(link_annotation_allocations, &(&1.page_index == page_index))
+  end
+
+  defp build_link_annotation_object(obj_num, rect, {:uri, uri}, _page_obj_nums, opts) do
+    dict =
+      {:dict,
+       [
+         {"Type", {:name, "Annot"}},
+         {"Subtype", {:name, "Link"}},
+         {"Rect", {:array, rect}},
+         {"Border", {:array, [0, 0, 0]}},
+         {"A", {:dict, [{"S", {:name, "URI"}}, {"URI", {:string, uri}}]}}
+       ]}
+
+    Object.indirect_object(obj_num, 0, Object.serialize(dict, opts))
+  end
+
+  defp build_link_annotation_object(obj_num, rect, {:page, page_number}, page_obj_nums, opts) do
+    {target_page_obj_num, _content_obj_num} = Enum.at(page_obj_nums, page_number - 1)
+
+    dict =
+      {:dict,
+       [
+         {"Type", {:name, "Annot"}},
+         {"Subtype", {:name, "Link"}},
+         {"Rect", {:array, rect}},
+         {"Border", {:array, [0, 0, 0]}},
+         {"Dest", {:array, [{:ref, target_page_obj_num, 0}, {:name, "Fit"}]}}
+       ]}
+
+    Object.indirect_object(obj_num, 0, Object.serialize(dict, opts))
   end
 
   defp page_form_field_allocations(form_field_allocations, page_index) do
@@ -1285,6 +1385,20 @@ defmodule Rendro.PDF.Writer do
 
   defp rect_width([left, _bottom, right, _top]), do: right - left
   defp rect_height([_left, bottom, _right, top]), do: top - bottom
+
+  defp collect_link_annotations(%Rendro.Document{pages: pages}) do
+    pages
+    |> Enum.with_index()
+    |> Enum.flat_map(fn {%Rendro.Page{blocks: blocks}, page_index} ->
+      Enum.flat_map(blocks, fn
+        %Rendro.Block{content: %Rendro.Link{target: target}} = block ->
+          [%{page_index: page_index, block: block, target: target}]
+
+        _block ->
+          []
+      end)
+    end)
+  end
 
   defp collect_form_fields(%Rendro.Document{pages: pages}) do
     pages

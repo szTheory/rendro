@@ -117,7 +117,14 @@ defmodule Rendro.PDF.WriterTest do
       )
       |> Rendro.link(target_opts)
 
-    page = struct!(Rendro.Page, Keyword.merge([blocks: [block]], page_overrides))
+    page =
+      struct!(
+        Rendro.Page,
+        Keyword.merge(
+          [blocks: [block], width: 612, height: 792, margin_left: 72, margin_top: 72],
+          page_overrides
+        )
+      )
 
     %Rendro.Document{
       pages: [page],
@@ -162,36 +169,32 @@ defmodule Rendro.PDF.WriterTest do
   end
 
   defp linked_fragment_document(target_opts) do
-    page_template = %Rendro.PageTemplate{
-      name: :linked_body,
-      width: 612,
-      height: 792,
-      margin_top: 0,
-      margin_right: 0,
-      margin_bottom: 0,
-      margin_left: 0,
-      regions: [
-        %Rendro.Region{
-          name: :body,
-          role: :body,
-          anchor: :flow,
-          x: 0,
-          y: 0,
-          width: 200,
-          height: 45
+    source = Rendro.text("alpha beta gamma delta", font: "Helvetica", size: 12, line_height: 1.5)
+
+    fragment = fn lines, y ->
+      measured =
+        %MeasuredText{
+          source: source,
+          lines: Enum.map(lines, fn text -> [%{text: text, font: Font.helvetica(), width: 60}] end),
+          line_height: source.line_height,
+          width: 60,
+          height: length(lines) * 18,
+          widows: 2,
+          orphans: 2,
+          resolved_font: Font.helvetica()
         }
-      ]
-    }
 
-    text = String.duplicate("alpha beta gamma delta ", 8)
-
-    Rendro.document()
-    |> Map.put(:content, [
-      Rendro.block(Rendro.text(text, font: "Helvetica", size: 12), width: 100)
+      Rendro.block(measured, x: 10, y: y, width: 60, height: measured.height)
       |> Rendro.link(target_opts)
-    ])
-    |> Map.put(:page_template, :linked_body)
-    |> Map.put(:page_templates, [page_template])
+    end
+
+    %Rendro.Document{
+      pages: [
+        %Rendro.Page{width: 612, height: 792, margin_left: 72, margin_top: 72, blocks: [fragment.(["alpha beta ", "gamma"], 20)]},
+        %Rendro.Page{width: 612, height: 792, margin_left: 72, margin_top: 72, blocks: [fragment.(["delta"], 20)]}
+      ],
+      metadata: %Rendro.Metadata{title: "Linked Fragment Document"}
+    }
   end
 
   describe "render/1" do
