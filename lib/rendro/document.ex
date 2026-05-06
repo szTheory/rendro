@@ -49,6 +49,7 @@ defmodule Rendro.Document do
             font_registry: Rendro.FontRegistry.new(),
             default_font: Rendro.FontRegistry.default_font(),
             asset_registry: Rendro.AssetRegistry.new(),
+            embedded_file_registry: Rendro.EmbeddedFileRegistry.new(),
             header: [],
             footer: [],
             metadata: %Rendro.Metadata{},
@@ -64,6 +65,7 @@ defmodule Rendro.Document do
           font_registry: Rendro.FontRegistry.t(),
           default_font: Rendro.FontRegistry.logical_name(),
           asset_registry: Rendro.AssetRegistry.t(),
+          embedded_file_registry: Rendro.EmbeddedFileRegistry.t(),
           header: [Rendro.Block.t()],
           footer: [Rendro.Block.t()],
           metadata: Rendro.Metadata.t(),
@@ -201,6 +203,24 @@ defmodule Rendro.Document do
       doc
       | asset_registry:
           Rendro.AssetRegistry.register_image(doc.asset_registry, logical_name, source)
+    }
+  end
+
+  @doc """
+  Registers a document-level embedded file on the document's owned registry.
+  """
+  @spec register_embedded_file(
+          t(),
+          atom(),
+          {:path, Path.t()} | {:binary, binary()},
+          keyword()
+        ) :: t()
+  def register_embedded_file(%__MODULE__{} = doc, logical_name, source, metadata)
+      when is_atom(logical_name) and is_list(metadata) do
+    %__MODULE__{
+      doc
+      | embedded_file_registry:
+          Rendro.EmbeddedFileRegistry.register(doc.embedded_file_registry, logical_name, source, metadata)
     }
   end
 

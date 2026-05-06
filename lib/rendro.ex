@@ -139,6 +139,20 @@ defmodule Rendro do
   end
 
   @doc """
+  Registers a document-level embedded file on a document.
+  """
+  @spec register_embedded_file(
+          Document.t(),
+          atom(),
+          {:path, Path.t()} | {:binary, binary()},
+          keyword()
+        ) :: Document.t()
+  def register_embedded_file(%Document{} = doc, logical_name, source, metadata)
+      when is_atom(logical_name) and is_list(metadata) do
+    Document.register_embedded_file(doc, logical_name, source, metadata)
+  end
+
+  @doc """
   Registers a four-variant embedded font family on a document.
   """
   @spec register_embedded_font_family(
