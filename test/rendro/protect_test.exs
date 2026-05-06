@@ -130,6 +130,19 @@ defmodule Rendro.ProtectTest do
     refute_receive {:fake_adapter_called, _}
   end
 
+  test "rejects passwords with unsafe control characters before adapter execution" do
+    assert {:error, %Rendro.Error{} = error} =
+             Protect.password(sample_artifact(),
+               adapter: FakeAdapter,
+               open_password: "open-secret\n--replace-input",
+               owner_password: "owner-secret"
+             )
+
+    assert error.stage == :protect
+    assert error.reason == {:invalid_option, :open_password, :unsafe_characters}
+    refute_receive {:fake_adapter_called, _}
+  end
+
   test "rejects unsupported algorithms" do
     assert {:error, %Rendro.Error{} = error} =
              Protect.password(sample_artifact(),

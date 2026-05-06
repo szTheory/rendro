@@ -151,10 +151,16 @@ defmodule Rendro.Protect do
         {:error, Error.from_stage(:protect, {:missing_required_option, key}, %{})}
 
       {:ok, value} when is_binary(value) ->
-        if String.trim(value) == "" do
-          {:error, Error.from_stage(:protect, {:invalid_option, key, :empty}, %{})}
-        else
-          {:ok, value}
+        cond do
+          String.trim(value) == "" ->
+            {:error, Error.from_stage(:protect, {:invalid_option, key, :empty}, %{})}
+
+          String.contains?(value, ["\n", "\r", <<0>>]) ->
+            {:error,
+             Error.from_stage(:protect, {:invalid_option, key, :unsafe_characters}, %{})}
+
+          true ->
+            {:ok, value}
         end
 
       {:ok, value} ->
