@@ -15,6 +15,10 @@ if Code.ensure_loaded?(Mailglass) do
         |> Rendro.Adapters.Mailglass.attach_pdf(document, "invoice.pdf")
         |> MyApp.Mailer.deliver()
 
+    `attach_pdf/3` is the render-and-attach convenience path for unprotected PDFs.
+    Protected delivery must pass an already-protected `%Rendro.Artifact{}` to `attach_artifact/3`.
+    Mailglass never accepts, persists, derives, or manages password material.
+
     The first argument may be:
 
       * a `Swoosh.Email` struct
@@ -50,6 +54,9 @@ if Code.ensure_loaded?(Mailglass) do
     @doc """
     Attaches a rendered `Rendro.Artifact` as a PDF to `email_or_message`.
 
+    Protected delivery must pass an already-protected `%Rendro.Artifact{}` to `attach_artifact/3`.
+    Mailglass never accepts, persists, derives, or manages password material.
+
     Returns the modified email/message on success, or `{:error, error}` if
     the target is invalid.
     """
@@ -68,6 +75,9 @@ if Code.ensure_loaded?(Mailglass) do
 
     @doc """
     Renders `document` and attaches it to `email_or_message` as a PDF.
+
+    `attach_pdf/3` is the render-and-attach convenience path for unprotected
+    PDFs. Use `attach_artifact/3` when the artifact has already been protected.
 
     Returns the modified email/message on success, or `{:error, error}` if
     rendering fails.

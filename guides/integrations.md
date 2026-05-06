@@ -65,9 +65,12 @@ The worker does **not** support arbitrary job-arg pass-through into
 that normalization explicitly in your own job producer before calling Rendro.
 
 The worker also does **not** accept password or protection fields in job args.
-Protection secrets do not belong in persisted Oban args. If you need protected
+Protection secrets do not belong in persisted Oban args. Persist only business identifiers in Oban args. Resolve protection secrets at execution time inside your application boundary.
+
+The canonical protected-delivery recipe is
+`render_to_artifact -> Protect.password -> store/deliver`. If you need protected
 delivery, render the artifact in your worker and apply `Rendro.Protect.password/2`
- in an application-owned credential boundary before storage or delivery.
+in an application-owned secret boundary before storage or delivery.
 
 ### Worker failure diagnostics
 
@@ -268,6 +271,8 @@ then hand the protected artifact to `attach_artifact/3`:
 email_with_attachment =
   Rendro.Adapters.Mailglass.attach_artifact(email, artifact, "invoice.pdf")
 ```
+
+Protected delivery uses `Rendro.Adapters.Mailglass.attach_artifact/3` with an already-protected `%Rendro.Artifact{}`.
 
 That flow keeps protection at the artifact boundary. Mailglass does not need to know the passwords; it just transports the already-protected PDF bytes.
 

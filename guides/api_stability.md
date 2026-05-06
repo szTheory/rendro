@@ -56,3 +56,21 @@ Adobe Acrobat Reader is `supported` for both `embedded_files` and `links`. The r
 Apple Preview is `supported` for `links` and `unverified` for `embedded_files`. The recorded checklist confirms external URI handoff and internal page navigation work in Preview, but Preview did not surface the document-level embedded file in its UI under the version checked. Embedded file discoverability stays `unverified` for Apple Preview until a future checklist records the behavior; the surface is not marked `unsupported`, since Rendro continues to author it correctly per the structural proof lane.
 
 Viewers not listed above are outside the recorded support contract for embedded artifact surfaces.
+
+## Protected PDF Support Boundary
+
+Rendro supports password-to-open PDF protection through an external artifact-first boundary.
+
+The canonical API is `Rendro.Protect.password/2`, which wraps an already-rendered `%Rendro.Artifact{}` through a protection adapter such as `Rendro.Adapters.Qpdf`. The core render pipeline remains deterministic; the protected output does not. Protected artifacts therefore set `metadata.deterministic` to `false` and carry read-only `metadata.protection` details describing the algorithm and advisory-permission posture.
+
+Rendro v1.10 supports only `:aes_256` on this public protection surface. AES-128, RC4, and native in-core encryption are not part of the supported contract for this release.
+
+Advisory permissions are an honor-system PDF flag surface, not a cryptographic enforcement mechanism. Use the term `advisory_permissions` deliberately: compliant viewers may honor print/copy/modify-related flags, and non-compliant viewers or command-line tools may ignore them. Rendro does not market advisory permissions as hard security.
+
+Protection is not compliance, not tamper evidence, and not digital signing. Password-to-open encryption does not prove authorship, does not detect document modification, does not satisfy PDF/A archival requirements, and does not provide a signature-grade integrity story.
+
+Delivery and storage seams should transport already-protected artifacts, not password material.
+
+Phase 53 does not introduce a first-party protected worker or orchestration API.
+
+Structural validation through `pdfinfo`/Poppler proves that a protected PDF remains structurally readable when a password is supplied to the validator. If validation succeeds only with `owner_password`, that proves structural decryptability fallback rather than the normative password-to-open path. It does not prove viewer behavior. All `protection` viewer rows remain `unverified` in `priv/support_matrix.json` until a recorded checklist promotes a named viewer.
