@@ -33,7 +33,7 @@ Progress: [==========] 100%
 
 ## Milestone Snapshot
 
-- Milestone: `v1.10 Protected Delivery Hooks & Encryption Boundaries` (shipped and release-verified at `v0.1.0`).
+- Milestone: `v1.10 Protected Delivery Hooks & Encryption Boundaries` (shipped and release-verified at `v0.2.0`).
 - Last shipped: `v1.9 Embedded Artifact Surfaces (2026-05-06)` — see `milestones/v1.9-ROADMAP.md`.
 - Phase numbering continues from v1.9 — v1.10 starts at Phase 51.
 
@@ -66,11 +66,11 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 ### Pending Todos
 
 - Define the next milestone through fresh context, requirements, and roadmap artifacts.
-- Publish `v0.1.0` from the verified release tag if it has not been pushed to external registries yet.
+- Publish `v0.2.0` from the verified release tag if it has not been pushed to external registries yet.
 
 ### Blockers/Concerns
 
-- No local release-verification blocker remains: `mix ci`, `mix release.preflight`, and `scripts/release_preflight_proof.exs --current-version-tag --worktree /tmp/rendro-release-proof` all pass at exact tag `v0.1.0`.
+- No local release-verification blocker remains: `mix ci`, `mix release.preflight`, and `scripts/release_preflight_proof.exs --current-version-tag --worktree /tmp/rendro-release-proof` all pass at exact tag `v0.2.0`.
 - Tracking-artifact debt from v1.9 (missing `49-VERIFICATION.md`, stale `wave_0_complete: false` flags, inconsistent SUMMARY frontmatter shape) was accepted at close per the v1.9 audit; remediable retroactively if needed.
 
 ## Deferred Items

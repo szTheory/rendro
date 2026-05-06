@@ -13,7 +13,7 @@
 - Published a dedicated `protection` support contract and promoted only the first proof-backed viewer pair: Apple Preview for the `protection` surface.
 - Closed the release tail with changelog/readiness guidance, a preflight gate for the canonical recipe, and a passing isolated tagged proof lane.
 
-**Close note:** release verification passed at exact tag `v0.1.0` via `mix ci`, `mix release.preflight`, and `scripts/release_preflight_proof.exs`.
+**Close note:** release verification passed at exact tag `v0.2.0` via `mix ci`, `mix release.preflight`, and `scripts/release_preflight_proof.exs`.
 
 ---
 
