@@ -198,7 +198,7 @@ defmodule Rendro.PDF.WriterTest do
       assert pdf =~ "/Size 8"
       assert pdf =~ "/CheckSum <E5EBD4C02CEFBE7955977C67ADA242B7>"
       assert pdf =~ "/CreationDate (D:20260505140000Z)"
-      refute pdf =~ "/ModDate (D:20000101000000Z)"
+      refute pdf =~ "/Params <<\n/CheckSum <E5EBD4C02CEFBE7955977C67ADA242B7>\n/CreationDate (D:20260505140000Z)\n/ModDate (D:20000101000000Z)"
     end
 
     test "does not widen page annotations into file attachment annotations" do

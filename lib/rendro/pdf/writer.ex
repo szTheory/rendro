@@ -282,11 +282,17 @@ defmodule Rendro.PDF.Writer do
          },
          opts
        ) do
+    params =
+      [{"Size", embedded_file.byte_size}, {"CheckSum", {:hex_string, :crypto.hash(:md5, embedded_file.bytes)}}]
+      |> maybe_add_pdf_entry("CreationDate", maybe_format_pdf_date(embedded_file[:created_at]))
+      |> maybe_add_pdf_entry("ModDate", maybe_format_pdf_date(embedded_file[:modified_at]))
+
     stream =
       {:stream,
        [
          {"Type", {:name, "EmbeddedFile"}},
-         {"Subtype", {:name, encode_pdf_name(embedded_file.mime_type)}}
+         {"Subtype", {:name, encode_pdf_name(embedded_file.mime_type)}},
+         {"Params", {:dict, params}}
        ], embedded_file.bytes}
 
     file_spec =
@@ -1380,11 +1386,17 @@ defmodule Rendro.PDF.Writer do
     Calendar.strftime(dt, "D:%Y%m%d%H%M%SZ")
   end
 
+  defp maybe_format_pdf_date(nil), do: nil
+  defp maybe_format_pdf_date(%DateTime{} = dt), do: {:string, format_date(dt)}
+
   defp maybe_add(entries, _key, nil), do: entries
   defp maybe_add(entries, key, value), do: [{key, {:string, value}} | entries]
 
   defp maybe_add_dict_entry(entries, _key, nil), do: entries
   defp maybe_add_dict_entry(entries, key, value), do: entries ++ [{key, {:string, value}}]
+
+  defp maybe_add_pdf_entry(entries, _key, nil), do: entries
+  defp maybe_add_pdf_entry(entries, key, value), do: entries ++ [{key, value}]
 
   defp pdf_literal_string(str), do: ["(", escape_pdf_string(str), ")"]
 
