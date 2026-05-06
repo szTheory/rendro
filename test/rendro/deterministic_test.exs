@@ -66,6 +66,16 @@ defmodule Rendro.DeterministicTest do
     end
   end
 
+  describe "embedded file ordering" do
+    test "deterministic output stays identical across embedded-file registration order" do
+      {:ok, pdf1} = Rendro.render(embedded_file_order_doc(:alpha_first), deterministic: true)
+      {:ok, pdf2} = Rendro.render(embedded_file_order_doc(:zeta_first), deterministic: true)
+
+      assert pdf1 == pdf2
+      assert offset_of(pdf1, "(alpha.txt)") < offset_of(pdf1, "(zeta.txt)")
+    end
+  end
+
   describe "embedded font parity" do
     test "the same resolved embedded font drives deterministic wrapping, pagination, and final PDF resources" do
       %{bytes: bytes} = FontFixture.supported_font()
@@ -164,6 +174,30 @@ defmodule Rendro.DeterministicTest do
     }
   end
 
+  defp embedded_file_order_doc(order) do
+    registrations =
+      case order do
+        :alpha_first ->
+          [
+            {:alpha, "alpha.txt", "alpha-data"},
+            {:zeta, "zeta.txt", "zeta-data"}
+          ]
+
+        :zeta_first ->
+          [
+            {:zeta, "zeta.txt", "zeta-data"},
+            {:alpha, "alpha.txt", "alpha-data"}
+          ]
+      end
+
+    Enum.reduce(registrations, simple_doc(), fn {logical_name, filename, bytes}, doc ->
+      Rendro.register_embedded_file(doc, logical_name, {:binary, bytes},
+        filename: filename,
+        mime_type: "text/plain"
+      )
+    end)
+  end
+
   defp dictionary_key_groups(pdf) do
     Regex.scan(~r/<<\n(.*?)\n>>/s, pdf, capture: :all_but_first)
     |> Enum.map(fn [body] -> body end)
@@ -201,5 +235,12 @@ defmodule Rendro.DeterministicTest do
     |> String.split(token)
     |> length()
     |> Kernel.-(1)
+  end
+
+  defp offset_of(pdf, needle) do
+    case :binary.match(pdf, needle) do
+      {offset, _length} -> offset
+      :nomatch -> raise "missing #{needle} in PDF output"
+    end
   end
 end

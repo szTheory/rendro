@@ -96,6 +96,19 @@ defmodule Rendro.PDF.WriterTest do
     )
   end
 
+  defp multiple_embedded_files_document do
+    sample_document()
+    |> Rendro.register_embedded_file(:zeta, {:binary, "z-data"},
+      filename: "zeta.txt",
+      mime_type: "text/plain"
+    )
+    |> Rendro.register_embedded_file(:alpha, {:binary, "alpha-data"},
+      filename: "alpha.txt",
+      mime_type: "text/plain",
+      modified_at: ~U[2026-05-05 14:30:00Z]
+    )
+  end
+
   describe "render/1" do
     test "returns {:ok, binary} tuple" do
       doc = sample_document()
@@ -165,6 +178,33 @@ defmodule Rendro.PDF.WriterTest do
 
       refute pdf =~ "/EmbeddedFiles"
       refute pdf =~ "/AF ["
+    end
+
+    test "wires catalog embedded-file names and AF entries in deterministic filename order" do
+      {:ok, pdf} = Writer.render(multiple_embedded_files_document(), deterministic: true)
+
+      assert pdf =~ "/Names <<"
+      assert pdf =~ "/EmbeddedFiles <<"
+      assert pdf =~ "/AF ["
+      assert pdf =~ "(alpha.txt)"
+      assert pdf =~ "(zeta.txt)"
+      assert offset_of(pdf, "(alpha.txt)") < offset_of(pdf, "(zeta.txt)")
+    end
+
+    test "serializes validated embedded-file params metadata only from authored inputs" do
+      {:ok, pdf} = Writer.render(embedded_file_document(), deterministic: true)
+
+      assert pdf =~ "/Params <<"
+      assert pdf =~ "/Size 8"
+      assert pdf =~ "/CheckSum <E5EBD4C02CEFBE7955977C67ADA242B7>"
+      assert pdf =~ "/CreationDate (D:20260505140000Z)"
+      refute pdf =~ "/ModDate (D:20000101000000Z)"
+    end
+
+    test "does not widen page annotations into file attachment annotations" do
+      {:ok, pdf} = Writer.render(embedded_file_document(), deterministic: true)
+
+      refute pdf =~ "/Subtype /FileAttachment"
     end
 
     test "serializes widget annotations and normal appearance streams for text fields" do
@@ -622,6 +662,13 @@ defmodule Rendro.PDF.WriterTest do
 
       {:ok, pdf} = Writer.render(doc)
       assert pdf =~ "(D:20250615103000Z)"
+    end
+  end
+
+  defp offset_of(pdf, needle) do
+    case :binary.match(pdf, needle) do
+      {offset, _length} -> offset
+      :nomatch -> raise "missing #{needle} in PDF output"
     end
   end
 end
