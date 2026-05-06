@@ -49,15 +49,35 @@ This roadmap defines the strategic arcs that turn Rendro into the production-rea
 * **Truthful Viewer Boundaries:**
   * Structural validation plus proof-backed viewer claims instead of generic "works everywhere" positioning.
 
-## Milestone 5: Document Trust & Embedded Artifact Surfaces (Next)
-**Focus:** Expand the PDF engine into higher-trust document capabilities while keeping claims proof-backed and scope narrow.
+## Milestone 5: Embedded Artifact Surfaces (Next)
+**Focus:** Extend Rendro's authored PDF surface with embedded related artifacts while keeping the public contract deterministic, narrow, and proof-backed.
 
-* **Digital Signatures:**
-  * Deterministic signing primitives and explicit support boundaries.
-* **Document Encryption:**
-  * Password-protected documents and encryption policy surfaces.
-* **Attachments & Annotations:**
-  * Embedded file attachments and annotation support that do not compromise deterministic output guarantees.
+* **Document-Level Embedded Files:**
+  * Embedded related artifacts in the PDF binary with explicit metadata and deterministic serialization.
+* **Curated Link Annotations:**
+  * External-URI and internal-destination links only, reusing the existing annotation seam without opening a generic review/comment API.
+* **Truthful Artifact Boundaries:**
+  * Support-matrix and proof updates that distinguish structural validity from viewer discoverability and policy behavior.
+
+## Milestone 6: Protected Delivery Hooks & Encryption Boundaries
+**Focus:** Add a truthful PDF protection story without overclaiming permissions-based security or destabilizing deterministic core rendering.
+
+* **External Protection Hooks First:**
+  * Optional post-processing or adapter seams for encryption/protection workflows.
+* **Narrow Security Claims:**
+  * Explicit distinction between password-to-open, advisory permissions, and unsupported compliance/archive narratives.
+* **Support-Boundary Discipline:**
+  * Proof-backed validation before any native encryption story expands.
+
+## Milestone 7: Signature Fields & External Signing Preparation
+**Focus:** Add narrow signing preparation surfaces while keeping actual cryptographic trust operations explicit and separately bounded.
+
+* **Unsigned Signature Fields:**
+  * Core-authored signature-field surfaces only if they fit the existing form model truthfully.
+* **External Signing Preparation:**
+  * Deterministic preparation seams for append/incremental external signing workflows.
+* **Deferred Compliance Surface:**
+  * PAdES, LTV, TSA/OCSP/CRL, and broad compliance claims remain later work.
 
 ---
 *Note: This roadmap is a live strategic guide. Active milestone definition still happens through dedicated milestone context, requirements, and roadmap artifacts.*

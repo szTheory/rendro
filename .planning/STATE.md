@@ -1,9 +1,9 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
+milestone: v1.9
+milestone_name: embedded-artifact-surfaces
 status: verifying
-last_updated: "2026-05-06T01:25:47.202Z"
+last_updated: "2026-05-06T07:03:21.000Z"
 last_activity: 2026-05-06
 progress:
   total_phases: 45
@@ -20,28 +20,29 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-05)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 48 — embedded-file-core-surface
+**Current focus:** Phase 49 — curated-link-annotation-surface
 
 ## Current Position
 
-Phase: 48 (embedded-file-core-surface) — EXECUTING
-Plan: 2 of 2
+Phase: 49
+Plan: Complete
 Status: Phase complete — ready for verification
 Last activity: 2026-05-06
 
-Progress: [----------] 0%
+Progress: [##########] 100%
 
 ## Milestone Snapshot
 
 - Milestone: `v1.9 Embedded Artifact Surfaces`
 - Phases: `3 planned`
-- Plans: `0`
-- Tasks: `0`
+- Plans: `5 complete, Phase 50 pending planning`
+- Tasks: `Phase 48 and 49 executed; Phase 50 not planned yet`
 - Timeline: `2026-05-05` -> `TBD`
 - Key accomplishments:
   - `v1.9` scope is fixed to document-level embedded files and curated link annotations.
-  - Native encryption and digital-signature work are intentionally deferred to later milestones.
-  - The milestone arc is now recorded so future milestone-definition runs can reuse the same sequencing decisions.
+  - Phase 48 delivered document-level embedded files through the existing deterministic writer seams.
+  - Phase 49 delivered curated external-URI and internal-destination link annotations with deterministic pagination and writer output.
+  - Native encryption and digital-signature work remain intentionally deferred to later milestones.
 
 ## Performance Metrics
 
@@ -54,6 +55,7 @@ Progress: [----------] 0%
 | 47 | 3/3 | 6 | 2 |
 | Phase 48 P01 | 4min | 2 tasks | 10 files |
 | Phase 48 P02 | 5min | 2 tasks | 3 files |
+| 48 | 2 | - | - |
 
 ## Accumulated Context
 
@@ -79,12 +81,12 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Plan Phase 48 for embedded-file core surface work.
+- Verify Phase 49 and capture any remaining proof or docs gaps before Phase 50 starts.
 - Keep `v1.9` docs and support boundaries narrower than generic annotation, encryption, or signing claims.
 
 ### Blockers/Concerns
 
-- Embedded-file viewer discoverability and security-policy variance must be documented truthfully before support claims widen.
+- Embedded-file and link viewer discoverability/policy variance must be documented truthfully before support claims widen.
 
 ## Deferred Items
 

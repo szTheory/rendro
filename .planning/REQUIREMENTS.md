@@ -46,8 +46,8 @@
 | EMBED-01 | Phase 48 | Complete |
 | EMBED-02 | Phase 48 | Complete |
 | EMBED-03 | Phase 48 | Complete |
-| LINK-01 | Phase 49 | Pending |
-| LINK-02 | Phase 49 | Pending |
+| LINK-01 | Phase 49 | Complete |
+| LINK-02 | Phase 49 | Complete |
 | TRUST-01 | Phase 50 | Pending |
 | TRUST-02 | Phase 50 | Pending |
 

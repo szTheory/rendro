@@ -24,12 +24,16 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 **Foundation Already Shipped:** v1.3 release readiness, v1.2 typography/assets truth, v1.1 layout-authoring maturity, and v1.0 deterministic core rendering.
 
-## Current Milestone: TBD
+## Current Milestone: v1.9 Embedded Artifact Surfaces
 
-**Goal:** TBD
+**Goal:** Extend Rendro's deterministic authored PDF surface with document-level embedded files and curated link annotations while keeping support claims narrow and proof-backed.
 
 **Target features:**
-- TBD
+- Document-level embedded files with explicit, deterministic metadata
+- Curated link annotations for external URIs and internal destinations
+- Docs/support-matrix proof closure for the new artifact surface
+
+**Why now:** This deepens the PDF product surface without yet taking on the heavier trust-model and non-determinism tradeoffs of native encryption or cryptographic signing.
 
 ## Requirements
 
@@ -47,7 +51,9 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-- [ ] No active milestone requirements are defined yet. Start the next milestone before reopening requirement tracking.
+- [ ] v1.9 will add document-level embedded files with deterministic metadata and validation.
+- [ ] v1.9 will add curated link annotations only, not a generic annotations surface.
+- [ ] v1.9 will close with proof-backed docs and support-boundary updates before any broader trust-surface work.
 
 ### Out of Scope
 
@@ -61,15 +67,16 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 Rendro has moved beyond layout-authoring maturity and trust-surface basics into interactive document behavior. `v1.8` proved that authored AcroForm widgets can live inside the same deterministic measure/paginate/render pipeline as static content without widening the support contract beyond what is actually verified.
 
-The next risk is not adding more surface area mechanically; it is preserving truthful operational boundaries as the PDF engine enters higher-trust features such as signatures, encryption, and attachments. Those features need narrow milestone scope and proof-backed claims from day one.
+`v1.9` intentionally chooses embedded artifact surfaces over native encryption or signing. That choice preserves Rendro's strongest property: narrowly-scoped, provable document features that fit the existing writer seams and do not yet force a broader cryptographic trust contract.
 
 ## Constraints
 
 - **Tech stack**: Keep the core pure Elixir with no hard dependency on Phoenix, Oban, browser runtimes, or external layout engines — preserves deterministic deployment and product boundaries.
 - **Architecture**: Extend the existing `build -> compose -> measure -> paginate -> render -> validate` pipeline instead of creating an alternate rendering path — one engine must continue to power both APIs.
-- **Product scope**: Interactive forms do not imply broad viewer compatibility, XFA support, digital signatures, or compliance claims. Future milestones must keep those boundaries explicit.
+- **Product scope**: Interactive forms do not imply broad viewer compatibility, XFA support, generic annotations, digital signatures, or compliance claims. Future milestones must keep those boundaries explicit.
 - **Determinism**: Widget geometry, appearance generation, and PDF object allocation must remain deterministic for identical authored inputs.
 - **Documentation honesty**: Public APIs, guides, and examples must not imply viewer support or form capabilities beyond what `priv/support_matrix.json` and proof lanes cover.
+- **Terminology**: Delivery attachments in adapters and embedded files inside PDFs must remain distinct in naming and docs to avoid user confusion.
 - **Verification**: Merge-blocking, docs-contract, structural-validation, and manual-viewer proof lanes must stay truthful as the PDF feature surface expands.
 
 ## Key Decisions
@@ -96,7 +103,9 @@ The next risk is not adding more surface area mechanically; it is preserving tru
 
 ## Evolution Path
 
-- The next milestone should define proof-backed requirements for signatures, encryption, and embedded artifact surfaces before any new implementation begins.
+- `v1.9` should prove document-level embedded files and curated link annotations before any broader annotation, encryption, or signing work begins.
+- Encryption should stay a later milestone and prefer truthful protection boundaries over broad “secure PDF” marketing.
+- Signature work should separate unsigned field authoring and external-signing preparation from actual cryptographic-signature claims.
 - Viewer support should continue to expand only when manual proof is recorded and reflected in `priv/support_matrix.json`.
 - The core deterministic pipeline and optional-adapter boundary remain non-negotiable.
 
@@ -118,4 +127,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-05 after v1.8 milestone complete.*
+*Last updated: 2026-05-05 after v1.9 milestone definition.*
