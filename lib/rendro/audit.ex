@@ -20,4 +20,28 @@ defmodule Rendro.Audit do
   should NOT raise — audit failures must not break the render pipeline.
   """
   @callback track_render(render_id, metadata) :: :ok | {:error, term()}
+
+  @doc """
+  Removes reserved password-related keys from metadata before it crosses an
+  audit boundary.
+  """
+  @spec scrub_metadata(metadata()) :: metadata()
+  def scrub_metadata(metadata) when is_map(metadata) do
+    metadata
+    |> Map.drop([
+      :password,
+      :open_password,
+      :owner_password,
+      "password",
+      "open_password",
+      "owner_password"
+    ])
+    |> Enum.into(%{}, fn {key, value} ->
+      {key, scrub_value(value)}
+    end)
+  end
+
+  defp scrub_value(value) when is_map(value), do: scrub_metadata(value)
+  defp scrub_value(value) when is_list(value), do: Enum.map(value, &scrub_value/1)
+  defp scrub_value(value), do: value
 end

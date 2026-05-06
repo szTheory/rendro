@@ -64,6 +64,11 @@ The worker does **not** support arbitrary job-arg pass-through into
 `doc.options` or `Rendro.render/2`. If you need a broader async contract, build
 that normalization explicitly in your own job producer before calling Rendro.
 
+The worker also does **not** accept password or protection fields in job args.
+Protection secrets do not belong in persisted Oban args. If you need protected
+delivery, render the artifact in your worker and apply `Rendro.Protect.password/2`
+ in an application-owned credential boundary before storage or delivery.
+
 ### Worker failure diagnostics
 
 Boundary misuse returns typed `{:error, reason}` tuples without crashing the
@@ -243,6 +248,28 @@ email
   {:error, reason} -> handle_error(reason)
 end
 ```
+
+If your workflow needs password-to-open delivery, protect the artifact first and
+then hand the protected artifact to `attach_artifact/3`:
+
+```elixir-schematic
+{:ok, artifact} =
+  doc
+  |> Rendro.render_to_artifact(deterministic: true)
+  |> then(fn {:ok, artifact} ->
+    Rendro.Protect.password(artifact,
+      open_password: System.fetch_env!("PDF_OPEN_PASSWORD"),
+      owner_password: System.fetch_env!("PDF_OWNER_PASSWORD"),
+      advisory_permissions: [:print],
+      adapter: Rendro.Adapters.Qpdf
+    )
+  end)
+
+email_with_attachment =
+  Rendro.Adapters.Mailglass.attach_artifact(email, artifact, "invoice.pdf")
+```
+
+That flow keeps protection at the artifact boundary. Mailglass does not need to know the passwords; it just transports the already-protected PDF bytes.
 
 ### Verification
 
