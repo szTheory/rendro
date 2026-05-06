@@ -185,13 +185,10 @@ defmodule Rendro.Protect do
 
   defp protection_metadata(opts) do
     %{
-      protected: true,
       algorithm: opts.algorithm,
-      adapter: opts.adapter,
       has_open_password: true,
       has_owner_password: true,
-      advisory_permissions: opts.advisory_permissions,
-      deterministic: false
+      advisory_permissions: opts.advisory_permissions
     }
   end
 
