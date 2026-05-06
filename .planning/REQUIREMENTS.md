@@ -13,8 +13,8 @@
 
 ### Link Annotations
 
-- [ ] **LINK-01**: Engineers can author deterministic external-URI link annotations through a curated public API.
-- [ ] **LINK-02**: Engineers can author deterministic internal-destination link annotations for in-document navigation.
+- [x] **LINK-01**: Engineers can author deterministic external-URI link annotations through a curated public API.
+- [x] **LINK-02**: Engineers can author deterministic internal-destination link annotations for in-document navigation.
 
 ### Truthful Support Boundaries
 
