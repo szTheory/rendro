@@ -148,15 +148,15 @@ Recording rules:
 
 | Viewer | Version | OS | Date checked | Fixture | Discoverable | Open/extract | Save/extract | Result | Notes |
 |--------|---------|----|--------------|---------|--------------|--------------|--------------|--------|-------|
-| Adobe Acrobat Reader | pending | pending | pending | `tmp/embedded_artifact_support_fixture.pdf` | unverified | unverified | unverified | unverified | Not yet manually checked in this phase. Plan 03 fills this row. |
-| Apple Preview | pending | pending | pending | `tmp/embedded_artifact_support_fixture.pdf` | unverified | unverified | unverified | unverified | Not yet manually checked in this phase. Plan 03 fills this row. |
+| Adobe Acrobat Reader | n/a | macOS | 2026-05-06 | `tmp/embedded_artifact_support_fixture.pdf` | pass | pass | pass | supported | `invoice.csv` visible in the Attachments pane (paperclip icon); double-click opens it; right-click → Save Attachment writes to disk. |
+| Apple Preview | n/a | macOS | 2026-05-06 | `tmp/embedded_artifact_support_fixture.pdf` | unverified | unverified | unverified | unverified | Apple Preview did not surface the embedded file in its UI under the version checked. Stays unverified per D-08; Rendro does author the surface correctly per the structural lane (D-09 — not marked unsupported). |
 
 ### Links
 
 | Viewer | Version | OS | Date checked | Fixture | External URI handoff | Internal page navigation | Result | Notes |
 |--------|---------|----|--------------|---------|----------------------|--------------------------|--------|-------|
-| Adobe Acrobat Reader | pending | pending | pending | `tmp/embedded_artifact_support_fixture.pdf` | unverified | unverified | unverified | Not yet manually checked in this phase. Plan 03 fills this row. |
-| Apple Preview | pending | pending | pending | `tmp/embedded_artifact_support_fixture.pdf` | unverified | unverified | unverified | Not yet manually checked in this phase. Plan 03 fills this row. |
+| Adobe Acrobat Reader | n/a | macOS | 2026-05-06 | `tmp/embedded_artifact_support_fixture.pdf` | pass | pass | supported | "Rendro documentation" link hands off to the system browser; "Continued on page 2" link navigates to page 2 within the PDF. |
+| Apple Preview | n/a | macOS | 2026-05-06 | `tmp/embedded_artifact_support_fixture.pdf` | pass | pass | supported | Same observed behavior as Adobe Reader for both link types. |
 
 ## Validation Sign-Off
 
@@ -166,6 +166,6 @@ Recording rules:
 - [x] No watch-mode flags
 - [x] `mix docs.contract` remains the canonical docs gate
 - [x] `nyquist_compliant: true` set in frontmatter
-- [ ] Viewer evidence tables completed for any viewer/surface pair promoted to `supported`
+- [x] Viewer evidence tables completed for any viewer/surface pair promoted to `supported`
 
-**Approval:** Phase 50 validation lane prepared on 2026-05-06; Plan 02 Task 2 rewrite executed on 2026-05-06.
+**Approval:** Phase 50 validation lane prepared on 2026-05-06; Plan 02 Task 2 rewrite executed on 2026-05-06; Plan 03 Task 1 manual viewer evidence recorded on 2026-05-06.
