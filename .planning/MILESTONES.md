@@ -1,5 +1,21 @@
 # Milestones
 
+## v1.9 Embedded Artifact Surfaces (Shipped: 2026-05-06)
+
+**Phases completed:** 3 phases (48, 49, 50)
+
+**Key accomplishments:**
+
+- Added a deterministic authored boundary for document-level embedded files with explicit metadata and validate-stage rejection of ambiguous state.
+- Extended the writer to emit deterministic `/EmbeddedFile`, `/Filespec`, `/Names`, and `/AF` catalog wiring sorted by stable authored keys.
+- Added curated link annotations limited to `http`/`https` URIs and in-document page targets through the existing page `/Annots` seam — no named destinations, no `/GoToR`, no generic action dictionaries.
+- Published the proof-backed support contract: family-first matrix entries for `embedded_files` and `links`, canonical guide wording that distinguishes PDF-internal embedded files from delivery attachments, and a new `Embedded artifact semantic-claims` docs-contract lane.
+- Recorded manual viewer evidence in Adobe Acrobat Reader and Apple Preview; promoted only proof-backed pairs (Adobe: both surfaces; Preview: links supported, embedded files unverified per D-09).
+
+**Audit status:** `tech_debt` — all 7 requirements satisfied; debt is documentation/tracking-artifact only (missing `49-VERIFICATION.md`, stale `wave_0_complete: false` flags, inconsistent SUMMARY frontmatter shape). See `milestones/v1.9-MILESTONE-AUDIT.md`.
+
+---
+
 ## v1.8 Interactive PDF Forms (Shipped: 2026-05-05)
 
 **Phases completed:** 3 phases (45, 46, 47)

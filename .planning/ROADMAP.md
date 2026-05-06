@@ -49,7 +49,7 @@ This roadmap defines the strategic arcs that turn Rendro into the production-rea
 * **Truthful Viewer Boundaries:**
   * Structural validation plus proof-backed viewer claims instead of generic "works everywhere" positioning.
 
-## Milestone 5: Embedded Artifact Surfaces (Next)
+## Milestone 5: Embedded Artifact Surfaces (Completed)
 **Focus:** Extend Rendro's authored PDF surface with embedded related artifacts while keeping the public contract deterministic, narrow, and proof-backed.
 
 * **Document-Level Embedded Files:**
@@ -59,7 +59,7 @@ This roadmap defines the strategic arcs that turn Rendro into the production-rea
 * **Truthful Artifact Boundaries:**
   * Support-matrix and proof updates that distinguish structural validity from viewer discoverability and policy behavior.
 
-## Milestone 6: Protected Delivery Hooks & Encryption Boundaries
+## Milestone 6: Protected Delivery Hooks & Encryption Boundaries (Next)
 **Focus:** Add a truthful PDF protection story without overclaiming permissions-based security or destabilizing deterministic core rendering.
 
 * **External Protection Hooks First:**

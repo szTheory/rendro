@@ -10,9 +10,13 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Shipped Version:** v1.8 Interactive PDF Forms (2026-05-05)
+**Shipped Version:** v1.9 Embedded Artifact Surfaces (2026-05-06)
 
-Rendro now supports deterministic authored AcroForm text fields, checkboxes, and radio groups in the core pipeline. The writer emits explicit AcroForm objects and appearance streams, structural proof runs through the Poppler lane, and support claims for forms are constrained to evidence-backed boundaries.
+Rendro now supports document-level embedded files with explicit, deterministic metadata and curated link annotations limited to `http`/`https` URIs and in-document page targets. The writer emits deterministic `/EmbeddedFile`, `/Filespec`, `/Names`, and `/AF` catalog wiring and serializes `/Link` annotations through the existing page `/Annots` seam without named destinations or generic action dictionaries. Public claims are backed by structural proof through Poppler and recorded manual viewer evidence in Adobe Acrobat Reader and Apple Preview.
+
+**Previous Shipped Version:** v1.8 Interactive PDF Forms (2026-05-05)
+
+Rendro supports deterministic authored AcroForm text fields, checkboxes, and radio groups in the core pipeline with explicit appearance streams and proof-backed forms support boundaries.
 
 **Previous Shipped Version:** v1.5 Validation and Trust Surfaces (2026-05-05)
 
@@ -24,21 +28,22 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 **Foundation Already Shipped:** v1.3 release readiness, v1.2 typography/assets truth, v1.1 layout-authoring maturity, and v1.0 deterministic core rendering.
 
-## Current Milestone: v1.9 Embedded Artifact Surfaces
+## Next Milestone: v1.10 Protected Delivery Hooks & Encryption Boundaries
 
-**Goal:** Extend Rendro's deterministic authored PDF surface with document-level embedded files and curated link annotations while keeping support claims narrow and proof-backed.
+**Goal:** Add a truthful PDF protection story without overclaiming permissions-based security or destabilizing deterministic core rendering.
 
-**Target features:**
-- Document-level embedded files with explicit, deterministic metadata
-- Curated link annotations for external URIs and internal destinations
-- Docs/support-matrix proof closure for the new artifact surface
+**Target focus:**
+- External protection hooks first (post-processing or adapter seams) before any native encryption story.
+- Narrow security claims that distinguish password-to-open, advisory permissions, and unsupported compliance/archive narratives.
+- Support-boundary discipline with proof-backed validation before any native encryption surface expands.
 
-**Why now:** This deepens the PDF product surface without yet taking on the heavier trust-model and non-determinism tradeoffs of native encryption or cryptographic signing.
+**Why now:** With embedded artifact surfaces shipped, the next coherent step is protection without taking on the heavier cryptographic-trust contract of digital signing.
 
 ## Requirements
 
 ### Validated
 
+- [x] Rendro v1.9 delivered deterministic authored document-level embedded files and curated link annotations (`http`/`https` URIs and in-document page targets only), with one proof-backed support contract published across `priv/support_matrix.json` and `guides/api_stability.md`, structural proof through the Poppler lane, and recorded manual viewer evidence in Adobe Acrobat Reader (both surfaces) and Apple Preview (links). Validated at milestone close in `v1.9-MILESTONE-AUDIT.md`.
 - [x] Rendro v1.8 delivered deterministic authored interactive PDF forms for text fields, checkboxes, and radio groups, along with truthful forms support boundaries. Validated at milestone close in `v1.8-MILESTONE-AUDIT.md`.
 - [x] Rendro v1.5 delivered validator-backed trust surfaces, structural validation, and a machine-readable support matrix. Validated at milestone close in `v1.5-MILESTONE-AUDIT.md`.
 - [x] Rendro v1.4 delivered Async Delivery and Artifact Operations, including a queued render lifecycle, artifact metadata, and persistence/sink contracts. Validated at milestone close in `v1.4-MILESTONE-AUDIT.md`.
@@ -51,9 +56,9 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-- [ ] v1.9 will add document-level embedded files with deterministic metadata and validation.
-- [ ] v1.9 will add curated link annotations only, not a generic annotations surface.
-- [ ] v1.9 will close with proof-backed docs and support-boundary updates before any broader trust-surface work.
+- [ ] v1.10 will introduce a truthful PDF protection story through external protection hooks first, with narrow password-to-open and advisory-permissions claims rather than blanket "secure PDF" marketing.
+- [ ] v1.10 will keep native PDF encryption gated on proof-backed validation before any in-core encryption surface expands.
+- [ ] v1.10 will preserve the existing deterministic core pipeline and the optional-adapter boundary as non-negotiable.
 
 ### Out of Scope
 
@@ -65,9 +70,9 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ## Context
 
-Rendro has moved beyond layout-authoring maturity and trust-surface basics into interactive document behavior. `v1.8` proved that authored AcroForm widgets can live inside the same deterministic measure/paginate/render pipeline as static content without widening the support contract beyond what is actually verified.
+Rendro has now shipped four authored PDF surfaces inside one deterministic pipeline: static content (v1.0–v1.2), interactive forms (v1.8), document-level embedded files (v1.9), and curated link annotations (v1.9). `v1.9` proved that the core writer's existing allocation, catalog-injection, and `/Annots` seams can absorb new authored object kinds without creating parallel rendering paths or widening the public contract beyond recorded evidence.
 
-`v1.9` intentionally chooses embedded artifact surfaces over native encryption or signing. That choice preserves Rendro's strongest property: narrowly-scoped, provable document features that fit the existing writer seams and do not yet force a broader cryptographic trust contract.
+`v1.10` will keep the trust-model expansion gradual: external protection hooks before any native encryption work, password-to-open and advisory-permissions framing before broader compliance narratives, and proof-backed validation before any in-core encryption surface ships. Digital signatures, PAdES, LTV, and TSA/OCSP/CRL claims remain explicitly deferred to a later milestone with their own separately-bounded cryptographic-trust contract.
 
 ## Constraints
 
@@ -83,13 +88,29 @@ Rendro has moved beyond layout-authoring maturity and trust-surface basics into 
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Reuse one `Rendro.form_field/3` / `%Rendro.FormField{}` authored boundary for all currently supported interactive widgets | Keeps DSL surface area narrow and preserves one normalization path into the core engine | Shipped in v1.8 |
-| Generate explicit form appearance streams instead of relying on `NeedAppearances` | Viewer-generated appearances would weaken determinism and create false portability claims | Shipped in v1.8 |
-| Publish support boundaries as machine-readable product contract | Viewer and feature claims need one canonical truth source that docs and tests can enforce | Shipped in v1.5 and extended in v1.8 |
-| Preserve the core/adapter split even as operational features grow | Keeps Rendro deployable and testable without forcing downstream ecosystem choices | Reinforced across v1.4 through v1.8 |
-| Treat verification artifacts as product behavior | Operators need clear proof of what the engine supports and what remains unverified | Reinforced across shipped milestones |
+| Embedded files live on the document in a dedicated registry, not on `metadata.custom` or in writer-owned state | Preserves the registry-backed authored-input pattern and keeps serialization separate from authoring state | ✓ Shipped in v1.9 |
+| Embedded-file metadata is validated in `Rendro.Pipeline.Validate` with tuple errors, not registration-time exceptions | Keeps malformed authored state in the standard validate-stage error envelope before writer work begins | ✓ Shipped in v1.9 |
+| Embedded files extend the existing writer allocation/build funnel; no inline serializer or separate PDF surface | Preserves one deterministic object-planning seam in the core writer | ✓ Shipped in v1.9 |
+| Attachment catalog wiring stays document-level only (`/Names`, `/EmbeddedFiles`, `/AF`); no page-level file-attachment annotations | Matches the phase threat model and prevents generic-annotation scope creep | ✓ Shipped in v1.9 |
+| Curated links accept only explicit `uri:` (`http`/`https`) or `page:` targets; no named destinations, no `/GoToR`, no generic actions | Narrowest useful annotation surface that reuses the existing `/Annots` seam without opening a generic review/comment API | ✓ Shipped in v1.9 |
+| Hold viewer claims at `unverified` until manual evidence is recorded; promote only proof-backed pairs at milestone close | Keeps the public support contract truthful and auditable; prevents portability overclaims | ✓ Shipped in v1.9 |
+| Reuse one `Rendro.form_field/3` / `%Rendro.FormField{}` authored boundary for all currently supported interactive widgets | Keeps DSL surface area narrow and preserves one normalization path into the core engine | ✓ Shipped in v1.8 |
+| Generate explicit form appearance streams instead of relying on `NeedAppearances` | Viewer-generated appearances would weaken determinism and create false portability claims | ✓ Shipped in v1.8 |
+| Publish support boundaries as machine-readable product contract | Viewer and feature claims need one canonical truth source that docs and tests can enforce | ✓ Shipped in v1.5 and extended in v1.8/v1.9 |
+| Preserve the core/adapter split even as operational features grow | Keeps Rendro deployable and testable without forcing downstream ecosystem choices | ✓ Reinforced across v1.4 through v1.9 |
+| Treat verification artifacts as product behavior | Operators need clear proof of what the engine supports and what remains unverified | ✓ Reinforced across shipped milestones |
 
 ## Archived Milestone Context
+
+<details>
+<summary>v1.9 milestone focus before ship</summary>
+
+- Add document-level embedded files with deterministic metadata and validate-stage rejection of ambiguous state.
+- Add curated link annotations only — `http`/`https` URIs and in-document page targets — through the existing `/Annots` seam, with no named destinations or generic action dictionaries.
+- Publish one proof-backed support contract for the new families across `priv/support_matrix.json` and `guides/api_stability.md`.
+- Defer native encryption to v1.10 and digital signatures to v2.0.
+
+</details>
 
 <details>
 <summary>v1.8 milestone focus before ship</summary>
@@ -103,11 +124,10 @@ Rendro has moved beyond layout-authoring maturity and trust-surface basics into 
 
 ## Evolution Path
 
-- `v1.9` should prove document-level embedded files and curated link annotations before any broader annotation, encryption, or signing work begins.
-- Encryption should stay a later milestone and prefer truthful protection boundaries over broad “secure PDF” marketing.
-- Signature work should separate unsigned field authoring and external-signing preparation from actual cryptographic-signature claims.
-- Viewer support should continue to expand only when manual proof is recorded and reflected in `priv/support_matrix.json`.
-- The core deterministic pipeline and optional-adapter boundary remain non-negotiable.
+- `v1.10` should introduce protected delivery hooks and a narrow encryption-boundary story through external hooks first, with proof-backed validation before any in-core encryption surface expands.
+- Signature work should remain a later milestone and should separate unsigned field authoring and external-signing preparation from actual cryptographic-signature claims (PAdES, LTV, TSA/OCSP/CRL stay deferred).
+- Viewer support should continue to expand only when manual proof is recorded and reflected in `priv/support_matrix.json` (e.g., promoting Apple Preview × `embedded_files` if a future Preview release surfaces document-level embedded files).
+- The core deterministic pipeline and the optional-adapter boundary remain non-negotiable.
 
 ## Evolution
 
@@ -127,4 +147,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-05 after v1.9 milestone definition.*
+*Last updated: 2026-05-06 after v1.9 milestone close.*
