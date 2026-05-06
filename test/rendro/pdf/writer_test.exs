@@ -84,6 +84,18 @@ defmodule Rendro.PDF.WriterTest do
     }
   end
 
+  defp embedded_file_document(metadata \\ []) do
+    created_at = Keyword.get(metadata, :created_at, ~U[2026-05-05 14:00:00Z])
+
+    sample_document()
+    |> Rendro.register_embedded_file(:invoice_csv, {:binary, "a,b\n1,2\n"},
+      filename: Keyword.get(metadata, :filename, "invoice.csv"),
+      mime_type: Keyword.get(metadata, :mime_type, "text/csv"),
+      description: Keyword.get(metadata, :description, "Billing export"),
+      created_at: created_at
+    )
+  end
+
   describe "render/1" do
     test "returns {:ok, binary} tuple" do
       doc = sample_document()
@@ -135,6 +147,24 @@ defmodule Rendro.PDF.WriterTest do
       {:ok, pdf} = Writer.render(sample_document())
 
       refute pdf =~ "/AcroForm"
+    end
+
+    test "serializes embedded-file stream and file-spec objects for document attachments" do
+      {:ok, pdf} = Writer.render(embedded_file_document(), deterministic: true)
+
+      assert pdf =~ "/Type /EmbeddedFile"
+      assert pdf =~ "/Type /Filespec"
+      assert pdf =~ "/EF <<"
+      assert pdf =~ "/F (invoice.csv)"
+      assert pdf =~ "/UF (invoice.csv)"
+      assert pdf =~ "/Desc (Billing export)"
+    end
+
+    test "does not inject embedded-file catalog surface when no attachments exist" do
+      {:ok, pdf} = Writer.render(sample_document(), deterministic: true)
+
+      refute pdf =~ "/EmbeddedFiles"
+      refute pdf =~ "/AF ["
     end
 
     test "serializes widget annotations and normal appearance streams for text fields" do
