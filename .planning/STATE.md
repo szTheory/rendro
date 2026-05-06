@@ -65,12 +65,12 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 
 ### Pending Todos
 
-- Stage the dirty worktree into coherent commits and restore exact-tag parity before publish proof.
-- Run `mix release.preflight` and `scripts/release_preflight_proof.exs` from a clean, tagged release state.
+- Prepare the publish/ship step from the verified `v0.1.0` release candidate.
+- Optionally collapse the final release-candidate commit train if a cleaner public history is desired before publish.
 
 ### Blockers/Concerns
 
-- `mix release.preflight` currently fails on local environment state, not feature correctness: the worktree is dirty and HEAD is not on exact tag `v0.1.0`.
+- No local release-verification blocker remains: `mix ci`, `mix release.preflight`, and `scripts/release_preflight_proof.exs --current-version-tag --worktree /tmp/rendro-release-proof` all pass at exact tag `v0.1.0`.
 - Tracking-artifact debt from v1.9 (missing `49-VERIFICATION.md`, stale `wave_0_complete: false` flags, inconsistent SUMMARY frontmatter shape) was accepted at close per the v1.9 audit; remediable retroactively if needed.
 
 ## Deferred Items
