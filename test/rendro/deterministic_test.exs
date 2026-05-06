@@ -342,6 +342,10 @@ defmodule Rendro.DeterministicTest do
     |> Kernel.-(1)
   end
 
+  defp annotation_offsets(pdf, needles) do
+    Enum.map(needles, &offset_of(pdf, &1))
+  end
+
   defp offset_of(pdf, needle) do
     case :binary.match(pdf, needle) do
       {offset, _length} -> offset
