@@ -2,7 +2,7 @@ defmodule Rendro.Pipeline.ValidateTest do
   use ExUnit.Case, async: true
 
   alias Rendro.Pipeline.Validate
-  alias Rendro.{Block, Document, FormField, Page, Text}
+  alias Rendro.{Block, Document, FormField, Link, Page, Text}
 
   defp sample_document do
     doc = Document.new()
@@ -123,6 +123,53 @@ defmodule Rendro.Pipeline.ValidateTest do
       assert {:missing_required_key, :content} in errors
       assert {:duplicate_embedded_file_name, "invoice.csv"} in errors
       assert {:invalid_embedded_file_mime_type, ""} in errors
+    end
+
+    test "aggregates link semantic failures alongside other validation errors" do
+      doc =
+        %Document{
+          pages: [
+            %Page{
+              width: 500,
+              height: 500,
+              blocks: [
+                %Block{
+                  content: %Link{
+                    content: %Text{content: "Docs", font: "Helvetica", size: 12, color: {0, 0, 0}},
+                    target: {:uri, "mailto:jon@example.com"}
+                  },
+                  x: 10,
+                  y: 20,
+                  width: 100,
+                  height: 20
+                },
+                %Block{
+                  content: %Link{
+                    content: %FormField{name: "email"},
+                    target: {:uri, "https://example.com"}
+                  },
+                  x: 10,
+                  y: 50,
+                  width: 100,
+                  height: 20
+                },
+                %Block{content: nil, x: "not a number", y: 20, width: 100, height: 20}
+              ]
+            }
+          ]
+        }
+
+      assert {:error,
+              %Rendro.Error{
+                stage: :validate,
+                reason: :structural_corruption,
+                details: %{errors: errors}
+              }} = Validate.run(doc)
+
+      assert :invalid_block_bounds in errors
+      assert {:missing_required_key, :content} in errors
+      assert {:unsupported_link_scheme, "mailto"} in errors
+      assert {:unsupported_link_content, :form_field} in errors
     end
 
     test "stress test: traverses a deeply nested AST with acceptable performance" do
