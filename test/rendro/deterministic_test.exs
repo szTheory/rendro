@@ -76,6 +76,31 @@ defmodule Rendro.DeterministicTest do
     end
   end
 
+  describe "link annotation determinism" do
+    test "deterministic output stays byte-identical for the same linked document" do
+      doc = linked_text_doc()
+      {:ok, pdf1} = Rendro.render(doc, deterministic: true)
+      {:ok, pdf2} = Rendro.render(doc, deterministic: true)
+
+      assert pdf1 == pdf2
+      assert pdf1 =~ "/Subtype /Link"
+      assert pdf1 =~ "/URI (https://example.com/docs?q=keep)"
+      assert pdf1 =~ "(Linked body) Tj"
+    end
+
+    test "multiple curated links stay in page order across repeated deterministic renders" do
+      doc = ordered_links_doc()
+      {:ok, pdf1} = Rendro.render(doc, deterministic: true)
+      {:ok, pdf2} = Rendro.render(doc, deterministic: true)
+
+      assert pdf1 == pdf2
+      assert annotation_offsets(pdf1, ["/URI (https://example.com/alpha)", "/Dest [4 0 R /Fit]"]) ==
+               annotation_offsets(pdf2, ["/URI (https://example.com/alpha)", "/Dest [4 0 R /Fit]"])
+      assert pdf1 =~ "(Alpha link) Tj"
+      assert pdf1 =~ "(Beta table) Tj"
+    end
+  end
+
   describe "embedded font parity" do
     test "the same resolved embedded font drives deterministic wrapping, pagination, and final PDF resources" do
       %{bytes: bytes} = FontFixture.supported_font()
@@ -171,6 +196,86 @@ defmodule Rendro.DeterministicTest do
           height: 45
         }
       ]
+    }
+  end
+
+  defp linked_text_doc do
+    block =
+      Rendro.block(Rendro.text("Linked body", font: "Helvetica", size: 12),
+        x: 10,
+        y: 20,
+        width: 120,
+        height: 24
+      )
+      |> Rendro.link(uri: "https://example.com/docs?q=keep")
+
+    %Rendro.Document{
+      pages: [
+        %Rendro.Page{
+          width: 612,
+          height: 792,
+          margin_left: 72,
+          margin_top: 72,
+          blocks: [block]
+        }
+      ],
+      metadata: %Rendro.Metadata{title: "Linked Determinism"}
+    }
+  end
+
+  defp ordered_links_doc do
+    alpha =
+      Rendro.block(Rendro.text("Alpha link", font: "Helvetica", size: 12),
+        x: 10,
+        y: 20,
+        width: 120,
+        height: 24
+      )
+      |> Rendro.link(uri: "https://example.com/alpha")
+
+    beta_table =
+      %Rendro.Table{
+        rows: [
+          %Rendro.Row{
+            cells: [
+              %Rendro.Cell{
+                content:
+                  Rendro.block(
+                    Rendro.text("Beta table", font: "Helvetica", size: 12),
+                    x: 0,
+                    y: 0,
+                    width: 120,
+                    height: 24
+                  ),
+                width: 120,
+                height: 24
+              }
+            ]
+          }
+        ],
+        row_heights: [24],
+        split_policy: :none,
+        repeat_header: false
+      }
+
+    beta =
+      Rendro.block(beta_table, x: 10, y: 60, width: 120, height: 24)
+      |> Rendro.link(page: 2)
+
+    target = %Rendro.Page{blocks: [%Rendro.Block{content: Rendro.text("Target page"), x: 0, y: 0}]}
+
+    %Rendro.Document{
+      pages: [
+        %Rendro.Page{
+          width: 612,
+          height: 792,
+          margin_left: 72,
+          margin_top: 72,
+          blocks: [alpha, beta]
+        },
+        target
+      ],
+      metadata: %Rendro.Metadata{title: "Ordered Links"}
     }
   end
 
