@@ -110,7 +110,9 @@ defmodule Rendro.Adapters.Qpdf do
         Map.fetch!(opts, :open_password),
         Map.fetch!(opts, :owner_password),
         "256"
-      ] ++ permission_args(Map.fetch!(opts, :advisory_permissions)) ++ ["--", input_path, output_path]
+      ] ++
+        permission_args(Map.fetch!(opts, :advisory_permissions)) ++
+        ["--", input_path, output_path]
 
     case write_private_file(argfile_path, Enum.join(args, "\n") <> "\n") do
       :ok -> {:ok, argfile_path}
