@@ -72,4 +72,21 @@ defmodule Rendro.ErrorTest do
       assert err.where == "Rendro.Pipeline.Validate"
     end
   end
+
+  describe "from_stage/3 with stage :protect" do
+    test "missing executable emits qpdf guidance" do
+      err = Rendro.Error.from_stage(:protect, {:missing_executable, "qpdf"})
+      assert err.stage == :protect
+      assert err.where == "Rendro.Pipeline.Protect"
+      assert err.what == "PDF protection failed while wrapping the rendered artifact."
+      assert err.next =~ "Install qpdf"
+    end
+
+    test "invalid algorithm emits AES-256 guidance" do
+      err = Rendro.Error.from_stage(:protect, {:invalid_option, :algorithm, :aes_128})
+      assert err.stage == :protect
+      assert err.why == "Invalid protection option algorithm: :aes_128"
+      assert err.next =~ "algorithm: :aes_256"
+    end
+  end
 end
