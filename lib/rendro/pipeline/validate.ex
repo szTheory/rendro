@@ -6,11 +6,19 @@ defmodule Rendro.Pipeline.Validate do
     CheckBounds,
     CheckEmbeddedFiles,
     CheckFormFields,
+    CheckLinks,
     CheckReferences,
     CheckRequiredKeys
   }
 
-  @default_rules [CheckReferences, CheckBounds, CheckRequiredKeys, CheckFormFields, CheckEmbeddedFiles]
+  @default_rules [
+    CheckReferences,
+    CheckBounds,
+    CheckRequiredKeys,
+    CheckFormFields,
+    CheckLinks,
+    CheckEmbeddedFiles
+  ]
 
   @spec run(Rendro.Document.t()) :: {:ok, Rendro.Document.t()} | {:error, Rendro.Error.t()}
   def run(%Document{} = doc) do
