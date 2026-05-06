@@ -18,8 +18,8 @@
 
 ### Truthful Support Boundaries
 
-- [ ] **TRUST-01**: Rendro publishes one proof-backed support contract for embedded files and curated link annotations across docs and `priv/support_matrix.json`.
-- [ ] **TRUST-02**: Verification distinguishes structural proof from viewer behavior and does not claim support for artifact surfaces or viewers without recorded evidence.
+- [x] **TRUST-01**: Rendro publishes one proof-backed support contract for embedded files and curated link annotations across docs and `priv/support_matrix.json`.
+- [x] **TRUST-02**: Verification distinguishes structural proof from viewer behavior and does not claim support for artifact surfaces or viewers without recorded evidence.
 
 ## v2+ Requirements
 
@@ -48,8 +48,8 @@
 | EMBED-03 | Phase 48 | Complete |
 | LINK-01 | Phase 49 | Complete |
 | LINK-02 | Phase 49 | Complete |
-| TRUST-01 | Phase 50 | Pending |
-| TRUST-02 | Phase 50 | Pending |
+| TRUST-01 | Phase 50 | Complete |
+| TRUST-02 | Phase 50 | Complete |
 
 **Coverage:**
 - v1.9 requirements: 7 total

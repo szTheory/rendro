@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: embedded-artifact-surfaces
-status: executing
-last_updated: "2026-05-06T03:50:00.000Z"
+status: complete
+last_updated: "2026-05-06T04:00:00.000Z"
 last_activity: 2026-05-06
 progress:
-  total_phases: 45
-  completed_phases: 43
-  total_plans: 98
-  completed_plans: 99
+  total_phases: 46
+  completed_phases: 46
+  total_plans: 100
+  completed_plans: 100
   percent: 100
 ---
 
@@ -20,28 +20,29 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-05)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 50 — support-boundary-and-proof-closure
+**Current focus:** Milestone v1.9 complete — ready to scope v1.10 (Protected Delivery Hooks & Encryption Boundaries).
 
 ## Current Position
 
-Phase: 50
-Plan: 50-03 (Wave 2 — checkpoint plan)
-Status: Wave 1 complete (50-01, 50-02 merged); awaiting human viewer evidence for Wave 2
+Phase: 50 (Complete)
+Plan: 50-03 (Complete)
+Status: Phase 50 verified; milestone v1.9 complete
 Last activity: 2026-05-06
 
-Progress: [######----] 66% (2/3 plans complete)
+Progress: [##########] 100%
 
 ## Milestone Snapshot
 
-- Milestone: `v1.9 Embedded Artifact Surfaces`
-- Phases: `3 planned`
-- Plans: `7 complete (48: 2, 49: 3, 50: 2 of 3); 50-03 pending human viewer evidence`
-- Tasks: `Phase 48 and 49 executed; Phase 50 Wave 1 executed; 50-03 awaiting blocking checkpoint`
+- Milestone: `v1.9 Embedded Artifact Surfaces` (Complete 2026-05-06)
+- Phases: `3 planned, 3 complete`
+- Plans: `8 complete (48: 2, 49: 3, 50: 3)`
+- Tasks: `Phase 48, 49, 50 executed and verified; recorded viewer evidence backs the published support contract`
 - Timeline: `2026-05-05` -> `TBD`
 - Key accomplishments:
   - `v1.9` scope is fixed to document-level embedded files and curated link annotations.
   - Phase 48 delivered document-level embedded files through the existing deterministic writer seams.
   - Phase 49 delivered curated external-URI and internal-destination link annotations with deterministic pagination and writer output.
+  - Phase 50 published the proof-backed support contract: family-first matrix, conservative public wording, structural Poppler lane on a representative fixture, and recorded manual viewer evidence for Adobe Acrobat Reader and Apple Preview (Adobe supported for both surfaces; Preview supported for links and unverified for embedded files).
   - Native encryption and digital-signature work remain intentionally deferred to later milestones.
 
 ## Performance Metrics
