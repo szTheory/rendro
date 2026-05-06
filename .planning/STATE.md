@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: embedded-artifact-surfaces
-status: verifying
-last_updated: "2026-05-06T07:03:21.000Z"
+status: executing
+last_updated: "2026-05-06T03:50:00.000Z"
 last_activity: 2026-05-06
 progress:
   total_phases: 45
   completed_phases: 43
-  total_plans: 95
-  completed_plans: 97
+  total_plans: 98
+  completed_plans: 99
   percent: 100
 ---
 
@@ -20,23 +20,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-05)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 49 — curated-link-annotation-surface
+**Current focus:** Phase 50 — support-boundary-and-proof-closure
 
 ## Current Position
 
-Phase: 49
-Plan: Complete
-Status: Phase complete — ready for verification
+Phase: 50
+Plan: 50-03 (Wave 2 — checkpoint plan)
+Status: Wave 1 complete (50-01, 50-02 merged); awaiting human viewer evidence for Wave 2
 Last activity: 2026-05-06
 
-Progress: [##########] 100%
+Progress: [######----] 66% (2/3 plans complete)
 
 ## Milestone Snapshot
 
 - Milestone: `v1.9 Embedded Artifact Surfaces`
 - Phases: `3 planned`
-- Plans: `5 complete, Phase 50 pending planning`
-- Tasks: `Phase 48 and 49 executed; Phase 50 not planned yet`
+- Plans: `7 complete (48: 2, 49: 3, 50: 2 of 3); 50-03 pending human viewer evidence`
+- Tasks: `Phase 48 and 49 executed; Phase 50 Wave 1 executed; 50-03 awaiting blocking checkpoint`
 - Timeline: `2026-05-05` -> `TBD`
 - Key accomplishments:
   - `v1.9` scope is fixed to document-level embedded files and curated link annotations.
