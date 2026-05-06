@@ -30,7 +30,7 @@ defmodule Rendro.ProtectTest do
     }
   end
 
-  test "protects an artifact and marks the result non-deterministic" do
+  test "protects an artifact with minimal password-safe metadata and marks the result non-deterministic" do
     {:ok, protected} =
       Protect.password(sample_artifact(),
         adapter: FakeAdapter,
@@ -45,9 +45,18 @@ defmodule Rendro.ProtectTest do
     assert protected.binary == "%PDF-sample::protected"
     assert protected.metadata.page_count == 1
     assert protected.metadata.deterministic == false
-    assert protected.metadata.protection.protected == true
-    assert protected.metadata.protection.adapter == FakeAdapter
-    assert protected.metadata.protection.advisory_permissions == [:copy, :print]
+    assert protected.metadata.protection == %{
+             algorithm: :aes_256,
+             advisory_permissions: [:copy, :print],
+             has_open_password: true,
+             has_owner_password: true
+           }
+
+    refute Map.has_key?(protected.metadata.protection, :adapter)
+    refute Map.has_key?(protected.metadata.protection, :deterministic)
+    refute Map.has_key?(protected.metadata.protection, :protected)
+    refute inspect(protected.metadata.protection) =~ "open-secret"
+    refute inspect(protected.metadata.protection) =~ "owner-secret"
   end
 
   test "requires a non-empty open password" do
@@ -217,7 +226,12 @@ defmodule Rendro.ProtectTest do
                owner_password: "owner-secret"
              )
 
-    assert artifact.metadata.protection.adapter == FakeAdapter
     assert artifact.metadata.deterministic == false
+    assert artifact.metadata.protection == %{
+             algorithm: :aes_256,
+             advisory_permissions: [],
+             has_open_password: true,
+             has_owner_password: true
+           }
   end
 end
