@@ -30,6 +30,7 @@ defmodule Rendro.PDF.Writer do
          opts
        ) do
     form_fields = collect_form_fields(doc)
+    embedded_files = collect_embedded_files(doc)
     obj_num = 1
     catalog_num = obj_num
 
@@ -37,6 +38,7 @@ defmodule Rendro.PDF.Writer do
     {font_objects, next_num} = allocate_font_nums(fonts, next_num)
     {image_objects, next_num} = allocate_image_nums(images, next_num)
     {form_field_objects, next_num} = allocate_form_field_nums(form_fields, next_num)
+    {embedded_file_objects, next_num} = allocate_embedded_file_nums(embedded_files, next_num)
     pages_num = next_num
     next_num = next_num + 1
 
@@ -46,6 +48,7 @@ defmodule Rendro.PDF.Writer do
     font_pdf_objects = build_font_objects(font_objects, opts)
     image_pdf_objects = build_image_objects(image_objects, opts)
     form_field_pdf_objects = build_radio_group_objects(form_field_objects, opts)
+    embedded_file_pdf_objects = build_embedded_file_objects(embedded_file_objects, opts)
 
     page_tree_kids =
       {:array, Enum.map(page_obj_nums, fn {page_num, _} -> {:ref, page_num, 0} end)}
@@ -61,7 +64,10 @@ defmodule Rendro.PDF.Writer do
     pages_obj = Object.indirect_object(pages_num, 0, Object.serialize(pages_dict, opts))
 
     catalog_dict =
-      {:dict, maybe_add_acro_form_entry(pages_num, form_field_objects)}
+      {:dict,
+       pages_num
+       |> maybe_add_acro_form_entry(form_field_objects)
+       |> maybe_add_embedded_files_entries(embedded_file_objects)}
 
     catalog_obj = Object.indirect_object(catalog_num, 0, Object.serialize(catalog_dict, opts))
 
@@ -91,6 +97,7 @@ defmodule Rendro.PDF.Writer do
          font_pdf_objects ++
          image_pdf_objects ++
          form_field_pdf_objects ++
+         embedded_file_pdf_objects ++
          [{pages_num, pages_obj}] ++
          page_objects ++
          [{info_num, info_obj}])
@@ -193,6 +200,12 @@ defmodule Rendro.PDF.Writer do
     end)
   end
 
+  defp allocate_embedded_file_nums(embedded_files, start_num) do
+    Enum.map_reduce(embedded_files, start_num, fn embedded_file, num ->
+      {%{embedded_file: embedded_file, stream_obj_num: num, file_spec_obj_num: num + 1}, num + 2}
+    end)
+  end
+
   defp allocate_standalone_form_field(form_field, num) do
     base = %{
       type: form_field.field.type,
@@ -255,6 +268,42 @@ defmodule Rendro.PDF.Writer do
     |> Enum.map(fn allocation ->
       {allocation.field_obj_num, build_radio_group_field_object(allocation, opts)}
     end)
+  end
+
+  defp build_embedded_file_objects(embedded_file_allocations, opts) do
+    Enum.flat_map(embedded_file_allocations, &build_embedded_file_object(&1, opts))
+  end
+
+  defp build_embedded_file_object(
+         %{
+           embedded_file: embedded_file,
+           stream_obj_num: stream_obj_num,
+           file_spec_obj_num: file_spec_obj_num
+         },
+         opts
+       ) do
+    stream =
+      {:stream,
+       [
+         {"Type", {:name, "EmbeddedFile"}},
+         {"Subtype", {:name, encode_pdf_name(embedded_file.mime_type)}}
+       ], embedded_file.bytes}
+
+    file_spec =
+      {:dict,
+       [
+         {"Type", {:name, "Filespec"}},
+         {"F", {:string, embedded_file.filename}},
+         {"UF", {:string, embedded_file.filename}},
+         {"EF", {:dict, [{"F", {:ref, stream_obj_num, 0}}]}}
+       ]
+       |> maybe_add_dict_entry("Desc", embedded_file[:description])}
+
+    [
+      {stream_obj_num, Object.indirect_object(stream_obj_num, 0, Object.serialize(stream, opts))},
+      {file_spec_obj_num,
+       Object.indirect_object(file_spec_obj_num, 0, Object.serialize(file_spec, opts))}
+    ]
   end
 
   defp build_image_objects(image_allocations, opts) do
@@ -1239,6 +1288,14 @@ defmodule Rendro.PDF.Writer do
     end)
   end
 
+  defp collect_embedded_files(%Rendro.Document{embedded_file_registry: registry}) do
+    registry.files
+    |> Map.values()
+    |> Enum.sort_by(fn embedded_file ->
+      {embedded_file.filename, Atom.to_string(embedded_file.logical_name)}
+    end)
+  end
+
   defp collect_page_form_fields(blocks, page_index) do
     Enum.flat_map(blocks, &collect_block_form_fields(&1, page_index))
   end
@@ -1326,6 +1383,9 @@ defmodule Rendro.PDF.Writer do
   defp maybe_add(entries, _key, nil), do: entries
   defp maybe_add(entries, key, value), do: [{key, {:string, value}} | entries]
 
+  defp maybe_add_dict_entry(entries, _key, nil), do: entries
+  defp maybe_add_dict_entry(entries, key, value), do: entries ++ [{key, {:string, value}}]
+
   defp pdf_literal_string(str), do: ["(", escape_pdf_string(str), ")"]
 
   defp button_state_name("Off"), do: "Off"
@@ -1367,6 +1427,29 @@ defmodule Rendro.PDF.Writer do
       {"Pages", {:ref, pages_num, 0}},
       {"AcroForm", acro_form}
     ]
+  end
+
+  defp maybe_add_embedded_files_entries(entries, []), do: entries
+
+  defp maybe_add_embedded_files_entries(entries, embedded_file_allocations) do
+    names =
+      embedded_file_allocations
+      |> Enum.flat_map(fn allocation ->
+        [
+          {:string, allocation.embedded_file.filename},
+          {:ref, allocation.file_spec_obj_num, 0}
+        ]
+      end)
+
+    entries ++
+      [
+        {"Names",
+         {:dict,
+          [
+            {"EmbeddedFiles", {:dict, [{"Names", {:array, names}}]}}
+          ]}},
+        {"AF", {:array, Enum.map(embedded_file_allocations, &{:ref, &1.file_spec_obj_num, 0})}}
+      ]
   end
 
   defp assemble(
