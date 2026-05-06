@@ -103,6 +103,50 @@
       }
     }
   },
+  "protection": {
+    "capabilities": {
+      "password_to_open": "supported",
+      "external_hook_qpdf": "supported",
+      "native_encryption": "unsupported"
+    },
+    "algorithms": {
+      "aes_256": "supported",
+      "aes_128": "unsupported",
+      "rc4": "unsupported"
+    },
+    "behaviors": {
+      "advisory_permissions": "supported",
+      "deterministic_output": "unsupported",
+      "digital_signatures": "unsupported",
+      "pdf_a_compliance": "unsupported",
+      "tamper_evidence": "unsupported"
+    },
+    "boundaries": {
+      "external_hook_only": "supported",
+      "persisted_async_job_args_passwords": "unsupported",
+      "delivery_and_storage_seams_transport_artifacts_not_passwords": "supported"
+    },
+    "viewers": {
+      "adobe_acrobat_reader": {
+        "status": "unverified",
+        "proof": [
+          "opens_with_user_password",
+          "displays_authored_content_correctly",
+          "honors_advisory_print_flag",
+          "honors_advisory_copy_flag"
+        ]
+      },
+      "apple_preview": {
+        "status": "unverified",
+        "proof": [
+          "opens_with_user_password",
+          "displays_authored_content_correctly",
+          "honors_advisory_print_flag",
+          "honors_advisory_copy_flag"
+        ]
+      }
+    }
+  },
   "unsupported": [
     "full_pdf_compliance",
     "digital_signatures"
