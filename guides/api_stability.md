@@ -49,4 +49,10 @@ Other URI schemes, named destinations, and broader action dictionaries are not p
 
 ## Embedded Artifact Viewer Posture
 
-All `embedded_files` and `links` viewer statuses remain `unverified` in `priv/support_matrix.json` until a recorded checklist promotes a named viewer. Promotion requires recorded evidence (viewer name, version when easily available, OS, fixture, date checked, and per-behavior pass/fail) in the phase validation record; no viewer is implicitly supported by structural validity alone.
+Viewer support is tracked per surface and per viewer in `priv/support_matrix.json`, with each `supported` claim backed by a recorded checklist in the phase validation record. Promotion requires recorded evidence (viewer name, version when easily available, OS, fixture, date checked, and per-behavior pass/fail); a pass for one surface does not imply a pass for another on the same viewer, and no viewer is implicitly supported by structural validity alone.
+
+Adobe Acrobat Reader is `supported` for both `embedded_files` and `links`. The recorded checklist confirms that the embedded file is discoverable in the Attachments pane and that the listed entry can be opened and saved to disk, and that both external `http`/`https` link handoff and internal page navigation work as authored.
+
+Apple Preview is `supported` for `links` and `unverified` for `embedded_files`. The recorded checklist confirms external URI handoff and internal page navigation work in Preview, but Preview did not surface the document-level embedded file in its UI under the version checked. Embedded file discoverability stays `unverified` for Apple Preview until a future checklist records the behavior; the surface is not marked `unsupported`, since Rendro continues to author it correctly per the structural proof lane.
+
+Viewers not listed above are outside the recorded support contract for embedded artifact surfaces.

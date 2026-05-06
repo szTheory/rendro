@@ -60,7 +60,7 @@
     },
     "viewers": {
       "adobe_acrobat_reader": {
-        "status": "unverified",
+        "status": "supported",
         "proof": [
           "discoverable",
           "open_or_extract",
@@ -88,14 +88,14 @@
     },
     "viewers": {
       "adobe_acrobat_reader": {
-        "status": "unverified",
+        "status": "supported",
         "proof": [
           "external_uri_handoff",
           "internal_page_navigation"
         ]
       },
       "apple_preview": {
-        "status": "unverified",
+        "status": "supported",
         "proof": [
           "external_uri_handoff",
           "internal_page_navigation"
