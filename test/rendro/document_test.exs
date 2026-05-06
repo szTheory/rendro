@@ -1,7 +1,7 @@
 defmodule Rendro.DocumentTest do
   use ExUnit.Case, async: true
 
-  alias Rendro.{Document, FontRegistry, Metadata, Page, PageTemplate, Section}
+  alias Rendro.{Document, EmbeddedFileRegistry, FontRegistry, Metadata, Page, PageTemplate, Section}
   alias Rendro.FontRegistry.EmbeddedFontFamilyError
 
   describe "struct construction" do
@@ -15,6 +15,7 @@ defmodule Rendro.DocumentTest do
       assert doc.font_registry == FontRegistry.new()
       assert doc.default_font == :default
       assert doc.asset_registry == Rendro.AssetRegistry.new()
+      assert doc.embedded_file_registry == EmbeddedFileRegistry.new()
       assert doc.metadata == %Metadata{}
       assert doc.options == %{}
     end
@@ -34,6 +35,7 @@ defmodule Rendro.DocumentTest do
         font_registry: Document.new().font_registry,
         default_font: :default,
         asset_registry: Rendro.AssetRegistry.new(),
+        embedded_file_registry: Rendro.EmbeddedFileRegistry.new(),
         metadata: meta,
         options: %{deterministic: true}
       }
@@ -46,6 +48,7 @@ defmodule Rendro.DocumentTest do
       assert doc.font_registry.default_font == :default
       assert doc.default_font == :default
       assert doc.asset_registry == Rendro.AssetRegistry.new()
+      assert doc.embedded_file_registry == EmbeddedFileRegistry.new()
       assert doc.metadata.title == "Test"
       assert doc.options.deterministic == true
     end
@@ -70,6 +73,7 @@ defmodule Rendro.DocumentTest do
       assert doc.font_registry == FontRegistry.new()
       assert doc.default_font == :default
       assert doc.asset_registry == Rendro.AssetRegistry.new()
+      assert doc.embedded_file_registry == EmbeddedFileRegistry.new()
       assert doc.metadata == %Metadata{}
       assert doc.options == %{}
     end
@@ -84,6 +88,27 @@ defmodule Rendro.DocumentTest do
 
       assert {:ok, %{width: 2, height: 2, mime: "image/png"}} =
                Rendro.AssetRegistry.fetch(doc.asset_registry, :logo)
+    end
+
+    test "register_embedded_file/4 delegates to the embedded-file registry" do
+      doc =
+        Document.new()
+        |> Document.register_embedded_file(:invoice_csv, {:binary, "a,b\n1,2\n"},
+          filename: "invoice.csv",
+          mime_type: "text/csv",
+          description: "Billing export"
+        )
+
+      assert {:ok,
+              %{
+                logical_name: :invoice_csv,
+                filename: "invoice.csv",
+                mime_type: "text/csv",
+                description: "Billing export",
+                bytes: "a,b\n1,2\n",
+                byte_size: 8
+              }} =
+               Rendro.EmbeddedFileRegistry.fetch(doc.embedded_file_registry, :invoice_csv)
     end
 
     test "new/1 accepts keyword opts and returns populated Document struct" do

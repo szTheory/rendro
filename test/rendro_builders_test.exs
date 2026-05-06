@@ -149,6 +149,27 @@ defmodule RendroBuildersTest do
       assert doc.font_registry.fonts.brand.source_data.bytes == bytes
     end
 
+    test "register_embedded_file/4 wraps document embedded-file registration" do
+      created_at = ~U[2026-05-05 14:00:00Z]
+
+      doc =
+        Rendro.document()
+        |> Rendro.register_embedded_file(:invoice_csv, {:binary, "a,b\n1,2\n"},
+          filename: "invoice.csv",
+          mime_type: "text/csv",
+          description: "Billing export",
+          created_at: created_at
+        )
+
+      assert doc.embedded_file_registry.files.invoice_csv.logical_name == :invoice_csv
+      assert doc.embedded_file_registry.files.invoice_csv.filename == "invoice.csv"
+      assert doc.embedded_file_registry.files.invoice_csv.mime_type == "text/csv"
+      assert doc.embedded_file_registry.files.invoice_csv.description == "Billing export"
+      assert doc.embedded_file_registry.files.invoice_csv.bytes == "a,b\n1,2\n"
+      assert doc.embedded_file_registry.files.invoice_csv.created_at == created_at
+      refute Map.has_key?(doc.embedded_file_registry.files.invoice_csv, :modified_at)
+    end
+
     test "register_embedded_font_family/3 registers all four narrow variants explicitly" do
       bytes = <<9, 8, 7>>
 
