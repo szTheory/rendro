@@ -67,8 +67,10 @@ defmodule Rendro.Adapters.Qpdf do
         "rendro-protect-#{System.unique_integer([:positive, :monotonic])}"
       )
 
-    case File.mkdir_p(path) do
-      :ok -> {:ok, path}
+    with :ok <- File.mkdir_p(path),
+         :ok <- File.chmod(path, 0o700) do
+      {:ok, path}
+    else
       {:error, reason} -> {:error, reason}
     end
   end
@@ -77,7 +79,7 @@ defmodule Rendro.Adapters.Qpdf do
     input_path = Path.join(tmp_dir, "input.pdf")
     output_path = Path.join(tmp_dir, "output.pdf")
 
-    case File.write(input_path, binary) do
+    case write_private_file(input_path, binary) do
       :ok -> {:ok, input_path, output_path}
       {:error, reason} -> {:error, reason}
     end
@@ -94,9 +96,16 @@ defmodule Rendro.Adapters.Qpdf do
         "256"
       ] ++ permission_args(opts.advisory_permissions) ++ ["--", input_path, output_path]
 
-    case File.write(argfile_path, Enum.join(args, "\n") <> "\n") do
+    case write_private_file(argfile_path, Enum.join(args, "\n") <> "\n") do
       :ok -> {:ok, argfile_path}
       {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp write_private_file(path, contents) do
+    with :ok <- File.write(path, contents),
+         :ok <- File.chmod(path, 0o600) do
+      :ok
     end
   end
 

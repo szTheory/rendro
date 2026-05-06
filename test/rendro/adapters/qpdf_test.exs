@@ -1,6 +1,8 @@
 defmodule Rendro.Adapters.QpdfTest do
   use ExUnit.Case, async: false
 
+  import Bitwise
+
   alias Rendro.Adapters.Qpdf
   alias Rendro.Artifact
 
@@ -44,6 +46,11 @@ defmodule Rendro.Adapters.QpdfTest do
     Application.put_env(:rendro, :qpdf_command_runner, fn "/tmp/fake-qpdf",
                                                           ["@" <> path],
                                                           _opts ->
+      input_path = Path.join(Path.dirname(path), "input.pdf")
+      assert file_mode(Path.dirname(path)) == 0o700
+      assert file_mode(path) == 0o600
+      assert file_mode(input_path) == 0o600
+
       [first | rest] = File.read!(path) |> String.split("\n", trim: true)
       assert first == "--encrypt"
       assert Enum.member?(rest, "open-secret")
@@ -92,5 +99,12 @@ defmodule Rendro.Adapters.QpdfTest do
 
     assert_receive {:tmp_dir, tmp_dir}
     refute File.exists?(tmp_dir)
+  end
+
+  defp file_mode(path) do
+    path
+    |> File.stat!()
+    |> Map.fetch!(:mode)
+    |> band(0o777)
   end
 end
