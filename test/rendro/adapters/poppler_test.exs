@@ -2,6 +2,7 @@ defmodule Rendro.Adapters.PopplerTest do
   use ExUnit.Case, async: true
 
   alias Rendro.Adapters.Poppler
+  alias Rendro.Test.EmbeddedArtifactSupportFixture
   alias Rendro.Test.FormSupportFixture
 
   describe "validate/1" do
@@ -89,6 +90,33 @@ defmodule Rendro.Adapters.PopplerTest do
           assert {:ok, metadata} = Poppler.validate(path)
           assert is_map(metadata)
           assert metadata["Pages"] == "1"
+
+          File.rm!(path)
+      end
+    end
+
+    test "validates the representative embedded-artifact support fixture" do
+      # Phase 50 D-10..D-14: Poppler proves PDF structure only. This lane
+      # does NOT prove embedded-file discoverability, extract/save behavior,
+      # external-link handoff, or internal-page navigation. Those claims
+      # require the manual viewer proof lane in 50-VALIDATION.md.
+      case System.find_executable("pdfinfo") do
+        nil ->
+          IO.puts("Skipping embedded-artifact fixture validation test: pdfinfo not installed")
+          :ok
+
+        _executable ->
+          path =
+            Path.join(
+              System.tmp_dir!(),
+              "embedded_artifact_#{System.unique_integer([:positive])}.pdf"
+            )
+
+          EmbeddedArtifactSupportFixture.write_fixture(path)
+
+          assert {:ok, metadata} = Poppler.validate(path)
+          assert is_map(metadata)
+          assert metadata["Pages"] == "2"
 
           File.rm!(path)
       end
