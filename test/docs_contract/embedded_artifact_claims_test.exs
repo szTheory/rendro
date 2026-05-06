@@ -1,13 +1,11 @@
 defmodule Rendro.DocsContract.EmbeddedArtifactClaimsTest do
   use ExUnit.Case, async: true
 
-  # Phase 50 Plan 01: family-first nested support matrix.
-  # `embedded_files` and `links` are siblings of the existing `forms` family —
-  # NOT wrapped in a generic `"surfaces"` key, NOT given BCD-style per-leaf
-  # statement objects, and NOT promoted to "supported" for any viewer until
-  # Plan 03 records manual evidence in `50-VALIDATION.md`.
+  # Phase 50: family-first nested support matrix with per-surface, per-viewer
+  # promotions driven exclusively by recorded manual evidence in `50-VALIDATION.md`.
+  # Any viewer/surface pair without complete passing evidence stays `unverified`.
 
-  test "support matrix exposes the nested embedded_files contract with provisional viewer statuses" do
+  test "support matrix exposes the nested embedded_files contract with proof-backed viewer statuses" do
     matrix = File.read!("priv/support_matrix.json")
 
     # Family is a top-level sibling of `forms`, not wrapped in `"surfaces"`.
@@ -31,10 +29,14 @@ defmodule Rendro.DocsContract.EmbeddedArtifactClaimsTest do
     assert matrix =~ ~s|"validators"|
     assert matrix =~ ~s|"pdfinfo"|
 
-    # Per-surface viewer entries with proof checklist for embedded files.
+    # Adobe Acrobat Reader passed all three behaviors (discoverable, open_or_extract,
+    # save_or_extract) per `50-VALIDATION.md` 2026-05-06 entry → promoted to `supported`.
     assert matrix =~
-             ~r/"embedded_files".*?"viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+             ~r/"embedded_files".*?"viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
 
+    # Apple Preview did not surface the embedded file in its UI under the version
+    # checked → stays `unverified` per D-08. Not `unsupported` (D-09): Rendro authors
+    # the surface correctly per the structural lane; the gap is on the viewer side.
     assert matrix =~
              ~r/"embedded_files".*?"viewers".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
 
@@ -42,17 +44,15 @@ defmodule Rendro.DocsContract.EmbeddedArtifactClaimsTest do
     assert matrix =~ ~s|"open_or_extract"|
     assert matrix =~ ~s|"save_or_extract"|
 
-    # No generic `"surfaces"` wrapper; no premature `supported` for new viewers.
+    # No generic `"surfaces"` wrapper.
     refute matrix =~ ~s|"surfaces"|
 
-    refute matrix =~
-             ~r/"embedded_files".*?"viewers".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
-
-    refute matrix =~
-             ~r/"embedded_files".*?"viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
+    # Independent per-surface, per-viewer status: a links pass for Apple Preview
+    # must not infer an embedded_files pass. The assertion above already pins
+    # apple_preview embedded_files at "unverified".
   end
 
-  test "support matrix exposes the nested links contract with provisional viewer statuses" do
+  test "support matrix exposes the nested links contract with proof-backed viewer statuses" do
     matrix = File.read!("priv/support_matrix.json")
 
     assert matrix =~ ~s|"links"|
@@ -64,25 +64,22 @@ defmodule Rendro.DocsContract.EmbeddedArtifactClaimsTest do
     assert matrix =~ ~s|"fragment_rectangles": "supported"|
     assert matrix =~ ~s|"named_destinations": "unsupported"|
 
-    # Per-surface viewer entries with proof checklist for links.
+    # Both viewers passed external_uri_handoff and internal_page_navigation per
+    # `50-VALIDATION.md` 2026-05-06 entry → both promoted to `supported`.
     assert matrix =~
-             ~r/"links".*?"viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+             ~r/"links".*?"viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
 
     assert matrix =~
-             ~r/"links".*?"viewers".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+             ~r/"links".*?"viewers".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
 
     assert matrix =~ ~s|"external_uri_handoff"|
     assert matrix =~ ~s|"internal_page_navigation"|
 
-    # Refute premature promotion to "supported" for either named viewer.
-    refute matrix =~
-             ~r/"links".*?"viewers".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
-
-    refute matrix =~
-             ~r/"links".*?"viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
+    # No leakage: the links promotion for Apple Preview MUST NOT silently widen
+    # to embedded_files (covered by the embedded_files test above).
   end
 
-  test "public embedded files wording stays narrow and matches the provisional matrix posture" do
+  test "public embedded files wording matches the recorded viewer evidence" do
     guide = File.read!("guides/api_stability.md")
 
     # Canonical public wording per D-15..D-18.
@@ -95,14 +92,18 @@ defmodule Rendro.DocsContract.EmbeddedArtifactClaimsTest do
     assert guide =~
              "Embedded files live inside the PDF binary and are distinct from delivery, email, or download attachments handled by Rendro adapters outside the PDF."
 
-    # Structural-vs-viewer separation, reused from forms wording but stated again
-    # for the new artifact surfaces so the boundary is unambiguous in docs.
+    # Structural-vs-viewer separation remains stated in docs prose.
     assert guide =~
              "Structural validation through `pdfinfo`/Poppler proves PDF structure only. It does not prove viewer behavior for embedded files or links."
 
-    # Viewer claims for the new families remain unverified until Plan 03 records evidence.
+    # Post-proof per-surface, per-viewer wording. Adobe Reader is supported for
+    # both surfaces; Apple Preview is supported for links only; Apple Preview
+    # remains unverified for embedded files.
     assert guide =~
-             "All `embedded_files` and `links` viewer statuses remain `unverified` in `priv/support_matrix.json` until a recorded checklist promotes a named viewer."
+             "Adobe Acrobat Reader is `supported` for both `embedded_files` and `links`."
+
+    assert guide =~
+             "Apple Preview is `supported` for `links` and `unverified` for `embedded_files`."
 
     # Refute broad/blanket viewer language and over-broad scheme/destination claims.
     refute guide =~ "standard PDF viewers"
@@ -110,6 +111,12 @@ defmodule Rendro.DocsContract.EmbeddedArtifactClaimsTest do
     refute guide =~ "all PDF viewers"
     refute guide =~ "Rendro supports named destinations"
     refute guide =~ "Rendro supports page attachment annotations"
+
+    # Refute the pre-proof "everything stays unverified" sentence — that wording
+    # was correct after Plan 01 but is now inaccurate; keeping it would publish
+    # a contract that contradicts the recorded evidence.
+    refute guide =~
+             "All `embedded_files` and `links` viewer statuses remain `unverified` in `priv/support_matrix.json` until a recorded checklist promotes a named viewer."
   end
 
   test "the canonical docs verification script includes the embedded artifact claims lane" do
