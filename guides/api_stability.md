@@ -5,7 +5,7 @@
 Rendro adheres to Semantic Versioning (SemVer).
 
 ### The `0.x.x` Era (Current)
-During the `0.1.x` and subsequent `0.x.x` releases, the API is considered stable enough for production use, but minor versions (e.g., `0.1.x` to `0.2.0`) may introduce breaking changes. We commit to providing clear upgrade paths and changelogs for any breaking changes during this era. Patch versions (e.g., `0.1.0` to `0.1.1`) will remain strictly backward compatible and only contain bug fixes or additive features.
+During the `0.x.x` era, the API is considered stable enough for production use, but minor versions (for example `0.1.x` to `0.2.0`) may introduce breaking changes. We commit to providing clear upgrade paths and changelogs for any breaking changes during this era. Patch versions (for example `0.2.0` to `0.2.1`) will remain strictly backward compatible and only contain bug fixes or additive features.
 
 ### The `1.x.x` Era (Future)
 Once Rendro reaches `1.0.0`, breaking changes will only occur in major version bumps (e.g., `1.x.x` to `2.0.0`).

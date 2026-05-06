@@ -80,11 +80,11 @@ defmodule Rendro.ReleasePreflightProof do
     if Regex.match?(~r/^\d+\.\d+\.\d+([-.][0-9A-Za-z.-]+)?$/, rest) do
       :ok
     else
-      {:error, "ref must be an exact release tag like v0.1.0; got #{ref}"}
+      {:error, "ref must be an exact release tag like vX.Y.Z; got #{ref}"}
     end
   end
 
-  def validate_ref(ref), do: {:error, "ref must be an exact release tag like v0.1.0; got #{ref}"}
+  def validate_ref(ref), do: {:error, "ref must be an exact release tag like vX.Y.Z; got #{ref}"}
 
   def validate_worktree(worktree) do
     if Path.expand(worktree) == File.cwd!() do

@@ -10,7 +10,7 @@ defmodule Rendro.ReleasePreflightProofTest do
              ReleasePreflightProof.parse_args([])
 
     assert {:error, "missing required --worktree PATH"} =
-             ReleasePreflightProof.parse_args(["--ref", "v0.1.0"])
+             ReleasePreflightProof.parse_args(["--ref", "v0.2.0"])
   end
 
   test "current version tag mode derives the exact tag from mix project version" do
@@ -27,7 +27,7 @@ defmodule Rendro.ReleasePreflightProofTest do
   end
 
   test "rejects ambiguous or non-release refs" do
-    assert {:error, "ref must be an exact release tag like v0.1.0; got not-a-real-tag"} =
+    assert {:error, "ref must be an exact release tag like vX.Y.Z; got not-a-real-tag"} =
              ReleasePreflightProof.validate_ref("not-a-real-tag")
   end
 
@@ -51,7 +51,7 @@ defmodule Rendro.ReleasePreflightProofTest do
       )
 
     assert status == 1
-    assert output =~ "ref must be an exact release tag like v0.1.0"
+    assert output =~ "ref must be an exact release tag like vX.Y.Z"
     refute File.exists?(worktree)
   end
 
@@ -63,32 +63,32 @@ defmodule Rendro.ReleasePreflightProofTest do
   test "synthetic tag proof creates and cleans up isolated release state on success" do
     runner =
       command_runner_for(%{
-        {"git", ["rev-parse", "--verify", "refs/tags/v0.1.0^{commit}"]} => {"", 1},
-        {"git", ["tag", "-f", "v0.1.0", "HEAD"]} => {"Updated tag\n", 0},
-        {"git", ["rev-parse", "--verify", "v0.1.0^{commit}"]} => {"abc123\n", 0},
-        {"git", ["worktree", "add", "--detach", "/tmp/release-proof", "v0.1.0"]} => {"", 0},
+        {"git", ["rev-parse", "--verify", "refs/tags/v0.2.0^{commit}"]} => {"", 1},
+        {"git", ["tag", "-f", "v0.2.0", "HEAD"]} => {"Updated tag\n", 0},
+        {"git", ["rev-parse", "--verify", "v0.2.0^{commit}"]} => {"abc123\n", 0},
+        {"git", ["worktree", "add", "--detach", "/tmp/release-proof", "v0.2.0"]} => {"", 0},
         {"mix", ["deps.get"]} => {"deps ok\n", 0},
         {"mix", ["release.preflight"]} => {"preflight ok\n", 0},
         {"git", ["worktree", "remove", "--force", "/tmp/release-proof"]} => {"", 0},
-        {"git", ["tag", "-d", "v0.1.0"]} => {"Deleted tag\n", 0}
+        {"git", ["tag", "-d", "v0.2.0"]} => {"Deleted tag\n", 0}
       })
 
     assert {:ok, output} =
              ReleasePreflightProof.execute_proof(
                %{
-                 ref: "v0.1.0",
+                 ref: "v0.2.0",
                  worktree: "/tmp/release-proof",
                  dry_run: false,
                  keep: false,
                  synthetic_tag: true
                },
-               %{runner: runner, project_config: [version: "0.1.0"]}
+               %{runner: runner, project_config: [version: "0.2.0"]}
              )
 
     assert output =~ "deps ok"
     assert output =~ "preflight ok"
 
-    assert_received {:proof_command, "git", ["tag", "-f", "v0.1.0", "HEAD"], _}
+    assert_received {:proof_command, "git", ["tag", "-f", "v0.2.0", "HEAD"], _}
     assert_received {:proof_command, "mix", ["deps.get"], opts}
     assert opts[:cd] == "/tmp/release-proof"
     assert opts[:stderr_to_stdout] == true
@@ -100,38 +100,38 @@ defmodule Rendro.ReleasePreflightProofTest do
     assert_received {:proof_command, "git",
                      ["worktree", "remove", "--force", "/tmp/release-proof"], _}
 
-    assert_received {:proof_command, "git", ["tag", "-d", "v0.1.0"], _}
+    assert_received {:proof_command, "git", ["tag", "-d", "v0.2.0"], _}
   end
 
   test "synthetic tag proof restores previous tag target and cleans up after failure" do
     runner =
       command_runner_for(%{
-        {"git", ["rev-parse", "--verify", "refs/tags/v0.1.0^{commit}"]} => {"deadbeef\n", 0},
-        {"git", ["tag", "-f", "v0.1.0", "HEAD"]} => {"Updated tag\n", 0},
-        {"git", ["rev-parse", "--verify", "v0.1.0^{commit}"]} => {"abc123\n", 0},
-        {"git", ["worktree", "add", "--detach", "/tmp/release-proof", "v0.1.0"]} => {"", 0},
+        {"git", ["rev-parse", "--verify", "refs/tags/v0.2.0^{commit}"]} => {"deadbeef\n", 0},
+        {"git", ["tag", "-f", "v0.2.0", "HEAD"]} => {"Updated tag\n", 0},
+        {"git", ["rev-parse", "--verify", "v0.2.0^{commit}"]} => {"abc123\n", 0},
+        {"git", ["worktree", "add", "--detach", "/tmp/release-proof", "v0.2.0"]} => {"", 0},
         {"mix", ["deps.get"]} => {"deps ok\n", 0},
         {"mix", ["release.preflight"]} => {"preflight failed\n", 1},
         {"git", ["worktree", "remove", "--force", "/tmp/release-proof"]} => {"", 0},
-        {"git", ["tag", "-f", "v0.1.0", "deadbeef"]} => {"Restored tag\n", 0}
+        {"git", ["tag", "-f", "v0.2.0", "deadbeef"]} => {"Restored tag\n", 0}
       })
 
     assert {:error, 1, "deps ok\npreflight failed\n"} =
              ReleasePreflightProof.execute_proof(
                %{
-                 ref: "v0.1.0",
+                 ref: "v0.2.0",
                  worktree: "/tmp/release-proof",
                  dry_run: false,
                  keep: false,
                  synthetic_tag: true
                },
-               %{runner: runner, project_config: [version: "0.1.0"]}
+               %{runner: runner, project_config: [version: "0.2.0"]}
              )
 
     assert_received {:proof_command, "git",
                      ["worktree", "remove", "--force", "/tmp/release-proof"], _}
 
-    assert_received {:proof_command, "git", ["tag", "-f", "v0.1.0", "deadbeef"], _}
+    assert_received {:proof_command, "git", ["tag", "-f", "v0.2.0", "deadbeef"], _}
   end
 
   defp command_runner_for(responses) do

@@ -120,9 +120,10 @@ defmodule Mix.Tasks.Release.Preflight do
 
   defp check_changelog_release_tail(context) do
     changelog_path = Map.get(context, :changelog_path, "CHANGELOG.md")
+    version = context.project_config[:version]
 
     with {:ok, changelog} <- File.read(changelog_path),
-         true <- String.contains?(changelog, "## [0.1.0] - Unreleased"),
+         true <- String.contains?(changelog, "## [#{version}] - Unreleased"),
          true <-
            String.contains?(
              changelog,

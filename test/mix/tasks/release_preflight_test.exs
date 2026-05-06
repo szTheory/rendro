@@ -7,7 +7,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
     runner =
       command_runner_for(%{
         {"git", ["status", "--short"]} => {" M README.md\n", 0},
-        {"git", ["describe", "--tags", "--exact-match"]} => {"v0.1.0\n", 0},
+        {"git", ["describe", "--tags", "--exact-match"]} => {"v0.2.0\n", 0},
         {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0}
       })
 
@@ -41,7 +41,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
     runner =
       command_runner_for(%{
         {"git", ["status", "--short"]} => {"", 0},
-        {"git", ["describe", "--tags", "--exact-match"]} => {"v0.1.0\n", 0},
+        {"git", ["describe", "--tags", "--exact-match"]} => {"v0.2.0\n", 0},
         {"mix", ["ci"]} => {"ci ok", 0},
         {"mix", ["docs.contract"]} => {"docs drifted", 1},
         {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0},
@@ -88,7 +88,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
     File.write!(changelog_path, """
     # Changelog
 
-    ## [0.1.0] - Unreleased
+    ## [0.2.0] - Unreleased
 
     ### Added
 
@@ -102,7 +102,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
     runner =
       command_runner_for(%{
         {"git", ["status", "--short"]} => {"", 0},
-        {"git", ["describe", "--tags", "--exact-match"]} => {"v0.1.0\n", 0},
+        {"git", ["describe", "--tags", "--exact-match"]} => {"v0.2.0\n", 0},
         {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0}
       })
 
@@ -110,7 +110,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
       capture_shell_messages(fn ->
         Preflight.run_with_context(%{
           project_config: [
-            version: "0.1.0",
+            version: "0.2.0",
             package: [licenses: ["Apache-2.0"], links: %{"GitHub" => "https://example.test"}]
           ],
           command_runner: runner,
@@ -134,7 +134,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
       send(test_pid, {:preflight_command, command, args})
 
       if command == "mix" and args == ["hex.build", "--unpack"] do
-        File.mkdir_p!("rendro-0.1.0/guides")
+        File.mkdir_p!("rendro-0.2.0/guides")
 
         Enum.each(
           [
@@ -146,11 +146,11 @@ defmodule Mix.Tasks.Release.PreflightTest do
             "guides/integrations.md"
           ],
           fn file ->
-            File.touch!(Path.join("rendro-0.1.0", file))
+            File.touch!(Path.join("rendro-0.2.0", file))
           end
         )
 
-        File.touch!("rendro-0.1.0.tar")
+        File.touch!("rendro-0.2.0.tar")
       end
 
       Map.fetch!(responses, {command, args})
