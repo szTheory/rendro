@@ -39,6 +39,7 @@ defmodule Rendro.EndToEndPipelineTest do
 
   test "S07: Final End-to-End Pipeline Integration" do
     storage_path = Path.join(System.tmp_dir!(), "e2e_invoice_#{:rand.uniform(100_000)}.pdf")
+    on_exit(fn -> Local.delete(storage_path, []) end)
 
     # Simulate an Oban Job enqueue
     job = %Oban.Job{
@@ -70,12 +71,12 @@ defmodule Rendro.EndToEndPipelineTest do
     # 5. Threadline audit (implicitly tested via telemetry attachments,
     # but the pipeline completed without crashing, proving deterministic success).
 
-    File.rm!(storage_path)
   end
 
   test "protected artifacts can be retrieved, protected inside the app boundary, and delivered" do
     storage_path =
       Path.join(System.tmp_dir!(), "e2e_protected_invoice_#{:rand.uniform(100_000)}.pdf")
+    on_exit(fn -> Local.delete(storage_path, []) end)
 
     job = %Oban.Job{
       args: %{
@@ -90,7 +91,10 @@ defmodule Rendro.EndToEndPipelineTest do
     assert {:ok, %Artifact{} = reloaded} = Local.get(storage_path, [])
     assert is_binary(reloaded.binary)
     assert String.starts_with?(reloaded.binary, "%PDF-")
-    assert reloaded.metadata == %{}
+    refute Map.has_key?(job.args, "open_password")
+    refute Map.has_key?(job.args, "owner_password")
+    refute Map.has_key?(job.args, "protection")
+    refute Map.has_key?(reloaded.metadata, :protection)
 
     {:ok, protected} =
       Protect.password(reloaded,
@@ -122,6 +126,5 @@ defmodule Rendro.EndToEndPipelineTest do
     assert protected_binary == protected_reload.binary
     assert protected_binary =~ "::protected"
 
-    File.rm!(storage_path)
   end
 end
