@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: signature-fields-and-external-signing-preparation
 status: ready_to_plan
-last_updated: "2026-05-07T00:40:52Z"
-last_activity: 2026-05-06 — Phase 55 executed with unsigned signature authoring and support-boundary closure
+last_updated: "2026-05-07T01:48:49Z"
+last_activity: 2026-05-06 — Phase 56 executed with deterministic signature widgets and artifact-first signing preparation
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 6
-  completed_plans: 2
-  percent: 33
+  completed_plans: 4
+  percent: 67
 ---
 
 # Project State
@@ -20,20 +20,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-06 after v1.9 close)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Plan Phase 56 `Writer and External Signing Preparation Seam` on top of the completed Phase 55 unsigned-signature contract.
+**Current focus:** Plan Phase 57 `Support Contract and Proof Closure` on top of the completed Phase 56 writer and preparation seams.
 
 ## Current Position
 
-Phase: 56 (Writer and External Signing Preparation Seam)
+Phase: 57 (Support Contract and Proof Closure)
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-05-06 — Phase 55 completed and Phase 56 unblocked
+Last activity: 2026-05-06 — Phase 56 completed and Phase 57 unblocked
 
-Progress: [===.......] 33%
+Progress: [=======...] 67%
 
 ## Milestone Snapshot
 
-- Active milestone: `v2.0 Signature Fields & External Signing Preparation` (Phase 55 complete; Phase 56 ready to plan).
+- Active milestone: `v2.0 Signature Fields & External Signing Preparation` (Phases 55-56 complete; Phase 57 ready to plan).
 - Last shipped: `v1.10 Protected Delivery Hooks & Encryption Boundaries (2026-05-06)` — see `milestones/v1.10-ROADMAP.md`.
 - Phase numbering continues from v1.10 — v2.0 currently sits at completed Phase 55 / upcoming Phase 56.
 
@@ -59,12 +59,14 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 - [Phase 55]: Keep unsigned signature placeholders on the existing `%Rendro.FormField{}` seam through `Rendro.signature_field/2` rather than opening a second forms engine.
 - [Phase 55]: Preserve blocked signature metadata only on a finite rejection-only carrier so validate-stage typed errors stay explicit and signing-preparation behavior remains deferred.
 - [Phase 55]: Public support claims must name the authored unsigned helper while keeping rendered signature widgets and digital signatures explicitly unsupported.
+- [Phase 56]: Prepare rendered signature fields by patching Rendro-owned `/FT /Sig` widget bytes after render instead of threading `%Rendro.Document{}` or a new render-time index into the API.
+- [Phase 56]: Keep the shared signing-preparation manifest generic under `metadata.signing_preparation` and isolate adapter-local handoff data under `metadata.signing_preparation_adapter`.
 
 ### Roadmap Evolution
 
 - `v1.9` closed 2026-05-06 as a shipped milestone — embedded artifact surfaces (document-level embedded files + curated links).
 - `v1.10` closed 2026-05-06 as a shipped milestone — protected delivery hooks and encryption boundaries (external hooks first, narrow security claims, proof-backed validation before any in-core encryption).
-- `v2.0` is now active — Phase 55 shipped the unsigned signature authoring contract; Phase 56 will handle deterministic widget serialization and external-signing preparation seams.
+- `v2.0` is now active — Phase 55 shipped the unsigned signature authoring contract, Phase 56 shipped deterministic widget serialization plus artifact-first signing preparation, and Phase 57 now remains for truthful support-boundary publication and proof closure.
 
 ### Pending Todos
 
@@ -73,7 +75,7 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 ### Blockers/Concerns
 
 - No local release-verification blocker remains: `mix ci`, `mix release.preflight`, and `scripts/release_preflight_proof.exs --current-version-tag --worktree /tmp/rendro-release-proof` all pass at exact tag `v0.2.0`.
-- Phase 56 depends on keeping the new signature-field support boundary truthful while adding writer-side structures and final-byte handoff rules.
+- Phase 57 must publish the signature-preparation support boundary without implying digital-signature trust, compliance, viewer proof, or signer ownership in core.
 - Tracking-artifact debt from v1.9 (missing `49-VERIFICATION.md`, stale `wave_0_complete: false` flags, inconsistent SUMMARY frontmatter shape) was accepted at close per the v1.9 audit; remediable retroactively if needed.
 
 ## Deferred Items

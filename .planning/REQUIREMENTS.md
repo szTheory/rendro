@@ -10,13 +10,13 @@
 
 - [x] **SIGN-01**: Engineers can author unsigned signature fields through Rendro's public authored-PDF API without introducing a parallel rendering path.
 - [x] **SIGN-02**: Validation rejects unsupported, ambiguous, or scope-breaking signature-field state before render.
-- [ ] **SIGN-03**: Rendro serializes the required AcroForm, widget, and signature-related PDF structures deterministically for identical authored inputs.
+- [x] **SIGN-03**: Rendro serializes the required AcroForm, widget, and signature-related PDF structures deterministically for identical authored inputs.
 
 ### External Signing Preparation
 
-- [ ] **PREP-01**: Engineers can prepare a rendered `%Rendro.Artifact{}` for external signing through an artifact-first API that does not change `Rendro.render/2` semantics.
-- [ ] **PREP-02**: The signing-preparation seam operates on final artifact bytes and preserves a clear terminal handoff boundary for append or incremental signing workflows.
-- [ ] **PREP-03**: Key custody, certificate management, and signer-specific trust operations remain outside Rendro core and inside optional adapters or external workflows.
+- [x] **PREP-01**: Engineers can prepare a rendered `%Rendro.Artifact{}` for external signing through an artifact-first API that does not change `Rendro.render/2` semantics.
+- [x] **PREP-02**: The signing-preparation seam operates on final artifact bytes and preserves a clear terminal handoff boundary for append or incremental signing workflows.
+- [x] **PREP-03**: Key custody, certificate management, and signer-specific trust operations remain outside Rendro core and inside optional adapters or external workflows.
 
 ### Truthful Support Boundaries
 
