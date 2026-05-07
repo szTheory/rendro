@@ -48,6 +48,9 @@ defmodule Rendro.Error do
   defp what(:render, _reason), do: "PDF serialization failed during render."
   defp what(:validate, _reason), do: "Post-render validation failed."
   defp what(:protect, _reason), do: "PDF protection failed while wrapping the rendered artifact."
+  defp what(:prepare, _reason),
+    do: "PDF signing preparation failed while wrapping the rendered artifact."
+
   defp what(stage, _reason), do: "Render pipeline failed in stage #{inspect(stage)}."
 
   defp why({:unsupported_glyph, char}), do: "Missing glyph for character: #{char}"
@@ -55,11 +58,29 @@ defmodule Rendro.Error do
   defp why({:unsupported_script, reason}) when is_atom(reason),
     do: "Unsupported script boundary: #{reason |> Atom.to_string() |> String.replace("_", " ")}"
 
+  defp why({:missing_required_option, :field}),
+    do: "Missing required signing preparation option: field"
+
+  defp why({:missing_required_option, :reserved_bytes}),
+    do: "Missing required signing preparation option: reserved_bytes"
+
   defp why({:missing_required_option, option}),
     do: "Missing required protection option: #{option}"
 
+  defp why({:invalid_option, :field, value}),
+    do: "Invalid signing preparation option field: #{inspect(value)}"
+
+  defp why({:invalid_option, :reserved_bytes, value}),
+    do: "Invalid signing preparation option reserved_bytes: #{inspect(value)}"
+
   defp why({:invalid_option, option, value}),
     do: "Invalid protection option #{option}: #{inspect(value)}"
+
+  defp why({:field_not_preparable, field}),
+    do: "Rendered artifact does not expose a preparable signature field named #{field}"
+
+  defp why(:already_prepared),
+    do: "Rendered artifact already appears to contain signature preparation placeholders"
 
   defp why({:unknown_permissions, permissions}),
     do: "Unknown advisory permissions: #{Enum.map_join(permissions, ", ", &to_string/1)}"
@@ -170,6 +191,38 @@ defmodule Rendro.Error do
     "Inspect the adapter stderr/output and rerun with the same protection options after correcting the host-level qpdf issue."
   end
 
+  defp next_step(:prepare, {:missing_required_option, :field}) do
+    "Pass field: \"signature_name\" so Rendro can target one rendered unsigned signature widget explicitly."
+  end
+
+  defp next_step(:prepare, {:missing_required_option, :reserved_bytes}) do
+    "Pass reserved_bytes as a positive integer so Rendro can reserve deterministic signature-content capacity."
+  end
+
+  defp next_step(:prepare, {:invalid_option, :field, _value}) do
+    "Pass field as a non-empty string naming one rendered unsigned signature widget."
+  end
+
+  defp next_step(:prepare, {:invalid_option, :reserved_bytes, :too_large}) do
+    "Use reserved_bytes as a positive integer no larger than 1048576."
+  end
+
+  defp next_step(:prepare, {:invalid_option, :reserved_bytes, _value}) do
+    "Use reserved_bytes as a positive integer so Rendro can reserve deterministic signature-content capacity."
+  end
+
+  defp next_step(:prepare, {:field_not_preparable, _field}) do
+    "Render a document that includes the named unsigned signature widget, then call Rendro.Sign.prepare/2 against that artifact."
+  end
+
+  defp next_step(:prepare, :already_prepared) do
+    "Prepare each rendered artifact once; rerender a fresh unsigned artifact before repeating signing preparation."
+  end
+
+  defp next_step(:prepare, {:adapter_failure, _adapter, _reason}) do
+    "Inspect the adapter-local preparation output and rerun after correcting the external signer integration state."
+  end
+
   defp next_step(:render, _reason) do
     "Inspect telemetry events for the same render_id and verify PDF object generation inputs."
   end
@@ -182,6 +235,9 @@ defmodule Rendro.Error do
     case stage do
       :protect ->
         "Protect"
+
+      :prepare ->
+        "Prepare"
 
       _ ->
         stage
