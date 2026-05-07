@@ -69,15 +69,17 @@ This roadmap defines the strategic arcs that turn Rendro into the production-rea
 * **Support-Boundary Discipline:**
   * Proof-backed validation before any native encryption story expands.
 
-## Milestone 7: Signature Fields & External Signing Preparation (Active)
-**Focus:** Add narrow signing preparation surfaces while keeping actual cryptographic trust operations explicit and separately bounded.
+## Milestone 7: Signature Fields & External Signing Preparation (Completed)
+**Focus:** Added narrow signing preparation surfaces while keeping actual cryptographic trust operations explicit and separately bounded.
 
 * **Unsigned Signature Fields:**
-  * Core-authored signature-field surfaces only if they fit the existing form model truthfully.
+  * Core-authored signature-field surfaces ship on the existing form model truthfully.
 * **External Signing Preparation:**
-  * Deterministic preparation seams for append/incremental external signing workflows.
+  * Deterministic preparation seams ship for append/incremental external signing workflows.
 * **Deferred Compliance Surface:**
   * PAdES, LTV, TSA/OCSP/CRL, and broad compliance claims remain later work.
+* **Archive:**
+  * See `.planning/milestones/v2.0-ROADMAP.md` for shipped phase detail.
 
 ---
 *Note: This roadmap is a live strategic guide. Active milestone definition still happens through dedicated milestone context, requirements, and roadmap artifacts.*

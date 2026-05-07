@@ -10,7 +10,11 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Shipped Version:** v1.10 Protected Delivery Hooks & Encryption Boundaries (2026-05-06)
+**Shipped Version:** v2.0 Signature Fields & External Signing Preparation (2026-05-07)
+
+Rendro now supports explicit unsigned signature-field authoring through `Rendro.signature_field/2`, deterministic unsigned `/Sig` widget serialization on the existing AcroForm seam, and artifact-first external-signing preparation through `Rendro.Sign.prepare/2`. The public support contract now names unsigned widgets and signing preparation separately from unsupported digital-signature, viewer-validity, tamper-evidence, and compliance claims, and the closeout trail now includes backfilled Phase 55 and 56 verification artifacts so requirement closure is audit-grade rather than summary-only.
+
+**Previous Shipped Version:** v1.10 Protected Delivery Hooks & Encryption Boundaries (2026-05-06)
 
 Rendro now supports artifact-first password-to-open protection through `Rendro.Protect` and the first-party optional `qpdf` adapter, with AES-256-only public semantics, password-safe error/audit boundaries, password-aware Poppler structural validation, proof-backed Apple Preview support for the `protection` surface, and release-readiness gates that keep the canonical protected-delivery recipe truthful.
 
@@ -34,22 +38,22 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ## Current Milestone
 
-**Active milestone:** v2.0 Signature Fields & External Signing Preparation
+No milestone is active right now. `v2.0` is shipped and archived; the next milestone should be defined fresh before more scoped implementation work begins.
 
-**Goal:** Add a narrow, truthful signing-preparation surface that lets Phoenix teams author unsigned signature fields and prepare artifacts for external signing without turning Rendro core into a cryptographic trust stack.
+## Next Milestone Goals
 
-**Target features:**
-- Unsigned signature-field authoring that fits the existing authored form model truthfully.
-- Deterministic PDF serialization for signature widgets and related AcroForm structures.
-- Artifact-first external-signing preparation seams for append or incremental signing workflows after render.
-- Truthful support-matrix and docs language that distinguishes field authoring and signing preparation from actual digital-signature claims.
+**Next candidate:** post-`v2.0` cryptographic signing and compliance proof
 
-**Why now:** `v1.10` proved Rendro can widen trust-sensitive functionality through optional, artifact-first boundaries without destabilizing deterministic core rendering. Signature preparation is the next high-value trust layer, but only if key custody, compliance narratives, and broad viewer claims remain deferred.
+**Direction:**
+- Keep actual cryptographic signing outside core unless a fresh milestone explicitly proves a narrow optional-adapter boundary.
+- Add proof-backed signed-artifact and viewer evidence only through recorded validation lanes, not by widening the current unsigned/preparation contract.
+- Keep PAdES/LTV/TSA/OCSP/CRL and broad compliance narratives deferred until specific validator and workflow evidence exists.
 
 ## Requirements
 
 ### Validated
 
+- [x] Rendro v2.0 delivered unsigned signature-field authoring, deterministic unsigned signature-widget serialization, artifact-first external-signing preparation, truthful signature support language, and backfilled verification artifacts for full audit-grade requirement closure. Shipped on 2026-05-07 and archived in `milestones/v2.0-ROADMAP.md` / `milestones/v2.0-REQUIREMENTS.md`.
 - [x] Rendro v1.10 delivered artifact-first password protection, a first-party optional `qpdf` adapter, password-aware structural validation, protected-artifact-safe delivery seams, proof-backed protection support language, and release-ready protection proof. Shipped at exact tag `v0.2.0`.
 - [x] Rendro v1.9 delivered deterministic authored document-level embedded files and curated link annotations (`http`/`https` URIs and in-document page targets only), with one proof-backed support contract published across `priv/support_matrix.json` and `guides/api_stability.md`, structural proof through the Poppler lane, and recorded manual viewer evidence in Adobe Acrobat Reader (both surfaces) and Apple Preview (links). Validated at milestone close in `v1.9-MILESTONE-AUDIT.md`.
 - [x] Rendro v1.8 delivered deterministic authored interactive PDF forms for text fields, checkboxes, and radio groups, along with truthful forms support boundaries. Validated at milestone close in `v1.8-MILESTONE-AUDIT.md`.
@@ -64,10 +68,9 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-- [ ] Deliver unsigned signature-field authoring and validation through the existing authored form boundary where truthful.
-- [ ] Add an artifact-first external-signing preparation seam without changing `Rendro.render/2` semantics or introducing core key custody.
-- [ ] Keep `digital_signatures`, PAdES/LTV/TSA/OCSP/CRL, and broad compliance claims deferred while publishing explicit support boundaries for signature preparation.
-- [ ] Continue promoting any signature-related viewer support only through recorded proof and support-matrix updates.
+- [ ] Define the next milestone through fresh context, requirements, and roadmap artifacts before starting new implementation work.
+- [ ] Keep any future cryptographic-signature work narrower than blanket trust or compliance claims.
+- [ ] Continue promoting signature-related viewer support only through recorded proof and support-matrix updates.
 
 ### Out of Scope
 
@@ -81,13 +84,13 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 Rendro has now shipped four authored PDF surfaces inside one deterministic pipeline: static content (v1.0-v1.2), interactive forms (v1.8), document-level embedded files (v1.9), and curated link annotations (v1.9). `v1.9` proved that the core writer's existing allocation, catalog-injection, and `/Annots` seams can absorb new authored object kinds without creating parallel rendering paths or widening the public contract beyond recorded evidence.
 
-`v1.10` proved that Rendro can expand its trust surfaces without widening the core rendering contract: protection shipped through external hooks first, password-to-open and advisory-permissions claims stayed narrow, and support promotion stayed tied to proof. `v2.0` should preserve that pattern by treating signature preparation as a separate trust boundary rather than an extension of protection or a shortcut to compliance narratives.
+`v1.10` proved that Rendro can expand its trust surfaces without widening the core rendering contract: protection shipped through external hooks first, password-to-open and advisory-permissions claims stayed narrow, and support promotion stayed tied to proof. `v2.0` extends that pattern by shipping unsigned signature authoring and preparation as a separate trust boundary instead of a shortcut to cryptographic-signature or compliance narratives.
 
 ## Constraints
 
 - **Tech stack**: Keep the core pure Elixir with no hard dependency on Phoenix, Oban, browser runtimes, or external layout engines — preserves deterministic deployment and product boundaries.
 - **Architecture**: Extend the existing `build -> compose -> measure -> paginate -> render -> validate` pipeline instead of creating an alternate rendering path — one engine must continue to power both APIs.
-- **Product scope**: Interactive forms do not imply broad viewer compatibility, XFA support, generic annotations, digital signatures, or compliance claims. `v2.0` must keep signature-field authoring and signing preparation narrower than cryptographic-signature or compliance claims.
+- **Product scope**: Interactive forms do not imply broad viewer compatibility, XFA support, generic annotations, digital signatures, or compliance claims. Future signing work must stay narrower than cryptographic-signature or compliance claims unless a later milestone proves otherwise.
 - **Determinism**: Widget geometry, appearance generation, and PDF object allocation must remain deterministic for identical authored inputs.
 - **Documentation honesty**: Public APIs, guides, and examples must not imply viewer support or form capabilities beyond what `priv/support_matrix.json` and proof lanes cover.
 - **Terminology**: Delivery attachments in adapters and embedded files inside PDFs must remain distinct in naming and docs to avoid user confusion.
@@ -112,6 +115,16 @@ Rendro has now shipped four authored PDF surfaces inside one deterministic pipel
 ## Archived Milestone Context
 
 <details>
+<summary>v2.0 milestone focus before ship</summary>
+
+- Add unsigned signature-field authoring that fits the existing authored form model truthfully.
+- Add deterministic unsigned signature-widget serialization and artifact-first external-signing preparation without changing `Rendro.render/2`.
+- Publish support boundaries that distinguish field authoring and preparation from actual digital-signature, viewer-validity, and compliance claims.
+- Defer cryptographic signing, key custody, PAdES/LTV/TSA/OCSP/CRL, and broad compliance narratives.
+
+</details>
+
+<details>
 <summary>v1.9 milestone focus before ship</summary>
 
 - Add document-level embedded files with deterministic metadata and validate-stage rejection of ambiguous state.
@@ -133,9 +146,9 @@ Rendro has now shipped four authored PDF surfaces inside one deterministic pipel
 
 ## Evolution Path
 
-- `v2.0` should introduce signature preparation through narrow authored fields and external-signing seams, not broad cryptographic or compliance claims.
+- `v2.0` shipped signature preparation through narrow authored fields and external-signing seams, not broad cryptographic or compliance claims.
 - A post-`v2.0` signing milestone, if warranted, should add cryptographic-signature proof and compliance surfaces only after the preparation contract is stable and evidence-backed.
-- Viewer support should continue to expand only when manual proof is recorded and reflected in `priv/support_matrix.json` (e.g., promoting a signature-field viewer row only after a recorded checklist exists for that exact surface).
+- Viewer support should continue to expand only when manual proof is recorded and reflected in `priv/support_matrix.json`.
 - The core deterministic pipeline and the optional-adapter boundary remain non-negotiable.
 
 ## Evolution
@@ -156,4 +169,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-06 after v2.0 milestone start.*
+*Last updated: 2026-05-07 after v2.0 milestone close.*

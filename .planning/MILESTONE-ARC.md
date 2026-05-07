@@ -1,41 +1,42 @@
 # Rendro Milestone Arc
 
-**Last updated:** 2026-05-06
+**Last updated:** 2026-05-07
 **Purpose:** Preserve the recommended next-milestone sequence so milestone-definition work does not reopen already-set architectural tradeoffs unless the project direction materially changes.
 
 ## Last Shipped Milestone
 
-### v1.10 Protected Delivery Hooks & Encryption Boundaries
-
-- **Status:** shipped
-- **Why now:** Added a truthful PDF protection story through an external artifact-first boundary without destabilizing deterministic core rendering or widening into compliance/signature claims.
-- **Scope recommendation:**
-  - External post-processing/enforcement hooks first
-  - Truthful docs/support-matrix language around password protection vs advisory permissions
-  - Proof-backed validation before any broader encryption story
-- **Non-goals:**
-  - Weak/legacy algorithms
-  - Broad compliance or archival claims
-  - Marketing PDF permissions as hard security
-
-## Active Milestone
-
 ### v2.0 Signature Fields & External Signing Preparation
 
-- **Status:** active
-- **Why after v1.10:** Signature work is a higher-trust, higher-surprise surface that should follow the newly-shipped protection boundaries rather than overlap them.
+- **Status:** shipped
+- **Why now:** Extended Rendro's authored forms and artifact-first trust seams into unsigned signature widgets and external-signing preparation without turning core into a cryptographic trust stack.
 - **Scope recommendation:**
-  - Unsigned signature-field authoring in core
-  - Deterministic preparation seams for external signing
-  - Optional adapter/workflow boundary for actual cryptographic signing
+  - Unsigned signature-field authoring on the shared `%Rendro.FormField{}` seam
+  - Deterministic unsigned widget serialization on the existing AcroForm path
+  - Artifact-first external-signing preparation with explicit adapter isolation
 - **Non-goals:**
   - Core key custody
-  - PAdES/LTV/OCSP/CRL/TSA support
-  - Broad compliance claims
+  - PAdES/LTV/TSA/OCSP/CRL support
+  - Broad compliance or cryptographic-signature claims
+
+## Next Candidate
+
+### Post-v2.0 Cryptographic Signing & Compliance Proof
+
+- **Status:** candidate
+- **Why after v2.0:** The unsigned-field and signing-preparation contract is now shipped, so any further signing work should focus only on proof-backed cryptographic trust and compliance surfaces rather than reopening preparation semantics.
+- **Scope recommendation:**
+  - Optional adapter/workflow boundaries for actual cryptographic signing
+  - Proof-backed viewer and validator evidence for signed-artifact claims
+  - Separate compliance narratives only if specific evidence lanes justify them
+- **Non-goals:**
+  - Re-scoping unsigned widget authoring or preparation fundamentals
+  - Implicit trust or compliance marketing without recorded evidence
+  - In-core certificate management by default
 
 ## Follow-On Direction
 
 - Keep any post-`v2.0` milestone focused on proof-backed cryptographic-signature and compliance work only if the unsigned-field and signing-preparation contract proves stable in real usage.
+- Continue treating viewer promotion as evidence-gated and separate from structural or cryptographic validity claims.
 
 ## Arc Rules
 

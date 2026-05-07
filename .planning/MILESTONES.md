@@ -1,5 +1,22 @@
 # Milestones
 
+## v2.0 Signature Fields & External Signing Preparation (Shipped: 2026-05-07)
+
+**Phases completed:** 5 phases (55, 56, 57, 58, 59)
+
+**Key accomplishments:**
+
+- Added `Rendro.signature_field/2` as the explicit unsigned signature-field authoring seam while keeping authored state on the shared `%Rendro.FormField{}` path.
+- Added validate-stage rejection for scope-breaking signature metadata so unsupported signing semantics fail before render with typed errors.
+- Extended the writer to emit deterministic unsigned `/Sig` widgets and AcroForm structures without introducing signer-owned placeholders or policy dictionaries into ordinary render output.
+- Added an artifact-first `Rendro.Sign.prepare/2` seam that operates on final artifact bytes, publishes only deterministic placeholder coordinates in shared metadata, and keeps adapter-specific handoff data isolated.
+- Published a narrow signature support contract across `priv/support_matrix.json`, `guides/api_stability.md`, and docs-contract tests that separates unsigned widgets and signing preparation from digital-signature, viewer, and compliance claims.
+- Backfilled Phase 55 and Phase 56 verification artifacts so all nine milestone requirements close with explicit proof instead of summary-only traceability.
+
+**Audit status:** `passed` — all 9 requirements satisfied, all 5 milestone phases closed, cross-phase authoring/render/prepare/docs flows verified. See `milestones/v2.0-MILESTONE-AUDIT.md`.
+
+---
+
 ## v1.10 Protected Delivery Hooks & Encryption Boundaries (Shipped: 2026-05-06)
 
 **Phases completed:** 4 phases (51, 52, 53, 54)

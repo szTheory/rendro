@@ -1,0 +1,348 @@
+---
+gsd_state_version: 1.0
+milestone: v1.5
+milestone_name: Operational Tooling & Admin UX
+status: planned
+last_updated: "2026-05-05T12:00:00.000Z"
+last_activity: 2026-05-05
+progress:
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 1
+  percent: 0
+---
+
+# Project State
+
+## Project Reference
+
+See: .planning/PROJECT.md (updated 2026-05-05)
+
+**Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
+**Current focus:** Phase 41
+
+## Current Position
+
+Phase: 41
+Plan: 01
+Status: planned
+Last activity: 2026-05-05
+
+Progress: [          ] 0%
+
+## Milestone Snapshot
+
+- Milestone: `v1.5 Operational Tooling & Admin UX`
+- Phases: `41`
+- Plans: `1`
+- Tasks: `0`
+- Timeline: `2026-05-05` -> `TBD`
+- Key accomplishments:
+  - `v1.5` initiated.
+
+## Performance Metrics
+
+**By Phase:**
+
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| 18 | 3/3 | — | — |
+| 19 | 3/3 | — | — |
+| 20 | 2/2 | — | — |
+| 21 | 2/2 | — | — |
+| 22 | 3/3 | — | — |
+| 23 | 2/2 | — | — |
+| 24 | 2/2 | — | — |
+| 35 | 5/5 | — | — |
+| 41 | 1/1 | 5 | 5 |
+
+## Accumulated Context
+
+### Decisions
+
+Decisions are logged in PROJECT.md Key Decisions table.
+Recent decisions affecting current work:
+
+- Confirmed schemas and pagination constraints correctly apply widows and orphans logic from existing implementation.
+- Since Phase 41 features were implemented and covered by unit tests in a previous pipeline stage rollout, zero code changes were needed in this pass. Empty commits generated to mark verification passing.
+
+- [Init] Keep pure core and optional adapters as hard architectural boundary.
+- [Init] Prioritize deterministic pagination/table reliability before broad integrations.
+- [Init] Enforce truthful docs/release verification as a first-class quality contract.
+- [v1.1 Init] Scope the next milestone around layout-authoring maturity before fonts/assets or async artifact expansion.
+- [v1.1 Init] Treat break semantics, reusable page templates/regions, and deterministic measurement contracts as prerequisites for later milestones.
+- [v1.1 Init] Defer custom fonts/assets to v1.2 and async artifact lifecycle contracts to v1.3.
+- [v1.2 Init] Make deterministic typography, assets, and honest Unicode/i18n boundaries the next active milestone.
+- [v1.2 Init] Pull first public Hex release readiness ahead of async artifact operations once the branded-document support boundary is proved.
+- Model reusable flow geometry as a separate PageTemplate struct with named Region entries instead of extending Rendro.Page.
+- Keep flow template selection explicit on Rendro.Document with page_template and page_templates fields while preserving existing header/footer compatibility.
+- Normalize sections and named regions into internal layout metadata during Compose, then keep the public Document contract unchanged.
+- Treat body capacity as the authored body-region height instead of recomputing it from header/footer block heights.
+- Materialize flow pages from PageTemplate geometry and anchor repeated non-body regions by region coordinates on every page.
+- Validate fixed-position pages against the usable page box and flow regions against their declared rectangles inside Paginate so overflow stays a stage-specific contract.
+- Preserve overflow source, region, page index, and block geometry in Rendro.Error.details so public render failures stay actionable.
+- Measure table width from deterministic rendered column geometry instead of a hard-coded 500-unit width so fit validation matches real output.
+- Kept authored geometry and break intent on Rendro.Block while keeping line-height styling on Rendro.Text.
+- Stored wrapped lines in a private measured-text carrier during Measure so downstream stages can consume one deterministic line list.
+- Used newline-first whitespace wrapping with grapheme fallback for oversized tokens instead of introducing hyphenation or paragraph DSL semantics.
+- Evaluate keep and break directives only after measurement so page moves consume final block heights.
+- Reject flow pagination directives on fixed-position pages through the existing paginate error surface instead of silently ignoring them.
+- Rendered PDF text now serializes the measured line list directly instead of reconstructing paragraphs inside the writer.
+- README examples teach the Phase 19 block-and-text flow path with explicit break semantics and narrow exclusions.
+- Decided to resolve layout body bounds during measurement to allow table width percentages to be relative to layout bounds.
+- Decided to let stack_cells in Paginate use absolute table coordinates directly.
+- Rejected width and border attributes on Rendro.table/2 to steer users to explicit column rules.
+- Added a diagnostics list to Rendro.Document to accumulate pagination info without raising exceptions or spamming telemetry.
+- Exposed Rendro.render_with_diagnostics/2 in the top-level Rendro module to allow extracting the fully populated document struct alongside the generated PDF binary, making it easier to fetch doc.diagnostics.
+- Used snapshot tests for the inspector to lock down the output format and ensure deterministic layout checks.
+- Expose pipeline builder API directly on Rendro.Document module to keep function discovery co-located with the struct definition
+- Use append semantics (list ++ [item]) for add_template/2 and add_section/2 to preserve insertion order
+- Use Map.merge/2 for put_options/2 to allow incremental option accumulation over multiple pipe stages
+- Tiered Composition pattern: document/2 (batteries-included), page_template/1 (layout), sections/2 (content) for recipe escape hatches
+- Accrue adapter uses explicit page template sections; doc.header and doc.footer remain empty; all content through named regions
+- Rendro.Recipes.invoice/1 delegates to Rendro.Recipes.Invoice.document/1 for backward compatibility
+- Source-level test uses File.read! on controller to verify canonical recipe call without mocking
+- ConnCase uses import Plug.Conn + import Phoenix.ConnTest (non-deprecated form)
+- README non-runnable schematic blocks use elixir-schematic tag to avoid docs-contract enforcement
+- Fail unsupported table split policies through a typed paginate error instead of silently defaulting to row-atomic continuation.
+- Canonicalize table split_policy to :row_atomic and keep :atomic only as a temporary compatibility alias.
+- Keep Phase 23 as the authoritative LAY-10 closure point while backfilling Phase 20 with explicit re-verification framing.
+- Update REQUIREMENTS.md and ROADMAP.md only after the Phase 23 verification artifact exists on disk.
+- Keep the diagnostics contract map-based and correct the docs/types instead of inventing a %Rendro.Document.Diagnostic{} struct.
+- Use the existing public proof surfaces (render_with_diagnostics/2, paginate tests, inspector tests, and docs-contract) instead of adding new verification machinery.
+- Leave OBS-05 and QUAL-06 open in traceability until plan 24-02 creates the authoritative verification artifacts.
+- Preserve Phase 21 as the historical implementation owner and use Phase 24 as the authoritative closure point for OBS-05 and QUAL-06.
+- Do not flip REQUIREMENTS.md or ROADMAP.md until 24-VERIFICATION.md exists and cites the repaired Phase 21 history.
+- Treat verification-artifact wording as executable contract surface when plan gates assert exact markdown markers.
+- Keep Helvetica as a narrow compatibility alias while moving the authored contract to logical font names.
+- Do not mark FONT-01 complete until plan 25-02 wires registry-backed selection into measurement and rendering.
+- Keep embedded font registration separate from built-in registration to preserve explicit product scope.
+- Normalize tagged font sources into owned bytes at registration so later stages never reopen filesystem paths.
+- Use Build as the deterministic embedded-font preflight boundary and cache parsed metrics on the registry for stage reuse.
+- Kept the measurement algorithm unchanged and tightened proof around the existing shared resolved-font seam instead of forking an embedded-font codepath.
+- Proved pagination parity with focused regressions rather than modifying paginate internals that already consumed measured heights correctly.
+- Kept built-in and embedded writer paths explicit while sharing one collection and resource-allocation pipeline.
+- Drove embedded PDF objects from the existing resolved Rendro.PDF.Font payload instead of reparsing font sources in Writer.
+- Locked the public proof surface to repeated-run layout/resource parity instead of expanding the support claim into broad byte-identity or fallback promises.
+- Maps Asset Registry images to XObjects
+- Uses PDF `cm` matrix for scaling into the measured geometry
+- Implemented exact HarfBuzz widths for accurate text measurement.
+- Adjusted layout and wrapping tests to account for the narrower and more precise HarfBuzz character widths.
+- Embedded true HarfBuzz measured runs using deterministic text run objects with no manual word-wrap patching inside Writer.
+- Passed Hex-encoded raw glyph IDs through the measurement and rendering pipelines to ensure 100% exact CID mappings.
+- Confirmed that existing logic seamlessly handled text run shapes from HarfBuzz by relying on the exact boundaries captured in MeasuredText runs.
+- Verified that Validate, Paginate, and Render are exactly aligned with the upstream layout and CID output metrics with no additional codebase drift.
+
+### Pending Todos
+
+- None.
+
+### Blockers/Concerns
+
+- Historic v1.0, v1.1, and v1.2 phase directories remain on disk for auditability. New roadmap numbering continues at Phase 31 to avoid collisions.
+
+## Deferred Items
+
+Items acknowledged and deferred at milestone close on 2026-05-03:
+
+| Category | Item | Status |
+|----------|------|--------|
+| verification_gaps | 29-VERIFICATION.md | human_needed |
+# Rendro Long-Term Roadmap: "Batteries Included" Production PDF Platform
+
+This roadmap defines the overarching epic arcs required to make Rendro the feature-complete, production-ready document generation standard for Elixir SaaS applications. It acts as the strategic memory for planning future milestones.
+
+## Core Mandates & DNA (The "Why")
+- **Pure Elixir:** No headless Chrome/Chromium dependency in core.
+- **Deterministic Layout:** Reliable layout, pagination, and reproducible output bytes.
+- **Operational Trust:** Telemetry, bounded execution (policies), and structured diagnostic errors.
+- **Integration over Coupling:** Core remains pure; ecosystem value is delivered through optional adapters and canonical recipes.
+
+---
+
+## Milestone 1: Core Ecosystem Integrations (Do Now)
+**Focus:** Bridge Rendro into the standard operational and communication flows of a Phoenix SaaS app. Prove that Rendro fits seamlessly into existing business requirements.
+
+* **Threadline (Audit Trail):**
+  * Implement `Rendro.Audit` behaviors and an optional `threadline` adapter.
+  * Capture and persist lifecycle events: template published, render succeeded, render failed (with redacted error metadata).
+* **Mailglass (Transactional Email):**
+  * Create a reliable attachments recipe.
+  * Build a `rendro_mailglass` bridge (`render_to_binary` + attachment helper + preview flow).
+* **Accrue (Billing & Invoicing):**
+  * Develop robust billing-document recipes (invoices, statements).
+  * Ensure deterministic artifact hashing, naming, and operator verification checklists.
+
+## Milestone 2: Advanced Layout & Typography (Core Maturation)
+**Focus:** Address remaining core layout and presentation needs to support complex business documents, while strictly maintaining the deterministic pure-Elixir rendering engine constraint.
+
+* **Typography & i18n:**
+  * Advanced font subsetting, shaping, and fallback strategies.
+  * Expanded internationalization (i18n) support for diverse character sets and text directionality.
+* **Robust Flow Enhancements:**
+  * Advanced table handling (complex column sharing, nested data, explicit cell fragmentation).
+  * Expanded pagination controls and block-level break semantics (widow/orphan management).
+* **Core Hardening:**
+  * Extensive edge-case testing for nested flows and fixed-position hybrid documents.
+
+## Milestone 3: Operational Tooling & Admin UX (Soon)
+**Focus:** Provide high-trust operational governance and operator tooling for managing document generation at scale, leveraging sibling `szTheory` libraries.
+
+* **Rulestead (Rollouts & Governance):**
+  * Feature-flag hooks for template version rollouts and graceful degradation.
+  * Controlled fallback behaviors and runtime renderer toggles for expensive features.
+* **Sigra (Admin Security):**
+  * Cookbooks for secure admin/operator workflows.
+  * MFA and step-up auth patterns for template management, approvals, and overrides.
+* **Lattice_Stripe (Billing Narratives):**
+  * Applied examples and integrations for Stripe-adjacent customer documents (receipts, statements, dispute packs).
+
+## Milestone 4: Strategic Adjacencies & Ecosystem Tooling (Track)
+**Focus:** Expand the footprint of Rendro into specialized domains and automated development workflows.
+
+* **Scrypath (Artifact Indexing):**
+  * Searchable render and template artifact indexing.
+  * Operational lookup and admin search UX.
+* **Kiln (Automated Quality):**
+  * Autonomous generation and testing of document fixtures.
+  * Automated template regression loops and visual tracking.
+* **Lockspire (API Auth):**
+  * Delegated OAuth/OIDC for document services in embedded product contexts.
+  * Future optional API mode for headless document generation as a service.
+
+---
+*Note: This roadmap is intended to be a live document to guide future milestones. Refer to `prompts/rendro-integration-opportunities.md`, `prompts/rendro-gsd-seed.md`, and `prompts/rendro-oss-dna.md` for deeper context on decision weightings and architectural constraints.*
+# Rendro
+
+## What This Is
+
+Rendro is a pure-Elixir, Phoenix-first PDF and document generation library for teams that need deterministic, production-grade output without depending on a browser runtime in core. It focuses on predictable layout and pagination for real business artifacts like invoices, statements, certificates, and reporting documents. The primary users are Phoenix SaaS engineers, back-office/reporting engineers, and operators who need trustworthy behavior under production load.
+
+## Core Value
+
+Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
+
+## Current State
+
+**Shipped Version:** v1.4 Async Delivery and Artifact Operations (2026-05-05)
+
+Rendro now has a queued render lifecycle, artifact metadata, and persistence/sink contracts. It implements optional integrations (`Accrue`, `Mailglass`, `Oban.RenderWorker`) to power production async/delivery workflows and supports advanced table fragmentation DSL.
+
+**Previous Shipped Version:** v1.3 First Public Hex Release Readiness (2026-05-03)
+
+Rendro now has licensing, metadata, API stability policy, and release preflight mechanics in place.
+
+Rendro now has a stable layout-authoring contract on top of the v1.0 engine core. `v1.1` shipped explicit page templates, named regions, reusable sections, deterministic wrapped-text measurement, authored keep/break pagination semantics, truthful fit validation, runtime-consumed table split policy, structured diagnostics/proof surfaces, and canonical invoice/report guidance through recipes and the Phoenix example.
+
+**Previous Shipped Version:** v1.2 Deterministic Typography (2026-05-03)
+
+`v1.2` delivered typography, assets, and honest Unicode boundaries.
+
+`v1.0` proved the core thesis: pure deterministic rendering, baseline layout/pagination, optional adapters, structured errors, and truthful CI/release verification contracts all ship with committed proof.
+
+## Current Milestone: v1.5 Operational Tooling & Admin UX
+
+**Goal:** Provide high-trust operational governance and operator tooling for managing document generation at scale.
+
+**Target features:**
+- Feature-flag hooks for template version rollouts and graceful degradation.
+- Controlled fallback behaviors and runtime renderer toggles for expensive features.
+- Cookbooks for secure admin/operator workflows.
+- MFA and step-up auth patterns for template management, approvals, and overrides.
+- Applied examples and integrations for Stripe-adjacent customer documents.
+
+## Requirements
+
+### Validated
+
+- [x] Rendro v1.4 delivered Async Delivery and Artifact Operations, including a queued render lifecycle, artifact metadata, and persistence/sink contracts. Validated at milestone close in `v1.4-MILESTONE-AUDIT.md`.
+- [x] Rendro v1.2 delivered deterministic typography, assets, and honest Unicode boundaries. Validated at milestone close in `v1.2-REQUIREMENTS.md`.
+- [x] Rendro v1.3 delivered first public hex release readiness. Validated at milestone close in `v1.3-REQUIREMENTS.md`.
+
+- [x] Merge-blocking verification is now truthful and executable: `mix ci` covers format, compile, tests, docs, and package build, and `mix verify` separates deterministic vs advisory lanes without early exit. Validated in Phase 12: Verification Chain Closure (`QUAL-01`, `QUAL-03`, `QUAL-05`).
+- [x] Deterministic CI gate regression is fixed and traceability state perfectly mirrors the true gate status. Validated in Phase 17: Deterministic CI Gate Recovery Traceability Resync (`QUAL-01`).
+- [x] Rendro v1.0 proved pure-core rendering, baseline layout primitives, optional adapters, and truthful operational verification as a shippable MVP. Validated at milestone close in `v1.0-REQUIREMENTS.md`.
+- [x] Rendro v1.1 proved layout-authoring maturity with explicit templates/regions, deterministic wrapped text, keep/break pagination semantics, truthful fit validation, stronger table continuation, diagnostics proof, and canonical recipes. Validated at milestone close in `v1.1-REQUIREMENTS.md`.
+
+### Active
+
+- [ ] Provide high-trust operational governance and operator tooling.
+- [ ] Implement feature-flag hooks for template version rollouts.
+- [ ] Add cookbooks for secure admin/operator workflows.
+
+### Out of Scope
+
+- HTML/CSS parity or browser-style layout behavior — Rendro remains a deterministic document engine, not a browser renderer.
+- WYSIWYG builders, hosted template editing, or app-specific layout hacks in core — they would widen surface area before the authoring contract is stable.
+- Render manifests, persistence sinks, and richer async artifact lifecycle contracts — defer to the later async-delivery milestone after first release readiness.
+- Blanket PDF/A, PDF/UA, signature, or compliance claims — require validator-backed proof in the later trust/validation arc.
+- Remote asset fetching, broad complex-script support, and "supports every language" positioning — defer until the engine has proof surfaces for them.
+
+## Context
+
+Rendro's next challenge is no longer core authoring depth; it is rendering breadth without losing trust. The codebase now has stable layout semantics and proof surfaces, which means typography and assets can be layered in as the next real adoption surface. The risk has shifted from missing author intent to overclaiming what the engine supports once fonts, fallback chains, logos, and wider Unicode expectations enter the picture.
+
+That makes `v1.2` a boundary-setting capability milestone. Font and asset work must preserve deterministic measurement, pagination truth, and explicit failure semantics. A first public Hex release should follow this proof layer immediately after `v1.2`, not be substituted for it.
+
+## Constraints
+
+- **Tech stack**: Keep the core pure Elixir with no hard dependency on Phoenix, Oban, browser runtimes, or external layout engines — preserves deterministic deployment and product boundaries.
+- **Architecture**: Extend the existing `build -> compose -> measure -> paginate -> render -> validate` pipeline instead of creating an alternate rendering path — one engine must continue to power both APIs.
+- **Product scope**: `v1.2` is a typography/assets truth milestone, not a browser-layout, remote-asset, or broad internationalization milestone.
+- **Determinism**: New measurement, fallback, and asset-placement semantics must remain deterministic and fixture-verifiable — pagination decisions cannot become heuristic or environment dependent.
+- **Documentation honesty**: Public APIs, guides, and examples must not imply shaping, RTL, or asset-fetch behavior that the engine does not actually honor.
+- **Verification**: Merge-blocking, docs-contract, and example proof lanes must stay truthful while font and asset behavior expands.
+
+## Key Decisions
+
+| Decision | Rationale | Outcome |
+|----------|-----------|---------|
+| Make v1.1 a layout-authoring milestone before fonts/assets or async expansion | The current adoption gap was authoring depth, and later milestones depend on stable layout contracts | Shipped in v1.1 |
+| Add first-class break semantics instead of hiding pagination policy in ad hoc block behavior | Business documents need explicit author intent for page breaks and content grouping | Shipped in v1.1 |
+| Introduce reusable page templates/sections/regions for flow documents | Fonts, assets, headers/footers, and diagnostics need stable placement surfaces | Shipped in v1.1 |
+| Treat break explanations, diagnostics, and verification artifacts as product behavior | Operators and adopters need to understand why a document split or overflowed | Shipped in v1.1 |
+| Make v1.2 a typography/assets milestone before public release work | Branded documents and truthful support boundaries are the highest-leverage adoption layer after v1.1 | Active |
+| Pull first public Hex release readiness ahead of async artifact operations | A credible first public package depends more on finished branded document support than on richer queued-delivery workflows | Active future arc |
+| Defer first public Hex release until support boundaries are battle-tested | Packaging ability alone is not the release bar for this library | Backlog (`Phase 999.1`, targeted for v1.3) |
+
+## Archived Milestone Context
+
+<details>
+<summary>v1.1 milestone focus before ship</summary>
+
+- First-class break semantics such as `keep_together`, `keep_with_next`, and explicit break directives.
+- Reusable page templates, sections, and bounded layout regions for flow documents.
+- Deterministic width-aware text measurement and flow-page geometry instead of hard-coded layout assumptions.
+- Richer table sizing and pagination behavior with row integrity, repeated headers, and explicit split policy.
+- Truthful fixed-position fit validation and operator-facing break diagnostics.
+- Canonical recipes/examples that demonstrate the new authoring surface without app-specific pagination glue.
+
+</details>
+
+## Evolution Path
+
+- `v1.2` focuses on deterministic typography, assets, and honest Unicode/i18n boundaries.
+- `v1.3` should promote first public Hex release readiness from backlog into active scope if `v1.2` closes truthfully.
+- `v1.4` should tackle async delivery and artifact operations after the public release boundary is defined.
+- `v1.5` should strengthen validator-backed trust surfaces and support-matrix evidence.
+
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? -> Move to Out of Scope with reason
+2. Requirements validated? -> Move to Validated with phase reference
+3. New requirements emerged? -> Add to Active
+4. Decisions to log? -> Add to Key Decisions
+5. "What This Is" still accurate? -> Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check -> still the right priority?
+3. Audit Out of Scope -> reasons still valid?
+4. Update Context with current state
+
+---
+*Last updated: 2026-05-03 after v1.3 milestone complete.*

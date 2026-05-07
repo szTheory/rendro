@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: signature-fields-and-external-signing-preparation
-status: phase_complete
-last_updated: "2026-05-07T10:29:17Z"
-last_activity: 2026-05-07 — Phase 57 executed with truthful signature support boundaries, proof-lane separation, and milestone-close verification
+status: between_milestones
+last_updated: "2026-05-07T14:30:00Z"
+last_activity: 2026-05-07 — v2.0 archived after verification backfill closed all requirement gaps
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 6
-  completed_plans: 6
+  total_phases: 5
+  completed_phases: 5
+  total_plans: 8
+  completed_plans: 8
   percent: 100
 ---
 
@@ -17,25 +17,25 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-06 after v1.9 close)
+See: .planning/PROJECT.md (updated 2026-05-07 after v2.0 close)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Close out the completed `v2.0` signature milestone and route the next milestone or release work.
+**Current focus:** Start the next milestone definition from a shipped `v2.0` baseline.
 
 ## Current Position
 
-Phase: 57 (Support Contract and Proof Closure)
-Plan: Complete
-Status: Phase complete
-Last activity: 2026-05-07 — Phase 57 completed with published support boundaries and verification artifacts
+Phase: none active
+Plan: none active
+Status: Milestone `v2.0` is shipped and archived; no new milestone has been defined yet
+Last activity: 2026-05-07 — v2.0 milestone archive completed after Phase 58/59 verification backfill closed the audit trail
 
 Progress: [==========] 100%
 
 ## Milestone Snapshot
 
-- Active milestone: `v2.0 Signature Fields & External Signing Preparation` (Phases 55-57 complete; milestone ready for closeout/release routing).
-- Last shipped: `v1.10 Protected Delivery Hooks & Encryption Boundaries (2026-05-06)` — see `milestones/v1.10-ROADMAP.md`.
-- Phase numbering continues from v1.10 — v2.0 currently sits at completed Phase 55 / upcoming Phase 56.
+- Milestone: `v2.0 Signature Fields & External Signing Preparation` (shipped and archived on 2026-05-07; see `milestones/v2.0-ROADMAP.md`).
+- Last shipped before that: `v1.10 Protected Delivery Hooks & Encryption Boundaries (2026-05-06)` — see `milestones/v1.10-ROADMAP.md`.
+- Next milestone should continue phase numbering after Phase 59.
 
 ## Performance Metrics
 
@@ -61,32 +61,36 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 - [Phase 55]: Public support claims must name the authored unsigned helper while keeping rendered signature widgets and digital signatures explicitly unsupported.
 - [Phase 56]: Prepare rendered signature fields by patching Rendro-owned `/FT /Sig` widget bytes after render instead of threading `%Rendro.Document{}` or a new render-time index into the API.
 - [Phase 56]: Keep the shared signing-preparation manifest generic under `metadata.signing_preparation` and isolate adapter-local handoff data under `metadata.signing_preparation_adapter`.
+- [Phase 58]: Verification backfill can close shipped requirement gaps later without rewriting implementation history when the artifact trail is missing.
+- [Phase 59]: Runtime tests remain the authoritative signing-preparation proof; docs/support lanes align claims but do not replace behavioral evidence.
 
 ### Roadmap Evolution
 
 - `v1.9` closed 2026-05-06 as a shipped milestone — embedded artifact surfaces (document-level embedded files + curated links).
 - `v1.10` closed 2026-05-06 as a shipped milestone — protected delivery hooks and encryption boundaries (external hooks first, narrow security claims, proof-backed validation before any in-core encryption).
-- `v2.0` is complete — Phase 55 shipped the unsigned signature authoring contract, Phase 56 shipped deterministic widget serialization plus artifact-first signing preparation, and Phase 57 closed the public support boundary with proof-backed docs and verification artifacts.
+- `v2.0` closed 2026-05-07 as a shipped milestone — unsigned signature authoring, deterministic unsigned widget serialization, artifact-first signing preparation, truthful support boundaries, and verification-backfill closure for Phases 55/56.
 
 ### Pending Todos
 
+- Define the next milestone through `/gsd-new-milestone` (questioning -> research -> requirements -> roadmap).
 - Publish `v0.2.0` from the verified release tag if it has not been pushed to external registries yet.
 
 ### Blockers/Concerns
 
-- No local release-verification blocker remains: `mix ci`, `mix release.preflight`, and `scripts/release_preflight_proof.exs --current-version-tag --worktree /tmp/rendro-release-proof` all pass at exact tag `v0.2.0`.
-- Phase 57 must publish the signature-preparation support boundary without implying digital-signature trust, compliance, viewer proof, or signer ownership in core.
+- No local release-verification blocker remains from the last published release: `mix ci`, `mix release.preflight`, and `scripts/release_preflight_proof.exs --current-version-tag --worktree /tmp/rendro-release-proof` all pass at exact tag `v0.2.0`.
+- Future signing work must not soften the current unsigned/preparation boundary into implied cryptographic trust, compliance, or viewer-validity claims.
 - Tracking-artifact debt from v1.9 (missing `49-VERIFICATION.md`, stale `wave_0_complete: false` flags, inconsistent SUMMARY frontmatter shape) was accepted at close per the v1.9 audit; remediable retroactively if needed.
 
 ## Deferred Items
 
-Items deferred at v1.9 milestone close on 2026-05-06:
+Items deferred at v2.0 milestone close on 2026-05-07:
 
 | Category | Item | Status |
 |----------|------|--------|
 | viewer_proof | Apple Preview × `embedded_files` | unverified (viewer-side gap; Rendro authoring is correct per structural lane) |
 | viewer_proof | Adobe Acrobat Reader forms checklist (Phase 47) | still unverified — not in v1.9 scope |
-| encryption | Native PDF encryption in core | deferred to v1.10 |
-| signatures | Digital signatures and compliance-oriented signing claims | deferred to v2.0+ |
-| docs | Regenerate `49-VERIFICATION.md` and refresh stale `wave_0_complete` flags on `49`/`50` `VALIDATION.md` | tech debt accepted at v1.9 close |
+| signatures | Cryptographic digital signatures in core | deferred beyond v2.0 |
+| compliance | PAdES/LTV/TSA/OCSP/CRL and broad compliance claims | deferred beyond v2.0 |
+| viewer_proof | Signature-specific viewer promotion | unverified until recorded per-viewer evidence exists |
+| docs | Regenerate `49-VERIFICATION.md` and refresh stale `wave_0_complete: false` flags on `49`/`50` `VALIDATION.md` | tech debt accepted at v1.9 close |
 | docs | Standardize SUMMARY frontmatter shape (explicit `requirements:` list across all plans) | tech debt accepted at v1.9 close |
