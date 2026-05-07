@@ -84,7 +84,7 @@ defmodule Rendro.PDF.WriterTest do
     }
   end
 
-  defp signature_field_document(attrs \\ []) do
+  defp signature_field_document(attrs) do
     field =
       Rendro.signature_field(
         Keyword.get(attrs, :name, "customer_signature"),
@@ -433,7 +433,8 @@ defmodule Rendro.PDF.WriterTest do
       assert pdf =~ "/T (customer_signature)"
       assert pdf =~ "/AP <<"
       refute pdf =~ "/V"
-      refute pdf =~ "/Contents"
+      refute pdf =~ "/Contents <"
+      refute pdf =~ "/Contents ("
       refute pdf =~ "/ByteRange"
       refute pdf =~ "/Lock"
       refute pdf =~ "/SV"

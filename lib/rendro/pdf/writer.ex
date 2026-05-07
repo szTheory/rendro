@@ -1002,6 +1002,27 @@ defmodule Rendro.PDF.Writer do
     {widget_obj, appearance_objects}
   end
 
+  defp build_widget_objects(%{type: :signature} = allocation, page_num, rect, opts) do
+    widget_obj =
+      build_signature_widget_annotation_object(
+        allocation.widget_obj_num,
+        page_num,
+        allocation.appearance_obj_num,
+        rect,
+        allocation.field
+      )
+
+    appearance_obj =
+      build_signature_appearance_object(
+        allocation.appearance_obj_num,
+        rect_width(rect),
+        rect_height(rect),
+        opts
+      )
+
+    {widget_obj, [{allocation.appearance_obj_num, appearance_obj}]}
+  end
+
   defp build_widget_objects(%{type: :radio} = allocation, page_num, rect, opts) do
     widget_obj =
       build_radio_widget_annotation_object(
@@ -1085,6 +1106,34 @@ defmodule Rendro.PDF.Writer do
       "/Off ",
       Integer.to_string(unchecked_appearance_obj_num),
       " 0 R\n>>\n>>\n/P ",
+      Integer.to_string(page_num),
+      " 0 R\n>>"
+    ]
+
+    Object.indirect_object(widget_obj_num, 0, {:raw, widget_dict}, [])
+  end
+
+  defp build_signature_widget_annotation_object(
+         widget_obj_num,
+         page_num,
+         appearance_obj_num,
+         rect,
+         field
+       ) do
+    rect_serialized = IO.iodata_to_binary(Object.serialize({:array, rect}, []))
+
+    widget_dict = [
+      "<<\n",
+      "/Type /Annot\n",
+      "/Subtype /Widget\n",
+      "/FT /Sig\n",
+      "/Rect ",
+      rect_serialized,
+      "\n/T ",
+      pdf_literal_string(field.name),
+      "\n/AP <<\n/N ",
+      Integer.to_string(appearance_obj_num),
+      " 0 R\n>>\n/P ",
       Integer.to_string(page_num),
       " 0 R\n>>"
     ]
@@ -1214,6 +1263,18 @@ defmodule Rendro.PDF.Writer do
     Object.indirect_object(obj_num, 0, Object.serialize(stream, opts))
   end
 
+  defp build_signature_appearance_object(obj_num, width, height, opts) do
+    stream =
+      {:stream,
+       [
+         {"Type", {:name, "XObject"}},
+         {"Subtype", {:name, "Form"}},
+         {"BBox", {:array, [0, 0, width, height]}}
+       ], build_signature_appearance_stream(width, height)}
+
+    Object.indirect_object(obj_num, 0, Object.serialize(stream, opts))
+  end
+
   defp build_form_field_appearance_stream(width, height, field) do
     inset_x = 2
     baseline_y = max(2.0, (height - field.size) / 2.0)
@@ -1245,6 +1306,38 @@ defmodule Rendro.PDF.Writer do
       escape_pdf_string(field.value),
       ") Tj\n",
       "ET\nQ"
+    ]
+    |> IO.iodata_to_binary()
+  end
+
+  defp build_signature_appearance_stream(width, height) do
+    line_inset = min(width, height) * 0.125
+    mid_y = height / 2.0
+
+    [
+      "q\n",
+      "1 1 1 rg\n",
+      "0 0 ",
+      format_num(width),
+      " ",
+      format_num(height),
+      " re\nf\n",
+      "0 0 0 RG\n",
+      "1 w\n",
+      "0.5 0.5 ",
+      format_num(width - 1.0),
+      " ",
+      format_num(height - 1.0),
+      " re\nS\n",
+      format_num(line_inset),
+      " ",
+      format_num(mid_y),
+      " m\n",
+      format_num(width - line_inset),
+      " ",
+      format_num(mid_y),
+      " l\nS\n",
+      "Q"
     ]
     |> IO.iodata_to_binary()
   end

@@ -113,7 +113,8 @@ defmodule Rendro.DeterministicTest do
       assert pdf1 =~ "/Subtype /Widget"
       assert pdf1 =~ "/FT /Sig"
       refute pdf1 =~ "/ByteRange"
-      refute pdf1 =~ "/Contents"
+      refute pdf1 =~ "/Contents <"
+      refute pdf1 =~ "/Contents ("
       refute pdf1 =~ "/V"
     end
   end
