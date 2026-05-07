@@ -55,4 +55,15 @@ defmodule Rendro.DocsContract.FormsClaimsTest do
     assert script =~
              ~s|{"Forms semantic-claims lane", ["test", "test/docs_contract/forms_claims_test.exs"]}|
   end
+
+  test "signature docs-contract lane keeps explicit negative claim guards" do
+    source = File.read!(__ENV__.file)
+    [wording_test] =
+      Regex.run(~r/test "public forms wording stays narrow.*?\n  end/s, source)
+
+    assert wording_test =~ ~s|refute guide =~ "digital signatures are supported"|
+    assert wording_test =~ ~s|refute guide =~ "signature widgets are supported"|
+    assert wording_test =~ ~s|refute guide =~ "PAdES is supported"|
+    assert wording_test =~ ~s|refute guide =~ "viewer-proofed digital signatures"|
+  end
 end
