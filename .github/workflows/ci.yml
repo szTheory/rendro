@@ -22,9 +22,6 @@ jobs:
           otp-version: '28'
           elixir-version: '1.19.5'
 
-      - name: Install System Dependencies
-        run: sudo apt-get update && sudo apt-get install -y poppler-utils
-
       - name: Install Dependencies
         run: mix deps.get
 
@@ -36,6 +33,40 @@ jobs:
           cd examples/phoenix_example
           mix deps.get
           mix compile
+
+  signing-live-proof:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Beam
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: '28'
+          elixir-version: '1.19.5'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Signing Proof Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+          pdfsig -v
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pyHanko pyHanko-cli
+          pyhanko --version
+
+      - name: Install Dependencies
+        run: mix deps.get
+
+      - name: Run Signing Live Proof
+        run: mix test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs
 
   release-proof:
     runs-on: ubuntu-latest

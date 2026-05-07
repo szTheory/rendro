@@ -1,5 +1,22 @@
 # Milestones
 
+## v2.1 Cryptographic Signing & Signed-Artifact Proof (Shipped: 2026-05-07)
+
+**Phases completed:** 4 phases (60, 61, 62, 63)
+
+**Key accomplishments:**
+
+- Added `Rendro.Sign.sign/2` as the explicit artifact-first cryptographic-signing seam over the shipped unsigned/preparation boundary.
+- Added first-party optional `Rendro.Adapters.PyHanko` and `Rendro.Adapters.Pdfsig` adapters that keep runtime-executable, redaction, and integrity-vs-trust boundaries narrow.
+- Added a dedicated live proof lane with checked-in non-secret signing fixtures and a `signing-live-proof` GitHub Actions job.
+- Enforced `signing-live-proof` as a required status check on `main`, turning the supported signing path into an operational gate rather than advisory proof only.
+- Published one exact signed-artifact support contract across `priv/support_matrix.json`, `guides/api_stability.md`, `guides/integrations.md`, docs-contract tests, and verification artifacts.
+- Closed the milestone audit trail by adding Phase 60-62 verification artifacts and synchronizing all 9 milestone requirements to explicit proof-backed closure.
+
+**Audit status:** `passed` — all 9 requirements satisfied, all 4 phases closed, cross-phase signing/validation/docs flows verified. See `milestones/v2.1-MILESTONE-AUDIT.md`.
+
+---
+
 ## v2.0 Signature Fields & External Signing Preparation (Shipped: 2026-05-07)
 
 **Phases completed:** 5 phases (55, 56, 57, 58, 59)

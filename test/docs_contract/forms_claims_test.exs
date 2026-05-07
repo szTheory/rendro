@@ -41,7 +41,7 @@ defmodule Rendro.DocsContract.FormsClaimsTest do
              "Rendro supports authored AcroForm text fields, checkboxes, radio groups, and the explicit `Rendro.signature_field/2` helper for unsigned signature placeholders."
 
     assert guide =~
-             "Rendro can author an unsigned placeholder, render an artifact, prepare that final artifact for an external signer, and then stop. External signing and verification remain outside Rendro core."
+             "Rendro can author an unsigned placeholder, render an artifact, prepare that final artifact for a lower-level external workflow, or sign the original unsigned artifact through a narrow optional adapter boundary."
 
     assert guide =~
              "Supported surface: `Rendro.signature_field/2` authors unsigned signature placeholders, and Rendro renders those placeholders as unsigned `/Sig` widgets only."
@@ -75,6 +75,7 @@ defmodule Rendro.DocsContract.FormsClaimsTest do
 
   test "signature docs-contract lane keeps explicit negative claim guards" do
     source = File.read!(__ENV__.file)
+
     [wording_test] =
       Regex.run(~r/test "public forms wording stays narrow.*?\n  end/s, source)
 

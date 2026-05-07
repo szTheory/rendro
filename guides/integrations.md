@@ -28,6 +28,61 @@ layout contract and remain the same regardless of delivery path.
 
 ---
 
+## Signing
+
+Rendro publishes one canonical signed-artifact recipe for operators:
+Rendro-authored existing field -> `Rendro.Sign.sign/2` via first-party
+`Rendro.Adapters.PyHanko` -> `Rendro.Sign.validate/2` / `pdfsig`.
+
+```elixir-schematic
+doc =
+  Rendro.fixed([
+    Rendro.page(
+      width: 612,
+      height: 792,
+      margin_left: 72,
+      margin_top: 72,
+      blocks: [
+        Rendro.signature_field("customer_signature",
+          x: 10,
+          y: 20,
+          width: 180,
+          height: 48
+        )
+      ]
+    )
+  ])
+
+{:ok, artifact} = Rendro.render_to_artifact(doc, deterministic: true)
+
+{:ok, signed} =
+  Rendro.Sign.sign(artifact,
+    field: "customer_signature",
+    adapter: Rendro.Adapters.PyHanko,
+    adapter_opts: [
+      key: System.fetch_env!("PYHANKO_KEY_PATH"),
+      cert: System.fetch_env!("PYHANKO_CERT_PATH"),
+      passfile: System.fetch_env!("PYHANKO_PASSFILE_PATH")
+    ]
+  )
+
+{:ok, posture} = Rendro.Sign.validate(signed)
+assert [%{field: "customer_signature", integrity: :valid}] = posture.signatures
+```
+
+Keep credentials application-owned. Signing is an artifact-stage transform over
+the original unsigned rendered artifact, not a render-core concern and not a
+prepared-artifact workflow.
+
+This recipe proves integrity validation only. It does not prove certificate
+trust, viewer behavior, or compliance posture, and signed output remains
+non-deterministic.
+
+Use `guides/api_stability.md` and `priv/support_matrix.json` for the canonical
+support boundary vocabulary.
+
+---
+
 ## Oban
 
 `Rendro.Adapters.Oban.RenderWorker` is an optional background-worker boundary for

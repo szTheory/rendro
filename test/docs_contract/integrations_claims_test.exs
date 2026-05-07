@@ -64,6 +64,24 @@ defmodule Rendro.DocsContract.IntegrationsClaimsTest do
     assert content =~ "release-tail contract for Phoenix and Mailglass users"
   end
 
+  test "integrations guide publishes one canonical signing recipe" do
+    content = File.read!("guides/integrations.md")
+
+    assert content =~ "## Signing"
+    assert content =~ "Rendro-authored existing field"
+    assert content =~ "`Rendro.Sign.sign/2`"
+    assert content =~ "`Rendro.Adapters.PyHanko`"
+    assert content =~ "`Rendro.Sign.validate/2` / `pdfsig`"
+    assert content =~ "Keep credentials application-owned."
+    assert content =~ "original unsigned rendered artifact"
+    assert content =~ "certificate"
+    assert content =~ "trust, viewer behavior, or compliance posture"
+    assert content =~ "signed output remains"
+    refute content =~ "PAdES is supported"
+    refute content =~ "viewer support is proven"
+    refute content =~ "multi-signature workflows are supported"
+  end
+
   test "threadline timeout closure stays truthful" do
     content = for i <- 1..200, do: Rendro.block(Rendro.text("timeout me #{i}", size: 12))
     doc = Rendro.flow(content)

@@ -96,6 +96,37 @@
       }
     }
   },
+  "signing": {
+    "capabilities": {
+      "artifact_first_external_signing": "supported",
+      "pyhanko_pemder_existing_field": "supported"
+    },
+    "behaviors": {
+      "signed_artifact_output": "supported",
+      "signed_artifact_validation_via_pdfsig": "supported",
+      "deterministic_output": "unsupported"
+    },
+    "boundaries": {
+      "signer_identity_trust": "unsupported",
+      "tamper_evidence_narratives": "unsupported",
+      "pades_ltv_tsa_ocsp_crl": "unsupported",
+      "multi_signature_workflows": "unsupported"
+    },
+    "viewers": {
+      "adobe_acrobat_reader": {
+        "status": "unverified"
+      },
+      "apple_preview": {
+        "status": "unverified"
+      },
+      "chrome_pdfium": {
+        "status": "unverified"
+      },
+      "pdfjs": {
+        "status": "unverified"
+      }
+    }
+  },
   "embedded_files": {
     "capabilities": {
       "document_level": "supported"

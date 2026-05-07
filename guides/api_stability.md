@@ -29,7 +29,7 @@ Rendro supports authored AcroForm text fields, checkboxes, radio groups, and the
 
 Structural validation through `pdfinfo`/Poppler proves PDF structure only. It does not prove interactive viewer behavior.
 
-Rendro can author an unsigned placeholder, render an artifact, prepare that final artifact for an external signer, and then stop. External signing and verification remain outside Rendro core.
+Rendro can author an unsigned placeholder, render an artifact, prepare that final artifact for a lower-level external workflow, or sign the original unsigned artifact through a narrow optional adapter boundary.
 
 ### Unsigned Signature Widgets
 
@@ -50,6 +50,18 @@ Supported surface: `Rendro.Sign.prepare/2` is an artifact-first preparation seam
 Proof lane: prepare-stage and manifest tests prove prepared-artifact coordinates and metadata boundaries only. This proof lane is separate from viewer behavior, signer execution, and cryptographic validity.
 
 Unsupported narratives: external signer execution, signer identity or trust policy, digital-signature validity, tamper evidence, compliance narratives, and PAdES/LTV/TSA/OCSP/CRL support remain unsupported. Signature-preparation viewer rows remain `unverified` unless a recorded checklist exists for that exact viewer and prepared-artifact surface.
+
+## Signed Artifact Support Boundary
+
+Supported surface: `Rendro.Sign.sign/2` and `Rendro.render_signed/3` sign a rendered unsigned-signature artifact through an optional external adapter. In this release, the first-party path is `Rendro.Adapters.PyHanko` using the `pyhanko` CLI over PEM or DER key material and an existing Rendro-authored signature field.
+
+Proof lane: signed-artifact proof is split in two. Automated tests cover the artifact-first API and adapter boundary, and Poppler `pdfsig` validates signature presence and cryptographic integrity on produced artifacts. This lane does not prove signer trust, certificate policy, or compliance posture.
+
+Important boundary: `Rendro.Sign.sign/2` operates on the original unsigned rendered artifact, not the placeholder-patched output from `Rendro.Sign.prepare/2`. The preparation seam remains available for lower-level external workflows that need deterministic placeholder coordinates and byte ranges.
+
+Signed output is explicitly non-deterministic.
+
+Unsupported narratives: signer identity or trust, tamper-evidence marketing, compliance narratives, PAdES/LTV/TSA/OCSP/CRL support, and multi-signature workflows remain unsupported. Signed-artifact viewer rows remain `unverified` unless a recorded checklist exists for that exact viewer and signing surface.
 
 ## Embedded Files Support Boundary
 

@@ -1,128 +1,97 @@
-# Milestone v2.1: Cryptographic Signing & Signed-Artifact Proof
+# Rendro Long-Term Roadmap: "Batteries Included" Production PDF Platform
 
-**Status:** planned
-**Started:** 2026-05-07
-**Phases:** 60-63
-**Total Plans:** 8
+This roadmap defines the strategic arcs that turn Rendro into the production-ready document generation standard for Elixir teams. It is intentionally milestone-sized rather than phase-sized so active milestone artifacts can stay small while this file preserves product direction.
 
-## Overview
-
-`v2.1` adds one proof-backed cryptographic-signing path to Rendro by extending the shipped unsigned/preparation seam into actual signing, keeping the core writer pure, and proving the resulting signed-artifact posture through optional validation tooling. The milestone is intentionally scoped to cryptographic signing, signed-artifact proof, and truthful support boundaries; long-lived signatures, viewer promotion, and compliance claims remain deferred.
-
-## Phases
-
-### Phase 60: Public Cryptographic-Signing Contract
-
-**Goal:** Lock the public `Rendro.Sign.sign/2` contract, redaction rules, and signed-artifact metadata posture without widening the shipped unsigned/preparation boundary.
-**Depends on:** Phase 59
-**Plans:** 2 plans
-
-Plans:
-
-- [ ] 60-01: Signing API option contract, field validation, and typed error taxonomy
-- [ ] 60-02: Signed-artifact metadata, redaction coverage, and deterministic-vs-signed behavior proof
-
-**Requirements:** `SIGN-04`, `SIGN-05`, `SIGN-06`
-**Success criteria:**
-1. Engineers can sign a rendered artifact through one explicit public API without changing `Rendro.render/2` semantics.
-2. Invalid field selection and malformed adapter configuration fail with typed, redacted errors.
-3. Signed artifacts clearly advertise non-deterministic signing state and do not leak secret material in shared metadata.
-
-### Phase 61: First-Party Signing and Validation Adapters
-
-**Goal:** Ship the first proof-backed optional signing and signed-artifact validation adapters while preserving the existing runtime-executable boundary discipline.
-**Depends on:** Phase 60
-**Plans:** 2 plans
-
-Plans:
-
-- [ ] 61-01: First-party pyHanko signing adapter and runtime boundary hardening
-- [ ] 61-02: First-party pdfsig validation adapter and posture classification
-
-**Requirements:** `ADAPT-04`, `ADAPT-05`
-**Success criteria:**
-1. Rendro ships a first-party pyHanko-backed signing adapter without introducing a hard Python dependency.
-2. Rendro ships a first-party pdfsig-backed validation adapter that reports signed-artifact posture separately from certificate trust.
-3. Adapter execution remains injectable, optional, and safe around temp files and tool failures.
-
-### Phase 62: Live Proof and Support-Contract Closure
-
-**Goal:** Prove the supported end-to-end toolchain and align docs/support surfaces with that exact proof-backed path.
-**Depends on:** Phase 61
-**Plans:** 2 plans
-
-Plans:
-
-- [ ] 62-01: Live signing proof lane with real pyHanko, pdfsig, and OpenSSL fixtures
-- [ ] 62-02: Support-matrix, guide wording, and docs-contract updates for digital signatures
-
-**Requirements:** `ADAPT-06`, `TRUST-04`, `TRUST-05`
-**Success criteria:**
-1. A live-tool lane can sign a representative artifact and validate the resulting signed posture through the supported validator path.
-2. Public support docs distinguish signature integrity, certificate trust, viewer posture, and deferred compliance claims.
-3. `priv/support_matrix.json` and docs-contract tests stay in lockstep with the proof-backed path.
-
-### Phase 63: Verification and Operational Proof Closure
-
-**Goal:** Close the milestone with explicit verification artifacts and operational guidance for the supported signing path.
-**Depends on:** Phase 62
-**Plans:** 2 plans
-
-Plans:
-
-- [ ] 63-01: Milestone verification artifact for cryptographic-signing and redaction boundaries
-- [ ] 63-02: Operational guidance, closeout audit notes, and deferred-scope confirmation
-
-**Requirements:** `TRUST-06`
-**Success criteria:**
-1. Verification artifacts cite the live proof lanes that back the supported signing path.
-2. The closeout trail explicitly proves the credential-redaction boundary and keeps long-lived-signature/compliance claims out of scope.
-3. Operators have one truthful supported-path recipe for signing and validating artifacts.
-
-## Phase Ordering Rationale
-
-- Phase 60 constrains public semantics first so adapter work cannot smuggle wider trust claims into the API.
-- Phase 61 follows because signing and validation adapters are the first concrete proof-backed implementation boundary for the milestone.
-- Phase 62 closes the support contract only after the real toolchain path exists, keeping public claims downstream of evidence.
-- Phase 63 closes the milestone with explicit verification and operational guidance so the signed-artifact story is auditable rather than implied.
-
-## Deferred
-
-- In-core key custody, certificate-store management, or HSM orchestration
-- Timestamp, revocation, and long-lived-signature evidence
-- PAdES/LTV/TSA/OCSP/CRL and broad compliance narratives
-- Broad viewer support claims without recorded evidence
-
-## Coverage Summary
-
-| Phase | Requirements Covered |
-|-------|----------------------|
-| 60 | `SIGN-04`, `SIGN-05`, `SIGN-06` |
-| 61 | `ADAPT-04`, `ADAPT-05` |
-| 62 | `ADAPT-06`, `TRUST-04`, `TRUST-05` |
-| 63 | `TRUST-06` |
-
-## Milestone Summary
-
-**Key Decisions:**
-
-- Keep cryptographic signing artifact-first over the shipped unsigned/preparation seam instead of reopening render-time semantics.
-- Keep signing credentials, executable invocation, and tool-specific metadata adapter-local and optional at runtime.
-- Treat signed output as intentionally non-deterministic while preserving deterministic claims for authored unsigned render output.
-- Separate cryptographic signature integrity, certificate trust, viewer posture, and compliance narratives in every public surface.
-- Defer long-lived-signature and compliance evidence to a later milestone even if the chosen tools expose those features.
-
-**Primary Risks:**
-
-- Public docs or metadata may overclaim what a "signed" artifact proves.
-- Adapter failures may leak credentials or tool-specific details if redaction is incomplete.
-- Tool capability may tempt the milestone into timestamp/revocation/PAdES scope creep.
-
-**Mitigations:**
-
-- Lock support-matrix/docs-contract updates to the exact live proof path.
-- Test redaction boundaries at the API and adapter layers.
-- Keep deferred scope explicit in requirements, roadmap, and closeout artifacts.
+## Core Mandates & DNA
+- **Pure Elixir:** No browser runtime or hard dependency on external layout engines in core.
+- **Deterministic Layout:** Layout, pagination, and output bytes must remain reproducible for identical inputs.
+- **Operational Trust:** Errors, verification, and support boundaries are product behavior, not afterthoughts.
+- **Integration over Coupling:** Ecosystem value is delivered through optional adapters and canonical recipes, not core entanglement.
 
 ---
-_For current status, see `.planning/STATE.md`, `.planning/PROJECT.md`, and milestone archives under `.planning/milestones/`._
+
+## Milestone 1: Core Ecosystem Integrations (Completed)
+**Focus:** Make Rendro fit naturally into Phoenix SaaS operational flows.
+
+* **Audit and Delivery Adapters:**
+  * `Rendro.Audit` and optional adapters for external lifecycle logging.
+  * Attachment and delivery recipes for operational handoff into surrounding app infrastructure.
+* **Billing-Document Recipes:**
+  * Deterministic invoice and statement flows that prove downstream business-document fit.
+
+## Milestone 2: Advanced Layout & Typography (Completed)
+**Focus:** Mature the layout engine so complex business documents remain deterministic under real-world content pressure.
+
+* **Typography & Assets:**
+  * Font registration, embedding, fallback, and honest Unicode boundaries.
+* **Flow Layout Depth:**
+  * Table fragmentation, nested structures, and widow/orphan pagination controls.
+* **Proof Surfaces:**
+  * Regression and docs-contract coverage that keeps layout claims truthful.
+
+## Milestone 3: Validation and Trust Surfaces (Completed)
+**Focus:** Strengthen evidence around produced PDFs without pretending to provide blanket compliance guarantees.
+
+* **Optional Validator Adapters:**
+  * Structural validation through advisory lanes such as `pdfinfo`/Poppler.
+* **Support Matrix:**
+  * Machine-readable boundaries for validated, experimental, and unsupported surfaces.
+* **Preflight Reporting:**
+  * Stronger structural diagnostics and clearer operator-facing proof.
+
+## Milestone 4: Interactive PDF Forms (Completed)
+**Focus:** Extend the core engine from static documents into deterministic authored AcroForm output.
+
+* **Authored Form Widgets:**
+  * Text fields, checkboxes, and radio groups authored through Rendro primitives.
+* **Deterministic Serialization:**
+  * AcroForm catalogs, widget annotations, and appearance streams emitted without `NeedAppearances`.
+* **Truthful Viewer Boundaries:**
+  * Structural validation plus proof-backed viewer claims instead of generic "works everywhere" positioning.
+
+## Milestone 5: Embedded Artifact Surfaces (Completed)
+**Focus:** Extend Rendro's authored PDF surface with embedded related artifacts while keeping the public contract deterministic, narrow, and proof-backed.
+
+* **Document-Level Embedded Files:**
+  * Embedded related artifacts in the PDF binary with explicit metadata and deterministic serialization.
+* **Curated Link Annotations:**
+  * External-URI and internal-destination links only, reusing the existing annotation seam without opening a generic review/comment API.
+* **Truthful Artifact Boundaries:**
+  * Support-matrix and proof updates that distinguish structural validity from viewer discoverability and policy behavior.
+
+## Milestone 6: Protected Delivery Hooks & Encryption Boundaries (Completed)
+**Focus:** Add a truthful PDF protection story without overclaiming permissions-based security or destabilizing deterministic core rendering.
+
+* **External Protection Hooks First:**
+  * Optional post-processing or adapter seams for encryption/protection workflows.
+* **Narrow Security Claims:**
+  * Explicit distinction between password-to-open, advisory permissions, and unsupported compliance/archive narratives.
+* **Support-Boundary Discipline:**
+  * Proof-backed validation before any native encryption story expands.
+
+## Milestone 7: Signature Fields & External Signing Preparation (Completed)
+**Focus:** Added narrow signing preparation surfaces while keeping actual cryptographic trust operations explicit and separately bounded.
+
+* **Unsigned Signature Fields:**
+  * Core-authored signature-field surfaces ship on the existing form model truthfully.
+* **External Signing Preparation:**
+  * Deterministic preparation seams ship for append/incremental external signing workflows.
+* **Deferred Compliance Surface:**
+  * PAdES, LTV, TSA/OCSP/CRL, and broad compliance claims remain later work.
+* **Archive:**
+  * See `.planning/milestones/v2.0-ROADMAP.md` for shipped phase detail.
+
+## Milestone 8: Cryptographic Signing & Signed-Artifact Proof (Completed)
+**Focus:** Proved one truthful cryptographic-signing path over the shipped unsigned/preparation seam while keeping compliance and long-lived-signature narratives deferred.
+
+* **Artifact-First Cryptographic Signing:**
+  * `Rendro.Sign.sign/2` signs rendered artifacts without widening `Rendro.render/2`.
+* **Optional Runtime Adapters:**
+  * First-party pyHanko signing and pdfsig validation adapters preserve runtime-executable and integrity-vs-trust boundaries.
+* **Operationally Enforced Proof:**
+  * The `signing-live-proof` lane is both executable and required on `main`.
+* **Archive:**
+  * See `.planning/milestones/v2.1-ROADMAP.md` for shipped phase detail.
+
+---
+*Note: This roadmap is a live strategic guide. Active milestone definition still happens through dedicated milestone context, requirements, and roadmap artifacts.*

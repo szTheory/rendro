@@ -126,10 +126,74 @@ defmodule Rendro.ErrorTest do
     test "missing signature widget guidance stays field-scoped without signer details" do
       err = Rendro.Error.from_stage(:prepare, {:field_not_preparable, "customer_signature"})
       assert err.stage == :prepare
-      assert err.why == "Rendered artifact does not expose a preparable signature field named customer_signature"
+
+      assert err.why ==
+               "Rendered artifact does not expose a preparable signature field named customer_signature"
+
       assert err.next =~ "unsigned signature widget"
       refute err.next =~ "certificate"
       refute err.next =~ "private key"
+    end
+  end
+
+  describe "from_stage/3 with stage :sign" do
+    test "invalid field wording stays sign-specific" do
+      err = Rendro.Error.from_stage(:sign, {:field_not_preparable, "customer_signature"})
+      assert err.stage == :sign
+
+      assert err.why ==
+               "Rendered artifact does not expose a signable signature field named customer_signature"
+
+      assert err.next =~ "original unsigned artifact"
+      refute err.why =~ "preparation"
+      refute err.why =~ "Protection"
+    end
+
+    test "missing executable emits pyhanko guidance" do
+      err = Rendro.Error.from_stage(:sign, {:missing_executable, "pyhanko"})
+      assert err.stage == :sign
+      assert err.where == "Rendro.Pipeline.Sign"
+      assert err.what == "PDF signing failed while wrapping the rendered artifact."
+      assert err.next =~ "pyhanko-cli"
+    end
+
+    test "prepared-artifact signing stays on the unsigned artifact seam" do
+      err = Rendro.Error.from_stage(:sign, :prepared_artifact_not_signable)
+      assert err.stage == :sign
+      assert err.why =~ "not signable"
+      assert err.next =~ "original unsigned rendered artifact"
+    end
+
+    test "invalid field option wording does not reuse preparation language" do
+      err = Rendro.Error.from_stage(:sign, {:invalid_option, :field, :empty})
+      assert err.stage == :sign
+      assert err.why == "Invalid signing option field: :empty"
+      refute err.why =~ "preparation"
+      refute err.why =~ "Protection"
+    end
+  end
+
+  describe "from_stage/3 with stage :validate for signed-artifact posture" do
+    test "missing executable emits pdfsig guidance" do
+      err = Rendro.Error.from_stage(:validate, {:missing_executable, "pdfsig"})
+      assert err.stage == :validate
+      assert err.next =~ "pdfsig"
+      refute err.next =~ "stderr"
+    end
+
+    test "no-signatures result stays typed and redacted" do
+      err = Rendro.Error.from_stage(:validate, {:invalid_pdf, :no_signatures})
+      assert err.stage == :validate
+      assert err.why =~ "does not expose any signatures"
+      assert err.next =~ "Pass a signed artifact"
+    end
+
+    test "tool failure keeps raw pdfsig output out of the public contract" do
+      err = Rendro.Error.from_stage(:validate, {:invalid_pdf, :tool_failure})
+      assert err.stage == :validate
+      assert err.why =~ "tool failed"
+      refute err.why =~ "stderr"
+      refute err.next =~ "stdout"
     end
   end
 end

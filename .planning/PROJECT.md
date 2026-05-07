@@ -10,7 +10,11 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Shipped Version:** v2.0 Signature Fields & External Signing Preparation (2026-05-07)
+**Shipped Version:** v2.1 Cryptographic Signing & Signed-Artifact Proof (2026-05-07)
+
+Rendro now supports one proof-backed cryptographic-signing path over the shipped unsigned/preparation seam: `Rendro.Sign.sign/2` signs rendered artifacts, first-party optional pyHanko and pdfsig adapters keep runtime-executable and integrity-vs-trust boundaries explicit, and the live proof lane is both executable and enforced on `main` through the required `signing-live-proof` status check. The public support contract now distinguishes signed-artifact integrity from certificate trust, viewer posture, and deferred compliance narratives, and the closeout trail includes Phase 60-63 verification artifacts for full audit-grade requirement closure.
+
+**Previous Shipped Version:** v2.0 Signature Fields & External Signing Preparation (2026-05-07)
 
 Rendro now supports explicit unsigned signature-field authoring through `Rendro.signature_field/2`, deterministic unsigned `/Sig` widget serialization on the existing AcroForm seam, and artifact-first external-signing preparation through `Rendro.Sign.prepare/2`. The public support contract now names unsigned widgets and signing preparation separately from unsupported digital-signature, viewer-validity, tamper-evidence, and compliance claims, and the closeout trail now includes backfilled Phase 55 and 56 verification artifacts so requirement closure is audit-grade rather than summary-only.
 
@@ -36,16 +40,18 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 **Foundation Already Shipped:** v1.3 release readiness, v1.2 typography/assets truth, v1.1 layout-authoring maturity, and v1.0 deterministic core rendering.
 
-## Current Milestone: v2.1 Cryptographic Signing & Signed-Artifact Proof
+## Current Milestone
 
-**Goal:** Prove one truthful cryptographic-signing path over Rendro's shipped unsigned/preparation seam while keeping compliance and long-lived-signature claims deferred.
+No milestone is active right now. `v2.1` is shipped and archived; the next milestone should be defined fresh before more scoped implementation work begins.
 
-**Target features:**
-- Artifact-first cryptographic signing through `Rendro.Sign.sign/2`
-- First-party optional runtime adapters for signing and signed-artifact validation
-- Proof-backed docs and support-matrix boundaries separating signature integrity, certificate trust, viewer posture, and deferred compliance claims
+## Next Milestone Goals
 
-**Why now:** `v2.0` already shipped the unsigned-field and signing-preparation contract. The highest-leverage next step is to prove actual signing and signed-artifact validation without reopening preparation semantics or widening the product contract into blanket trust/compliance claims.
+**Next candidate:** post-`v2.1` long-lived signatures and compliance evidence
+
+**Direction:**
+- Keep any follow-on signature work narrower than blanket trust or compliance positioning.
+- Add timestamp, revocation, and long-lived-signature proof only through explicit validator-backed artifact lanes.
+- Continue promoting signed-PDF viewer support only through recorded proof and support-matrix updates.
 
 ## Requirements
 
@@ -66,9 +72,9 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-- [ ] Engineers can sign a rendered `%Rendro.Artifact{}` through a narrow public API that preserves the shipped unsigned/preparation seam.
-- [ ] Rendro can validate signed-artifact posture truthfully through optional runtime tooling without conflating signature integrity, certificate trust, viewer support, or compliance.
-- [ ] Public docs and `priv/support_matrix.json` name the supported cryptographic-signing path precisely and keep long-lived-signature/compliance claims deferred.
+- [ ] Define the next milestone through fresh context, requirements, and roadmap artifacts before starting new implementation work.
+- [ ] Keep any future signature work narrower than blanket trust or compliance claims unless a proof-backed milestone explicitly closes those gaps.
+- [ ] Continue promoting signed-PDF viewer support only through recorded proof and support-matrix updates.
 
 ### Out of Scope
 
@@ -81,9 +87,9 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ## Context
 
-Rendro has now shipped four authored PDF surfaces inside one deterministic pipeline: static content (v1.0-v1.2), interactive forms (v1.8), document-level embedded files (v1.9), and curated link annotations (v1.9). `v1.10` and `v2.0` proved that trust-sensitive capabilities can land through artifact-first or optional-adapter seams without widening the core rendering contract: protection shipped through `Rendro.Protect`, and unsigned signature preparation shipped through `Rendro.Sign.prepare/2`.
+Rendro has now shipped four authored PDF surfaces inside one deterministic pipeline: static content (v1.0-v1.2), interactive forms (v1.8), document-level embedded files (v1.9), and curated link annotations (v1.9). `v1.10`, `v2.0`, and now `v2.1` prove that trust-sensitive capabilities can land through artifact-first or optional-adapter seams without widening the core rendering contract: protection shipped through `Rendro.Protect`, unsigned signature preparation shipped through `Rendro.Sign.prepare/2`, and cryptographic signing shipped through `Rendro.Sign.sign/2` plus first-party optional runtime adapters.
 
-Current in-repo work already points at the right `v2.1` shape: `Rendro.Sign.sign/2`, `Rendro.Adapters.PyHanko`, `Rendro.Adapters.Pdfsig`, and a live proof test using `openssl`, `pyhanko`, and `pdfsig` exist in the working tree. The milestone therefore needs to turn that implementation direction into a truthful product boundary with explicit proof lanes, redaction rules, and support-matrix/docs discipline.
+The next step, if warranted, should build on this proof-backed seam rather than reopening it: long-lived evidence, timestamp/revocation narratives, and narrower compliance stories should come only after explicit validator-backed artifact proof exists.
 
 ## Constraints
 
@@ -110,7 +116,7 @@ Current in-repo work already points at the right `v2.1` shape: `Rendro.Sign.sign
 | Publish support boundaries as machine-readable product contract | Viewer and feature claims need one canonical truth source that docs and tests can enforce | ✓ Shipped in v1.5 and extended in v1.8/v1.9/v2.0 |
 | Preserve the core/adapter split even as operational features grow | Keeps Rendro deployable and testable without forcing downstream ecosystem choices | ✓ Reinforced across v1.4 through v2.0 |
 | Treat verification artifacts as product behavior | Operators need clear proof of what the engine supports and what remains unverified | ✓ Reinforced across shipped milestones |
-| `v2.1` will prove one narrow cryptographic-signing path before any compliance or long-lived-signature stories | Protects the product contract from widening faster than the evidence lanes can support it | — Active milestone constraint |
+| `v2.1` proved one narrow cryptographic-signing path before any compliance or long-lived-signature stories | Protected the product contract from widening faster than the evidence lanes could support it | ✓ Shipped in v2.1 |
 
 ## Archived Milestone Context
 
@@ -136,7 +142,7 @@ Current in-repo work already points at the right `v2.1` shape: `Rendro.Sign.sign
 ## Evolution Path
 
 - `v2.0` shipped signature preparation through narrow authored fields and external-signing seams, not broad cryptographic or compliance claims.
-- `v2.1` should add actual cryptographic signing and signed-artifact proof without collapsing integrity, trust, viewer posture, and compliance into one claim.
+- `v2.1` added actual cryptographic signing and signed-artifact proof without collapsing integrity, trust, viewer posture, and compliance into one claim.
 - A post-`v2.1` milestone, if warranted, should add long-lived-signature evidence and compliance narratives only after the signing seam is stable and explicitly proof-backed.
 - The core deterministic pipeline and the optional-adapter boundary remain non-negotiable.
 
@@ -158,4 +164,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-07 after starting v2.1 milestone definition.*
+*Last updated: 2026-05-07 after v2.1 milestone close.*

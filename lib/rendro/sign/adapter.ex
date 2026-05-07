@@ -1,6 +1,6 @@
 defmodule Rendro.Sign.Adapter do
   @moduledoc """
-  Optional behaviour for external signing preparation adapters.
+  Optional behaviour for external signing adapters.
 
   Core Rendro stops at prepared artifact output. Optional adapters can inspect
   that prepared artifact, derive adapter-local handoff data, and return updated
@@ -8,5 +8,8 @@ defmodule Rendro.Sign.Adapter do
   """
 
   @callback prepare(Rendro.Artifact.t(), map()) ::
+              {:ok, binary(), map()} | {:error, term()}
+
+  @callback sign(Rendro.Artifact.t(), map()) ::
               {:ok, binary(), map()} | {:error, term()}
 end

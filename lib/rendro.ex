@@ -16,6 +16,7 @@ defmodule Rendro do
     Pipeline,
     Region,
     Section,
+    Sign,
     Table,
     Text
   }
@@ -256,6 +257,19 @@ defmodule Rendro do
       when is_list(render_opts) and is_list(protect_opts) do
     with {:ok, artifact} <- render_to_artifact(doc, render_opts) do
       Protect.password(artifact, protect_opts)
+    end
+  end
+
+  @doc """
+  Renders the document to an artifact and then applies the configured
+  signing adapter.
+  """
+  @spec render_signed(Document.t(), render_options(), keyword()) ::
+          {:ok, Artifact.t()} | {:error, Rendro.Error.t()}
+  def render_signed(%Document{} = doc, render_opts \\ [], sign_opts)
+      when is_list(render_opts) and is_list(sign_opts) do
+    with {:ok, artifact} <- render_to_artifact(doc, render_opts) do
+      Sign.sign(artifact, sign_opts)
     end
   end
 

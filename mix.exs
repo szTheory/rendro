@@ -143,6 +143,12 @@ defmodule Rendro.MixProject do
           Rendro.Protect,
           Rendro.Protect.Adapter
         ],
+        Signing: [
+          Rendro.Sign,
+          Rendro.Sign.Adapter,
+          Rendro.Adapters.PyHanko,
+          Rendro.Adapters.Pdfsig
+        ],
         "Inspection & Observability": [
           Rendro.Inspector,
           Rendro.Error,

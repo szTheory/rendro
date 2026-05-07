@@ -5,32 +5,17 @@
 
 ## Last Shipped Milestone
 
-### v2.0 Signature Fields & External Signing Preparation
-
-- **Status:** shipped
-- **Why now:** Extended Rendro's authored forms and artifact-first trust seams into unsigned signature widgets and external-signing preparation without turning core into a cryptographic trust stack.
-- **Scope recommendation:**
-  - Unsigned signature-field authoring on the shared `%Rendro.FormField{}` seam
-  - Deterministic unsigned widget serialization on the existing AcroForm path
-  - Artifact-first external-signing preparation with explicit adapter isolation
-- **Non-goals:**
-  - Core key custody
-  - PAdES/LTV/TSA/OCSP/CRL support
-  - Broad compliance or cryptographic-signature claims
-
-## Active Milestone
-
 ### v2.1 Cryptographic Signing & Signed-Artifact Proof
 
-- **Status:** active
-- **Why after v2.0:** The unsigned-field and signing-preparation contract is shipped, and the narrowest next step is to prove a real cryptographic-signing path over that seam instead of widening into generic compliance or viewer marketing.
+- **Status:** shipped
+- **Why now:** Extended the shipped unsigned/preparation seam into one truthful cryptographic-signing and signed-artifact-validation path without widening the core contract into generic trust or compliance claims.
 - **Scope recommendation:**
   - Artifact-first cryptographic signing through `Rendro.Sign.sign/2`
   - First-party optional runtime adapters for signing and signed-artifact validation
   - Proof-backed support language that separates signature integrity, certificate trust, viewer posture, and deferred compliance narratives
 - **Non-goals:**
-  - Re-scoping unsigned widget authoring or signing preparation fundamentals
   - In-core certificate management, key custody, or signer workflows by default
+  - Long-lived-signature and revocation evidence
   - PAdES/LTV/TSA/OCSP/CRL and blanket compliance claims
 
 ## Next Candidate
@@ -50,7 +35,7 @@
 
 ## Follow-On Direction
 
-- Keep post-`v2.0` signature work focused on proof-backed cryptographic behavior first, then compliance evidence later if the signing seam proves stable in real usage.
+- Keep post-`v2.1` signature work focused on long-lived evidence and compliance only when the current signing seam remains stable in real usage.
 - Continue treating viewer promotion as evidence-gated and separate from structural, cryptographic, and compliance validity claims.
 - Keep support-matrix growth tied to exact proof lanes and milestone scope so the public contract stays narrow and auditable.
 

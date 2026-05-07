@@ -25,7 +25,7 @@ defmodule Rendro.Error do
     %__MODULE__{
       what: what(stage, reason),
       where: "Rendro.Pipeline.#{stage_module_suffix(stage)}",
-      why: why(reason),
+      why: why(stage, reason),
       next: next_step(stage, reason),
       stage: stage,
       reason: reason,
@@ -48,60 +48,119 @@ defmodule Rendro.Error do
   defp what(:render, _reason), do: "PDF serialization failed during render."
   defp what(:validate, _reason), do: "Post-render validation failed."
   defp what(:protect, _reason), do: "PDF protection failed while wrapping the rendered artifact."
+
   defp what(:prepare, _reason),
     do: "PDF signing preparation failed while wrapping the rendered artifact."
 
+  defp what(:sign, _reason), do: "PDF signing failed while wrapping the rendered artifact."
+
   defp what(stage, _reason), do: "Render pipeline failed in stage #{inspect(stage)}."
 
-  defp why({:unsupported_glyph, char}), do: "Missing glyph for character: #{char}"
-
-  defp why({:unsupported_script, reason}) when is_atom(reason),
-    do: "Unsupported script boundary: #{reason |> Atom.to_string() |> String.replace("_", " ")}"
-
-  defp why({:missing_required_option, :field}),
+  defp why(:prepare, {:missing_required_option, :field}),
     do: "Missing required signing preparation option: field"
 
-  defp why({:missing_required_option, :reserved_bytes}),
-    do: "Missing required signing preparation option: reserved_bytes"
+  defp why(:sign, {:missing_required_option, :field}),
+    do: "Missing required signing option: field"
 
-  defp why({:missing_required_option, option}),
-    do: "Missing required protection option: #{option}"
-
-  defp why({:invalid_option, :field, value}),
+  defp why(:prepare, {:invalid_option, :field, value}),
     do: "Invalid signing preparation option field: #{inspect(value)}"
 
-  defp why({:invalid_option, :reserved_bytes, value}),
-    do: "Invalid signing preparation option reserved_bytes: #{inspect(value)}"
+  defp why(:sign, {:invalid_option, :field, value}),
+    do: "Invalid signing option field: #{inspect(value)}"
 
-  defp why({:invalid_option, option, value}),
-    do: "Invalid protection option #{option}: #{inspect(value)}"
-
-  defp why({:field_not_preparable, field}),
+  defp why(:prepare, {:field_not_preparable, field}),
     do: "Rendered artifact does not expose a preparable signature field named #{field}"
 
-  defp why(:already_prepared),
+  defp why(:sign, {:field_not_preparable, field}),
+    do: "Rendered artifact does not expose a signable signature field named #{field}"
+
+  defp why(:validate, {:invalid_pdf, :no_signatures}),
+    do: "Rendered artifact does not expose any signatures for validation"
+
+  defp why(:validate, {:invalid_pdf, :structural_invalidity}),
+    do: "Signed-artifact validation could not parse a structurally valid PDF"
+
+  defp why(:validate, {:invalid_pdf, :tool_failure}),
+    do: "Signed-artifact validation tool failed before returning posture details"
+
+  defp why(_stage, {:unsupported_glyph, char}), do: "Missing glyph for character: #{char}"
+
+  defp why(_stage, {:unsupported_script, reason}) when is_atom(reason),
+    do: "Unsupported script boundary: #{reason |> Atom.to_string() |> String.replace("_", " ")}"
+
+  defp why(_stage, {:missing_required_option, :reserved_bytes}),
+    do: "Missing required signing preparation option: reserved_bytes"
+
+  defp why(_stage, {:missing_required_adapter_option, option}),
+    do: "Missing required signing adapter option: #{option}"
+
+  defp why(_stage, {:missing_required_option, option}),
+    do: "Missing required protection option: #{option}"
+
+  defp why(_stage, {:invalid_option, :reserved_bytes, value}),
+    do: "Invalid signing preparation option reserved_bytes: #{inspect(value)}"
+
+  defp why(_stage, {:invalid_option, :adapter_opts, value}),
+    do: "Invalid signing option adapter_opts: #{inspect(value)}"
+
+  defp why(_stage, {:invalid_option, option, value}),
+    do: "Invalid protection option #{option}: #{inspect(value)}"
+
+  defp why(_stage, {:invalid_adapter_option, option, value}),
+    do: "Invalid signing adapter option #{option}: #{inspect(value)}"
+
+  defp why(_stage, {:pyhanko_failed, exit_code}),
+    do: "Signing adapter failed: pyhanko exited with status #{exit_code}"
+
+  defp why(_stage, {:command_failed, error_module}),
+    do: "Signing adapter command runner crashed with #{inspect(error_module)}"
+
+  defp why(:validate, :temp_dir_unavailable),
+    do: "Signed-artifact validation could not create a private temporary workspace"
+
+  defp why(:validate, :artifact_io_failed),
+    do:
+      "Signed-artifact validation could not write the artifact into its private temporary workspace"
+
+  defp why(_stage, :already_prepared),
     do: "Rendered artifact already appears to contain signature preparation placeholders"
 
-  defp why({:unknown_permissions, permissions}),
+  defp why(_stage, :already_signed),
+    do: "Rendered artifact already appears to contain Rendro-managed signing metadata"
+
+  defp why(_stage, :prepared_artifact_not_signable),
+    do: "Prepared signature-placeholder artifacts are not signable through Rendro.Sign.sign/2"
+
+  defp why(_stage, {:unknown_permissions, permissions}),
     do: "Unknown advisory permissions: #{Enum.map_join(permissions, ", ", &to_string/1)}"
 
-  defp why({:missing_executable, executable}), do: "Missing executable: #{executable}"
+  defp why(_stage, {:missing_executable, executable}), do: "Missing executable: #{executable}"
 
-  defp why({:adapter_failure, adapter, {:qpdf_failed, exit_code}}),
+  defp why(_stage, {:adapter_failure, adapter, {:qpdf_failed, exit_code}}),
     do: "Protection adapter #{inspect(adapter)} failed: qpdf exited with status #{exit_code}"
 
-  defp why({:adapter_failure, adapter, {:command_failed, error_module}}),
+  defp why(:sign, {:adapter_failure, adapter, {:command_failed, error_module}}),
+    do:
+      "Signing adapter #{inspect(adapter)} failed: command runner crashed with #{inspect(error_module)}"
+
+  defp why(_stage, {:adapter_failure, adapter, {:command_failed, error_module}}),
     do:
       "Protection adapter #{inspect(adapter)} failed: command runner crashed with #{inspect(error_module)}"
 
-  defp why({:adapter_failure, adapter, reason}),
+  defp why(_stage, {:adapter_failure, adapter, {:pyhanko_failed, exit_code}}),
+    do: "Signing adapter #{inspect(adapter)} failed: pyhanko exited with status #{exit_code}"
+
+  defp why(:sign, {:adapter_failure, adapter, reason}),
+    do: "Signing adapter #{inspect(adapter)} failed: #{inspect(reason)}"
+
+  defp why(_stage, {:adapter_failure, adapter, reason}),
     do: "Protection adapter #{inspect(adapter)} failed: #{inspect(reason)}"
 
-  defp why(reason) when is_atom(reason),
+  defp why(_stage, reason) when is_atom(reason),
     do: reason |> Atom.to_string() |> String.replace("_", " ")
 
-  defp why(reason) when is_binary(reason), do: reason
-  defp why(reason), do: Exception.format_banner(:error, reason)
+  defp why(_stage, reason) when is_binary(reason), do: reason
+  defp why(_stage, reason), do: Exception.format_banner(:error, reason)
 
   defp next_step(:build, :no_pages) do
     "Add at least one page before rendering (Rendro.document(pages: [...]))."
@@ -161,6 +220,30 @@ defmodule Rendro.Error do
 
   defp next_step(:validate, :max_bytes_exceeded) do
     "Reduce content complexity or increase the :max_bytes policy limit."
+  end
+
+  defp next_step(:validate, {:missing_executable, "pdfsig"}) do
+    "Install Poppler's `pdfsig` on the host or select a different validation adapter before calling Rendro.Sign.validate/2."
+  end
+
+  defp next_step(:validate, {:invalid_pdf, :no_signatures}) do
+    "Pass a signed artifact to Rendro.Sign.validate/2 or use Rendro.Sign.sign/2 before validating signature posture."
+  end
+
+  defp next_step(:validate, {:invalid_pdf, :structural_invalidity}) do
+    "Rerender or resign the artifact, then retry validation; Rendro exposes only structurally valid signed-artifact posture."
+  end
+
+  defp next_step(:validate, {:invalid_pdf, :tool_failure}) do
+    "Retry after correcting the host-level pdfsig installation or runtime state; Rendro does not expose raw pdfsig output in the public contract."
+  end
+
+  defp next_step(:validate, :temp_dir_unavailable) do
+    "Ensure the host temporary directory is writable, then retry signed-artifact validation."
+  end
+
+  defp next_step(:validate, :artifact_io_failed) do
+    "Ensure the host temporary directory accepts private file writes, then retry signed-artifact validation."
   end
 
   defp next_step(:protect, {:missing_required_option, :open_password}) do
@@ -223,6 +306,54 @@ defmodule Rendro.Error do
     "Inspect the adapter-local preparation output and rerun after correcting the external signer integration state."
   end
 
+  defp next_step(:sign, {:missing_required_option, :field}) do
+    "Pass field: \"signature_name\" so Rendro can target one rendered unsigned signature widget explicitly."
+  end
+
+  defp next_step(:sign, {:invalid_option, :field, _value}) do
+    "Pass field as a non-empty string naming one rendered unsigned signature widget."
+  end
+
+  defp next_step(:sign, {:field_not_preparable, _field}) do
+    "Render a document that includes the named unsigned signature widget, then call Rendro.Sign.sign/2 against that original unsigned artifact."
+  end
+
+  defp next_step(:sign, {:invalid_option, :adapter_opts, _value}) do
+    "Pass adapter_opts as a keyword list or map containing only adapter-local signing settings."
+  end
+
+  defp next_step(:sign, {:missing_executable, "pyhanko"}) do
+    "Install the pyHanko CLI (`pyhanko-cli`) on the host or select a different signing adapter before calling Rendro.Sign.sign/2."
+  end
+
+  defp next_step(:sign, {:missing_required_adapter_option, :key}) do
+    "Pass adapter_opts with a readable PEM or DER private-key path under :key."
+  end
+
+  defp next_step(:sign, {:missing_required_adapter_option, :cert}) do
+    "Pass adapter_opts with a readable PEM or DER certificate path under :cert."
+  end
+
+  defp next_step(:sign, {:invalid_adapter_option, _option, _value}) do
+    "Use only the supported adapter-local options for Rendro.Adapters.PyHanko: :key, :cert, optional :passfile, optional :chain, and optional :reason."
+  end
+
+  defp next_step(:sign, {:pyhanko_failed, _exit_code}) do
+    "Inspect the adapter stderr/output and rerun after correcting the external signer integration state."
+  end
+
+  defp next_step(:sign, {:command_failed, _error_module}) do
+    "Inspect the adapter stderr/output and rerun after correcting the external signer integration state."
+  end
+
+  defp next_step(:sign, :already_signed) do
+    "Sign each rendered artifact once; rerender a fresh unsigned artifact before repeating signing."
+  end
+
+  defp next_step(:sign, :prepared_artifact_not_signable) do
+    "Call Rendro.Sign.sign/2 on the original unsigned rendered artifact; keep Rendro.Sign.prepare/2 for external placeholder-based workflows."
+  end
+
   defp next_step(:render, _reason) do
     "Inspect telemetry events for the same render_id and verify PDF object generation inputs."
   end
@@ -238,6 +369,9 @@ defmodule Rendro.Error do
 
       :prepare ->
         "Prepare"
+
+      :sign ->
+        "Sign"
 
       _ ->
         stage
