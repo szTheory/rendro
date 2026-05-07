@@ -104,4 +104,32 @@ defmodule Rendro.ErrorTest do
       assert err.next =~ "adapter stderr/output"
     end
   end
+
+  describe "from_stage/3 with stage :prepare" do
+    test "missing field option emits signing-preparation guidance" do
+      err = Rendro.Error.from_stage(:prepare, {:missing_required_option, :field})
+      assert err.stage == :prepare
+      assert err.where == "Rendro.Pipeline.Prepare"
+      assert err.what == "PDF signing preparation failed while wrapping the rendered artifact."
+      assert err.next =~ "Pass field: \"signature_name\""
+    end
+
+    test "invalid reserved byte sizing stays actionable and secret-free" do
+      err = Rendro.Error.from_stage(:prepare, {:invalid_option, :reserved_bytes, 0})
+      assert err.stage == :prepare
+      assert err.why == "Invalid signing preparation option reserved_bytes: 0"
+      assert err.next =~ "positive integer"
+      refute err.why =~ "certificate"
+      refute err.why =~ "private key"
+    end
+
+    test "missing signature widget guidance stays field-scoped without signer details" do
+      err = Rendro.Error.from_stage(:prepare, {:field_not_preparable, "customer_signature"})
+      assert err.stage == :prepare
+      assert err.why == "Rendered artifact does not expose a preparable signature field named customer_signature"
+      assert err.next =~ "unsigned signature widget"
+      refute err.next =~ "certificate"
+      refute err.next =~ "private key"
+    end
+  end
 end
