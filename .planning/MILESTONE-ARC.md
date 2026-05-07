@@ -18,28 +18,44 @@
   - PAdES/LTV/TSA/OCSP/CRL support
   - Broad compliance or cryptographic-signature claims
 
+## Active Milestone
+
+### v2.1 Cryptographic Signing & Signed-Artifact Proof
+
+- **Status:** active
+- **Why after v2.0:** The unsigned-field and signing-preparation contract is shipped, and the narrowest next step is to prove a real cryptographic-signing path over that seam instead of widening into generic compliance or viewer marketing.
+- **Scope recommendation:**
+  - Artifact-first cryptographic signing through `Rendro.Sign.sign/2`
+  - First-party optional runtime adapters for signing and signed-artifact validation
+  - Proof-backed support language that separates signature integrity, certificate trust, viewer posture, and deferred compliance narratives
+- **Non-goals:**
+  - Re-scoping unsigned widget authoring or signing preparation fundamentals
+  - In-core certificate management, key custody, or signer workflows by default
+  - PAdES/LTV/TSA/OCSP/CRL and blanket compliance claims
+
 ## Next Candidate
 
-### Post-v2.0 Cryptographic Signing & Compliance Proof
+### Post-v2.1 Long-Lived Signatures & Compliance Evidence
 
 - **Status:** candidate
-- **Why after v2.0:** The unsigned-field and signing-preparation contract is now shipped, so any further signing work should focus only on proof-backed cryptographic trust and compliance surfaces rather than reopening preparation semantics.
+- **Why after v2.1:** Long-lived-signature and compliance work only makes sense after Rendro proves one truthful cryptographic-signing and validation path, plus the operational boundaries around it.
 - **Scope recommendation:**
-  - Optional adapter/workflow boundaries for actual cryptographic signing
-  - Proof-backed viewer and validator evidence for signed-artifact claims
-  - Separate compliance narratives only if specific evidence lanes justify them
+  - Timestamp, revocation, and long-lived-signature evidence lanes
+  - Narrow PAdES-baseline narratives only when backed by explicit validator and artifact proof
+  - Additional adapter stories only where the public support contract can stay precise
 - **Non-goals:**
-  - Re-scoping unsigned widget authoring or preparation fundamentals
-  - Implicit trust or compliance marketing without recorded evidence
-  - In-core certificate management by default
+  - Broad compliance branding without artifact-level evidence
+  - Default in-core trust-store, CA, or HSM management
+  - Viewer promotion that outruns recorded proof
 
 ## Follow-On Direction
 
-- Keep any post-`v2.0` milestone focused on proof-backed cryptographic-signature and compliance work only if the unsigned-field and signing-preparation contract proves stable in real usage.
-- Continue treating viewer promotion as evidence-gated and separate from structural or cryptographic validity claims.
+- Keep post-`v2.0` signature work focused on proof-backed cryptographic behavior first, then compliance evidence later if the signing seam proves stable in real usage.
+- Continue treating viewer promotion as evidence-gated and separate from structural, cryptographic, and compliance validity claims.
+- Keep support-matrix growth tied to exact proof lanes and milestone scope so the public contract stays narrow and auditable.
 
 ## Arc Rules
 
-- Treat embedded artifacts, protection, and signatures as separate milestones unless a future proof-backed design shows they can be combined without widening the trust contract.
+- Treat unsigned field authoring, cryptographic signing, and long-lived/compliance narratives as separate milestone layers unless a future proof-backed design shows they can be merged safely.
 - Keep core focused on deterministic authored surfaces and optional adapters focused on environment-specific trust operations.
-- Keep `priv/support_matrix.json`, docs-contract tests, and milestone scope in lockstep before claiming any new support boundary.
+- Keep `priv/support_matrix.json`, docs-contract tests, and milestone scope in lockstep before claiming any new signing or compliance boundary.
