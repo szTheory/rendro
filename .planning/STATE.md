@@ -1,41 +1,41 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.1
-milestone_name: cryptographic-signing-and-signed-artifact-proof
-status: between_milestones
-last_updated: "2026-05-07T20:49:47Z"
-last_activity: 2026-05-07 — v2.1 archived after signing proof, branch protection, and verification closure aligned
+milestone: v2.2
+milestone_name: long-lived-signatures-and-compliance-evidence
+status: active
+last_updated: "2026-05-07T21:30:00Z"
+last_activity: 2026-05-07 — v2.2 milestone defined with Phase 64-67 roadmap and strategic trust-and-adoption arc
 progress:
   total_phases: 4
-  completed_phases: 4
+  completed_phases: 0
   total_plans: 8
-  completed_plans: 8
-  percent: 100
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-07 after v2.1 close)
+See: .planning/PROJECT.md (updated 2026-05-07 after v2.2 milestone definition)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Start the next milestone definition from a shipped `v2.1` baseline.
+**Current focus:** Execute milestone `v2.2 Long-Lived Signatures & Compliance Evidence` from the shipped `v2.1` signing baseline.
 
 ## Current Position
 
-Phase: none active
+Phase: 64 long-lived-signature-artifact-contract
 Plan: none active
-Status: Milestone `v2.1` is shipped and archived; no new milestone has been defined yet
-Last activity: 2026-05-07 — v2.1 milestone archive completed after signing proof, verification artifacts, and required-check enforcement all closed
+Status: Milestone defined and roadmap approved; ready for `/gsd-plan-phase 64`
+Last activity: 2026-05-07 — Defined `v2.2`, activated the strategic arc, and mapped requirements to Phases 64-67
 
-Progress: [==========] 100%
+Progress: [----------] 0%
 
 ## Milestone Snapshot
 
-- Milestone: `v2.1 Cryptographic Signing & Signed-Artifact Proof` (shipped and archived on 2026-05-07; see `milestones/v2.1-ROADMAP.md`).
-- Last shipped before that: `v2.0 Signature Fields & External Signing Preparation (2026-05-07)` — see `milestones/v2.0-ROADMAP.md`.
-- Next milestone should continue phase numbering after Phase 63.
+- Milestone: `v2.2 Long-Lived Signatures & Compliance Evidence` (planned on 2026-05-07; see `.planning/ROADMAP.md`).
+- Previous shipped milestone: `v2.1 Cryptographic Signing & Signed-Artifact Proof` (shipped and archived on 2026-05-07; see `milestones/v2.1-ROADMAP.md`).
+- Strategic next-up after `v2.2`: `v2.3 Viewer Proof & Interop Closure`, then `v2.4 Batteries-Included Workflow & Adoption Closure`.
 
 ## Performance Metrics
 
@@ -65,6 +65,7 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 - [Phase 59]: Runtime tests remain the authoritative signing-preparation proof; docs/support lanes align claims but do not replace behavioral evidence.
 - [v2.1]: Prove one narrow cryptographic-signing path before any compliance or long-lived-signature stories.
 - [Phase 62]: Require `signing-live-proof` on `main` so the supported cryptographic-signing path remains an operational gate rather than advisory proof only.
+- [v2.2 planning]: Prioritize long-lived evidence as the next prerequisite between “can sign” and “production-credible signed workflow,” then follow with viewer-proof and adoption-closure milestones.
 
 ### Roadmap Evolution
 
@@ -72,26 +73,29 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 - `v1.10` closed 2026-05-06 as a shipped milestone — protected delivery hooks and encryption boundaries (external hooks first, narrow security claims, proof-backed validation before any in-core encryption).
 - `v2.0` closed 2026-05-07 as a shipped milestone — unsigned signature authoring, deterministic unsigned widget serialization, artifact-first signing preparation, truthful support boundaries, and verification-backfill closure for Phases 55/56.
 - `v2.1` closed 2026-05-07 as a shipped milestone — cryptographic signing and signed-artifact proof over the shipped `v2.0` seam, with enforced proof gates and truthful support boundaries.
+- `v2.2` opened 2026-05-07 as the active milestone — long-lived evidence and narrow compliance posture over the shipped signing seam.
 
 ### Pending Todos
 
-- Define the next milestone through `/gsd-new-milestone` (questioning -> research -> requirements -> roadmap).
-- Publish the next release/tag from the now-verified signing milestone when you are ready to ship externally.
+- Run `/gsd-plan-phase 64` to turn Phase 64 into an executable implementation plan.
+- Keep the v2.2 implementation artifact-first and proof-backed; do not widen into viewer or blanket compliance claims mid-milestone.
+- Preserve the new strategic arc so `v2.3` and `v2.4` planning can start from an explicit game plan instead of reopening milestone selection from scratch.
 
 ### Blockers/Concerns
 
-- Future signing work must not soften the current unsigned/preparation boundary into implied trust anchoring, blanket viewer support, or compliance claims.
-- Long-lived signatures, timestamps, revocation evidence, and PAdES narratives remain outside `v2.1` until there is a dedicated proof lane.
+- Long-lived-signature work must not soften the current boundary into implied signer trust, blanket compliance support, or generic “enterprise signing” marketing.
+- Viewer promotion for signing, long-lived evidence, and protection remains separately proof-gated; do not smuggle viewer claims into `v2.2`.
+- Multi-signature workflows, HSM orchestration, and global text-shaping remain tempting adjacent problems; they should not leak into the active milestone without a deliberate re-scope.
 
 ## Deferred Items
 
-Items deferred at `v2.1` milestone close on 2026-05-07:
+Items still deferred or intentionally left outside the active milestone as of 2026-05-07:
 
 | Category | Item | Status |
 |----------|------|--------|
 | viewer_proof | Apple Preview × `embedded_files` | unverified (viewer-side gap; Rendro authoring is correct per structural lane) |
-| viewer_proof | Adobe Acrobat Reader forms checklist (Phase 47) | still unverified — not in `v2.1` scope |
-| signatures | Long-lived signatures, timestamps, and revocation evidence | deferred beyond `v2.1` |
-| compliance | PAdES/LTV/TSA/OCSP/CRL and broad compliance claims | deferred beyond `v2.1` |
+| viewer_proof | Adobe Acrobat Reader forms checklist (Phase 47) | still unverified — not in `v2.2` scope |
 | viewer_proof | Signature-specific viewer promotion | unverified until recorded per-viewer evidence exists |
-| adapters | Additional signing adapters beyond the first proof-backed path | deferred until demand and proof justify them |
+| adoption | Additional signing or long-lived adapters beyond the first proof-backed path | deferred until demand and proof justify them |
+| workflows | Multi-signature workflows and signer orchestration | deferred beyond `v2.2` |
+| globalization | Global text shaping, RTL support, and broader script coverage | deferred to a later candidate milestone unless urgency changes |
