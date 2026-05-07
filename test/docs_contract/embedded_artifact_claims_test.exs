@@ -18,12 +18,12 @@ defmodule Rendro.DocsContract.EmbeddedArtifactClaimsTest do
     assert matrix =~ ~s|"authored_timestamps": "supported"|
     assert matrix =~ ~s|"page_attachment_annotations": "unsupported"|
 
-    # Existing `forms` family must remain unchanged at the top level.
+    # Existing `forms` family must remain present at the top level.
     assert matrix =~ ~s|"forms"|
     assert matrix =~ ~s|"text": "supported"|
     assert matrix =~ ~s|"checkbox": "supported"|
     assert matrix =~ ~s|"radio": "supported"|
-    assert matrix =~ ~s|"signature": "unsupported"|
+    assert matrix =~ ~s|"signature_field": "supported_unsigned_placeholder_only"|
 
     # Existing validators block must remain unchanged.
     assert matrix =~ ~s|"validators"|

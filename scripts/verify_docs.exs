@@ -9,6 +9,7 @@ lanes = [
   {"Integration contract lane", ["test", "test/docs_contract/integrations_contract_test.exs"]},
   {"Integration semantic-claims lane", ["test", "test/docs_contract/integrations_claims_test.exs"]},
   {"Forms semantic-claims lane", ["test", "test/docs_contract/forms_claims_test.exs"]},
+  {"Signing semantic-claims lane", ["test", "test/docs_contract/signing_claims_test.exs"]},
   {"Embedded artifact semantic-claims lane", ["test", "test/docs_contract/embedded_artifact_claims_test.exs"]},
   {"Protection semantic-claims lane", ["test", "test/docs_contract/protection_claims_test.exs"]}
 ]

@@ -29,13 +29,27 @@ Rendro supports authored AcroForm text fields, checkboxes, radio groups, and the
 
 Structural validation through `pdfinfo`/Poppler proves PDF structure only. It does not prove interactive viewer behavior.
 
-The `Rendro.signature_field/2` helper is an authored unsigned-placeholder contract only. Phase 55 does not yet claim rendered signature-widget support, viewer support for signature fields, or digital-signature behavior.
+Rendro can author an unsigned placeholder, render an artifact, prepare that final artifact for an external signer, and then stop. External signing and verification remain outside Rendro core.
 
-Digital signatures, signer metadata, tamper evidence, compliance narratives, and PAdES/LTV/TSA/OCSP/CRL support remain unsupported.
+### Unsigned Signature Widgets
+
+Supported surface: `Rendro.signature_field/2` authors unsigned signature placeholders, and Rendro renders those placeholders as unsigned `/Sig` widgets only.
+
+Proof lane: deterministic writer and structural tests prove unsigned widget structure only. Structural proof is not viewer proof and not cryptographic validity proof.
+
+Unsupported narratives: digital signatures, signer identity or trust, tamper evidence, compliance narratives, and PAdES/LTV/TSA/OCSP/CRL support remain unsupported. Signature-specific viewer rows remain `unverified` in `priv/support_matrix.json` until a recorded checklist exists for that exact viewer and signature surface.
 
 For text fields, checkboxes, and radio groups, Apple Preview is supported for this phase based on the recorded Phase 47 viewer checklist. Adobe Acrobat Reader remains `unverified` until the same checklist records passing open, visible default state, edit/toggle, and save behavior.
 
 Other viewers are not part of Rendro's supported contract unless `priv/support_matrix.json` later records proof-backed support for them.
+
+## Signing Preparation Support Boundary
+
+Supported surface: `Rendro.Sign.prepare/2` is an artifact-first preparation seam over rendered `%Rendro.Artifact{}` bytes. It supports external artifact preparation, final byte handoff, and adapter-local metadata isolation.
+
+Proof lane: prepare-stage and manifest tests prove prepared-artifact coordinates and metadata boundaries only. This proof lane is separate from viewer behavior, signer execution, and cryptographic validity.
+
+Unsupported narratives: external signer execution, signer identity or trust policy, digital-signature validity, tamper evidence, compliance narratives, and PAdES/LTV/TSA/OCSP/CRL support remain unsupported. Signature-preparation viewer rows remain `unverified` unless a recorded checklist exists for that exact viewer and prepared-artifact surface.
 
 ## Embedded Files Support Boundary
 

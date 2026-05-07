@@ -13,8 +13,7 @@ defmodule Rendro.DocsContract.FormsClaimsTest do
     assert matrix =~ ~s|"text": "supported"|
     assert matrix =~ ~s|"checkbox": "supported"|
     assert matrix =~ ~s|"radio": "supported"|
-    assert matrix =~ ~s|"signature": "unsupported"|
-    assert matrix =~ ~s|"digital_signatures": "unsupported"|
+    assert matrix =~ ~s|"signature": "supported_unsigned_widget_only"|
     assert matrix =~ ~s|"hierarchical_field_names": "unsupported"|
     assert matrix =~ ~s|"need_appearances": "unsupported"|
     assert matrix =~ ~s|"xfa": "unsupported"|
@@ -23,6 +22,14 @@ defmodule Rendro.DocsContract.FormsClaimsTest do
     assert matrix =~ ~r/"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
     assert matrix =~ ~r/"chrome_pdfium"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
     assert matrix =~ ~r/"pdfjs"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+
+    assert matrix =~
+             ~r/"signature_widget_viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+
+    assert matrix =~
+             ~r/"signature_widget_viewers".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+
+    assert matrix =~ ~s|"digital_signatures": "unsupported"|
 
     refute matrix =~ ~s|"surfaces"|
   end
@@ -34,13 +41,19 @@ defmodule Rendro.DocsContract.FormsClaimsTest do
              "Rendro supports authored AcroForm text fields, checkboxes, radio groups, and the explicit `Rendro.signature_field/2` helper for unsigned signature placeholders."
 
     assert guide =~
-             "Structural validation through `pdfinfo`/Poppler proves PDF structure only. It does not prove interactive viewer behavior."
+             "Rendro can author an unsigned placeholder, render an artifact, prepare that final artifact for an external signer, and then stop. External signing and verification remain outside Rendro core."
 
     assert guide =~
-             "The `Rendro.signature_field/2` helper is an authored unsigned-placeholder contract only. Phase 55 does not yet claim rendered signature-widget support, viewer support for signature fields, or digital-signature behavior."
+             "Supported surface: `Rendro.signature_field/2` authors unsigned signature placeholders, and Rendro renders those placeholders as unsigned `/Sig` widgets only."
 
     assert guide =~
-             "Digital signatures, signer metadata, tamper evidence, compliance narratives, and PAdES/LTV/TSA/OCSP/CRL support remain unsupported."
+             "Proof lane: deterministic writer and structural tests prove unsigned widget structure only. Structural proof is not viewer proof and not cryptographic validity proof."
+
+    assert guide =~
+             "Unsupported narratives: digital signatures, signer identity or trust, tamper evidence, compliance narratives, and PAdES/LTV/TSA/OCSP/CRL support remain unsupported."
+
+    assert guide =~
+             "Signature-specific viewer rows remain `unverified` in `priv/support_matrix.json` until a recorded checklist exists for that exact viewer and signature surface."
 
     assert guide =~
              "Other viewers are not part of Rendro's supported contract unless `priv/support_matrix.json` later records proof-backed support for them."
@@ -48,7 +61,7 @@ defmodule Rendro.DocsContract.FormsClaimsTest do
     refute guide =~ "standard PDF viewers"
     refute guide =~ "Adobe Acrobat Reader is supported"
     refute guide =~ "digital signatures are supported"
-    refute guide =~ "signature widgets are supported"
+    refute guide =~ "viewer support for signature fields"
     refute guide =~ "PAdES is supported"
     refute guide =~ "viewer-proofed digital signatures"
   end
@@ -66,7 +79,7 @@ defmodule Rendro.DocsContract.FormsClaimsTest do
       Regex.run(~r/test "public forms wording stays narrow.*?\n  end/s, source)
 
     assert wording_test =~ ~s|refute guide =~ "digital signatures are supported"|
-    assert wording_test =~ ~s|refute guide =~ "signature widgets are supported"|
+    assert wording_test =~ ~s|refute guide =~ "viewer support for signature fields"|
     assert wording_test =~ ~s|refute guide =~ "PAdES is supported"|
     assert wording_test =~ ~s|refute guide =~ "viewer-proofed digital signatures"|
   end

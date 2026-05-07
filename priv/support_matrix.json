@@ -15,7 +15,7 @@
       "text": "supported",
       "checkbox": "supported",
       "radio": "supported",
-      "signature": "unsupported"
+      "signature": "supported_unsigned_widget_only"
     },
     "behaviors": {
       "prefilled_values": "supported",
@@ -43,6 +43,50 @@
           "edit_or_toggle",
           "save"
         ]
+      },
+      "chrome_pdfium": {
+        "status": "unverified"
+      },
+      "pdfjs": {
+        "status": "unverified"
+      }
+    },
+    "signature_widget_viewers": {
+      "adobe_acrobat_reader": {
+        "status": "unverified"
+      },
+      "apple_preview": {
+        "status": "unverified"
+      },
+      "chrome_pdfium": {
+        "status": "unverified"
+      },
+      "pdfjs": {
+        "status": "unverified"
+      }
+    }
+  },
+  "signing_preparation": {
+    "capabilities": {
+      "external_artifact_prepare": "supported"
+    },
+    "behaviors": {
+      "final_byte_handoff": "supported",
+      "adapter_local_metadata_isolation": "supported"
+    },
+    "boundaries": {
+      "digital_signatures": "unsupported",
+      "signer_identity_trust": "unsupported",
+      "cryptographic_validity": "unsupported",
+      "tamper_evidence": "unsupported",
+      "pades_ltv_tsa_ocsp_crl": "unsupported"
+    },
+    "viewers": {
+      "adobe_acrobat_reader": {
+        "status": "unverified"
+      },
+      "apple_preview": {
+        "status": "unverified"
       },
       "chrome_pdfium": {
         "status": "unverified"
