@@ -10,13 +10,13 @@
 
 - [x] **SIGN-01**: Engineers can author unsigned signature fields through Rendro's public authored-PDF API without introducing a parallel rendering path.
 - [x] **SIGN-02**: Validation rejects unsupported, ambiguous, or scope-breaking signature-field state before render.
-- [ ] **SIGN-03**: Rendro serializes the required AcroForm, widget, and signature-related PDF structures deterministically for identical authored inputs.
+- [x] **SIGN-03**: Rendro serializes the required AcroForm, widget, and signature-related PDF structures deterministically for identical authored inputs.
 
 ### External Signing Preparation
 
-- [ ] **PREP-01**: Engineers can prepare a rendered `%Rendro.Artifact{}` for external signing through an artifact-first API that does not change `Rendro.render/2` semantics.
-- [ ] **PREP-02**: The signing-preparation seam operates on final artifact bytes and preserves a clear terminal handoff boundary for append or incremental signing workflows.
-- [ ] **PREP-03**: Key custody, certificate management, and signer-specific trust operations remain outside Rendro core and inside optional adapters or external workflows.
+- [x] **PREP-01**: Engineers can prepare a rendered `%Rendro.Artifact{}` for external signing through an artifact-first API that does not change `Rendro.render/2` semantics.
+- [x] **PREP-02**: The signing-preparation seam operates on final artifact bytes and preserves a clear terminal handoff boundary for append or incremental signing workflows.
+- [x] **PREP-03**: Key custody, certificate management, and signer-specific trust operations remain outside Rendro core and inside optional adapters or external workflows.
 
 ### Truthful Support Boundaries
 
@@ -36,10 +36,10 @@
 |-------------|---------------|-------|
 | SIGN-01 | Phase 58 | Closed by Phase 58 via `55-VERIFICATION.md`; implementation shipped in Phase 55 |
 | SIGN-02 | Phase 58 | Closed by Phase 58 via `55-VERIFICATION.md`; implementation shipped in Phase 55 |
-| SIGN-03 | Phase 59 | Reopened by v2.0 audit pending `56-VERIFICATION.md` backfill |
-| PREP-01 | Phase 59 | Reopened by v2.0 audit pending `56-VERIFICATION.md` backfill |
-| PREP-02 | Phase 59 | Reopened by v2.0 audit pending `56-VERIFICATION.md` backfill |
-| PREP-03 | Phase 59 | Reopened by v2.0 audit pending `56-VERIFICATION.md` backfill |
+| SIGN-03 | Phase 59 | Closed in Phase 59 by audit backfill via `56-VERIFICATION.md`; shipped in Phase 56 |
+| PREP-01 | Phase 59 | Closed in Phase 59 by audit backfill via `56-VERIFICATION.md`; shipped in Phase 56 |
+| PREP-02 | Phase 59 | Closed in Phase 59 by audit backfill via `56-VERIFICATION.md`; shipped in Phase 56 |
+| PREP-03 | Phase 59 | Closed in Phase 59 by audit backfill via `56-VERIFICATION.md`; shipped in Phase 56 |
 | TRUST-01 | Phase 57 | Support matrix updates |
 | TRUST-02 | Phase 57 | Docs and support-boundary wording |
 | TRUST-03 | Phase 57 | Proof and viewer-promotion discipline |
