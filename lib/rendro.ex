@@ -212,6 +212,11 @@ defmodule Rendro do
     struct!(Block, Keyword.put(block_attrs, :content, field))
   end
 
+  @spec signature_field(String.t(), keyword()) :: Block.t()
+  def signature_field(name, attrs \\ []) do
+    form_field(name, "", Keyword.put(attrs, :type, :signature))
+  end
+
   @doc """
   Wraps exactly one authored block with a curated external URI or internal page target.
   """

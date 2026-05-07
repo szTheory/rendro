@@ -3,12 +3,13 @@ defmodule Rendro.FormField do
   Interactive form field content with deterministic authoring defaults.
 
   Supported widget families stay intentionally narrow: text fields, checkboxes,
-  and radio widgets only. Authoring-time editing appearance configuration is
-  currently limited to the built-in Helvetica path.
+  radio widgets, and unsigned signature placeholders only. Authoring-time
+  editing appearance configuration is currently limited to the built-in
+  Helvetica path.
   """
 
-  @typedoc "Supported AcroForm widget families exposed through `Rendro.form_field/3`."
-  @type field_type :: :text | :checkbox | :radio
+  @typedoc "Supported AcroForm widget families exposed through Rendro's form-field builders."
+  @type field_type :: :text | :checkbox | :radio | :signature
   @type editing_font :: String.t()
 
   @enforce_keys [:name]
