@@ -20,6 +20,21 @@ defmodule Rendro do
     Text
   }
 
+  @signature_rejection_attrs [
+    :reason,
+    :location,
+    :contact,
+    :signing_date,
+    :lock,
+    :seed_value,
+    :certification,
+    :filter,
+    :subfilter,
+    :byte_range,
+    :contents,
+    :reference
+  ]
+
   @type render_option :: {:output, Path.t()} | {:deterministic, boolean()}
   @type render_options :: [render_option()]
 
@@ -205,8 +220,14 @@ defmodule Rendro do
 
   @spec form_field(String.t(), String.t(), keyword()) :: Block.t()
   def form_field(name, value \\ "", attrs \\ []) do
+    type = Keyword.get(attrs, :type, :text)
+    {signature_rejections, attrs} = extract_signature_rejections(type, attrs)
+
     {field_attrs, block_attrs} =
       Keyword.split(attrs, [:font, :size, :type, :checked, :group, :export_value])
+
+    field_attrs =
+      maybe_put_signature_rejections(field_attrs, type, signature_rejections)
 
     field = struct!(FormField, Keyword.merge(field_attrs, name: name, value: value))
     struct!(Block, Keyword.put(block_attrs, :content, field))
@@ -270,6 +291,18 @@ defmodule Rendro do
                 " (or temporary alias :atomic); got: #{inspect(split_policy)}"
     end
   end
+
+  defp extract_signature_rejections(:signature, attrs) do
+    Keyword.split(attrs, @signature_rejection_attrs)
+  end
+
+  defp extract_signature_rejections(_type, attrs), do: {[], attrs}
+
+  defp maybe_put_signature_rejections(field_attrs, :signature, signature_rejections) do
+    Keyword.put(field_attrs, :signature_rejections, signature_rejections)
+  end
+
+  defp maybe_put_signature_rejections(field_attrs, _type, _signature_rejections), do: field_attrs
 
   defp normalize_text_attrs(attrs) do
     case Keyword.fetch(attrs, :font) do

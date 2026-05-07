@@ -3,13 +3,14 @@ defmodule Rendro.Rules.CheckFormFields do
 
   alias Rendro.{Block, Document, FormField, Page, Row, Table, Text}
 
-  @supported_types [:text, :checkbox, :radio]
+  @supported_types [:text, :checkbox, :radio, :signature]
 
   def check(%Document{} = doc, _root_doc) do
     errors =
       duplicate_form_field_names(doc) ++
         duplicate_radio_export_values(doc) ++
-        duplicate_checked_radio_groups(doc)
+        duplicate_checked_radio_groups(doc) ++
+        invalid_signature_placeholder_bounds(doc)
 
     case errors do
       [] -> :ok
@@ -35,6 +36,9 @@ defmodule Rendro.Rules.CheckFormFields do
 
   defp check_field_contract(%FormField{type: :text, value: value}) when not is_binary(value),
     do: {:error, {:invalid_form_field_value, value}}
+
+  defp check_field_contract(%FormField{type: :signature} = field),
+    do: check_signature_field_contract(field)
 
   defp check_field_contract(%FormField{font: font} = field) do
     if font == Text.default_font() do
@@ -78,6 +82,26 @@ defmodule Rendro.Rules.CheckFormFields do
        do: {:error, {:invalid_form_field_value, value}}
 
   defp check_export_value_contract(%FormField{}), do: :ok
+
+  defp check_signature_field_contract(%FormField{value: value}) when value != "",
+    do: {:error, {:unsupported_signature_value, value}}
+
+  defp check_signature_field_contract(%FormField{checked: checked}) when checked != false,
+    do: {:error, {:unsupported_signature_attr, :checked, checked}}
+
+  defp check_signature_field_contract(%FormField{group: group}) when not is_nil(group),
+    do: {:error, {:unsupported_signature_attr, :group, group}}
+
+  defp check_signature_field_contract(%FormField{export_value: export_value})
+       when export_value != "Yes",
+       do: {:error, {:unsupported_signature_attr, :export_value, export_value}}
+
+  defp check_signature_field_contract(%FormField{signature_rejections: [{key, value} | _rest]})
+       when is_atom(key),
+       do: {:error, {:unsupported_signature_attr, key, value}}
+
+  defp check_signature_field_contract(%FormField{} = field),
+    do: check_field_contract(%{field | type: :text})
 
   defp duplicate_form_field_names(%Document{} = doc) do
     fields = collect_form_fields(doc)
@@ -140,6 +164,38 @@ defmodule Rendro.Rules.CheckFormFields do
 
   defp collect_row_form_fields(%Row{cells: cells}) do
     Enum.flat_map(cells, fn %Rendro.Cell{content: block} -> collect_block_form_fields(block) end)
+  end
+
+  defp invalid_signature_placeholder_bounds(%Document{pages: pages}) do
+    Enum.flat_map(pages, &invalid_signature_placeholder_bounds/1)
+  end
+
+  defp invalid_signature_placeholder_bounds(%Page{blocks: blocks}) do
+    Enum.flat_map(blocks, &invalid_signature_placeholder_bounds/1)
+  end
+
+  defp invalid_signature_placeholder_bounds(%Block{
+         content: %Table{} = table
+       }) do
+    invalid_signature_placeholder_bounds(table.header) ++
+      Enum.flat_map(table.rows, &invalid_signature_placeholder_bounds/1)
+  end
+
+  defp invalid_signature_placeholder_bounds(%Block{
+         content: %FormField{type: :signature, name: name},
+         width: width,
+         height: height
+       })
+       when not (is_number(width) and width > 0 and is_number(height) and height > 0),
+       do: [{:invalid_signature_placeholder_bounds, name}]
+
+  defp invalid_signature_placeholder_bounds(%Block{}), do: []
+  defp invalid_signature_placeholder_bounds(nil), do: []
+
+  defp invalid_signature_placeholder_bounds(%Row{cells: cells}) do
+    Enum.flat_map(cells, fn %Rendro.Cell{content: block} ->
+      invalid_signature_placeholder_bounds(block)
+    end)
   end
 
   defp duplicate_strings(values) do
