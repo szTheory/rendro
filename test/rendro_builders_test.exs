@@ -78,6 +78,28 @@ defmodule RendroBuildersTest do
       assert radio_field.export_value == "email"
     end
 
+    test "signature_field/2 builds a Block containing a signature FormField" do
+      block =
+        Rendro.signature_field("customer_signature",
+          x: 72,
+          y: 96,
+          width: 180,
+          height: 48
+        )
+
+      assert %Block{
+               x: 72,
+               y: 96,
+               width: 180,
+               height: 48,
+               content: %FormField{
+                 type: :signature,
+                 name: "customer_signature",
+                 value: ""
+               }
+             } = block
+    end
+
     test "link/2 wraps a block with an explicit URI target" do
       text = Rendro.text("Read the guide")
       block = Rendro.block(text, x: 10, y: 20, width: 180, height: 24)
