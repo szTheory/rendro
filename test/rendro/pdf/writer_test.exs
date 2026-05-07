@@ -84,6 +84,31 @@ defmodule Rendro.PDF.WriterTest do
     }
   end
 
+  defp signature_field_document(attrs \\ []) do
+    field =
+      Rendro.signature_field(
+        Keyword.get(attrs, :name, "customer_signature"),
+        x: Keyword.get(attrs, :x, 10),
+        y: Keyword.get(attrs, :y, 20),
+        width: Keyword.get(attrs, :width, 180),
+        height: Keyword.get(attrs, :height, 48)
+      )
+
+    page =
+      %Rendro.Page{
+        width: Keyword.get(attrs, :page_width, 612),
+        height: Keyword.get(attrs, :page_height, 792),
+        margin_left: Keyword.get(attrs, :margin_left, 72),
+        margin_top: Keyword.get(attrs, :margin_top, 72),
+        blocks: [field]
+      }
+
+    %Rendro.Document{
+      pages: [page],
+      metadata: %Rendro.Metadata{title: "Signature Form Document"}
+    }
+  end
+
   defp embedded_file_document(metadata \\ []) do
     created_at = Keyword.get(metadata, :created_at, ~U[2026-05-05 14:00:00Z])
 
@@ -380,6 +405,41 @@ defmodule Rendro.PDF.WriterTest do
       assert pdf =~ "/Rect [82 680 102 700]"
       assert pdf =~ "/Rect [112 680 132 700]"
       assert length(Regex.scan(~r|/Subtype /Widget|, pdf)) == 2
+      refute pdf =~ "/NeedAppearances"
+    end
+
+    test "serializes unsigned signature widgets through the standalone AcroForm seam" do
+      {:ok, pdf} =
+        Writer.render(
+          signature_field_document(
+            name: "customer_signature",
+            x: 10,
+            y: 20,
+            width: 180,
+            height: 48,
+            page_width: 612,
+            page_height: 792,
+            margin_left: 72,
+            margin_top: 72
+          ),
+          deterministic: true
+        )
+
+      assert pdf =~ "/AcroForm <<"
+      assert pdf =~ "/Fields ["
+      assert pdf =~ "/Subtype /Widget"
+      assert pdf =~ "/FT /Sig"
+      assert pdf =~ "/Rect [82 652 262 700]"
+      assert pdf =~ "/T (customer_signature)"
+      assert pdf =~ "/AP <<"
+      refute pdf =~ "/V"
+      refute pdf =~ "/Contents"
+      refute pdf =~ "/ByteRange"
+      refute pdf =~ "/Lock"
+      refute pdf =~ "/SV"
+      refute pdf =~ "/Reference"
+      refute pdf =~ "/Filter"
+      refute pdf =~ "/SubFilter"
       refute pdf =~ "/NeedAppearances"
     end
 

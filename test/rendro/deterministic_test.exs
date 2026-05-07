@@ -103,6 +103,21 @@ defmodule Rendro.DeterministicTest do
     end
   end
 
+  describe "signature widget determinism" do
+    test "deterministic output stays byte-identical for the same unsigned signature document" do
+      doc = signature_field_doc()
+      {:ok, pdf1} = Rendro.render(doc, deterministic: true)
+      {:ok, pdf2} = Rendro.render(doc, deterministic: true)
+
+      assert pdf1 == pdf2
+      assert pdf1 =~ "/Subtype /Widget"
+      assert pdf1 =~ "/FT /Sig"
+      refute pdf1 =~ "/ByteRange"
+      refute pdf1 =~ "/Contents"
+      refute pdf1 =~ "/V"
+    end
+  end
+
   describe "embedded font parity" do
     test "the same resolved embedded font drives deterministic wrapping, pagination, and final PDF resources" do
       %{bytes: bytes} = FontFixture.supported_font()
@@ -305,6 +320,29 @@ defmodule Rendro.DeterministicTest do
         mime_type: "text/plain"
       )
     end)
+  end
+
+  defp signature_field_doc do
+    signature =
+      Rendro.signature_field("customer_signature",
+        x: 10,
+        y: 20,
+        width: 180,
+        height: 48
+      )
+
+    %Rendro.Document{
+      pages: [
+        %Rendro.Page{
+          width: 612,
+          height: 792,
+          margin_left: 72,
+          margin_top: 72,
+          blocks: [signature]
+        }
+      ],
+      metadata: %Rendro.Metadata{title: "Signature Determinism"}
+    }
   end
 
   defp dictionary_key_groups(pdf) do
