@@ -35,8 +35,8 @@ defmodule Rendro.Rules.CheckFormFieldsTest do
                CheckFormFields.check(%FormField{name: "billing.email"}, %Document{})
     end
 
-    test "returns an error for unsupported widget types" do
-      assert {:error, {:invalid_form_field_type, :signature}} =
+    test "accepts signature fields that stay within the unsigned placeholder contract" do
+      assert :ok =
                CheckFormFields.check(%FormField{name: "sig", type: :signature}, %Document{})
     end
 
@@ -110,6 +110,105 @@ defmodule Rendro.Rules.CheckFormFieldsTest do
                  },
                  %Document{}
                )
+    end
+
+    test "rejects authored values on signature fields" do
+      assert {:error, {:unsupported_signature_value, "signed"}} =
+               CheckFormFields.check(
+                 %FormField{name: "sig", type: :signature, value: "signed"},
+                 %Document{}
+               )
+    end
+
+    test "rejects checked carryover attrs on signature fields" do
+      assert {:error, {:unsupported_signature_attr, :checked, true}} =
+               CheckFormFields.check(
+                 %FormField{name: "sig", type: :signature, checked: true},
+                 %Document{}
+               )
+    end
+
+    test "rejects group carryover attrs on signature fields" do
+      assert {:error, {:unsupported_signature_attr, :group, "contact"}} =
+               CheckFormFields.check(
+                 %FormField{name: "sig", type: :signature, group: "contact"},
+                 %Document{}
+               )
+    end
+
+    test "rejects export_value carryover attrs on signature fields" do
+      assert {:error, {:unsupported_signature_attr, :export_value, "On"}} =
+               CheckFormFields.check(
+                 %FormField{name: "sig", type: :signature, export_value: "On"},
+                 %Document{}
+               )
+    end
+
+    test "rejects signer metadata carried on signature fields" do
+      assert {:error, {:unsupported_signature_attr, :reason, "Approved"}} =
+               CheckFormFields.check(
+                 %FormField{
+                   name: "sig",
+                   type: :signature,
+                   signature_rejections: [reason: "Approved"]
+                 },
+                 %Document{}
+               )
+
+      assert {:error, {:unsupported_signature_attr, :location, "NYC"}} =
+               CheckFormFields.check(
+                 %FormField{
+                   name: "sig",
+                   type: :signature,
+                   signature_rejections: [location: "NYC"]
+                 },
+                 %Document{}
+               )
+
+      assert {:error, {:unsupported_signature_attr, :contact, "jon@example.com"}} =
+               CheckFormFields.check(
+                 %FormField{
+                   name: "sig",
+                   type: :signature,
+                   signature_rejections: [contact: "jon@example.com"]
+                 },
+                 %Document{}
+               )
+
+      assert {:error, {:unsupported_signature_attr, :signing_date, ~D[2026-05-06]}} =
+               CheckFormFields.check(
+                 %FormField{
+                   name: "sig",
+                   type: :signature,
+                   signature_rejections: [signing_date: ~D[2026-05-06]]
+                 },
+                 %Document{}
+               )
+    end
+
+    test "rejects signing-specific attrs carried on signature fields" do
+      signature_attrs = [
+        lock: %{action: :all},
+        seed_value: %{digest: :sha256},
+        certification: :doc_mdp,
+        filter: "Adobe.PPKLite",
+        subfilter: "adbe.pkcs7.detached",
+        byte_range: [0, 100, 200, 50],
+        contents: <<1, 2, 3>>,
+        reference: [%{transform_method: :doc_mdp}]
+      ]
+
+      Enum.each(signature_attrs, fn {key, value} ->
+        assert {:error, {:unsupported_signature_attr, ^key, ^value}} =
+                 CheckFormFields.check(
+                   %FormField{
+                     name: "sig",
+                     type: :signature,
+                     signature_rejections: [{key, value}]
+                   },
+                   %Document{}
+                 )
+      end)
     end
   end
 

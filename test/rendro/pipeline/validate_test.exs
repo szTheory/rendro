@@ -80,6 +80,41 @@ defmodule Rendro.Pipeline.ValidateTest do
       assert {:duplicate_radio_export_value, "contact", "email"} in errors
     end
 
+    test "reports signature-specific validate errors for blocked attrs and zero-rect placeholders" do
+      doc =
+        %Document{
+          pages: [
+            %Page{
+              width: 500,
+              height: 500,
+              blocks: [
+                %Block{
+                  content: %FormField{
+                    name: "customer_signature",
+                    type: :signature,
+                    signature_rejections: [reason: "Approved"]
+                  },
+                  x: 10,
+                  y: 20,
+                  width: 0,
+                  height: 48
+                }
+              ]
+            }
+          ]
+        }
+
+      assert {:error,
+              %Rendro.Error{
+                stage: :validate,
+                reason: :structural_corruption,
+                details: %{errors: errors}
+              }} = Validate.run(doc)
+
+      assert {:unsupported_signature_attr, :reason, "Approved"} in errors
+      assert {:invalid_signature_placeholder_bounds, "customer_signature"} in errors
+    end
+
     test "aggregates embedded-file semantic failures alongside other validation errors" do
       doc =
         %Document{
