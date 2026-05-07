@@ -8,6 +8,9 @@
     }
   },
   "forms": {
+    "authored_helpers": {
+      "signature_field": "supported_unsigned_placeholder_only"
+    },
     "widgets": {
       "text": "supported",
       "checkbox": "supported",

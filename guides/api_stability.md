@@ -25,11 +25,15 @@ When an API is deprecated:
 
 ## Interactive Forms Support Boundary
 
-Rendro supports authored AcroForm text fields, checkboxes, and radio groups.
+Rendro supports authored AcroForm text fields, checkboxes, radio groups, and the explicit `Rendro.signature_field/2` helper for unsigned signature placeholders.
 
 Structural validation through `pdfinfo`/Poppler proves PDF structure only. It does not prove interactive viewer behavior.
 
-Apple Preview is supported for this phase based on the recorded Phase 47 viewer checklist. Adobe Acrobat Reader remains `unverified` until the same checklist records passing open, visible default state, edit/toggle, and save behavior.
+The `Rendro.signature_field/2` helper is an authored unsigned-placeholder contract only. Phase 55 does not yet claim rendered signature-widget support, viewer support for signature fields, or digital-signature behavior.
+
+Digital signatures, signer metadata, tamper evidence, compliance narratives, and PAdES/LTV/TSA/OCSP/CRL support remain unsupported.
+
+For text fields, checkboxes, and radio groups, Apple Preview is supported for this phase based on the recorded Phase 47 viewer checklist. Adobe Acrobat Reader remains `unverified` until the same checklist records passing open, visible default state, edit/toggle, and save behavior.
 
 Other viewers are not part of Rendro's supported contract unless `priv/support_matrix.json` later records proof-backed support for them.
 
