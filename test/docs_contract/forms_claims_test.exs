@@ -47,6 +47,10 @@ defmodule Rendro.DocsContract.FormsClaimsTest do
 
     refute guide =~ "standard PDF viewers"
     refute guide =~ "Adobe Acrobat Reader is supported"
+    refute guide =~ "digital signatures are supported"
+    refute guide =~ "signature widgets are supported"
+    refute guide =~ "PAdES is supported"
+    refute guide =~ "viewer-proofed digital signatures"
   end
 
   test "the canonical docs verification script includes the forms claims lane" do
