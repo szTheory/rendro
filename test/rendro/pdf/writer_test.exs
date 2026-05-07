@@ -408,7 +408,7 @@ defmodule Rendro.PDF.WriterTest do
       refute pdf =~ "/NeedAppearances"
     end
 
-    test "serializes unsigned signature widgets through the standalone AcroForm seam" do
+    test "serializes unsigned signature widgets without any signature value or trust dictionaries" do
       {:ok, pdf} =
         Writer.render(
           signature_field_document(
@@ -432,6 +432,8 @@ defmodule Rendro.PDF.WriterTest do
       assert pdf =~ "/Rect [82 652 262 700]"
       assert pdf =~ "/T (customer_signature)"
       assert pdf =~ "/AP <<"
+      # This proof lane is intentionally structural-only: it proves an unsigned
+      # `/Sig` widget exists while signing-value and policy dictionaries remain absent.
       refute pdf =~ "/V"
       refute pdf =~ "/Contents <"
       refute pdf =~ "/Contents ("

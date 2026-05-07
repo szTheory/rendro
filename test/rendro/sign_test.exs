@@ -37,7 +37,7 @@ defmodule Rendro.SignTest do
     artifact
   end
 
-  test "prepare/2 wraps prepared bytes back into an artifact with a narrow manifest" do
+  test "prepare/2 proves prepared-artifact coordinates only and not signer or compliance state" do
     assert {:ok, prepared} =
              Sign.prepare(signature_artifact(), field: "customer_signature", reserved_bytes: 8192)
 
@@ -67,9 +67,13 @@ defmodule Rendro.SignTest do
     assert binary_part(prepared.binary, byte_range_offset, byte_range_length) =~ "/ByteRange ["
     assert binary_part(prepared.binary, contents_offset, contents_length) =~ ~r/\A[0-9A-F]+\z/
     refute Map.has_key?(prepared.metadata.signing_preparation, :adapter)
+    refute inspect(prepared.metadata.signing_preparation) =~ "signer"
     refute inspect(prepared.metadata.signing_preparation) =~ "certificate"
     refute inspect(prepared.metadata.signing_preparation) =~ "trust"
     refute inspect(prepared.metadata.signing_preparation) =~ "pkcs7"
+    refute inspect(prepared.metadata.signing_preparation) =~ "pades"
+    refute inspect(prepared.metadata.signing_preparation) =~ "ocsp"
+    refute inspect(prepared.metadata.signing_preparation) =~ "crl"
   end
 
   test "prepare/2 rejects malformed top-level options" do
@@ -152,5 +156,7 @@ defmodule Rendro.SignTest do
            }
 
     refute Map.has_key?(prepared.metadata.signing_preparation, :fake_signer)
+    refute inspect(prepared.metadata.signing_preparation_adapter) =~ "certificate"
+    refute inspect(prepared.metadata.signing_preparation_adapter) =~ "trust"
   end
 end
