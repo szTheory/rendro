@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: signature-fields-and-external-signing-preparation
-status: ready_to_plan
-last_updated: "2026-05-07T01:48:49Z"
-last_activity: 2026-05-06 — Phase 56 executed with deterministic signature widgets and artifact-first signing preparation
+status: phase_complete
+last_updated: "2026-05-07T10:29:17Z"
+last_activity: 2026-05-07 — Phase 57 executed with truthful signature support boundaries, proof-lane separation, and milestone-close verification
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 6
-  completed_plans: 4
-  percent: 67
+  completed_plans: 6
+  percent: 100
 ---
 
 # Project State
@@ -20,20 +20,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-06 after v1.9 close)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Plan Phase 57 `Support Contract and Proof Closure` on top of the completed Phase 56 writer and preparation seams.
+**Current focus:** Close out the completed `v2.0` signature milestone and route the next milestone or release work.
 
 ## Current Position
 
 Phase: 57 (Support Contract and Proof Closure)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-05-06 — Phase 56 completed and Phase 57 unblocked
+Plan: Complete
+Status: Phase complete
+Last activity: 2026-05-07 — Phase 57 completed with published support boundaries and verification artifacts
 
-Progress: [=======...] 67%
+Progress: [==========] 100%
 
 ## Milestone Snapshot
 
-- Active milestone: `v2.0 Signature Fields & External Signing Preparation` (Phases 55-56 complete; Phase 57 ready to plan).
+- Active milestone: `v2.0 Signature Fields & External Signing Preparation` (Phases 55-57 complete; milestone ready for closeout/release routing).
 - Last shipped: `v1.10 Protected Delivery Hooks & Encryption Boundaries (2026-05-06)` — see `milestones/v1.10-ROADMAP.md`.
 - Phase numbering continues from v1.10 — v2.0 currently sits at completed Phase 55 / upcoming Phase 56.
 
@@ -66,7 +66,7 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 
 - `v1.9` closed 2026-05-06 as a shipped milestone — embedded artifact surfaces (document-level embedded files + curated links).
 - `v1.10` closed 2026-05-06 as a shipped milestone — protected delivery hooks and encryption boundaries (external hooks first, narrow security claims, proof-backed validation before any in-core encryption).
-- `v2.0` is now active — Phase 55 shipped the unsigned signature authoring contract, Phase 56 shipped deterministic widget serialization plus artifact-first signing preparation, and Phase 57 now remains for truthful support-boundary publication and proof closure.
+- `v2.0` is complete — Phase 55 shipped the unsigned signature authoring contract, Phase 56 shipped deterministic widget serialization plus artifact-first signing preparation, and Phase 57 closed the public support boundary with proof-backed docs and verification artifacts.
 
 ### Pending Todos
 
