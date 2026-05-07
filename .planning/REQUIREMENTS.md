@@ -8,8 +8,8 @@
 
 ### Signature Fields
 
-- [ ] **SIGN-01**: Engineers can author unsigned signature fields through Rendro's public authored-PDF API without introducing a parallel rendering path.
-- [ ] **SIGN-02**: Validation rejects unsupported, ambiguous, or scope-breaking signature-field state before render.
+- [x] **SIGN-01**: Engineers can author unsigned signature fields through Rendro's public authored-PDF API without introducing a parallel rendering path.
+- [x] **SIGN-02**: Validation rejects unsupported, ambiguous, or scope-breaking signature-field state before render.
 - [ ] **SIGN-03**: Rendro serializes the required AcroForm, widget, and signature-related PDF structures deterministically for identical authored inputs.
 
 ### External Signing Preparation

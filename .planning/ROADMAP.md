@@ -69,7 +69,7 @@ This roadmap defines the strategic arcs that turn Rendro into the production-rea
 * **Support-Boundary Discipline:**
   * Proof-backed validation before any native encryption story expands.
 
-## Milestone 7: Signature Fields & External Signing Preparation (Next)
+## Milestone 7: Signature Fields & External Signing Preparation (Active)
 **Focus:** Add narrow signing preparation surfaces while keeping actual cryptographic trust operations explicit and separately bounded.
 
 * **Unsigned Signature Fields:**
