@@ -1,36 +1,35 @@
 defmodule Rendro.DocsContract.SigningClaimsTest do
   use ExUnit.Case, async: true
 
-  test "support matrix publishes signing preparation as a narrow sibling family" do
+  test "support matrix publishes long-lived support as a nested signing subtree" do
     matrix = File.read!("priv/support_matrix.json")
 
     assert matrix =~ ~s|"signing_preparation"|
     assert matrix =~ ~s|"signing"|
-    assert matrix =~ ~s|"external_artifact_prepare": "supported"|
-    assert matrix =~ ~s|"final_byte_handoff": "supported"|
-    assert matrix =~ ~s|"adapter_local_metadata_isolation": "supported"|
-    assert matrix =~ ~s|"artifact_first_external_signing": "supported"|
-    assert matrix =~ ~s|"pyhanko_pemder_existing_field": "supported"|
-    assert matrix =~ ~s|"signed_artifact_output": "supported"|
-    assert matrix =~ ~s|"signed_artifact_validation_via_pdfsig": "supported"|
-    assert matrix =~ ~s|"deterministic_output": "unsupported"|
-    assert matrix =~ ~s|"digital_signatures": "unsupported"|
-    assert matrix =~ ~s|"signer_identity_trust": "unsupported"|
-    assert matrix =~ ~s|"cryptographic_validity": "unsupported"|
-    assert matrix =~ ~s|"tamper_evidence_narratives": "unsupported"|
-    assert matrix =~ ~s|"pades_ltv_tsa_ocsp_crl": "unsupported"|
+    assert matrix =~ ~s|"long_lived"|
+    assert matrix =~ ~s|"pyhanko_sign_augment_validate_existing_field": "supported"|
+    assert matrix =~ ~s|"timestamp_posture_via_pyhanko": "supported"|
+    assert matrix =~ ~s|"revocation_evidence_via_pyhanko": "supported"|
+    assert matrix =~ ~s|"embedded_validation_evidence_posture": "supported"|
+    assert matrix =~ ~s|"certificate_trust_is_separate": "supported"|
+    assert matrix =~ ~s|"pdfsig_integrity_parity": "supported_secondary"|
+    assert matrix =~ ~s|"viewer_promotion": "unsupported"|
+    assert matrix =~ ~s|"lt_lta_profile_marketing": "unsupported"|
+    assert matrix =~ ~s|"blanket_compliance_claims": "unsupported"|
     assert matrix =~ ~s|"multi_signature_workflows": "unsupported"|
 
     assert matrix =~
-             ~r/"signing_preparation".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+             ~r/"signing".*?"long_lived".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
 
     assert matrix =~
-             ~r/"signing_preparation".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+             ~r/"signing".*?"long_lived".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
 
+    refute matrix =~ ~s|"long_lived": "supported"|
     refute matrix =~ ~s|"tamper_evidence_narratives": "supported"|
+    refute matrix =~ ~r/^  "long_lived"\s*:/m
   end
 
-  test "signature-specific viewer rows stay unverified unless a named checklist promotes that exact surface" do
+  test "signature-specific and long-lived viewer rows stay unverified" do
     matrix = File.read!("priv/support_matrix.json")
 
     assert matrix =~
@@ -43,43 +42,48 @@ defmodule Rendro.DocsContract.SigningClaimsTest do
              ~r/"signing_preparation".*?"chrome_pdfium"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
 
     assert matrix =~
-             ~r/"signing".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+             ~r/"signing".*?"viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+
+    assert matrix =~
+             ~r/"signing".*?"long_lived".*?"pdfjs"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
 
     refute matrix =~ ~s|targeted for verification|
   end
 
-  test "api stability guide keeps signing preparation and signed-artifact claims narrow" do
+  test "api stability guide keeps signing, long-lived, trust, and compliance claims separate" do
     guide = File.read!("guides/api_stability.md")
 
     assert guide =~ "## Signing Preparation Support Boundary"
     assert guide =~ "## Signed Artifact Support Boundary"
+    assert guide =~ "## Long-Lived Evidence Support Boundary"
 
     assert guide =~
              "Supported surface: `Rendro.Sign.prepare/2` is an artifact-first preparation seam over rendered `%Rendro.Artifact{}` bytes. It supports external artifact preparation, final byte handoff, and adapter-local metadata isolation."
 
     assert guide =~
-             "Proof lane: prepare-stage and manifest tests prove prepared-artifact coordinates and metadata boundaries only. This proof lane is separate from viewer behavior, signer execution, and cryptographic validity."
-
-    assert guide =~
-             "Unsupported narratives: external signer execution, signer identity or trust policy, digital-signature validity, tamper evidence, compliance narratives, and PAdES/LTV/TSA/OCSP/CRL support remain unsupported."
-
-    assert guide =~
-             "Signature-preparation viewer rows remain `unverified` unless a recorded checklist exists for that exact viewer and prepared-artifact surface."
-
-    assert guide =~
              "Supported surface: `Rendro.Sign.sign/2` and `Rendro.render_signed/3` sign a rendered unsigned-signature artifact through an optional external adapter."
 
     assert guide =~
-             "Important boundary: `Rendro.Sign.sign/2` operates on the original unsigned rendered artifact, not the placeholder-patched output from `Rendro.Sign.prepare/2`."
-
-    assert guide =~ "Signed output is explicitly non-deterministic."
+             "Supported surface: take a Rendro-rendered artifact, sign it through `Rendro.Sign.sign/2`, augment it through `Rendro.Sign.augment/2`, and validate timestamp, revocation, and embedded-validation-evidence posture through `Rendro.Sign.validate/2` with `adapter: Rendro.Adapters.PyHanko`."
 
     assert guide =~
-             "Signed-artifact viewer rows remain `unverified` unless a recorded checklist exists for that exact viewer and signing surface."
+             "Local recipe: `mix test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs`."
+
+    assert guide =~
+             "CI recipe: the dedicated `long-lived-live-proof` job runs the same tagged command after provisioning pyHanko, certomancer, and pdfsig."
+
+    assert guide =~
+             "Certificate trust is a separate question from timestamp and revocation evidence posture."
+
+    assert guide =~
+             "Long-lived viewer rows remain `unverified` in `priv/support_matrix.json` until a recorded checklist exists for that exact augmented-signature surface."
 
     refute guide =~ "tamper-evident signing"
     refute guide =~ "PAdES is supported"
+    refute guide =~ "LT/LTA is supported"
     refute guide =~ "all signature viewers are supported"
+    refute guide =~ "viewer portability is guaranteed"
+    refute guide =~ "Rendro owns signer identity trust"
   end
 
   test "docs verification script includes the signing claims lane" do

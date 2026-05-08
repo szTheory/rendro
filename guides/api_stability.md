@@ -63,6 +63,18 @@ Signed output is explicitly non-deterministic.
 
 Unsupported narratives: signer identity or trust, tamper-evidence marketing, compliance narratives, PAdES/LTV/TSA/OCSP/CRL support, and multi-signature workflows remain unsupported. Signed-artifact viewer rows remain `unverified` unless a recorded checklist exists for that exact viewer and signing surface.
 
+## Long-Lived Evidence Support Boundary
+
+Supported surface: take a Rendro-rendered artifact, sign it through `Rendro.Sign.sign/2`, augment it through `Rendro.Sign.augment/2`, and validate timestamp, revocation, and embedded-validation-evidence posture through `Rendro.Sign.validate/2` with `adapter: Rendro.Adapters.PyHanko`. `pdfsig` remains secondary and only confirms signed-artifact integrity after augmentation.
+
+Proof lane: the exact long-lived claim is backed by one opt-in live proof over runtime-generated PDFs plus checked-in non-secret certomancer fixtures that stand up a local TSA and revocation service. Local recipe: `mix test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs`. CI recipe: the dedicated `long-lived-live-proof` job runs the same tagged command after provisioning pyHanko, certomancer, and pdfsig.
+
+Certificate trust is a separate question from timestamp and revocation evidence posture. Long-lived evidence support does not mean Rendro owns signer identity policy, trust-store management, or viewer trust UX.
+
+Long-lived viewer rows remain `unverified` in `priv/support_matrix.json` until a recorded checklist exists for that exact augmented-signature surface.
+
+Unsupported narratives: signer identity or trust ownership, viewer promotion, LT/LTA profile claims, blanket compliance claims, and multi-signature workflows remain unsupported.
+
 ## Embedded Files Support Boundary
 
 Rendro supports document-level embedded files with explicit metadata.

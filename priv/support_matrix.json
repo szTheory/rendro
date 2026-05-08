@@ -106,6 +106,39 @@
       "signed_artifact_validation_via_pdfsig": "supported",
       "deterministic_output": "unsupported"
     },
+    "long_lived": {
+      "capabilities": {
+        "pyhanko_sign_augment_validate_existing_field": "supported"
+      },
+      "validation": {
+        "timestamp_posture_via_pyhanko": "supported",
+        "revocation_evidence_via_pyhanko": "supported",
+        "embedded_validation_evidence_posture": "supported",
+        "certificate_trust_is_separate": "supported",
+        "pdfsig_integrity_parity": "supported_secondary"
+      },
+      "boundaries": {
+        "signer_identity_trust": "unsupported",
+        "viewer_promotion": "unsupported",
+        "lt_lta_profile_marketing": "unsupported",
+        "blanket_compliance_claims": "unsupported",
+        "multi_signature_workflows": "unsupported"
+      },
+      "viewers": {
+        "adobe_acrobat_reader": {
+          "status": "unverified"
+        },
+        "apple_preview": {
+          "status": "unverified"
+        },
+        "chrome_pdfium": {
+          "status": "unverified"
+        },
+        "pdfjs": {
+          "status": "unverified"
+        }
+      }
+    },
     "boundaries": {
       "signer_identity_trust": "unsupported",
       "tamper_evidence_narratives": "unsupported",
