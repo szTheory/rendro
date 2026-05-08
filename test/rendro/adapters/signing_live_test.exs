@@ -15,8 +15,12 @@ defmodule Rendro.Adapters.SigningLiveTest do
                          |> Enum.map(&elem(&1, 0))
 
   @signing_skip_reason (case @signing_missing_tools do
-                          [] -> nil
-                          [tool] -> "live signing proof requires #{tool} on PATH"
+                          [] ->
+                            nil
+
+                          [tool] ->
+                            "live signing proof requires #{tool} on PATH"
+
                           tools ->
                             "live signing proof requires #{Enum.join(tools, " and ")} on PATH"
                         end)
@@ -30,8 +34,12 @@ defmodule Rendro.Adapters.SigningLiveTest do
                             |> Enum.map(&elem(&1, 0))
 
   @long_lived_skip_reason (case @long_lived_missing_tools do
-                             [] -> nil
-                             [tool] -> "live long-lived proof requires #{tool} on PATH"
+                             [] ->
+                               nil
+
+                             [tool] ->
+                               "live long-lived proof requires #{tool} on PATH"
+
                              tools ->
                                "live long-lived proof requires #{Enum.join(tools, " and ")} on PATH"
                            end)
