@@ -110,7 +110,8 @@ defmodule Rendro.Sign do
   def augment(%Artifact{} = artifact, opts) when is_list(opts) do
     with {:ok, normalized} <- normalize_augment_opts(opts),
          {:ok, :signed} <- ensure_augmentable_artifact(artifact),
-         {:ok, augmented_binary, adapter_metadata} <- normalized.adapter.augment(artifact, normalized) do
+         {:ok, augmented_binary, adapter_metadata} <-
+           normalized.adapter.augment(artifact, normalized) do
       metadata_updates = %{
         deterministic: false,
         long_lived: build_long_lived_metadata(normalized.adapter, adapter_metadata),
@@ -585,9 +586,9 @@ defmodule Rendro.Sign do
     {:error, Error.from_stage(:augment, :already_augmented, %{})}
   end
 
-  defp ensure_augmentable_artifact(
-         %Artifact{metadata: %{signing_preparation: %{status: :prepared}}}
-       ) do
+  defp ensure_augmentable_artifact(%Artifact{
+         metadata: %{signing_preparation: %{status: :prepared}}
+       }) do
     {:error, Error.from_stage(:augment, :prepared_artifact_not_augmentable, %{})}
   end
 
@@ -677,6 +678,9 @@ defmodule Rendro.Sign do
           Map.get(signature, :signature_validation) ||
           :unknown,
       trust: normalize_validation_trust(signature, adapter_opts),
+      timestamp: Map.get(signature, :timestamp, :unknown),
+      revocation: Map.get(signature, :revocation, :unknown),
+      compliance: normalize_validation_compliance(Map.get(signature, :compliance)),
       total_document_signed: Map.get(signature, :total_document_signed, false)
     }
   end
@@ -686,6 +690,9 @@ defmodule Rendro.Sign do
       field: nil,
       integrity: :unknown,
       trust: normalize_validation_trust(%{}, adapter_opts),
+      timestamp: :unknown,
+      revocation: :unknown,
+      compliance: normalize_validation_compliance(nil),
       total_document_signed: false
     }
   end
@@ -696,6 +703,29 @@ defmodule Rendro.Sign do
     else
       Map.get(signature, :trust) || Map.get(signature, :certificate_validation) || :unknown
     end
+  end
+
+  defp normalize_validation_compliance(%{} = compliance) do
+    proofs = Map.get(compliance, :proofs, %{})
+
+    %{
+      scope: :embedded_validation_evidence,
+      level: Map.get(compliance, :level, :not_assessed),
+      proofs: %{
+        document_timestamp: Map.get(proofs, :document_timestamp, false),
+        revocation_info: Map.get(proofs, :revocation_info, false)
+      },
+      gaps: Map.get(compliance, :gaps, [])
+    }
+  end
+
+  defp normalize_validation_compliance(_compliance) do
+    %{
+      scope: :embedded_validation_evidence,
+      level: :not_assessed,
+      proofs: %{document_timestamp: false, revocation_info: false},
+      gaps: []
+    }
   end
 
   defp make_validation_tmp_dir do

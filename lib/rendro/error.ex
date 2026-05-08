@@ -53,7 +53,9 @@ defmodule Rendro.Error do
     do: "PDF signing preparation failed while wrapping the rendered artifact."
 
   defp what(:sign, _reason), do: "PDF signing failed while wrapping the rendered artifact."
-  defp what(:augment, _reason), do: "PDF long-lived augmentation failed while wrapping the signed artifact."
+
+  defp what(:augment, _reason),
+    do: "PDF long-lived augmentation failed while wrapping the signed artifact."
 
   defp what(stage, _reason), do: "Render pipeline failed in stage #{inspect(stage)}."
 
@@ -78,6 +80,12 @@ defmodule Rendro.Error do
   defp why(:augment, {:invalid_option, :adapter_opts, value}),
     do: "Invalid long-lived augmentation option adapter_opts: #{inspect(value)}"
 
+  defp why(:augment, {:missing_required_adapter_option, option}),
+    do: "Missing required long-lived adapter option: #{option}"
+
+  defp why(:augment, {:invalid_adapter_option, option, value}),
+    do: "Invalid long-lived adapter option #{option}: #{inspect(value)}"
+
   defp why(:prepare, {:field_not_preparable, field}),
     do: "Rendered artifact does not expose a preparable signature field named #{field}"
 
@@ -92,6 +100,15 @@ defmodule Rendro.Error do
 
   defp why(:validate, {:invalid_pdf, :tool_failure}),
     do: "Signed-artifact validation tool failed before returning posture details"
+
+  defp why(:validate, {:missing_executable, "pyhanko"}),
+    do: "Signed-artifact validation requires pyhanko for long-lived evidence inspection"
+
+  defp why(:validate, {:missing_executable, "python"}),
+    do: "Signed-artifact validation helper requires python on the host"
+
+  defp why(:validate, {:missing_executable, "python3"}),
+    do: "Signed-artifact validation helper requires python3 on the host"
 
   defp why(_stage, {:unsupported_glyph, char}), do: "Missing glyph for character: #{char}"
 
@@ -142,16 +159,20 @@ defmodule Rendro.Error do
     do: "Prepared signature-placeholder artifacts are not signable through Rendro.Sign.sign/2"
 
   defp why(:augment, :unsigned_artifact_not_augmentable),
-    do: "Rendered artifact must already be a signed artifact before long-lived augmentation can run"
+    do:
+      "Rendered artifact must already be a signed artifact before long-lived augmentation can run"
 
   defp why(:augment, :prepared_artifact_not_augmentable),
-    do: "Prepared signature-placeholder artifacts are not augmentable through Rendro.Sign.augment/2"
+    do:
+      "Prepared signature-placeholder artifacts are not augmentable through Rendro.Sign.augment/2"
 
   defp why(:augment, :unsupported_artifact_state),
-    do: "Rendered artifact is missing the signed-artifact metadata required for long-lived augmentation"
+    do:
+      "Rendered artifact is missing the signed-artifact metadata required for long-lived augmentation"
 
   defp why(:augment, :already_augmented),
-    do: "Rendered artifact already appears to contain Rendro-managed long-lived augmentation metadata"
+    do:
+      "Rendered artifact already appears to contain Rendro-managed long-lived augmentation metadata"
 
   defp why(_stage, {:unknown_permissions, permissions}),
     do: "Unknown advisory permissions: #{Enum.map_join(permissions, ", ", &to_string/1)}"
@@ -256,6 +277,15 @@ defmodule Rendro.Error do
 
   defp next_step(:validate, {:missing_executable, "pdfsig"}) do
     "Install Poppler's `pdfsig` on the host or select a different validation adapter before calling Rendro.Sign.validate/2."
+  end
+
+  defp next_step(:validate, {:missing_executable, "pyhanko"}) do
+    "Install the pyHanko CLI (`pyhanko-cli`) on the host before calling Rendro.Sign.validate/2 with the long-lived evidence adapter."
+  end
+
+  defp next_step(:validate, {:missing_executable, executable})
+       when executable in ["python", "python3"] do
+    "Install Python on the host so Rendro's pyHanko validation helper can inspect embedded validation evidence."
   end
 
   defp next_step(:validate, {:invalid_pdf, :no_signatures}) do
@@ -364,6 +394,22 @@ defmodule Rendro.Error do
 
   defp next_step(:augment, {:invalid_option, :adapter_opts, _value}) do
     "Pass adapter_opts as a keyword list or map containing only adapter-local long-lived settings."
+  end
+
+  defp next_step(:augment, {:missing_required_adapter_option, :tsa_url}) do
+    "Pass adapter_opts with a non-empty :tsa_url so Rendro can add a document timestamp during augmentation."
+  end
+
+  defp next_step(:augment, {:missing_required_adapter_option, :trust_roots}) do
+    "Pass adapter_opts with one or more trust-root paths under :trust_roots so pyHanko can embed validation evidence."
+  end
+
+  defp next_step(:augment, {:missing_required_adapter_option, _option}) do
+    "Pass the required adapter-local long-lived settings in adapter_opts before calling Rendro.Sign.augment/2."
+  end
+
+  defp next_step(:augment, {:invalid_adapter_option, _option, _value}) do
+    "Use only the supported adapter-local long-lived options for Rendro.Adapters.PyHanko: :tsa_url, :trust_roots, and optional :other_certs."
   end
 
   defp next_step(:sign, {:missing_executable, "pyhanko"}) do
