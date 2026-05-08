@@ -14,7 +14,7 @@ Turn the proof-backed signing seam into a truthful long-lived-signature story by
 
 - [x] **SIGN-07**: Engineers can extend a supported signed `%Rendro.Artifact{}` through one explicit artifact-stage API that adds timestamp and revocation evidence without changing `Rendro.render/2` or bare `Rendro.Sign.sign/2` semantics.
 - [x] **SIGN-08**: Long-lived augmentation rejects unsigned artifacts, unsupported signature state, malformed adapter configuration, and secret-bearing runtime failures with typed, redacted errors.
-- [ ] **SIGN-09**: Long-lived artifacts expose explicit metadata describing timestamp, revocation, and compliance-evidence posture without persisting keys, passphrases, or raw tool output.
+- [x] **SIGN-09**: Long-lived artifacts expose explicit metadata describing timestamp, revocation, and compliance-evidence posture without persisting keys, passphrases, or raw tool output.
 
 ### Adapter and Validator Boundaries
 

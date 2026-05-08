@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: long-lived-signatures-and-compliance-evidence
 status: active
-last_updated: "2026-05-08T00:27:34Z"
-last_activity: 2026-05-08 — completed Phase 64 Plan 01 with the signed-artifact-only augment seam, augment-stage errors, and proof-backed rejection/redaction tests
+last_updated: "2026-05-08T00:30:19Z"
+last_activity: 2026-05-08 — completed Phase 64 with canonical long-lived artifact metadata, deterministic-vs-augmented proof, and unchanged support-contract surfaces
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 8
-  completed_plans: 1
-  percent: 12
+  completed_plans: 2
+  percent: 25
 ---
 
 # Project State
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-05-07 after v2.2 milestone definition)
 ## Current Position
 
 Phase: 64 long-lived-signature-artifact-contract
-Plan: 02 next
-Status: Plan 01 complete; ready to execute metadata posture and deterministic-vs-augmented proof in `64-02`
-Last activity: 2026-05-08 — Completed `64-01`, committed the public `Rendro.Sign.augment/2` seam, and closed `SIGN-07` plus `SIGN-08`
+Plan: none active
+Status: Phase 64 complete; ready to begin Phase 65 first-party long-lived adapter and validator execution
+Last activity: 2026-05-08 — Completed `64-02`, committed the canonical long-lived metadata contract, and closed `SIGN-09`
 
-Progress: [#---------] 12%
+Progress: [##--------] 25%
 
 ## Milestone Snapshot
 
@@ -67,6 +67,7 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 - [Phase 62]: Require `signing-live-proof` on `main` so the supported cryptographic-signing path remains an operational gate rather than advisory proof only.
 - [v2.2 planning]: Prioritize long-lived evidence as the next prerequisite between “can sign” and “production-credible signed workflow,” then follow with viewer-proof and adoption-closure milestones.
 - [Phase 64]: Keep long-lived support on one explicit `Rendro.Sign.augment/2` seam over already signed artifacts, with adapter `augment/2` callback validation and redacted `:augment` diagnostics.
+- [Phase 64]: Persist shared posture under `metadata.long_lived`, keep tool-shaped facts in `metadata.long_lived_adapter`, and force explicit non-determinism on every augmented artifact.
 
 ### Roadmap Evolution
 
@@ -78,7 +79,7 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 
 ### Pending Todos
 
-- Execute `64-02` to lock the shared long-lived metadata posture and deterministic-vs-augmented proof without widening support claims.
+- Begin Phase 65 to ship the first proof-backed long-lived adapter path and validator-backed posture classification on top of the completed Phase 64 contract.
 - Keep the v2.2 implementation artifact-first and proof-backed; do not widen into viewer or blanket compliance claims mid-milestone.
 - Preserve the new strategic arc so `v2.3` and `v2.4` planning can start from an explicit game plan instead of reopening milestone selection from scratch.
 
