@@ -113,11 +113,8 @@ defmodule Rendro.Sign do
          {:ok, augmented_binary, adapter_metadata} <- normalized.adapter.augment(artifact, normalized) do
       metadata_updates = %{
         deterministic: false,
-        long_lived_signing: %{
-          status: :augmented,
-          adapter: normalized.adapter
-        },
-        long_lived_signing_adapter: sanitize_augment_adapter_metadata(adapter_metadata)
+        long_lived: build_long_lived_metadata(normalized.adapter, adapter_metadata),
+        long_lived_adapter: sanitize_augment_adapter_metadata(adapter_metadata)
       }
 
       {:ok, Artifact.wrap(augmented_binary, artifact, metadata_updates)}
@@ -584,7 +581,7 @@ defmodule Rendro.Sign do
 
   defp sanitize_signing_adapter_metadata(_metadata), do: %{}
 
-  defp ensure_augmentable_artifact(%Artifact{metadata: %{long_lived_signing: %{status: :augmented}}}) do
+  defp ensure_augmentable_artifact(%Artifact{metadata: %{long_lived: %{status: :augmented}}}) do
     {:error, Error.from_stage(:augment, :already_augmented, %{})}
   end
 
@@ -610,16 +607,44 @@ defmodule Rendro.Sign do
     {:error, Error.from_stage(:augment, :unsigned_artifact_not_augmentable, %{})}
   end
 
+  defp build_long_lived_metadata(adapter, metadata) when is_map(metadata) do
+    %{
+      status: :augmented,
+      adapter: adapter
+    }
+    |> maybe_put_long_lived_posture(:timestamp, metadata)
+    |> maybe_put_long_lived_posture(:revocation, metadata)
+    |> maybe_put_long_lived_posture(:compliance_evidence, metadata)
+  end
+
+  defp build_long_lived_metadata(adapter, _metadata) do
+    %{status: :augmented, adapter: adapter}
+  end
+
+  defp maybe_put_long_lived_posture(acc, key, metadata) do
+    case Map.fetch(metadata, key) do
+      {:ok, value} -> Map.put(acc, key, value)
+      :error -> acc
+    end
+  end
+
   defp sanitize_augment_adapter_metadata(metadata) when is_map(metadata) do
     metadata
-    |> Map.take([:tool, :tool_family, :timestamp_profile, :revocation_profile, :evidence_profile])
+    |> Map.take([
+      :tool,
+      :tool_family,
+      :evidence_profile,
+      :timestamp_authority,
+      :revocation_sources,
+      :passphrase_supplied
+    ])
   end
 
   defp sanitize_augment_adapter_metadata(_metadata), do: %{}
 
   defp normalized_augment_artifact_state(%Artifact{metadata: metadata}) when is_map(metadata) do
     cond do
-      get_in(metadata, [:long_lived_signing, :status]) == :augmented -> :already_augmented
+      get_in(metadata, [:long_lived, :status]) == :augmented -> :already_augmented
       get_in(metadata, [:signing_preparation, :status]) == :prepared -> :prepared
       get_in(metadata, [:signing, :status]) == :signed -> :signed
       Map.get(metadata, :deterministic) == false -> :unsupported

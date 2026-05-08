@@ -24,7 +24,17 @@ defmodule Rendro.SignTest do
     @impl true
     def augment(%Artifact{binary: binary}, opts) do
       send(self(), {:fake_augment_called, opts})
-      {:ok, binary <> "-augmented", %{tool: :fake_signer, timestamp_profile: :pades_lt}}
+
+      {:ok, binary <> "-augmented",
+       %{
+         tool: :fake_signer,
+         evidence_profile: :pades_lt,
+         timestamp: :present,
+         revocation: :embedded,
+         compliance_evidence: :narrow_supported_path,
+         timestamp_authority: :test_tsa,
+         revocation_sources: [:ocsp, :crl]
+       }}
     end
   end
 
@@ -53,11 +63,20 @@ defmodule Rendro.SignTest do
       {:ok, binary <> "-augmented",
        %{
          tool: :secret_leaker,
-         timestamp_profile: :pades_lta,
+         evidence_profile: :pades_lta,
+         timestamp: :present,
+         revocation: :embedded,
+         compliance_evidence: :narrow_supported_path,
+         timestamp_authority: :tsa_primary,
+         revocation_sources: [:ocsp, :crl],
+         passphrase_supplied: true,
          passphrase: "super-secret",
          stderr: "sensitive stderr",
          temp_path: "/tmp/rendro-ltv",
-         revocation_blob: "raw-ocsp"
+         revocation_blob: "raw-ocsp",
+         trust_verdict: :trusted,
+         signer_identity: "Rendro Test Signer",
+         tsa_url: "https://tsa.example.test"
        }}
     end
   end
@@ -418,8 +437,24 @@ defmodule Rendro.SignTest do
     assert opts.adapter == FakeSignerAdapter
     assert opts.adapter_opts == [tsa_url: "https://tsa.example.test", revocation: :embed]
     assert augmented.binary =~ "-augmented"
+    assert augmented.binary != signed.binary
+    assert augmented.hash != signed.hash
     assert augmented.metadata.deterministic == false
     assert augmented.metadata.signing.status == :signed
+    assert augmented.metadata.long_lived == %{
+             status: :augmented,
+             adapter: FakeSignerAdapter,
+             timestamp: :present,
+             revocation: :embedded,
+             compliance_evidence: :narrow_supported_path
+           }
+
+    assert augmented.metadata.long_lived_adapter == %{
+             tool: :fake_signer,
+             evidence_profile: :pades_lt,
+             timestamp_authority: :test_tsa,
+             revocation_sources: [:ocsp, :crl]
+           }
   end
 
   test "augment/2 rejects unsigned artifacts before adapter execution" do
@@ -468,7 +503,7 @@ defmodule Rendro.SignTest do
 
     already_augmented =
       Artifact.wrap("signed-augmented", signed, %{
-        long_lived_signing: %{status: :augmented, adapter: FakeSignerAdapter}
+        long_lived: %{status: :augmented, adapter: FakeSignerAdapter}
       })
 
     assert {:error, %Rendro.Error{} = error} =
@@ -637,21 +672,35 @@ defmodule Rendro.SignTest do
     refute inspect(error.details) =~ "/tmp/revocation"
   end
 
-  test "augment/2 persists only safe adapter-local metadata on augmented artifacts" do
+  test "augment/2 persists only safe long-lived metadata on augmented artifacts" do
     assert {:ok, augmented} =
              Sign.augment(signed_artifact(),
                adapter: SecretLeakingAdapter,
                adapter_opts: [tsa_url: "https://tsa.example.test"]
              )
 
-    assert augmented.metadata.long_lived_signing_adapter == %{
-             tool: :secret_leaker,
-             timestamp_profile: :pades_lta
+    assert augmented.metadata.long_lived == %{
+             status: :augmented,
+             adapter: SecretLeakingAdapter,
+             timestamp: :present,
+             revocation: :embedded,
+             compliance_evidence: :narrow_supported_path
            }
 
-    refute inspect(augmented.metadata.long_lived_signing_adapter) =~ "super-secret"
-    refute inspect(augmented.metadata.long_lived_signing_adapter) =~ "stderr"
-    refute inspect(augmented.metadata.long_lived_signing_adapter) =~ "/tmp/rendro-ltv"
-    refute inspect(augmented.metadata.long_lived_signing_adapter) =~ "raw-ocsp"
+    assert augmented.metadata.long_lived_adapter == %{
+             tool: :secret_leaker,
+             evidence_profile: :pades_lta,
+             timestamp_authority: :tsa_primary,
+             revocation_sources: [:ocsp, :crl],
+             passphrase_supplied: true
+           }
+
+    refute inspect(augmented.metadata.long_lived) =~ "trusted"
+    refute inspect(augmented.metadata.long_lived) =~ "Rendro Test Signer"
+    refute inspect(augmented.metadata.long_lived) =~ "tsa.example.test"
+    refute inspect(augmented.metadata.long_lived_adapter) =~ "super-secret"
+    refute inspect(augmented.metadata.long_lived_adapter) =~ "stderr"
+    refute inspect(augmented.metadata.long_lived_adapter) =~ "/tmp/rendro-ltv"
+    refute inspect(augmented.metadata.long_lived_adapter) =~ "raw-ocsp"
   end
 end
