@@ -19,7 +19,7 @@
 
 Plans:
 
-- [ ] 64-01: Long-lived artifact API option contract, typed error taxonomy, and unsigned/unsupported-artifact rejection
+- [x] 64-01: Long-lived artifact API option contract, typed error taxonomy, and unsigned/unsupported-artifact rejection
 - [ ] 64-02: Long-lived artifact metadata posture, redaction coverage, and deterministic-vs-augmented behavior proof
 
 **Requirements:** `SIGN-07`, `SIGN-08`, `SIGN-09`

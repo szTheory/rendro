@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: long-lived-signatures-and-compliance-evidence
 status: active
-last_updated: "2026-05-07T21:30:00Z"
-last_activity: 2026-05-07 — v2.2 milestone defined with Phase 64-67 roadmap and strategic trust-and-adoption arc
+last_updated: "2026-05-08T00:27:34Z"
+last_activity: 2026-05-08 — completed Phase 64 Plan 01 with the signed-artifact-only augment seam, augment-stage errors, and proof-backed rejection/redaction tests
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 8
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 12
 ---
 
 # Project State
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-05-07 after v2.2 milestone definition)
 ## Current Position
 
 Phase: 64 long-lived-signature-artifact-contract
-Plan: none active
-Status: Milestone defined and roadmap approved; ready for `/gsd-plan-phase 64`
-Last activity: 2026-05-07 — Defined `v2.2`, activated the strategic arc, and mapped requirements to Phases 64-67
+Plan: 02 next
+Status: Plan 01 complete; ready to execute metadata posture and deterministic-vs-augmented proof in `64-02`
+Last activity: 2026-05-08 — Completed `64-01`, committed the public `Rendro.Sign.augment/2` seam, and closed `SIGN-07` plus `SIGN-08`
 
-Progress: [----------] 0%
+Progress: [#---------] 12%
 
 ## Milestone Snapshot
 
@@ -66,6 +66,7 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 - [v2.1]: Prove one narrow cryptographic-signing path before any compliance or long-lived-signature stories.
 - [Phase 62]: Require `signing-live-proof` on `main` so the supported cryptographic-signing path remains an operational gate rather than advisory proof only.
 - [v2.2 planning]: Prioritize long-lived evidence as the next prerequisite between “can sign” and “production-credible signed workflow,” then follow with viewer-proof and adoption-closure milestones.
+- [Phase 64]: Keep long-lived support on one explicit `Rendro.Sign.augment/2` seam over already signed artifacts, with adapter `augment/2` callback validation and redacted `:augment` diagnostics.
 
 ### Roadmap Evolution
 
@@ -77,7 +78,7 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 
 ### Pending Todos
 
-- Run `/gsd-plan-phase 64` to turn Phase 64 into an executable implementation plan.
+- Execute `64-02` to lock the shared long-lived metadata posture and deterministic-vs-augmented proof without widening support claims.
 - Keep the v2.2 implementation artifact-first and proof-backed; do not widen into viewer or blanket compliance claims mid-milestone.
 - Preserve the new strategic arc so `v2.3` and `v2.4` planning can start from an explicit game plan instead of reopening milestone selection from scratch.
 
