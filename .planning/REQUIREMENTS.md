@@ -20,7 +20,7 @@ Turn the proof-backed signing seam into a truthful long-lived-signature story by
 
 - [x] **ADAPT-07**: Rendro ships a first-party optional adapter path that can add document timestamp and revocation evidence over the supported signed-artifact seam.
 - [x] **ADAPT-08**: Rendro ships a validator-backed inspection path that reports cryptographic integrity, timestamp presence, revocation evidence presence, and narrow compliance posture as distinct signals.
-- [ ] **ADAPT-09**: Rendro includes a live proof lane that produces a representative long-lived signed artifact and verifies the resulting posture through the supported validator path. Manual closeout pending: make `long-lived-live-proof` a required status check after push.
+- [x] **ADAPT-09**: Rendro includes a live proof lane that produces a representative long-lived signed artifact and verifies the resulting posture through the supported validator path.
 
 ### Truthful Compliance Boundaries
 

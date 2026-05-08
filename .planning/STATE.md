@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: long-lived-signatures-and-compliance-evidence
-status: active
-last_updated: "2026-05-08T15:05:00Z"
-last_activity: 2026-05-08 — completed both Phase 67 plans, closed the `TRUST-09` proof ledger via `67-VERIFICATION.md`, and carried forward the remaining required-check caveat for `long-lived-live-proof`
+status: completed
+last_updated: "2026-05-08T15:15:00Z"
+last_activity: 2026-05-08 — Confirmed `long-lived-live-proof` as a required status check in GitHub branch protection, closing the final operational caveat. Milestone v2.2 is now complete.
 progress:
   total_phases: 4
   completed_phases: 4
@@ -20,20 +20,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-07 after v2.2 milestone definition)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Execute milestone `v2.2 Long-Lived Signatures & Compliance Evidence` from the shipped `v2.1` signing baseline.
+**Current focus:** Execute milestone `v2.3 Viewer Proof & Interop Closure` from the shipped `v2.2` baseline.
 
 ## Current Position
 
-Phase: 67 verification-and-milestone-closure
+Phase: milestone-complete
 Plan: none active
-Status: Phase 67 closeout artifacts are complete; `67-VERIFICATION.md` closes the `TRUST-09` proof ledger, but `v2.2` operational closure remains blocked until `long-lived-live-proof` is confirmed as a required status check
-Last activity: 2026-05-08 — Completed `67-01` and `67-02`, created the closeout/handoff artifact, and preserved the remaining required-check caveat from Phase 66
+Status: Milestone `v2.2` is fully complete and audited. `long-lived-live-proof` has been confirmed as a required status check, closing the final operational caveat.
+Last activity: 2026-05-08 — Updated branch protection rules, audited the milestone, and generated `.planning/milestones/v2.2-MILESTONE-AUDIT.md`.
 
 Progress: [##########] 100%
 
 ## Milestone Snapshot
 
-- Milestone: `v2.2 Long-Lived Signatures & Compliance Evidence` (planned on 2026-05-07; closeout artifacts complete on 2026-05-08, but final operational closure is still pending required-check confirmation; see `.planning/ROADMAP.md`).
+- Milestone: `v2.2 Long-Lived Signatures & Compliance Evidence` (shipped and archived on 2026-05-08; see `milestones/v2.2-MILESTONE-AUDIT.md`).
 - Previous shipped milestone: `v2.1 Cryptographic Signing & Signed-Artifact Proof` (shipped and archived on 2026-05-07; see `milestones/v2.1-ROADMAP.md`).
 - Strategic next-up after `v2.2`: `v2.3 Viewer Proof & Interop Closure`, then `v2.4 Batteries-Included Workflow & Adoption Closure`.
 
@@ -79,14 +79,12 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 
 ### Pending Todos
 
-- Confirm branch protection or rulesets require `long-lived-live-proof`, then close `ADAPT-09` and finish `v2.2` operational closure.
 - Keep the v2.2 implementation artifact-first and proof-backed; do not widen into viewer or blanket compliance claims mid-milestone.
 - Preserve the new strategic arc so `v2.3` and `v2.4` planning can start from an explicit game plan instead of reopening milestone selection from scratch.
 
 ### Blockers/Concerns
 
 - Long-lived-signature work must not soften the current boundary into implied signer trust, blanket compliance support, or generic “enterprise signing” marketing.
-- Fresh branch-protection truth still shows required contexts `test`, `signing-live-proof`, and `release-proof`; `long-lived-live-proof` is not yet confirmed as a required status check, so operational closure remains partial.
 - Viewer promotion for signing, long-lived evidence, and protection remains separately proof-gated; do not smuggle viewer claims into `v2.2`.
 - Multi-signature workflows, HSM orchestration, and global text-shaping remain tempting adjacent problems; they should not leak into the active milestone without a deliberate re-scope.
 

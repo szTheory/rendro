@@ -1,6 +1,6 @@
 # Milestone v2.2: Long-Lived Signatures & Compliance Evidence
 
-**Status:** Planned
+**Status:** Active
 **Started:** 2026-05-07
 **Phases:** 64-67
 **Total Plans:** 8
@@ -36,8 +36,8 @@ Plans:
 
 Plans:
 
-- [ ] 65-01: First-party optional timestamp/revocation evidence adapter path and runtime-boundary hardening
-- [ ] 65-02: Validator-backed long-lived posture classification for integrity, timestamp, revocation, and narrow compliance evidence
+- [x] 65-01: First-party optional timestamp/revocation evidence adapter path and runtime-boundary hardening
+- [x] 65-02: Validator-backed long-lived posture classification for integrity, timestamp, revocation, and narrow compliance evidence
 
 **Requirements:** `ADAPT-07`, `ADAPT-08`
 **Success criteria:**
@@ -53,8 +53,8 @@ Plans:
 
 Plans:
 
-- [ ] 66-01: Live long-lived-signature proof lane with representative fixtures and validator confirmation
-- [ ] 66-02: Support-matrix, guide wording, docs-contract, and operator recipe updates for long-lived evidence
+- [x] 66-01: Live long-lived-signature proof lane with representative fixtures and validator confirmation
+- [x] 66-02: Support-matrix, guide wording, docs-contract, and operator recipe updates for long-lived evidence
 
 **Requirements:** `ADAPT-09`, `TRUST-07`, `TRUST-08`
 **Success criteria:**

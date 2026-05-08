@@ -1,5 +1,22 @@
 # Milestones
 
+## v2.2 Long-Lived Signatures & Compliance Evidence (Shipped: 2026-05-08)
+
+**Phases completed:** 4 phases (64, 65, 66, 67)
+
+**Key accomplishments:**
+
+- Added `Rendro.Sign.augment/2` as the public seam for applying timestamp and revocation evidence over signed artifacts, enforcing explicit non-deterministic posture.
+- Shipped a first-party optional long-lived adapter backed by pyHanko that provides timestamp and revocation facts while remaining separate from bare signing and certificate trust ownership.
+- Shipped a validator-backed inspection path that reports cryptographic integrity, timestamp presence, revocation evidence presence, and narrow compliance posture as distinct signals.
+- Established a dedicated `long-lived-live-proof` job on CI to verify the full `sign -> augment -> validate` workflow against known fixtures.
+- Updated repository branch protection rules to explicitly require `long-lived-live-proof` as an operational support-contract gate.
+- Published an updated `priv/support_matrix.json` and docs-contract testing lane that rigorously separates long-lived and narrow compliance capabilities from blanket PDF/A claims, generic enterprise narratives, and multi-signature workflows.
+
+**Audit status:** `passed` — all 7 requirements satisfied, all 4 phases closed, cross-phase long-lived workflows verified, branch protection rule enforced. See `milestones/v2.2-MILESTONE-AUDIT.md`.
+
+---
+
 ## v2.1 Cryptographic Signing & Signed-Artifact Proof (Shipped: 2026-05-07)
 
 **Phases completed:** 4 phases (60, 61, 62, 63)

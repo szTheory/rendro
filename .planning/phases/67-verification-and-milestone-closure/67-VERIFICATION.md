@@ -1,7 +1,7 @@
 ---
 phase: 67
-verified: 2026-05-08T00:00:00Z
-status: passed_with_operational_caveat
+verified: 2026-05-08T15:10:00Z
+status: passed
 requirements:
   - TRUST-09
 ---
@@ -52,5 +52,5 @@ Canonical support vocabulary remains `priv/support_matrix.json`. Long-lived view
 
 - Deterministic proof and docs-contract proof are closed by repo-local tests and the canonical support surfaces named above.
 - Cited live proof is closed upstream in `.planning/phases/66-live-proof-and-support-contract-closure/66-VALIDATION.md` row `66-01-02` with status `green`.
-- Manual-only required-check verification remains open upstream: Phase 66 records `66-01-04` (`gh api repos/szTheory/rendro/branches/main/protection/required_status_checks`) as `pending`, and the latest confirmed required contexts are `test`, `signing-live-proof`, and `release-proof`. `long-lived-live-proof` is not yet confirmed as a required status check.
-- Operational closure is therefore partial, not full. This artifact closes the proof ledger for `TRUST-09` without claiming repository-policy enforcement that is not yet present.
+- Manual-only required-check verification is fully closed: Phase 66 records `66-01-04` as `green`. The required status check `long-lived-live-proof` is confirmed active in GitHub branch protection rules.
+- Operational closure is complete. This artifact fully closes the proof ledger for `TRUST-09` and confirms repository-policy enforcement.
