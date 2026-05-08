@@ -229,5 +229,13 @@ defmodule Rendro.ErrorTest do
       refute err.next =~ "stdout"
       refute err.next =~ "protection"
     end
+
+    test "adapter-local option wording stays augmentation-specific" do
+      err = Rendro.Error.from_stage(:augment, {:missing_required_adapter_option, :tsa_url})
+      assert err.stage == :augment
+      assert err.why == "Missing required long-lived adapter option: tsa_url"
+      assert err.next =~ ":tsa_url"
+      refute err.why =~ "signing"
+    end
   end
 end

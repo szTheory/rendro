@@ -37,6 +37,29 @@ defmodule Rendro.Adapters.PyHankoTest do
     }
   end
 
+  defp signed_artifact do
+    %Artifact{
+      binary: "%PDF-signed",
+      hash: Base.encode16(:crypto.hash(:sha256, "%PDF-signed"), case: :lower),
+      diagnostics: [],
+      metadata: %{
+        page_count: 1,
+        deterministic: false,
+        signing: %{status: :signed, field: "customer_signature"}
+      }
+    }
+  end
+
+  defp augment_opts do
+    %{
+      adapter_opts: [
+        tsa_url: "https://tsa.example.test",
+        trust_roots: ["/tmp/root-ca.pem"],
+        other_certs: ["/tmp/intermediate.pem"]
+      ]
+    }
+  end
+
   test "returns a typed error when pyhanko is missing" do
     Application.put_env(:rendro, :pyhanko_executable_finder, fn "pyhanko" -> nil end)
 
@@ -104,6 +127,130 @@ defmodule Rendro.Adapters.PyHankoTest do
                field: "customer_signature",
                adapter_opts: [key: "/tmp/key.pem", cert: "/tmp/cert.pem", chain: :bad]
              })
+  end
+
+  test "augment uses a private temp directory, validates its narrow schema, and returns safe metadata" do
+    Application.put_env(:rendro, :pyhanko_executable_finder, fn "pyhanko" -> "/tmp/pyhanko" end)
+
+    Application.put_env(:rendro, :pyhanko_command_runner, fn "/tmp/pyhanko", args, _opts ->
+      [input_path, output_path] = Enum.take(Enum.reverse(args), 2) |> Enum.reverse()
+
+      assert file_mode(Path.dirname(input_path)) == 0o700
+      assert file_mode(input_path) == 0o600
+      assert Enum.take(args, 4) == ["sign", "ltvfix", "--field", "customer_signature"]
+      assert Enum.member?(args, "--timestamp-url")
+      assert Enum.member?(args, "https://tsa.example.test")
+      assert Enum.member?(args, "--trust")
+      assert Enum.member?(args, "/tmp/root-ca.pem")
+      assert Enum.member?(args, "--other-cert")
+      assert Enum.member?(args, "/tmp/intermediate.pem")
+
+      File.write!(output_path, "%PDF-augmented")
+      {"ok", 0}
+    end)
+
+    assert {:ok, "%PDF-augmented", metadata} = PyHanko.augment(signed_artifact(), augment_opts())
+
+    assert metadata == %{
+             tool: :pyhanko,
+             tool_family: :pyhanko,
+             evidence_profile: :timestamp_with_embedded_validation,
+             timestamp: :present,
+             revocation: :embedded,
+             compliance_evidence: :narrow_supported_path,
+             timestamp_authority: :configured,
+             revocation_sources: [:ocsp, :crl]
+           }
+  end
+
+  test "augment cleans up temp state and redacts failures on non-zero exit" do
+    Application.put_env(:rendro, :pyhanko_executable_finder, fn "pyhanko" -> "/tmp/pyhanko" end)
+
+    Application.put_env(:rendro, :pyhanko_command_runner, fn "/tmp/pyhanko", args, _opts ->
+      [input_path | _] = Enum.take(Enum.reverse(args), 2) |> Enum.reverse()
+      send(self(), {:augment_tmp_dir, Path.dirname(input_path)})
+      {"tsa https://tsa.example.test failed", 9}
+    end)
+
+    assert {:error, {:pyhanko_failed, 9}} = PyHanko.augment(signed_artifact(), augment_opts())
+    assert_receive {:augment_tmp_dir, tmp_dir}
+    refute File.exists?(tmp_dir)
+  end
+
+  test "augment rejects malformed adapter-local inputs before command execution" do
+    Application.put_env(:rendro, :pyhanko_executable_finder, fn "pyhanko" -> "/tmp/pyhanko" end)
+
+    assert {:error, {:missing_required_adapter_option, :tsa_url}} =
+             PyHanko.augment(signed_artifact(), %{adapter_opts: [trust_roots: ["/tmp/root.pem"]]})
+
+    assert {:error, {:missing_required_adapter_option, :trust_roots}} =
+             PyHanko.augment(signed_artifact(), %{adapter_opts: [tsa_url: "https://tsa.example"]})
+
+    assert {:error, {:invalid_adapter_option, :trust_roots, :bad}} =
+             PyHanko.augment(signed_artifact(), %{
+               adapter_opts: [
+                 tsa_url: "https://tsa.example",
+                 trust_roots: :bad
+               ]
+             })
+  end
+
+  test "validate decodes helper JSON into explicit evidence posture" do
+    Application.put_env(:rendro, :pyhanko_executable_finder, fn
+      "pyhanko" -> "/tmp/pyhanko"
+      "python3" -> "/tmp/python3"
+      "python" -> "/tmp/python"
+    end)
+
+    Application.put_env(:rendro, :pyhanko_command_runner, fn "/tmp/python3", args, _opts ->
+      assert List.last(args) == "/tmp/file.pdf"
+
+      {"""
+       {"signatures":[{"field":"customer_signature","integrity":"valid","trust":"valid","timestamp":"present","revocation":"embedded","compliance":{"level":"present","proofs":{"document_timestamp":true,"revocation_info":true},"gaps":[]},"total_document_signed":true}]}
+       """, 0}
+    end)
+
+    assert {:ok, %{signatures: [signature]}} = PyHanko.validate("/tmp/file.pdf")
+    assert signature.field == "customer_signature"
+    assert signature.integrity == :valid
+    assert signature.trust == :skipped
+    assert signature.timestamp == :present
+    assert signature.revocation == :embedded
+
+    assert signature.compliance == %{
+             scope: :embedded_validation_evidence,
+             level: :present,
+             proofs: %{document_timestamp: true, revocation_info: true},
+             gaps: []
+           }
+  end
+
+  test "validate maps incomplete evidence and trust-enabled posture without widening into blanket compliance" do
+    Application.put_env(:rendro, :pyhanko_executable_finder, fn
+      "pyhanko" -> "/tmp/pyhanko"
+      "python3" -> "/tmp/python3"
+      "python" -> "/tmp/python"
+    end)
+
+    Application.put_env(:rendro, :pyhanko_command_runner, fn "/tmp/python3", _args, _opts ->
+      {"""
+       {"signatures":[{"field":"customer_signature","integrity":"valid","trust":"untrusted","timestamp":"missing","revocation":"missing","compliance":{"level":"incomplete","proofs":{"document_timestamp":false,"revocation_info":false},"gaps":["document_timestamp","revocation_info"]},"total_document_signed":false}]}
+       """, 0}
+    end)
+
+    assert {:ok, %{signatures: [signature]}} =
+             PyHanko.validate("/tmp/file.pdf", skip_certificate_validation: false)
+
+    assert signature.trust == :untrusted
+    assert signature.timestamp == :missing
+    assert signature.revocation == :missing
+
+    assert signature.compliance == %{
+             scope: :embedded_validation_evidence,
+             level: :incomplete,
+             proofs: %{document_timestamp: false, revocation_info: false},
+             gaps: ["document_timestamp", "revocation_info"]
+           }
   end
 
   defp file_mode(path) do
