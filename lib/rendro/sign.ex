@@ -30,6 +30,12 @@ defmodule Rendro.Sign do
 
   @type sign_options :: [sign_option()]
 
+  @type augment_option ::
+          {:adapter, module()}
+          | {:adapter_opts, keyword() | map()}
+
+  @type augment_options :: [augment_option()]
+
   @type validate_option :: {:adapter, module()}
 
   @type validate_options :: [validate_option()]
@@ -98,6 +104,43 @@ defmodule Rendro.Sign do
 
   def sign(%Artifact{}, opts) do
     {:error, Error.from_stage(:sign, {:invalid_option, :options, opts}, %{})}
+  end
+
+  @spec augment(Artifact.t(), augment_options()) :: {:ok, Artifact.t()} | {:error, Error.t()}
+  def augment(%Artifact{} = artifact, opts) when is_list(opts) do
+    with {:ok, normalized} <- normalize_augment_opts(opts),
+         {:ok, :signed} <- ensure_augmentable_artifact(artifact),
+         {:ok, augmented_binary, adapter_metadata} <- normalized.adapter.augment(artifact, normalized) do
+      metadata_updates = %{
+        deterministic: false,
+        long_lived_signing: %{
+          status: :augmented,
+          adapter: normalized.adapter
+        },
+        long_lived_signing_adapter: sanitize_augment_adapter_metadata(adapter_metadata)
+      }
+
+      {:ok, Artifact.wrap(augmented_binary, artifact, metadata_updates)}
+    else
+      {:error, %Error{} = error} ->
+        {:error, error}
+
+      {:error, reason} ->
+        {:error,
+         Error.from_stage(
+           :augment,
+           reason,
+           %{
+             details:
+               redact_augment_opts(opts)
+               |> Map.put(:artifact_state, normalized_augment_artifact_state(artifact))
+           }
+         )}
+    end
+  end
+
+  def augment(%Artifact{}, opts) do
+    {:error, Error.from_stage(:augment, {:invalid_option, :options, opts}, %{})}
   end
 
   @spec validate(Artifact.t(), validate_options()) :: {:ok, map()} | {:error, Error.t()}
@@ -171,6 +214,29 @@ defmodule Rendro.Sign do
     }
   end
 
+  @spec redact_augment_opts(augment_options() | map()) :: map()
+  def redact_augment_opts(opts) when is_list(opts) do
+    opts
+    |> Enum.into(%{})
+    |> redact_augment_opts()
+  end
+
+  def redact_augment_opts(opts) when is_map(opts) do
+    adapter_opts =
+      opts
+      |> Map.get(:adapter_opts, %{})
+      |> case do
+        values when is_list(values) -> Enum.into(values, %{})
+        values when is_map(values) -> values
+        _ -> %{}
+      end
+
+    %{
+      adapter: Map.get(opts, :adapter),
+      adapter_opt_keys: adapter_opts |> Map.keys() |> Enum.sort()
+    }
+  end
+
   defp normalize_prepare_opts(opts) do
     with {:ok, field} <- fetch_field(opts, :prepare),
          {:ok, reserved_bytes} <- fetch_reserved_bytes(opts),
@@ -184,6 +250,13 @@ defmodule Rendro.Sign do
          {:ok, adapter} <- fetch_sign_adapter(opts),
          {:ok, adapter_opts} <- fetch_sign_adapter_opts(opts) do
       {:ok, %{field: field, adapter: adapter, adapter_opts: adapter_opts}}
+    end
+  end
+
+  defp normalize_augment_opts(opts) do
+    with {:ok, adapter} <- fetch_augment_adapter(opts),
+         {:ok, adapter_opts} <- fetch_augment_adapter_opts(opts) do
+      {:ok, %{adapter: adapter, adapter_opts: adapter_opts}}
     end
   end
 
@@ -267,6 +340,38 @@ defmodule Rendro.Sign do
 
       value ->
         {:error, Error.from_stage(:sign, {:invalid_option, :adapter_opts, value}, %{})}
+    end
+  end
+
+  defp fetch_augment_adapter(opts) do
+    case Keyword.fetch(opts, :adapter) do
+      :error ->
+        {:error, Error.from_stage(:augment, {:missing_required_option, :adapter}, %{})}
+
+      {:ok, adapter} when not is_atom(adapter) ->
+        {:error, Error.from_stage(:augment, {:invalid_option, :adapter, adapter}, %{})}
+
+      {:ok, adapter} ->
+        cond do
+          not Code.ensure_loaded?(adapter) ->
+            {:error, Error.from_stage(:augment, {:invalid_option, :adapter, adapter}, %{})}
+
+          not function_exported?(adapter, :augment, 2) ->
+            {:error, Error.from_stage(:augment, {:invalid_option, :adapter, adapter}, %{})}
+
+          true ->
+            {:ok, adapter}
+        end
+    end
+  end
+
+  defp fetch_augment_adapter_opts(opts) do
+    case Keyword.get(opts, :adapter_opts, []) do
+      values when is_list(values) or is_map(values) ->
+        {:ok, values}
+
+      value ->
+        {:error, Error.from_stage(:augment, {:invalid_option, :adapter_opts, value}, %{})}
     end
   end
 
@@ -478,6 +583,51 @@ defmodule Rendro.Sign do
   end
 
   defp sanitize_signing_adapter_metadata(_metadata), do: %{}
+
+  defp ensure_augmentable_artifact(%Artifact{metadata: %{long_lived_signing: %{status: :augmented}}}) do
+    {:error, Error.from_stage(:augment, :already_augmented, %{})}
+  end
+
+  defp ensure_augmentable_artifact(
+         %Artifact{metadata: %{signing_preparation: %{status: :prepared}}}
+       ) do
+    {:error, Error.from_stage(:augment, :prepared_artifact_not_augmentable, %{})}
+  end
+
+  defp ensure_augmentable_artifact(%Artifact{metadata: %{signing: %{status: :signed}}}) do
+    {:ok, :signed}
+  end
+
+  defp ensure_augmentable_artifact(%Artifact{metadata: metadata}) when is_map(metadata) do
+    if Map.get(metadata, :deterministic) == false do
+      {:error, Error.from_stage(:augment, :unsupported_artifact_state, %{})}
+    else
+      {:error, Error.from_stage(:augment, :unsigned_artifact_not_augmentable, %{})}
+    end
+  end
+
+  defp ensure_augmentable_artifact(%Artifact{}) do
+    {:error, Error.from_stage(:augment, :unsigned_artifact_not_augmentable, %{})}
+  end
+
+  defp sanitize_augment_adapter_metadata(metadata) when is_map(metadata) do
+    metadata
+    |> Map.take([:tool, :tool_family, :timestamp_profile, :revocation_profile, :evidence_profile])
+  end
+
+  defp sanitize_augment_adapter_metadata(_metadata), do: %{}
+
+  defp normalized_augment_artifact_state(%Artifact{metadata: metadata}) when is_map(metadata) do
+    cond do
+      get_in(metadata, [:long_lived_signing, :status]) == :augmented -> :already_augmented
+      get_in(metadata, [:signing_preparation, :status]) == :prepared -> :prepared
+      get_in(metadata, [:signing, :status]) == :signed -> :signed
+      Map.get(metadata, :deterministic) == false -> :unsupported
+      true -> :unsigned
+    end
+  end
+
+  defp normalized_augment_artifact_state(%Artifact{}), do: :unsigned
 
   defp sanitize_validation_result(%{signatures: signatures}, adapter, adapter_opts)
        when is_list(signatures) do

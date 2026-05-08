@@ -53,6 +53,7 @@ defmodule Rendro.Error do
     do: "PDF signing preparation failed while wrapping the rendered artifact."
 
   defp what(:sign, _reason), do: "PDF signing failed while wrapping the rendered artifact."
+  defp what(:augment, _reason), do: "PDF long-lived augmentation failed while wrapping the signed artifact."
 
   defp what(stage, _reason), do: "Render pipeline failed in stage #{inspect(stage)}."
 
@@ -62,11 +63,20 @@ defmodule Rendro.Error do
   defp why(:sign, {:missing_required_option, :field}),
     do: "Missing required signing option: field"
 
+  defp why(:augment, {:missing_required_option, :adapter}),
+    do: "Missing required long-lived augmentation option: adapter"
+
   defp why(:prepare, {:invalid_option, :field, value}),
     do: "Invalid signing preparation option field: #{inspect(value)}"
 
   defp why(:sign, {:invalid_option, :field, value}),
     do: "Invalid signing option field: #{inspect(value)}"
+
+  defp why(:augment, {:invalid_option, :adapter, value}),
+    do: "Invalid long-lived augmentation option adapter: #{inspect(value)}"
+
+  defp why(:augment, {:invalid_option, :adapter_opts, value}),
+    do: "Invalid long-lived augmentation option adapter_opts: #{inspect(value)}"
 
   defp why(:prepare, {:field_not_preparable, field}),
     do: "Rendered artifact does not expose a preparable signature field named #{field}"
@@ -131,6 +141,18 @@ defmodule Rendro.Error do
   defp why(_stage, :prepared_artifact_not_signable),
     do: "Prepared signature-placeholder artifacts are not signable through Rendro.Sign.sign/2"
 
+  defp why(:augment, :unsigned_artifact_not_augmentable),
+    do: "Rendered artifact must already be a signed artifact before long-lived augmentation can run"
+
+  defp why(:augment, :prepared_artifact_not_augmentable),
+    do: "Prepared signature-placeholder artifacts are not augmentable through Rendro.Sign.augment/2"
+
+  defp why(:augment, :unsupported_artifact_state),
+    do: "Rendered artifact is missing the signed-artifact metadata required for long-lived augmentation"
+
+  defp why(:augment, :already_augmented),
+    do: "Rendered artifact already appears to contain Rendro-managed long-lived augmentation metadata"
+
   defp why(_stage, {:unknown_permissions, permissions}),
     do: "Unknown advisory permissions: #{Enum.map_join(permissions, ", ", &to_string/1)}"
 
@@ -142,6 +164,16 @@ defmodule Rendro.Error do
   defp why(:sign, {:adapter_failure, adapter, {:command_failed, error_module}}),
     do:
       "Signing adapter #{inspect(adapter)} failed: command runner crashed with #{inspect(error_module)}"
+
+  defp why(:augment, {:adapter_failure, adapter, {:command_failed, error_module}}),
+    do:
+      "Long-lived adapter #{inspect(adapter)} failed: command runner crashed with #{inspect(error_module)}"
+
+  defp why(:augment, {:adapter_failure, adapter, reason}),
+    do: "Long-lived adapter #{inspect(adapter)} failed: #{inspect(reason)}"
+
+  defp why(:augment, {:command_failed, error_module}),
+    do: "Long-lived adapter command runner crashed with #{inspect(error_module)}"
 
   defp why(_stage, {:adapter_failure, adapter, {:command_failed, error_module}}),
     do:
@@ -310,6 +342,10 @@ defmodule Rendro.Error do
     "Pass field: \"signature_name\" so Rendro can target one rendered unsigned signature widget explicitly."
   end
 
+  defp next_step(:augment, {:missing_required_option, :adapter}) do
+    "Pass adapter: MyLongLivedAdapter so Rendro can run one explicit post-sign long-lived augmentation step."
+  end
+
   defp next_step(:sign, {:invalid_option, :field, _value}) do
     "Pass field as a non-empty string naming one rendered unsigned signature widget."
   end
@@ -320,6 +356,14 @@ defmodule Rendro.Error do
 
   defp next_step(:sign, {:invalid_option, :adapter_opts, _value}) do
     "Pass adapter_opts as a keyword list or map containing only adapter-local signing settings."
+  end
+
+  defp next_step(:augment, {:invalid_option, :adapter, _value}) do
+    "Pass adapter as a loaded module that implements augment/2 on the Rendro.Sign.Adapter boundary."
+  end
+
+  defp next_step(:augment, {:invalid_option, :adapter_opts, _value}) do
+    "Pass adapter_opts as a keyword list or map containing only adapter-local long-lived settings."
   end
 
   defp next_step(:sign, {:missing_executable, "pyhanko"}) do
@@ -346,12 +390,36 @@ defmodule Rendro.Error do
     "Inspect the adapter stderr/output and rerun after correcting the external signer integration state."
   end
 
+  defp next_step(:augment, {:command_failed, _error_module}) do
+    "Inspect the adapter-local runtime logs and rerun after correcting the external long-lived evidence integration state."
+  end
+
   defp next_step(:sign, :already_signed) do
     "Sign each rendered artifact once; rerender a fresh unsigned artifact before repeating signing."
   end
 
   defp next_step(:sign, :prepared_artifact_not_signable) do
     "Call Rendro.Sign.sign/2 on the original unsigned rendered artifact; keep Rendro.Sign.prepare/2 for external placeholder-based workflows."
+  end
+
+  defp next_step(:augment, :unsigned_artifact_not_augmentable) do
+    "Call Rendro.Sign.sign/2 first, then pass the resulting signed artifact to Rendro.Sign.augment/2."
+  end
+
+  defp next_step(:augment, :prepared_artifact_not_augmentable) do
+    "Sign the original unsigned rendered artifact before augmentation; prepared placeholder artifacts stay on the external-signing seam."
+  end
+
+  defp next_step(:augment, :unsupported_artifact_state) do
+    "Pass only artifacts returned from Rendro.Sign.sign/2; Rendro does not infer long-lived eligibility from raw bytes or caller-added metadata."
+  end
+
+  defp next_step(:augment, :already_augmented) do
+    "Augment each signed artifact once; rerun signing on a fresh artifact before repeating long-lived augmentation."
+  end
+
+  defp next_step(:augment, {:adapter_failure, _adapter, _reason}) do
+    "Inspect the adapter-local runtime logs and rerun after correcting the external long-lived evidence integration state."
   end
 
   defp next_step(:render, _reason) do
@@ -372,6 +440,9 @@ defmodule Rendro.Error do
 
       :sign ->
         "Sign"
+
+      :augment ->
+        "Augment"
 
       _ ->
         stage

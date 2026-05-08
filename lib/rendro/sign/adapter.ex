@@ -7,9 +7,14 @@ defmodule Rendro.Sign.Adapter do
   bytes plus namespaced metadata without widening the shared core manifest.
   """
 
+  @optional_callbacks augment: 2
+
   @callback prepare(Rendro.Artifact.t(), map()) ::
               {:ok, binary(), map()} | {:error, term()}
 
   @callback sign(Rendro.Artifact.t(), map()) ::
+              {:ok, binary(), map()} | {:error, term()}
+
+  @callback augment(Rendro.Artifact.t(), map()) ::
               {:ok, binary(), map()} | {:error, term()}
 end
