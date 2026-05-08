@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: long-lived-signatures-and-compliance-evidence
 status: active
-last_updated: "2026-05-08T00:30:19Z"
-last_activity: 2026-05-08 — completed Phase 64 with canonical long-lived artifact metadata, deterministic-vs-augmented proof, and unchanged support-contract surfaces
+last_updated: "2026-05-08T15:05:00Z"
+last_activity: 2026-05-08 — completed both Phase 67 plans, closed the `TRUST-09` proof ledger via `67-VERIFICATION.md`, and carried forward the remaining required-check caveat for `long-lived-live-proof`
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 4
   total_plans: 8
-  completed_plans: 2
-  percent: 25
+  completed_plans: 8
+  percent: 100
 ---
 
 # Project State
@@ -24,16 +24,16 @@ See: .planning/PROJECT.md (updated 2026-05-07 after v2.2 milestone definition)
 
 ## Current Position
 
-Phase: 64 long-lived-signature-artifact-contract
+Phase: 67 verification-and-milestone-closure
 Plan: none active
-Status: Phase 64 complete; ready to begin Phase 65 first-party long-lived adapter and validator execution
-Last activity: 2026-05-08 — Completed `64-02`, committed the canonical long-lived metadata contract, and closed `SIGN-09`
+Status: Phase 67 closeout artifacts are complete; `67-VERIFICATION.md` closes the `TRUST-09` proof ledger, but `v2.2` operational closure remains blocked until `long-lived-live-proof` is confirmed as a required status check
+Last activity: 2026-05-08 — Completed `67-01` and `67-02`, created the closeout/handoff artifact, and preserved the remaining required-check caveat from Phase 66
 
-Progress: [##--------] 25%
+Progress: [##########] 100%
 
 ## Milestone Snapshot
 
-- Milestone: `v2.2 Long-Lived Signatures & Compliance Evidence` (planned on 2026-05-07; see `.planning/ROADMAP.md`).
+- Milestone: `v2.2 Long-Lived Signatures & Compliance Evidence` (planned on 2026-05-07; closeout artifacts complete on 2026-05-08, but final operational closure is still pending required-check confirmation; see `.planning/ROADMAP.md`).
 - Previous shipped milestone: `v2.1 Cryptographic Signing & Signed-Artifact Proof` (shipped and archived on 2026-05-07; see `milestones/v2.1-ROADMAP.md`).
 - Strategic next-up after `v2.2`: `v2.3 Viewer Proof & Interop Closure`, then `v2.4 Batteries-Included Workflow & Adoption Closure`.
 
@@ -79,13 +79,14 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 
 ### Pending Todos
 
-- Begin Phase 65 to ship the first proof-backed long-lived adapter path and validator-backed posture classification on top of the completed Phase 64 contract.
+- Confirm branch protection or rulesets require `long-lived-live-proof`, then close `ADAPT-09` and finish `v2.2` operational closure.
 - Keep the v2.2 implementation artifact-first and proof-backed; do not widen into viewer or blanket compliance claims mid-milestone.
 - Preserve the new strategic arc so `v2.3` and `v2.4` planning can start from an explicit game plan instead of reopening milestone selection from scratch.
 
 ### Blockers/Concerns
 
 - Long-lived-signature work must not soften the current boundary into implied signer trust, blanket compliance support, or generic “enterprise signing” marketing.
+- Fresh branch-protection truth still shows required contexts `test`, `signing-live-proof`, and `release-proof`; `long-lived-live-proof` is not yet confirmed as a required status check, so operational closure remains partial.
 - Viewer promotion for signing, long-lived evidence, and protection remains separately proof-gated; do not smuggle viewer claims into `v2.2`.
 - Multi-signature workflows, HSM orchestration, and global text-shaping remain tempting adjacent problems; they should not leak into the active milestone without a deliberate re-scope.
 

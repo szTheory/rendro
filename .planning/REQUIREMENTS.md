@@ -18,15 +18,15 @@ Turn the proof-backed signing seam into a truthful long-lived-signature story by
 
 ### Adapter and Validator Boundaries
 
-- [ ] **ADAPT-07**: Rendro ships a first-party optional adapter path that can add document timestamp and revocation evidence over the supported signed-artifact seam.
-- [ ] **ADAPT-08**: Rendro ships a validator-backed inspection path that reports cryptographic integrity, timestamp presence, revocation evidence presence, and narrow compliance posture as distinct signals.
-- [ ] **ADAPT-09**: Rendro includes a live proof lane that produces a representative long-lived signed artifact and verifies the resulting posture through the supported validator path.
+- [x] **ADAPT-07**: Rendro ships a first-party optional adapter path that can add document timestamp and revocation evidence over the supported signed-artifact seam.
+- [x] **ADAPT-08**: Rendro ships a validator-backed inspection path that reports cryptographic integrity, timestamp presence, revocation evidence presence, and narrow compliance posture as distinct signals.
+- [ ] **ADAPT-09**: Rendro includes a live proof lane that produces a representative long-lived signed artifact and verifies the resulting posture through the supported validator path. Manual closeout pending: make `long-lived-live-proof` a required status check after push.
 
 ### Truthful Compliance Boundaries
 
-- [ ] **TRUST-07**: `priv/support_matrix.json` publishes long-lived-signature and narrow compliance support separately from bare signing, signer identity trust, viewer behavior, and broad compliance narratives.
-- [ ] **TRUST-08**: Public docs explain timestamp/revocation evidence, certificate trust, viewer behavior, and narrow compliance claims as distinct boundaries and keep unsupported rows explicit.
-- [ ] **TRUST-09**: Verification artifacts prove the exact supported long-lived/compliance path without implying blanket PDF/A, viewer support, multi-signature workflows, or generic regulatory approval.
+- [x] **TRUST-07**: `priv/support_matrix.json` publishes long-lived-signature and narrow compliance support separately from bare signing, signer identity trust, viewer behavior, and broad compliance narratives.
+- [x] **TRUST-08**: Public docs explain timestamp/revocation evidence, certificate trust, viewer behavior, and narrow compliance claims as distinct boundaries and keep unsupported rows explicit.
+- [x] **TRUST-09**: Verification artifacts prove the exact supported long-lived/compliance path without implying blanket PDF/A, viewer support, multi-signature workflows, or generic regulatory approval. Closed by `.planning/phases/67-verification-and-milestone-closure/67-VERIFICATION.md`; operational branch-protection confirmation remains tracked separately under `ADAPT-09`.
 
 ## Future Requirements
 
