@@ -1,10 +1,10 @@
 ---
 gsd_state_version: 1.0
 milestone: v2.2
-milestone_name: long-lived-signatures-and-compliance-evidence
-status: completed
-last_updated: "2026-05-08T15:15:00Z"
-last_activity: 2026-05-08 — Confirmed `long-lived-live-proof` as a required status check in GitHub branch protection, closing the final operational caveat. Milestone v2.2 is now complete.
+milestone_name: milestone
+status: Awaiting next milestone
+last_updated: "2026-05-08T14:20:36.218Z"
+last_activity: 2026-05-08 — Milestone v2.2 completed and archived
 progress:
   total_phases: 4
   completed_phases: 4
@@ -24,12 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-07 after v2.2 milestone definition)
 
 ## Current Position
 
-Phase: milestone-complete
-Plan: none active
-Status: Milestone `v2.2` is fully complete and audited. `long-lived-live-proof` has been confirmed as a required status check, closing the final operational caveat.
-Last activity: 2026-05-08 — Updated branch protection rules, audited the milestone, and generated `.planning/milestones/v2.2-MILESTONE-AUDIT.md`.
-
-Progress: [##########] 100%
+Phase: Milestone v2.2 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-05-08 — Milestone v2.2 completed and archived
 
 ## Milestone Snapshot
 
@@ -100,3 +98,7 @@ Items still deferred or intentionally left outside the active milestone as of 20
 | adoption | Additional signing or long-lived adapters beyond the first proof-backed path | deferred until demand and proof justify them |
 | workflows | Multi-signature workflows and signer orchestration | deferred beyond `v2.2` |
 | globalization | Global text shaping, RTL support, and broader script coverage | deferred to a later candidate milestone unless urgency changes |
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone
