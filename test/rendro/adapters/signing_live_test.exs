@@ -6,23 +6,77 @@ defmodule Rendro.Adapters.SigningLiveTest do
 
   @fixtures_dir Path.expand("../../fixtures/signing", __DIR__)
   @certomancer_dir Path.join(@fixtures_dir, "certomancer")
-  @missing_tools [
-                   {"pyhanko", System.find_executable("pyhanko")},
-                   {"pdfsig", System.find_executable("pdfsig")},
-                   {"certomancer", System.find_executable("certomancer")}
-                 ]
-                 |> Enum.reject(fn {_tool, path} -> is_binary(path) end)
-                 |> Enum.map(&elem(&1, 0))
 
-  @skip_reason (case @missing_tools do
-                  [] -> nil
-                  [tool] -> "live long-lived proof requires #{tool} on PATH"
-                  tools ->
-                    "live long-lived proof requires #{Enum.join(tools, " and ")} on PATH"
-                end)
+  @signing_missing_tools [
+                           {"pyhanko", System.find_executable("pyhanko")},
+                           {"pdfsig", System.find_executable("pdfsig")}
+                         ]
+                         |> Enum.reject(fn {_tool, path} -> is_binary(path) end)
+                         |> Enum.map(&elem(&1, 0))
 
-  if @skip_reason do
-    @tag skip: @skip_reason
+  @signing_skip_reason (case @signing_missing_tools do
+                          [] -> nil
+                          [tool] -> "live signing proof requires #{tool} on PATH"
+                          tools ->
+                            "live signing proof requires #{Enum.join(tools, " and ")} on PATH"
+                        end)
+
+  @long_lived_missing_tools [
+                              {"pyhanko", System.find_executable("pyhanko")},
+                              {"pdfsig", System.find_executable("pdfsig")},
+                              {"certomancer", System.find_executable("certomancer")}
+                            ]
+                            |> Enum.reject(fn {_tool, path} -> is_binary(path) end)
+                            |> Enum.map(&elem(&1, 0))
+
+  @long_lived_skip_reason (case @long_lived_missing_tools do
+                             [] -> nil
+                             [tool] -> "live long-lived proof requires #{tool} on PATH"
+                             tools ->
+                               "live long-lived proof requires #{Enum.join(tools, " and ")} on PATH"
+                           end)
+
+  if @signing_skip_reason do
+    @tag skip: @signing_skip_reason
+  end
+
+  @tag live_signing: true
+  test "real pyhanko plus pdfsig prove the v2.1 signed-artifact path" do
+    tmp_dir = tmp_dir("rendro-live-signing")
+    on_exit(fn -> File.rm_rf(tmp_dir) end)
+
+    {:ok, signed} =
+      Sign.sign(sample_artifact(),
+        field: "customer_signature",
+        adapter: PyHanko,
+        adapter_opts: [
+          key: fixture_path("live_signer_key.pem"),
+          cert: fixture_path("live_signer_cert.pem"),
+          passfile: fixture_path("live_signer_passphrase.txt"),
+          reason: "Approved"
+        ]
+      )
+
+    assert signed.metadata.deterministic == false
+
+    assert {:ok, %{signatures: [signature]}} = Sign.validate(signed)
+    assert signature.field == "customer_signature"
+    assert signature.integrity == :valid
+    assert signature.trust == :skipped
+    assert signature.total_document_signed == true
+
+    signed_path = Path.join(tmp_dir, "signed.pdf")
+    File.write!(signed_path, signed.binary)
+
+    assert {:ok, %{signatures: [pdfsig_signature]}} = Pdfsig.validate(signed_path)
+    assert pdfsig_signature.field == signature.field
+    assert pdfsig_signature.integrity == :valid
+    assert pdfsig_signature.trust == :skipped
+    assert pdfsig_signature.total_document_signed == true
+  end
+
+  if @long_lived_skip_reason do
+    @tag skip: @long_lived_skip_reason
   end
 
   @tag live_pdf_tools: true
@@ -222,6 +276,7 @@ defmodule Rendro.Adapters.SigningLiveTest do
 
   defp certomancer_config_path, do: Path.join(@certomancer_dir, "certomancer.yml")
   defp certomancer_key_path(file_name), do: Path.join([@certomancer_dir, "keys-rsa", file_name])
+  defp fixture_path(file_name), do: Path.join(@fixtures_dir, file_name)
 
   defp shell_quote(value) do
     escaped = String.replace(value, "'", "'\"'\"'")

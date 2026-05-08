@@ -1,5 +1,5 @@
 ExUnit.start()
-ExUnit.configure(exclude: [live_pdf_tools: true])
+ExUnit.configure(exclude: [live_pdf_tools: true, live_signing: true])
 
 # Initialize the ETS-backed Threadline call recorder used by adapter tests.
 Rendro.Test.Mocks.ensure_table!()
