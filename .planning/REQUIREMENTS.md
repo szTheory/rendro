@@ -1,7 +1,7 @@
 # Requirements: Rendro v2.3 Viewer Proof & Interop Closure
 
 **Defined:** 2026-05-08
-**Status:** Planned
+**Status:** Planned (roadmap created)
 **Core Value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
 
 ## Milestone Goal
@@ -71,35 +71,42 @@ Explicit exclusions; documented to prevent scope creep mid-milestone.
 
 ## Traceability
 
-Empty initially; populated by gsd-roadmapper during roadmap creation.
+Populated by gsd-roadmapper on 2026-05-08 from the v2.3 roadmap (phases 68–72).
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MATRIX-01 | TBD | Pending |
-| MATRIX-02 | TBD | Pending |
-| MATRIX-03 | TBD | Pending |
-| RECIPE-01 | TBD | Pending |
-| RECIPE-02 | TBD | Pending |
-| RECIPE-03 | TBD | Pending |
-| RECIPE-04 | TBD | Pending |
-| RECIPE-05 | TBD | Pending |
-| VIEWER-01 | TBD | Pending |
-| VIEWER-02 | TBD | Pending |
-| VIEWER-03 | TBD | Pending |
-| VIEWER-04 | TBD | Pending |
-| VIEWER-05 | TBD | Pending |
-| VIEWER-06 | TBD | Pending |
-| VIEWER-07 | TBD | Pending |
-| GUARDRAIL-01 | TBD | Pending |
-| GUARDRAIL-02 | TBD | Pending |
-| GUARDRAIL-03 | TBD | Pending |
-| GUARDRAIL-04 | TBD | Pending |
+| MATRIX-01 | 68 | Pending |
+| MATRIX-02 | 68 | Pending |
+| MATRIX-03 | 68 | Pending |
+| RECIPE-01 | 69 | Pending |
+| RECIPE-02 | 68 | Pending |
+| RECIPE-03 | 69 | Pending |
+| RECIPE-04 | 68 | Pending |
+| RECIPE-05 | 69 | Pending |
+| VIEWER-01 | 70 | Pending |
+| VIEWER-02 | 71 | Pending |
+| VIEWER-03 | 71 | Pending |
+| VIEWER-04 | 71 | Pending |
+| VIEWER-05 | 71 | Pending |
+| VIEWER-06 | 71 | Pending |
+| VIEWER-07 | 71 | Pending |
+| GUARDRAIL-01 | 68 | Pending |
+| GUARDRAIL-02 | 72 | Pending |
+| GUARDRAIL-03 | 68 | Pending |
+| GUARDRAIL-04 | 68 | Pending |
 
 **Coverage:**
 - v2.3 requirements: 19 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 19 ⚠️ (will be filled by roadmap step)
+- Mapped to phases: 19 (phases 68–72)
+- Unmapped: 0
+
+**Phase distribution:**
+- Phase 68 (schema/task/docs-contract lane): 8 requirements (MATRIX-01, MATRIX-02, MATRIX-03, RECIPE-02, RECIPE-04, GUARDRAIL-01, GUARDRAIL-03, GUARDRAIL-04)
+- Phase 69 (operator recipe + first cell): 3 requirements (RECIPE-01, RECIPE-03, RECIPE-05)
+- Phase 70 (consolidate already-validated, parallel-safe with 71): 1 requirement (VIEWER-01)
+- Phase 71 (record new + explicit deferrals, parallel-safe with 70): 6 requirements (VIEWER-02 through VIEWER-07)
+- Phase 72 (closure / audit / ship): 1 requirement (GUARDRAIL-02)
 
 ---
 *Requirements defined: 2026-05-08*
-*Last updated: 2026-05-08 after v2.3 research synthesis.*
+*Last updated: 2026-05-08 after roadmap creation (traceability filled in across phases 68–72).*

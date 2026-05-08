@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v2.3
 milestone_name: Viewer Proof & Interop Closure
 status: planning
-last_updated: "2026-05-08T14:38:09.415Z"
+last_updated: "2026-05-08T15:00:00.000Z"
 last_activity: 2026-05-08
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-07 after v2.2 milestone definition)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 68 — Viewer Evidence Schema, Mix Task, and Docs-Contract Lane (Not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-08 — Milestone v2.3 started
+Status: Roadmap defined; ready to plan phase 68
+Last activity: 2026-05-08 — Roadmap created (5 phases: 68–72; 19/19 requirements mapped)
 
 ## Milestone Snapshot
 
@@ -73,7 +73,8 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 - `v1.10` closed 2026-05-06 as a shipped milestone — protected delivery hooks and encryption boundaries (external hooks first, narrow security claims, proof-backed validation before any in-core encryption).
 - `v2.0` closed 2026-05-07 as a shipped milestone — unsigned signature authoring, deterministic unsigned widget serialization, artifact-first signing preparation, truthful support boundaries, and verification-backfill closure for Phases 55/56.
 - `v2.1` closed 2026-05-07 as a shipped milestone — cryptographic signing and signed-artifact proof over the shipped `v2.0` seam, with enforced proof gates and truthful support boundaries.
-- `v2.2` opened 2026-05-07 as the active milestone — long-lived evidence and narrow compliance posture over the shipped signing seam.
+- `v2.2` closed 2026-05-08 as a shipped milestone — long-lived signatures and compliance evidence; phases 64–67.
+- `v2.3` opened 2026-05-08 as the active milestone — viewer proof and interop closure; phases 68–72; 19 requirements mapped across 5 phases (parallel-safe at 70/71).
 
 ### Pending Todos
 
@@ -101,4 +102,4 @@ Items still deferred or intentionally left outside the active milestone as of 20
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Plan phase 68 with /gsd-plan-phase 68
