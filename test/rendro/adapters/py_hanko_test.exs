@@ -133,7 +133,7 @@ defmodule Rendro.Adapters.PyHankoTest do
     Application.put_env(:rendro, :pyhanko_executable_finder, fn "pyhanko" -> "/tmp/pyhanko" end)
 
     Application.put_env(:rendro, :pyhanko_command_runner, fn "/tmp/pyhanko", args, _opts ->
-      [input_path, output_path] = Enum.take(Enum.reverse(args), 2) |> Enum.reverse()
+      input_path = List.last(args)
 
       assert file_mode(Path.dirname(input_path)) == 0o700
       assert file_mode(input_path) == 0o600
@@ -142,10 +142,10 @@ defmodule Rendro.Adapters.PyHankoTest do
       assert Enum.member?(args, "https://tsa.example.test")
       assert Enum.member?(args, "--trust")
       assert Enum.member?(args, "/tmp/root-ca.pem")
-      assert Enum.member?(args, "--other-cert")
+      assert Enum.member?(args, "--other-certs")
       assert Enum.member?(args, "/tmp/intermediate.pem")
 
-      File.write!(output_path, "%PDF-augmented")
+      File.write!(input_path, "%PDF-augmented")
       {"ok", 0}
     end)
 
@@ -167,7 +167,7 @@ defmodule Rendro.Adapters.PyHankoTest do
     Application.put_env(:rendro, :pyhanko_executable_finder, fn "pyhanko" -> "/tmp/pyhanko" end)
 
     Application.put_env(:rendro, :pyhanko_command_runner, fn "/tmp/pyhanko", args, _opts ->
-      [input_path | _] = Enum.take(Enum.reverse(args), 2) |> Enum.reverse()
+      input_path = List.last(args)
       send(self(), {:augment_tmp_dir, Path.dirname(input_path)})
       {"tsa https://tsa.example.test failed", 9}
     end)

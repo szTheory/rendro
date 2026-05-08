@@ -240,9 +240,9 @@ defmodule Rendro.Adapters.PyHanko do
   end
 
   defp augment_with_tmp_dir(executable, tmp_dir, binary, field, adapter_opts) do
-    with {:ok, input_path, output_path} <- write_input_paths(tmp_dir, binary),
+    with {:ok, input_path} <- write_input_path(tmp_dir, binary),
          {:ok, augmented_binary} <-
-           run_pyhanko_augment(executable, input_path, output_path, field, adapter_opts) do
+           run_pyhanko_augment(executable, input_path, field, adapter_opts) do
       {:ok, augmented_binary,
        %{
          tool: :pyhanko,
@@ -286,7 +286,7 @@ defmodule Rendro.Adapters.PyHanko do
     end
   end
 
-  defp run_pyhanko_augment(executable, input_path, output_path, field, opts) do
+  defp run_pyhanko_augment(executable, input_path, field, opts) do
     args =
       [
         "sign",
@@ -298,14 +298,14 @@ defmodule Rendro.Adapters.PyHanko do
       ] ++
         trust_args(opts.trust_roots) ++
         other_cert_args(opts.other_certs) ++
-        [input_path, output_path]
+        [input_path]
 
     case run_command(executable, args, stderr_to_stdout: true) do
       {:error, _reason} = error ->
         error
 
       {_output, 0} ->
-        File.read(output_path)
+        File.read(input_path)
 
       {_output, exit_code} ->
         {:error, {:pyhanko_failed, exit_code}}
@@ -323,7 +323,7 @@ defmodule Rendro.Adapters.PyHanko do
   end
 
   defp run_validation_helper(python, helper_path, file_path) do
-    case run_command(python, [helper_path, file_path], cd: File.cwd!(), stderr_to_stdout: true) do
+    case run_command(python, [helper_path, file_path], cd: File.cwd!()) do
       {:error, _reason} = error ->
         error
 
@@ -433,7 +433,7 @@ defmodule Rendro.Adapters.PyHanko do
 
   defp chain_args(paths), do: Enum.flat_map(paths, &["--chain", &1])
   defp trust_args(paths), do: Enum.flat_map(paths, &["--trust", &1])
-  defp other_cert_args(paths), do: Enum.flat_map(paths, &["--other-cert", &1])
+  defp other_cert_args(paths), do: Enum.flat_map(paths, &["--other-certs", &1])
   defp passfile_args(nil), do: []
   defp passfile_args(path), do: ["--passfile", path]
 
@@ -444,6 +444,17 @@ defmodule Rendro.Adapters.PyHanko do
     case write_private_file(input_path, binary) do
       :ok -> {:ok, input_path, output_path}
       {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp write_input_path(tmp_dir, binary) do
+    input_path = Path.join(tmp_dir, "input.pdf")
+
+    with :ok <- write_private_file(input_path, binary) do
+      {:ok, input_path}
+    else
+      {:error, reason} -> {:error, reason}
+      reason -> {:error, reason}
     end
   end
 

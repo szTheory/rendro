@@ -44,6 +44,9 @@ defmodule Rendro.Adapters.PdfsigTest do
     assert signature.total_document_signed == true
     assert signature.integrity == :valid
     assert signature.trust == :skipped
+    refute Map.has_key?(signature, :timestamp)
+    refute Map.has_key?(signature, :revocation)
+    refute Map.has_key?(signature, :compliance)
   end
 
   test "parses untrusted certificate posture when cert validation is enabled" do
@@ -76,6 +79,26 @@ defmodule Rendro.Adapters.PdfsigTest do
     end)
 
     assert {:error, {:invalid_pdf, :no_signatures}} = Pdfsig.validate("/tmp/file.pdf")
+  end
+
+  test "parses signature posture from non-zero output when pdfsig still emits signature blocks" do
+    Application.put_env(:rendro, :pdfsig_executable_finder, fn "pdfsig" -> "/tmp/pdfsig" end)
+
+    Application.put_env(:rendro, :pdfsig_command_runner, fn "/tmp/pdfsig", _args, _opts ->
+      {"""
+       NSS_Init failed: security library: bad database.
+       Digital Signature Info of: /tmp/file.pdf
+       Signature #1:
+         - Signature Field Name: customer_signature
+         - Signature Validation: Signature is Valid.
+         - Certificate Validation: Certificate issuer is unknown.
+       """, 1}
+    end)
+
+    assert {:ok, %{signatures: [signature]}} = Pdfsig.validate("/tmp/file.pdf")
+    assert signature.field == "customer_signature"
+    assert signature.integrity == :valid
+    assert signature.trust == :unknown
   end
 
   test "classifies runner crashes as redacted tool failures" do

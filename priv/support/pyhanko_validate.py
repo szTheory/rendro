@@ -4,8 +4,16 @@
 from __future__ import annotations
 
 import json
+import logging
 import sys
 from pathlib import Path
+
+from pyhanko.pdf_utils.reader import PdfFileReader
+from pyhanko.sign.validation import DocumentSecurityStore, validate_pdf_signature
+
+logging.getLogger().setLevel(logging.CRITICAL)
+logging.getLogger("pyhanko").setLevel(logging.CRITICAL)
+logging.getLogger("pyhanko_certvalidator").setLevel(logging.CRITICAL)
 
 
 def _status(value: bool | None, *, valid: str, invalid: str) -> str:
@@ -70,9 +78,6 @@ def _compliance(timestamp: bool, revocation: bool) -> dict[str, object]:
 
 
 def _validation_payload(pdf_path: Path) -> dict[str, object]:
-    from pyhanko.pdf_utils.reader import PdfFileReader
-    from pyhanko.sign.validation import DocumentSecurityStore, validate_pdf_signature
-
     with pdf_path.open("rb") as handle:
         reader = PdfFileReader(handle)
         embedded_signatures = list(reader.embedded_signatures)

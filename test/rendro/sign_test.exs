@@ -1,9 +1,18 @@
 defmodule Rendro.SignTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   import Bitwise
 
   alias Rendro.{Artifact, Sign}
+
+  setup do
+    on_exit(fn ->
+      Application.delete_env(:rendro, :pyhanko_executable_finder)
+      Application.delete_env(:rendro, :pyhanko_command_runner)
+    end)
+
+    :ok
+  end
 
   defmodule FakeSignerAdapter do
     @behaviour Rendro.Sign.Adapter
@@ -124,6 +133,14 @@ defmodule Rendro.SignTest do
                  do: :skipped,
                  else: :valid
                ),
+             timestamp: :present,
+             revocation: :embedded,
+             compliance: %{
+               scope: :embedded_validation_evidence,
+               level: :present,
+               proofs: %{document_timestamp: true, revocation_info: true},
+               gaps: []
+             },
              total_document_signed: true,
              signer_common_name: "Rendro Test Signer"
            }
@@ -441,6 +458,7 @@ defmodule Rendro.SignTest do
     assert augmented.hash != signed.hash
     assert augmented.metadata.deterministic == false
     assert augmented.metadata.signing.status == :signed
+
     assert augmented.metadata.long_lived == %{
              status: :augmented,
              adapter: FakeSignerAdapter,
@@ -545,6 +563,7 @@ defmodule Rendro.SignTest do
              )
 
     assert missing_callback.stage == :augment
+
     assert missing_callback.reason ==
              {:invalid_option, :adapter, MissingAugmentCallbackAdapter}
   end
@@ -605,6 +624,14 @@ defmodule Rendro.SignTest do
                  field: "customer_signature",
                  integrity: :valid,
                  trust: :skipped,
+                 timestamp: :present,
+                 revocation: :embedded,
+                 compliance: %{
+                   scope: :embedded_validation_evidence,
+                   level: :present,
+                   proofs: %{document_timestamp: true, revocation_info: true},
+                   gaps: []
+                 },
                  total_document_signed: true
                }
              ]
@@ -623,6 +650,118 @@ defmodule Rendro.SignTest do
                field: "customer_signature",
                integrity: :valid,
                trust: :valid,
+               timestamp: :present,
+               revocation: :embedded,
+               compliance: %{
+                 scope: :embedded_validation_evidence,
+                 level: :present,
+                 proofs: %{document_timestamp: true, revocation_info: true},
+                 gaps: []
+               },
+               total_document_signed: true
+             }
+           ]
+  end
+
+  test "augment and validate keep the canonical first-party long-lived flow explicit" do
+    Application.put_env(:rendro, :pyhanko_executable_finder, fn
+      "pyhanko" -> "/tmp/pyhanko"
+      "python3" -> "/tmp/python3"
+      "python" -> "/tmp/python"
+    end)
+
+    Application.put_env(:rendro, :pyhanko_command_runner, fn executable, args, _opts ->
+      cond do
+        executable == "/tmp/pyhanko" and Enum.take(args, 2) == ["sign", "addsig"] ->
+          [input_path, output_path] = Enum.take(Enum.reverse(args), 2) |> Enum.reverse()
+          assert Enum.member?(args, "--field")
+          assert Enum.member?(args, "customer_signature")
+          File.write!(output_path, File.read!(input_path) <> "-signed")
+          {"signed", 0}
+
+        executable == "/tmp/pyhanko" and Enum.take(args, 2) == ["sign", "ltvfix"] ->
+          input_path = List.last(args)
+          assert Enum.member?(args, "--timestamp-url")
+          assert Enum.member?(args, "https://tsa.example.test")
+          assert Enum.member?(args, "--trust")
+          assert Enum.member?(args, "/tmp/root-ca.pem")
+          File.write!(input_path, File.read!(input_path) <> "-augmented")
+          {"augmented", 0}
+
+        executable == "/tmp/python3" ->
+          payload =
+            ~s({"signatures":[{"field":"customer_signature","integrity":"valid","trust":"valid","timestamp":"present","revocation":"embedded","compliance":{"level":"present","proofs":{"document_timestamp":true,"revocation_info":true},"gaps":[]},"total_document_signed":true}]})
+
+          {payload, 0}
+
+        true ->
+          flunk("unexpected command: #{inspect({executable, args})}")
+      end
+    end)
+
+    assert {:ok, signed} =
+             Sign.sign(signature_artifact(),
+               field: "customer_signature",
+               adapter: Rendro.Adapters.PyHanko,
+               adapter_opts: [key: "/tmp/key.pem", cert: "/tmp/cert.pem"]
+             )
+
+    assert {:ok, augmented} =
+             Sign.augment(signed,
+               adapter: Rendro.Adapters.PyHanko,
+               adapter_opts: [
+                 tsa_url: "https://tsa.example.test",
+                 trust_roots: ["/tmp/root-ca.pem"]
+               ]
+             )
+
+    assert {:ok, posture} =
+             Sign.validate(augmented, adapter: Rendro.Adapters.PyHanko)
+
+    assert {:ok, trust_posture} =
+             Sign.validate_trust(augmented, adapter: Rendro.Adapters.PyHanko)
+
+    assert augmented.metadata.long_lived == %{
+             status: :augmented,
+             adapter: Rendro.Adapters.PyHanko,
+             timestamp: :present,
+             revocation: :embedded,
+             compliance_evidence: :narrow_supported_path
+           }
+
+    assert posture == %{
+             adapter: Rendro.Adapters.PyHanko,
+             signatures: [
+               %{
+                 field: "customer_signature",
+                 integrity: :valid,
+                 trust: :skipped,
+                 timestamp: :present,
+                 revocation: :embedded,
+                 compliance: %{
+                   scope: :embedded_validation_evidence,
+                   level: :present,
+                   proofs: %{document_timestamp: true, revocation_info: true},
+                   gaps: []
+                 },
+                 total_document_signed: true
+               }
+             ]
+           }
+
+    assert trust_posture.signatures == [
+             %{
+               field: "customer_signature",
+               integrity: :valid,
+               trust: :valid,
+               timestamp: :present,
+               revocation: :embedded,
+               compliance: %{
+                 scope: :embedded_validation_evidence,
+                 level: :present,
+                 proofs: %{document_timestamp: true, revocation_info: true},
+                 gaps: []
+               },
                total_document_signed: true
              }
            ]

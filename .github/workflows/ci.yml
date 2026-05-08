@@ -34,7 +34,7 @@ jobs:
           mix deps.get
           mix compile
 
-  signing-live-proof:
+  long-lived-live-proof:
     runs-on: ubuntu-latest
     needs: test
 
@@ -59,13 +59,14 @@ jobs:
           sudo apt-get install -y poppler-utils
           pdfsig -v
           python3 -m pip install --upgrade pip
-          python3 -m pip install pyHanko pyHanko-cli
+          python3 -m pip install 'certomancer[web-api]' pyHanko pyHanko-cli
+          certomancer --version
           pyhanko --version
 
-      - name: Install Dependencies
+      - name: Install Elixir Dependencies
         run: mix deps.get
 
-      - name: Run Signing Live Proof
+      - name: Run Long-Lived Live Proof
         run: mix test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs
 
   release-proof:

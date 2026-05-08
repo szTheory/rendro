@@ -25,7 +25,10 @@ defmodule Rendro.Adapters.Pdfsig do
             parse_validation(output)
 
           {:error, {:pdfsig_failed, exit_code, output}} ->
-            {:error, {:invalid_pdf, classify_failure(output, exit_code)}}
+            case parse_validation(output) do
+              {:ok, _result} = ok -> ok
+              {:error, _reason} -> {:error, {:invalid_pdf, classify_failure(output, exit_code)}}
+            end
 
           {:error, {:command_failed, _error_module}} ->
             {:error, {:invalid_pdf, :tool_failure}}
