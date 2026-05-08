@@ -13,6 +13,7 @@ defmodule Rendro.DocsContract.SigningClaimsTest do
     assert matrix =~ ~s|"embedded_validation_evidence_posture": "supported"|
     assert matrix =~ ~s|"certificate_trust_is_separate": "supported"|
     assert matrix =~ ~s|"pdfsig_integrity_parity": "supported_secondary"|
+    assert matrix =~ ~s|"signer_identity_trust": "unsupported"|
     assert matrix =~ ~s|"viewer_promotion": "unsupported"|
     assert matrix =~ ~s|"lt_lta_profile_marketing": "unsupported"|
     assert matrix =~ ~s|"blanket_compliance_claims": "unsupported"|
@@ -81,6 +82,9 @@ defmodule Rendro.DocsContract.SigningClaimsTest do
     refute guide =~ "tamper-evident signing"
     refute guide =~ "PAdES is supported"
     refute guide =~ "LT/LTA is supported"
+    refute guide =~ "PDF/A is supported"
+    refute guide =~ "regulatory approval"
+    refute guide =~ "enterprise compliance"
     refute guide =~ "all signature viewers are supported"
     refute guide =~ "viewer portability is guaranteed"
     refute guide =~ "Rendro owns signer identity trust"
