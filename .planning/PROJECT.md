@@ -44,7 +44,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 **Foundation Already Shipped:** v1.3 release readiness, v1.2 typography/assets truth, v1.1 layout-authoring maturity, and v1.0 deterministic core rendering.
 
-## Next Milestone: v2.3 Viewer Proof & Interop Closure
+## Current Milestone: v2.3 Viewer Proof & Interop Closure
 
 **Goal:** Close the trust-sensitive viewer evidence gap surface-by-surface so public support claims for forms, protection, signatures, signing preparation, signed artifacts, and long-lived evidence can be promoted with recorded per-viewer proof rather than deferred under blanket "unverified" rows.
 
@@ -196,4 +196,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-08 after v2.2 milestone shipped.*
+*Last updated: 2026-05-08 after v2.3 milestone definition (viewer proof & interop closure activated).*

@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.2
-milestone_name: milestone
-status: Awaiting next milestone
-last_updated: "2026-05-08T14:20:36.218Z"
-last_activity: 2026-05-08 — Milestone v2.2 completed and archived
+milestone: v2.3
+milestone_name: Viewer Proof & Interop Closure
+status: planning
+last_updated: "2026-05-08T14:38:09.415Z"
+last_activity: 2026-05-08
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 8
-  completed_plans: 8
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-07 after v2.2 milestone definition)
 
 ## Current Position
 
-Phase: Milestone v2.2 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-05-08 — Milestone v2.2 completed and archived
+Status: Defining requirements
+Last activity: 2026-05-08 — Milestone v2.3 started
 
 ## Milestone Snapshot
 
