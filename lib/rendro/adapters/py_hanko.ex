@@ -452,9 +452,6 @@ defmodule Rendro.Adapters.PyHanko do
 
     with :ok <- write_private_file(input_path, binary) do
       {:ok, input_path}
-    else
-      {:error, reason} -> {:error, reason}
-      reason -> {:error, reason}
     end
   end
 
