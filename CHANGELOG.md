@@ -5,7 +5,62 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.0] - Unreleased
+## [0.3.0] - Unreleased
+
+This release lifts the v1.5–v2.2 milestone work onto Hex. The 0.2.0 published surface ended at password-to-open protection; 0.3.0 adds validation/trust surfaces, interactive forms, embedded artifacts, signature widgets and signing preparation, cryptographic signing, and long-lived signature evidence — every public claim backed by `priv/support_matrix.json` rows and either a structural or live-tool proof lane. Per-viewer evidence remains the next milestone (v2.3) and is intentionally still recorded as `unverified` outside the rows that have promoted proof.
+
+### Added
+
+#### Validation and Trust Surfaces (v1.5)
+
+- `Rendro.Adapters.Poppler` for structural PDF validation through `pdfinfo`/Poppler with stable redacted error reasons. The lane proves PDF structure only; it does not prove interactive viewer behavior.
+- `priv/support_matrix.json` as the canonical machine-readable support contract, mirrored by `guides/api_stability.md`. Every public surface added in this release ships a row in the matrix; rows without recorded per-viewer evidence stay `unverified` rather than being promoted optimistically.
+- Widow/orphan layout controls and richer nested-layout structures.
+
+#### Interactive Forms (v1.8)
+
+- `Rendro.form_field/3` with `%Rendro.FormField{}` for deterministic authored AcroForm text fields, checkboxes, and radio groups in the core pipeline.
+- Explicit appearance streams for every form widget rather than relying on viewer-generated `NeedAppearances` — keeps deterministic render output stable across viewers.
+- Forms boundary in `priv/support_matrix.json` and a `forms_claims_test.exs` docs-contract lane.
+- Recorded Apple Preview proof for the `forms` surface (Phase 47); other viewers held at `unverified` pending v2.3 viewer-evidence work.
+
+#### Embedded Artifact Surfaces (v1.9)
+
+- Document-level embedded files with explicit deterministic metadata, validate-stage rejection of ambiguous authored state, and writer emission of `/EmbeddedFile`, `/Filespec`, `/Names`, and `/AF` catalog wiring sorted by stable authored keys.
+- Curated link annotations limited to `http`/`https` URIs and in-document page targets, serialized through the existing page `/Annots` seam — no named destinations, no `/GoToR`, no generic action dictionaries.
+- Recorded Adobe Acrobat Reader proof for both `embedded_files` and `links`; recorded Apple Preview proof for `links`.
+
+#### Signature Field Authoring and External Signing Preparation (v2.0)
+
+- `Rendro.signature_field/2` for explicit unsigned signature-field authoring on the existing `%Rendro.FormField{}` seam — narrow surface, no second forms engine.
+- Deterministic unsigned `/Sig` widget serialization and AcroForm structures without signer-owned placeholders or policy dictionaries leaking into ordinary render output.
+- Validate-stage rejection for scope-breaking signature metadata (signer identity, trust anchors, compliance claims) so unsupported semantics fail before render with typed errors.
+- `Rendro.Sign.prepare/2` artifact-first external-signing preparation that operates on final artifact bytes, publishes deterministic placeholder coordinates under `metadata.signing_preparation`, and isolates adapter-specific handoff data under `metadata.signing_preparation_adapter`.
+
+#### Cryptographic Signing and Signed-Artifact Validation (v2.1)
+
+- `Rendro.Sign.sign/2` as the artifact-first cryptographic-signing seam over the v2.0 unsigned/preparation boundary.
+- `Rendro.Sign.Adapter` behaviour defining the narrow signing-adapter contract.
+- First-party optional `Rendro.Adapters.PyHanko` (signing + signed-artifact validation) and `Rendro.Adapters.Pdfsig` (validation) adapters with explicit runtime-executable, redaction, and integrity-vs-trust boundaries — neither package becomes a hard dependency.
+- `Rendro.Sign.validate/2` with distinct signals for cryptographic integrity, certificate trust, and viewer behavior (rather than collapsing them into one "signed and valid" claim).
+- `signing-live-proof` GitHub Actions lane required on `main` that exercises the canonical `sign → validate` path against checked-in static signing fixtures.
+- One signed-artifact support contract aligned across `priv/support_matrix.json`, `guides/api_stability.md`, `guides/integrations.md`, docs-contract tests, and verification artifacts. Signature-specific viewer rows remain `unverified` until recorded per-viewer evidence exists.
+
+#### Long-Lived Signatures and Compliance Evidence (v2.2)
+
+- `Rendro.Sign.augment/2` as a separate seam that adds timestamp and revocation evidence over already-signed artifacts — keeps signing, augmentation, and validation as three explicit boundaries instead of one widening API.
+- First-party optional pyHanko long-lived adapter that adds timestamp and revocation evidence without claiming certificate-trust ownership.
+- Validator-backed posture classification reporting cryptographic integrity, timestamp presence, revocation evidence presence, and narrow compliance posture as distinct signals — not a blanket PDF/A or PAdES claim.
+- `metadata.long_lived` shared posture and `metadata.long_lived_adapter` for tool-shaped facts; explicit non-determinism flagged on every augmented artifact.
+- `long-lived-live-proof` GitHub Actions lane required on `main`, backed by an offline `certomancer`-driven PKI/TSA/OCSP fixture so the supported `sign → augment → validate` path is operationally enforced without depending on any public PKI/TSA/CRL endpoint.
+- Nested `signing.long_lived` taxonomy in `priv/support_matrix.json`, separate from blanket PDF/A claims, signer trust, viewer behavior, and multi-signature workflows.
+
+### Truthful Boundaries Held
+
+- `priv/support_matrix.json` and `guides/api_stability.md` keep unsupported narratives (HTML/CSS parity, browser-style layout, signer-identity trust by default, broad compliance branding, viewer promotion without recorded evidence, multi-signature workflows, HSM/key custody in core, remote asset fetching, broad complex-script support) explicit. Every supported viewer row is backed by recorded checklist proof; rows without recorded proof remain `unverified` rather than being promoted.
+- The canonical protected-delivery recipe documented in 0.2.0 stays unchanged: `render_to_artifact -> Protect.password -> store/deliver`. Signing seams (`prepare/2`, `sign/2`, `augment/2`) live alongside protection on the artifact boundary, never inside `Rendro.render/2`.
+
+## [0.2.0] - 2026-05-06
 
 ### Added
 

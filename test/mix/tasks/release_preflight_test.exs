@@ -7,7 +7,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
     runner =
       command_runner_for(%{
         {"git", ["status", "--short"]} => {" M README.md\n", 0},
-        {"git", ["describe", "--tags", "--exact-match"]} => {"v0.2.0\n", 0},
+        {"git", ["describe", "--tags", "--exact-match"]} => {"v0.3.0\n", 0},
         {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0}
       })
 
@@ -41,7 +41,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
     runner =
       command_runner_for(%{
         {"git", ["status", "--short"]} => {"", 0},
-        {"git", ["describe", "--tags", "--exact-match"]} => {"v0.2.0\n", 0},
+        {"git", ["describe", "--tags", "--exact-match"]} => {"v0.3.0\n", 0},
         {"mix", ["ci"]} => {"ci ok", 0},
         {"mix", ["docs.contract"]} => {"docs drifted", 1},
         {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0},
@@ -134,7 +134,8 @@ defmodule Mix.Tasks.Release.PreflightTest do
       send(test_pid, {:preflight_command, command, args})
 
       if command == "mix" and args == ["hex.build", "--unpack"] do
-        File.mkdir_p!("rendro-0.2.0/guides")
+        version = Mix.Project.config()[:version]
+        File.mkdir_p!("rendro-#{version}/guides")
 
         Enum.each(
           [
@@ -146,11 +147,11 @@ defmodule Mix.Tasks.Release.PreflightTest do
             "guides/integrations.md"
           ],
           fn file ->
-            File.touch!(Path.join("rendro-0.2.0", file))
+            File.touch!(Path.join("rendro-#{version}", file))
           end
         )
 
-        File.touch!("rendro-0.2.0.tar")
+        File.touch!("rendro-#{version}.tar")
       end
 
       Map.fetch!(responses, {command, args})
