@@ -196,4 +196,38 @@ defmodule Rendro.ErrorTest do
       refute err.next =~ "stdout"
     end
   end
+
+  describe "from_stage/3 with stage :augment" do
+    test "missing adapter emits augment-specific guidance" do
+      err = Rendro.Error.from_stage(:augment, {:missing_required_option, :adapter})
+      assert err.stage == :augment
+      assert err.where == "Rendro.Pipeline.Augment"
+      assert err.what == "PDF long-lived augmentation failed while wrapping the signed artifact."
+      assert err.next =~ "Pass adapter:"
+      refute err.next =~ "pyhanko-cli"
+    end
+
+    test "unsigned artifact wording stays augment-specific" do
+      err = Rendro.Error.from_stage(:augment, :unsigned_artifact_not_augmentable)
+      assert err.stage == :augment
+      assert err.why =~ "signed artifact"
+      assert err.next =~ "Rendro.Sign.sign/2"
+      refute err.why =~ "Protection"
+      refute err.why =~ "validation"
+    end
+
+    test "adapter failure guidance stays redacted and stage-specific" do
+      err =
+        Rendro.Error.from_stage(
+          :augment,
+          {:adapter_failure, Rendro.Adapters.PyHanko, {:command_failed, RuntimeError}}
+        )
+
+      assert err.stage == :augment
+      assert err.why =~ "Long-lived adapter Rendro.Adapters.PyHanko failed"
+      refute err.why =~ "stderr"
+      refute err.next =~ "stdout"
+      refute err.next =~ "protection"
+    end
+  end
 end

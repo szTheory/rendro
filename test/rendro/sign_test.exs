@@ -20,6 +20,12 @@ defmodule Rendro.SignTest do
       send(self(), {:fake_sign_called, opts})
       {:ok, binary <> "-signed", %{tool: :fake_signer, credential_source: :pemder}}
     end
+
+    @impl true
+    def augment(%Artifact{binary: binary}, opts) do
+      send(self(), {:fake_augment_called, opts})
+      {:ok, binary <> "-augmented", %{tool: :fake_signer, timestamp_profile: :pades_lt}}
+    end
   end
 
   defmodule SecretLeakingAdapter do
@@ -41,6 +47,19 @@ defmodule Rendro.SignTest do
          trust_verdict: :trusted
        }}
     end
+
+    @impl true
+    def augment(%Artifact{binary: binary}, _opts) do
+      {:ok, binary <> "-augmented",
+       %{
+         tool: :secret_leaker,
+         timestamp_profile: :pades_lta,
+         passphrase: "super-secret",
+         stderr: "sensitive stderr",
+         temp_path: "/tmp/rendro-ltv",
+         revocation_blob: "raw-ocsp"
+       }}
+    end
   end
 
   defmodule FailingSignerAdapter do
@@ -51,6 +70,21 @@ defmodule Rendro.SignTest do
 
     @impl true
     def sign(%Artifact{}, _opts), do: {:error, {:command_failed, RuntimeError}}
+
+    @impl true
+    def augment(%Artifact{}, _opts), do: {:error, {:command_failed, RuntimeError}}
+  end
+
+  defmodule MissingAugmentCallbackAdapter do
+    @behaviour Rendro.Sign.Adapter
+
+    @impl true
+    def prepare(%Artifact{} = artifact, _opts), do: {:ok, artifact.binary, %{}}
+
+    @impl true
+    def sign(%Artifact{binary: binary}, _opts) do
+      {:ok, binary <> "-signed", %{tool: :missing_augment}}
+    end
   end
 
   defmodule FakeValidationAdapter do
@@ -114,6 +148,17 @@ defmodule Rendro.SignTest do
       ])
 
     {:ok, artifact} = Rendro.render_to_artifact(doc, deterministic: true)
+    artifact
+  end
+
+  defp signed_artifact do
+    {:ok, artifact} =
+      Sign.sign(signature_artifact(),
+        field: "customer_signature",
+        adapter: FakeSignerAdapter,
+        adapter_opts: [key: "/tmp/key.pem", cert: "/tmp/cert.pem"]
+      )
+
     artifact
   end
 
@@ -359,6 +404,124 @@ defmodule Rendro.SignTest do
     refute inspect(signed.metadata.signing_adapter) =~ "trust"
   end
 
+  test "augment/2 extends a signed artifact through the configured adapter only" do
+    signed = signed_artifact()
+
+    assert {:ok, augmented} =
+             Sign.augment(signed,
+               adapter: FakeSignerAdapter,
+               adapter_opts: [tsa_url: "https://tsa.example.test", revocation: :embed]
+             )
+
+    assert_receive {:fake_sign_called, _sign_opts}
+    assert_receive {:fake_augment_called, opts}
+    assert opts.adapter == FakeSignerAdapter
+    assert opts.adapter_opts == [tsa_url: "https://tsa.example.test", revocation: :embed]
+    assert augmented.binary =~ "-augmented"
+    assert augmented.metadata.deterministic == false
+    assert augmented.metadata.signing.status == :signed
+  end
+
+  test "augment/2 rejects unsigned artifacts before adapter execution" do
+    assert {:error, %Rendro.Error{} = error} =
+             Sign.augment(signature_artifact(),
+               adapter: FakeSignerAdapter,
+               adapter_opts: [tsa_url: "https://tsa.example.test"]
+             )
+
+    assert error.stage == :augment
+    assert error.reason == :unsigned_artifact_not_augmentable
+    refute_received {:fake_augment_called, _opts}
+  end
+
+  test "augment/2 rejects prepared artifacts before adapter execution" do
+    {:ok, prepared} =
+      Sign.prepare(signature_artifact(), field: "customer_signature", reserved_bytes: 4096)
+
+    assert {:error, %Rendro.Error{} = error} =
+             Sign.augment(prepared,
+               adapter: FakeSignerAdapter,
+               adapter_opts: [tsa_url: "https://tsa.example.test"]
+             )
+
+    assert error.stage == :augment
+    assert error.reason == :prepared_artifact_not_augmentable
+    refute_received {:fake_augment_called, _opts}
+  end
+
+  test "augment/2 rejects artifacts missing signing metadata before adapter execution" do
+    artifact = Artifact.wrap("signed-bytes", signature_artifact(), %{deterministic: false})
+
+    assert {:error, %Rendro.Error{} = error} =
+             Sign.augment(artifact,
+               adapter: FakeSignerAdapter,
+               adapter_opts: [tsa_url: "https://tsa.example.test"]
+             )
+
+    assert error.stage == :augment
+    assert error.reason == :unsupported_artifact_state
+    refute_received {:fake_augment_called, _opts}
+  end
+
+  test "augment/2 rejects already-augmented artifacts before adapter execution" do
+    signed = signed_artifact()
+
+    already_augmented =
+      Artifact.wrap("signed-augmented", signed, %{
+        long_lived_signing: %{status: :augmented, adapter: FakeSignerAdapter}
+      })
+
+    assert {:error, %Rendro.Error{} = error} =
+             Sign.augment(already_augmented,
+               adapter: FakeSignerAdapter,
+               adapter_opts: [tsa_url: "https://tsa.example.test"]
+             )
+
+    assert error.stage == :augment
+    assert error.reason == :already_augmented
+    refute_received {:fake_augment_called, _opts}
+  end
+
+  test "augment/2 rejects malformed top-level options" do
+    assert {:error, %Rendro.Error{} = error} = Sign.augment(signed_artifact(), %{adapter: nil})
+
+    assert error.stage == :augment
+    assert error.reason == {:invalid_option, :options, %{adapter: nil}}
+  end
+
+  test "augment/2 requires an explicit adapter" do
+    assert {:error, %Rendro.Error{} = error} = Sign.augment(signed_artifact(), adapter_opts: [])
+
+    assert error.stage == :augment
+    assert error.reason == {:missing_required_option, :adapter}
+  end
+
+  test "augment/2 rejects invalid adapter modules or missing callbacks" do
+    assert {:error, %Rendro.Error{} = invalid_adapter} =
+             Sign.augment(signed_artifact(), adapter: "bad-adapter", adapter_opts: [])
+
+    assert invalid_adapter.stage == :augment
+    assert invalid_adapter.reason == {:invalid_option, :adapter, "bad-adapter"}
+
+    assert {:error, %Rendro.Error{} = missing_callback} =
+             Sign.augment(signed_artifact(),
+               adapter: MissingAugmentCallbackAdapter,
+               adapter_opts: []
+             )
+
+    assert missing_callback.stage == :augment
+    assert missing_callback.reason ==
+             {:invalid_option, :adapter, MissingAugmentCallbackAdapter}
+  end
+
+  test "augment/2 rejects invalid adapter option containers" do
+    assert {:error, %Rendro.Error{} = error} =
+             Sign.augment(signed_artifact(), adapter: FakeSignerAdapter, adapter_opts: "bad")
+
+    assert error.stage == :augment
+    assert error.reason == {:invalid_option, :adapter_opts, "bad"}
+  end
+
   test "render_signed/3 signs after rendering through the top-level seam" do
     doc =
       Rendro.fixed([
@@ -453,5 +616,42 @@ defmodule Rendro.SignTest do
     assert error.details.adapter == UnsignedValidationAdapter
     refute inspect(error.details) =~ "rendro-validate-"
     refute inspect(error) =~ "artifact.pdf"
+  end
+
+  test "augment/2 redacts adapter failures to adapter identity and adapter option keys only" do
+    assert {:error, %Rendro.Error{} = error} =
+             Sign.augment(signed_artifact(),
+               adapter: FailingSignerAdapter,
+               adapter_opts: [
+                 tsa_url: "https://tsa.example.test",
+                 passfile: "/tmp/pass.txt",
+                 revocation_cache: "/tmp/revocation"
+               ]
+             )
+
+    assert error.stage == :augment
+    assert error.reason == {:command_failed, RuntimeError}
+    assert error.details.adapter == FailingSignerAdapter
+    assert error.details.adapter_opt_keys == [:passfile, :revocation_cache, :tsa_url]
+    refute inspect(error.details) =~ "/tmp/pass.txt"
+    refute inspect(error.details) =~ "/tmp/revocation"
+  end
+
+  test "augment/2 persists only safe adapter-local metadata on augmented artifacts" do
+    assert {:ok, augmented} =
+             Sign.augment(signed_artifact(),
+               adapter: SecretLeakingAdapter,
+               adapter_opts: [tsa_url: "https://tsa.example.test"]
+             )
+
+    assert augmented.metadata.long_lived_signing_adapter == %{
+             tool: :secret_leaker,
+             timestamp_profile: :pades_lta
+           }
+
+    refute inspect(augmented.metadata.long_lived_signing_adapter) =~ "super-secret"
+    refute inspect(augmented.metadata.long_lived_signing_adapter) =~ "stderr"
+    refute inspect(augmented.metadata.long_lived_signing_adapter) =~ "/tmp/rendro-ltv"
+    refute inspect(augmented.metadata.long_lived_signing_adapter) =~ "raw-ocsp"
   end
 end
