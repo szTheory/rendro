@@ -37,7 +37,11 @@ vendor/
 coverage/
 .cache/
 tmp/
-.planning/
+# .planning/ stays tracked in git; ignore only transient GSD scratch
+.gsd_*
+.planning/tmp_state.json
+.planning/*_snapshot.json
+.planning/roadmap_analyze.json
 
 # Example app artifacts
 examples/phoenix_example/_build/
