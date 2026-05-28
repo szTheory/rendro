@@ -41,7 +41,7 @@ created: 2026-05-28
 | 70-01-01 | 01 | 1 | VIEWER-01 | T-70-01-01 | Embedded fixture committed with deterministic structure | unit | `mix test test/support/embedded_artifact_support_fixture_test.exs` | ✅ | ⬜ pending |
 | 70-01-02 | 01 | 1 | VIEWER-01 | — | Protection fixture file exists on disk | unit | `test -f test/fixtures/protection_support_fixture.pdf` | ❌ W0 | ⬜ pending |
 | 70-02-01 | 02 | 2 | VIEWER-01 | T-70-02-01 | Five evidence files pass Validator.validate_evidence_file | integration | `mix test test/docs_contract/viewer_evidence_claims_test.exs` | ❌ W0 | ⬜ pending |
-| 70-02-02 | 02 | 2 | VIEWER-01 | — | Evidence lint: no secrets/home paths | unit | `mix rendro.viewer_evidence validate` (pre-matrix) | ✅ | ⬜ pending |
+| 70-02-02 | 02 | 2 | VIEWER-01 | — | Per-file evidence validation (skip_path_alignment) | unit | `mix run -e '...validate_evidence_file(..., skip_path_alignment: true)'` for all 5 paths | ✅ | ⬜ pending |
 | 70-03-01 | 03 | 3 | VIEWER-01 | T-70-03-01 | Production matrix promotion-complete | integration | `mix test test/docs_contract/viewer_evidence_claims_test.exs` | ❌ W0 | ⬜ pending |
 | 70-03-02 | 03 | 3 | VIEWER-01 | — | JSON Schema tier-B flip rejects pointerless supported | unit | `mix test test/docs_contract/viewer_evidence_claims_test.exs` | ❌ W0 | ⬜ pending |
 | 70-03-03 | 03 | 3 | VIEWER-01 | — | api_stability mirrors all five evidence paths | integration | `mix test test/docs_contract/viewer_evidence_claims_test.exs` | ❌ W0 | ⬜ pending |
