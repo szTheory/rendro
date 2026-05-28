@@ -1,5 +1,5 @@
 {
-  "model_profile": "balanced",
+  "model_profile": "adaptive",
   "commit_docs": true,
   "parallelization": true,
   "search_gitignored": false,
@@ -42,5 +42,13 @@
   "features": {},
   "resolve_model_ids": "omit",
   "mode": "yolo",
-  "granularity": "coarse"
+  "granularity": "coarse",
+  "runtime": "cursor",
+  "model_profile_overrides": {
+    "cursor": {
+      "opus": "inherit",
+      "sonnet": "composer-2.5",
+      "haiku": "composer-2.5"
+    }
+  }
 }
