@@ -51,7 +51,9 @@ defmodule Rendro.MixProject do
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.40", only: [:dev, :test], runtime: false},
-      {:req, "~> 0.5", only: [:dev, :test]}
+      {:req, "~> 0.5", only: [:dev, :test]},
+      {:jsv, "~> 0.18", only: [:dev, :test], runtime: false},
+      {:yaml_elixir, "~> 2.12", only: [:dev, :test], runtime: false}
     ]
   end
 

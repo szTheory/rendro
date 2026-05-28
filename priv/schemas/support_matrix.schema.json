@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "support_matrix.schema.json",
+  "title": "Rendro Support Matrix",
+  "description": "Structural contract for priv/support_matrix.json viewer rows and family layout.",
+  "type": "object",
+  "required": ["forms", "signing", "embedded_files", "links", "protection"],
+  "properties": {
+    "validators": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "forms": {
+      "type": "object",
+      "properties": {
+        "authored_helpers": { "type": "object", "additionalProperties": true },
+        "widgets": { "type": "object", "additionalProperties": true },
+        "behaviors": { "type": "object", "additionalProperties": true },
+        "viewers": { "$ref": "#/$defs/viewer_map" },
+        "signature_widget_viewers": { "$ref": "#/$defs/viewer_map" }
+      },
+      "additionalProperties": true
+    },
+    "signing_preparation": {
+      "type": "object",
+      "properties": {
+        "capabilities": { "type": "object", "additionalProperties": true },
+        "behaviors": { "type": "object", "additionalProperties": true },
+        "boundaries": { "type": "object", "additionalProperties": true },
+        "viewers": { "$ref": "#/$defs/viewer_map" }
+      },
+      "additionalProperties": true
+    },
+    "signing": {
+      "type": "object",
+      "properties": {
+        "capabilities": { "type": "object", "additionalProperties": true },
+        "behaviors": { "type": "object", "additionalProperties": true },
+        "boundaries": { "type": "object", "additionalProperties": true },
+        "viewers": { "$ref": "#/$defs/viewer_map" },
+        "long_lived": {
+          "type": "object",
+          "properties": {
+            "capabilities": { "type": "object", "additionalProperties": true },
+            "validation": { "type": "object", "additionalProperties": true },
+            "boundaries": { "type": "object", "additionalProperties": true },
+            "viewers": { "$ref": "#/$defs/viewer_map" }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "embedded_files": {
+      "type": "object",
+      "properties": {
+        "capabilities": { "type": "object", "additionalProperties": true },
+        "behaviors": { "type": "object", "additionalProperties": true },
+        "viewers": { "$ref": "#/$defs/viewer_map" }
+      },
+      "additionalProperties": true
+    },
+    "links": {
+      "type": "object",
+      "properties": {
+        "targets": { "type": "object", "additionalProperties": true },
+        "behaviors": { "type": "object", "additionalProperties": true },
+        "viewers": { "$ref": "#/$defs/viewer_map" }
+      },
+      "additionalProperties": true
+    },
+    "protection": {
+      "type": "object",
+      "properties": {
+        "capabilities": { "type": "object", "additionalProperties": true },
+        "algorithms": { "type": "object", "additionalProperties": true },
+        "behaviors": { "type": "object", "additionalProperties": true },
+        "boundaries": { "type": "object", "additionalProperties": true },
+        "viewers": { "$ref": "#/$defs/viewer_map" }
+      },
+      "additionalProperties": true
+    },
+    "unsupported": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "viewer_map": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/viewer_row" }
+    },
+    "viewer_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["supported", "unverified", "explicit_deferral"]
+        },
+        "proof": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "evidence": {
+          "type": "string",
+          "pattern": "^priv/viewer_evidence/[a-z0-9_]+/[a-z0-9_]+\\.md$"
+        },
+        "recorded_at": { "type": "string", "format": "date" },
+        "viewer_kind": {
+          "type": "string",
+          "enum": ["manual", "pdfium-cli", "pdfjs-dist"]
+        },
+        "evidence_deferred": { "type": "string", "minLength": 40 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "explicit_deferral" } },
+            "required": ["status"]
+          },
+          "then": {
+            "required": ["evidence_deferred"],
+            "not": {
+              "anyOf": [
+                { "required": ["evidence"] },
+                { "required": ["recorded_at"] },
+                { "required": ["viewer_kind"] }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "status": { "const": "unverified" } },
+            "required": ["status"]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                { "required": ["evidence"] },
+                { "required": ["recorded_at"] },
+                { "required": ["viewer_kind"] },
+                { "required": ["evidence_deferred"] }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

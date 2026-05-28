@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "viewer_evidence.schema.json",
+  "title": "Viewer Evidence Frontmatter",
+  "description": "Frontmatter contract for priv/viewer_evidence/<surface>/<viewer>.md files. Each evidence file must stay within a 65536-byte budget on disk.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "surface",
+    "viewer",
+    "viewer_version",
+    "platform",
+    "recorded_at",
+    "behaviors"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Frontmatter schema version. Must be 1."
+    },
+    "surface": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$",
+      "description": "Evidence surface segment; must match the parent directory under priv/viewer_evidence/."
+    },
+    "viewer": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$",
+      "description": "Viewer key; must match the filename stem under priv/viewer_evidence/<surface>/."
+    },
+    "viewer_version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Recorded viewer or runtime version at observation time."
+    },
+    "platform": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Single OS + platform string describing the observation environment."
+    },
+    "recorded_at": {
+      "type": "string",
+      "format": "date",
+      "description": "ISO date (YYYY-MM-DD) when evidence was recorded."
+    },
+    "recorded_by": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional operator or automation identifier."
+    },
+    "fixture": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Repo-relative path to the PDF fixture used for this observation."
+    },
+    "fixture_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Content-addressed fixture reference when no repo path is stored."
+    },
+    "behaviors": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Per-behavior observation rows aligned with matrix proof[] IDs for the promoted cell.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["behavior", "result", "note"],
+        "properties": {
+          "behavior": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Matrix proof[] behavior identifier for this cell."
+          },
+          "result": {
+            "type": "string",
+            "enum": ["pass", "fail", "skip", "na"],
+            "description": "Observation outcome for this behavior."
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Non-empty operator note, required even when result is pass."
+          }
+        }
+      }
+    }
+  },
+  "oneOf": [
+    { "required": ["fixture"] },
+    { "required": ["fixture_sha256"] }
+  ]
+}
