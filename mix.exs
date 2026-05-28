@@ -104,7 +104,8 @@ defmodule Rendro.MixProject do
         "README.md",
         "guides/integrations.md",
         "guides/branding.md",
-        "guides/api_stability.md"
+        "guides/api_stability.md",
+        "guides/viewer_evidence.md"
       ],
       groups_for_extras: [
         Guides: [
@@ -112,7 +113,8 @@ defmodule Rendro.MixProject do
           "guides/integrations.md"
         ],
         Policies: [
-          "guides/api_stability.md"
+          "guides/api_stability.md",
+          "guides/viewer_evidence.md"
         ]
       ],
       groups_for_modules: [
