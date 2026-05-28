@@ -1,6 +1,8 @@
 defmodule Rendro.ViewerEvidence.ValidatorTest do
   use ExUnit.Case, async: true
 
+  alias Rendro.ViewerEvidence.Matrix
+
   @matrix_schema_path "priv/schemas/support_matrix.schema.json"
   @evidence_schema_path "priv/schemas/viewer_evidence.schema.json"
   @matrix_path "priv/support_matrix.json"
@@ -31,6 +33,74 @@ defmodule Rendro.ViewerEvidence.ValidatorTest do
       "$ref" => "#/$defs/viewer_row"
     }
     |> JSV.build!()
+  end
+
+  describe "matrix_walker" do
+    @tag :matrix_walker
+    test "enumerate_viewer_cells returns 26 cells sorted by surface then viewer" do
+      matrix = Matrix.load!()
+      cells = Matrix.enumerate_viewer_cells(matrix)
+
+      assert length(cells) == 26
+      assert cells == Enum.sort_by(cells, fn cell -> {cell.surface, cell.viewer} end)
+    end
+
+    @tag :matrix_walker
+    test "production matrix status split is 5 supported, 21 unverified, 0 explicit_deferral" do
+      matrix = Matrix.load!()
+      cells = Matrix.enumerate_viewer_cells(matrix)
+
+      assert Enum.count(cells, &(&1.status == "supported")) == 5
+      assert Enum.count(cells, &(&1.status == "unverified")) == 21
+      assert Enum.count(cells, &(&1.status == "explicit_deferral")) == 0
+    end
+
+    @tag :matrix_walker
+    test "surface mapping uses evidence-path segments not matrix family names" do
+      matrix = Matrix.load!()
+      cells = Matrix.enumerate_viewer_cells(matrix)
+
+      assert Enum.find(cells, &(&1.viewer == "apple_preview" && &1.surface == "forms"))
+      assert Enum.find(cells, &(&1.viewer == "pdfjs" && &1.surface == "signature_widget"))
+      assert Enum.find(cells, &(&1.viewer == "pdfjs" && &1.surface == "signed_artifact"))
+      assert Enum.find(cells, &(&1.viewer == "pdfjs" && &1.surface == "long_lived_signed_artifact"))
+
+      refute Enum.any?(cells, &(&1.surface == "signing"))
+      refute Enum.any?(cells, &(&1.surface == "long_lived"))
+    end
+
+    @tag :matrix_walker
+    test "walker includes all eight viewer maps" do
+      matrix = Matrix.load!()
+      cells = Matrix.enumerate_viewer_cells(matrix)
+
+      map_paths =
+        cells
+        |> Enum.map(& &1.matrix_path)
+        |> Enum.map(fn path ->
+          path
+          |> String.split(".")
+          |> Enum.drop(-1)
+          |> case do
+            ["forms", "signature_widget_viewers"] -> "forms.signature_widget_viewers"
+            ["signing", "long_lived", "viewers"] -> "signing.long_lived.viewers"
+            [family, "viewers"] -> "#{family}.viewers"
+          end
+        end)
+        |> Enum.uniq()
+        |> Enum.sort()
+
+      assert map_paths == [
+               "embedded_files.viewers",
+               "forms.signature_widget_viewers",
+               "forms.viewers",
+               "links.viewers",
+               "protection.viewers",
+               "signing.long_lived.viewers",
+               "signing.viewers",
+               "signing_preparation.viewers"
+             ]
+    end
   end
 
   describe "schema_contract" do
