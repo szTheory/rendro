@@ -35,6 +35,87 @@ defmodule Rendro.ViewerEvidence.ValidatorTest do
     |> JSV.build!()
   end
 
+  describe "template" do
+    alias Rendro.ViewerEvidence.Validator
+
+    @tag :template
+    test "_template.md validates against the frontmatter schema and forms proof ids" do
+      proof = ["open", "default_state_visible", "edit_or_toggle", "save"]
+
+      assert :ok = Validator.validate_evidence_file("priv/viewer_evidence/_template.md", proof)
+    end
+
+    @tag :template
+    test "_template.md is excluded from orphan evidence scan" do
+      orphans = Validator.list_orphan_evidence()
+      refute "priv/viewer_evidence/_template.md" in orphans
+    end
+
+    @tag :template
+    test "run_full succeeds on production matrix with legacy supported warnings" do
+      assert {:ok, warnings} = Validator.run_full()
+      assert Enum.count(warnings, &String.contains?(&1, "missing promotion-complete")) == 5
+    end
+  end
+
+  describe "validator" do
+    alias Rendro.ViewerEvidence.Validator
+
+    @tag :validator
+    test "validate_matrix_structure passes on production matrix" do
+      matrix = Matrix.load!()
+      assert :ok = Validator.validate_matrix_structure(matrix)
+    end
+
+    @tag :validator
+    test "validate_matrix_structure rejects forbidden viewer-row keys" do
+      matrix = Matrix.load!()
+
+      invalid =
+        put_in(matrix, ["forms", "viewers", "apple_preview", "compliance_tier"], "enterprise")
+
+      assert {:error, reason} = Validator.validate_matrix_structure(invalid)
+      assert is_binary(reason)
+    end
+
+    @tag :validator
+    test "validate_promotion_complete fails for supported rows without evidence" do
+      matrix = %{
+        "forms" => %{
+          "viewers" => %{
+            "apple_preview" => %{
+              "status" => "supported",
+              "proof" => ["open"]
+            }
+          }
+        }
+      }
+
+      assert {:error, violations} = Validator.validate_promotion_complete(matrix)
+      assert violations != []
+    end
+
+    @tag :validator
+    test "validate_promotion_complete fails for explicit_deferral without reason" do
+      matrix = %{
+        "forms" => %{
+          "viewers" => %{
+            "pdfjs" => %{"status" => "explicit_deferral"}
+          }
+        }
+      }
+
+      assert {:error, violations} = Validator.validate_promotion_complete(matrix)
+      assert Enum.any?(violations, &String.contains?(&1, "evidence_deferred"))
+    end
+
+    @tag :validator
+    test "list_orphan_evidence ignores template and gitkeep" do
+      orphans = Validator.list_orphan_evidence()
+      refute "priv/viewer_evidence/_template.md" in orphans
+    end
+  end
+
   describe "lint" do
     @fixtures_dir "test/support/viewer_evidence/fixtures"
 
