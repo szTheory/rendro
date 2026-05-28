@@ -20,11 +20,11 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 
 ### Operator-Grade Recipe (Durability Layer)
 
-- [ ] **RECIPE-01**: A canonical home `priv/viewer_evidence/<surface>/<viewer>.md` exists for one (surface × viewer) evidence record, with YAML frontmatter (viewer, viewer_version, OS+platform, fixture path or hash, recorded_at, per-behavior result table, optional operator handle) and a Markdown body for prose context.
+- [x] **RECIPE-01**: A canonical home `priv/viewer_evidence/<surface>/<viewer>.md` exists for one (surface × viewer) evidence record, with YAML frontmatter (viewer, viewer_version, OS+platform, fixture path or hash, recorded_at, per-behavior result table, optional operator handle) and a Markdown body for prose context.
 - [x] **RECIPE-02**: Operators can run `mix rendro.viewer_evidence` to list every (surface × viewer) cell against `priv/support_matrix.json`, validate evidence-file frontmatter against the schema, and report which cells are silently `unverified` (missing both promotion and explicit-deferral) so coverage gaps are auditable.
-- [ ] **RECIPE-03**: A single operator entry point `guides/viewer_evidence.md` (registered under the existing `Policies` extras group next to `guides/api_stability.md`) walks an operator end-to-end through recording one cell, including the fixture pattern, the per-behavior checklist for each surface, and the explicit-deferral discipline.
+- [x] **RECIPE-03**: A single operator entry point `guides/viewer_evidence.md` (registered under the existing `Policies` extras group next to `guides/api_stability.md`) walks an operator end-to-end through recording one cell, including the fixture pattern, the per-behavior checklist for each surface, and the explicit-deferral discipline.
 - [x] **RECIPE-04**: A new docs-contract lane `test/docs_contract/viewer_evidence_claims_test.exs` (modeled on the existing `protection_claims_test.exs`) rejects `supported` rows missing a resolvable `evidence:` pointer, rejects `explicit_deferral` rows missing a named reason, rejects forbidden vocabulary in deferral reasons (`TBD`, `not yet`, `deferred for later`, empty strings), and rejects orphan evidence files with no matching matrix row.
-- [ ] **RECIPE-05**: Every cell promotion (`unverified` → `supported`) and every new explicit-deferral lands in CHANGELOG as a public-contract change, with the rule documented in `guides/api_stability.md` so future surfaces inherit the discipline.
+- [x] **RECIPE-05**: Every cell promotion (`unverified` → `supported`) and every new explicit-deferral lands in CHANGELOG as a public-contract change, with the rule documented in `guides/api_stability.md` so future surfaces inherit the discipline.
 
 ### Recorded Per-Viewer Evidence
 
@@ -78,11 +78,11 @@ Populated by gsd-roadmapper on 2026-05-08 from the v2.3 roadmap (phases 68–72)
 | MATRIX-01 | 68 | Complete |
 | MATRIX-02 | 68 | Complete |
 | MATRIX-03 | 68 | Complete |
-| RECIPE-01 | 69 | Pending |
+| RECIPE-01 | 69 | Complete |
 | RECIPE-02 | 68 | Complete |
-| RECIPE-03 | 69 | Pending |
+| RECIPE-03 | 69 | Complete |
 | RECIPE-04 | 68 | Complete |
-| RECIPE-05 | 69 | Pending |
+| RECIPE-05 | 69 | Complete |
 | VIEWER-01 | 70 | Pending |
 | VIEWER-02 | 71 | Pending |
 | VIEWER-03 | 71 | Pending |
