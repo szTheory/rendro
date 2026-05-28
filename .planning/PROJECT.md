@@ -10,6 +10,8 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
+**Active Milestone:** v2.3 Viewer Proof & Interop Closure — Phase 68 complete (2026-05-28): JSON Schema contracts for viewer evidence, shared `Rendro.ViewerEvidence.*` validation modules, `mix rendro.viewer_evidence` operator tooling, and the eighth docs-contract lane. Production `priv/support_matrix.json` unchanged; two-tier validation (Tier A structural, Tier B promotion-complete in fixtures) with 26 viewer cells (5 legacy supported, 21 unverified).
+
 **Shipped Version:** v2.2 Long-Lived Signatures & Compliance Evidence (2026-05-08)
 
 Rendro now supports one proof-backed long-lived-signature path over the shipped cryptographic-signing seam: `Rendro.Sign.augment/2` adds timestamp and revocation evidence over signed artifacts on a separate seam from `sign/2`, the first-party optional pyHanko long-lived adapter provides timestamp and revocation facts without claiming certificate-trust ownership, and `validate/2` reports cryptographic integrity, timestamp presence, revocation evidence presence, and narrow compliance posture as distinct signals. The `long-lived-live-proof` CI lane runs the full `sign → augment → validate` workflow against an offline certomancer-backed PKI/TSA/OCSP fixture and is required on `main`. `priv/support_matrix.json` and `guides/api_stability.md` publish `signing.long_lived` evidence separately from blanket PDF/A claims, signer trust, viewer behavior, and multi-signature workflows, with the `67-VERIFICATION.md` ledger backing the exact supported path.
@@ -196,4 +198,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-08 after v2.3 milestone definition (viewer proof & interop closure activated).*
+*Last updated: 2026-05-28 after Phase 68 (viewer evidence schema, Mix task, docs-contract lane).*
