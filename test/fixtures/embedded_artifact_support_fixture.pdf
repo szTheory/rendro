@@ -1,0 +1,169 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<<
+/AF [8 0 R]
+/Names <<
+/EmbeddedFiles <<
+/Names [(invoice.csv) 8 0 R]
+>>
+>>
+/Pages 11 0 R
+/Type /Catalog
+>>
+endobj
+2 0 obj
+<<
+/Annots [9 0 R 10 0 R]
+/Contents 3 0 R
+/MediaBox [0 0 612 792]
+/Parent 11 0 R
+/Resources <<
+/Font <<
+/F_DEFAULT 6 0 R
+>>
+>>
+/Type /Page
+>>
+endobj
+3 0 obj
+<<
+/Length 166
+>>
+stream
+BT
+0.0000 0.0000 0.0000 rg
+144 612 Td
+/F_DEFAULT 12 Tf
+(Rendro documentation) Tj
+ET
+BT
+0.0000 0.0000 0.0000 rg
+144 564 Td
+/F_DEFAULT 12 Tf
+(Continued on page 2) Tj
+ET
+endstream
+endobj
+4 0 obj
+<<
+/Contents 5 0 R
+/MediaBox [0 0 612 792]
+/Parent 11 0 R
+/Resources <<
+/Font <<
+/F_DEFAULT 6 0 R
+>>
+>>
+/Type /Page
+>>
+endobj
+5 0 obj
+<<
+/Length 92
+>>
+stream
+BT
+0.0000 0.0000 0.0000 rg
+144 612 Td
+/F_DEFAULT 12 Tf
+(Target of internal page link.) Tj
+ET
+endstream
+endobj
+6 0 obj
+<<
+/BaseFont /Helvetica
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+7 0 obj
+<<
+/Length 8
+/Params <<
+/CheckSum <E5EBD4C02CEFBE7955977C67ADA242B7>
+/CreationDate (D:20260505140000Z)
+/Size 8
+>>
+/Subtype /text#2Fcsv
+/Type /EmbeddedFile
+>>
+stream
+a,b
+1,2
+
+endstream
+endobj
+8 0 obj
+<<
+/Desc (Billing export)
+/EF <<
+/F 7 0 R
+>>
+/F (invoice.csv)
+/Type /Filespec
+/UF (invoice.csv)
+>>
+endobj
+9 0 obj
+<<
+/A <<
+/S /URI
+/URI (https://example.com/docs)
+>>
+/Border [0 0 0]
+/Rect [144 600 384 624]
+/Subtype /Link
+/Type /Annot
+>>
+endobj
+10 0 obj
+<<
+/Border [0 0 0]
+/Dest [4 0 R /Fit]
+/Rect [144 552 384 576]
+/Subtype /Link
+/Type /Annot
+>>
+endobj
+11 0 obj
+<<
+/Count 2
+/Kids [2 0 R 4 0 R]
+/Type /Pages
+>>
+endobj
+12 0 obj
+<<
+/CreationDate (D:20000101000000Z)
+/ModDate (D:20000101000000Z)
+/Producer (Rendro)
+/Title (Rendro Embedded-Artifact Support Fixture)
+>>
+endobj
+xref
+0 13
+0000000000 65535 f 
+0000000015 00000 n 
+0000000140 00000 n 
+0000000297 00000 n 
+0000000514 00000 n 
+0000000648 00000 n 
+0000000790 00000 n 
+0000000860 00000 n 
+0000001059 00000 n 
+0000001173 00000 n 
+0000001311 00000 n 
+0000001420 00000 n 
+0000001484 00000 n 
+trailer
+<<
+/ID [<2F4DB4D75DDAAFA9C0BA8CB97B65D9E1> <2F4DB4D75DDAAFA9C0BA8CB97B65D9E1>]
+/Info 12 0 R
+/Root 1 0 R
+/Size 13
+>>
+startxref
+1638
+%%EOF
