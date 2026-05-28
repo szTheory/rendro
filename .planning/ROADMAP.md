@@ -53,6 +53,7 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 **Goal**: A second operator can follow `guides/viewer_evidence.md` start-to-finish and record a new (surface × viewer) cell without asking questions, with the recipe smoke-tested on one real cell before broader recording starts.
 **Depends on**: Phase 68
 **Requirements**: RECIPE-01, RECIPE-03, RECIPE-05
+**Gap Closure:** Closes gaps from v2.3 milestone audit (2026-05-28) — RECIPE-01/03/05, integration 68→69, flow "Operator records one cell"
 **Success Criteria** (what must be TRUE):
 
   1. An operator opening HexDocs sees `guides/viewer_evidence.md` listed under the `Policies` extras group next to `guides/api_stability.md`, and the guide walks them end-to-end through recording one cell (frontmatter, per-behavior checklist, fixture pattern, explicit-deferral discipline).
@@ -73,6 +74,7 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 **Depends on**: Phase 69
 **Parallel-safe with**: Phase 71 (disjoint files; no merge conflicts)
 **Requirements**: VIEWER-01
+**Gap Closure:** Closes gaps from v2.3 milestone audit (2026-05-28) — VIEWER-01, integration 68→70, flow "Consolidate 5 legacy supported rows"
 **Success Criteria** (what must be TRUE):
 
   1. Each of the five pre-v2.3 `supported` viewer rows — forms × Apple Preview (v1.8 Phase 47), embedded_files × Adobe Acrobat Reader (v1.9), links × Adobe Acrobat Reader (v1.9), links × Apple Preview (v1.9), protection × Apple Preview (v1.10 Phase 54) — has a recorded evidence file at `priv/viewer_evidence/<surface>/<viewer>.md` referenced by an `evidence:` pointer in `priv/support_matrix.json`.
@@ -93,6 +95,7 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 **Depends on**: Phase 69
 **Parallel-safe with**: Phase 70 (disjoint files; no merge conflicts)
 **Requirements**: VIEWER-02, VIEWER-03, VIEWER-04, VIEWER-05, VIEWER-06, VIEWER-07
+**Gap Closure:** Closes gaps from v2.3 milestone audit (2026-05-28) — VIEWER-02 through VIEWER-07, integration 68→71, flow "Record remaining trust-sensitive cells"
 **Success Criteria** (what must be TRUE):
 
   1. An operator can run `mix rendro.viewer_evidence list` and see Adobe Acrobat Reader rows recorded as `supported` with evidence files for `forms` (4-check checklist), `protection` (5-check checklist), `signature_widget`, `signing_preparation`, `signed_artifact` (with integrity and certificate-trust captured as separate signals), and `long_lived_signed_artifact` (using the certomancer-backed long-lived fixture chain).
@@ -115,6 +118,7 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 **Goal**: The milestone ships with every viewer claim either backed by a checked-in evidence file or carrying a recorded named deferral, the engine-level trust spine is verified unchanged, and the operator-grade recipe is durable for future surfaces.
 **Depends on**: Phase 70 and Phase 71
 **Requirements**: GUARDRAIL-02
+**Gap Closure:** Closes gaps from v2.3 milestone audit (2026-05-28) — GUARDRAIL-02, integration 69→72, flow "Milestone closure audit"
 **Success Criteria** (what must be TRUE):
 
   1. The milestone-close audit verifies the GitHub branch protection on `main` still requires every engine-level lane shipped before v2.3 (`signing-live-proof`, `long-lived-live-proof`, `mix ci`, structural validation, all v1.5–v2.2 docs-contract lanes) — the required-check list grew or stayed flat, never shrank, and no behavioral lane was diluted by viewer-evidence work.
