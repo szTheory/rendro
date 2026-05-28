@@ -35,6 +35,105 @@ defmodule Rendro.ViewerEvidence.ValidatorTest do
     |> JSV.build!()
   end
 
+  describe "lint" do
+    @fixtures_dir "test/support/viewer_evidence/fixtures"
+
+    @tag :lint
+    test "Frontmatter.parse/1 splits YAML fences and returns body" do
+      content = File.read!("#{@fixtures_dir}/invalid_evidence_image.md")
+
+      assert {:ok, {frontmatter, body}} = Rendro.ViewerEvidence.Frontmatter.parse(content)
+      assert frontmatter["schema_version"] == 1
+      assert frontmatter["surface"] == "forms"
+      assert body =~ "forbidden image embed"
+    end
+
+    @tag :lint
+    test "path_alignment/2 errors when surface or viewer disagree with path" do
+      frontmatter = %{"surface" => "forms", "viewer" => "apple_preview"}
+
+      assert :ok =
+               Rendro.ViewerEvidence.Frontmatter.path_alignment(
+                 frontmatter,
+                 "priv/viewer_evidence/forms/apple_preview.md"
+               )
+
+      assert {:error, reason} =
+               Rendro.ViewerEvidence.Frontmatter.path_alignment(
+                 frontmatter,
+                 "priv/viewer_evidence/protection/apple_preview.md"
+               )
+
+      assert reason =~ "surface"
+    end
+
+    @tag :lint
+    test "evidence_body/1 rejects image, secret, and home-path fixtures" do
+      image = File.read!("#{@fixtures_dir}/invalid_evidence_image.md")
+      {:ok, {_fm, image_body}} = Rendro.ViewerEvidence.Frontmatter.parse(image)
+      assert {:error, _} = Rendro.ViewerEvidence.Lint.evidence_body(image_body)
+
+      secret = File.read!("#{@fixtures_dir}/invalid_evidence_secret.md")
+      {:ok, {_fm, secret_body}} = Rendro.ViewerEvidence.Frontmatter.parse(secret)
+      assert {:error, _} = Rendro.ViewerEvidence.Lint.evidence_body(secret_body)
+
+      home = File.read!("#{@fixtures_dir}/invalid_evidence_home_path.md")
+      {:ok, {_fm, home_body}} = Rendro.ViewerEvidence.Frontmatter.parse(home)
+      assert {:error, _} = Rendro.ViewerEvidence.Lint.evidence_body(home_body)
+    end
+
+    @tag :lint
+    test "evidence_body/1 allows negated passphrase prose" do
+      body = "The viewer shows no passphrase: prompt and no private_key: material."
+
+      assert {:ok, :clean} = Rendro.ViewerEvidence.Lint.evidence_body(body)
+    end
+
+    @tag :lint
+    test "deferral_reason/1 rejects TBD, vague, short, and leading deferred-for-later reasons" do
+      fixture = File.read!("#{@fixtures_dir}/invalid_deferral_tbd.json")
+      %{"evidence_deferred" => reason} = JSON.decode!(fixture)
+      assert {:error, _} = Rendro.ViewerEvidence.Lint.deferral_reason(reason)
+
+      assert {:error, _} = Rendro.ViewerEvidence.Lint.deferral_reason("not yet")
+      assert {:error, _} = Rendro.ViewerEvidence.Lint.deferral_reason("deferred for later")
+      assert {:error, _} = Rendro.ViewerEvidence.Lint.deferral_reason("   ")
+
+      assert {:error, _} =
+               Rendro.ViewerEvidence.Lint.deferral_reason(
+                 "Deferred for later when pdf.js fixes widget rendering."
+               )
+
+      assert {:error, _} =
+               Rendro.ViewerEvidence.Lint.deferral_reason("Still tracking TBD in issue tracker.")
+    end
+
+    @tag :lint
+    test "deferral_reason/1 allows substantive and allowlisted phrases" do
+      assert {:ok, :clean} =
+               Rendro.ViewerEvidence.Lint.deferral_reason(
+                 "mozilla/pdf.js#4202 — signature widget rendering deferred pending upstream fix."
+               )
+
+      assert {:ok, :clean} =
+               Rendro.ViewerEvidence.Lint.deferral_reason(
+                 "Apple Preview does not yet implement signature widget appearance for this fixture."
+               )
+    end
+
+    @tag :lint
+    test "byte_budget/1 rejects content over 65536 bytes" do
+      assert {:ok, :clean} =
+               Rendro.ViewerEvidence.Lint.byte_budget(
+                 File.read!("#{@fixtures_dir}/oversized_evidence.md")
+               )
+
+      oversized = String.duplicate("x", 65_537)
+      assert {:error, reason} = Rendro.ViewerEvidence.Lint.byte_budget(oversized)
+      assert reason =~ "65536"
+    end
+  end
+
   describe "matrix_walker" do
     @tag :matrix_walker
     test "enumerate_viewer_cells returns 26 cells sorted by surface then viewer" do
