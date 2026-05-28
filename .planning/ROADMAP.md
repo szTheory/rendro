@@ -37,7 +37,7 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
   3. The new `test/docs_contract/viewer_evidence_claims_test.exs` lane fails CI when an operator drafts a `supported` row without an `evidence:` pointer, an `explicit_deferral` row without a named reason, a deferral reason containing forbidden vocabulary (`TBD`, `not yet`, `deferred for later`, empty string), or an evidence file containing image syntax / inline binaries / operational-secret tokens (`-----BEGIN`, `passphrase`, `private_key`) / absolute home-directory paths / files larger than the documented byte budget.
   4. An attempt to introduce a non-additive schema mutation on `priv/support_matrix.json` (renamed field, retyped field, removed field, or a new compliance/trust/multi-signature key on a viewer row) fails the JSON-Schema validator before merge.
   5. Existing v1.5–v2.2 docs-contract lanes still pass against the unchanged `priv/support_matrix.json` after the additive fields are introduced.
-**Plans**: TBD
+**Plans**: 3/3 complete (68-01, 68-02, 68-03)
 **Pitfall guardrails for this phase**:
   - Engine-level required lanes (`signing-live-proof`, `long-lived-live-proof`, `mix ci`, structural validation) must remain required and unchanged in semantics.
   - Schema mutations on `priv/support_matrix.json` must stay strictly additive; no compliance/trust/multi-signature keys on viewer rows.
