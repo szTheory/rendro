@@ -14,16 +14,16 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 
 ### Support-Matrix Vocabulary & Schema
 
-- [ ] **MATRIX-01**: `priv/support_matrix.json` carries a third documented row state `explicit_deferral` (alongside `supported` and `unverified`) with a required `evidence_deferred` reason that names a specific viewer behavior or version, so cells where a viewer fundamentally does not implement a surface are recorded as named non-promotions distinct from un-attempted cells.
-- [ ] **MATRIX-02**: `supported` viewer rows in `priv/support_matrix.json` carry additive `evidence:` (repo-relative pointer to `priv/viewer_evidence/<surface>/<viewer>.md`), `recorded_at:` (ISO date), and `viewer_kind:` (`manual | pdfium-cli | pdfjs-dist`) fields without renaming or removing any existing field, so existing v1.5–v2.2 readers continue to pass.
-- [ ] **MATRIX-03**: Matrix shape is enforced by an in-tree JSON-Schema validator (Draft 2020-12) wired to the existing required `test` job, so an unevidenced `supported` row, a deferred row missing its reason, or a non-additive schema mutation fails CI before merge.
+- [x] **MATRIX-01**: `priv/support_matrix.json` carries a third documented row state `explicit_deferral` (alongside `supported` and `unverified`) with a required `evidence_deferred` reason that names a specific viewer behavior or version, so cells where a viewer fundamentally does not implement a surface are recorded as named non-promotions distinct from un-attempted cells.
+- [x] **MATRIX-02**: `supported` viewer rows in `priv/support_matrix.json` carry additive `evidence:` (repo-relative pointer to `priv/viewer_evidence/<surface>/<viewer>.md`), `recorded_at:` (ISO date), and `viewer_kind:` (`manual | pdfium-cli | pdfjs-dist`) fields without renaming or removing any existing field, so existing v1.5–v2.2 readers continue to pass.
+- [x] **MATRIX-03**: Matrix shape is enforced by an in-tree JSON-Schema validator (Draft 2020-12) wired to the existing required `test` job, so an unevidenced `supported` row, a deferred row missing its reason, or a non-additive schema mutation fails CI before merge.
 
 ### Operator-Grade Recipe (Durability Layer)
 
 - [ ] **RECIPE-01**: A canonical home `priv/viewer_evidence/<surface>/<viewer>.md` exists for one (surface × viewer) evidence record, with YAML frontmatter (viewer, viewer_version, OS+platform, fixture path or hash, recorded_at, per-behavior result table, optional operator handle) and a Markdown body for prose context.
-- [ ] **RECIPE-02**: Operators can run `mix rendro.viewer_evidence` to list every (surface × viewer) cell against `priv/support_matrix.json`, validate evidence-file frontmatter against the schema, and report which cells are silently `unverified` (missing both promotion and explicit-deferral) so coverage gaps are auditable.
+- [x] **RECIPE-02**: Operators can run `mix rendro.viewer_evidence` to list every (surface × viewer) cell against `priv/support_matrix.json`, validate evidence-file frontmatter against the schema, and report which cells are silently `unverified` (missing both promotion and explicit-deferral) so coverage gaps are auditable.
 - [ ] **RECIPE-03**: A single operator entry point `guides/viewer_evidence.md` (registered under the existing `Policies` extras group next to `guides/api_stability.md`) walks an operator end-to-end through recording one cell, including the fixture pattern, the per-behavior checklist for each surface, and the explicit-deferral discipline.
-- [ ] **RECIPE-04**: A new docs-contract lane `test/docs_contract/viewer_evidence_claims_test.exs` (modeled on the existing `protection_claims_test.exs`) rejects `supported` rows missing a resolvable `evidence:` pointer, rejects `explicit_deferral` rows missing a named reason, rejects forbidden vocabulary in deferral reasons (`TBD`, `not yet`, `deferred for later`, empty strings), and rejects orphan evidence files with no matching matrix row.
+- [x] **RECIPE-04**: A new docs-contract lane `test/docs_contract/viewer_evidence_claims_test.exs` (modeled on the existing `protection_claims_test.exs`) rejects `supported` rows missing a resolvable `evidence:` pointer, rejects `explicit_deferral` rows missing a named reason, rejects forbidden vocabulary in deferral reasons (`TBD`, `not yet`, `deferred for later`, empty strings), and rejects orphan evidence files with no matching matrix row.
 - [ ] **RECIPE-05**: Every cell promotion (`unverified` → `supported`) and every new explicit-deferral lands in CHANGELOG as a public-contract change, with the rule documented in `guides/api_stability.md` so future surfaces inherit the discipline.
 
 ### Recorded Per-Viewer Evidence
@@ -38,10 +38,10 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 
 ### Discipline Guardrails
 
-- [ ] **GUARDRAIL-01**: Explicit-deferral rows must name a specific viewer behavior or version; the forbidden-vocabulary scan in the docs-contract lane prevents `TBD`, `not yet`, `deferred for later`, empty strings, and unspecified-viewer language from landing on `main`.
+- [x] **GUARDRAIL-01**: Explicit-deferral rows must name a specific viewer behavior or version; the forbidden-vocabulary scan in the docs-contract lane prevents `TBD`, `not yet`, `deferred for later`, empty strings, and unspecified-viewer language from landing on `main`.
 - [ ] **GUARDRAIL-02**: The engine-level required CI lanes shipped before v2.3 (`signing-live-proof`, `long-lived-live-proof`, `mix ci`, structural validation) remain required on `main` and unchanged in semantics; the milestone-close audit verifies the required-check list grew, never shrank, and that no behavioral lane was diluted by viewer-evidence work.
-- [ ] **GUARDRAIL-03**: `priv/support_matrix.json` extensions are strictly additive; no new top-level keys, no compliance/signer-trust/multi-signature keys on viewer rows, no field renames, no field retypes — schema-coupling pitfalls are blocked at the schema-validator level rather than caught in review.
-- [ ] **GUARDRAIL-04**: Evidence files are text-only and within a documented byte budget (default ~64KB), embed fixtures by repo-path or content hash rather than inline binaries, and reject operational-secret tokens (`-----BEGIN`, `passphrase`, `private_key`) and absolute home-directory paths via the docs-contract scan.
+- [x] **GUARDRAIL-03**: `priv/support_matrix.json` extensions are strictly additive; no new top-level keys, no compliance/signer-trust/multi-signature keys on viewer rows, no field renames, no field retypes — schema-coupling pitfalls are blocked at the schema-validator level rather than caught in review.
+- [x] **GUARDRAIL-04**: Evidence files are text-only and within a documented byte budget (default ~64KB), embed fixtures by repo-path or content hash rather than inline binaries, and reject operational-secret tokens (`-----BEGIN`, `passphrase`, `private_key`) and absolute home-directory paths via the docs-contract scan.
 
 ## Future Requirements
 
@@ -75,13 +75,13 @@ Populated by gsd-roadmapper on 2026-05-08 from the v2.3 roadmap (phases 68–72)
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MATRIX-01 | 68 | Pending |
-| MATRIX-02 | 68 | Pending |
-| MATRIX-03 | 68 | Pending |
+| MATRIX-01 | 68 | Complete |
+| MATRIX-02 | 68 | Complete |
+| MATRIX-03 | 68 | Complete |
 | RECIPE-01 | 69 | Pending |
-| RECIPE-02 | 68 | Pending |
+| RECIPE-02 | 68 | Complete |
 | RECIPE-03 | 69 | Pending |
-| RECIPE-04 | 68 | Pending |
+| RECIPE-04 | 68 | Complete |
 | RECIPE-05 | 69 | Pending |
 | VIEWER-01 | 70 | Pending |
 | VIEWER-02 | 71 | Pending |
@@ -90,17 +90,19 @@ Populated by gsd-roadmapper on 2026-05-08 from the v2.3 roadmap (phases 68–72)
 | VIEWER-05 | 71 | Pending |
 | VIEWER-06 | 71 | Pending |
 | VIEWER-07 | 71 | Pending |
-| GUARDRAIL-01 | 68 | Pending |
+| GUARDRAIL-01 | 68 | Complete |
 | GUARDRAIL-02 | 72 | Pending |
-| GUARDRAIL-03 | 68 | Pending |
-| GUARDRAIL-04 | 68 | Pending |
+| GUARDRAIL-03 | 68 | Complete |
+| GUARDRAIL-04 | 68 | Complete |
 
 **Coverage:**
+
 - v2.3 requirements: 19 total
 - Mapped to phases: 19 (phases 68–72)
 - Unmapped: 0
 
 **Phase distribution:**
+
 - Phase 68 (schema/task/docs-contract lane): 8 requirements (MATRIX-01, MATRIX-02, MATRIX-03, RECIPE-02, RECIPE-04, GUARDRAIL-01, GUARDRAIL-03, GUARDRAIL-04)
 - Phase 69 (operator recipe + first cell): 3 requirements (RECIPE-01, RECIPE-03, RECIPE-05)
 - Phase 70 (consolidate already-validated, parallel-safe with 71): 1 requirement (VIEWER-01)

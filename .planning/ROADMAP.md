@@ -19,7 +19,7 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 
 ## Phases
 
-- [ ] **Phase 68: Viewer Evidence Schema, Mix Task, and Docs-Contract Lane** — Land the additive matrix vocabulary, the schema validator, the operator mix task, and the docs-contract enforcement lane that everything else depends on.
+- [x] **Phase 68: Viewer Evidence Schema, Mix Task, and Docs-Contract Lane** — Land the additive matrix vocabulary, the schema validator, the operator mix task, and the docs-contract enforcement lane that everything else depends on. (completed 2026-05-28)
 - [ ] **Phase 69: Operator Recipe + First Cell End-to-End** — Publish `guides/viewer_evidence.md` and walk one full cell (forms × Apple Preview) end-to-end as the canonical worked example.
 - [ ] **Phase 70: Consolidate Already-Validated Surfaces (Wave 1, parallel-safe)** — Move the five pre-v2.3 `supported` rows into the canonical `priv/viewer_evidence/` home with `evidence:` pointers; no regression in published support.
 - [ ] **Phase 71: Record New Trust-Sensitive Surfaces and Explicit Deferrals (Wave 2, parallel-safe)** — Walk every remaining (surface × viewer) cell across forms, protection, signature widgets, signing prep, signed artifacts, and long-lived; record promotions or `explicit_deferral` rows.
@@ -28,66 +28,82 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 ## Phase Details
 
 ### Phase 68: Viewer Evidence Schema, Mix Task, and Docs-Contract Lane
+
 **Goal**: Operators have a validated, additive matrix vocabulary plus the tooling and CI gate that makes recording-discipline failures visible before merge.
 **Depends on**: Nothing (first phase of v2.3; builds on shipped v2.2 baseline)
 **Requirements**: MATRIX-01, MATRIX-02, MATRIX-03, RECIPE-02, RECIPE-04, GUARDRAIL-01, GUARDRAIL-03, GUARDRAIL-04
 **Success Criteria** (what must be TRUE):
+
   1. An operator can run `mix rendro.viewer_evidence list` against the unchanged matrix and see every (surface × viewer) cell categorized as `supported`, `explicit_deferral`, or `unverified` with no schema errors.
   2. An operator can run `mix rendro.viewer_evidence missing` and receive a deterministic report of every silently-`unverified` cell (no promotion, no named deferral).
   3. The new `test/docs_contract/viewer_evidence_claims_test.exs` lane fails CI when an operator drafts a `supported` row without an `evidence:` pointer, an `explicit_deferral` row without a named reason, a deferral reason containing forbidden vocabulary (`TBD`, `not yet`, `deferred for later`, empty string), or an evidence file containing image syntax / inline binaries / operational-secret tokens (`-----BEGIN`, `passphrase`, `private_key`) / absolute home-directory paths / files larger than the documented byte budget.
   4. An attempt to introduce a non-additive schema mutation on `priv/support_matrix.json` (renamed field, retyped field, removed field, or a new compliance/trust/multi-signature key on a viewer row) fails the JSON-Schema validator before merge.
   5. Existing v1.5–v2.2 docs-contract lanes still pass against the unchanged `priv/support_matrix.json` after the additive fields are introduced.
+
 **Plans**: 3/3 complete (68-01, 68-02, 68-03)
 **Pitfall guardrails for this phase**:
+
   - Engine-level required lanes (`signing-live-proof`, `long-lived-live-proof`, `mix ci`, structural validation) must remain required and unchanged in semantics.
   - Schema mutations on `priv/support_matrix.json` must stay strictly additive; no compliance/trust/multi-signature keys on viewer rows.
   - The new lane is structural-only and named accordingly (`viewer-evidence-schema`-style naming, never `viewer-proof`); folds into the existing required `test` job through `scripts/verify_docs.exs` rather than introducing a new required CI lane.
   - Evidence-file linting must enforce text-only, fixtures-by-path-or-hash, no inline binaries, no operational secrets, ~64KB byte budget per file.
 
 ### Phase 69: Operator Recipe + First Cell End-to-End
+
 **Goal**: A second operator can follow `guides/viewer_evidence.md` start-to-finish and record a new (surface × viewer) cell without asking questions, with the recipe smoke-tested on one real cell before broader recording starts.
 **Depends on**: Phase 68
 **Requirements**: RECIPE-01, RECIPE-03, RECIPE-05
 **Success Criteria** (what must be TRUE):
+
   1. An operator opening HexDocs sees `guides/viewer_evidence.md` listed under the `Policies` extras group next to `guides/api_stability.md`, and the guide walks them end-to-end through recording one cell (frontmatter, per-behavior checklist, fixture pattern, explicit-deferral discipline).
   2. The canonical evidence template at `priv/viewer_evidence/<surface>/<viewer>.md` produces a file with YAML frontmatter (viewer, viewer_version, OS+platform, fixture path or hash, recorded_at, per-behavior result table, optional operator handle) and a Markdown body with prose context, validated by `mix rendro.viewer_evidence validate`.
   3. One full cycle has been walked end-to-end against forms × Apple Preview (consolidating the existing v1.8 Phase 47 record): operator checklist → frontmatter file → matrix promotion with `evidence:` pointer → docs-contract lane passes.
   4. `guides/api_stability.md` documents the rule that every cell promotion (`unverified` → `supported`) and every new `explicit_deferral` lands as a public-contract change in CHANGELOG so the discipline is inherited by future surfaces.
+
 **Plans**: TBD
 **Pitfall guardrails for this phase**:
+
   - Reproducibility: every evidence file must carry seven fields (fixture pointer, viewer version, OS+platform, per-behavior result table, one-line reason per entry, date recorded, optional operator handle).
   - Storage / PII: text-only Markdown only, no inline screenshots, fixtures referenced by checked-in path or content hash, no operational-secret vocabulary.
   - Honest-failure vocabulary baked into the recipe: deferrals must name a specific viewer behavior or version.
 
 ### Phase 70: Consolidate Already-Validated Surfaces (Wave 1, parallel-safe)
+
 **Goal**: Every viewer row that was already `supported` before v2.3 carries a checked-in `evidence:` pointer in the canonical home, with no regression in published support.
 **Depends on**: Phase 69
 **Parallel-safe with**: Phase 71 (disjoint files; no merge conflicts)
 **Requirements**: VIEWER-01
 **Success Criteria** (what must be TRUE):
+
   1. Each of the five pre-v2.3 `supported` viewer rows — forms × Apple Preview (v1.8 Phase 47), embedded_files × Adobe Acrobat Reader (v1.9), links × Adobe Acrobat Reader (v1.9), links × Apple Preview (v1.9), protection × Apple Preview (v1.10 Phase 54) — has a recorded evidence file at `priv/viewer_evidence/<surface>/<viewer>.md` referenced by an `evidence:` pointer in `priv/support_matrix.json`.
   2. `mix rendro.viewer_evidence list` reports each of those five rows as `supported` with a resolvable `evidence:` pointer and a `recorded_at` date traceable to the prior milestone audit.
   3. Re-running every existing v1.5–v2.2 docs-contract lane (forms claims, signing claims, embedded artifact claims, protection claims, integrations claims/contract, README doctest) passes unchanged — no regression in published support.
   4. `guides/api_stability.md` prose for each of the five rows points at the canonical `priv/viewer_evidence/` evidence file rather than referring back to phase summaries.
+
 **Plans**: TBD
 **Pitfall guardrails for this phase**:
+
   - No regression in published support — a row's `status` cannot demote during consolidation.
   - All five evidence files must use the Phase 69 template; no shape drift across the wave.
   - No new top-level keys, no new row families, no compliance/trust language smuggled in alongside consolidation.
 
 ### Phase 71: Record New Trust-Sensitive Surfaces and Explicit Deferrals (Wave 2, parallel-safe)
+
 **Goal**: Every (shipped-surface × named-viewer) cell that was `unverified` at v2.3 start ends in either `supported` (with recorded evidence) or `explicit_deferral` (with a named reason); no silent `unverified` cells remain across the trust-sensitive surfaces.
 **Depends on**: Phase 69
 **Parallel-safe with**: Phase 70 (disjoint files; no merge conflicts)
 **Requirements**: VIEWER-02, VIEWER-03, VIEWER-04, VIEWER-05, VIEWER-06, VIEWER-07
 **Success Criteria** (what must be TRUE):
+
   1. An operator can run `mix rendro.viewer_evidence list` and see Adobe Acrobat Reader rows recorded as `supported` with evidence files for `forms` (4-check checklist), `protection` (5-check checklist), `signature_widget`, `signing_preparation`, `signed_artifact` (with integrity and certificate-trust captured as separate signals), and `long_lived_signed_artifact` (using the certomancer-backed long-lived fixture chain).
   2. Apple Preview × signature_widget and PDFium × {forms, signature_widget, signed_artifact} are recorded as `supported` with evidence files where the viewer renders/handles the surface truthfully; PDFium evidence files pin exact host app + host-app version + PDFium version.
   3. PDF.js × signature_widget is recorded as `explicit_deferral` with the Mozilla `#4202` non-implementation as the named reason; Apple Preview × signed_artifact and PDF.js × signed_artifact are recorded as `explicit_deferral` naming each viewer's lack of `/Sig` validation (and Preview's append-save invalidation behavior); Apple Preview × long_lived, PDFium × long_lived, and PDF.js × long_lived are recorded as `explicit_deferral` naming "viewer does not implement long-term-validation indicators."
   4. `guides/api_stability.md` documents the signing-preparation × signature-widget equivalence note for viewers where the cells are behaviorally indistinguishable, so operators do not double-record.
   5. The docs-contract lane passes against every newly-recorded cell — every `supported` row resolves to an evidence file, every `explicit_deferral` row carries a named reason that does not match the forbidden-vocabulary list, and no orphan evidence file exists without a matching matrix row.
+
 **Plans**: TBD
 **Pitfall guardrails for this phase**:
+
   - Per-behavior promotion only: behavioral verbs (`edit_or_toggle`, `save_and_reopen`), never `looks_correct` or `displays_without_error`; integrity and trust must be recorded as separate signals on signed-artifact rows.
   - PDFium rows must record exact host app + version + platform — `chrome_pdfium` is not one viewer.
   - No widening of engine code to please specific viewers: viewer gaps are recorded as `explicit_deferral`, never patched into the writer.
@@ -95,16 +111,20 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
   - Text-only evidence files with fixtures by path-or-hash; no inline binaries; no operational secrets.
 
 ### Phase 72: Closure — Audit, Polish, and Ship
+
 **Goal**: The milestone ships with every viewer claim either backed by a checked-in evidence file or carrying a recorded named deferral, the engine-level trust spine is verified unchanged, and the operator-grade recipe is durable for future surfaces.
 **Depends on**: Phase 70 and Phase 71
 **Requirements**: GUARDRAIL-02
 **Success Criteria** (what must be TRUE):
+
   1. The milestone-close audit verifies the GitHub branch protection on `main` still requires every engine-level lane shipped before v2.3 (`signing-live-proof`, `long-lived-live-proof`, `mix ci`, structural validation, all v1.5–v2.2 docs-contract lanes) — the required-check list grew or stayed flat, never shrank, and no behavioral lane was diluted by viewer-evidence work.
   2. `mix rendro.viewer_evidence list` confirms every (shipped-surface × named-viewer) cell is in one of `supported`, `explicit_deferral`, or expected-empty `unverified`; `mix rendro.viewer_evidence missing` is empty (or expected-empty per recorded operator-capacity disclaimer).
   3. `guides/api_stability.md` prose mirrors every promoted row and every explicit-deferral row by pointer or named reason; `guides/viewer_evidence.md` worked example is current.
   4. `72-VERIFICATION.md` records the final cell-by-cell ledger and the verified required-check list; the milestone is tagged and shipped.
+
 **Plans**: TBD
 **Pitfall guardrails for this phase**:
+
   - The required-check audit is the load-bearing closure step: confirm `signing-live-proof` and `long-lived-live-proof` remain required and unchanged in semantics; confirm any new lane added in v2.3 is structural-only and additive.
   - No new top-level keys or row families in `priv/support_matrix.json`; close-out audit verifies scope guardrail held end-to-end.
   - Closure must not flip any cell from `supported` to `unverified` without a recorded `not_promoted_reason`-style audit trail; demotion is a public-contract change.
@@ -113,7 +133,7 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 68. Viewer Evidence Schema, Mix Task, and Docs-Contract Lane | 0/0 | Not started | - |
+| 68. Viewer Evidence Schema, Mix Task, and Docs-Contract Lane | 3/3 | Complete    | 2026-05-28 |
 | 69. Operator Recipe + First Cell End-to-End | 0/0 | Not started | - |
 | 70. Consolidate Already-Validated Surfaces | 0/0 | Not started | - |
 | 71. Record New Trust-Sensitive Surfaces and Explicit Deferrals | 0/0 | Not started | - |
