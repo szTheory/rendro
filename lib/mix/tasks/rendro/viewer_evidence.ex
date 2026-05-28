@@ -46,7 +46,7 @@ defmodule Mix.Tasks.Rendro.ViewerEvidence do
   `test/docs_contract/viewer_evidence_claims_test.exs`). This task is **not** part
   of the `mix ci` alias in Phase 68 — use it locally before recording promotions.
 
-  Human workflow guide: `guides/viewer_evidence.md` (Phase 69).
+  Human workflow guide: `guides/viewer_evidence.md`.
   """
 
   @matrix_path "priv/support_matrix.json"

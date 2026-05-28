@@ -37,6 +37,13 @@ defmodule Rendro.DocsContract.ViewerEvidenceClaimsTest do
         refute Enum.any?(warnings, &String.contains?(&1, "structural"))
       end
     end
+
+    test "viewer evidence guide references canonical template and worked example paths" do
+      guide = File.read!("guides/viewer_evidence.md")
+
+      assert guide =~ "priv/viewer_evidence/_template.md"
+      assert guide =~ "priv/viewer_evidence/forms/apple_preview.md"
+    end
   end
 
   describe "tier-B promotion and deferral violations" do
