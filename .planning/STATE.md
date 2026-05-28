@@ -1,10 +1,10 @@
 ---
 gsd_state_version: 1.0
 milestone: v2.3
-milestone_name: Viewer Proof & Interop Closure
+milestone_name: milestone
 status: planning
-last_updated: "2026-05-08T15:00:00.000Z"
-last_activity: 2026-05-08
+last_updated: "2026-05-28T18:25:28.427Z"
+last_activity: "2026-05-08 — Roadmap created (5 phases: 68–72; 19/19 requirements mapped)"
 progress:
   total_phases: 5
   completed_phases: 0
