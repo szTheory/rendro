@@ -134,7 +134,10 @@ defmodule Rendro.MixProject do
         "Canonical Recipes": [
           Rendro.Recipes,
           Rendro.Recipes.Invoice,
-          Rendro.Recipes.BrandedInvoice
+          Rendro.Recipes.BrandedInvoice,
+          Rendro.Recipes.Statement,
+          Rendro.Recipes.Receipt,
+          Rendro.Recipes.Certificate
         ],
         "Ecosystem Adapters": [
           Rendro.Adapters.Phoenix,
