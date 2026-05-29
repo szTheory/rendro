@@ -139,7 +139,7 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 |-------|----------------|--------|-----------|
 | 68. Viewer Evidence Schema, Mix Task, and Docs-Contract Lane | 3/3 | Complete    | 2026-05-28 |
 | 69. Operator Recipe + First Cell End-to-End | 3/3 | Complete    | 2026-05-28 |
-| 70. Consolidate Already-Validated Surfaces | 0/0 | Not started | - |
+| 70. Consolidate Already-Validated Surfaces | 1/3 | In Progress|  |
 | 71. Record New Trust-Sensitive Surfaces and Explicit Deferrals | 0/0 | Not started | - |
 | 72. Closure — Audit, Polish, and Ship | 0/0 | Not started | - |
 

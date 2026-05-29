@@ -10,7 +10,9 @@ Close VIEWER-01 by consolidating all five pre-v2.3 legacy `supported` viewer row
 
 **Five rows:** forms × Apple Preview (v1.8 Phase 47), embedded_files × Adobe Acrobat Reader (v1.9), links × Adobe Acrobat Reader (v1.9), links × Apple Preview (v1.9), protection × Apple Preview (v1.10 Phase 54).
 
-Out of scope: net-new viewer promotions (Phase 71), explicit deferral rows (Phase 71), `mix rendro.viewer_evidence init` polish (Phase 72 unless trivial), staleness blocking on `main` (Phase 72 GUARDRAIL-02), Hex `files:` packaging expansion, automating Preview/Acrobat rows via pdfium-cli (no credible proxy for Attachments pane, URI handoff, or password UX).
+Out of scope: net-new viewer promotions (Phase 71), explicit deferral rows (Phase 71), `mix rendro.viewer_evidence init` polish (Phase 72 unless trivial), staleness blocking on `main` (Phase 72 GUARDRAIL-02), Hex `files:` packaging expansion, headless-browser Preview/Acrobat GUI automation (deferred per ROADMAP).
+
+**Phase 70 automation (revised):** All five legacy rows re-attest via Linux CI structural proxies (pdfium-cli, pdfinfo, qpdf) with `viewer_kind: "pdfium-cli"`. GUI viewers are not re-run in CI; provenance dates remain in evidence body prose only.
 
 </domain>
 
@@ -18,11 +20,11 @@ Out of scope: net-new viewer promotions (Phase 71), explicit deferral rows (Phas
 ## Implementation Decisions
 
 ### Re-attestation rigor (Area 1)
-- **D-01:** **Re-attestation consolidation** for all five legacy rows — schema migration plus mandatory manual re-run of **every** `proof[]` behavior with substantive fixture-specific notes. Reject paperwork-only migration from milestone summaries (supersedes ARCHITECTURE.md “no manual checking” for viewer-behavioral rows).
+- **D-01:** **Re-attestation consolidation** via **structural CI proxies** (pdfium-cli/poppler/qpdf) for all five legacy rows — mandatory re-run of every `proof[]` behavior with substantive fixture-specific CLI notes. Original milestone dates in body prose only.
 - **D-02:** **`recorded_at`** = re-validation date (ISO `YYYY-MM-DD`) in **both** matrix row and evidence frontmatter — must be equal. Original milestone attestation dates (`2026-05-05` Phase 47, `2026-05-06` Phase 50, Phase 54 protection audit) live in evidence **body prose only** — never backdate frontmatter.
 - **D-03:** ROADMAP success criterion #2 “traceable to prior milestone audit” means **provenance chain in body prose**, not backdated `recorded_at`.
 - **D-04:** Read `viewer_version` and `platform` fresh at observation time — never copy from `api_stability.md`, phase summaries, or other evidence files.
-- **D-05:** **protection × Apple Preview** gets a **full five-check** manual checklist (trust-sensitive surface) — not a minimal subset.
+- **D-05:** **protection × Apple Preview** gets a **full five-check** structural proxy checklist (pdfinfo + qpdf) — trust-sensitive surface, automated in CI.
 - **D-06:** **Operator batching:** run **embedded_files × Acrobat** and **links × Acrobat** in one Acrobat session on the shared embedded-artifact fixture; record separate evidence files per surface×viewer.
 - **D-07:** **links × Apple Preview** remains **independent** of embedded_files × Preview — v1.9 precedent (links `supported`, embedded_files `unverified`) must not be conflated in notes or matrix edits.
 
@@ -36,8 +38,8 @@ Out of scope: net-new viewer promotions (Phase 71), explicit deferral rows (Phas
 
 ### forms × Apple Preview vs chrome_pdfium (Area 3)
 - **D-14:** **Same fixture, orthogonal evidence files** — `priv/viewer_evidence/forms/apple_preview.md` (manual) alongside existing `priv/viewer_evidence/forms/chrome_pdfium.md` (pdfium-cli proxy).
-- **D-15:** Matrix: `viewer_kind: "manual"` for Preview; keep `viewer_kind: "pdfium-cli"` on chrome_pdfium unchanged.
-- **D-16:** Preview `behaviors[].note` entries describe **GUI observations** (widget names, visible states, Save As behavior) — never pdfium-cli command output.
+- **D-15:** Matrix: `viewer_kind: "pdfium-cli"` for all five consolidated legacy rows; keep `viewer_kind: "pdfium-cli"` on chrome_pdfium unchanged.
+- **D-16:** Evidence `behaviors[].note` entries describe **CLI structural observations** with explicit GUI negation — not Preview/Acrobat GUI output.
 - **D-17:** Both evidence bodies include explicit cross-boundary negation: pdfium-cli does not prove Preview GUI; Preview manual checklist does not inherit pdfium automation (mirror `chrome_pdfium.md` pattern).
 - **D-18:** `api_stability.md` forms section carries **two** STACK-style mirrors after Phase 70 — Preview manual path + existing chrome_pdfium sentence (do not conflate).
 
