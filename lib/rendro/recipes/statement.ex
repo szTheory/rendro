@@ -106,6 +106,11 @@ defmodule Rendro.Recipes.Statement do
   # Default table column rules: Date | Description | Amount | Balance
   @table_columns [{:fixed, 72}, {:share, 1}, {:fixed, 72}, {:fixed, 72}]
 
+  # Conservative one-row epsilon margin (D-09): pack to capacity − epsilon so
+  # sub-pixel rounding never tips a page into :content_overflow.
+  # A blank trailing row is a far better failure mode than a render error.
+  @row_epsilon 2.0
+
   # ---------------------------------------------------------------------------
   # Public API — three-rung escape hatch (consistent with Invoice / STMT-03)
   # ---------------------------------------------------------------------------
@@ -270,25 +275,164 @@ defmodule Rendro.Recipes.Statement do
     rows_with_balance = fold_balance(ob, lines)
 
     table_header = ["Date", "Description", "Amount", lbl.(:balance)]
+    table_opts = [header: table_header, columns: @table_columns]
 
-    # For this plan (74-03), emit a single non-paginated table block of all rows.
-    # Plan 74-04 replaces this with per-page chunking + carried/brought-forward rows.
-    table_rows =
+    # Convert balanced rows to formatted table rows (strings).
+    formatted_rows =
       Enum.map(rows_with_balance, fn %{date: d, description: desc, amount: amt, balance: bal} ->
         [fmt_date.(d), desc, fmt_amount.(amt), fmt_amount.(bal)]
       end)
 
-    table =
-      Rendro.table(table_rows,
-        header: table_header,
-        columns: @table_columns
-      )
+    # D-09: measure all rows at the body region width using the engine's OWN
+    # font metrics so chunking uses real heights, not recipe-local estimates.
+    doc_for_measure = Rendro.Document.new()
+
+    {header_h, row_heights} =
+      Rendro.measure_rows(formatted_rows, @content_width, doc_for_measure, table_opts)
+
+    # Body capacity formula (mirrors measure.ex body_capacity/1):
+    # capacity = body.height − header.height (if overlaps) − footer.height (if overlaps)
+    # With the recipe's fixed geometry, header and footer are always adjacent to body,
+    # so the full subtraction applies.
+    capacity = @body_height - @header_height - @footer_height
+
+    # Chunk rows into pages, accounting for the repeated table header on each page
+    # and the brought/carried-forward extra rows. Reserve a conservative one-row
+    # epsilon margin (D-09) so sub-pixel rounding never causes :content_overflow.
+    pages = chunk_into_pages(rows_with_balance, formatted_rows, row_heights, header_h, capacity)
+
+    # D-02 / D-10: inject brought-forward / carried-forward rows.
+    # Each page's rows are structured as: [brought_forward?, ...txns, carried_forward?]
+    # - carried-forward: last row of each non-final page, suppressed on the last page
+    # - brought-forward: first row of each page after page 1, suppressed on page 1
+    #
+    # The balance shown in both rows is the running balance at the PAGE BREAK — i.e.,
+    # the balance_at_break from the previous page (== carried-forward balance from p-1).
+    # This keeps the invariant: brought-forward[N+1] == carried-forward[N] (D-10 / V6).
+    last_page_idx = length(pages) - 1
+
+    # Pair each page with its previous page's break balance (nil for page 0).
+    pages_with_prev_balance =
+      pages
+      |> Enum.with_index()
+      |> Enum.map(fn {{page_rows, balance_at_break}, idx} ->
+        prev_balance =
+          if idx > 0 do
+            {_prev_rows, prev_break} = Enum.at(pages, idx - 1)
+            prev_break
+          else
+            nil
+          end
+
+        {page_rows, balance_at_break, prev_balance, idx}
+      end)
+
+    blocks =
+      Enum.map(pages_with_prev_balance, fn {page_rows, balance_at_break, prev_balance, idx} ->
+        # carried-forward: last row of each non-final page (balance at current page's break)
+        cf_row =
+          if idx < last_page_idx do
+            [lbl.(:carried_forward), "", "", fmt_amount.(balance_at_break)]
+          else
+            nil
+          end
+
+        # brought-forward: first row of each page after page 1 (balance from previous page's break)
+        bf_row =
+          if idx > 0 do
+            [lbl.(:brought_forward), "", "", fmt_amount.(prev_balance)]
+          else
+            nil
+          end
+
+        # Page row structure: [brought_forward?, ...txns, carried_forward?]
+        full_page_rows =
+          [bf_row | page_rows] ++ [cf_row]
+          |> Enum.reject(&is_nil/1)
+
+        table = Rendro.table(full_page_rows, table_opts)
+
+        # D-10: break_before: true on the first block of every page AFTER page 1.
+        # No keep_together (oversized group → hard overflow — Anti-Pattern).
+        Rendro.block(table, break_before: idx > 0)
+      end)
 
     Rendro.section(
       name: :statement_body,
       region: :body,
-      content: [Rendro.block(table)]
+      content: blocks
     )
+  end
+
+  # ---------------------------------------------------------------------------
+  # Per-page chunking (D-09 / D-10)
+  # ---------------------------------------------------------------------------
+
+  # Chunks rows into pages by cumulative height, packing to capacity − epsilon.
+  # Accounts for the repeated table header and extra brought/carried-forward rows.
+  # Returns a list of {page_rows (formatted), balance_at_break} tuples.
+  # balance_at_break is the running balance at the end of the last txn row on the page.
+  defp chunk_into_pages(rows_with_balance, formatted_rows, row_heights, header_h, capacity) do
+    # Estimate a typical row height for epsilon margin and brought/carried-forward overhead.
+    # Use the median/mean or a conservative max to reserve space.
+    typical_row_h =
+      if Enum.empty?(row_heights) do
+        14.4
+      else
+        Enum.sum(row_heights) / length(row_heights)
+      end
+
+    # Effective capacity per page:
+    # header_h (repeated on every page) + brought-forward row + carried-forward row + epsilon
+    # We reserve space for at most 2 extra rows (bf + cf) and the epsilon margin.
+    effective_capacity = capacity - header_h - 2 * typical_row_h - @row_epsilon
+
+    # Pair each formatted row with its balance and height.
+    rows_with_meta =
+      Enum.zip([formatted_rows, row_heights, rows_with_balance])
+      |> Enum.map(fn {fmt_row, height, row_data} ->
+        {fmt_row, height, row_data.balance}
+      end)
+
+    do_chunk_pages(rows_with_meta, effective_capacity, [], 0.0, [])
+  end
+
+  # Recursive page-chunker. Returns [{page_formatted_rows, balance_at_break}] list.
+  defp do_chunk_pages([], _cap, current_page, _current_h, pages) do
+    if current_page == [] do
+      Enum.reverse(pages)
+    else
+      {page_rows, balance} = finalize_page(current_page)
+      Enum.reverse([{page_rows, balance} | pages])
+    end
+  end
+
+  defp do_chunk_pages([{fmt_row, height, balance} | rest], cap, current_page, current_h, pages) do
+    new_h = current_h + height
+
+    if new_h <= cap or current_page == [] do
+      # Row fits (or page is empty — always add at least one row to prevent infinite loop)
+      do_chunk_pages(rest, cap, [{fmt_row, balance} | current_page], new_h, pages)
+    else
+      # Row would overflow — start a new page
+      {page_rows, page_balance} = finalize_page(current_page)
+      do_chunk_pages(
+        [{fmt_row, height, balance} | rest],
+        cap,
+        [],
+        0.0,
+        [{page_rows, page_balance} | pages]
+      )
+    end
+  end
+
+  # Finalizes a page: reverses accumulator (rows were added head-first) and
+  # returns {formatted_rows, balance_at_break} where balance is from the last row.
+  defp finalize_page(page_acc) do
+    reversed = Enum.reverse(page_acc)
+    rows = Enum.map(reversed, fn {fmt_row, _balance} -> fmt_row end)
+    {_last_fmt, last_balance} = List.last(reversed)
+    {rows, last_balance}
   end
 
   defp footer_section(_data, opts) do
