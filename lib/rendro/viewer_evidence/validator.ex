@@ -80,8 +80,9 @@ defmodule Rendro.ViewerEvidence.Validator do
     |> Path.join("**/*.md")
     |> Path.wildcard()
     |> Enum.map(&normalize_repo_path/1)
-    |> Enum.reject(&orphan_excluded?/1)
-    |> Enum.reject(&MapSet.member?(referenced, &1))
+    |> Enum.reject(fn path ->
+      orphan_excluded?(path) or MapSet.member?(referenced, path)
+    end)
     |> Enum.sort()
   end
 
@@ -202,8 +203,9 @@ defmodule Rendro.ViewerEvidence.Validator do
     |> Path.join("**/*.md")
     |> Path.wildcard()
     |> Enum.map(&normalize_repo_path/1)
-    |> Enum.reject(&orphan_excluded?/1)
-    |> Enum.reject(&MapSet.member?(referenced, &1))
+    |> Enum.reject(fn path ->
+      orphan_excluded?(path) or MapSet.member?(referenced, path)
+    end)
   end
 
   defp promotion_violations(cell, matrix, strict?) do

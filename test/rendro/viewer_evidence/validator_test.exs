@@ -231,7 +231,7 @@ defmodule Rendro.ViewerEvidence.ValidatorTest do
       cells = Matrix.enumerate_viewer_cells(matrix)
 
       assert Enum.count(cells, &(&1.status == "supported")) == 17
-      assert Enum.count(cells, &(&1.status == "unverified")) == 0
+      refute Enum.any?(cells, &(&1.status == "unverified"))
       assert Enum.count(cells, &(&1.status == "explicit_deferral")) == 9
     end
 
@@ -303,7 +303,7 @@ defmodule Rendro.ViewerEvidence.ValidatorTest do
 
       assert length(statuses) == 26
       assert Enum.count(statuses, &(&1 == "supported")) == 17
-      assert Enum.count(statuses, &(&1 == "unverified")) == 0
+      refute Enum.any?(statuses, &(&1 == "unverified"))
       assert Enum.count(statuses, &(&1 == "explicit_deferral")) == 9
     end
 
