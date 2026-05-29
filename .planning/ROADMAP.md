@@ -64,7 +64,8 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
   3. Running region content can be authored as a named helper (`Rendro.page_number/1`-style) or a raw `fn {page, total} -> ... end`, and can be suppressed on specific pages (e.g. first page)
   4. Rendering the same document twice with `deterministic: true` produces byte-identical output — no non-determinism introduced by running-region substitution
 
-**Plans**: 5 plansPlans:
+**Plans**: 5 plans
+
 **Wave 1**
 
 - [x] 73-01-PLAN.md — Wave 0 test scaffolding: all failing stubs for PAGE-01..04 (RED state)
@@ -99,7 +100,20 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
   3. The three-rung escape hatch (`document/2`, `page_template/1`, `sections/2`) is available and consistent with `Rendro.Recipes.Invoice` — callers can override at any rung without touching the rungs above
   4. "Page X of Y" appears in the running footer using the Phase 73 PAGE primitive, and the page count is correct on every page including the last
 
-**Plans**: TBD
+**Plans**: 4 plans
+
+**Wave 1** *(parallel — no file overlap)*
+
+- [ ] 74-01-PLAN.md — Engine enablers: declare `:decimal` core dep (D-04) + read-only `Rendro.measure_rows/4` measurement helper (D-09)
+- [ ] 74-02-PLAN.md — Pure deterministic `Rendro.Format` — money/date/labels, no CLDR/locale (D-11)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 74-03-PLAN.md — Statement recipe core: three-rung skeleton, `validate_data!/1`, Decimal balance fold, non-zero footer with PAGE primitive (STMT-01/03/04, D-03/D-05..D-08)
+
+**Wave 3** *(blocked on Wave 2)*
+
+- [ ] 74-04-PLAN.md — Recipe-owned per-page chunking + carried/brought-forward rows + full V1..V10 / determinism / overflow test suite (STMT-02, D-01/D-02/D-09/D-10)
 
 ---
 
@@ -142,7 +156,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 73. Page-Numbering / Running-Region Primitive | 5/5 | Complete    | 2026-05-29 |
-| 74. Statement Recipe | 0/? | Not started | - |
+| 74. Statement Recipe | 0/4 | Planned | - |
 | 75. Receipt/Report and Certificate Recipes + Support Contract | 0/? | Not started | - |
 | 76. Reference Phoenix App, CI, and Documentation Closure | 0/? | Not started | - |
 
