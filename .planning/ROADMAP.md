@@ -180,7 +180,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 | 73. Page-Numbering / Running-Region Primitive | 5/5 | Complete    | 2026-05-29 |
 | 74. Statement Recipe | 4/4 | Complete    | 2026-05-29 |
 | 75. Receipt/Report and Certificate Recipes + Support Contract | 4/4 | Complete    | 2026-05-29 |
-| 76. Reference Phoenix App, CI, and Documentation Closure | 4/4 | Complete   | 2026-05-29 |
+| 76. Reference Phoenix App, CI, and Documentation Closure | 4/4 | Complete    | 2026-05-29 |
 
 ---
 *v2.3 archived 2026-05-29 on milestone completion. v2.4 roadmap created 2026-05-29. Phase numbering: 73-76.*
