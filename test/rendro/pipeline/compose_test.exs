@@ -49,6 +49,120 @@ defmodule Rendro.Pipeline.ComposeTest do
       assert length(page.blocks) == 2
     end
 
+    test "CR-03 regression: two sections targeting the same region with conflicting suppress_on raises ArgumentError" do
+      # Two sections both targeting :footer but with different suppress_on values must
+      # raise rather than silently dropping one (last-wins via Map.new was the bug).
+      template =
+        %PageTemplate{
+          name: :cr03_test,
+          regions: [
+            %Region{
+              name: :footer,
+              role: :footer,
+              anchor: :bottom,
+              x: 72,
+              y: 760,
+              width: 451.28,
+              height: 28
+            },
+            %Region{
+              name: :body,
+              role: :body,
+              anchor: :flow,
+              x: 72,
+              y: 112,
+              width: 451.28,
+              height: 620
+            }
+          ]
+        }
+
+      section1 =
+        %Section{
+          name: :footer_a,
+          region: :footer,
+          content: [Rendro.block(Rendro.text("Footer A"))],
+          suppress_on: :first
+        }
+
+      section2 =
+        %Section{
+          name: :footer_b,
+          region: :footer,
+          content: [Rendro.block(Rendro.text("Footer B"))],
+          suppress_on: {:pages, [3]}
+        }
+
+      doc =
+        %Rendro.Document{
+          page_template: :cr03_test,
+          page_templates: [template],
+          content: [Rendro.block(Rendro.text("Body"))],
+          sections: [section1, section2],
+          metadata: %Rendro.Metadata{}
+        }
+
+      assert_raise ArgumentError, ~r/Conflicting suppress_on for region :footer/, fn ->
+        Compose.run(doc)
+      end
+    end
+
+    test "CR-03 regression: two sections targeting the same region with identical suppress_on values is allowed" do
+      # If both suppress_on values are identical, no conflict — keep one (no error).
+      template =
+        %PageTemplate{
+          name: :cr03_identical_test,
+          regions: [
+            %Region{
+              name: :footer,
+              role: :footer,
+              anchor: :bottom,
+              x: 72,
+              y: 760,
+              width: 451.28,
+              height: 28
+            },
+            %Region{
+              name: :body,
+              role: :body,
+              anchor: :flow,
+              x: 72,
+              y: 112,
+              width: 451.28,
+              height: 620
+            }
+          ]
+        }
+
+      section1 =
+        %Section{
+          name: :footer_a,
+          region: :footer,
+          content: [Rendro.block(Rendro.text("Footer A"))],
+          suppress_on: :first
+        }
+
+      section2 =
+        %Section{
+          name: :footer_b,
+          region: :footer,
+          content: [Rendro.block(Rendro.text("Footer B"))],
+          suppress_on: :first
+        }
+
+      doc =
+        %Rendro.Document{
+          page_template: :cr03_identical_test,
+          page_templates: [template],
+          content: [Rendro.block(Rendro.text("Body"))],
+          sections: [section1, section2],
+          metadata: %Rendro.Metadata{}
+        }
+
+      assert {:ok, result} = Compose.run(doc)
+      assert result.options.layout.region_suppress_on == %{footer: :first}
+    end
+
     test "normalizes sections into explicit body and anchored regions before pagination" do
       template =
         %PageTemplate{

@@ -90,8 +90,19 @@ defmodule Rendro.Pipeline.Compose do
     region_suppress_on =
       doc.sections
       |> Enum.filter(&(&1.suppress_on != nil))
-      |> Enum.map(&{&1.region || :body, &1.suppress_on})
-      |> Map.new()
+      |> Enum.reduce(%{}, fn section, acc ->
+        region = section.region || :body
+
+        case Map.fetch(acc, region) do
+          {:ok, existing} when existing != section.suppress_on ->
+            raise ArgumentError,
+                  "Conflicting suppress_on for region #{inspect(region)}: " <>
+                    "#{inspect(existing)} vs #{inspect(section.suppress_on)}"
+
+          _ ->
+            Map.put(acc, region, section.suppress_on)
+        end
+      end)
 
     layout = %{
       template: template,
