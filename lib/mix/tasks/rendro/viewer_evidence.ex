@@ -22,7 +22,7 @@ defmodule Mix.Tasks.Rendro.ViewerEvidence do
 
       mix rendro.viewer_evidence list [--json]
       mix rendro.viewer_evidence missing [--json]
-      mix rendro.viewer_evidence validate
+      mix rendro.viewer_evidence validate [--strict]
       mix rendro.viewer_evidence record <surface> <viewer> [--fixture PATH] [--recorded-by ID]
 
   Supported automated recordings:
@@ -57,7 +57,9 @@ defmodule Mix.Tasks.Rendro.ViewerEvidence do
     * `missing` — **1** when any `unverified` cell exists; **0** when none.
     * `validate` — **1** on Tier-A schema errors, evidence-file failures, or orphan
       scans; **0** when only Tier-B legacy-supported warnings and/or staleness
-      warnings (180 days) remain.
+      warnings (180 days) remain. With `--strict`, staleness warnings (180 days)
+      are fatal — **1** when any `supported` row is stale; **0** when dates are
+      current. Operator/release use only; not part of `mix ci`.
 
   ## CI enforcement
 
@@ -73,7 +75,7 @@ defmodule Mix.Tasks.Rendro.ViewerEvidence do
 
   @impl Mix.Task
   def run(args) do
-    {command, json?, record_opts} =
+    {command, json?, strict?, record_opts} =
       args
       |> parse_args!()
       |> normalize_parsed()
@@ -91,15 +93,16 @@ defmodule Mix.Tasks.Rendro.ViewerEvidence do
         case command do
           :list -> run_list(matrix, cells, json?)
           :missing -> run_missing(matrix, cells, json?)
-          :validate -> run_validate(json?)
+          :validate -> run_validate(json?, strict?)
         end
     end
   end
 
-  defp normalize_parsed({command, json?}) when command in [:list, :missing, :validate],
-    do: {command, json?, []}
+  defp normalize_parsed({command, json?, strict?})
+       when command in [:list, :missing, :validate],
+       do: {command, json?, strict?, []}
 
-  defp normalize_parsed({:record, json?, record_opts}), do: {:record, json?, record_opts}
+  defp normalize_parsed({:record, json?, record_opts}), do: {:record, json?, false, record_opts}
 
   defp run_record(%{surface: surface, viewer: viewer} = opts_map, json?) do
     opts =
@@ -132,14 +135,22 @@ defmodule Mix.Tasks.Rendro.ViewerEvidence do
 
     case rest do
       ["record", surface, viewer | record_rest] ->
-        {:record, json?,
+        {:record, json?, false,
          Map.merge(%{surface: surface, viewer: viewer}, Map.new(parse_record_flags(record_rest)))}
+
+      ["validate" | validate_rest] ->
+        {strict?, remaining} = pop_strict_flag(validate_rest)
+
+        if remaining != [] do
+          usage_error!("unexpected arguments: #{inspect(remaining)}")
+        end
+
+        {:validate, json?, strict?}
 
       [command] ->
         case command do
-          "list" -> {:list, json?}
-          "missing" -> {:missing, json?}
-          "validate" -> {:validate, json?}
+          "list" -> {:list, json?, false}
+          "missing" -> {:missing, json?, false}
           other -> usage_error!("unknown subcommand #{inspect(other)}")
         end
 
@@ -164,6 +175,11 @@ defmodule Mix.Tasks.Rendro.ViewerEvidence do
 
   defp pop_json_flag(args) do
     {flags, rest} = Enum.split_with(args, &(&1 == "--json"))
+    {flags != [], rest}
+  end
+
+  defp pop_strict_flag(args) do
+    {flags, rest} = Enum.split_with(args, &(&1 == "--strict"))
     {flags != [], rest}
   end
 
@@ -200,10 +216,10 @@ defmodule Mix.Tasks.Rendro.ViewerEvidence do
     end
   end
 
-  defp run_validate(_json?) do
+  defp run_validate(_json?, strict?) do
     case Validator.run_full(@matrix_path, @evidence_root, []) do
       {:ok, warnings} ->
-        {advisory, fatal} = partition_warnings(warnings)
+        {advisory, fatal} = partition_warnings(warnings, strict: strict?)
 
         Enum.each(advisory, fn warning -> Mix.shell().error(warning) end)
         Enum.each(fatal, fn warning -> Mix.shell().error(warning) end)
@@ -340,13 +356,22 @@ defmodule Mix.Tasks.Rendro.ViewerEvidence do
     end
   end
 
-  defp partition_warnings(warnings) do
-    Enum.split_with(warnings, &advisory_warning?/1)
+  defp partition_warnings(warnings, opts) do
+    strict? = Keyword.get(opts, :strict, false)
+    Enum.split_with(warnings, &advisory_warning?(&1, strict?))
   end
 
-  defp advisory_warning?(warning) do
-    String.contains?(warning, "missing promotion-complete") or
-      String.contains?(warning, "is older than")
+  defp advisory_warning?(warning, strict?) do
+    cond do
+      String.contains?(warning, "missing promotion-complete") ->
+        true
+
+      String.contains?(warning, "is older than") and not strict? ->
+        true
+
+      true ->
+        false
+    end
   end
 
   defp fetch_row(matrix, %{matrix_path: path}) do
@@ -384,7 +409,7 @@ defmodule Mix.Tasks.Rendro.ViewerEvidence do
     Mix.shell().error(message)
 
     Mix.shell().error(
-      "Usage: mix rendro.viewer_evidence list|validate|missing [--json] | record <surface> <viewer> [--fixture PATH] [--recorded-by ID]"
+      "Usage: mix rendro.viewer_evidence list|validate|missing [--json] | validate [--strict] | record <surface> <viewer> [--fixture PATH] [--recorded-by ID]"
     )
 
     exit({:shutdown, 1})
