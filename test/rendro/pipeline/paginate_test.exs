@@ -905,6 +905,28 @@ defmodule Rendro.Pipeline.PaginateTest do
       assert error.next =~ "running-content function"
     end
 
+    test "WR-01 regression: flow_layout/1 fallback uses overlap-aware formula (header entirely below body is not subtracted)" do
+      # flow_layout/1 is hit when Paginate.run/1 is called directly without going
+      # through Compose+Measure (e.g. doc with content but no options.layout).
+      # Using default %PageTemplate{} whose header/footer regions have height: 0
+      # means no subtraction. The key is that 49 blocks * 14.4 = 705.6 > 697.89
+      # (default body capacity), so page 1 fills to ~48 blocks and page 2 gets block 49.
+      # This ensures the fallback body_capacity matches measure.ex's overlap-aware result.
+      blocks = for i <- 1..49, do: %Rendro.Block{content: Rendro.text("Block #{i}"), height: 14.4}
+
+      doc = %Rendro.Document{
+        content: blocks,
+        header: [],
+        footer: [],
+        metadata: %Rendro.Metadata{}
+      }
+
+      assert {:ok, paginated} = Paginate.run(doc)
+      # With correct overlap-aware capacity (default template: header/footer height=0),
+      # body_capacity = 697.89, fits 48 blocks (48*14.4=691.2 ≤ 697.89 < 705.6=49*14.4).
+      assert length(paginated.pages) == 2
+    end
+
     test "flow_layout/1 fallback subtracts footer height from body_capacity" do
       # The flow_layout/1 fallback uses %PageTemplate{} (default) whose header and
       # footer regions both have height: 0, so body_capacity = body_region.height - 0 - 0.
