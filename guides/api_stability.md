@@ -43,13 +43,17 @@ Supported surface: `Rendro.signature_field/2` authors unsigned signature placeho
 
 Proof lane: deterministic writer and structural tests prove unsigned widget structure only. Structural proof is not viewer proof and not cryptographic validity proof.
 
-Unsupported narratives: digital signatures, signer identity or trust, tamper evidence, compliance narratives, and PAdES/LTV/TSA/OCSP/CRL support remain unsupported. Signature-specific viewer rows remain `unverified` in `priv/support_matrix.json` until a recorded checklist exists for that exact viewer and signature surface.
+Unsupported narratives: digital signatures, signer identity or trust, tamper evidence, compliance narratives, and PAdES/LTV/TSA/OCSP/CRL support remain unsupported. Signature-widget viewer rows are promoted only when a recorded checklist exists for that exact viewer and unsigned-widget surface; PDF.js is `explicit_deferral` pending upstream signature-field support.
 
 For text fields, checkboxes, and radio groups, Apple Preview is `supported` for `forms` based on the recorded viewer checklist for version **v0.10.3** on **macOS (arm64)** (`priv/viewer_evidence/forms/apple_preview.md`). That proof confirms `open`, `default_state_visible`, `edit_or_toggle`, and `save` for the representative forms fixture via pdfium-cli structural automation proxy (GUI Apple Preview not re-run in CI).
 
-Adobe Acrobat Reader remains `unverified` for `forms` until the same checklist records passing open, visible default state, edit/toggle, and save behavior.
+Adobe Acrobat Reader is `supported` for `forms` based on the recorded viewer checklist for version **v0.10.3** on **Ubuntu (amd64)** (`priv/viewer_evidence/forms/adobe_acrobat_reader.md`). That proof confirms the same four-check forms checklist via pdfium-cli structural automation proxy (GUI Acrobat not re-run in CI).
 
 Chrome PDFium is `supported` for `forms` based on the recorded viewer checklist for version **v0.10.3** on **macOS (arm64)** (`priv/viewer_evidence/forms/chrome_pdfium.md`). That proof confirms `open`, `default_state_visible`, `edit_or_toggle`, and `save` for the representative forms fixture via pdfium-cli automation proxy.
+
+PDF.js is `explicit_deferral` for `forms` because the four-check save-and-reopen round-trip failed on the representative fixture during Phase 71 review — edit/toggle persistence is not reliable.
+
+Adobe Acrobat Reader is `supported` for unsigned `signature_widget` based on the recorded checklist (`priv/viewer_evidence/signature_widget/adobe_acrobat_reader.md`). Apple Preview is `supported` with evidence at `priv/viewer_evidence/signature_widget/apple_preview.md`. Chrome PDFium is `supported` with evidence at `priv/viewer_evidence/signature_widget/chrome_pdfium.md`. PDF.js is `explicit_deferral` for signature widgets per mozilla/pdf.js#4202.
 
 Other viewers are not part of Rendro's supported contract unless `priv/support_matrix.json` later records proof-backed support for them.
 
@@ -59,7 +63,11 @@ Supported surface: `Rendro.Sign.prepare/2` is an artifact-first preparation seam
 
 Proof lane: prepare-stage and manifest tests prove prepared-artifact coordinates and metadata boundaries only. This proof lane is separate from viewer behavior, signer execution, and cryptographic validity.
 
-Unsupported narratives: external signer execution, signer identity or trust policy, digital-signature validity, tamper evidence, compliance narratives, and PAdES/LTV/TSA/OCSP/CRL support remain unsupported. Signature-preparation viewer rows remain `unverified` unless a recorded checklist exists for that exact viewer and prepared-artifact surface.
+Unsupported narratives: external signer execution, signer identity or trust policy, digital-signature validity, tamper evidence, compliance narratives, and PAdES/LTV/TSA/OCSP/CRL support remain unsupported. Signature-preparation viewer rows are promoted only when a recorded checklist exists for that exact viewer and prepared-artifact surface.
+
+For viewers other than Adobe Acrobat Reader, `signing_preparation` and `signature_widget` cells are behaviorally indistinguishable — record signature-widget evidence once and inherit the same status, `recorded_at`, `viewer_kind`, and evidence pointer for `signing_preparation`. Adobe Acrobat Reader requires independent `signing_preparation` evidence because byte-range layout after save is viewer-discriminable (`priv/viewer_evidence/signing_preparation/adobe_acrobat_reader.md`).
+
+Apple Preview and Chrome PDFium `signing_preparation` rows inherit their `signature_widget` evidence pointers. PDF.js `signing_preparation` is `explicit_deferral` with the same upstream signature-field reason as the signature-widget row.
 
 ## Signed Artifact Support Boundary
 
@@ -71,7 +79,9 @@ Important boundary: `Rendro.Sign.sign/2` operates on the original unsigned rende
 
 Signed output is explicitly non-deterministic.
 
-Unsupported narratives: signer identity or trust, tamper-evidence marketing, compliance narratives, PAdES/LTV/TSA/OCSP/CRL support, and multi-signature workflows remain unsupported. Signed-artifact viewer rows remain `unverified` unless a recorded checklist exists for that exact viewer and signing surface.
+Unsupported narratives: signer identity or trust, tamper-evidence marketing, compliance narratives, PAdES/LTV/TSA/OCSP/CRL support, and multi-signature workflows remain unsupported. Signed-artifact viewer rows are promoted only when a recorded checklist exists for that exact viewer and signing surface.
+
+Adobe Acrobat Reader and Chrome PDFium are `supported` for `signed_artifact` with evidence at `priv/viewer_evidence/signed_artifact/adobe_acrobat_reader.md` and `priv/viewer_evidence/signed_artifact/chrome_pdfium.md` (pdfsig/pyhanko structural proxies — not Acrobat or browser signature-trust GUI). Apple Preview and PDF.js are `explicit_deferral` because Preview does not validate `/Sig` digital signatures and PDF.js exposes no signed-artifact integrity panel.
 
 ## Long-Lived Evidence Support Boundary
 
@@ -81,7 +91,7 @@ Proof lane: the exact long-lived claim is backed by one opt-in live proof over r
 
 Certificate trust is a separate question from timestamp and revocation evidence posture. Long-lived evidence support does not mean Rendro owns signer identity policy, trust-store management, or viewer trust UX.
 
-Long-lived viewer rows remain `unverified` in `priv/support_matrix.json` until a recorded checklist exists for that exact augmented-signature surface.
+Adobe Acrobat Reader is `supported` for `long_lived_signed_artifact` with evidence at `priv/viewer_evidence/long_lived_signed_artifact/adobe_acrobat_reader.md` (pyhanko structural posture on the representative certomancer fixture — not Acrobat LTV panel GUI). Apple Preview, Chrome PDFium, and PDF.js are `explicit_deferral` because those viewers do not surface long-term-validation timestamp, revocation, or expiry indicators for augmented signatures.
 
 Unsupported narratives: signer identity or trust ownership, viewer promotion, LT/LTA profile claims, blanket compliance claims, and multi-signature workflows remain unsupported.
 
@@ -105,7 +115,7 @@ Viewer support is tracked per surface and per viewer in `priv/support_matrix.jso
 
 Adobe Acrobat Reader is `supported` for both `embedded_files` and `links`. The recorded checklist for version **v0.10.3** on **macOS (arm64)** confirms embedded-file structural markers (`priv/viewer_evidence/embedded_files/adobe_acrobat_reader.md`: `discoverable`, `open_or_extract`, `save_or_extract`) and link structural markers (`priv/viewer_evidence/links/adobe_acrobat_reader.md`: `external_uri_handoff`, `internal_page_navigation`) via pdfium-cli automation proxy — not Attachments pane or URI handoff GUI.
 
-Apple Preview is `supported` for `links` and `unverified` for `embedded_files`. The recorded checklist for version **v0.10.3** on **macOS (arm64)** (`priv/viewer_evidence/links/apple_preview.md`) confirms external URI handoff and internal page navigation structural markers via pdfium-cli automation proxy. Preview embedded-file discoverability stays `unverified` until a future checklist records the behavior; the surface is not marked `unsupported`, since Rendro continues to author it correctly per the structural proof lane.
+Apple Preview is `supported` for `links` and `explicit_deferral` for `embedded_files`. The recorded checklist for version **v0.10.3** on **macOS (arm64)** (`priv/viewer_evidence/links/apple_preview.md`) confirms external URI handoff and internal page navigation structural markers via pdfium-cli automation proxy. Preview embedded-file discoverability is `explicit_deferral` because the Attachments UI still does not discover, open, or extract the representative fixture after Phase 71 re-verify; the surface is not marked `unsupported`, since Rendro continues to author it correctly per the structural proof lane.
 
 Viewers not listed above are outside the recorded support contract for embedded artifact surfaces.
 
@@ -129,4 +139,4 @@ Structural validation through `pdfinfo`/Poppler proves that a protected PDF rema
 
 Apple Preview is `supported` for the `protection` surface based on the recorded viewer checklist for **pdfinfo version 26.04.0** on **macOS (arm64)** (`priv/viewer_evidence/protection/apple_preview.md`). That proof confirms `opens_with_open_password`, `displays_authored_content_correctly`, `advisory_print_behavior`, `advisory_copy_behavior`, and `save_and_reopen_readability` for the representative protected fixture via pdfinfo/qpdf structural automation proxy (Preview password GUI not re-run in CI).
 
-Adobe Acrobat Reader remains `unverified` until the same five-check protection checklist is recorded for that viewer. Other `protection` viewers remain `unverified` in `priv/support_matrix.json` until a recorded checklist promotes a named viewer.
+Adobe Acrobat Reader is `supported` for the `protection` surface based on the recorded viewer checklist for **pdfinfo** on **Ubuntu (amd64)** (`priv/viewer_evidence/protection/adobe_acrobat_reader.md`). That proof confirms the same five-check protection checklist via pdfinfo/qpdf structural automation proxy (Acrobat password GUI not re-run in CI). Other `protection` viewers are outside the recorded contract unless `priv/support_matrix.json` promotes them.

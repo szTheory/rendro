@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.3
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-29T00:45:55.793Z"
-last_activity: 2026-05-29 -- Phase 71 planning complete
+last_updated: "2026-05-29T00:48:58.700Z"
+last_activity: 2026-05-29 -- Phase 71 complete (3/3 plans)
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 12
-  completed_plans: 9
-  percent: 60
+  completed_plans: 12
+  percent: 80
 ---
 
 # Project State
@@ -24,11 +24,11 @@ See: .planning/PROJECT.md (updated 2026-05-07 after v2.2 milestone definition)
 
 ## Current Position
 
-Phase: 71
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-05-29 -- Phase 71 planning complete
-Resume: .planning/phases/71-record-new-trust-sensitive-surfaces-and-explicit-deferrals/71-CONTEXT.md
+Phase: 72 (closure-audit-polish-and-ship) — NEXT
+Plan: 0 of 0
+Status: Phase 71 complete
+Last activity: 2026-05-29 -- Phase 71 complete (3/3 plans)
+Resume: .planning/ROADMAP.md Phase 72
 
 ## Milestone Snapshot
 
@@ -94,13 +94,13 @@ Items still deferred or intentionally left outside the active milestone as of 20
 
 | Category | Item | Status |
 |----------|------|--------|
-| viewer_proof | Apple Preview × `embedded_files` | unverified (viewer-side gap; Rendro authoring is correct per structural lane) |
-| viewer_proof | Adobe Acrobat Reader forms checklist (Phase 47) | still unverified — not in `v2.2` scope |
-| viewer_proof | Signature-specific viewer promotion | unverified until recorded per-viewer evidence exists |
+| viewer_proof | Apple Preview × `embedded_files` | explicit_deferral (Attachments UI gap named in matrix) |
+| viewer_proof | Adobe Acrobat Reader forms checklist | supported via pdfium-cli structural proxy (Phase 71) |
+| viewer_proof | Signature-specific viewer promotion | supported or explicit_deferral for all trust-sensitive cells (Phase 71) |
 | adoption | Additional signing or long-lived adapters beyond the first proof-backed path | deferred until demand and proof justify them |
 | workflows | Multi-signature workflows and signer orchestration | deferred beyond `v2.2` |
 | globalization | Global text shaping, RTL support, and broader script coverage | deferred to a later candidate milestone unless urgency changes |
 
 ## Operator Next Steps
 
-- Plan phase 68 with /gsd-plan-phase 68
+- Plan phase 72 with /gsd-plan-phase 72

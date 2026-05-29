@@ -24,6 +24,32 @@ defmodule Rendro.ViewerEvidence.ObservationEnvironment do
     {:ok, %{viewer_version: version, platform: platform_string()}}
   end
 
+  def pdfsig_cli(_opts \\ []) do
+    version =
+      case System.cmd("pdfsig", ["-v"], stderr_to_stdout: true) do
+        {output, 0} -> output |> String.trim() |> String.split("\n") |> List.first() |> to_string()
+        _ -> "pdfsig"
+      end
+
+    {:ok, %{viewer_version: version, platform: platform_string()}}
+  end
+
+  def pyhanko_cli(_opts \\ []) do
+    version =
+      case System.find_executable("pyhanko") do
+        nil ->
+          "pyhanko"
+
+        executable ->
+          case System.cmd(executable, ["--version"], stderr_to_stdout: true) do
+            {output, 0} -> String.trim(output)
+            _ -> "pyhanko"
+          end
+      end
+
+    {:ok, %{viewer_version: version, platform: platform_string()}}
+  end
+
   @spec platform_string() :: String.t()
   def platform_string do
     os_name =

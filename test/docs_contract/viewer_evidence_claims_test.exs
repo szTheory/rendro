@@ -34,13 +34,37 @@ defmodule Rendro.DocsContract.ViewerEvidenceClaimsTest do
 
       for path <- [
             "priv/viewer_evidence/forms/apple_preview.md",
+            "priv/viewer_evidence/forms/adobe_acrobat_reader.md",
             "priv/viewer_evidence/embedded_files/adobe_acrobat_reader.md",
             "priv/viewer_evidence/links/adobe_acrobat_reader.md",
             "priv/viewer_evidence/links/apple_preview.md",
-            "priv/viewer_evidence/protection/apple_preview.md"
+            "priv/viewer_evidence/protection/apple_preview.md",
+            "priv/viewer_evidence/protection/adobe_acrobat_reader.md",
+            "priv/viewer_evidence/signature_widget/adobe_acrobat_reader.md",
+            "priv/viewer_evidence/signature_widget/apple_preview.md",
+            "priv/viewer_evidence/signing_preparation/adobe_acrobat_reader.md",
+            "priv/viewer_evidence/signed_artifact/adobe_acrobat_reader.md",
+            "priv/viewer_evidence/signed_artifact/chrome_pdfium.md",
+            "priv/viewer_evidence/long_lived_signed_artifact/adobe_acrobat_reader.md"
           ] do
         assert guide =~ path
       end
+    end
+
+    test "trust-sensitive matrix cells have no bare unverified status" do
+      matrix = File.read!("priv/support_matrix.json")
+      refute matrix =~ ~r/"signature_widget_viewers".*?"status"\s*:\s*"unverified"/s
+      refute matrix =~ ~r/"signing_preparation".*?"status"\s*:\s*"unverified"/s
+      refute matrix =~ ~r/"signing".*?"status"\s*:\s*"unverified"/s
+    end
+
+    test "viewer evidence guide documents Phase 71 deferral templates" do
+      guide = File.read!("guides/viewer_evidence.md")
+
+      assert guide =~ "UPSTREAM_ISSUE"
+      assert guide =~ "NO_SIG_VALIDATION"
+      assert guide =~ "NO_LTV_INDICATORS"
+      assert guide =~ "SURFACE_EQUIVALENCE"
     end
 
     test "viewer claim sentences do not reference phase summaries instead of evidence files" do

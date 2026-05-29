@@ -1,7 +1,7 @@
 defmodule Rendro.DocsContract.FormsClaimsTest do
   use ExUnit.Case, async: true
 
-  test "support matrix exposes the nested forms contract with provisional viewer statuses" do
+  test "support matrix exposes the nested forms contract with terminal viewer statuses" do
     matrix = File.read!("priv/support_matrix.json")
 
     assert matrix =~ ~s|"forms"|
@@ -18,23 +18,30 @@ defmodule Rendro.DocsContract.FormsClaimsTest do
     assert matrix =~ ~s|"need_appearances": "unsupported"|
     assert matrix =~ ~s|"xfa": "unsupported"|
 
-    assert matrix =~ ~r/"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+    assert matrix =~
+             ~r/"forms".*?"viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
+
     assert matrix =~ ~r/"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
     assert matrix =~ ~r/"chrome_pdfium"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
-    assert matrix =~ ~r/"pdfjs"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
 
     assert matrix =~
-             ~r/"signature_widget_viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+             ~r/"forms".*?"viewers".*?"pdfjs"\s*:\s*\{\s*"status"\s*:\s*"explicit_deferral"/s
 
     assert matrix =~
-             ~r/"signature_widget_viewers".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+             ~r/"signature_widget_viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
+
+    assert matrix =~
+             ~r/"signature_widget_viewers".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
+
+    assert matrix =~
+             ~r/"signature_widget_viewers".*?"pdfjs"\s*:\s*\{\s*"status"\s*:\s*"explicit_deferral"/s
 
     assert matrix =~ ~s|"digital_signatures": "unsupported"|
 
     refute matrix =~ ~s|"surfaces"|
   end
 
-  test "public forms wording stays narrow and matches the provisional matrix posture" do
+  test "public forms wording stays narrow and matches the terminal matrix posture" do
     guide = File.read!("guides/api_stability.md")
 
     assert guide =~
@@ -53,7 +60,9 @@ defmodule Rendro.DocsContract.FormsClaimsTest do
              "Unsupported narratives: digital signatures, signer identity or trust, tamper evidence, compliance narratives, and PAdES/LTV/TSA/OCSP/CRL support remain unsupported."
 
     assert guide =~
-             "Signature-specific viewer rows remain `unverified` in `priv/support_matrix.json` until a recorded checklist exists for that exact viewer and signature surface."
+             "Signature-widget viewer rows are promoted only when a recorded checklist exists for that exact viewer and unsigned-widget surface"
+
+    assert guide =~ "priv/viewer_evidence/signature_widget/adobe_acrobat_reader.md"
 
     assert guide =~
              "Other viewers are not part of Rendro's supported contract unless `priv/support_matrix.json` later records proof-backed support for them."

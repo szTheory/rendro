@@ -86,11 +86,9 @@ Existing infrastructure covers framework; Phase 71 creates new artifacts:
 
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
-| Acrobat six-PDF session | VIEWER-02–07 | No headless Acrobat CI | §5.1 in 71-RESEARCH.md checklist |
-| Preview signature_widget GUI | VIEWER-04 | No Preview automation | Open fixture; run 5-check; record manual evidence |
-| embedded_files × Preview re-verify | VIEWER-04 (adjacent) | GUI Attachments pane | 5-minute re-open; promote or defer per D-12 |
-| PDF.js forms 4-check | VIEWER-02 | Browser GUI | Attempt promotion; defer only on failure |
 | Deferral clause wording | VIEWER-04–07 | Human judgment within templates | Pre-validate against lint before matrix commit |
+
+All former GUI-only rows (Acrobat session, Preview sig-widget, PDF.js forms attempt, embedded_files × Preview re-verify) are **CI structural-proxy lanes** — see proof modules and `viewer-evidence-live-proof` job.
 
 ---
 

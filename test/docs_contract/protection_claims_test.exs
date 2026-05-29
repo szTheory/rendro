@@ -24,7 +24,7 @@ defmodule Rendro.DocsContract.ProtectionClaimsTest do
              ~s|"delivery_and_storage_seams_transport_artifacts_not_passwords": "supported"|
 
     assert matrix =~
-             ~r/"protection".*?"viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+             ~r/"protection".*?"viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
 
     assert matrix =~
              ~r/"protection".*?"viewers".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
@@ -58,7 +58,8 @@ defmodule Rendro.DocsContract.ProtectionClaimsTest do
     assert guide =~ "If validation succeeds only with `owner_password`"
     assert guide =~ "Apple Preview is `supported` for the `protection` surface"
     assert guide =~ "`save_and_reopen_readability`"
-    assert guide =~ "Adobe Acrobat Reader remains `unverified`"
+    assert guide =~ "Adobe Acrobat Reader is `supported` for the `protection` surface"
+    assert guide =~ "priv/viewer_evidence/protection/adobe_acrobat_reader.md"
 
     refute guide =~ "secure PDF"
     refute guide =~ "tamper-proof"

@@ -20,33 +20,33 @@ defmodule Rendro.DocsContract.SigningClaimsTest do
     assert matrix =~ ~s|"multi_signature_workflows": "unsupported"|
 
     assert matrix =~
-             ~r/"signing".*?"long_lived".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+             ~r/"signing".*?"long_lived".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
 
     assert matrix =~
-             ~r/"signing".*?"long_lived".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+             ~r/"signing".*?"long_lived".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"explicit_deferral"/s
 
     refute matrix =~ ~s|"long_lived": "supported"|
     refute matrix =~ ~s|"tamper_evidence_narratives": "supported"|
     refute matrix =~ ~r/^  "long_lived"\s*:/m
   end
 
-  test "signature-specific and long-lived viewer rows stay unverified" do
+  test "signature-specific and long-lived viewer rows are terminal after Phase 71" do
     matrix = File.read!("priv/support_matrix.json")
 
     assert matrix =~
-             ~r/"signature_widget_viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+             ~r/"signature_widget_viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
 
     assert matrix =~
-             ~r/"signature_widget_viewers".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+             ~r/"signature_widget_viewers".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
 
     assert matrix =~
-             ~r/"signing_preparation".*?"chrome_pdfium"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+             ~r/"signing_preparation".*?"chrome_pdfium"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
 
     assert matrix =~
-             ~r/"signing".*?"viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+             ~r/"signing".*?"viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
 
     assert matrix =~
-             ~r/"signing".*?"long_lived".*?"pdfjs"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+             ~r/"signing".*?"long_lived".*?"pdfjs"\s*:\s*\{\s*"status"\s*:\s*"explicit_deferral"/s
 
     refute matrix =~ ~s|targeted for verification|
   end
@@ -77,7 +77,9 @@ defmodule Rendro.DocsContract.SigningClaimsTest do
              "Certificate trust is a separate question from timestamp and revocation evidence posture."
 
     assert guide =~
-             "Long-lived viewer rows remain `unverified` in `priv/support_matrix.json` until a recorded checklist exists for that exact augmented-signature surface."
+             "For viewers other than Adobe Acrobat Reader, `signing_preparation` and `signature_widget` cells are behaviorally indistinguishable"
+
+    assert guide =~ "priv/viewer_evidence/long_lived_signed_artifact/adobe_acrobat_reader.md"
 
     refute guide =~ "tamper-evident signing"
     refute guide =~ "PAdES is supported"

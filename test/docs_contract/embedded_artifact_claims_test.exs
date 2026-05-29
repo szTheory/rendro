@@ -35,10 +35,11 @@ defmodule Rendro.DocsContract.EmbeddedArtifactClaimsTest do
              ~r/"embedded_files".*?"viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
 
     # Apple Preview did not surface the embedded file in its UI under the version
-    # checked → stays `unverified` per D-08. Not `unsupported` (D-09): Rendro authors
-    # the surface correctly per the structural lane; the gap is on the viewer side.
+    # checked → explicit_deferral per Phase 71 re-verify. Not `unsupported` (D-09):
+    # Rendro authors the surface correctly per the structural lane; the gap is on
+    # the viewer side.
     assert matrix =~
-             ~r/"embedded_files".*?"viewers".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"unverified"/s
+             ~r/"embedded_files".*?"viewers".*?"apple_preview"\s*:\s*\{\s*"status"\s*:\s*"explicit_deferral"/s
 
     assert matrix =~ ~s|"discoverable"|
     assert matrix =~ ~s|"open_or_extract"|
@@ -49,7 +50,7 @@ defmodule Rendro.DocsContract.EmbeddedArtifactClaimsTest do
 
     # Independent per-surface, per-viewer status: a links pass for Apple Preview
     # must not infer an embedded_files pass. The assertion above already pins
-    # apple_preview embedded_files at "unverified".
+    # apple_preview embedded_files at explicit_deferral.
   end
 
   test "support matrix exposes the nested links contract with proof-backed viewer statuses" do
@@ -98,12 +99,12 @@ defmodule Rendro.DocsContract.EmbeddedArtifactClaimsTest do
 
     # Post-proof per-surface, per-viewer wording. Adobe Reader is supported for
     # both surfaces; Apple Preview is supported for links only; Apple Preview
-    # remains unverified for embedded files.
+    # is explicit_deferral for embedded files.
     assert guide =~
              "Adobe Acrobat Reader is `supported` for both `embedded_files` and `links`."
 
     assert guide =~
-             "Apple Preview is `supported` for `links` and `unverified` for `embedded_files`."
+             "Apple Preview is `supported` for `links` and `explicit_deferral` for `embedded_files`."
 
     # Refute broad/blanket viewer language and over-broad scheme/destination claims.
     refute guide =~ "standard PDF viewers"

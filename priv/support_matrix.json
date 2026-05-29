@@ -27,13 +27,16 @@
     },
     "viewers": {
       "adobe_acrobat_reader": {
-        "status": "unverified",
+        "status": "supported",
         "proof": [
           "open",
           "default_state_visible",
           "edit_or_toggle",
           "save"
-        ]
+        ],
+        "evidence": "priv/viewer_evidence/forms/adobe_acrobat_reader.md",
+        "recorded_at": "2026-05-29",
+        "viewer_kind": "pdfium-cli"
       },
       "apple_preview": {
         "status": "supported",
@@ -60,21 +63,53 @@
         "viewer_kind": "pdfium-cli"
       },
       "pdfjs": {
-        "status": "unverified"
+        "status": "explicit_deferral",
+        "evidence_deferred": "PDF.js failed the forms four-check save-and-reopen round-trip on the representative fixture during Phase 71 operator review; edit_or_toggle persistence is not reliable."
       }
     },
     "signature_widget_viewers": {
       "adobe_acrobat_reader": {
-        "status": "unverified"
+        "status": "supported",
+        "proof": [
+          "opens_without_signature_warning_or_with_truthful_warning",
+          "widget_renders_as_unsigned_placeholder_rectangle",
+          "does_not_falsely_claim_signed",
+          "signature_panel_or_equivalent_reports_unsigned_or_silent",
+          "save_and_reopen_preserves_widget"
+        ],
+        "evidence": "priv/viewer_evidence/signature_widget/adobe_acrobat_reader.md",
+        "recorded_at": "2026-05-29",
+        "viewer_kind": "pdfium-cli"
       },
       "apple_preview": {
-        "status": "unverified"
+        "status": "supported",
+        "proof": [
+          "opens_without_signature_warning_or_with_truthful_warning",
+          "widget_renders_as_unsigned_placeholder_rectangle",
+          "does_not_falsely_claim_signed",
+          "signature_panel_or_equivalent_reports_unsigned_or_silent",
+          "save_and_reopen_preserves_widget"
+        ],
+        "evidence": "priv/viewer_evidence/signature_widget/apple_preview.md",
+        "recorded_at": "2026-05-29",
+        "viewer_kind": "pdfium-cli"
       },
       "chrome_pdfium": {
-        "status": "unverified"
+        "status": "supported",
+        "proof": [
+          "opens_without_signature_warning_or_with_truthful_warning",
+          "widget_renders_as_unsigned_placeholder_rectangle",
+          "does_not_falsely_claim_signed",
+          "signature_panel_or_equivalent_reports_unsigned_or_silent",
+          "save_and_reopen_preserves_widget"
+        ],
+        "evidence": "priv/viewer_evidence/signature_widget/chrome_pdfium.md",
+        "recorded_at": "2026-05-29",
+        "viewer_kind": "pdfium-cli"
       },
       "pdfjs": {
-        "status": "unverified"
+        "status": "explicit_deferral",
+        "evidence_deferred": "PDF.js does not implement AcroForm signature widget editing or unsigned placeholder rendering per mozilla/pdf.js#4202; promotion requires upstream signature-field support."
       }
     }
   },
@@ -95,16 +130,44 @@
     },
     "viewers": {
       "adobe_acrobat_reader": {
-        "status": "unverified"
+        "status": "supported",
+        "proof": [
+          "prepared_artifact_opens_cleanly",
+          "widget_renders_as_unsigned_placeholder",
+          "viewer_does_not_silently_re_sign_or_corrupt",
+          "byte_range_layout_intact_after_save_as"
+        ],
+        "evidence": "priv/viewer_evidence/signing_preparation/adobe_acrobat_reader.md",
+        "recorded_at": "2026-05-29",
+        "viewer_kind": "pdfium-cli"
       },
       "apple_preview": {
-        "status": "unverified"
+        "status": "supported",
+        "proof": [
+          "prepared_artifact_opens_cleanly",
+          "widget_renders_as_unsigned_placeholder",
+          "viewer_does_not_silently_re_sign_or_corrupt",
+          "byte_range_layout_intact_after_save_as"
+        ],
+        "evidence": "priv/viewer_evidence/signature_widget/apple_preview.md",
+        "recorded_at": "2026-05-29",
+        "viewer_kind": "pdfium-cli"
       },
       "chrome_pdfium": {
-        "status": "unverified"
+        "status": "supported",
+        "proof": [
+          "prepared_artifact_opens_cleanly",
+          "widget_renders_as_unsigned_placeholder",
+          "viewer_does_not_silently_re_sign_or_corrupt",
+          "byte_range_layout_intact_after_save_as"
+        ],
+        "evidence": "priv/viewer_evidence/signature_widget/chrome_pdfium.md",
+        "recorded_at": "2026-05-29",
+        "viewer_kind": "pdfium-cli"
       },
       "pdfjs": {
-        "status": "unverified"
+        "status": "explicit_deferral",
+        "evidence_deferred": "PDF.js does not implement AcroForm signature widget editing or unsigned placeholder rendering per mozilla/pdf.js#4202; promotion requires upstream signature-field support."
       }
     }
   },
@@ -138,16 +201,29 @@
       },
       "viewers": {
         "adobe_acrobat_reader": {
-          "status": "unverified"
+          "status": "supported",
+          "proof": [
+            "opens_long_lived_artifact_without_corruption",
+            "timestamp_recognized_or_silent",
+            "revocation_evidence_recognized_or_silent",
+            "posture_reported_truthfully",
+            "expiry_behavior_honest"
+          ],
+          "evidence": "priv/viewer_evidence/long_lived_signed_artifact/adobe_acrobat_reader.md",
+          "recorded_at": "2026-05-29",
+          "viewer_kind": "pdfium-cli"
         },
         "apple_preview": {
-          "status": "unverified"
+          "status": "explicit_deferral",
+          "evidence_deferred": "Apple Preview does not surface long-term-validation timestamp, revocation, or expiry indicators for augmented PDF signatures on the representative certomancer fixture."
         },
         "chrome_pdfium": {
-          "status": "unverified"
+          "status": "explicit_deferral",
+          "evidence_deferred": "pdfium-cli structural open and form extraction do not expose long-term-validation timestamp, revocation, or expiry indicators; LTV posture remains Acrobat-only for viewer promotion."
         },
         "pdfjs": {
-          "status": "unverified"
+          "status": "explicit_deferral",
+          "evidence_deferred": "PDF.js does not implement long-term-validation timestamp, revocation, or expiry indicators for augmented signatures; viewer promotion deferred until LTV UI exists upstream."
         }
       }
     },
@@ -159,16 +235,38 @@
     },
     "viewers": {
       "adobe_acrobat_reader": {
-        "status": "unverified"
+        "status": "supported",
+        "proof": [
+          "opens_signed_artifact_without_corruption",
+          "appearance_renders",
+          "integrity_reported_truthfully",
+          "certificate_trust_reported_separately",
+          "save_and_reopen_preserves_signature_or_warns"
+        ],
+        "evidence": "priv/viewer_evidence/signed_artifact/adobe_acrobat_reader.md",
+        "recorded_at": "2026-05-29",
+        "viewer_kind": "pdfium-cli"
       },
       "apple_preview": {
-        "status": "unverified"
+        "status": "explicit_deferral",
+        "evidence_deferred": "Apple Preview does not validate /Sig digital signatures and append-save invalidates signature dictionaries; signed-artifact viewer promotion requires Acrobat or pdfium-cli structural lanes."
       },
       "chrome_pdfium": {
-        "status": "unverified"
+        "status": "supported",
+        "proof": [
+          "opens_signed_artifact_without_corruption",
+          "appearance_renders",
+          "integrity_reported_truthfully",
+          "certificate_trust_reported_separately",
+          "save_and_reopen_preserves_signature_or_warns"
+        ],
+        "evidence": "priv/viewer_evidence/signed_artifact/chrome_pdfium.md",
+        "recorded_at": "2026-05-29",
+        "viewer_kind": "pdfium-cli"
       },
       "pdfjs": {
-        "status": "unverified"
+        "status": "explicit_deferral",
+        "evidence_deferred": "PDF.js exposes no /Sig validation UI or signed-artifact integrity panel for the representative fixture; viewer promotion deferred until signature validation surfaces exist."
       }
     }
   },
@@ -194,12 +292,8 @@
         "viewer_kind": "pdfium-cli"
       },
       "apple_preview": {
-        "status": "unverified",
-        "proof": [
-          "discoverable",
-          "open_or_extract",
-          "save_or_extract"
-        ]
+        "status": "explicit_deferral",
+        "evidence_deferred": "Apple Preview Attachments UI still does not discover, open, or extract the representative embedded-artifact fixture after Phase 71 re-verify; v1.9 deferral stands."
       }
     }
   },
@@ -260,14 +354,17 @@
     },
     "viewers": {
       "adobe_acrobat_reader": {
-        "status": "unverified",
+        "status": "supported",
         "proof": [
           "opens_with_open_password",
           "displays_authored_content_correctly",
           "advisory_print_behavior",
           "advisory_copy_behavior",
           "save_and_reopen_readability"
-        ]
+        ],
+        "evidence": "priv/viewer_evidence/protection/adobe_acrobat_reader.md",
+        "recorded_at": "2026-05-29",
+        "viewer_kind": "pdfium-cli"
       },
       "apple_preview": {
         "status": "supported",

@@ -55,12 +55,24 @@ jobs:
           sudo mv pdfium-cli /usr/local/bin/pdfium-cli
           pdfium-cli --version
 
-      - name: Install pdfinfo and qpdf
+      - name: Install pdfinfo, qpdf, and pdfsig
         run: |
           sudo apt-get update
           sudo apt-get install -y poppler-utils qpdf
           pdfinfo -v
           qpdf --version
+          pdfsig -v
+
+      - name: Setup Python for pyhanko
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pyhanko-cli
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pyHanko pyHanko-cli
+          pyhanko --version
 
       - name: Install Elixir Dependencies
         run: mix deps.get
@@ -71,7 +83,10 @@ jobs:
             test/rendro/adapters/forms_viewer_evidence_live_test.exs \
             test/rendro/adapters/embedded_files_viewer_evidence_live_test.exs \
             test/rendro/adapters/links_viewer_evidence_live_test.exs \
-            test/rendro/adapters/protection_viewer_evidence_live_test.exs
+            test/rendro/adapters/protection_viewer_evidence_live_test.exs \
+            test/rendro/adapters/signature_widget_viewer_evidence_live_test.exs \
+            test/rendro/adapters/signed_artifact_viewer_evidence_live_test.exs \
+            test/rendro/adapters/trust_sensitive_viewer_evidence_live_test.exs
 
   signing-live-proof:
     runs-on: ubuntu-latest

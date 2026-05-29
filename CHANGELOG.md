@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.0] - Unreleased
 
-This release lifts the v1.5–v2.2 milestone work onto Hex. The 0.2.0 published surface ended at password-to-open protection; 0.3.0 adds validation/trust surfaces, interactive forms, embedded artifacts, signature widgets and signing preparation, cryptographic signing, and long-lived signature evidence — every public claim backed by `priv/support_matrix.json` rows and either a structural or live-tool proof lane. Per-viewer evidence remains the next milestone (v2.3) and is intentionally still recorded as `unverified` outside the rows that have promoted proof.
+This release lifts the v1.5–v2.2 milestone work onto Hex. The 0.2.0 published surface ended at password-to-open protection; 0.3.0 adds validation/trust surfaces, interactive forms, embedded artifacts, signature widgets and signing preparation, cryptographic signing, and long-lived signature evidence — every public claim backed by `priv/support_matrix.json` rows and either a structural or live-tool proof lane. Phase 71 closes all trust-sensitive viewer cells as `supported` with CI structural-proxy evidence or `explicit_deferral` with named reasons — zero bare `unverified` rows remain in those surfaces.
 
 ### Added
 
@@ -18,6 +18,15 @@ This release lifts the v1.5–v2.2 milestone work onto Hex. The 0.2.0 published 
 - `Rendro.Adapters.Pdfium` optional PATH-discovered adapter for pdfium-cli form/info observation used by the viewer-evidence live-proof lane.
 - `mix rendro.viewer_evidence record forms chrome_pdfium` to autogenerate evidence files from pdfium-cli observations.
 - Promoted `forms.viewers.chrome_pdfium` to `supported` with evidence at `priv/viewer_evidence/forms/chrome_pdfium.md` (`viewer_kind: pdfium-cli`).
+- Promoted `forms.viewers.adobe_acrobat_reader` to `supported` with evidence at `priv/viewer_evidence/forms/adobe_acrobat_reader.md` (`viewer_kind: pdfium-cli`).
+- Promoted `forms.signature_widget_viewers.adobe_acrobat_reader`, `apple_preview`, and `chrome_pdfium` to `supported` with evidence under `priv/viewer_evidence/signature_widget/`.
+- Promoted `signing_preparation.viewers.adobe_acrobat_reader` to `supported` with evidence at `priv/viewer_evidence/signing_preparation/adobe_acrobat_reader.md`; non-Acrobat rows inherit signature-widget evidence pointers (D-15).
+- Promoted `signing.viewers.adobe_acrobat_reader` and `chrome_pdfium` to `supported` with evidence under `priv/viewer_evidence/signed_artifact/`.
+- Promoted `signing.long_lived.viewers.adobe_acrobat_reader` to `supported` with evidence at `priv/viewer_evidence/long_lived_signed_artifact/adobe_acrobat_reader.md`.
+- Promoted `protection.viewers.adobe_acrobat_reader` to `supported` with evidence at `priv/viewer_evidence/protection/adobe_acrobat_reader.md`.
+- Phase 71 structural-proxy proof modules: `FormsAcrobatProof`, `ProtectionAcrobatProof`, `SignatureWidgetAcrobatProof`, `SignatureWidgetApplePreviewProof`, `SigningPreparationPdfiumProof`, `SignedArtifactAcrobatProof`, `LongLivedAcrobatProof`.
+- `viewer-evidence-live-proof` CI lane extended with pdfsig/pyhanko and Phase 71 live tests (`trust_sensitive_viewer_evidence_live_test.exs` and related adapters).
+- Explicit deferrals for `forms.viewers.pdfjs`, `forms.signature_widget_viewers.pdfjs`, `signing_preparation.viewers.pdfjs`, `signing.viewers.apple_preview`, `signing.viewers.pdfjs`, `signing.long_lived.viewers.{apple_preview,chrome_pdfium,pdfjs}`, and `embedded_files.viewers.apple_preview` with named reasons in `priv/support_matrix.json`.
 
 ##### Changed
 
@@ -27,6 +36,8 @@ This release lifts the v1.5–v2.2 milestone work onto Hex. The 0.2.0 published 
 - Re-home `links.viewers.adobe_acrobat_reader` evidence to `priv/viewer_evidence/links/adobe_acrobat_reader.md` (**support status unchanged** since v1.9 Phase 50).
 - Re-home `links.viewers.apple_preview` evidence to `priv/viewer_evidence/links/apple_preview.md` (**support status unchanged** since v1.9 Phase 50).
 - Re-home `protection.viewers.apple_preview` evidence to `priv/viewer_evidence/protection/apple_preview.md` (**support status unchanged** since v1.10 Phase 54).
+- Signing-preparation equivalence note in `guides/api_stability.md`: non-Acrobat `signing_preparation` rows inherit `signature_widget` evidence; Acrobat requires independent byte-range evidence.
+- `embedded_files.viewers.apple_preview` status changed from `unverified` to `explicit_deferral` after Phase 71 re-verify (Attachments UI gap named explicitly).
 
 #### Validation and Trust Surfaces (v1.5)
 
@@ -74,7 +85,7 @@ This release lifts the v1.5–v2.2 milestone work onto Hex. The 0.2.0 published 
 
 ### Truthful Boundaries Held
 
-- `priv/support_matrix.json` and `guides/api_stability.md` keep unsupported narratives (HTML/CSS parity, browser-style layout, signer-identity trust by default, broad compliance branding, viewer promotion without recorded evidence, multi-signature workflows, HSM/key custody in core, remote asset fetching, broad complex-script support) explicit. Every supported viewer row is backed by recorded checklist proof; rows without recorded proof remain `unverified` rather than being promoted.
+- `priv/support_matrix.json` and `guides/api_stability.md` keep unsupported narratives (HTML/CSS parity, browser-style layout, signer-identity trust by default, broad compliance branding, viewer promotion without recorded evidence, multi-signature workflows, HSM/key custody in core, remote asset fetching, broad complex-script support) explicit. Every supported viewer row is backed by recorded checklist proof; trust-sensitive surfaces without recorded proof use `explicit_deferral` with named reasons rather than bare `unverified`.
 - The canonical protected-delivery recipe documented in 0.2.0 stays unchanged: `render_to_artifact -> Protect.password -> store/deliver`. Signing seams (`prepare/2`, `sign/2`, `augment/2`) live alongside protection on the artifact boundary, never inside `Rendro.render/2`.
 
 ## [0.2.0] - 2026-05-06

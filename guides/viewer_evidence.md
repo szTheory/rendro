@@ -189,9 +189,64 @@ Protection regen produces **new bytes** — re-run the structural proof lane aft
 
 Use `explicit_deferral` when a viewer cannot satisfy a behavior and you can name **why** in ≥40 characters. Do not create an evidence file. Do not use vague deferral vocabulary: `TBD`, `not yet`, `deferred for later`, or empty strings — CI lint rejects them.
 
-### Hypothetical example (non-production)
+### Template: UPSTREAM_ISSUE
 
-*Do not add this row to `priv/support_matrix.json` in Phase 69 — teaching example only.*
+Use when promotion is blocked by missing upstream viewer capability (not a Rendro authoring gap).
+
+```json
+"pdfjs": {
+  "status": "explicit_deferral",
+  "evidence_deferred": "PDF.js does not implement AcroForm signature widget editing or unsigned placeholder rendering per mozilla/pdf.js#4202; promotion requires upstream signature-field support."
+}
+```
+
+Example surfaces: `forms.viewers.pdfjs`, `forms.signature_widget_viewers.pdfjs`, `signing_preparation.viewers.pdfjs`.
+
+### Template: NO_SIG_VALIDATION
+
+Use when the viewer cannot validate `/Sig` digital signatures or signed-artifact integrity UI.
+
+```json
+"apple_preview": {
+  "status": "explicit_deferral",
+  "evidence_deferred": "Apple Preview does not validate /Sig digital signatures and append-save invalidates signature dictionaries; signed-artifact viewer promotion requires Acrobat or pdfium-cli structural lanes."
+}
+```
+
+Example surfaces: `signing.viewers.apple_preview`, `signing.viewers.pdfjs`.
+
+### Template: NO_LTV_INDICATORS
+
+Use when long-term-validation timestamp, revocation, or expiry indicators are absent.
+
+```json
+"chrome_pdfium": {
+  "status": "explicit_deferral",
+  "evidence_deferred": "pdfium-cli structural open and form extraction do not expose long-term-validation timestamp, revocation, or expiry indicators; LTV posture remains Acrobat-only for viewer promotion."
+}
+```
+
+Example surfaces: `signing.long_lived.viewers.{apple_preview,chrome_pdfium,pdfjs}`.
+
+### Template: SURFACE_EQUIVALENCE (supported inheritance, not deferral)
+
+Use when two surfaces share identical viewer behavior — record once on the primary surface and inherit pointers on the secondary surface.
+
+```json
+"apple_preview": {
+  "status": "supported",
+  "proof": ["prepared_artifact_opens_cleanly", "widget_renders_as_unsigned_placeholder", "viewer_does_not_silently_re_sign_or_corrupt", "byte_range_layout_intact_after_save_as"],
+  "evidence": "priv/viewer_evidence/signature_widget/apple_preview.md",
+  "recorded_at": "2026-05-29",
+  "viewer_kind": "pdfium-cli"
+}
+```
+
+Applies to `signing_preparation` non-Acrobat rows inheriting `signature_widget` evidence (D-15). Adobe Acrobat Reader requires independent `signing_preparation` evidence because byte-range layout is viewer-discriminable.
+
+### Hypothetical teaching example (non-production)
+
+*Do not add orphan rows — teaching contrast only.*
 
 `signed_artifact` × `apple_preview` deferral JSON:
 
@@ -242,7 +297,7 @@ Full API and CI notes: see `Mix.Tasks.Rendro.ViewerEvidence` moduledoc (`mix hel
 | Promotion-complete test fails in fixtures only | Tier-B fixture matrix missing `evidence` | Production tier-A still passes until promotion; add keys when recording |
 | `forms_claims_test` fails after `api_stability` edit | Broke Adobe `unverified` wording or refute guards | Preserve narrow claims; see Phase 69 plan 03 |
 
-Docs-contract proves **structural** alignment (matrix JSON, evidence schema, path references, lint). It does **not** run viewers. Signing live-proof and long-lived-live-proof GitHub Actions lanes are unchanged — manual checklist remains the behavioral truth source.
+Docs-contract proves **structural** alignment (matrix JSON, evidence schema, path references, lint). The `viewer-evidence-live-proof` GitHub Actions lane runs pdfium-cli, pdfsig, pyhanko, and poppler structural-proxy proofs that regenerate committed evidence files — no GUI viewer sessions required for Phase 71 trust-sensitive closures.
 
 ## Appendix F — Overclaim boundaries
 
