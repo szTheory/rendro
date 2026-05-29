@@ -35,6 +35,85 @@ defmodule Rendro.ViewerEvidence.ValidatorTest do
     |> JSV.build!()
   end
 
+  describe "staleness" do
+    alias Rendro.ViewerEvidence.Validator
+
+    @tag :staleness
+    test "staleness_warnings/1 emits warning when recorded_at exceeds 180 days on supported row" do
+      stale_date =
+        Date.utc_today()
+        |> Date.add(-181)
+        |> Date.to_iso8601()
+
+      matrix = %{
+        "forms" => %{
+          "viewers" => %{
+            "apple_preview" => %{
+              "status" => "supported",
+              "proof" => ["open"],
+              "evidence" => "priv/viewer_evidence/forms/apple_preview.md",
+              "recorded_at" => stale_date,
+              "viewer_kind" => "manual"
+            }
+          }
+        }
+      }
+
+      warnings = Validator.staleness_warnings(matrix)
+
+      assert length(warnings) == 1
+      assert hd(warnings) =~ "forms.viewers.apple_preview"
+      assert hd(warnings) =~ "is older than 180 days"
+    end
+
+    @tag :staleness
+    test "staleness_warnings/1 returns empty when recorded_at is within 180 days" do
+      fresh_date =
+        Date.utc_today()
+        |> Date.add(-30)
+        |> Date.to_iso8601()
+
+      matrix = %{
+        "forms" => %{
+          "viewers" => %{
+            "apple_preview" => %{
+              "status" => "supported",
+              "proof" => ["open"],
+              "evidence" => "priv/viewer_evidence/forms/apple_preview.md",
+              "recorded_at" => fresh_date,
+              "viewer_kind" => "manual"
+            }
+          }
+        }
+      }
+
+      assert Validator.staleness_warnings(matrix) == []
+    end
+
+    @tag :staleness
+    test "staleness_warnings/1 ignores explicit_deferral rows" do
+      stale_date =
+        Date.utc_today()
+        |> Date.add(-181)
+        |> Date.to_iso8601()
+
+      matrix = %{
+        "forms" => %{
+          "viewers" => %{
+            "pdfjs" => %{
+              "status" => "explicit_deferral",
+              "evidence_deferred" =>
+                "mozilla/pdf.js#4202 — signature widget rendering deferred pending upstream fix.",
+              "recorded_at" => stale_date
+            }
+          }
+        }
+      }
+
+      assert Validator.staleness_warnings(matrix) == []
+    end
+  end
+
   describe "template" do
     alias Rendro.ViewerEvidence.Validator
 

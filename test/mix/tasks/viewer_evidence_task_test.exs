@@ -72,6 +72,58 @@ defmodule Mix.Tasks.Rendro.ViewerEvidenceTest do
     end
   end
 
+  describe "validate --strict" do
+    test "returns :ok on the production matrix with current recorded_at dates" do
+      {messages, result} =
+        capture_shell_messages(fn -> ViewerEvidence.run(["validate", "--strict"]) end)
+
+      assert result == :ok
+      output = Enum.join(messages, "\n")
+      assert output =~ "Viewer evidence validation passed"
+    end
+
+    test "exits 1 when supported row recorded_at exceeds 180 days" do
+      tmp = stale_matrix_fixture!()
+
+      try do
+        parent = self()
+
+        pid =
+          spawn(fn ->
+            File.cd!(tmp, fn ->
+              send(parent, {:run_result, ViewerEvidence.run(["validate", "--strict"])})
+            end)
+          end)
+
+        ref = Process.monitor(pid)
+        assert_receive {:DOWN, ^ref, :process, ^pid, {:shutdown, 1}}, 5_000
+        refute_receive {:run_result, _}, 100
+      after
+        File.rm_rf!(tmp)
+      end
+    end
+
+    test "default validate exits 0 with stale recorded_at (advisory only)" do
+      tmp = stale_matrix_fixture!()
+
+      try do
+        File.cd!(tmp, fn ->
+          {messages, result} =
+            capture_shell_messages(fn ->
+              ViewerEvidence.run(["validate"])
+            end)
+
+          assert result == :ok
+          output = Enum.join(messages, "\n")
+          assert output =~ "Viewer evidence validation passed"
+          assert Enum.any?(messages, &String.contains?(&1, "is older than"))
+        end)
+      after
+        File.rm_rf!(tmp)
+      end
+    end
+  end
+
   describe "module contract" do
     test "moduledoc mentions mix docs.contract" do
       {:docs_v1, _, _, _, module_doc, _, _} = Code.fetch_docs(ViewerEvidence)
@@ -90,6 +142,25 @@ defmodule Mix.Tasks.Rendro.ViewerEvidenceTest do
       mix_source = File.read!("mix.exs")
       refute mix_source =~ "rendro.viewer_evidence"
     end
+  end
+
+  defp stale_matrix_fixture! do
+    tmp = Path.join(System.tmp_dir!(), "rendro_stale_matrix_#{System.unique_integer([:positive])}")
+    File.mkdir_p!(tmp)
+    File.cp_r!("priv", Path.join(tmp, "priv"))
+
+    matrix_path = Path.join(tmp, "priv/support_matrix.json")
+    matrix = matrix_path |> File.read!() |> JSON.decode!()
+
+    stale_date =
+      Date.utc_today()
+      |> Date.add(-181)
+      |> Date.to_iso8601()
+
+    matrix = put_in(matrix, ["forms", "viewers", "apple_preview", "recorded_at"], stale_date)
+    File.write!(matrix_path, JSON.encode!(matrix))
+
+    tmp
   end
 
   defp capture_shell_messages(fun) do
