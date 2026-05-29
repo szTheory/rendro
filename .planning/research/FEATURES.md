@@ -1,204 +1,420 @@
-# Project Research — Features for v2.3 Viewer Proof & Interop Closure
+# Feature Research
 
-**Domain:** Per-viewer evidence recording for shipped PDF surfaces (forms, protection, signatures) across Adobe Acrobat Reader, Apple Preview, PDFium, PDF.js
-**Researched:** 2026-05-08
-**Confidence:** HIGH (engine-side surfaces all already shipped; this is a recording milestone, not an engineering one)
+**Domain:** PDF document generation — page-numbering/running-region primitive + Statement, Receipt/Report, Certificate recipes
+**Researched:** 2026-05-29
+**Confidence:** HIGH (page-numbering mechanics verified across ReportLab, fpdf2, Prawn, wkhtmltopdf; document field structures verified against industry templates and accounting standards)
 
-## Cell Topology — The Real Numbers
+---
 
-Six surfaces × four viewers = **24 cells**, but the genuinely-open count is much smaller once you net out what's already promoted and what's known not implementable by a viewer:
+## Context: Existing Capabilities This Research Builds On
 
-| Status | Count | Notes |
-|--------|-------|-------|
-| Already promoted (`supported`, recorded proof) | 5 | Apple Preview × forms (v1.8 P47), Acrobat × embedded_files (v1.9), Acrobat × links (v1.9), Apple Preview × links (v1.9), Apple Preview × protection (v1.10 P54). These are out of v2.3 scope. |
-| Open `unverified` cells targeted by v2.3 | 19 | The full surface×viewer matrix below |
-| Of those 19, expected to **promote** in v2.3 | ~6-8 | Forms, protection, signature widgets, signed artifacts on the viewers that actually implement the surface |
-| Of those 19, expected to land as **explicit-deferral** rows | ~10-12 | Preview × signature validation, PDF.js × signature widgets, etc. — promotion not possible because the viewer does not implement the surface |
-| Cells that may stay `unverified` if operator capacity is the bottleneck | residual | Acceptable as long as the recipe stays in place |
+Before mapping table-stakes vs differentiators, note what Rendro already ships — these are NOT features to build in v2.4:
 
-The full v2.3-in-scope grid (after netting out what's already shipped):
+- Named page-template regions (`:header`, `:body`, `:footer`, `:logo` + custom via `role: :custom`)
+- Deterministic wrapped text + pagination with keep/break semantics
+- Table continuation across page breaks
+- Fixed-coordinate positioning (`Rendro.fixed/2`)
+- Flow authoring (`Rendro.flow/2`)
+- Three-rung recipe escape hatch (`document/2`, `page_template/1`, `sections/2`)
+- Font registration and image asset registration
+- Section-to-region mapping
 
-| Surface | Acrobat | Preview | PDFium | PDF.js |
-|---------|---------|---------|--------|--------|
-| forms (text/checkbox/radio) | unverified — promotable | **already supported** | unverified — promotable | unverified — promotable (with caveats) |
-| protection (password-to-open) | unverified — promotable | **already supported** | unverified — promotable | unverified — known-not-supported (PDF.js does not handle encrypted PDFs in most embeds; explicit-deferral) |
-| signature widgets (unsigned `/Sig` placeholder) | unverified — promotable (renders as placeholder) | unverified — promotable (renders as placeholder, no validation UI) | unverified — promotable (renders as placeholder, no validation UI) | unverified — known-gap (`Unimplemented annotation type (Widget signature)` — historical PDF.js behavior; explicit-deferral) |
-| signing preparation (artifact-first prepared bytes) | unverified — promotable as "opens like an unsigned signature widget" | same | same | same |
-| signed artifacts (cryptographically signed) | unverified — promotable (full integrity + trust UI) | unverified — known-gap (Preview ignores signatures and append-saves; explicit-deferral) | unverified — promotable (renders artifact, no signature UI) | unverified — explicit-deferral (no signature UI; renders as widget) |
-| long-lived signed artifacts (timestamp + revocation evidence) | unverified — promotable (LTV indicator) | unverified — explicit-deferral (no validation UI) | unverified — explicit-deferral (no LTV UI) | unverified — explicit-deferral (no LTV UI) |
+The v2.4 work sits on top of this foundation. Page numbering is a new primitive that unlocks the new recipes. Existing recipe shape (Invoice, BrandedInvoice) shows the convention to match.
 
-This is the "categories clear" answer: **the milestone has roughly 6-8 promotable cells and 10-12 explicit-deferral cells. It is a recording-discipline milestone, not a code-engineering milestone.**
+---
 
-## Feature Landscape
+## Category 1: Page Numbering / Running Header-Footer Primitive
 
-### Table Stakes (Per-Viewer Evidence Checklists — One Per Surface)
+### The Core Technical Problem: Total Page Count Resolution
 
-The minimum honest behavioral checks an operator must record per (surface × viewer) cell. These match the already-shipped checklist patterns in `priv/support_matrix.json` (e.g., `forms.viewers.apple_preview.proof`, `protection.viewers.apple_preview.proof`).
+This is the hardest behavior in the category. "Page X of Y" requires knowing Y before writing page X. Every mature engine resolves this differently:
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| **VIEWER-EVIDENCE-FORMS** — checklist: `open` (no error/prompt), `default_state_visible` (placeholder text + checked state render correctly), `edit_or_toggle` (text typeable, checkbox togglable, radio mutually exclusive), `save` (Save As round-trips state) | Established by Phase 47 (`forms.viewers.apple_preview.proof`); already canonical | LOW (engineering); MEDIUM (manual recording per viewer) | Reuse existing 4-item proof array. Acrobat × forms is the headline gap |
-| **VIEWER-EVIDENCE-PROTECTION** — checklist: `opens_with_open_password`, `displays_authored_content_correctly`, `advisory_print_behavior` (flag honored or honestly disclaimed), `advisory_copy_behavior`, `save_and_reopen_readability` | Established by Phase 54 (`protection.viewers.apple_preview.proof`); already canonical | LOW (engineering); MEDIUM (manual recording) | Reuse existing 5-item proof array. Acrobat × protection is the headline gap |
-| **VIEWER-EVIDENCE-SIGNATURE-WIDGETS** — checklist: `opens_without_signature_warning_or_with_truthful_warning`, `widget_renders_as_unsigned_placeholder_rectangle`, `does_not_falsely_claim_signed`, `signature_panel_or_equivalent_reports_unsigned_or_silent`, `save_and_reopen_preserves_widget` | Brand-new surface — checklist must be authored in this milestone | LOW (engineering); MEDIUM (recording) | The discriminating check is "does NOT claim signed" — this is a negative-evidence requirement. Critical |
-| **VIEWER-EVIDENCE-SIGNING-PREP** — checklist: `prepared_artifact_opens_cleanly`, `widget_renders_as_unsigned_placeholder`, `viewer_does_not_silently_re_sign_or_corrupt`, `byte_range_layout_intact_after_save_as` | Brand-new surface | LOW (engineering); MEDIUM (recording) | Largely identical to signature-widgets at the viewer level — most viewers cannot tell the difference. That's fine. Document the equivalence |
-| **VIEWER-EVIDENCE-SIGNED-ARTIFACTS** — checklist: `opens_signed_artifact_without_corruption`, `appearance_renders` (widget visible), `integrity_reported_truthfully` (or silent-but-not-falsely-valid), `certificate_trust_reported_separately` (per-viewer; trust may be untrusted-but-integrity-OK and that is a passing record), `save_and_reopen_preserves_signature_or_warns` | Brand-new surface | LOW (engineering); MEDIUM-HIGH (recording — requires fixture chain, possibly trust anchor pinning) | **The integrity vs. trust split must be recorded as two separate per-viewer signals.** A pass = "integrity reported truthfully and trust reported separately," not "Signed and all signatures are valid." Acrobat is the only viewer that fully discriminates these |
-| **VIEWER-EVIDENCE-LONG-LIVED** — checklist: `opens_long_lived_artifact_without_corruption`, `timestamp_recognized_or_silent` (Acrobat-only: LTV indicator surfaces), `revocation_evidence_recognized_or_silent`, `posture_reported_truthfully` (no false LT/LTA brand), `expiry_behavior_honest` (signature still verifiable past signer-cert expiry, when the viewer supports the concept) | Brand-new surface; only Acrobat genuinely implements LTV UI | LOW (engineering); HIGH (recording — full certomancer fixture chain, expiry simulation) | Most viewers will land as explicit-deferral. Acrobat × long-lived is the only cell that can promote on the strong signal |
+| Engine | Strategy | Mechanism |
+|--------|----------|-----------|
+| fpdf2 | Deferred string substitution | `{nb}` placeholder in footer text; replaced at document close with the final page count via `alias_nb_pages()`. Single-pass — placeholder is a string that gets substituted after all pages are generated. |
+| ReportLab | Deferred canvas accumulation | Custom canvas subclass accumulates page codes in memory on `showPage()`, patches page numbers at final `save()`. Single-pass; total count is known at save time because no bytes have yet been emitted. |
+| Prawn | Post-render stamp | `number_pages` called at end of document block; stamps `<total>` placeholder after all pages are already composed; `start_count_at` + `total_pages` override allow section restarts. |
+| wkhtmltopdf | HTML variable injection | `[page]` / `[topage]` variables injected into footer HTML via query-string params before page render. Browser engine does the substitution. |
+| LaTeX/fancyhdr | Two-pass TeX compilation | First pass writes `.aux` file with final page count; second pass substitutes `\pageref{LastPage}`. The canonical academic two-pass model — the only approach here that truly renders twice. |
 
-### Differentiators (Nice-to-Have Per-Viewer Signals — Recorded but Never Block Promotion)
+**For Rendro's deterministic pipeline, the right approach is single-pass deferred injection.** The `paginate` stage already knows the total page count after it completes — it has laid out all pages. Before the `render` stage executes, the total is available. Region content that needs `{current_page, total_pages}` must be defined as a parameterized value (an arity-1 function over `{page, total}` rather than a static content list) so the render stage can call it per-page with the resolved values. No second render pass is needed.
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| **DIFF-LTV-INDICATOR** — record Acrobat's exact "Signature is LTV enabled" UI string and screenshot | Strongest possible evidence that Acrobat agrees with our long-lived posture | LOW | Acrobat-specific; do not gate other viewers on equivalent UI |
-| **DIFF-PREVIEW-SIG-GAP-NOTE** — record Apple Preview's known append-save behavior on signed PDFs as a recorded disclaimer in the proof entry | Closes a known integrity hazard transparently | LOW | This is a disclaimer field, not a pass/fail check |
-| **DIFF-PDFJS-APPEARANCE-PARITY** — record whether PDF.js rendered the form-field appearance stream identically to Acrobat (visual) vs. fell back to its own renderer | Differentiates "looks identical" from "looks different but functional" | LOW-MEDIUM | Visual diff is informational; functional pass is what gates promotion |
-| **DIFF-PDFIUM-CHROMIUM-CHANNEL** — record exact Chromium build + PDFium version | PDFium ships embedded in many Chromium variants and behavior can drift | LOW | Capture once per checklist; do not re-test every channel |
-| **DIFF-VIEWER-VERSION** — record viewer version + OS version next to every cell | Enables future regression detection when a Reader update changes form/signing behavior | LOW | Already canonical; reinforce |
-| **DIFF-NEGATIVE-PROOF-SCREENSHOT** — for explicit-deferral cells, capture a screenshot of the viewer's actual behavior so the deferral is concrete, not hand-waved | Future-auditable; defends against "but it might work now" pressure | LOW-MEDIUM | High-leverage for the durability of the recipe |
+This is the architecturally load-bearing decision for v2.4. Regions today accept static block lists. Page numbering requires regions (specifically footer/header regions) to accept a content function, not just static content. This is new authoring-primitive territory.
 
-### Anti-Features (Tempting for v2.3, Should Stay Out)
+**What NOT to do:**
+- Two-pass full rendering — wasteful and complicates the determinism story
+- Resolving page count inside the PDF writer — couples content decisions to serialization code
+- Storing page count in the authored `%Rendro.Document{}` struct — it is a pagination output, not an authored input
+- Making `{nb}` a magic string inside text blocks — this leaks rendering concerns into authored content and is fragile to composition
 
-| Feature | Why Requested | Why Problematic | Alternative |
-|---------|---------------|-----------------|-------------|
-| **Automated PDF.js / PDFium headless test suite** | "Manual recording feels primitive; CI would catch regressions" | Moves milestone scope from "recorded honest viewer evidence" to "automated viewer-rendering CI." Brittle (Chromium channel drift); rendered artifacts still need human judgment | Stay manual for v2.3. Make the recipe so durable that automation can land later as a separate milestone |
-| **A blanket "works in standard viewers" support row** | Marketing parity with browser-based PDF libs | Directly contradicts the milestone thesis. PROJECT.md and MILESTONE-ARC.md both name this as out-of-scope | Per-(surface × viewer) rows only |
-| **Promoting cells based on third-party screenshots, blog posts, or community claims** | "Other people have already verified this" | Promotion-grade evidence must include `viewer + version + OS + fixture + date checked + per-behavior pass/fail`, recorded in-repo. Anything else is hearsay | Treat external claims as differentiator-tier signal at most |
-| **Compliance-tier viewer claims (PDF/A, PDF/UA, ETSI EN 319 142 PAdES)** | "While we're recording viewer behavior, why not record compliance UI?" | Conflates viewer behavior with compliance. PROJECT.md explicitly defers compliance branding | Stay narrow. LTV is the closest v2.3 gets and only via the recorded indicator as a differentiator |
-| **Multi-signature workflow viewer behavior** | "Acrobat shows nice multi-sig timelines; let's record them" | Multi-signature is a separate signing surface that has not shipped. Recording its viewer behavior would create a public expectation of a feature that does not exist | Out of scope. Surface boundary first, viewer evidence second |
-| **Per-viewer remediation/troubleshooting code (e.g., shipping a PDF.js polyfill, monkey-patching the writer to please specific viewers)** | "We discovered PDF.js renders X badly — let's fix it" | Widening engine code on viewer feedback is exactly the wrong direction | Record the gap as an explicit-deferral row |
-| **Promoting "signing preparation" cells separately from "signature widget" cells when the viewer cannot tell them apart** | "We have two surfaces, so we need two viewer rows" | For most viewers, a prepared artifact and an unsigned signature-widget artifact look identical and carry the same proof. Forcing two rows manufactures recording busywork | Document the equivalence in `guides/api_stability.md` and either share a checklist or note "see signature-widget proof" on the prep row |
+### Table Stakes (Users Expect These)
 
-## Promotion-Gating Logic (Rubric)
+| Feature | Why Expected | Complexity | Existing Rendro Dependency |
+|---------|--------------|------------|---------------------------|
+| "Page X of Y" in footer region | Universal business document convention. Any statement, report, or multi-page certificate without it feels unprofessional. | MEDIUM — requires deferred total-count resolution; region content must accept a function over `{page, total_pages}` | Named regions (existing) + paginator page-count output (new exposure) |
+| Repeated static content in header region per page (document title, account number, company name) | Users expect headers to repeat identically on every page, like a letterhead; this is the definition of a "running header" | LOW — regions already repeat per page by design; the primitive needs to confirm and document this behavior is intentional and tested | Named page-template regions (existing) |
+| Current page number alone ("Page X") without total | Needed when total page count is unknowable at authoring time or undesirable (e.g., a certificate showing "Page 1") | LOW — subset of the `{page, total}` function approach | Same as "Page X of Y" |
+| Footer/header suppress on specific pages (suppress on first page, suppress on last page) | Statement cover pages and single-page receipts need a clean first page without a footer number; compliance certificates always single-page | LOW — conditional rendering based on page index | Paginator provides current page index |
 
-A (surface × viewer) cell promotes from `unverified` to `supported` when **all** of:
+### Differentiators (Above What Users Expect)
 
-1. The full **table-stakes checklist** for the surface passes end-to-end against a specific viewer version on a specific OS, with each check recorded as pass/fail.
-2. The recorded entry includes: `viewer name`, `viewer version` (when easily available), `OS + version`, `fixture path`, `date checked`, and `per-behavior pass/fail` (this matches the v1.10 Phase 54 record shape).
-3. The fixture used is in-repo or reproducible from `priv/support/`.
-4. **Differentiator items are noted but never block promotion.** A missing LTV screenshot does not block Acrobat × long-lived from promoting if the table-stakes checks all pass.
+| Feature | Value Proposition | Complexity | Existing Rendro Dependency |
+|---------|-------------------|------------|---------------------------|
+| Carried-forward running totals across page breaks (e.g. "Balance Carried Forward: $X") | Multi-page statements require the closing balance at page N's break to appear as "Balance Brought Forward" at the top of page N+1. This is standard accounting form, not optional for a real statement. | HIGH — requires accumulated numeric state per page-break point. The paginator must expose a hook where the author supplies a running-total function called at each page-break boundary, producing per-page derived values before render. This is new engine behavior. | Table continuation (existing) + new paginator page-break hook |
+| "Continued" marker on table split (cross-page) | Table continuation already works structurally; surfacing a "(Continued)" label as a built-in option makes recipe output match user expectation without escape-hatching | LOW — optional decoration label on the existing table continuation mechanism | Existing table continuation |
+| Even/odd header content variants | Duplex/book-style documents need mirrored headers (chapter title on left page, section title on right page). Needed for formal compliance reports that will be printed. | MEDIUM — page-parity flag exposed to region content function | Named regions + page index |
+| Section-local page number restart | Formal multi-section documents (appendix restarts at A-1) need independent counters per section | MEDIUM — page counter scoped to a document-section definition | Pagination section structure |
 
-A cell lands as **explicit-deferral** (a new third state distinct from `unverified`) when:
+### Anti-Features
 
-1. The viewer demonstrably does not implement the surface.
-2. A recorded entry captures the negative-evidence (ideally with a screenshot per `DIFF-NEGATIVE-PROOF-SCREENSHOT`) and a one-line rationale.
-3. The matrix entry uses a distinct status string (recommend `explicit_deferral` or `not_implemented_by_viewer`) so it is auditable against a silent `unverified`.
+| Feature | Why Requested | Why It Violates Rendro's Design Bias | Alternative |
+|---------|---------------|--------------------------------------|-------------|
+| Arbitrary JavaScript/CSS in running regions | wkhtmltopdf and Puppeteer users expect this; browser-based PDF tools expose it as the mechanism | Rendro is deterministic and browser-free; JS/CSS evaluation requires a browser runtime dependency — directly contradicts the core constraint in PROJECT.md | Use parameterized Elixir functions in region content; caller owns all logic |
+| Table of contents (TOC) with page numbers | Natural extension of page numbering — if we have page numbers, TOC seems like a short step | TOC requires forward-reference resolution at authoring time: the page number of a section header is unknown until pagination completes, and TOC itself may paginate differently when inserted. This is a multi-pass layout concern that expands the surface to a document-management system. | Defer; TOC is a separate, larger primitive — not v2.4 scope |
+| Named section anchors / page-reference cross-links | LaTeX `\ref` analogs; "see page X" cross-references | Same forward-reference problem as TOC with added author-visible anchor DSL | Out of scope for v2.4 |
+| Magic string substitution in text blocks (e.g. `"Page {{page}} of {{total}}"` as a raw string) | Simpler authoring API than a function | String interpolation at render time leaks rendering concerns into authored content, creates an implicit mini-template language, and is harder to test than plain functions | Use a clear function-based region content API |
+| Dynamic header content resolved from DB/HTTP at render time | Some teams want fresh data (current stock price, live timestamp) in every page header | Breaks determinism guarantee. The caller owns all data resolution before document authoring begins. | Caller pre-resolves all data and passes to `document/2`; render stays pure |
 
-A cell stays at **`unverified`** only when neither promotion nor explicit-deferral has been completed (operator capacity gap, not a permanent disclaimer).
+---
 
-This three-state model (`supported` / `explicit_deferral` / `unverified`) is the most important piece of v2.3's discipline.
+## Category 2: Statement Recipe
 
-## Operator-Grade Recipe (Smallest Repeatable Workflow)
+### What a Statement Is
 
-| Component | Description | Complexity |
-|-----------|-------------|------------|
-| **RECIPE-TEMPLATE** — `priv/viewer_evidence/<surface>/<viewer>.md` template | One markdown file per cell, fixed frontmatter (viewer, version, OS, fixture, date, checklist items) + body for screenshots/notes | LOW |
-| **RECIPE-MIXTASK** — `mix viewer_evidence` | Lists every cell from `priv/support_matrix.json`, cross-references `priv/viewer_evidence/<surface>/<viewer>.md`, prints coverage report (promoted / explicit-deferred / silently unverified). Exits non-zero when an `unverified` row has no companion evidence file at all | MEDIUM |
-| **RECIPE-CHANGELOG-RULE** — every cell promotion or explicit-deferral lands one CHANGELOG entry | Documented rule in `guides/api_stability.md`: promoting a viewer row is a public-contract change | LOW |
-| **RECIPE-FIXTURE-DIRECTORY** — `priv/viewer_evidence/fixtures/` for canonical PDFs | One fixture per surface, reused across viewers so cells compare apples to apples | LOW |
-| **RECIPE-SUPPORT-MATRIX-SCHEMA** — extend matrix JSON shape to allow `status: explicit_deferral` and a required `reason` field | One-line JSON-shape change + tests | LOW |
-| **RECIPE-DOCS-CONTRACT-LANE** — extend the existing docs-contract lane to assert that every `supported` viewer row has a matching evidence file and that every `explicit_deferral` row has a recorded reason | Reuses the existing pattern from v1.5/v1.9; not new infrastructure | LOW-MEDIUM |
+A statement of account summarizes all transactions between a vendor and a customer over a defined period. Unlike an invoice (a single billing event), a statement covers a time range and carries a running balance. It is the multi-page business document most likely to span several pages and most in need of the carried-forward totals primitive from Category 1.
 
-This is the **dominant cost of the milestone**: not the recipe code (a few hundred lines), but the **manual recording labor** for ~16-19 open cells. The engineering effort is small; the testing labor is the gating constraint.
+### Data Structure (Verified Against Industry Templates and Accounting Standards)
 
-## Surface-Specific Landmines
+**Account summary / header block (page 1 top, then repeats in running header):**
+- Vendor name + address
+- Customer name + address
+- Statement period (from date → to date)
+- Statement issue date
+- Account number / reference ID
 
-These are known, documented behaviors where the viewer simply does not implement the surface or implements it in a way that would invalidate a `supported` claim. They must be captured as explicit-deferral entries with recorded negative evidence.
+**Opening summary panel (page 1 only):**
+- Opening balance (balance brought forward from prior period — "B/F")
+- Total invoiced this period
+- Total paid this period
+- Closing balance / balance due
 
-| Surface × Viewer | Known Landmine | Required Action |
-|------------------|----------------|-----------------|
-| signature widgets × PDF.js | `Unimplemented annotation type (Widget signature)` historical; rendering remains incomplete in current builds | Explicit-deferral row with recorded version and screenshot. Do NOT promote even if a recent build incidentally renders the widget |
-| signed artifacts × Apple Preview | Preview ignores signature permissions and does an append-save that visually appears to leave the document signed but actually invalidates the signature; Preview does not validate signatures at all | Explicit-deferral row. Reason: "Apple Preview does not validate PDF digital signatures and may invalidate them through append-save." |
-| long-lived × Apple Preview / PDFium / PDF.js | None display LTV indicators; Preview/PDF.js do not validate signatures | Explicit-deferral row for all three |
-| protection × PDF.js | PDF.js / Firefox built-in viewer historically does not handle encrypted PDFs in most embed contexts | Explicit-deferral row. Verify on current Firefox; capture exact version |
-| forms × PDF.js | PDF.js renders form-field appearance streams but parity with Acrobat is incomplete. Rendro emits explicit appearance streams (no `NeedAppearances`), favorable for promotion | Likely promotable, record parity caveat as `DIFF-PDFJS-APPEARANCE-PARITY` |
-| forms × PDFium | PDFium supports AcroForms; embedded-in-Chromium presentation lacks some Acrobat affordances; signature widgets render but no validation UI | Forms promotable; signature widgets promotable on narrow checklist |
-| signed artifacts × PDFium | PDFium supports signatures structurally but Chrome/Edge embedded viewers do not surface validation panel | Promotable on narrow checklist; differentiator note captures missing trust UI |
-| signed artifacts × Acrobat with untrusted signer | "At least one signature has problems" is a **pass** for integrity-reported-truthfully | Document explicitly in the recipe so operators don't fail this check |
-| protection × Acrobat | Fully supports password-to-open and advisory permissions; no known landmines | Promotable. Headline cell alongside Acrobat × forms |
+**Transaction line table (the paginating body section):**
+- Date
+- Reference / invoice number
+- Description (e.g., "Invoice", "Payment", "Credit", "Adjustment")
+- Charge amount (debit column)
+- Payment/credit amount (credit column)
+- Running balance (balance after each line)
+
+**Multi-page continuation lines (at page breaks):**
+- End of each non-final page: "Balance Carried Forward: $X" (total balance at the page break, accounting "C/F")
+- Start of each continuation page: "Balance Brought Forward: $X" (same value, accounting "B/F")
+
+**Footer (every page):**
+- "Page X of Y"
+- Optional: payment terms / due date reminder, contact information
+
+**Closing summary (last page only):**
+- Aging summary (optional but common): current / 30 days overdue / 60 days / 90+ days buckets
+- Total amount due (prominently displayed)
+- Payment instructions / remittance section
+
+### Table Stakes
+
+| Feature | Why Expected | Complexity | Existing Rendro Dependency |
+|---------|--------------|------------|---------------------------|
+| Statement period + account number in header | Every real statement has this; users orient immediately from the period label | LOW | Named regions (existing) |
+| Opening balance line in summary panel | Standard accounting form; missing it makes the statement financially ambiguous | LOW | Static section content |
+| Transaction line table: date, reference, description, debit, credit, balance | Core content of a statement — this IS the statement | MEDIUM | Table with continuation (existing) |
+| Running balance column (balance after each transaction line) | Enables the user to trace their position at each event; without it the statement is just a list of charges | LOW — computed by caller as part of data preparation | Table primitive (existing) |
+| "Page X of Y" footer | Table-stakes for any multi-page document; statements are always potentially multi-page | MEDIUM | Page numbering primitive (Category 1) |
+| Balance Carried Forward / Brought Forward at page breaks | Without this, multi-page statements are financially ambiguous across the break | HIGH | Carried-forward running totals (Category 1 differentiator) |
+| Closing balance summary on final page | Required on every real statement; this is what the recipient acts on | LOW | Static section content |
+
+### Differentiators
+
+| Feature | Value Proposition | Complexity | Existing Rendro Dependency |
+|---------|-------------------|------------|---------------------------|
+| Aging summary panel on final page (current/30/60/90+ day buckets) | Common on B2B statements; useful for collections-workflow teams; caller pre-computes the buckets | LOW — data-driven table, caller provides bucketed values | Table primitive (existing) |
+| Zero-balance guard in `document/2` (raise or return `{:error, :zero_balance}` when no transactions) | Prevents empty statement generation; common billing-platform guard | LOW — guard clause in `document/2` at data validation | None |
+| Optional payment remittance section on last page (tear-off style) | Professional B2B statements include a remittance stub the customer returns with their check | LOW — optional section, caller opts in via data flag | Named regions, static content |
+
+### Anti-Features
+
+| Feature | Why Requested | Why It Violates Rendro's Design Bias | Alternative |
+|---------|---------------|--------------------------------------|-------------|
+| Multi-currency display with live FX conversion | Global billing platforms want it; feels like it belongs in the billing document | FX conversion is business logic, not rendering logic; pulling HTTP/DB into a recipe would break determinism and pure-Elixir portability | Caller converts all values to display currency before passing data to `document/2` |
+| Statement email delivery logic (send via Mailglass/SMTP) | Natural next step after generating the statement | Out of scope for a rendering library; Rendro has an existing delivery seam via `render_to_artifact/2` + Oban + Mailglass | Use existing delivery adapters as documented |
+| Arbitrary column configuration DSL in `document/2` (reorder columns, add custom fields without escape-hatching) | Ops engineers want flexible column config | Turns the recipe into a report builder; breaks the three-rung simplicity and widens the `document/2` API surface unpredictably | Use the `sections/2` escape hatch to replace the transaction table with a custom one |
+| Payment portal deep-link QR code baked into recipe | Marketing request from billing teams; "every statement should link to the portal" | Dynamic URLs are caller-injected data, not a recipe primitive; baking URL generation into the recipe couples it to a specific SaaS topology | Caller passes `data.payment_url`; recipe renders it as a plain text field or link annotation via the existing links surface |
+| Reconciliation logic (match debits to credits, flag unmatched items) | Accounts payable teams want it | Data transformation, not rendering; the recipe must not own business logic | Caller pre-reconciles; recipe renders the result |
+
+---
+
+## Category 3: Receipt / Report Recipe
+
+### What a Receipt Is vs What a Report Is
+
+These are structurally related but different documents:
+
+**Payment Receipt**: Single-event document proving a specific payment was received. Almost always one page (rarely two). Documents who paid, to whom, for what, how much, by what method, with what reference. The defining characteristic is that it confirms a completed transaction.
+
+**Operational Report**: Multi-page tabular document summarizing a set of records with subtotals and a grand total. Examples: monthly transaction report, expense report, sales report, dispatch log. Needs column headers that repeat, grouping by key fields, subtotals, grand total, optional summary section. The defining characteristic is that it presents a set of events for review.
+
+A single recipe can serve both: structure it around the Report shape, where a receipt is a minimal single-page report with payment-specific fields. This matches the three-rung escape-hatch pattern — full `document/2` defaults to receipt shape, caller uses escape hatches for richer report layout.
+
+### Receipt Field Structure (Verified Against IRS and Industry Standards)
+
+**Header:**
+- Document title ("Receipt" or "Payment Receipt")
+- Receipt number (unique identifier)
+- Date (and optionally time)
+
+**Issuer + Payer block:**
+- Vendor/issuer name, address, contact
+- Payer name (and optionally address)
+
+**Line items:**
+- Description of goods/services
+- Quantity, unit price, subtotal per line
+- Subtotal, tax, total
+
+**Payment block:**
+- Total amount paid
+- Payment method (cash / check number / bank transfer reference / last 4 of card)
+- Transaction reference number (for electronic payments)
+
+**Footer:**
+- "Paid in Full" confirmation / thank-you note
+- Optional: return policy, terms
+
+### Operational Report Field Structure
+
+**Header (repeats every page via running-region primitive):**
+- Report title and date range
+- Filter/criteria description ("All departments", "Region: West", etc.)
+- "Page X of Y"
+
+**Optional group headers (when data is grouped):**
+- Group label (e.g., "Department: Engineering")
+- Group subtotal row at bottom of each group
+
+**Data rows:**
+- Column-keyed values (caller defines columns via data structure)
+- Table continues across page breaks
+
+**Summary section (last page only):**
+- Grand total row
+- Optional: count, average, min/max for numeric columns
+- Run timestamp (when the report was generated — shows freshness)
+
+**Footer (every page):**
+- "Page X of Y"
+- Optional: confidentiality / classification notice
+
+### Table Stakes
+
+| Feature | Why Expected | Complexity | Existing Rendro Dependency |
+|---------|--------------|------------|---------------------------|
+| Receipt number + date + payer + payee header block | Non-negotiable for any receipt; without a receipt number it cannot be referenced | LOW | Named regions (existing) |
+| Itemized line items with per-line subtotals and a total | Users expect to see what was paid for and how much; the IRS requires itemization | MEDIUM | Table primitive (existing) |
+| Payment method and transaction reference | Required by IRS and standard receipt norms; needed for expense reimbursement | LOW | Static section content |
+| "Paid" / total amount paid confirmation block | The core purpose of a receipt: confirming payment received | LOW | Static section content |
+| Multi-page report: column header repeating on each page + "Page X of Y" | Reports that span multiple pages must orient the reader on every page | MEDIUM | Running regions primitive (Category 1) + table continuation (existing) |
+| Grand total row on final page | Every report needs a bottom line; without it the report is just a log | LOW | Static section at end of table |
+
+### Differentiators
+
+| Feature | Value Proposition | Complexity | Existing Rendro Dependency |
+|---------|-------------------|------------|---------------------------|
+| Group subtotals with a pre-grouped data shape | Grouped operational reports (by department, category, date range) are very common; if the caller pre-groups, the recipe renders group headers + subtotals naturally | MEDIUM — recipe accepts grouped data shape (list of `{group_key, [rows]}`) and renders a header row between groups | Table primitive (existing) |
+| Run timestamp in footer | Shows report freshness; standard in BI/reporting outputs | LOW | Footer region content |
+| "Continued" marker on table splits | Polished multi-page reports show "(Continued)" on continuation page table headers | LOW | Existing table continuation + optional label |
+
+### Anti-Features
+
+| Feature | Why Requested | Why It Violates Rendro's Design Bias | Alternative |
+|---------|---------------|--------------------------------------|-------------|
+| Dynamic grouping/aggregation engine inside recipe | Report builders do grouping; engineers want the recipe to accept a flat list and group automatically | This is data transformation, not rendering; coupling Ecto/Enum aggregation to a recipe creates a dependency on data-layer semantics the recipe cannot own safely | Caller pre-groups using Ecto/Enum/Stream; recipe renders the already-grouped structure |
+| Chart/graph rendering in report body | Reports often include charts; bar charts of monthly totals are common | Charts require SVG/Canvas drawing primitives not in Rendro's current pipeline; adding them in a recipe would add a major unproven rendering surface | Out of scope for v2.4; flag as potential conditional v2.5+ feature if demand justifies investment |
+| Configurable column order/visibility DSL in `document/2` | Ops engineers want per-report column configuration without escape-hatching | Turns the recipe into a report-builder tool; widens the API surface unpredictably | Use `sections/2` escape hatch to replace the data table with a custom-configured one |
+| "PAID" / "DRAFT" / "CONFIDENTIAL" watermark baked into recipe | Common on financial documents; teams expect it | Watermarks can already be implemented with fixed-position text blocks; no new recipe-level primitive is needed | Caller injects a fixed-position text block with appropriate opacity/color via `sections/2` override |
+
+---
+
+## Category 4: Certificate Recipe
+
+### What a Certificate Is
+
+A completion or compliance certificate is almost always:
+- **Single page** (occasionally a second page for terms)
+- **Fixed-coordinate layout** — the aesthetic identity requires precise placement; it cannot flow without destroying the design
+- **Branded prominently** — logo, border/frame, typography are defining visual elements
+- **Centered on the recipient name** — the largest single text element on the page
+- **Signed / sealed** — one or two signature lines, optional seal/stamp image, optional QR code for external verification
+
+The certificate maps naturally to Rendro's `Rendro.fixed/2` authoring path and fixed-anchor region support, which already ships.
+
+### Field Structure (Verified Against Industry and Compliance Certificate Standards)
+
+**Top band (issuer identity):**
+- Issuer logo / seal image (centered or left-aligned)
+- Issuer name (beneath or alongside logo)
+
+**Title block (center-upper portion of page, large type):**
+- Document title ("Certificate of Completion", "Certificate of Compliance", "Certificate of Achievement")
+
+**Recipient block (the hero element — visually dominant):**
+- "Presented to:" or "This certifies that:" label
+- Recipient name (largest text element on the page, typically 24–36pt)
+- Optional: recipient title/role
+
+**Achievement block:**
+- Course / program / standard title
+- Brief achievement statement ("has successfully completed...", "has satisfactorily met the requirements of...")
+- Completion date
+
+**Verification block:**
+- Certificate ID (unique, for external verification lookup)
+- Issue date
+- Optional: expiry date (compliance certs and first-aid certs expire)
+- Optional: QR code image pointing to verification URL (caller provides QR as a registered image asset)
+
+**Authorization block (bottom of page):**
+- One or two signature lines (horizontal rule + printed name + title beneath)
+- Optional: organizational seal image
+
+### Table Stakes
+
+| Feature | Why Expected | Complexity | Existing Rendro Dependency |
+|---------|--------------|------------|---------------------------|
+| Fixed-layout single page using `Rendro.fixed/2` | Certificates are design-driven, not content-driven; must use exact coordinates — a flowing layout would destroy the visual design | LOW — `Rendro.fixed/2` and fixed-anchor regions already exist | `Rendro.fixed/2`, fixed-anchor regions (existing) |
+| Recipient name as the hero element (large centered type) | The certificate exists for the recipient; their name must be visually dominant | LOW | Fixed text block with registered font (existing) |
+| Achievement statement + course title + completion date | These three fields define what the certificate proves; any missing field makes the cert legally and practically incomplete | LOW | Static fixed blocks |
+| Issuer name + logo image | Issuer identity is half the certificate's value — the recipient presents it to third parties who need to identify the issuer | LOW | Image asset registration (existing) |
+| Certificate ID | Required for any verifiable certificate; enables lookup in an external registry | LOW | Static text block |
+| Signature line(s) | Standard credentialing convention; a certificate without a signature line feels unfinished | LOW — a horizontal rule + name/title text block below it | Fixed blocks or a drawn-line primitive |
+| No page number footer | Certificates are single-page by convention; a "Page 1 of 1" footer looks wrong and amateurish | LOW — suppress via first-page/last-page suppress option from Category 1 | Page numbering suppress on first page |
+
+### Differentiators
+
+| Feature | Value Proposition | Complexity | Existing Rendro Dependency |
+|---------|-------------------|------------|---------------------------|
+| Optional second page (terms, verification detail, accreditation info) | Compliance and accreditation certificates often have a reverse side with program details | LOW — opt-in via recipe `document/2` option | Multi-page document structure (existing) |
+| QR code as image asset (caller-generated, recipe positions it) | Modern verifiable certificates include a scannable QR code pointing to a verification URL; caller generates the QR code as an image, recipe positions it in the verification block | LOW — caller provides QR code PNG as a registered image asset; recipe places it at a fixed coordinate | Image asset registration (existing) |
+| Expiry date field | Compliance, food-safety, and first-aid certificates expire; the expiry date must be prominent | LOW — optional field in recipe data struct | Static text block |
+| Decorative border frame around the page | Strong visual convention for certificates; draws attention and signals prestige | MEDIUM — depends on whether Rendro has a drawn-rectangle / border-path primitive; if not, this requires a thin vector drawing addition | Depends on drawn-path primitive availability in engine |
+
+### Anti-Features
+
+| Feature | Why Requested | Why It Violates Rendro's Design Bias | Alternative |
+|---------|---------------|--------------------------------------|-------------|
+| Certificate "theme" gallery / style picker | Teams want design options without coding; Canva-style UX | This is WYSIWYG template editing, explicitly out of scope in PROJECT.md: "WYSIWYG builders, hosted template editing, or app-specific layout hacks in core — they widen surface area before the authoring contract is stable." | Ship one clean default layout; use `page_template/1` escape hatch for custom styling |
+| Embedded digital signature / cryptographic signing seam baked into certificate recipe | Certificates "feel" like they should have a cryptographic stamp | The signing seam is a separate artifact-stage operation (`Rendro.Sign.sign/2`), not a recipe primitive. Conflating them blurs the authoring/artifact boundary and ties the recipe to an optional adapter. | Use `Rendro.Sign.sign/2` on the rendered artifact as a separate, explicit step after render |
+| Bulk generation loop in `document/2` (generate certificates for a list of recipients) | "Generate 200 certificates from a CSV" is a real workflow | A loop belongs in the caller, not in a document recipe; baking it in would make `document/2` return a list instead of a document, breaking the three-rung pattern contract | Caller maps over recipients calling `document/2` per recipient; Oban worker handles the queue |
+| Certificate validation service (check if a cert ID is valid) | Logical complement to generation | Backend service, not rendering logic | Out of scope for Rendro entirely; belongs in the caller's application |
+
+---
 
 ## Feature Dependencies
 
 ```
-[Every v2.3 cell] ──requires──> [Surface itself already shipped]
-                                       │
-                                       ↓
-                          (already true for all six surfaces)
+Category 1: Page Numbering / Running Regions
+    └── new primitive: region content as function over {page, total_pages}
+            └──required by──> Category 2: Statement ("Page X of Y" + carried-forward totals)
+            └──required by──> Category 3: Report variant ("Page X of Y" in repeating header)
+            └──suppression option used by──> Category 4: Certificate (suppress page number)
 
-[VIEWER-EVIDENCE-* checklists]
-        ├──requires──> [RECIPE-FIXTURE-DIRECTORY]
-        ├──requires──> [RECIPE-TEMPLATE]
-        └──enables──> [MATRIX-PROMOTE-* row promotions]
+Category 1: Carried-forward running totals (differentiator)
+    └──required by──> Category 2: Statement (balance C/F and B/F at page breaks)
+    └── this is new paginator-level engine behavior, not just recipe DSL
 
-[MATRIX-PROMOTE-* row promotions]
-        ├──requires──> [RECIPE-SUPPORT-MATRIX-SCHEMA] (for explicit_deferral)
-        └──requires──> [GUARDRAIL-NEGATIVE-EVIDENCE] (for explicit-deferral rows)
+Category 2: Statement
+    └── requires──> Table continuation (ALREADY SHIPPED)
+    └── requires──> Page numbering primitive (new — Category 1)
+    └── requires──> Carried-forward totals hook (new — Category 1 differentiator)
 
-[RECIPE-MIXTASK]
-        └──enables──> [RECIPE-DOCS-CONTRACT-LANE]
+Category 3: Receipt/Report
+    └── requires──> Table continuation (ALREADY SHIPPED)
+    └── Report variant requires──> Page numbering primitive (new — Category 1)
+    └── Receipt variant is INDEPENDENT of page numbering (single page)
+
+Category 4: Certificate
+    └── requires──> Rendro.fixed/2 + fixed-anchor regions (ALREADY SHIPPED)
+    └── requires──> Image asset registration (ALREADY SHIPPED)
+    └── is FULLY INDEPENDENT of page numbering primitive
+    └── optional QR code requires caller to generate QR image externally
 ```
 
-## MVP Definition
+### Dependency Notes
 
-This is a recording milestone, so MVP = **the minimum set of cells that, once promoted, materially change the public support story**, plus the recipe.
+- **Page numbering primitive must ship first in v2.4.** Statement and Report recipes are blocked on it for multi-page behavior. Receipt and Certificate can ship in parallel, but the primitive should lead the milestone since it unblocks the most.
+- **Certificate is the most independent feature.** It uses only existing `fixed/2` and asset-registration capabilities. If schedule pressure hits, it can ship in parallel with or even before the primitive work.
+- **Carried-forward totals is the hardest single feature.** It requires the paginator to expose an accumulation hook at page-break boundaries — this is new engine behavior, not just new recipe DSL. Scope it carefully and do not let it block simpler features.
+- **The "region content as function" change is the key API primitive.** Once this is in place, all other page-numbering features (suppress, even/odd variants, section restart) are incremental. The hardest design question is: does the authoring API expose a bare function, a named primitive like `Rendro.page_number/1`, or both?
 
-### Launch With (v2.3 ship)
+---
 
-- [ ] **RECIPE-TEMPLATE + RECIPE-FIXTURE-DIRECTORY + RECIPE-MIXTASK + RECIPE-SUPPORT-MATRIX-SCHEMA** — durability layer
-- [ ] **RECIPE-DOCS-CONTRACT-LANE** — enforces it
-- [ ] **VIEWER-EVIDENCE-FORMS / Adobe Acrobat Reader** — closes the most-asked existing gap
-- [ ] **VIEWER-EVIDENCE-PROTECTION / Adobe Acrobat Reader** — closes the second most-asked gap
-- [ ] **VIEWER-EVIDENCE-SIGNATURE-WIDGETS / Adobe Acrobat Reader, Apple Preview, PDFium** — promotable on narrow checklist
-- [ ] **VIEWER-EVIDENCE-SIGNED-ARTIFACTS / Adobe Acrobat Reader** — validates the v2.1 thesis
-- [ ] **VIEWER-EVIDENCE-LONG-LIVED / Adobe Acrobat Reader** — validates the v2.2 thesis
-- [ ] **GUARDRAIL: Explicit-deferral rows recorded** for: signature-widgets × PDF.js, signed-artifacts × Apple Preview / PDF.js, long-lived × Preview/PDFium/PDF.js, protection × PDF.js (if confirmed)
-- [ ] **CHANGELOG entries** for each promotion and each new explicit-deferral
+## Total Page Count Resolution — Recommended Strategy for Rendro
 
-### Add After Validation (within v2.3 if capacity allows)
+This warrants an explicit section because it is the most architecturally load-bearing decision in v2.4.
 
-- [ ] **VIEWER-EVIDENCE-FORMS / PDFium, PDF.js** — likely-promotable rows that strengthen breadth
-- [ ] **VIEWER-EVIDENCE-PROTECTION / PDFium** — promotable
-- [ ] **VIEWER-EVIDENCE-SIGNED-ARTIFACTS / PDFium** — narrow checklist
-- [ ] **VIEWER-EVIDENCE-SIGNING-PREP / Acrobat** (and equivalence note for the others)
+**Recommended: single-pass deferred injection.**
 
-### Future Consideration (post-v2.3)
+1. The `paginate` stage already knows the total page count after it completes — it has laid out all pages into a page list.
+2. After pagination and before the `render` stage, the total count is a resolved integer.
+3. Region content that needs `{current_page, total_pages}` is expressed as a 1-arity function (`fn {page, total} -> content_blocks end`) during authoring. Static region content (existing behavior) continues to work as-is.
+4. The `render` stage, when emitting a page, checks whether each region's content is a function or a static list. If a function, it is called with `{page_index, total_pages}` to produce the blocks for that page.
+5. No second render pass is needed. The total is available before the first byte is written.
 
-- [ ] Headless-browser automated viewer CI
-- [ ] Per-platform variants (Acrobat Windows vs macOS, Edge vs Chrome PDFium specifically)
-- [ ] Mobile viewer evidence (iOS Files, Android default)
-- [ ] Re-verification cadence (annual recheck)
+This matches the conceptual model of fpdf2's `{nb}` substitution (single-pass, substitute at close time) and ReportLab's deferred canvas accumulation — both approaches know the total before emitting final output, but neither requires rendering twice.
+
+Prawn's `number_pages` is a post-render stamp; it works differently from Rendro's pipeline model. LaTeX's two-pass model is the only genuine two-pass approach among the mature engines — it is efficient for TeX but wasteful for an in-memory Elixir pipeline.
+
+**The authoring-side question:** Should the region content function be exposed as a raw anonymous function, or as a named helper like `Rendro.page_number(format: "Page ~p of ~t")`? A named helper is more discoverable for recipes. The raw function form gives the escape hatch for custom content. Both can coexist: the named helper returns a function that the same region-content mechanism accepts.
+
+---
 
 ## Feature Prioritization Matrix
 
-| Feature | User Value | Implementation Cost | Priority |
-|---------|------------|---------------------|----------|
-| RECIPE-TEMPLATE / FIXTURE-DIR / MIXTASK / SCHEMA / DOCS-CONTRACT-LANE | HIGH | LOW–MEDIUM | P1 |
-| VIEWER-EVIDENCE-FORMS / Acrobat | HIGH | LOW eng / MEDIUM record | P1 |
-| VIEWER-EVIDENCE-PROTECTION / Acrobat | HIGH | LOW eng / MEDIUM record | P1 |
-| VIEWER-EVIDENCE-SIGNED-ARTIFACTS / Acrobat | HIGH | LOW eng / MEDIUM-HIGH record | P1 |
-| VIEWER-EVIDENCE-LONG-LIVED / Acrobat | HIGH | LOW eng / HIGH record | P1 |
-| VIEWER-EVIDENCE-SIGNATURE-WIDGETS / Acrobat, Preview, PDFium | MEDIUM | LOW eng / MEDIUM record | P1 |
-| GUARDRAIL: Explicit-deferral rows | HIGH | LOW | P1 |
-| DIFF-LTV-INDICATOR / DIFF-PREVIEW-SIG-GAP / DIFF-NEGATIVE-PROOF-SCREENSHOT | MEDIUM | LOW | P2 |
-| VIEWER-EVIDENCE-FORMS / PDFium + PDF.js | MEDIUM | LOW eng / MEDIUM record | P2 |
-| VIEWER-EVIDENCE-PROTECTION / PDFium | MEDIUM | LOW eng / MEDIUM record | P2 |
-| VIEWER-EVIDENCE-SIGNED-ARTIFACTS / PDFium (narrow) | MEDIUM | LOW eng / MEDIUM record | P2 |
-| VIEWER-EVIDENCE-SIGNING-PREP cells | LOW | LOW eng / LOW record | P3 |
-| Headless-browser automation | LOW for v2.3 (HIGH later) | HIGH | P3 (defer) |
-| Mobile viewer evidence | LOW for v2.3 | MEDIUM | P3 |
+| Feature | User Value | Implementation Cost | Priority | Phase Ordering |
+|---------|------------|---------------------|----------|---------------|
+| Page X of Y — deferred total count resolution (region content function) | HIGH | MEDIUM | P1 | Phase 1 — blocks all multi-page recipes |
+| Repeated static header region per page | HIGH | LOW | P1 | Phase 1 with page numbering |
+| Footer/header suppress on first/last page | MEDIUM | LOW | P1 | Phase 1 with page numbering |
+| Statement: transaction lines + running balance + page X of Y | HIGH | MEDIUM | P1 | Phase 2 — after page numbering |
+| Statement: balance carried forward / brought forward at page breaks | HIGH | HIGH | P1 | Phase 2 — requires new paginator hook |
+| Certificate: fixed-layout, recipient name, issuer, signature line | HIGH | LOW | P1 | Can run in parallel with Phase 1 |
+| Receipt: header + line items + payment block (single-page) | HIGH | LOW | P1 | Can run in parallel with Phase 1 |
+| Report: repeating column header + grand total | HIGH | MEDIUM | P1 | Phase 2 — after page numbering |
+| "Continued" marker on table splits | MEDIUM | LOW | P2 | Phase 2 alongside table features |
+| Statement: aging summary (current/30/60/90 day) | MEDIUM | LOW | P2 | Phase 2, opt-in data field |
+| Even/odd header content variants | LOW | MEDIUM | P3 | Defer post-v2.4 |
+| Section-local page number restart | LOW | MEDIUM | P3 | Defer post-v2.4 |
+| QR code on certificate (caller-generated image) | MEDIUM | LOW | P2 | Phase 2 alongside certificate |
+| Decorative border frame on certificate | MEDIUM | MEDIUM | P3 | Depends on drawn-path primitive availability |
 
-## Roadmap Implications for the Requirement-Definition Step
+**Priority key:**
+- P1: Required for v2.4 milestone to be called batteries-included
+- P2: Add during v2.4 if schedule allows; clear user value
+- P3: Defer post-v2.4; low demand relative to complexity or blocked on deeper engine work
 
-Suggested REQ-ID groupings:
-
-- **VIEWER-EVIDENCE-XX** — one per (surface × viewer) checklist; trim to P1 set for v2.3 commit
-- **MATRIX-PROMOTE-XX** — one per actual promotion event from `unverified` → `supported`
-- **RECIPE-XX** — RECIPE-TEMPLATE, RECIPE-FIXTURE-DIRECTORY, RECIPE-MIXTASK, RECIPE-SCHEMA, RECIPE-DOCS-CONTRACT, RECIPE-CHANGELOG-RULE
-- **GUARDRAIL-XX** — GUARDRAIL-EXPLICIT-DEFERRAL, GUARDRAIL-NEGATIVE-EVIDENCE, GUARDRAIL-NO-BLANKET-CLAIMS, GUARDRAIL-NO-THIRD-PARTY-PROMOTION
+---
 
 ## Sources
 
-- `.planning/PROJECT.md`, `.planning/MILESTONE-ARC.md`, `priv/support_matrix.json`, `guides/api_stability.md`
-- `.planning/milestones/v1.9-MILESTONE-AUDIT.md`, `v1.10-MILESTONE-AUDIT.md`, `v2.2-MILESTONE-AUDIT.md`
-- Apple Preview signature-validation gap (Adobe Community + discussions.apple.com)
-- PDF.js signature widget unimplemented (Mozilla #4202), AcroForm support (#7613)
-- PDFium SDK form/security docs (Patagames + googlesource)
-- Adobe Acrobat LTV indicator (SSL.com + PDF Association)
+- fpdf2 Tutorial — `{nb}` mechanism and header/footer override: https://py-pdf.github.io/fpdf2/Tutorial.html
+- ReportLab "Page X of Y" deferred canvas recipe: https://code.activestate.com/recipes/546511-page-x-of-y-with-reportlab/
+- ReportLab `multibuild` two-pass discussion: https://reportlab-users.reportlab.narkive.com/jhk7kUgD/page-totals
+- Prawn `number_pages` / `repeat` / `<total>` placeholder: https://github.com/prawnpdf/prawn/blob/master/manual/repeatable_content/page_numbering.rb
+- wkhtmltopdf `[page]`/`[topage]` variable injection: https://wkhtmltopdf.org/usage/wkhtmltopdf.txt
+- LaTeX fancyhdr even/odd, section restart, `\pageref{LastPage}`: https://www.overleaf.com/learn/latex/Headers_and_footers
+- Statement of account structure, carried forward convention: https://www.zoho.com/books/academy/accounting-principles/what-is-a-statement-of-accounts.html
+- Balance C/F and B/F accounting convention: https://www.accountingcapital.com/basic-accounting/balance-bf-and-balance-cf/
+- Payment receipt required fields (IRS-aligned, Stripe resource): https://stripe.com/resources/more/receipt-template-what-to-include-and-templates-for-different-use-cases
+- Completion certificate structure and verifiable fields: https://sertifier.com/blog/certificate-of-completion-template-verifiable/
+- iText "Continued" table pattern: https://kb.itextpdf.com/itext/how-to-add-continue-on-next-page-continued-from--1
+
+---
+*Feature research for: Rendro v2.4 — page-numbering primitive + Statement/Receipt-Report/Certificate recipes*
+*Researched: 2026-05-29*
