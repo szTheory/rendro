@@ -45,7 +45,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 ### 📋 v2.4 Batteries-Included Workflow & Adoption Closure (Phases 73-76)
 
-- [ ] **Phase 73: Page-Numbering / Running-Region Primitive** - Foundational: fix body_capacity, ship single-pass page-number token substitution, determinism proof
+- [x] **Phase 73: Page-Numbering / Running-Region Primitive** - Foundational: fix body_capacity, ship single-pass page-number token substitution, determinism proof (completed 2026-05-29)
 - [ ] **Phase 74: Statement Recipe** - First end-to-end exercise of PAGE primitive; carried-forward totals in data assembly; three-rung escape hatch
 - [ ] **Phase 75: Receipt/Report and Certificate Recipes + Support Contract** - Batched lower-complexity recipes; support-matrix rows for all new surfaces
 - [ ] **Phase 76: Reference Phoenix App, CI, and Documentation Closure** - Isolated CI job; all recipes demonstrated; HexDocs guides; docs-contract tests
@@ -83,7 +83,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 73-05-PLAN.md — D-11 four-property determinism assertions; full suite green (PAGE-04)
+- [x] 73-05-PLAN.md — D-11 four-property determinism assertions; full suite green (PAGE-04)
 
 ---
 
@@ -141,7 +141,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 73. Page-Numbering / Running-Region Primitive | 4/5 | In Progress|  |
+| 73. Page-Numbering / Running-Region Primitive | 5/5 | Complete   | 2026-05-29 |
 | 74. Statement Recipe | 0/? | Not started | - |
 | 75. Receipt/Report and Certificate Recipes + Support Contract | 0/? | Not started | - |
 | 76. Reference Phoenix App, CI, and Documentation Closure | 0/? | Not started | - |
