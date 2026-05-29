@@ -35,7 +35,7 @@ The foundational primitive. Must ship before any multi-page recipe depends on it
 
 - [x] **CERT-01**: User can generate a completion/compliance certificate from a data map via `Rendro.Recipes.Certificate.document/2` (title, recipient, body statement, issue date, signature/seal line).
 - [x] **CERT-02**: Certificate derives all element coordinates from template geometry — page size is a parameter (with a sensible default), no hardcoded A4 — and renders correctly at multiple page sizes (multi-size test is an exit criterion).
-- [ ] **CERT-03**: Certificate supports branded output (registered fonts/images) consistent with `Rendro.Recipes.BrandedInvoice`.
+- [x] **CERT-03**: Certificate supports branded output (registered fonts/images) consistent with `Rendro.Recipes.BrandedInvoice`.
 
 ### Reference Phoenix App & CI (REF)
 
@@ -96,7 +96,7 @@ Which phases cover which requirements. Updated on roadmap creation 2026-05-29.
 | RCPT-03 | Phase 75 | Complete |
 | CERT-01 | Phase 75 | Complete |
 | CERT-02 | Phase 75 | Complete |
-| CERT-03 | Phase 75 | Pending |
+| CERT-03 | Phase 75 | Complete |
 | CONTRACT-01 | Phase 75 | Pending |
 | REF-01 | Phase 76 | Pending |
 | REF-02 | Phase 76 | Pending |

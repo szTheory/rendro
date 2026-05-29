@@ -139,7 +139,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 **Wave 2** *(parallel — no file overlap; blocked on Wave 1)*
 
 - [x] 75-02-PLAN.md — Receipt recipe: three-rung, validate_data!/1, body chunking via Pagination helper, totals, "Page X of Y" footer (RCPT-01/02/03)
-- [ ] 75-03-PLAN.md — Certificate recipe: geometry-derived layout, landscape default, optional branding, multi-size test (CERT-01/02/03)
+- [x] 75-03-PLAN.md — Certificate recipe: geometry-derived layout, landscape default, optional branding, multi-size test (CERT-01/02/03)
 
 **Wave 3** *(blocked on Wave 2)*
 
@@ -169,7 +169,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 |-------|----------------|--------|-----------|
 | 73. Page-Numbering / Running-Region Primitive | 5/5 | Complete    | 2026-05-29 |
 | 74. Statement Recipe | 4/4 | Complete    | 2026-05-29 |
-| 75. Receipt/Report and Certificate Recipes + Support Contract | 2/4 | In Progress|  |
+| 75. Receipt/Report and Certificate Recipes + Support Contract | 3/4 | In Progress|  |
 | 76. Reference Phoenix App, CI, and Documentation Closure | 0/? | Not started | - |
 
 ---
