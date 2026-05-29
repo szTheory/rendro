@@ -44,8 +44,8 @@ Landed the two engine-side enablers the Statement recipe (plans 74-02/03/04) dep
 - `e4a064d` feat(74-01): expose read-only Rendro.measure_rows/4 over engine table measurement (D-09) — Task 2
 - `abfd19f` test(74-01): prove measure_rows/4 mirrors engine measurement and is read-only — Task 3
 - `68640d6` docs(74-01): complete statement-recipe engine enablers plan (initial SUMMARY/STATE/ROADMAP)
-- `ee32d29` fix(74-01): group measure_block/3 clauses (warnings-as-errors fix) — Rule 1/Rule 3 deviation
-- `35825e6` test(74-01): rewrite measure_rows test to use default Helvetica registry idiom — Rule 1 deviation
+- `8a0ba86` fix(74-01): group measure_block/3 clauses + rewrite measure_rows test fixtures — Rule 1/Rule 3 deviations (both auto-fixes in one commit)
+- `60328a2` docs(74-01): correct SUMMARY commit hashes and document deviations
 
 ## Key Implementation Details
 
@@ -72,7 +72,7 @@ were fixed before the plan closed:
   the user-facing `@doc` already lives on the public `Rendro.measure_rows/4`).
 - **Files modified:** lib/rendro/pipeline/measure.ex
 - **Verification:** `mix compile --warnings-as-errors` exits 0.
-- **Committed in:** `ee32d29`
+- **Committed in:** `8a0ba86`
 
 **2. [Rule 1 - Bug] measure_rows_test referenced a non-existent test fixture**
 - **Found during:** Task 3 (full-suite run)
@@ -84,7 +84,7 @@ were fixed before the plan closed:
   registry) and `Rendro.flow/1` for the read-only render check.
 - **Files modified:** test/rendro/measure_rows_test.exs
 - **Verification:** `mix test test/rendro/measure_rows_test.exs` — 4 tests, 0 failures.
-- **Committed in:** `35825e6`
+- **Committed in:** `8a0ba86` (same combined fix commit)
 
 ---
 
@@ -120,4 +120,4 @@ contract deviation.
 ## Self-Check: PASSED
 
 - Files: FOUND mix.exs, lib/rendro.ex, lib/rendro/pipeline/measure.ex, test/rendro/measure_rows_test.exs
-- Commits: FOUND e978aad, e4a064d, abfd19f, ee32d29, 35825e6
+- Commits: FOUND e978aad, e4a064d, abfd19f, 68640d6, 8a0ba86, 60328a2
