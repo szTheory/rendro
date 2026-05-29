@@ -134,7 +134,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 **Wave 1**
 
-- [ ] 75-01-PLAN.md — D-04 shared pagination helper (Rendro.Recipes.Pagination) + D-07 page-size helper (Rendro.PageSize) + Statement refactor + regression gate (51 tests)
+- [x] 75-01-PLAN.md — D-04 shared pagination helper (Rendro.Recipes.Pagination) + D-07 page-size helper (Rendro.PageSize) + Statement refactor + regression gate (51 tests)
 
 **Wave 2** *(parallel — no file overlap; blocked on Wave 1)*
 
@@ -169,7 +169,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 |-------|----------------|--------|-----------|
 | 73. Page-Numbering / Running-Region Primitive | 5/5 | Complete    | 2026-05-29 |
 | 74. Statement Recipe | 4/4 | Complete    | 2026-05-29 |
-| 75. Receipt/Report and Certificate Recipes + Support Contract | 0/4 | Not started | - |
+| 75. Receipt/Report and Certificate Recipes + Support Contract | 1/4 | In Progress|  |
 | 76. Reference Phoenix App, CI, and Documentation Closure | 0/? | Not started | - |
 
 ---

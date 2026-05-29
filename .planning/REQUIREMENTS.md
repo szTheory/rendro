@@ -27,14 +27,14 @@ The foundational primitive. Must ship before any multi-page recipe depends on it
 
 ### Receipt / Report Recipe (RCPT)
 
-- [ ] **RCPT-01**: User can generate a payment receipt / tabular operational report from a data map via a `Rendro.Recipes.*` recipe (header summary, line items, totals).
-- [ ] **RCPT-02**: Receipt/Report supports the three-rung escape hatch consistent with `Rendro.Recipes.Invoice`.
-- [ ] **RCPT-03**: Receipt/Report exercises table continuation with running footers across multiple pages, deterministically.
+- [x] **RCPT-01**: User can generate a payment receipt / tabular operational report from a data map via a `Rendro.Recipes.*` recipe (header summary, line items, totals).
+- [x] **RCPT-02**: Receipt/Report supports the three-rung escape hatch consistent with `Rendro.Recipes.Invoice`.
+- [x] **RCPT-03**: Receipt/Report exercises table continuation with running footers across multiple pages, deterministically.
 
 ### Certificate Recipe (CERT)
 
-- [ ] **CERT-01**: User can generate a completion/compliance certificate from a data map via `Rendro.Recipes.Certificate.document/2` (title, recipient, body statement, issue date, signature/seal line).
-- [ ] **CERT-02**: Certificate derives all element coordinates from template geometry — page size is a parameter (with a sensible default), no hardcoded A4 — and renders correctly at multiple page sizes (multi-size test is an exit criterion).
+- [x] **CERT-01**: User can generate a completion/compliance certificate from a data map via `Rendro.Recipes.Certificate.document/2` (title, recipient, body statement, issue date, signature/seal line).
+- [x] **CERT-02**: Certificate derives all element coordinates from template geometry — page size is a parameter (with a sensible default), no hardcoded A4 — and renders correctly at multiple page sizes (multi-size test is an exit criterion).
 - [ ] **CERT-03**: Certificate supports branded output (registered fonts/images) consistent with `Rendro.Recipes.BrandedInvoice`.
 
 ### Reference Phoenix App & CI (REF)
@@ -91,11 +91,11 @@ Which phases cover which requirements. Updated on roadmap creation 2026-05-29.
 | STMT-02 | Phase 74 | Complete |
 | STMT-03 | Phase 74 | Complete |
 | STMT-04 | Phase 74 | Complete |
-| RCPT-01 | Phase 75 | Pending |
-| RCPT-02 | Phase 75 | Pending |
-| RCPT-03 | Phase 75 | Pending |
-| CERT-01 | Phase 75 | Pending |
-| CERT-02 | Phase 75 | Pending |
+| RCPT-01 | Phase 75 | Complete |
+| RCPT-02 | Phase 75 | Complete |
+| RCPT-03 | Phase 75 | Complete |
+| CERT-01 | Phase 75 | Complete |
+| CERT-02 | Phase 75 | Complete |
 | CERT-03 | Phase 75 | Pending |
 | CONTRACT-01 | Phase 75 | Pending |
 | REF-01 | Phase 76 | Pending |
