@@ -104,12 +104,12 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 **Wave 1** *(parallel — no file overlap)*
 
-- [ ] 74-01-PLAN.md — Engine enablers: declare `:decimal` core dep (D-04) + read-only `Rendro.measure_rows/4` measurement helper (D-09)
-- [ ] 74-02-PLAN.md — Pure deterministic `Rendro.Format` — money/date/labels, no CLDR/locale (D-11)
+- [x] 74-01-PLAN.md — Engine enablers: declare `:decimal` core dep (D-04) + read-only `Rendro.measure_rows/4` measurement helper (D-09)
+- [x] 74-02-PLAN.md — Pure deterministic `Rendro.Format` — money/date/labels, no CLDR/locale (D-11)
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 74-03-PLAN.md — Statement recipe core: three-rung skeleton, `validate_data!/1`, Decimal balance fold, non-zero footer with PAGE primitive (STMT-01/03/04, D-03/D-05..D-08)
+- [x] 74-03-PLAN.md — Statement recipe core: three-rung skeleton, `validate_data!/1`, Decimal balance fold, non-zero footer with PAGE primitive (STMT-01/03/04, D-03/D-05..D-08)
 
 **Wave 3** *(blocked on Wave 2)*
 
@@ -156,7 +156,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 73. Page-Numbering / Running-Region Primitive | 5/5 | Complete    | 2026-05-29 |
-| 74. Statement Recipe | 0/4 | Planned | - |
+| 74. Statement Recipe | 3/4 | In Progress|  |
 | 75. Receipt/Report and Certificate Recipes + Support Contract | 0/? | Not started | - |
 | 76. Reference Phoenix App, CI, and Documentation Closure | 0/? | Not started | - |
 
