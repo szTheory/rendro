@@ -48,7 +48,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 - [x] **Phase 73: Page-Numbering / Running-Region Primitive** - Foundational: fix body_capacity, ship single-pass page-number token substitution, determinism proof (completed 2026-05-29)
 - [x] **Phase 74: Statement Recipe** - First end-to-end exercise of PAGE primitive; carried-forward totals in data assembly; three-rung escape hatch (completed 2026-05-29)
 - [x] **Phase 75: Receipt/Report and Certificate Recipes + Support Contract** - Batched lower-complexity recipes; support-matrix rows for all new surfaces (completed 2026-05-29)
-- [ ] **Phase 76: Reference Phoenix App, CI, and Documentation Closure** - Isolated CI job; all recipes demonstrated; HexDocs guides; docs-contract tests
+- [x] **Phase 76: Reference Phoenix App, CI, and Documentation Closure** - Isolated CI job; all recipes demonstrated; HexDocs guides; docs-contract tests (completed 2026-05-29)
 
 ## Phase Details
 
@@ -169,7 +169,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 **Wave 2** *(blocked on 76-01 — shares example-app boot)*
 
-- [ ] 76-02-PLAN.md — Recipe demonstration surface: 3 fixtures + 6 actions + 6 routes + chooser links + per-recipe ConnCase/structural tests (Certificate single-region) (REF-02)
+- [x] 76-02-PLAN.md — Recipe demonstration surface: 3 fixtures + 6 actions + 6 routes + chooser links + per-recipe ConnCase/structural tests (Certificate single-region) (REF-02)
 
 ---
 
@@ -180,7 +180,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 | 73. Page-Numbering / Running-Region Primitive | 5/5 | Complete    | 2026-05-29 |
 | 74. Statement Recipe | 4/4 | Complete    | 2026-05-29 |
 | 75. Receipt/Report and Certificate Recipes + Support Contract | 4/4 | Complete    | 2026-05-29 |
-| 76. Reference Phoenix App, CI, and Documentation Closure | 3/4 | In Progress|  |
+| 76. Reference Phoenix App, CI, and Documentation Closure | 4/4 | Complete   | 2026-05-29 |
 
 ---
 *v2.3 archived 2026-05-29 on milestone completion. v2.4 roadmap created 2026-05-29. Phase numbering: 73-76.*

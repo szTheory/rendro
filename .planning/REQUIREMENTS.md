@@ -40,7 +40,7 @@ The foundational primitive. Must ship before any multi-page recipe depends on it
 ### Reference Phoenix App & CI (REF)
 
 - [x] **REF-01**: The reference Phoenix app (`examples/phoenix_example`) is `mix`-runnable with a README documenting setup and each demonstrated recipe, on current, non-stale dependency constraints.
-- [ ] **REF-02**: The reference app demonstrates the shipped recipes (Invoice, BrandedInvoice, Statement, Receipt/Report, Certificate) through `Rendro.Adapters.Phoenix`.
+- [x] **REF-02**: The reference app demonstrates the shipped recipes (Invoice, BrandedInvoice, Statement, Receipt/Report, Certificate) through `Rendro.Adapters.Phoenix`.
 - [x] **REF-03**: The reference app is exercised in CI via an **isolated** `example-phoenix` job running `mix test` — kept off the required branch-protection checks so Phoenix-dependency failures never block the engine-critical lanes (`signing-live-proof`, `long-lived-live-proof`, `release-proof`, `test`).
 
 ### Support Contract & Documentation Honesty (CONTRACT)
@@ -99,7 +99,7 @@ Which phases cover which requirements. Updated on roadmap creation 2026-05-29.
 | CERT-03 | Phase 75 | Complete |
 | CONTRACT-01 | Phase 75 | Complete |
 | REF-01 | Phase 76 | Complete |
-| REF-02 | Phase 76 | Pending |
+| REF-02 | Phase 76 | Complete |
 | REF-03 | Phase 76 | Complete |
 | CONTRACT-02 | Phase 76 | Complete |
 
