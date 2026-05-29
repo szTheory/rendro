@@ -54,6 +54,21 @@ defmodule Rendro.DocsContract.BrandingClaimsTest do
       assert contents =~ "priv/branded/images/rendro-logo.png"
       assert contents =~ "NOTICE"
     end
+
+    test "built tarball excludes operator-only priv paths" do
+      tarball = "rendro-#{Mix.Project.config()[:version]}.tar"
+      File.rm(tarball)
+
+      {output, 0} = System.cmd("mix", ["hex.build"], stderr_to_stdout: true)
+      assert output =~ tarball
+      assert File.exists?(tarball)
+
+      list_cmd = "tar -xOf #{tarball} contents.tar.gz | tar -tzf -"
+      {contents, 0} = System.cmd("sh", ["-c", list_cmd], stderr_to_stdout: true)
+
+      refute contents =~ "priv/viewer_evidence/"
+      refute contents =~ "priv/support_matrix.json"
+    end
   end
 
   describe "missing-asset diagnostics" do

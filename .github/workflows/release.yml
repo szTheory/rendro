@@ -25,8 +25,11 @@ jobs:
       - name: Install Dependencies
         run: mix deps.get
 
-      - name: Run CI and Preflight Checks
+      - name: Run CI Checks
         run: mix ci
+
+      - name: Run Release Preflight
+        run: mix release.preflight
 
       - name: Publish to Hex
         env:
