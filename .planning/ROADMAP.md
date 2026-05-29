@@ -61,7 +61,13 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
   2. A running footer with non-zero height does not overlap the last body lines on any page — `body_capacity` subtracts all non-body region heights
   3. Running region content can be authored as a named helper (`Rendro.page_number/1`-style) or a raw `fn {page, total} -> ... end`, and can be suppressed on specific pages (e.g. first page)
   4. Rendering the same document twice with `deterministic: true` produces byte-identical output — no non-determinism introduced by running-region substitution
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 73-01-PLAN.md — Wave 0 test scaffolding: all failing stubs for PAGE-01..04 (RED state)
+- [ ] 73-02-PLAN.md — body_capacity fix: measure.ex primary site + paginate.ex flow_layout fallback (PAGE-03)
+- [ ] 73-03-PLAN.md — replace_page_numbers/3 extension + total threading single-pass (PAGE-01)
+- [ ] 73-04-PLAN.md — fn primitive + suppress_on selector + page_number/1 helper (PAGE-02)
+- [ ] 73-05-PLAN.md — D-11 four-property determinism assertions; full suite green (PAGE-04)
 
 ---
 
@@ -110,7 +116,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 73. Page-Numbering / Running-Region Primitive | 0/? | Not started | - |
+| 73. Page-Numbering / Running-Region Primitive | 0/5 | In progress | - |
 | 74. Statement Recipe | 0/? | Not started | - |
 | 75. Receipt/Report and Certificate Recipes + Support Contract | 0/? | Not started | - |
 | 76. Reference Phoenix App, CI, and Documentation Closure | 0/? | Not started | - |
