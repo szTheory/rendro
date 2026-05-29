@@ -5,6 +5,23 @@ defmodule Rendro.DocsContract.ViewerEvidenceClaimsTest do
 
   @fixtures_dir "test/support/viewer_evidence/fixtures"
 
+  defp collect_deferral_reasons(node) when is_map(node) do
+    own =
+      if node["status"] == "explicit_deferral" and is_binary(node["evidence_deferred"]) do
+        [node["evidence_deferred"]]
+      else
+        []
+      end
+
+    own ++ Enum.flat_map(Map.values(node), &collect_deferral_reasons/1)
+  end
+
+  defp collect_deferral_reasons(node) when is_list(node) do
+    Enum.flat_map(node, &collect_deferral_reasons/1)
+  end
+
+  defp collect_deferral_reasons(_), do: []
+
   describe "production tier-A artifacts" do
     test "production support matrix passes structural JSV validation" do
       matrix = Matrix.load!()
@@ -35,6 +52,7 @@ defmodule Rendro.DocsContract.ViewerEvidenceClaimsTest do
       for path <- [
             "priv/viewer_evidence/forms/apple_preview.md",
             "priv/viewer_evidence/forms/adobe_acrobat_reader.md",
+            "priv/viewer_evidence/forms/chrome_pdfium.md",
             "priv/viewer_evidence/embedded_files/adobe_acrobat_reader.md",
             "priv/viewer_evidence/links/adobe_acrobat_reader.md",
             "priv/viewer_evidence/links/apple_preview.md",
@@ -42,12 +60,27 @@ defmodule Rendro.DocsContract.ViewerEvidenceClaimsTest do
             "priv/viewer_evidence/protection/adobe_acrobat_reader.md",
             "priv/viewer_evidence/signature_widget/adobe_acrobat_reader.md",
             "priv/viewer_evidence/signature_widget/apple_preview.md",
+            "priv/viewer_evidence/signature_widget/chrome_pdfium.md",
             "priv/viewer_evidence/signing_preparation/adobe_acrobat_reader.md",
             "priv/viewer_evidence/signed_artifact/adobe_acrobat_reader.md",
             "priv/viewer_evidence/signed_artifact/chrome_pdfium.md",
             "priv/viewer_evidence/long_lived_signed_artifact/adobe_acrobat_reader.md"
           ] do
         assert guide =~ path
+      end
+    end
+
+    test "api stability guide contains deferral reason substrings from matrix" do
+      guide = File.read!("guides/api_stability.md")
+      reasons = collect_deferral_reasons(Matrix.load!())
+
+      assert reasons != [], "expected at least one explicit_deferral row in the matrix"
+
+      for reason <- reasons do
+        substring = String.slice(reason, 0, 40)
+
+        assert guide =~ substring,
+               "api_stability.md missing deferral substring: #{inspect(substring)}"
       end
     end
 

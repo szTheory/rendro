@@ -140,3 +140,16 @@ Structural validation through `pdfinfo`/Poppler proves that a protected PDF rema
 Apple Preview is `supported` for the `protection` surface based on the recorded viewer checklist for **pdfinfo version 26.04.0** on **macOS (arm64)** (`priv/viewer_evidence/protection/apple_preview.md`). That proof confirms `opens_with_open_password`, `displays_authored_content_correctly`, `advisory_print_behavior`, `advisory_copy_behavior`, and `save_and_reopen_readability` for the representative protected fixture via pdfinfo/qpdf structural automation proxy (Preview password GUI not re-run in CI).
 
 Adobe Acrobat Reader is `supported` for the `protection` surface based on the recorded viewer checklist for **pdfinfo** on **Ubuntu (amd64)** (`priv/viewer_evidence/protection/adobe_acrobat_reader.md`). That proof confirms the same five-check protection checklist via pdfinfo/qpdf structural automation proxy (Acrobat password GUI not re-run in CI). Other `protection` viewers are outside the recorded contract unless `priv/support_matrix.json` promotes them.
+
+## Explicit Deferral Reasons (matrix-mirrored)
+
+Every `explicit_deferral` viewer row in `priv/support_matrix.json` carries a named `evidence_deferred` reason. These are mirrored verbatim here so the adopter-visible contract states why a viewer is deferred rather than `unsupported`:
+
+- forms × PDF.js: PDF.js failed the forms four-check save-and-reopen round-trip on the representative fixture during Phase 71 operator review; edit_or_toggle persistence is not reliable.
+- signature_widget × PDF.js / signing_preparation × PDF.js: PDF.js does not implement AcroForm signature widget editing or unsigned placeholder rendering per mozilla/pdf.js#4202; promotion requires upstream signature-field support.
+- signed_artifact × Apple Preview: Apple Preview does not validate /Sig digital signatures and append-save invalidates signature dictionaries; signed-artifact viewer promotion requires Acrobat or pdfium-cli structural lanes.
+- signed_artifact × PDF.js: PDF.js exposes no /Sig validation UI or signed-artifact integrity panel for the representative fixture; viewer promotion deferred until signature validation surfaces exist.
+- long_lived_signed_artifact × Apple Preview: Apple Preview does not surface long-term-validation timestamp, revocation, or expiry indicators for augmented PDF signatures on the representative certomancer fixture.
+- long_lived_signed_artifact × Chrome PDFium: pdfium-cli structural open and form extraction do not expose long-term-validation timestamp, revocation, or expiry indicators; LTV posture remains Acrobat-only for viewer promotion.
+- long_lived_signed_artifact × PDF.js: PDF.js does not implement long-term-validation timestamp, revocation, or expiry indicators for augmented signatures; viewer promotion deferred until LTV UI exists upstream.
+- embedded_files × Apple Preview: Apple Preview Attachments UI still does not discover, open, or extract the representative embedded-artifact fixture after Phase 71 re-verify; v1.9 deferral stands.
