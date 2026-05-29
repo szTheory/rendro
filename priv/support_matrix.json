@@ -381,6 +381,51 @@
       }
     }
   },
+  "page_numbering": {
+    "surface": "page_numbering",
+    "status": "supported",
+    "evidence": "test/rendro/pipeline/paginate_test.exs",
+    "recorded_at": "2026-05-29",
+    "capabilities": {
+      "single_pass_substitution": "supported",
+      "deterministic_output": "supported",
+      "suppress_on_first_page": "supported"
+    }
+  },
+  "statement": {
+    "surface": "statement",
+    "status": "supported",
+    "evidence": "test/rendro/recipes/statement_test.exs",
+    "recorded_at": "2026-05-29",
+    "capabilities": {
+      "multi_page_table_continuation": "supported",
+      "running_footer_page_number": "supported",
+      "deterministic_output": "supported"
+    }
+  },
+  "receipt_report": {
+    "surface": "receipt_report",
+    "status": "supported",
+    "evidence": "test/rendro/recipes/receipt_test.exs",
+    "recorded_at": "2026-05-29",
+    "capabilities": {
+      "multi_page_table_continuation": "supported",
+      "running_footer_page_number": "supported",
+      "deterministic_output": "supported"
+    }
+  },
+  "certificate": {
+    "surface": "certificate",
+    "status": "supported",
+    "evidence": "test/rendro/recipes/certificate_test.exs",
+    "recorded_at": "2026-05-29",
+    "capabilities": {
+      "geometry_derived_layout": "supported",
+      "multi_page_size": "supported",
+      "branded_output": "supported",
+      "deterministic_output": "supported"
+    }
+  },
   "unsupported": [
     "full_pdf_compliance",
     "digital_signatures"
