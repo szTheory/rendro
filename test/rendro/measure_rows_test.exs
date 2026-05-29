@@ -99,5 +99,26 @@ defmodule Rendro.MeasureRowsTest do
       assert Rendro.measure_rows(rows, @width, doc(), table_opts()) ==
                Rendro.measure_rows(rows, @width, doc(), table_opts())
     end
+
+    test "zero-column rows do not trip a descending-range deprecation (CR-01)" do
+      # Rows that carry no cells make the internal grid's column count 0. The
+      # grid comprehension must produce an EMPTY column range, not the
+      # descending range 0..-1 (which yields [0, -1], injects a spurious
+      # {r, -1} grid cell, and emits a Range step deprecation that becomes a
+      # hard error in a future Elixir release).
+      zero_col_rows = [[], []]
+
+      stderr =
+        ExUnit.CaptureIO.capture_io(:stderr, fn ->
+          assert {header_height, row_heights} =
+                   Rendro.measure_rows(zero_col_rows, @width, doc(), [])
+
+          assert header_height == 0
+          assert length(row_heights) == length(zero_col_rows)
+        end)
+
+      refute stderr =~ "step of -1"
+      refute stderr =~ "Range.new/2"
+    end
   end
 end
