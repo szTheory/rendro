@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: Batteries-Included Workflow & Adoption Closure
-status: planning
-last_updated: "2026-05-29T15:22:36.928Z"
-last_activity: 2026-05-29 — Roadmap created for milestone v2.4 (Phases 73-76)
+status: executing
+last_updated: "2026-05-29T15:51:04.142Z"
+last_activity: 2026-05-29 -- Phase 73 planning complete
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 0
+  total_plans: 5
   completed_plans: 0
   percent: 0
 ---
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-05-29 after v2.3 milestone shipped)
 
 Phase: 73 — Page-Numbering / Running-Region Primitive (not started)
 Plan: —
-Status: Roadmap created; ready to plan Phase 73
-Last activity: 2026-05-29 — Roadmap created for milestone v2.4 (Phases 73-76)
+Status: Ready to execute
+Last activity: 2026-05-29 -- Phase 73 planning complete
 
 Progress: [░░░░░░░░░░] 0% (0/4 phases complete)
 

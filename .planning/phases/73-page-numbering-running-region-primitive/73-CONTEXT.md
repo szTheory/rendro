@@ -28,8 +28,8 @@ This phase delivers **running header/footer regions with deterministic "Page X o
 
 ### Reserved-height model (PAGE-03 fix)
 - **D-04:** **Authored region `height:`; the engine subtracts it.** Fix `body_capacity` to `body_region.height − header_region.height − footer_region.height`, reading the heights already present on `Rendro.Region` (default 0 → no-op for today's default template; correct reservation whenever a caller sets a non-zero footer/header).
-- **D-05:** **No engine auto-measure of region content** in this phase. Auto-measure is the one model (CSS @page margin boxes) that requires multi-pass and would reintroduce the convergence loop PAGE-04 forbids. Batteries-included ergonomics live at the recipe layer (recipes supply correct heights), not the engine primitive.
-- **D-06:** A future opt-in `height: :auto` (measure-once-then-freeze) is a **deferred** possibility, not in this phase's scope.
+- **D-05 [informational]:** **No engine auto-measure of region content** in this phase. Auto-measure is the one model (CSS @page margin boxes) that requires multi-pass and would reintroduce the convergence loop PAGE-04 forbids. Batteries-included ergonomics live at the recipe layer (recipes supply correct heights), not the engine primitive.
+- **D-06 [informational]:** A future opt-in `height: :auto` (measure-once-then-freeze) is a **deferred** possibility, not in this phase's scope.
 - **Fix locations:** `body_capacity/1` at `lib/rendro/pipeline/measure.ex:442` and the mirror at `lib/rendro/pipeline/paginate.ex:494`.
 
 ### Per-page suppression (PAGE-02)
