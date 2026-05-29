@@ -39,7 +39,7 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 ### Discipline Guardrails
 
 - [x] **GUARDRAIL-01**: Explicit-deferral rows must name a specific viewer behavior or version; the forbidden-vocabulary scan in the docs-contract lane prevents `TBD`, `not yet`, `deferred for later`, empty strings, and unspecified-viewer language from landing on `main`.
-- [ ] **GUARDRAIL-02**: The engine-level required CI lanes shipped before v2.3 (`signing-live-proof`, `long-lived-live-proof`, `mix ci`, structural validation) remain required on `main` and unchanged in semantics; the milestone-close audit verifies the required-check list grew, never shrank, and that no behavioral lane was diluted by viewer-evidence work.
+- [x] **GUARDRAIL-02**: The engine-level required CI lanes shipped before v2.3 (`signing-live-proof`, `long-lived-live-proof`, `mix ci`, structural validation) remain required on `main` and unchanged in semantics; the milestone-close audit verifies the required-check list grew, never shrank, and that no behavioral lane was diluted by viewer-evidence work.
 - [x] **GUARDRAIL-03**: `priv/support_matrix.json` extensions are strictly additive; no new top-level keys, no compliance/signer-trust/multi-signature keys on viewer rows, no field renames, no field retypes — schema-coupling pitfalls are blocked at the schema-validator level rather than caught in review.
 - [x] **GUARDRAIL-04**: Evidence files are text-only and within a documented byte budget (default ~64KB), embed fixtures by repo-path or content hash rather than inline binaries, and reject operational-secret tokens (`-----BEGIN`, `passphrase`, `private_key`) and absolute home-directory paths via the docs-contract scan.
 
@@ -91,7 +91,7 @@ Populated by gsd-roadmapper on 2026-05-08 from the v2.3 roadmap (phases 68–72)
 | VIEWER-06 | 71 | Pending |
 | VIEWER-07 | 71 | Pending |
 | GUARDRAIL-01 | 68 | Complete |
-| GUARDRAIL-02 | 72 | Pending |
+| GUARDRAIL-02 | 72 | Complete |
 | GUARDRAIL-03 | 68 | Complete |
 | GUARDRAIL-04 | 68 | Complete |
 
