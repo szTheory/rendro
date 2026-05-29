@@ -46,6 +46,54 @@
 
 ---
 
+## Milestone: v2.3 — Viewer Proof & Interop Closure
+
+**Shipped:** 2026-05-29 (tag v0.3.1)
+**Phases:** 5 (68-72) | **Plans:** 15 | **Tasks:** 32
+
+### What Was Built
+- `explicit_deferral` as a third matrix row state alongside `supported`/`unverified`, with a required `evidence_deferred` reason that must name a specific viewer behavior or version — making non-promotable cells honest, named non-promotions distinct from un-attempted cells.
+- Additive `evidence:` / `recorded_at:` / `viewer_kind:` fields on `priv/support_matrix.json` viewer rows, enforced by an in-tree two-tier JSON-Schema (Draft 2020-12) validator wired to the required `test` job — no existing field renamed or retyped, all v1.5–v2.2 readers still pass.
+- `mix rendro.viewer_evidence` operator task (list / validate / missing subcommands, `--json` contract, D-22 exit codes) reporting every (surface × viewer) cell against the matrix.
+- The 8th docs-contract lane (`viewer_evidence_claims_test.exs`) rejecting unevidenced `supported` rows, unnamed deferrals, forbidden vocabulary (`TBD`, `not yet`, `deferred for later`, empty), and orphan evidence files — folded into the required `test` job via `verify_docs.exs` rather than adding a new required GitHub context.
+- `guides/viewer_evidence.md` operator-grade recipe under the HexDocs Policies extras group, plus the canonical `priv/viewer_evidence/<surface>/<viewer>.md` template, smoke-tested end-to-end on forms × Apple Preview.
+- All 26 (surface × viewer) cells driven terminal: 17 `supported` with resolvable evidence pointers, 9 `explicit_deferral` with named reasons, 0 silently `unverified`, across forms, protection, signature widgets, signing preparation, signed artifacts, and long-lived artifacts.
+- Live branch-protection audit confirming the engine-level required-check list (`signing-live-proof`, `long-lived-live-proof`, `release-proof`, `test`) grew or stayed flat, never shrank; ship gate closed at v0.3.1 with a CHANGELOG split, `@version` bump, negative Hex-tarball test, and `release.yml` preflight hardening.
+
+### What Worked
+- **Additive-only schema discipline, enforced by a validator.** Extending the matrix with new fields and a new row state — never renaming or retyping — let every v1.5–v2.2 docs-contract reader keep passing untouched while the new recording discipline failed CI before merge. The JSON-Schema validator made "strictly additive" a machine-checked invariant rather than a review-time hope.
+- **`explicit_deferral` as a first-class state.** Giving non-promotable cells a named, required reason (instead of leaving them silent `unverified`) converted an ambiguous coverage gap into an auditable, honest ledger. `missing` empty ≠ everything supported — the distinction is now explicit in the data.
+- **Recipe before the bulk recording.** Phase 69 published the operator recipe and walked one full cell end-to-end before phases 70/71 recorded at scale, so the parallel-safe waves had a settled template with no shape drift.
+- **Parallel-safe disjoint waves.** Phases 70 (consolidate legacy) and 71 (record new + defer) touched disjoint files by design, so they ran as independent waves with no merge conflicts.
+- **Structural-proxy automation kept the milestone GUI-free.** Legacy and new viewer rows were re-attested via pdfium-cli / pdfinfo / qpdf CI proof modules rather than manual GUI sessions, keeping the recording reproducible.
+- **Folding the new lane into `test`, not a new required context.** The 8th docs-contract lane runs inside the existing required `test` job via `verify_docs.exs` (D-18), so the required-check list never grew a new GitHub context while still gaining enforcement.
+
+### What Was Inefficient
+- **Doubled audit filename.** The milestone audit was written as `v2.3-v2.3-MILESTONE-AUDIT.md`, so `gsd-sdk milestone.complete` reported `audit: false` and the file had to be moved into `milestones/` and renamed manually during close.
+- **Auto-extracted MILESTONES.md accomplishments were per-plan and noisy.** `milestone.complete` pulled 14 plan-level one-liners (including a stray `forms × chrome_pdfium` fragment) instead of milestone-level themes, requiring a manual rewrite to the curated 6-item list — same friction noted in the v2.2 retro.
+- **First audit ran too early.** The 2026-05-28 audit ran with only Phase 68 complete and returned `gaps_found`; it had to be regenerated 2026-05-29 after 69–72 verified. The regenerated audit superseded it (per D-15/D-21).
+- **Traceability drift on VIEWER-02..07.** REQUIREMENTS.md still listed those rows as `[ ]`/Pending (stale from the early audit) while VERIFICATION.md and SUMMARY frontmatter confirmed completion; the checkboxes were corrected during the audit.
+
+### Patterns Established
+- **Three-state support vocabulary.** Support rows are `supported` (with evidence) / `explicit_deferral` (with a named reason) / `unverified` (un-attempted). Silent `unverified` for a known-unsupportable cell is now a recording-discipline failure, not a default.
+- **Evidence-as-checked-in-text.** Per-(surface × viewer) proof lives as text-only Markdown under `priv/viewer_evidence/`, fixtures by repo-path or content hash, within a byte budget, with secret/PII scanning at the docs-contract level. Future surfaces inherit the recipe instead of re-deriving it.
+- **Record the gap, never widen the engine.** Viewer shortcomings are recorded as `explicit_deferral`, never patched into the writer with per-viewer polyfills — protecting determinism and preventing false portability claims.
+- **Schema-enforced additive evolution.** Public-contract data files (`priv/support_matrix.json`) evolve under a wired-in JSON-Schema validator that blocks non-additive mutation at CI time.
+
+### Key Lessons
+1. **Name the unsupportable, don't leave it silent.** A required-reason `explicit_deferral` state turned a fuzzy "unverified" backlog into a closed, auditable ledger. Honesty became structurally enforced rather than a documentation habit.
+2. **Enforce "additive-only" with a validator, not a review checklist.** Wiring a JSON-Schema validator into the required job let the matrix evolve confidently without breaking a single legacy reader.
+3. **Walk one cell end-to-end before recording at scale.** The Phase 69 worked example settled the template so the parallel recording waves had zero shape drift.
+4. **Audit only when the milestone is actually complete.** Running the audit at Phase 68 produced a throwaway `gaps_found` verdict and stale traceability that had to be corrected later. Audit after all phases verify.
+5. **Recurring close-time friction is now a pattern worth tooling.** Auto-extracted MILESTONES.md accomplishments and the per-milestone-vs-global ROADMAP convention have each caused manual rework across v2.2 and v2.3 — candidates for a project-specific close helper.
+
+### Cost Observations
+- 5 phases / 15 plans / 32 tasks across two calendar days (2026-05-28 → 2026-05-29); 78 commits.
+- Recording-discipline milestone, not an engineering one: no core engine code changed (hence Nyquist replay intentionally skipped for 69–72 per D-21). New surface area was concentrated in `priv/viewer_evidence/`, the schema/validator/mix-task tooling, the 8th docs-contract lane, and viewer-proof fixtures.
+- Rework: one early throwaway audit (regenerated), one manual MILESTONES.md rewrite, one manual audit-file move/rename at close.
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -55,6 +103,7 @@
 | v2.0 | 5 (55-59) | 10 | Established artifact-first signing-preparation seam and verification-backfill closure pattern. |
 | v2.1 | 4 (60-63) | 8 | Established public-contract-before-adapters discipline and operationally enforced live-proof gate (`signing-live-proof` required on `main`). |
 | v2.2 | 4 (64-67) | 8 | Extended live-proof gate pattern to long-lived (`long-lived-live-proof` required on `main`); established augmentation-as-separate-seam pattern and posture-vs-tool metadata split. |
+| v2.3 | 5 (68-72) | 15 | Recording-discipline (not engineering) milestone: added the `explicit_deferral` three-state support vocabulary, schema-enforced additive matrix evolution, the `mix rendro.viewer_evidence` operator task + 8th docs-contract lane, and the durable `guides/viewer_evidence.md` recipe. |
 
 ### Cumulative Quality
 
@@ -63,6 +112,7 @@
 | v2.0 | 0 | 0 (signing-prep was a first-party seam, not an adapter) |
 | v2.1 | 1 (`signing-live-proof`) | 2 (pyHanko signing, pdfsig validation) |
 | v2.2 | 2 (`signing-live-proof`, `long-lived-live-proof`) | 2 (pyHanko long-lived augmentation reuses signing adapter; pyHanko-backed validation) |
+| v2.3 | 2 (engine lanes unchanged; viewer-evidence lane folded into required `test`, not a new context) | 0 new (manual-only recording; observer adapters deferred to a later milestone) |
 
 ### Top Lessons (Verified Across Milestones)
 

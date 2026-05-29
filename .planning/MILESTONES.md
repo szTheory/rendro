@@ -1,5 +1,26 @@
 # Milestones
 
+## v2.3 Viewer Proof & Interop Closure (Shipped: 2026-05-29)
+
+**Phases completed:** 5 phases (68, 69, 70, 71, 72), 15 plans, 32 tasks
+
+**Delivered:** Closed the trust-sensitive viewer evidence gap surface-by-surface — every (surface × viewer) cell now carries recorded per-viewer proof or a named explicit deferral, backed by a durable operator-grade recording recipe future surfaces inherit.
+
+**Key accomplishments:**
+
+- Added `explicit_deferral` as a third matrix row state plus additive `evidence:`/`recorded_at:`/`viewer_kind:` fields on `priv/support_matrix.json`, enforced by an in-tree JSON-Schema (Draft 2020-12) two-tier validator wired to the required `test` job — strictly additive, no existing field renamed or retyped.
+- Shipped the `mix rendro.viewer_evidence` operator task (list/validate/missing subcommands, `--json` contract, D-22 exit codes) and the 8th docs-contract lane (`viewer_evidence_claims_test.exs`) rejecting unevidenced `supported` rows, unnamed deferrals, forbidden vocabulary, and orphan evidence files.
+- Published the `guides/viewer_evidence.md` operator-grade recipe under the HexDocs Policies extras group and the canonical `priv/viewer_evidence/<surface>/<viewer>.md` template, smoke-tested end-to-end on forms × Apple Preview as the worked example.
+- Drove all 26 (surface × viewer) cells to terminal state — **17 supported** (each with a resolvable `evidence:` pointer), **9 explicit_deferral** (each with a named reason), **0 silently unverified** — across forms, protection, signature widgets, signing preparation, signed artifacts, and long-lived signed artifacts.
+- Verified the engine-level trust spine unchanged via a live branch-protection audit: all four required engine lanes (`signing-live-proof`, `long-lived-live-proof`, `release-proof`, `test`) remain required on `main`; the required-check list grew or stayed flat, never shrank, and no behavioral lane was diluted by viewer-evidence work (GUARDRAIL-02).
+- Closed the ship gate at v0.3.1 — split the CHANGELOG into a frozen 0.3.0 and a new 0.3.1 section, bumped `@version`, locked Hex packaging honesty with a negative tarball test, and hardened `release.yml` with a preflight step (isolated-worktree preflight proof green at a synthetic exact tag).
+
+**Audit status:** `passed` — all 19 requirements satisfied, all 5 phases closed, 24/24 cross-phase integration checks passed, 4/4 E2E flows complete, live branch-protection audit passed. See `milestones/v2.3-MILESTONE-AUDIT.md`.
+
+**Tech debt (non-critical, largely intentional):** SURFACE_EQUIVALENCE-inherited secondary cells rely on operator discipline rather than independent proof-ID re-validation (optional hardening); Nyquist VALIDATION.md for phases 69–72 remain draft (lightweight backfill phases per D-21, no engine code changed); staleness gate advisory by default (D-17); Hex `files:` whitelist intentionally omits operator tooling assets (D-29, refuted by a negative hex.build test D-30).
+
+---
+
 ## v2.2 Long-Lived Signatures & Compliance Evidence (Shipped: 2026-05-08)
 
 **Phases completed:** 4 phases (64, 65, 66, 67)

@@ -10,9 +10,13 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Active Milestone:** v2.3 Viewer Proof & Interop Closure — Phase 70 complete (2026-05-29): five pre-v2.3 legacy `supported` viewer rows consolidated into canonical `priv/viewer_evidence/` homes with matrix `evidence:` pointers, Tier-B promotion-complete schema enforcement, api_stability STACK mirrors, and zero legacy validation warnings. Six promotion-complete supported rows (including Phase 69 chrome_pdfium); 20 unverified cells remain for Phase 71.
+**Between milestones.** v2.3 shipped 2026-05-29; v2.4 not yet planned. Run `/gsd-new-milestone` to define the next milestone (phase numbering continues from 73).
 
-**Shipped Version:** v2.2 Long-Lived Signatures & Compliance Evidence (2026-05-08)
+**Shipped Version:** v2.3 Viewer Proof & Interop Closure (2026-05-29, tag v0.3.1)
+
+All 26 (surface × viewer) cells across forms, protection, signature widgets, signing preparation, signed artifacts, and long-lived signed artifacts are now terminal — 17 `supported` (each with a resolvable `evidence:` pointer into `priv/viewer_evidence/`), 9 `explicit_deferral` (each with a named viewer-behavior reason), 0 silently `unverified`. v2.3 added the `explicit_deferral` matrix vocabulary, additive `evidence:`/`recorded_at:`/`viewer_kind:` fields enforced by an in-tree JSON-Schema validator, the `mix rendro.viewer_evidence` operator task, the 8th docs-contract lane wired into the required `test` job, and the durable `guides/viewer_evidence.md` operator recipe. The engine-level trust spine (`signing-live-proof`, `long-lived-live-proof`, `release-proof`, `test`) was verified unchanged via a live branch-protection audit. Archived in `milestones/v2.3-ROADMAP.md` / `milestones/v2.3-REQUIREMENTS.md` / `milestones/v2.3-MILESTONE-AUDIT.md`.
+
+**Previous Shipped Version:** v2.2 Long-Lived Signatures & Compliance Evidence (2026-05-08)
 
 Rendro now supports one proof-backed long-lived-signature path over the shipped cryptographic-signing seam: `Rendro.Sign.augment/2` adds timestamp and revocation evidence over signed artifacts on a separate seam from `sign/2`, the first-party optional pyHanko long-lived adapter provides timestamp and revocation facts without claiming certificate-trust ownership, and `validate/2` reports cryptographic integrity, timestamp presence, revocation evidence presence, and narrow compliance posture as distinct signals. The `long-lived-live-proof` CI lane runs the full `sign → augment → validate` workflow against an offline certomancer-backed PKI/TSA/OCSP fixture and is required on `main`. `priv/support_matrix.json` and `guides/api_stability.md` publish `signing.long_lived` evidence separately from blanket PDF/A claims, signer trust, viewer behavior, and multi-signature workflows, with the `67-VERIFICATION.md` ledger backing the exact supported path.
 
@@ -46,16 +50,11 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 **Foundation Already Shipped:** v1.3 release readiness, v1.2 typography/assets truth, v1.1 layout-authoring maturity, and v1.0 deterministic core rendering.
 
-## Current Milestone: v2.3 Viewer Proof & Interop Closure
+## Next Milestone: v2.4 Batteries-Included Workflow & Adoption Closure (planned)
 
-**Goal:** Close the trust-sensitive viewer evidence gap surface-by-surface so public support claims for forms, protection, signatures, signing preparation, signed artifacts, and long-lived evidence can be promoted with recorded per-viewer proof rather than deferred under blanket "unverified" rows.
+**Goal (provisional):** With engine-level truth and per-viewer truth now both proof-backed, close the adoption gap — make the common Phoenix workflows batteries-included so teams can reach production with the documented recipes rather than assembling primitives by hand.
 
-**Target features (planned):**
-- Recorded viewer checklists for forms, protection, signature widgets, signing preparation, signed artifacts, and long-lived signed artifacts
-- Promotion of `priv/support_matrix.json` viewer rows that have completed evidence; explicit deferral for those that have not
-- A documented operator-grade viewer-evidence recipe so future surfaces inherit the same proof discipline
-
-**Why now:** With long-lived signing now proof-backed, the largest remaining trust-and-adoption gap is surface-by-surface viewer evidence. Operators need to know what actually works in Acrobat, Preview, PDFium, and PDF.js before any broader adoption claims grow stronger.
+**Why now:** v2.3 closed the last recorded-truth gap (viewer behavior across Acrobat, Preview, PDFium, PDF.js). The highest-leverage next step is reducing time-to-production for the most common artifact workflows. Concrete requirements are defined by `/gsd-new-milestone` (phase numbering continues from 73). Conditional v2.5 (Global Text Shaping & Script Support) follows only if demand justifies the core investment.
 
 ## Strategic Arc
 
@@ -69,6 +68,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Validated
 
+- [x] Rendro v2.3 closed the trust-sensitive viewer evidence gap surface-by-surface: all 26 (surface × viewer) cells are terminal — 17 `supported` with resolvable `evidence:` pointers into `priv/viewer_evidence/`, 9 `explicit_deferral` with named viewer-behavior reasons, 0 silently `unverified`. Added the `explicit_deferral` matrix vocabulary plus additive `evidence:`/`recorded_at:`/`viewer_kind:` fields enforced by an in-tree JSON-Schema validator, the `mix rendro.viewer_evidence` operator task, the 8th docs-contract lane (wired into the required `test` job), and the durable `guides/viewer_evidence.md` operator recipe. The engine-level required CI lanes were verified unchanged via a live branch-protection audit. Shipped 2026-05-29 at tag `v0.3.1` and archived in `milestones/v2.3-ROADMAP.md` / `milestones/v2.3-REQUIREMENTS.md` / `milestones/v2.3-MILESTONE-AUDIT.md`.
 - [x] Rendro v2.2 delivered one proof-backed long-lived-signature path over the shipped cryptographic-signing seam: `Rendro.Sign.augment/2` for timestamp and revocation evidence, the first-party optional pyHanko long-lived adapter, validator-backed posture classification with distinct integrity/timestamp/revocation/compliance signals, the offline certomancer-backed `long-lived-live-proof` CI lane (now required on `main`), and a truthful `signing.long_lived` support contract that stays separate from blanket PDF/A claims, signer trust, viewer behavior, and multi-signature workflows. Shipped on 2026-05-08 and archived in `milestones/v2.2-ROADMAP.md` / `milestones/v2.2-REQUIREMENTS.md`.
 - [x] Rendro v2.0 delivered unsigned signature-field authoring, deterministic unsigned signature-widget serialization, artifact-first external-signing preparation, truthful signature support language, and backfilled verification artifacts for full audit-grade requirement closure. Shipped on 2026-05-07 and archived in `milestones/v2.0-ROADMAP.md` / `milestones/v2.0-REQUIREMENTS.md`.
 - [x] Rendro v1.10 delivered artifact-first password protection, a first-party optional `qpdf` adapter, password-aware structural validation, protected-artifact-safe delivery seams, proof-backed protection support language, and release-ready protection proof. Shipped at exact tag `v0.2.0`.
@@ -86,10 +86,11 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-- [ ] Record proof-backed per-viewer evidence for forms, protection, signature widgets, signing preparation, signed artifacts, and long-lived signed artifacts, and promote `priv/support_matrix.json` rows only where evidence is recorded.
-- [ ] Establish a durable, repeatable operator-grade viewer-evidence recipe that future surfaces inherit so viewer-proof discipline does not regress under new feature pressure.
-- [ ] Keep viewer claims narrower than blanket "works in every viewer" marketing, blanket compliance narratives, and signer identity trust unless a separate milestone proves them.
-- [ ] Preserve the multi-milestone game plan (v2.3 viewer proof → v2.4 adoption closure → conditional v2.5) so the next planning pass can continue from an explicit trust-and-adoption arc instead of reopening strategy from scratch.
+_No active milestone requirements — v2.3 shipped. Defined by `/gsd-new-milestone` for v2.4. Carried forward into next-milestone scoping:_
+
+- [ ] Close the adoption gap for the most common Phoenix artifact workflows (batteries-included recipes) so teams reach production with documented paths rather than assembling primitives by hand.
+- [ ] Keep viewer claims narrower than blanket "works in every viewer" marketing, blanket compliance narratives, and signer identity trust unless a separate milestone proves them; new surfaces inherit the v2.3 viewer-evidence recording discipline.
+- [ ] Preserve the multi-milestone game plan (v2.4 adoption closure → conditional v2.5 global text shaping) so the next planning pass continues from an explicit trust-and-adoption arc instead of reopening strategy from scratch.
 
 ### Out of Scope
 
@@ -103,7 +104,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 Rendro has now shipped four authored PDF surfaces inside one deterministic pipeline (static content v1.0-v1.2, interactive forms v1.8, document-level embedded files v1.9, curated link annotations v1.9) and one full trust-sensitive stack as artifact-first or optional-adapter seams: protection through `Rendro.Protect` (v1.10), unsigned signature preparation through `Rendro.Sign.prepare/2` (v2.0), cryptographic signing through `Rendro.Sign.sign/2` plus first-party optional runtime adapters (v2.1), and long-lived signature augmentation through `Rendro.Sign.augment/2` plus a dedicated long-lived-live-proof CI lane (v2.2). All of this lands without widening the core rendering contract or the deterministic `build → compose → measure → paginate → render → validate` pipeline.
 
-The remaining trust-and-adoption gaps are now visible on every recorded support row: viewers. Rendro's structural validity, signing integrity, and long-lived posture stories are proof-backed end-to-end, but per-viewer behavior across Acrobat, Preview, PDFium, and PDF.js is still mostly carried as `unverified`. Closing that gap is the highest-leverage next step before any batteries-included adoption push, because it is the only thing standing between recorded engine truth and recorded operator-facing truth.
+As of v2.3 (2026-05-29), per-viewer behavior is no longer carried as blanket `unverified`: every (surface × viewer) cell across forms, protection, signature widgets, signing preparation, signed artifacts, and long-lived artifacts is terminal — recorded `supported` with checked-in evidence or `explicit_deferral` with a named viewer-behavior reason. Recorded engine truth and recorded operator-facing truth are now aligned end-to-end, enforced by the schema validator and the 8th docs-contract lane. The next trust-and-adoption gap is adoption itself: reducing time-to-production for common Phoenix workflows (v2.4), with global text shaping held as a conditional v2.5.
 
 ## Constraints
 
@@ -136,7 +137,12 @@ The remaining trust-and-adoption gaps are now visible on every recorded support 
 | Persist long-lived posture under `metadata.long_lived` and adapter-shaped facts under `metadata.long_lived_adapter`, with explicit non-determinism on every augmented artifact | Keeps shared metadata posture-only, isolates tool-shaped data, and forces truthful determinism labeling | ✓ Shipped in v2.2 |
 | Use an offline certomancer-backed PKI/TSA/OCSP fixture for the required `long-lived-live-proof` lane | Keeps the operationally enforced proof reproducible without depending on any public PKI/TSA/CRL endpoint | ✓ Shipped in v2.2 |
 | Publish long-lived evidence as nested `signing.long_lived` rather than a new top-level family in `priv/support_matrix.json` | Reuses one signing taxonomy and prevents accidental coupling to broad compliance, viewer, or signer-identity rows | ✓ Shipped in v2.2 |
-| `v2.3` should close per-viewer evidence before any batteries-included adoption push | Engine-level truth (structure, signing, long-lived) is now proof-backed; per-viewer truth is the next blocker before stronger adoption claims | → Activated for v2.3 planning |
+| `v2.3` should close per-viewer evidence before any batteries-included adoption push | Engine-level truth (structure, signing, long-lived) is now proof-backed; per-viewer truth is the next blocker before stronger adoption claims | ✓ Shipped in v2.3 |
+| Add `explicit_deferral` as a third matrix row state (alongside `supported`/`unverified`) with a required named reason, rather than leaving non-promotable cells as silent `unverified` | Distinguishes a viewer that fundamentally does not implement a surface from an un-attempted cell; makes coverage honest and auditable | ✓ Shipped in v2.3 |
+| Extend `priv/support_matrix.json` strictly additively (new `evidence:`/`recorded_at:`/`viewer_kind:` fields, new row state) and enforce shape with an in-tree JSON-Schema validator wired to the required `test` job | Lets v1.5–v2.2 readers keep passing while making recording-discipline failures fail CI before merge, not in review | ✓ Shipped in v2.3 |
+| Record viewer evidence as text-only Markdown files under `priv/viewer_evidence/<surface>/<viewer>.md`, fixtures by repo-path or content hash, with a durable operator recipe in `guides/viewer_evidence.md` | Keeps evidence reproducible and PII/secret-free, and makes the discipline inheritable by future surfaces without re-deriving the recipe | ✓ Shipped in v2.3 |
+| Record viewer gaps as `explicit_deferral` rather than widening engine code to please specific viewers | Per-viewer polyfills in the writer would corrupt determinism and manufacture false portability; the gap belongs in the matrix, not the engine | ✓ Shipped in v2.3 |
+| `v2.4` batteries-included adoption closure is the next milestone; conditional `v2.5` global text shaping only if demand justifies the core investment | With engine-level and per-viewer truth both proof-backed, reducing time-to-production is the highest-leverage next step | → Activated for v2.4 planning |
 
 ## Archived Milestone Context
 
@@ -176,8 +182,8 @@ The remaining trust-and-adoption gaps are now visible on every recorded support 
 - `v2.0` shipped signature preparation through narrow authored fields and external-signing seams, not broad cryptographic or compliance claims.
 - `v2.1` added actual cryptographic signing and signed-artifact proof without collapsing integrity, trust, viewer posture, and compliance into one claim.
 - `v2.2` shipped timestamp/revocation evidence and a narrow long-lived-signature posture over the proof-backed signing seam, with `long-lived-live-proof` enforced on `main` and `signing.long_lived` published as its own support taxonomy.
-- `v2.3` is now activated to close per-viewer evidence across all shipped surfaces, promoting `priv/support_matrix.json` viewer rows only where recorded proof exists.
-- The planned follow-on sequence is: batteries-included adoption closure, then global text shaping only if demand keeps justifying the investment.
+- `v2.3` shipped per-viewer evidence closure across all shipped surfaces — every cell terminal (`supported` with recorded proof or `explicit_deferral` with a named reason), enforced by a schema validator and docs-contract lane, with a durable operator recipe for future surfaces.
+- `v2.4` is the planned next milestone: batteries-included adoption closure. Global text shaping (v2.5) follows only if demand keeps justifying the investment.
 - The core deterministic pipeline and the optional-adapter boundary remain non-negotiable.
 
 ## Evolution
@@ -198,4 +204,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-29 after Phase 70 (consolidate already-validated surfaces, VIEWER-01 closed).*
+*Last updated: 2026-05-29 after v2.3 milestone (Viewer Proof & Interop Closure) shipped at tag v0.3.1.*
