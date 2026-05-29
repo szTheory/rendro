@@ -30,10 +30,15 @@ defmodule Guardrails.RequiredChecksContractTest do
     test "advisory contexts document viewer-evidence-live-proof as not required" do
       baseline = load_baseline!()
 
-      [advisory] = baseline["advisory_contexts"]
-      assert advisory["name"] == "viewer-evidence-live-proof"
-      assert advisory["notes"] =~ "not required"
-      assert advisory["notes"] =~ "D-32"
+      viewer = Enum.find(baseline["advisory_contexts"], &(&1["name"] == "viewer-evidence-live-proof"))
+      assert viewer["notes"] =~ "not required"
+      assert viewer["notes"] =~ "D-32"
+
+      example = Enum.find(baseline["advisory_contexts"], &(&1["name"] == "example-phoenix"))
+      assert example, "example-phoenix advisory context must exist"
+      assert example["notes"] =~ "not required"
+      assert example["notes"] =~ "REF-03"
+      refute "example-phoenix" in baseline["required_contexts"]
     end
   end
 
@@ -41,7 +46,7 @@ defmodule Guardrails.RequiredChecksContractTest do
     test "contains required and advisory job keys" do
       ci = File.read!(@ci_path)
 
-      for job <- @required_contexts ++ ["viewer-evidence-live-proof"] do
+      for job <- @required_contexts ++ ["viewer-evidence-live-proof", "example-phoenix"] do
         assert ci =~ "  #{job}:"
       end
     end
@@ -92,7 +97,7 @@ defmodule Guardrails.RequiredChecksContractTest do
       script = File.read!(@verify_docs_path)
 
       lane_entries = Regex.scan(~r/\{"[^"]+", \["test", "test\/docs_contract\/[^"]+"\]\}/, script)
-      assert length(lane_entries) == 8
+      assert length(lane_entries) == 10
 
       assert script =~
                ~s|{"Viewer evidence semantic-claims lane", ["test", "test/docs_contract/viewer_evidence_claims_test.exs"]}|
