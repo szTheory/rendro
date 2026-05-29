@@ -23,7 +23,7 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 - [x] **Phase 69: Operator Recipe + First Cell End-to-End** — Publish `guides/viewer_evidence.md` and walk one full cell (forms × Apple Preview) end-to-end as the canonical worked example. (completed 2026-05-28)
 - [x] **Phase 70: Consolidate Already-Validated Surfaces (Wave 1, parallel-safe)** — Move the five pre-v2.3 `supported` rows into the canonical `priv/viewer_evidence/` home with `evidence:` pointers; no regression in published support. (completed 2026-05-29)
 - [x] **Phase 71: Record New Trust-Sensitive Surfaces and Explicit Deferrals (Wave 2, parallel-safe)** — Walk every remaining (surface × viewer) cell across forms, protection, signature widgets, signing prep, signed artifacts, and long-lived; record promotions or `explicit_deferral` rows.
-- [ ] **Phase 72: Closure — Audit, Polish, and Ship** — Verify cell coverage, confirm engine-level required CI lanes remain green and required, polish guides, record the audit ledger, tag and ship.
+- [x] **Phase 72: Closure — Audit, Polish, and Ship** — Verify cell coverage, confirm engine-level required CI lanes remain green and required, polish guides, record the audit ledger, tag and ship. (completed 2026-05-29)
 
 ## Phase Details
 
@@ -141,7 +141,7 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 | 69. Operator Recipe + First Cell End-to-End | 3/3 | Complete    | 2026-05-28 |
 | 70. Consolidate Already-Validated Surfaces | 3/3 | Complete    | 2026-05-29 |
 | 71. Record New Trust-Sensitive Surfaces and Explicit Deferrals | 3/3 | Complete    | 2026-05-29 |
-| 72. Closure — Audit, Polish, and Ship | 2/3 | In Progress|  |
+| 72. Closure — Audit, Polish, and Ship | 3/3 | Complete   | 2026-05-29 |
 
 ## Requirement Coverage
 

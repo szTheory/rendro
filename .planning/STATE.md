@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.3
 milestone_name: milestone
-status: executing
-last_updated: "2026-05-29T12:38:11.927Z"
+status: verifying
+last_updated: "2026-05-29T13:27:32.134Z"
 last_activity: 2026-05-29
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 15
-  completed_plans: 14
-  percent: 80
+  completed_plans: 15
+  percent: 100
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-07 after v2.2 milestone definition)
 
 Phase: 72 (closure-audit-polish-and-ship) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-05-29
 Resume: .planning/phases/72-closure-audit-polish-and-ship/72-CONTEXT.md
 
@@ -101,7 +101,9 @@ Items still deferred or intentionally left outside the active milestone as of 20
 | workflows | Multi-signature workflows and signer orchestration | deferred beyond `v2.2` |
 | globalization | Global text shaping, RTL support, and broader script coverage | deferred to a later candidate milestone unless urgency changes |
 | Phase 72 P02 | 25min | 4 tasks | 6 files |
+| Phase 72 P03 | 35min | 5 tasks | 11 files |
 
 ## Operator Next Steps
 
-- Plan phase 72 with /gsd-plan-phase 72
+- Verify phase 72 with /gsd-verify-phase 72 (all three waves complete; 72-VERIFICATION finalized, status gaps_found scoped to GITHUB_TOKEN live audit)
+- Operator ship sequence (D-15): merge → run branch-protection audit with GITHUB_TOKEN → tag v0.3.1 + push (release.yml publishes) → /gsd-audit-milestone v2.3 → /gsd-complete-milestone v2.3
