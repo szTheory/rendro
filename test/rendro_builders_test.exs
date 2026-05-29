@@ -357,6 +357,13 @@ defmodule RendroBuildersTest do
       end
     end
 
+    test "page_number/1 builds a Block containing a Text with page-number tokens" do
+      block = Rendro.page_number()
+      assert %Block{content: %Text{content: content}} = block
+      assert content =~ "{{page_number}}"
+      assert content =~ "{{total_pages}}"
+    end
+
     test "builders reject unknown keys via struct!" do
       assert_raise KeyError, fn ->
         Rendro.text("hello", bogus: true)

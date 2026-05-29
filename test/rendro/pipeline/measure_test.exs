@@ -123,6 +123,59 @@ defmodule Rendro.Pipeline.MeasureTest do
       assert_in_delta hd(result.content).height, 14.4, 1.0e-9
     end
 
+    test "subtracts header and footer region heights from body region height" do
+      template =
+        %PageTemplate{
+          name: :with_footer,
+          regions: [
+            %Region{
+              name: :header,
+              role: :header,
+              anchor: :top,
+              x: 72,
+              y: 72,
+              width: 451.28,
+              height: 0
+            },
+            %Region{
+              name: :body,
+              role: :body,
+              anchor: :flow,
+              x: 72,
+              y: 72,
+              width: 451.28,
+              height: 540
+            },
+            %Region{
+              name: :footer,
+              role: :footer,
+              anchor: :bottom,
+              x: 72,
+              y: 612,
+              width: 451.28,
+              height: 36
+            }
+          ]
+        }
+
+      doc =
+        %Rendro.Document{
+          page_template: :with_footer,
+          page_templates: [template],
+          content: [Rendro.block(Rendro.text("Line item"))],
+          header: [],
+          footer: [Rendro.block(Rendro.text("Footer text"), height: 36)],
+          metadata: %Rendro.Metadata{}
+        }
+
+      assert {:ok, composed} = Compose.run(doc)
+      assert {:ok, result} = Measure.run(composed)
+
+      layout = result.options.layout
+
+      assert_in_delta layout.body_capacity, 504, 1.0e-9
+    end
+
     test "identical input yields identical wrapped lines" do
       doc =
         %Rendro.Document{

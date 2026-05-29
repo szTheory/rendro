@@ -187,6 +187,24 @@ defmodule Rendro.DeterministicTest do
     end
   end
 
+  describe "running-region determinism (D-11)" do
+    test "(a) two deterministic renders with running footer are byte-identical" do
+      flunk "not yet implemented"
+    end
+
+    test "(b) body_capacity is identical for 9-page vs 100-page document" do
+      flunk "not yet implemented"
+    end
+
+    test "(c) page count and body-block assignment identical with total_pages vs static placeholder" do
+      flunk "not yet implemented"
+    end
+
+    test "(d) replace_page_numbers does not change MeasuredText geometry" do
+      flunk "not yet implemented"
+    end
+  end
+
   defp simple_doc do
     text = %Rendro.Text{content: "Hello World", font: "Helvetica", size: 12, color: {0, 0, 0}}
     block = %Rendro.Block{content: text, x: 0, y: 0}
