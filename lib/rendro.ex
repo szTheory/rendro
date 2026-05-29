@@ -298,6 +298,38 @@ defmodule Rendro do
     |> then(&struct!(Table, &1))
   end
 
+  @doc """
+  Returns `{header_height, row_heights}` (in points) for `rows` laid out as a
+  `Rendro.table/2` of total `width`, using `document`'s font metrics.
+
+  This is a **read-only** projection of the engine's OWN table measurement: it
+  builds an ephemeral table, measures it through the same private measurement
+  logic the paginator uses, and returns the geometry. It does not paginate,
+  render, cache, or mutate any engine state, so PAGE-04 single-pass behavior is
+  unchanged.
+
+  It exists so recipes can chunk transaction rows by the engine's actual row
+  heights — rather than a recipe-local estimate that would drift into
+  `:content_overflow` — and therefore place page breaks and carried/brought-forward
+  rows on the correct pages.
+
+  `table_opts` are forwarded to `Rendro.table/2` (e.g. `:header`, `:columns`).
+  Raises `ArgumentError` if the table cannot be measured (e.g. unsupported glyph).
+  """
+  @spec measure_rows([Table.row()], number(), Document.t(), keyword()) ::
+          {number(), [number()]}
+  def measure_rows(rows, width, %Document{} = document, table_opts \\ [])
+      when is_list(rows) and is_number(width) and is_list(table_opts) do
+    case Pipeline.Measure.measure_rows(document, rows, width, table_opts) do
+      {:ok, {header_height, row_heights}} ->
+        {header_height, row_heights}
+
+      {:error, reason} ->
+        raise ArgumentError,
+              "Rendro.measure_rows/4 could not measure the table: #{inspect(reason)}"
+    end
+  end
+
   defp normalize_table_attrs(attrs) do
     case Keyword.get(attrs, :split_policy, :row_atomic) do
       :row_atomic ->
