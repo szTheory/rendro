@@ -10,7 +10,7 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Active milestone:** v2.4 Batteries-Included Workflow & Adoption Closure (planning started 2026-05-29; phase numbering continues from 73). The proof/trust axis is at diminishing returns — the remaining leverage is adoption ergonomics. **Phase 73 (Page-Numbering / Running-Region Primitive) complete 2026-05-29** — running header/footer regions with single-pass deterministic `{{page_number}}`/`{{total_pages}}` substitution (the `fn {page, total}` primitive + `page_number/1` helper + `suppress_on` selector), `body_capacity` now subtracts overlapping non-body region heights (overlap fix closed), all proven by the four-property D-11 determinism suite. Next: Phase 74 (Statement recipe) consumes this primitive.
+**Active milestone:** v2.4 Batteries-Included Workflow & Adoption Closure (planning started 2026-05-29; phase numbering continues from 73). The proof/trust axis is at diminishing returns — the remaining leverage is adoption ergonomics. **Phase 74 (Statement recipe) complete 2026-05-29** — `Rendro.Recipes.Statement` is the first end-to-end consumer of the PAGE primitive: a caller with account-transaction data generates a multi-page billing statement with correct "Page X of Y" footers and carried-forward / brought-forward balances, all through the three-rung escape hatch (`document/2` → `page_template/1` → `sections/2`) consistent with `Invoice`. Engine enablers landed first (`Rendro.measure_rows/4` for recipe-owned chunking by the engine's own row heights; the pure locale-free `Rendro.Format` module), the running-balance fold is exact signed Decimal, and `validate_data!/1` is errors-as-product including a `Decimal.equal?/2` assertion on caller-supplied closing balances (STMT-01..04). Verified passed after closing two code-review gaps (CR-01 descending-range guard in `measure_rows`; WR-01 top-level closing-balance validation). Previously: **Phase 73 (Page-Numbering / Running-Region Primitive) complete 2026-05-29** — the `fn {page, total}` running header/footer primitive + `page_number/1` helper + `suppress_on` selector with single-pass deterministic substitution. Next: Phase 75 (Receipt/Report and Certificate recipes + support contract).
 
 **Shipped Version:** v2.3 Viewer Proof & Interop Closure (2026-05-29, tag v0.3.1)
 
@@ -214,4 +214,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-29 — milestone v2.4 (Batteries-Included Workflow & Adoption Closure); Phase 73 (Page-Numbering / Running-Region Primitive) complete — PAGE-01..04 delivered, 747 tests green.*
+*Last updated: 2026-05-29 — milestone v2.4 (Batteries-Included Workflow & Adoption Closure); Phase 74 (Statement recipe) complete — STMT-01..04 delivered via `Rendro.Recipes.Statement`, `Rendro.measure_rows/4` + `Rendro.Format` enablers landed, 817 tests green.*
