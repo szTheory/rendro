@@ -1,9 +1,11 @@
 ---
-status: gaps_found
+status: passed
 phase: 72-closure-audit-polish-and-ship
 verified: 2026-05-29T18:00:00Z
+closed: 2026-05-29T19:30:00Z
 requirements: [GUARDRAIL-02]
 score: 10/10
+note: "Recorded gaps_found at phase-verify time pending the token-gated live branch-protection audit; that audit ran and passed during /gsd-audit-milestone v2.3 (2026-05-29T19:30Z), closing the only open item. Status promoted to passed."
 ---
 
 # Phase 72 Verification Report (Plans 72-01 / 72-02 / 72-03)
@@ -25,7 +27,7 @@ score: 10/10
 | 7 | Machine `list --json` ledger (no hand-maintained 26-row table) | PASS | Matrix Ledger section |
 | 8 | Trust-sensitive spot-check ≥8 rows (D-19) | PASS | Spot-check table below |
 | 9 | GUARDRAIL-02 offline contract test green | PASS | 11 tests, 0 failures |
-| 10 | Live audit snapshot on `main` | PENDING | `GITHUB_TOKEN` unset — operator run before tag |
+| 10 | Live audit snapshot on `main` | PASS | Run 2026-05-29T19:30Z with gh token — exit 0, contexts match baseline (see GUARDRAIL-02 section) |
 
 ## Matrix Ledger (machine export)
 
@@ -77,11 +79,13 @@ Offline contract: `test/guardrails/required_checks_contract_test.exs` — **PASS
 
 Command: `mix run scripts/audit_branch_protection.exs`
 
-**Not run** — `GITHUB_TOKEN` unset in verification environment. Operator must run before v2.3 tag and paste normalized JSON:
+**Run 2026-05-29T19:30Z** during `/gsd-audit-milestone v2.3`, using the repo-admin `gh` token (`GITHUB_TOKEN=$(gh auth token)`). **Result: PASS (exit 0).** Live required-check list matches the baseline exactly (`strict: true`, four engine-level contexts present, none dropped):
 
 ```json
-{"strict": true, "contexts": ["long-lived-live-proof", "release-proof", "signing-live-proof", "test"]}
+{"contexts": ["long-lived-live-proof", "release-proof", "signing-live-proof", "test"], "strict": true}
 ```
+
+GUARDRAIL-02 satisfied — the required-check list grew or stayed flat, never shrank; no behavioral lane diluted by viewer-evidence work.
 
 ## Automated Checks Run
 
@@ -162,4 +166,4 @@ Viewer evidence validation passed.
 
 ## Gaps
 
-- `GITHUB_TOKEN unset — live branch-protection audit pending before tag` (D-06). Re-run `mix run scripts/audit_branch_protection.exs` with a repo admin read token and update this file with an ISO-8601 timestamp + fenced JSON snapshot. This is an accepted operator action (no code/contract change required); all in-repo automated ship-gate checks are green.
+None. The previously-open item — `GITHUB_TOKEN unset — live branch-protection audit pending` (D-06) — was closed on 2026-05-29T19:30Z during `/gsd-audit-milestone v2.3`: `mix run scripts/audit_branch_protection.exs` ran with a repo-admin gh token and returned `{"contexts":["long-lived-live-proof","release-proof","signing-live-proof","test"],"strict":true}` (exit 0). All ship-gate checks are green. Remaining operator action is the tag push itself (`git tag v0.3.1 && git push origin v0.3.1`).

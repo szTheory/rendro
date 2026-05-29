@@ -1,7 +1,7 @@
 # Requirements: Rendro v2.3 Viewer Proof & Interop Closure
 
 **Defined:** 2026-05-08
-**Status:** In progress (Phase 68 complete; gap closure phases 69–72 operationalized 2026-05-28)
+**Status:** Complete (all 19 requirements satisfied; milestone audit passed 2026-05-29)
 **Core Value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
 
 ## Milestone Goal
@@ -29,12 +29,12 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 ### Recorded Per-Viewer Evidence
 
 - [x] **VIEWER-01**: The five existing `supported` viewer rows shipped before v2.3 (forms × Apple Preview from v1.8 Phase 47; embedded_files × Acrobat, links × Acrobat, links × Apple Preview from v1.9; protection × Apple Preview from v1.10 Phase 54) are consolidated into the canonical `priv/viewer_evidence/<surface>/<viewer>.md` home with `evidence:` pointers added to their matrix entries, with no regression in published support.
-- [ ] **VIEWER-02**: A `forms` per-viewer behavioral checklist (`open` → `default_state_visible` → `edit_or_toggle` → `save`) is recorded against Adobe Acrobat Reader; the matrix `forms.viewers.acrobat_reader` row is promoted to `supported` with an `evidence:` pointer.
-- [ ] **VIEWER-03**: A `protection` per-viewer behavioral checklist (`opens_with_open_password` → `displays_authored_content_correctly` → `advisory_print_behavior` → `advisory_copy_behavior` → `save_and_reopen_readability`) is recorded against Adobe Acrobat Reader; the matrix `protection.viewers.acrobat_reader` row is promoted to `supported` with an `evidence:` pointer.
-- [ ] **VIEWER-04**: A `signature widgets` per-viewer behavioral checklist (`opens_without_signature_warning_or_with_truthful_warning` → `widget_renders_as_unsigned_placeholder_rectangle` → `does_not_falsely_claim_signed` → `signature_panel_or_equivalent_reports_unsigned_or_silent` → `save_and_reopen_preserves_widget`) is recorded against Adobe Acrobat Reader, Apple Preview, and PDFium where the viewer renders the placeholder truthfully; PDF.js × signature widgets is recorded as `explicit_deferral` with the Mozilla `#4202` non-implementation as the named reason.
-- [ ] **VIEWER-05**: A `signing preparation` per-viewer behavioral checklist (`prepared_artifact_opens_cleanly` → `widget_renders_as_unsigned_placeholder` → `viewer_does_not_silently_re_sign_or_corrupt` → `byte_range_layout_intact_after_save_as`) is recorded against Adobe Acrobat Reader, with a documented equivalence note in `guides/api_stability.md` for viewers where signing-prep and signature-widget cells are behaviorally indistinguishable.
-- [ ] **VIEWER-06**: A `signed artifacts` per-viewer behavioral checklist (`opens_signed_artifact_without_corruption` → `appearance_renders` → `integrity_reported_truthfully` → `certificate_trust_reported_separately` → `save_and_reopen_preserves_signature_or_warns`) is recorded against Adobe Acrobat Reader with integrity and trust captured as separate signals; Apple Preview × signed artifacts and PDF.js × signed artifacts are recorded as `explicit_deferral` rows naming the viewer's lack of `/Sig` validation (and Preview's append-save invalidation behavior) as the reason.
-- [ ] **VIEWER-07**: A `long-lived signed artifacts` per-viewer behavioral checklist (`opens_long_lived_artifact_without_corruption` → `timestamp_recognized_or_silent` → `revocation_evidence_recognized_or_silent` → `posture_reported_truthfully` → `expiry_behavior_honest`) is recorded against Adobe Acrobat Reader using the certomancer-backed long-lived fixture chain; Apple Preview, PDFium, and PDF.js × long-lived rows are recorded as `explicit_deferral` with "viewer does not implement long-term-validation indicators" as the named reason.
+- [x] **VIEWER-02**: A `forms` per-viewer behavioral checklist (`open` → `default_state_visible` → `edit_or_toggle` → `save`) is recorded against Adobe Acrobat Reader; the matrix `forms.viewers.acrobat_reader` row is promoted to `supported` with an `evidence:` pointer.
+- [x] **VIEWER-03**: A `protection` per-viewer behavioral checklist (`opens_with_open_password` → `displays_authored_content_correctly` → `advisory_print_behavior` → `advisory_copy_behavior` → `save_and_reopen_readability`) is recorded against Adobe Acrobat Reader; the matrix `protection.viewers.acrobat_reader` row is promoted to `supported` with an `evidence:` pointer.
+- [x] **VIEWER-04**: A `signature widgets` per-viewer behavioral checklist (`opens_without_signature_warning_or_with_truthful_warning` → `widget_renders_as_unsigned_placeholder_rectangle` → `does_not_falsely_claim_signed` → `signature_panel_or_equivalent_reports_unsigned_or_silent` → `save_and_reopen_preserves_widget`) is recorded against Adobe Acrobat Reader, Apple Preview, and PDFium where the viewer renders the placeholder truthfully; PDF.js × signature widgets is recorded as `explicit_deferral` with the Mozilla `#4202` non-implementation as the named reason.
+- [x] **VIEWER-05**: A `signing preparation` per-viewer behavioral checklist (`prepared_artifact_opens_cleanly` → `widget_renders_as_unsigned_placeholder` → `viewer_does_not_silently_re_sign_or_corrupt` → `byte_range_layout_intact_after_save_as`) is recorded against Adobe Acrobat Reader, with a documented equivalence note in `guides/api_stability.md` for viewers where signing-prep and signature-widget cells are behaviorally indistinguishable.
+- [x] **VIEWER-06**: A `signed artifacts` per-viewer behavioral checklist (`opens_signed_artifact_without_corruption` → `appearance_renders` → `integrity_reported_truthfully` → `certificate_trust_reported_separately` → `save_and_reopen_preserves_signature_or_warns`) is recorded against Adobe Acrobat Reader with integrity and trust captured as separate signals; Apple Preview × signed artifacts and PDF.js × signed artifacts are recorded as `explicit_deferral` rows naming the viewer's lack of `/Sig` validation (and Preview's append-save invalidation behavior) as the reason.
+- [x] **VIEWER-07**: A `long-lived signed artifacts` per-viewer behavioral checklist (`opens_long_lived_artifact_without_corruption` → `timestamp_recognized_or_silent` → `revocation_evidence_recognized_or_silent` → `posture_reported_truthfully` → `expiry_behavior_honest`) is recorded against Adobe Acrobat Reader using the certomancer-backed long-lived fixture chain; Apple Preview, PDFium, and PDF.js × long-lived rows are recorded as `explicit_deferral` with "viewer does not implement long-term-validation indicators" as the named reason.
 
 ### Discipline Guardrails
 
@@ -84,12 +84,12 @@ Populated by gsd-roadmapper on 2026-05-08 from the v2.3 roadmap (phases 68–72)
 | RECIPE-04 | 68 | Complete |
 | RECIPE-05 | 69 | Complete |
 | VIEWER-01 | 70 | Complete |
-| VIEWER-02 | 71 | Pending |
-| VIEWER-03 | 71 | Pending |
-| VIEWER-04 | 71 | Pending |
-| VIEWER-05 | 71 | Pending |
-| VIEWER-06 | 71 | Pending |
-| VIEWER-07 | 71 | Pending |
+| VIEWER-02 | 71 | Complete |
+| VIEWER-03 | 71 | Complete |
+| VIEWER-04 | 71 | Complete |
+| VIEWER-05 | 71 | Complete |
+| VIEWER-06 | 71 | Complete |
+| VIEWER-07 | 71 | Complete |
 | GUARDRAIL-01 | 68 | Complete |
 | GUARDRAIL-02 | 72 | Complete |
 | GUARDRAIL-03 | 68 | Complete |
@@ -111,4 +111,4 @@ Populated by gsd-roadmapper on 2026-05-08 from the v2.3 roadmap (phases 68–72)
 
 ---
 *Requirements defined: 2026-05-08*
-*Last updated: 2026-05-28 after v2.3 milestone audit gap closure (phases 69–72 confirmed; 11 requirements pending).*
+*Last updated: 2026-05-29 after v2.3 milestone audit passed — all 19 requirements satisfied (phases 68–72 verified; VIEWER-02..07 traceability drift corrected).*
