@@ -5,15 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.3.0] - Unreleased
+## [0.3.1] - Unreleased
 
-This release lifts the v1.5–v2.2 milestone work onto Hex. The 0.2.0 published surface ended at password-to-open protection; 0.3.0 adds validation/trust surfaces, interactive forms, embedded artifacts, signature widgets and signing preparation, cryptographic signing, and long-lived signature evidence — every public claim backed by `priv/support_matrix.json` rows and either a structural or live-tool proof lane. Phase 71 closes all trust-sensitive viewer cells as `supported` with CI structural-proxy evidence or `explicit_deferral` with named reasons — zero bare `unverified` rows remain in those surfaces.
+This release lands the v2.3 Viewer Evidence milestone onto Hex. The published `0.3.0` surface lifted v1.5–v2.2 work but left per-viewer evidence as the next milestone with trust-sensitive viewer rows recorded as `unverified`. Phase 71 closes all trust-sensitive viewer cells as `supported` with CI structural-proxy evidence or `explicit_deferral` with named reasons — zero bare `unverified` rows remain in those surfaces. Operator-only evidence artifacts (`priv/viewer_evidence/` and `priv/support_matrix.json`) intentionally remain out of the Hex package; the public contract is mirrored in `guides/api_stability.md`.
 
 ### Added
 
 #### Viewer Evidence (v2.3)
-
-##### Added
 
 - `Rendro.Adapters.Pdfium` optional PATH-discovered adapter for pdfium-cli form/info observation used by the viewer-evidence live-proof lane.
 - `mix rendro.viewer_evidence record forms chrome_pdfium` to autogenerate evidence files from pdfium-cli observations.
@@ -26,9 +24,10 @@ This release lifts the v1.5–v2.2 milestone work onto Hex. The 0.2.0 published 
 - Promoted `protection.viewers.adobe_acrobat_reader` to `supported` with evidence at `priv/viewer_evidence/protection/adobe_acrobat_reader.md`.
 - Phase 71 structural-proxy proof modules: `FormsAcrobatProof`, `ProtectionAcrobatProof`, `SignatureWidgetAcrobatProof`, `SignatureWidgetApplePreviewProof`, `SigningPreparationPdfiumProof`, `SignedArtifactAcrobatProof`, `LongLivedAcrobatProof`.
 - `viewer-evidence-live-proof` CI lane extended with pdfsig/pyhanko and Phase 71 live tests (`trust_sensitive_viewer_evidence_live_test.exs` and related adapters).
+- `mix rendro.viewer_evidence validate --strict` operator staleness gate (exit 1 on `recorded_at` older than 180 days); advisory and **not** merge-blocking in CI.
 - Explicit deferrals for `forms.viewers.pdfjs`, `forms.signature_widget_viewers.pdfjs`, `signing_preparation.viewers.pdfjs`, `signing.viewers.apple_preview`, `signing.viewers.pdfjs`, `signing.long_lived.viewers.{apple_preview,chrome_pdfium,pdfjs}`, and `embedded_files.viewers.apple_preview` with named reasons in `priv/support_matrix.json`.
 
-##### Changed
+### Changed
 
 - Document viewer-evidence CHANGELOG discipline in `guides/api_stability.md` — promotions, explicit deferrals, and legacy re-homes require CHANGELOG entries; re-validations refresh `recorded_at` in the log.
 - Re-home `forms.viewers.apple_preview` evidence to `priv/viewer_evidence/forms/apple_preview.md` (**support status unchanged** since v1.8 Phase 47).
@@ -38,6 +37,17 @@ This release lifts the v1.5–v2.2 milestone work onto Hex. The 0.2.0 published 
 - Re-home `protection.viewers.apple_preview` evidence to `priv/viewer_evidence/protection/apple_preview.md` (**support status unchanged** since v1.10 Phase 54).
 - Signing-preparation equivalence note in `guides/api_stability.md`: non-Acrobat `signing_preparation` rows inherit `signature_widget` evidence; Acrobat requires independent byte-range evidence.
 - `embedded_files.viewers.apple_preview` status changed from `unverified` to `explicit_deferral` after Phase 71 re-verify (Attachments UI gap named explicitly).
+
+### Truthful Boundaries Held
+
+- `priv/support_matrix.json` and `guides/api_stability.md` keep unsupported narratives (HTML/CSS parity, browser-style layout, signer-identity trust by default, broad compliance branding, viewer promotion without recorded evidence, multi-signature workflows, HSM/key custody in core, remote asset fetching, broad complex-script support) explicit. Every supported viewer row is backed by recorded checklist proof; trust-sensitive surfaces without recorded proof use `explicit_deferral` with named reasons rather than bare `unverified`.
+- The canonical protected-delivery recipe documented in 0.2.0 stays unchanged: `render_to_artifact -> Protect.password -> store/deliver`. Signing seams (`prepare/2`, `sign/2`, `augment/2`) live alongside protection on the artifact boundary, never inside `Rendro.render/2`.
+
+## [0.3.0] - 2026-05-08
+
+This release lifts the v1.5–v2.2 milestone work onto Hex. The 0.2.0 published surface ended at password-to-open protection; 0.3.0 adds validation/trust surfaces, interactive forms, embedded artifacts, signature widgets and signing preparation, cryptographic signing, and long-lived signature evidence — every public claim backed by `priv/support_matrix.json` rows and either a structural or live-tool proof lane. Per-viewer evidence remains the next milestone (v2.3) and is intentionally still recorded as `unverified` outside the rows that have promoted proof.
+
+### Added
 
 #### Validation and Trust Surfaces (v1.5)
 
@@ -85,8 +95,8 @@ This release lifts the v1.5–v2.2 milestone work onto Hex. The 0.2.0 published 
 
 ### Truthful Boundaries Held
 
-- `priv/support_matrix.json` and `guides/api_stability.md` keep unsupported narratives (HTML/CSS parity, browser-style layout, signer-identity trust by default, broad compliance branding, viewer promotion without recorded evidence, multi-signature workflows, HSM/key custody in core, remote asset fetching, broad complex-script support) explicit. Every supported viewer row is backed by recorded checklist proof; trust-sensitive surfaces without recorded proof use `explicit_deferral` with named reasons rather than bare `unverified`.
-- The canonical protected-delivery recipe documented in 0.2.0 stays unchanged: `render_to_artifact -> Protect.password -> store/deliver`. Signing seams (`prepare/2`, `sign/2`, `augment/2`) live alongside protection on the artifact boundary, never inside `Rendro.render/2`.
+- `priv/support_matrix.json` and `guides/api_stability.md` keep unsupported narratives (HTML/CSS parity, browser-style layout, signer-identity trust by default, broad compliance branding, viewer promotion without recorded evidence, multi-signature workflows, HSM/key custody in core, remote asset fetching, broad complex-script support) explicit. Every supported viewer row is backed by recorded checklist proof; rows without recorded proof remain `unverified` rather than being promoted.
+- The canonical protected-delivery recipe documented in 0.2.0 stays unchanged: signing seams (`prepare/2`, `sign/2`, `augment/2`) live alongside protection on the artifact boundary, never inside `Rendro.render/2`.
 
 ## [0.2.0] - 2026-05-06
 
