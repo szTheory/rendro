@@ -20,15 +20,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-07 after v2.2 milestone definition)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 70 — consolidate-already-validated-surfaces
+**Current focus:** Phase 71 — record-new-trust-sensitive-surfaces-and-explicit-deferrals
 
 ## Current Position
 
 Phase: 71
 Plan: Not started
-Status: Executing Phase 70
+Status: Phase 71 context gathered — ready for planning
 Last activity: 2026-05-29
-Resume: .planning/phases/70-consolidate-already-validated-surfaces/70-CONTEXT.md
+Resume: .planning/phases/71-record-new-trust-sensitive-surfaces-and-explicit-deferrals/71-CONTEXT.md
 
 ## Milestone Snapshot
 
