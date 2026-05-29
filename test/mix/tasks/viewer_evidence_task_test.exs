@@ -14,7 +14,7 @@ defmodule Mix.Tasks.Rendro.ViewerEvidenceTest do
       assert result == :ok
       output = Enum.join(messages, "\n")
       assert output =~ "Viewer evidence: 26 cells"
-      assert output =~ "supported=6, unverified=20, explicit_deferral=0"
+      assert output =~ "supported=17, unverified=0, explicit_deferral=9"
       refute output =~ "legacy: missing evidence pointer"
     end
 
@@ -26,9 +26,9 @@ defmodule Mix.Tasks.Rendro.ViewerEvidenceTest do
 
       assert {:ok, payload} = JSON.decode(json_output)
       assert payload["summary"]["total"] == 26
-      assert payload["summary"]["supported"] == 6
-      assert payload["summary"]["unverified"] == 20
-      assert payload["summary"]["explicit_deferral"] == 0
+      assert payload["summary"]["supported"] == 17
+      assert payload["summary"]["unverified"] == 0
+      assert payload["summary"]["explicit_deferral"] == 9
       assert length(payload["cells"]) == 26
 
       assert Enum.all?(payload["cells"], fn cell ->
@@ -40,28 +40,24 @@ defmodule Mix.Tasks.Rendro.ViewerEvidenceTest do
   end
 
   describe "missing/1" do
-    test "exits 1 when unverified cells exist" do
-      {messages, exit_reason} =
-        capture_shell_messages(fn ->
-          catch_exit(ViewerEvidence.run(["missing"]))
-        end)
+    test "exits 0 when no unverified cells remain after Phase 71 closure" do
+      {messages, result} = capture_shell_messages(fn -> ViewerEvidence.run(["missing"]) end)
 
-      assert exit_reason == {:shutdown, 1}
+      assert result == :ok
       output = Enum.join(messages, "\n")
-      assert output =~ "20 unverified viewer cell(s)"
+      assert output =~ "No unverified cells"
     end
 
-    test "--json filters to unverified cells only" do
+    test "--json reports empty unverified backlog" do
       json_output =
         capture_io(fn ->
-          catch_exit(ViewerEvidence.run(["missing", "--json"]))
+          assert :ok = ViewerEvidence.run(["missing", "--json"])
         end)
 
       assert {:ok, payload} = JSON.decode(json_output)
-      assert payload["summary"]["total"] == 20
-      assert payload["summary"]["unverified"] == 20
-      assert payload["summary"]["supported"] == 0
-      assert Enum.all?(payload["cells"], &(&1["status"] == "unverified"))
+      assert payload["summary"]["total"] == 0
+      assert payload["summary"]["unverified"] == 0
+      assert payload["cells"] == []
     end
   end
 

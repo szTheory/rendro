@@ -226,13 +226,13 @@ defmodule Rendro.ViewerEvidence.ValidatorTest do
     end
 
     @tag :matrix_walker
-    test "production matrix status split is 5 supported, 21 unverified, 0 explicit_deferral" do
+    test "production matrix status split is 17 supported, 0 unverified, 9 explicit_deferral" do
       matrix = Matrix.load!()
       cells = Matrix.enumerate_viewer_cells(matrix)
 
-      assert Enum.count(cells, &(&1.status == "supported")) == 6
-      assert Enum.count(cells, &(&1.status == "unverified")) == 20
-      assert Enum.count(cells, &(&1.status == "explicit_deferral")) == 0
+      assert Enum.count(cells, &(&1.status == "supported")) == 17
+      assert Enum.count(cells, &(&1.status == "unverified")) == 0
+      assert Enum.count(cells, &(&1.status == "explicit_deferral")) == 9
     end
 
     @tag :matrix_walker
@@ -302,9 +302,9 @@ defmodule Rendro.ViewerEvidence.ValidatorTest do
       statuses = collect_viewer_statuses(matrix)
 
       assert length(statuses) == 26
-      assert Enum.count(statuses, &(&1 == "supported")) == 6
-      assert Enum.count(statuses, &(&1 == "unverified")) == 20
-      assert Enum.count(statuses, &(&1 == "explicit_deferral")) == 0
+      assert Enum.count(statuses, &(&1 == "supported")) == 17
+      assert Enum.count(statuses, &(&1 == "unverified")) == 0
+      assert Enum.count(statuses, &(&1 == "explicit_deferral")) == 9
     end
 
     @tag :schema_contract

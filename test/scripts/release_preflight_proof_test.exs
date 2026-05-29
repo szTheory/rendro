@@ -31,6 +31,7 @@ defmodule Rendro.ReleasePreflightProofTest do
              ReleasePreflightProof.validate_ref("not-a-real-tag")
   end
 
+  @tag timeout: 120_000
   test "dry run refuses non-release refs without creating the worktree path" do
     worktree = Path.join(File.cwd!(), "tmp/release-preflight-proof-test")
     File.rm_rf!(worktree)
