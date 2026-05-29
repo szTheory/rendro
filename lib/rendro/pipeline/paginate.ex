@@ -397,14 +397,19 @@ defmodule Rendro.Pipeline.Paginate do
   end
 
   defp apply_page_template(%Page{} = page, idx, layout, total) do
+    region_suppress_on = Map.get(layout, :region_suppress_on, %{})
+
     anchored_blocks =
       layout.template.regions
       |> Enum.reject(&(&1.name == :body))
       |> Enum.flat_map(fn region ->
+        suppress_on = Map.get(region_suppress_on, region.name)
+
         anchored_region_blocks =
           layout.region_blocks
           |> Map.get(region.name, [])
-          # [Plan 04: fn evaluation and suppression inserted here]
+          |> apply_suppression(suppress_on, idx)
+          |> evaluate_fn_blocks(idx, total)
           |> replace_page_numbers(idx, total)
           |> anchor_region_blocks(region, page)
 
@@ -450,6 +455,43 @@ defmodule Rendro.Pipeline.Paginate do
           block
       end
     end)
+  end
+
+  defp evaluate_fn_blocks(blocks, page_num, total) do
+    Enum.flat_map(blocks, fn block ->
+      case block.content do
+        %Rendro.RunningContent{fun: fun} ->
+          try do
+            result = fun.({page_num, total})
+
+            case result do
+              nil -> []
+              [] -> []
+              list when is_list(list) -> list
+              single -> [single]
+            end
+          rescue
+            reason ->
+              raise Rendro.Error.from_stage(:paginate, {:running_content_error, inspect(reason)},
+                      %{details: %{page_num: page_num}}
+                    )
+          end
+
+        _ ->
+          [block]
+      end
+    end)
+  end
+
+  defp apply_suppression(blocks, suppress_on, page_idx) do
+    case suppress_on do
+      nil -> blocks
+      :first when page_idx == 1 -> []
+      :first -> blocks
+      {:pages, page_list} when is_list(page_list) ->
+        if page_idx in page_list, do: [], else: blocks
+      _ -> blocks
+    end
   end
 
   defp anchor_region_blocks(blocks, %Region{} = region, %Page{} = page) do

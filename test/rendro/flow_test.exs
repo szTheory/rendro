@@ -144,11 +144,173 @@ defmodule Rendro.FlowTest do
   end
 
   test "suppress_on: :first suppresses footer on first page only" do
-    flunk "not yet implemented"
+    # Build a 2-page document using an explicit template with a footer section
+    # that has suppress_on: :first. Page 1 should have no footer blocks; page 2 should.
+    template =
+      Rendro.page_template(
+        name: :suppress_first_test,
+        width: 420,
+        height: 220,
+        margin_top: 20,
+        margin_right: 24,
+        margin_bottom: 20,
+        margin_left: 24,
+        regions: [
+          Rendro.region(
+            name: :body,
+            role: :body,
+            anchor: :flow,
+            x: 24,
+            y: 52,
+            width: 372,
+            height: 60
+          ),
+          Rendro.region(
+            name: :footer,
+            role: :footer,
+            anchor: :bottom,
+            x: 24,
+            y: 180,
+            width: 372,
+            height: 16
+          )
+        ]
+      )
+
+    footer_section =
+      Rendro.section(
+        region: :footer,
+        content: [Rendro.block(Rendro.text("Page {{page_number}}"))],
+        suppress_on: :first
+      )
+
+    content = for i <- 1..8, do: Rendro.block(Rendro.text("Line #{i}"))
+
+    doc =
+      Rendro.flow(
+        content,
+        page_template: :suppress_first_test,
+        page_templates: [template],
+        sections: [footer_section]
+      )
+
+    {:ok, built} = Build.run(doc)
+    {:ok, composed} = Compose.run(built)
+    {:ok, measured} = Measure.run(composed)
+    assert {:ok, paginated} = Paginate.run(measured)
+
+    assert length(paginated.pages) >= 2
+
+    [page1, page2 | _] = paginated.pages
+
+    # Page 1: footer is suppressed — no footer block should appear
+    footer_blocks_p1 =
+      Enum.filter(page1.blocks, fn block ->
+        case block.content do
+          %MeasuredText{source: %Rendro.Text{content: "Page 1"}} -> true
+          %Rendro.Text{content: "Page " <> _} -> true
+          _ -> false
+        end
+      end)
+
+    assert footer_blocks_p1 == [],
+           "expected no footer on page 1 (suppressed), got #{inspect(footer_blocks_p1)}"
+
+    # Page 2: footer renders normally — "Page 2" block should appear
+    footer_block_p2 =
+      Enum.find(page2.blocks, fn block ->
+        case block.content do
+          %MeasuredText{source: %Rendro.Text{content: "Page 2"}} -> true
+          %Rendro.Text{content: "Page 2"} -> true
+          _ -> false
+        end
+      end)
+
+    assert footer_block_p2 != nil,
+           "expected footer 'Page 2' on page 2 but not found"
   end
 
   test "body blocks do not overlap footer region (y + height <= footer.y)" do
-    flunk "not yet implemented"
+    # Use an explicit template with a footer at a known y-position.
+    # Assert that no body block's bottom edge (y + height) exceeds footer.y.
+    # This tests D-08: body_capacity correctly reserves footer height so body content
+    # doesn't overlap the footer region.
+    template =
+      Rendro.page_template(
+        name: :overlap_test,
+        width: 420,
+        height: 220,
+        margin_top: 20,
+        margin_right: 24,
+        margin_bottom: 20,
+        margin_left: 24,
+        regions: [
+          Rendro.region(
+            name: :body,
+            role: :body,
+            anchor: :flow,
+            x: 24,
+            y: 52,
+            width: 372,
+            height: 60
+          ),
+          Rendro.region(
+            name: :footer,
+            role: :footer,
+            anchor: :bottom,
+            x: 24,
+            y: 180,
+            width: 372,
+            height: 16
+          )
+        ]
+      )
+
+    content = for i <- 1..8, do: Rendro.block(Rendro.text("Line #{i}"))
+
+    doc =
+      Rendro.flow(
+        content,
+        page_template: :overlap_test,
+        page_templates: [template],
+        footer: [Rendro.block(Rendro.text("Footer"))]
+      )
+
+    {:ok, built} = Build.run(doc)
+    {:ok, composed} = Compose.run(built)
+    {:ok, measured} = Measure.run(composed)
+    assert {:ok, paginated} = Paginate.run(measured)
+
+    assert length(paginated.pages) >= 2
+
+    # The footer region is at y: 180 relative to the page (the region's anchor is :bottom)
+    # In the composed view, footer blocks are anchored to y: 180 within the page.
+    # Body blocks should be stacked starting at body region y: 52, height: 60 (capacity).
+    # body_region ends at y: 52 + 60 = 112, well above footer at 180.
+    # So body blocks' max y+height must not exceed the body region's end (112).
+
+    footer_region_y = 180
+
+    paginated.pages
+    |> Enum.with_index(1)
+    |> Enum.each(fn {page, page_idx} ->
+      body_blocks =
+        Enum.filter(page.blocks, fn block ->
+          case block.content do
+            %MeasuredText{source: %Rendro.Text{content: "Line " <> _}} -> true
+            %Rendro.Text{content: "Line " <> _} -> true
+            _ -> false
+          end
+        end)
+
+      Enum.each(body_blocks, fn block ->
+        block_bottom = (block.y || 0) + (block.height || 0)
+
+        assert block_bottom <= footer_region_y,
+               "Page #{page_idx}: body block bottom #{block_bottom} overlaps footer at y=#{footer_region_y} " <>
+                 "(block: y=#{block.y}, height=#{block.height})"
+      end)
+    end)
   end
 
   test "explicit page templates anchor repeated header and footer regions deterministically" do

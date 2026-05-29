@@ -87,6 +87,12 @@ defmodule Rendro.Pipeline.Compose do
       |> Map.put(:header, header_blocks)
       |> Map.put(:footer, footer_blocks)
 
+    region_suppress_on =
+      doc.sections
+      |> Enum.filter(&(&1.suppress_on != nil))
+      |> Enum.map(&{&1.region || :body, &1.suppress_on})
+      |> Map.new()
+
     layout = %{
       template: template,
       region_map: region_map,
@@ -94,6 +100,7 @@ defmodule Rendro.Pipeline.Compose do
       header_region: Map.get(region_map, :header),
       footer_region: Map.get(region_map, :footer),
       region_blocks: region_blocks,
+      region_suppress_on: region_suppress_on,
       entries: entries
     }
 

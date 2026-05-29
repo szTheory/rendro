@@ -683,11 +683,161 @@ defmodule Rendro.Pipeline.PaginateTest do
 
   describe "running-region stubs (Wave 0)" do
     test "evaluates fn {page_number, total_pages} block per page with correct arguments" do
-      flunk "not yet implemented"
+      # Build a 2-page document using a template with a footer region that carries a
+      # RunningContent fn. After paginate, each page's footer blocks should contain
+      # text blocks whose content reflects the page_number and total_pages args.
+      template =
+        %PageTemplate{
+          name: :fn_eval_test,
+          width: 420,
+          height: 240,
+          margin_top: 20,
+          margin_right: 24,
+          margin_bottom: 28,
+          margin_left: 24,
+          regions: [
+            %Region{
+              name: :footer,
+              role: :footer,
+              anchor: :bottom,
+              x: 24,
+              y: 200,
+              width: 372,
+              height: 20
+            },
+            %Region{
+              name: :body,
+              role: :body,
+              anchor: :flow,
+              x: 24,
+              y: 52,
+              width: 372,
+              height: 100
+            }
+          ]
+        }
+
+      # Capture all {page_num, total} calls into an agent so we can assert on them
+      {:ok, agent} = Agent.start_link(fn -> [] end)
+
+      fn_block =
+        %Rendro.Block{
+          content: %Rendro.RunningContent{
+            fun: fn {pn, tp} ->
+              Agent.update(agent, fn calls -> [{pn, tp} | calls] end)
+              [Rendro.block(Rendro.text("#{pn}/#{tp}"))]
+            end
+          },
+          height: 14.4
+        }
+
+      # Use a section with the RunningContent block as footer content
+      section =
+        Rendro.section(
+          region: :footer,
+          content: [fn_block]
+        )
+
+      doc =
+        Rendro.flow(
+          for(i <- 1..8, do: Rendro.block(Rendro.text("Line #{i}"))),
+          page_template: :fn_eval_test,
+          page_templates: [template],
+          sections: [section]
+        )
+
+      {:ok, doc} = Build.run(doc)
+      {:ok, doc} = Compose.run(doc)
+      {:ok, doc} = Measure.run(doc)
+      assert {:ok, paginated} = Paginate.run(doc)
+
+      # Should produce 2 pages (8 blocks * 14.4 = 115.2 > body 100)
+      assert length(paginated.pages) >= 2
+
+      total_pages = length(paginated.pages)
+      calls = Agent.get(agent, & &1) |> Enum.reverse()
+      Agent.stop(agent)
+
+      # Each page should have been called exactly once with correct page index and total
+      assert length(calls) == total_pages
+
+      calls
+      |> Enum.with_index(1)
+      |> Enum.each(fn {{pn, tp}, expected_idx} ->
+        assert pn == expected_idx, "expected page_num #{expected_idx}, got #{pn}"
+        assert tp == total_pages, "expected total #{total_pages}, got #{tp}"
+      end)
     end
 
     test "suppressed page retains same body_capacity as non-suppressed page" do
-      flunk "not yet implemented"
+      # D-08: Suppression hides rendering but NEVER reclaims reserved height.
+      # body_capacity must be identical whether or not a footer is suppressed.
+      # We verify this by building a document with suppress_on: :first on the footer
+      # and asserting that layout.body_capacity is the same as without suppression.
+      template =
+        %PageTemplate{
+          name: :suppress_capacity_test,
+          width: 420,
+          height: 240,
+          margin_top: 20,
+          margin_right: 24,
+          margin_bottom: 28,
+          margin_left: 24,
+          regions: [
+            %Region{
+              name: :footer,
+              role: :footer,
+              anchor: :bottom,
+              x: 24,
+              y: 196,
+              width: 372,
+              height: 16
+            },
+            %Region{
+              name: :body,
+              role: :body,
+              anchor: :flow,
+              x: 24,
+              y: 48,
+              width: 372,
+              height: 128
+            }
+          ]
+        }
+
+      footer_block = Rendro.block(Rendro.text("Footer"))
+
+      doc_without_suppression =
+        Rendro.flow(
+          [Rendro.block(Rendro.text("Content"))],
+          page_template: :suppress_capacity_test,
+          page_templates: [template],
+          sections: [
+            Rendro.section(region: :footer, content: [footer_block])
+          ]
+        )
+
+      doc_with_suppression =
+        Rendro.flow(
+          [Rendro.block(Rendro.text("Content"))],
+          page_template: :suppress_capacity_test,
+          page_templates: [template],
+          sections: [
+            Rendro.section(region: :footer, content: [footer_block], suppress_on: :first)
+          ]
+        )
+
+      {:ok, doc_without_suppression} = Build.run(doc_without_suppression)
+      {:ok, doc_without_suppression} = Compose.run(doc_without_suppression)
+      {:ok, doc_without_suppression} = Measure.run(doc_without_suppression)
+
+      {:ok, doc_with_suppression} = Build.run(doc_with_suppression)
+      {:ok, doc_with_suppression} = Compose.run(doc_with_suppression)
+      {:ok, doc_with_suppression} = Measure.run(doc_with_suppression)
+
+      # D-08: body_capacity is identical with or without suppression (geometry-only)
+      assert doc_without_suppression.options.layout.body_capacity ==
+               doc_with_suppression.options.layout.body_capacity
     end
 
     test "flow_layout/1 fallback subtracts footer height from body_capacity" do
