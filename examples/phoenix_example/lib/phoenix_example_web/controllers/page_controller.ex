@@ -16,6 +16,12 @@ defmodule PhoenixExampleWeb.PageController do
         <li><a href="/preview">Unbranded invoice - inline preview</a></li>
         <li><a href="/branded/download">Branded invoice with logo + custom font - attachment download</a></li>
         <li><a href="/branded/preview">Branded invoice with logo + custom font - inline preview</a></li>
+        <li><a href="/statement/download">Statement - attachment download</a></li>
+        <li><a href="/statement/preview">Statement - inline preview</a></li>
+        <li><a href="/receipt/download">Receipt - attachment download</a></li>
+        <li><a href="/receipt/preview">Receipt - inline preview</a></li>
+        <li><a href="/certificate/download">Certificate - attachment download</a></li>
+        <li><a href="/certificate/preview">Certificate - inline preview</a></li>
       </ul>
     </body>
   </html>

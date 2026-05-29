@@ -22,5 +22,11 @@ defmodule PhoenixExampleWeb.Router do
     get "/preview", PDFController, :preview
     get "/branded/download", PDFController, :branded_download
     get "/branded/preview", PDFController, :branded_preview
+    get "/statement/download", PDFController, :statement_download
+    get "/statement/preview", PDFController, :statement_preview
+    get "/receipt/download", PDFController, :receipt_download
+    get "/receipt/preview", PDFController, :receipt_preview
+    get "/certificate/download", PDFController, :certificate_download
+    get "/certificate/preview", PDFController, :certificate_preview
   end
 end
