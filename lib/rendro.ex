@@ -206,6 +206,13 @@ defmodule Rendro do
     struct!(Section, attrs)
   end
 
+  @spec page_number(keyword()) :: Block.t()
+  def page_number(opts \\ []) do
+    format = Keyword.get(opts, :format, "Page {{page_number}} of {{total_pages}}")
+    text_opts = Keyword.drop(opts, [:format])
+    block(text(format, text_opts))
+  end
+
   @spec block(Text.t() | term(), keyword()) :: Block.t()
   def block(content, attrs \\ []) do
     struct!(Block, Keyword.put(attrs, :content, content))
