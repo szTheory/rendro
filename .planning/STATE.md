@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: Batteries-Included Workflow & Adoption Closure
-status: active
-last_updated: "2026-05-29T00:00:00.000Z"
-last_activity: 2026-05-29
+status: planning
+last_updated: "2026-05-29T15:22:36.928Z"
+last_activity: 2026-05-29 — Roadmap created for milestone v2.4 (Phases 73-76)
 progress:
   total_phases: 4
   completed_phases: 0
@@ -82,6 +82,7 @@ Full per-milestone decision log lives in `.planning/PROJECT.md` (Key Decisions t
 ### Assessment (2026-05-29)
 
 Roadmap created with 4 phases covering all 19 v1 requirements. Build order is:
+
 1. Phase 73: Engine primitive (prerequisite for multi-page recipes)
 2. Phase 74: Statement recipe (first full exercise of PAGE primitive, includes recipe-base extraction)
 3. Phase 75: Receipt/Report + Certificate recipes + support-matrix closure for all new surfaces
