@@ -29,15 +29,17 @@ defmodule Rendro.Pipeline.Paginate do
           %{overflow_source: :bounded_region, region: :body}
         )
 
+      pages = Enum.reverse(pages)
+      total = length(pages)
+
       pages =
         pages
-        |> Enum.reverse()
         |> Enum.with_index(1)
         |> Enum.map(fn {page, idx} ->
           page
           |> stack_body_blocks(layout.body_region)
           |> validate_body_region_fit!(layout.body_region, idx)
-          |> apply_page_template(idx, layout)
+          |> apply_page_template(idx, layout, total)
         end)
 
       {:ok,
@@ -394,7 +396,7 @@ defmodule Rendro.Pipeline.Paginate do
     Enum.to_list(start_index..finish_index)
   end
 
-  defp apply_page_template(%Page{} = page, idx, layout) do
+  defp apply_page_template(%Page{} = page, idx, layout, total) do
     anchored_blocks =
       layout.template.regions
       |> Enum.reject(&(&1.name == :body))
@@ -402,7 +404,8 @@ defmodule Rendro.Pipeline.Paginate do
         anchored_region_blocks =
           layout.region_blocks
           |> Map.get(region.name, [])
-          |> replace_page_numbers(idx)
+          # [Plan 04: fn evaluation and suppression inserted here]
+          |> replace_page_numbers(idx, total)
           |> anchor_region_blocks(region, page)
 
         maybe_validate_region_fit(anchored_region_blocks, region, page, idx, region.name)
@@ -411,42 +414,37 @@ defmodule Rendro.Pipeline.Paginate do
     %{page | blocks: anchored_blocks ++ page.blocks}
   end
 
-  defp replace_page_numbers(blocks, page_num) do
+  defp replace_page_numbers(blocks, page_num, total) do
     Enum.map(blocks, fn block ->
       case block.content do
         %Rendro.Text{content: text} = t ->
-          %{
-            block
-            | content: %{
-                t
-                | content: String.replace(text, "{{page_number}}", Integer.to_string(page_num))
-              }
-          }
+          new_text =
+            text
+            |> String.replace("{{page_number}}", Integer.to_string(page_num))
+            |> String.replace("{{total_pages}}", Integer.to_string(total))
+
+          %{block | content: %{t | content: new_text}}
 
         %Rendro.Pipeline.MeasuredText{source: %Rendro.Text{content: text} = source} = measured ->
-          replaced = String.replace(text, "{{page_number}}", Integer.to_string(page_num))
+          new_source_text =
+            text
+            |> String.replace("{{page_number}}", Integer.to_string(page_num))
+            |> String.replace("{{total_pages}}", Integer.to_string(total))
 
-          %{
-            block
-            | content: %{
-                measured
-                | source: %{source | content: replaced},
-                  lines:
-                    Enum.map(measured.lines, fn line ->
-                      Enum.map(line, fn run ->
-                        %{
-                          run
-                          | text:
-                              String.replace(
-                                run.text,
-                                "{{page_number}}",
-                                Integer.to_string(page_num)
-                              )
-                        }
-                      end)
-                    end)
-              }
-          }
+          new_lines =
+            Enum.map(measured.lines, fn line ->
+              Enum.map(line, fn run ->
+                new_run_text =
+                  run.text
+                  |> String.replace("{{page_number}}", Integer.to_string(page_num))
+                  |> String.replace("{{total_pages}}", Integer.to_string(total))
+
+                # NOTE: run.width intentionally NOT updated (D-10)
+                %{run | text: new_run_text}
+              end)
+            end)
+
+          %{block | content: %{measured | source: %{source | content: new_source_text}, lines: new_lines}}
 
         _ ->
           block

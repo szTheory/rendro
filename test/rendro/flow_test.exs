@@ -121,6 +121,28 @@ defmodule Rendro.FlowTest do
     assert pdf =~ "(Page 2) Tj"
   end
 
+  test "{{total_pages}} substitutes the real page count on every page (PAGE-01)" do
+    footer = [Rendro.block(Rendro.text("Page {{page_number}} of {{total_pages}}"))]
+
+    content =
+      for i <- 1..50 do
+        Rendro.block(Rendro.text("Line #{i}"))
+      end
+
+    doc = Rendro.flow(content, footer: footer)
+    {:ok, pdf} = Rendro.render(doc)
+
+    assert length(Regex.scan(~r"/Type\s*/Page\b", pdf)) == 2
+
+    # PAGE-01: {{total_pages}} replaced with real page count on every page
+    assert pdf =~ "(Page 1 of 2) Tj"
+    assert pdf =~ "(Page 2 of 2) Tj"
+
+    # Sanity: raw tokens must not appear in the output
+    refute pdf =~ "{{page_number}}"
+    refute pdf =~ "{{total_pages}}"
+  end
+
   test "suppress_on: :first suppresses footer on first page only" do
     flunk "not yet implemented"
   end
