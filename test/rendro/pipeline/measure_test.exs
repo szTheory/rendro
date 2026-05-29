@@ -176,6 +176,100 @@ defmodule Rendro.Pipeline.MeasureTest do
       assert_in_delta layout.body_capacity, 504, 1.0e-9
     end
 
+    test "CR-02 regression: header positioned entirely below body bottom is not subtracted from body_capacity" do
+      # body: y=100, height=400 (bottom=500). Header: y=600, height=30.
+      # The header does NOT overlap the body, so header_h must be 0.
+      # body_capacity should equal body_h (400), not 400-30=370.
+      template =
+        %PageTemplate{
+          name: :header_below_body,
+          regions: [
+            %Region{
+              name: :header,
+              role: :header,
+              anchor: :top,
+              x: 72,
+              y: 600,
+              width: 451.28,
+              height: 30
+            },
+            %Region{
+              name: :body,
+              role: :body,
+              anchor: :flow,
+              x: 72,
+              y: 100,
+              width: 451.28,
+              height: 400
+            }
+          ]
+        }
+
+      doc =
+        %Rendro.Document{
+          page_template: :header_below_body,
+          page_templates: [template],
+          content: [Rendro.block(Rendro.text("Line item"))],
+          header: [],
+          footer: [],
+          metadata: %Rendro.Metadata{}
+        }
+
+      assert {:ok, composed} = Compose.run(doc)
+      assert {:ok, result} = Measure.run(composed)
+
+      layout = result.options.layout
+      # header (y=600) is entirely below body bottom (y+h=500) => no subtraction
+      assert layout.body_capacity == 400
+    end
+
+    test "CR-02 regression: footer positioned entirely above body top is not subtracted from body_capacity" do
+      # body: y=200, height=400 (top=200). Footer: y=50, height=30 (bottom=80).
+      # The footer does NOT overlap the body, so footer_h must be 0.
+      # body_capacity should equal body_h (400), not 400-30=370.
+      template =
+        %PageTemplate{
+          name: :footer_above_body,
+          regions: [
+            %Region{
+              name: :body,
+              role: :body,
+              anchor: :flow,
+              x: 72,
+              y: 200,
+              width: 451.28,
+              height: 400
+            },
+            %Region{
+              name: :footer,
+              role: :footer,
+              anchor: :bottom,
+              x: 72,
+              y: 50,
+              width: 451.28,
+              height: 30
+            }
+          ]
+        }
+
+      doc =
+        %Rendro.Document{
+          page_template: :footer_above_body,
+          page_templates: [template],
+          content: [Rendro.block(Rendro.text("Line item"))],
+          header: [],
+          footer: [],
+          metadata: %Rendro.Metadata{}
+        }
+
+      assert {:ok, composed} = Compose.run(doc)
+      assert {:ok, result} = Measure.run(composed)
+
+      layout = result.options.layout
+      # footer (y=50, h=30, bottom=80) is entirely above body top (y=200) => no subtraction
+      assert layout.body_capacity == 400
+    end
+
     test "identical input yields identical wrapped lines" do
       doc =
         %Rendro.Document{

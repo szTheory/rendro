@@ -447,7 +447,9 @@ defmodule Rendro.Pipeline.Measure do
        when is_number(body_h) do
     header_h =
       if header_region && is_number(header_region.height) && is_number(header_region.y) &&
-           is_number(body_y) && body_y < header_region.y + header_region.height do
+           is_number(body_y) && is_number(body_h) &&
+           body_y < header_region.y + header_region.height &&
+           header_region.y < body_y + body_h do
         header_region.height
       else
         0
@@ -456,7 +458,8 @@ defmodule Rendro.Pipeline.Measure do
     footer_h =
       if footer_region && is_number(footer_region.height) && is_number(footer_region.y) &&
            is_number(body_y) && is_number(body_h) &&
-           body_y + body_h >= footer_region.y do
+           body_y + body_h >= footer_region.y &&
+           footer_region.y + footer_region.height > body_y do
         footer_region.height
       else
         0
