@@ -141,7 +141,7 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 | 69. Operator Recipe + First Cell End-to-End | 3/3 | Complete    | 2026-05-28 |
 | 70. Consolidate Already-Validated Surfaces | 3/3 | Complete    | 2026-05-29 |
 | 71. Record New Trust-Sensitive Surfaces and Explicit Deferrals | 3/3 | Complete    | 2026-05-29 |
-| 72. Closure — Audit, Polish, and Ship | 0/0 | Not started | - |
+| 72. Closure — Audit, Polish, and Ship | 1/3 | In Progress|  |
 
 ## Requirement Coverage
 
