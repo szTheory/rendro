@@ -10,7 +10,7 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Active milestone:** v2.4 Batteries-Included Workflow & Adoption Closure (planning started 2026-05-29; phase numbering continues from 73). The proof/trust axis is at diminishing returns — the remaining leverage is adoption ergonomics.
+**Active milestone:** v2.4 Batteries-Included Workflow & Adoption Closure (planning started 2026-05-29; phase numbering continues from 73). The proof/trust axis is at diminishing returns — the remaining leverage is adoption ergonomics. **Phase 73 (Page-Numbering / Running-Region Primitive) complete 2026-05-29** — running header/footer regions with single-pass deterministic `{{page_number}}`/`{{total_pages}}` substitution (the `fn {page, total}` primitive + `page_number/1` helper + `suppress_on` selector), `body_capacity` now subtracts overlapping non-body region heights (overlap fix closed), all proven by the four-property D-11 determinism suite. Next: Phase 74 (Statement recipe) consumes this primitive.
 
 **Shipped Version:** v2.3 Viewer Proof & Interop Closure (2026-05-29, tag v0.3.1)
 
@@ -214,4 +214,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-29 — started milestone v2.4 (Batteries-Included Workflow & Adoption Closure); scope confirmed, requirements pending.*
+*Last updated: 2026-05-29 — milestone v2.4 (Batteries-Included Workflow & Adoption Closure); Phase 73 (Page-Numbering / Running-Region Primitive) complete — PAGE-01..04 delivered, 747 tests green.*
