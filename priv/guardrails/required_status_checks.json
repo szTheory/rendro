@@ -44,6 +44,13 @@
       "ci_job": "viewer-evidence-live-proof",
       "command": "mix test --include live_pdf_tools test/rendro/adapters/forms_viewer_evidence_live_test.exs test/rendro/adapters/embedded_files_viewer_evidence_live_test.exs test/rendro/adapters/links_viewer_evidence_live_test.exs test/rendro/adapters/protection_viewer_evidence_live_test.exs test/rendro/adapters/signature_widget_viewer_evidence_live_test.exs test/rendro/adapters/signed_artifact_viewer_evidence_live_test.exs test/rendro/adapters/trust_sensitive_viewer_evidence_live_test.exs",
       "notes": "Phase 71 structural-proxy evidence regen; not required on main per D-18/D-32."
+    },
+    {
+      "name": "example-phoenix",
+      "semantic_class": "example_app",
+      "ci_job": "example-phoenix",
+      "command": "mix deps.get && mix test",
+      "notes": "Phase 76 reference Phoenix app smoke; not required on main per REF-03/D-09."
     }
   ],
   "supersedes_planning_refs": {

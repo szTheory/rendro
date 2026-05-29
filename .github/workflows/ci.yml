@@ -28,11 +28,24 @@ jobs:
       - name: Run CI
         run: mix ci
 
-      - name: Verify Phoenix Example
+  example-phoenix:
+    runs-on: ubuntu-latest
+    # no `needs:` -> graph-disconnected (D-09); no continue-on-error (D-10)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Beam
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: '28'
+          elixir-version: '1.19.5'
+
+      - name: Run example app tests
+        working-directory: examples/phoenix_example
         run: |
-          cd examples/phoenix_example
           mix deps.get
-          mix compile
+          mix test
 
   viewer-evidence-live-proof:
     runs-on: ubuntu-latest
