@@ -40,9 +40,12 @@ Landed the two engine-side enablers the Statement recipe (plans 74-02/03/04) dep
 
 ## Task Commits
 
-- `e978aad` feat(74-01): declare :decimal as a core dependency (D-04)
-- `3f1d9af` feat(74-01): expose read-only Rendro.measure_rows/4 over engine table measurement (D-09)
-- `4ab0f57` test(74-01): prove measure_rows/4 mirrors engine measurement and is read-only
+- `e978aad` feat(74-01): declare :decimal as a core dependency (D-04) — Task 1
+- `e4a064d` feat(74-01): expose read-only Rendro.measure_rows/4 over engine table measurement (D-09) — Task 2
+- `abfd19f` test(74-01): prove measure_rows/4 mirrors engine measurement and is read-only — Task 3
+- `68640d6` docs(74-01): complete statement-recipe engine enablers plan (initial SUMMARY/STATE/ROADMAP)
+- `ee32d29` fix(74-01): group measure_block/3 clauses (warnings-as-errors fix) — Rule 1/Rule 3 deviation
+- `35825e6` test(74-01): rewrite measure_rows test to use default Helvetica registry idiom — Rule 1 deviation
 
 ## Key Implementation Details
 
@@ -53,16 +56,58 @@ Landed the two engine-side enablers the Statement recipe (plans 74-02/03/04) dep
 
 ## Deviations from Plan
 
-None — plan executed exactly as written. The plan's recommended signature placed `rows` first (`measure_rows(rows, width, document, table_opts)`); the `Rendro.measure_rows/4` public helper matches that exactly. The internal `Measure.measure_rows/4` projection uses a `(document, rows, width, table_opts)` order for an idiomatic doc-first private API, which the public helper adapts to — this is an internal naming detail, not a deviation from the public contract.
+Two auto-fixed deviations (both correctness, no scope creep). The initial Task 2/Task 3
+commits passed their per-file test runs but a project-wide check surfaced two issues that
+were fixed before the plan closed:
+
+### Auto-fixed Issues
+
+**1. [Rule 1 - Bug / Rule 3 - Blocking] measure_block/3 clauses split → `mix compile --warnings-as-errors` failed**
+- **Found during:** Task 2 (post-commit project-wide compile check)
+- **Issue:** The public `measure_rows/4` and private `measure_table/3` were inserted *between*
+  the `measure_block/3` clauses, producing a "clauses with the same name and arity should be
+  grouped together" warning that fails the repo's `--warnings-as-errors` gate (CI/`mix ci`).
+- **Fix:** Moved `measure_rows/4` + `measure_table/3` to AFTER the last `measure_block/3`
+  clause; converted the projection's `@doc` to a comment (the module is `@moduledoc false`;
+  the user-facing `@doc` already lives on the public `Rendro.measure_rows/4`).
+- **Files modified:** lib/rendro/pipeline/measure.ex
+- **Verification:** `mix compile --warnings-as-errors` exits 0.
+- **Committed in:** `ee32d29`
+
+**2. [Rule 1 - Bug] measure_rows_test referenced a non-existent test fixture**
+- **Found during:** Task 3 (full-suite run)
+- **Issue:** The test called `FontFixture.document_with_helvetica/0`, which does not exist
+  (`FontFixture` only exposes `supported_font/1` and `restricted_font/1`), so all 4 new
+  tests raised `UndefinedFunctionError`.
+- **Fix:** Rewrote the test to use the default Helvetica-compatible font registry idiom from
+  `measure_test.exs` (`%Rendro.Document{metadata: %Rendro.Metadata{}}` carries the default
+  registry) and `Rendro.flow/1` for the read-only render check.
+- **Files modified:** test/rendro/measure_rows_test.exs
+- **Verification:** `mix test test/rendro/measure_rows_test.exs` — 4 tests, 0 failures.
+- **Committed in:** `35825e6`
+
+---
+
+**Total deviations:** 2 auto-fixed (1 blocking/compile-gate, 1 test bug)
+**Impact on plan:** Both fixes were necessary for the plan's own acceptance criteria
+(clean `--warnings-as-errors` compile and a passing test). No scope creep — the public
+contract (`Rendro.measure_rows/4` returning `{header_height, row_heights}`, delegating to
+the engine's own measurement) is exactly as the plan specified.
+
+The plan's recommended public signature placed `rows` first
+(`measure_rows(rows, width, document, table_opts)`); `Rendro.measure_rows/4` matches that
+exactly. The internal `Measure.measure_rows/4` projection uses a `(document, rows, width,
+table_opts)` doc-first order — an internal naming detail the public helper adapts to, not a
+contract deviation.
 
 ## Verification
 
 - `mix compile --warnings-as-errors` — exits 0 (clean).
 - `mix test test/rendro/measure_rows_test.exs` — 4 tests, 0 failures.
-- `mix test test/rendro/pipeline/measure_test.exs test/rendro/pipeline/paginate_test.exs test/rendro/table_test.exs` — 65 tests, 0 failures (no measurement/pagination regression).
-- `mix test` (full suite) — 751 tests, 0 failures (747 baseline + 4 new).
-- `mix format --check-formatted` (project-wide) — exits 0.
-- `mix.lock` unchanged for `ecto`/`jason`/`jsv` (no diff across all three commits).
+- `mix test test/rendro/measure_rows_test.exs test/rendro/pipeline/measure_test.exs test/rendro/pipeline/paginate_test.exs test/rendro/table_test.exs` — 117 tests, 0 failures (no measurement/pagination regression).
+- `mix test` (full suite) — 4 doctests, 3 properties, 751 tests, 0 failures (10 excluded; 747 baseline + 4 new).
+- `mix format --check-formatted` (changed files + project-wide) — exits 0.
+- `mix.lock` unchanged for `ecto`/`jason`/`jsv` (no diff across all commits).
 - The "heights are IDENTICAL to the engine's own measurement" test asserts exact `==` equality between `Rendro.measure_rows/4` output and the geometry from a block run through `Measure.run/1`, proving the helper uses engine numbers, not an estimate.
 
 ## For Future Reference
@@ -75,4 +120,4 @@ None — plan executed exactly as written. The plan's recommended signature plac
 ## Self-Check: PASSED
 
 - Files: FOUND mix.exs, lib/rendro.ex, lib/rendro/pipeline/measure.ex, test/rendro/measure_rows_test.exs
-- Commits: FOUND e978aad, 3f1d9af, 4ab0f57
+- Commits: FOUND e978aad, e4a064d, abfd19f, ee32d29, 35825e6
