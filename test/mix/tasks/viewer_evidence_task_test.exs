@@ -145,7 +145,9 @@ defmodule Mix.Tasks.Rendro.ViewerEvidenceTest do
   end
 
   defp stale_matrix_fixture! do
-    tmp = Path.join(System.tmp_dir!(), "rendro_stale_matrix_#{System.unique_integer([:positive])}")
+    tmp =
+      Path.join(System.tmp_dir!(), "rendro_stale_matrix_#{System.unique_integer([:positive])}")
+
     File.mkdir_p!(tmp)
     File.cp_r!("priv", Path.join(tmp, "priv"))
 

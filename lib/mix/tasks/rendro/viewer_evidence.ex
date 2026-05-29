@@ -135,7 +135,7 @@ defmodule Mix.Tasks.Rendro.ViewerEvidence do
 
     case rest do
       ["record", surface, viewer | record_rest] ->
-        {:record, json?, false,
+        {:record, json?,
          Map.merge(%{surface: surface, viewer: viewer}, Map.new(parse_record_flags(record_rest)))}
 
       ["validate" | validate_rest] ->
