@@ -12,7 +12,9 @@ lanes = [
   {"Signing semantic-claims lane", ["test", "test/docs_contract/signing_claims_test.exs"]},
   {"Embedded artifact semantic-claims lane", ["test", "test/docs_contract/embedded_artifact_claims_test.exs"]},
   {"Protection semantic-claims lane", ["test", "test/docs_contract/protection_claims_test.exs"]},
-  {"Viewer evidence semantic-claims lane", ["test", "test/docs_contract/viewer_evidence_claims_test.exs"]}
+  {"Viewer evidence semantic-claims lane", ["test", "test/docs_contract/viewer_evidence_claims_test.exs"]},
+  {"Recipes semantic-claims lane", ["test", "test/docs_contract/recipes_claims_test.exs"]},
+  {"Page-primitive semantic-claims lane", ["test", "test/docs_contract/page_primitive_claims_test.exs"]}
 ]
 
 Mix.shell().info("Running explicit docs-contract lanes...")
