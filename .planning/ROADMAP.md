@@ -71,7 +71,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 73-02-PLAN.md — body_capacity fix: measure.ex primary site + paginate.ex flow_layout fallback (PAGE-03)
+- [x] 73-02-PLAN.md — body_capacity fix: measure.ex primary site + paginate.ex flow_layout fallback (PAGE-03)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -141,7 +141,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 73. Page-Numbering / Running-Region Primitive | 1/5 | In Progress|  |
+| 73. Page-Numbering / Running-Region Primitive | 2/5 | In Progress|  |
 | 74. Statement Recipe | 0/? | Not started | - |
 | 75. Receipt/Report and Certificate Recipes + Support Contract | 0/? | Not started | - |
 | 76. Reference Phoenix App, CI, and Documentation Closure | 0/? | Not started | - |
