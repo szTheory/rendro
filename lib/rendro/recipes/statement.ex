@@ -698,6 +698,29 @@ defmodule Rendro.Recipes.Statement do
     """
   end
 
+  # A well-typed top-level :closing_balance is a caller assertion: it MUST equal
+  # the value derived from opening_balance + the signed line amounts (D-06). By
+  # the time this runs, opening_balance and lines are already validated (see
+  # validate_data!/1 ordering), so the fold is safe. Mirrors the
+  # :summary.closing_balance check in maybe_validate_summary!/1.
+  defp maybe_validate_closing_balance!(%{closing_balance: cb, opening_balance: ob, lines: lines})
+       when is_struct(cb, Decimal) do
+    derived_closing = Enum.reduce(lines, ob, fn %{amount: amt}, bal -> Decimal.add(bal, amt) end)
+
+    unless Decimal.equal?(cb, derived_closing) do
+      raise ArgumentError, """
+      Rendro.Recipes.Statement.document/2 — :closing_balance mismatch.
+
+      What:  The caller-supplied :closing_balance does not match the derived value.
+      Where: Rendro.Recipes.Statement.validate_data!/1
+      Why:   Supplied: #{inspect(cb)}, Derived: #{inspect(derived_closing)}.
+      Next:  Remove :closing_balance to let the recipe derive it, or correct the value.
+      """
+    end
+
+    :ok
+  end
+
   defp maybe_validate_closing_balance!(_data), do: :ok
 
   defp maybe_validate_summary!(%{summary: summary, opening_balance: ob, lines: lines})
