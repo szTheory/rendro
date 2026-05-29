@@ -20,7 +20,7 @@ defmodule Rendro.MixProject do
       source_url: @source_url,
       homepage_url: @source_url,
       docs: docs(),
-      dialyzer: [plt_add_apps: [:mix, :stream_data]]
+      dialyzer: [plt_add_apps: [:mix, :stream_data, :jsv, :yaml_elixir]]
     ]
   end
 
