@@ -96,6 +96,8 @@ defmodule Rendro.MixProject do
       skip_undefined_reference_warnings_on: [
         "guides/branding.md",
         "guides/integrations.md",
+        "guides/page_primitive.md",
+        "guides/recipes.md",
         "lib/rendro/document.ex",
         "lib/rendro/font_registry.ex",
         "lib/rendro.ex"
@@ -106,7 +108,9 @@ defmodule Rendro.MixProject do
         "guides/integrations.md",
         "guides/branding.md",
         "guides/api_stability.md",
-        "guides/viewer_evidence.md"
+        "guides/viewer_evidence.md",
+        "guides/page_primitive.md",
+        "guides/recipes.md"
       ],
       groups_for_extras: [
         Guides: [
@@ -116,6 +120,10 @@ defmodule Rendro.MixProject do
         Policies: [
           "guides/api_stability.md",
           "guides/viewer_evidence.md"
+        ],
+        "Recipes & Primitives": [
+          "guides/page_primitive.md",
+          "guides/recipes.md"
         ]
       ],
       groups_for_modules: [
