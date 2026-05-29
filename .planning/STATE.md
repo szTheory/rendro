@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: Batteries-Included Workflow & Adoption Closure
 status: executing
-last_updated: "2026-05-29T21:57:19.979Z"
-last_activity: 2026-05-29 -- Phase 76 planning complete
+last_updated: "2026-05-29T22:03:54.183Z"
+last_activity: 2026-05-29
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 17
-  completed_plans: 13
+  completed_plans: 14
   percent: 75
 ---
 
@@ -20,16 +20,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-29 after v2.3 milestone shipped)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 76 — reference phoenix app, ci, and documentation closure
+**Current focus:** Phase 76 — reference-phoenix-app-ci-and-documentation-closure
 
 ## Current Position
 
-Phase: 76
-Plan: Not started
+Phase: 76 (reference-phoenix-app-ci-and-documentation-closure) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-05-29 -- Phase 76 planning complete
+Last activity: 2026-05-29
 
-Progress: [██████████] 100%
+Progress: [████████░░] 82%
 
 ## Milestone Snapshot
 
@@ -71,6 +71,9 @@ Full per-milestone decision log lives in `.planning/PROJECT.md` (Key Decisions t
 - [v2.4 75-02]: Receipt totals block rendered as Rendro.text (not Rendro.table) — this distinguishes it from line-item table blocks in section content inspection and prevents spurious header: nil assertion failures in V5 tests.
 - [v2.4 75-02]: Receipt effective_capacity omits CF/BF overhead: capacity - header_h - row_epsilon (no 2*typical_row_h); Statement subtracts 2*typical_row_h for CF/BF rows; Receipt has none.
 - [Phase ?]: D-09/D-10 CONTRACT-01: Non-viewer surface rows are flat objects at support_matrix.json root level (no viewers sub-key), bypassing viewer_row schema validation; four terminal rows added for page_numbering, statement, receipt_report, certificate
+- [Phase ?]: D-02: Dep floor bumps to Phoenix ~> 1.8, Plug ~> 1.18, Jason ~> 1.4, Elixir ~> 1.19; mix.lock resolves above all floors
+- [Phase ?]: D-03: ErrorJSON uses Phoenix.Controller.status_message_from_template/1 — load-bearing fix; no Ecto/LiveView/gettext per D-01 minimal mandate
+- [Phase ?]: D-04: example-phoenix README is minimal arriving-engineer north star; advisory-CI not a required branch-protection check (REF-03)
 
 ### Roadmap Evolution
 
@@ -133,6 +136,7 @@ Items intentionally held outside v2.4 scope (carried from v2.3 + v2.4 planning):
 | Phase 75-receipt-report-and-certificate-recipes-support-contract P02 | 8min | 1 tasks | 2 files |
 | Phase 75 P03 | 4 | 1 tasks | 3 files |
 | Phase 75 P04 | 5 | 2 tasks | 1 files |
+| Phase 76 P01 | 2m | 2 tasks | 3 files |
 
 ## Operator Next Steps
 
