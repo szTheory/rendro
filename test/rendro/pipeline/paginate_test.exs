@@ -681,6 +681,20 @@ defmodule Rendro.Pipeline.PaginateTest do
     end
   end
 
+  describe "running-region stubs (Wave 0)" do
+    test "evaluates fn {page_number, total_pages} block per page with correct arguments" do
+      flunk "not yet implemented"
+    end
+
+    test "suppressed page retains same body_capacity as non-suppressed page" do
+      flunk "not yet implemented"
+    end
+
+    test "flow_layout/1 fallback subtracts footer height from body_capacity" do
+      flunk "not yet implemented"
+    end
+  end
+
   defp paginate_flow(doc) do
     {:ok, doc} = Build.run(doc)
     {:ok, doc} = Compose.run(doc)

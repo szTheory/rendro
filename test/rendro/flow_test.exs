@@ -121,6 +121,14 @@ defmodule Rendro.FlowTest do
     assert pdf =~ "(Page 2) Tj"
   end
 
+  test "suppress_on: :first suppresses footer on first page only" do
+    flunk "not yet implemented"
+  end
+
+  test "body blocks do not overlap footer region (y + height <= footer.y)" do
+    flunk "not yet implemented"
+  end
+
   test "explicit page templates anchor repeated header and footer regions deterministically" do
     template =
       Rendro.page_template(
