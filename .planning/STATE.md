@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.3
-milestone_name: Viewer Proof & Interop Closure
-status: Awaiting next milestone
-last_updated: "2026-05-29T13:57:59.501Z"
-last_activity: 2026-05-29 — Milestone v2.3 completed and archived
+milestone: v2.4
+milestone_name: Batteries-Included Workflow & Adoption Closure
+status: planning
+last_updated: "2026-05-29T14:26:18.719Z"
+last_activity: 2026-05-29
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 15
-  completed_plans: 15
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-29 after v2.3 milestone shipped)
 
 ## Current Position
 
-Phase: Milestone v2.3 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-05-29 — Milestone v2.3 completed and archived
+Status: Defining requirements
+Last activity: 2026-05-29 — Milestone v2.4 started
 
 ## Milestone Snapshot
 
@@ -63,11 +63,23 @@ Full per-milestone decision log lives in `.planning/PROJECT.md` (Key Decisions t
 - Plan v2.4 with `/gsd-new-milestone`: define batteries-included adoption-closure requirements; carry the viewer-evidence recording discipline forward to any new surfaces.
 - Preserve the strategic arc (v2.4 adoption closure → conditional v2.5 global text shaping) so planning continues from an explicit game plan.
 
+### Assessment (2026-05-29)
+
+Milestone next-step assessment (direct `lib/`/`test/`/`examples/`/`priv/` inspection): Rendro is
+**~88–90% done** for its stated scope. Sharpen v2.4 to bundle: **(a)** page-numbering / running
+header-footer as a first-class primitive (currently hand-rolled — table-stakes for invoices/
+statements/reports and a real adoption bounce risk), **(b)** 2–3 more production recipes (statement,
+receipt/report, certificate) on the Invoice three-rung pattern, **(c)** a polished, documented,
+**CI-run reference Phoenix app** (`examples/phoenix_example` is thin today). **1.0 release** is the
+natural capstone after v2.4 (engine is 1.0-grade; `guides/api_stability.md` exists). Full scoping
+detail + graduation candidates in `threads/v24-adoption-scoping.md`.
+
 ### Blockers/Concerns
 
 - Keep viewer claims narrower than blanket "works in every viewer" marketing, blanket compliance narratives, and signer identity trust unless a separate milestone proves them.
 - New surfaces must inherit the v2.3 viewer-evidence discipline (recorded proof or named `explicit_deferral`); do not regress to silent `unverified`.
 - Multi-signature workflows, HSM orchestration, and global text-shaping remain tempting adjacent problems; they should not leak into v2.4 without a deliberate re-scope.
+- [assessment 2026-05-29] The proof/trust axis is at diminishing returns — resist further viewer/mobile-proof/adapter/staleness-cadence investment without pulled adopter demand. **Adoption ergonomics is now the leverage axis**, not more proof. See `threads/v24-adoption-scoping.md`.
 
 ## Deferred Items
 

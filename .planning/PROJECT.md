@@ -10,7 +10,7 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Between milestones.** v2.3 shipped 2026-05-29; v2.4 not yet planned. Run `/gsd-new-milestone` to define the next milestone (phase numbering continues from 73).
+**Active milestone:** v2.4 Batteries-Included Workflow & Adoption Closure (planning started 2026-05-29; phase numbering continues from 73). The proof/trust axis is at diminishing returns — the remaining leverage is adoption ergonomics.
 
 **Shipped Version:** v2.3 Viewer Proof & Interop Closure (2026-05-29, tag v0.3.1)
 
@@ -50,11 +50,16 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 **Foundation Already Shipped:** v1.3 release readiness, v1.2 typography/assets truth, v1.1 layout-authoring maturity, and v1.0 deterministic core rendering.
 
-## Next Milestone: v2.4 Batteries-Included Workflow & Adoption Closure (planned)
+## Current Milestone: v2.4 Batteries-Included Workflow & Adoption Closure
 
-**Goal (provisional):** With engine-level truth and per-viewer truth now both proof-backed, close the adoption gap — make the common Phoenix workflows batteries-included so teams can reach production with the documented recipes rather than assembling primitives by hand.
+**Goal:** Close the adoption gap — make the common Phoenix document workflows batteries-included so teams can reach production with documented recipes rather than assembling primitives by hand.
 
-**Why now:** v2.3 closed the last recorded-truth gap (viewer behavior across Acrobat, Preview, PDFium, PDF.js). The highest-leverage next step is reducing time-to-production for the most common artifact workflows. Concrete requirements are defined by `/gsd-new-milestone` (phase numbering continues from 73). Conditional v2.5 (Global Text Shaping & Script Support) follows only if demand justifies the core investment.
+**Target features:**
+- **Page numbering / running headers-footers primitive** — first-class, foundational (a dedicated phase first, since the recipes depend on it): "Page X of Y", repeated header/footer region content, and carried-forward totals; deterministic and tested. Idiomatic analogs: ReportLab `onPage`, fpdf2 header/footer overrides.
+- **Three new production recipes** on the proven three-rung escape-hatch pattern (`document` / `page_template` / `sections`): **Statement**, **Receipt/Report**, and **Certificate** — each runnable from data, docs-contract tested, and documented in a guide.
+- **Reference Phoenix app** (`examples/phoenix_example`) upgraded to executable adoption proof — `mix`-runnable, README'd, and exercised in CI.
+
+**Why now:** v2.3 closed the last recorded-truth gap (viewer behavior across Acrobat, Preview, PDFium, PDF.js). The proof/trust axis is now at diminishing returns; the highest-leverage step is reducing time-to-production for the most common artifact workflows. **1.0 release is held as the capstone after v2.4** (engine is 1.0-grade; `guides/api_stability.md` exists). Conditional v2.5 (Global Text Shaping & Script Support) follows only if demand justifies the core investment. Scoping detail in `threads/v24-adoption-scoping.md`.
 
 ## Strategic Arc
 
@@ -86,11 +91,16 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-_No active milestone requirements — v2.3 shipped. Defined by `/gsd-new-milestone` for v2.4. Carried forward into next-milestone scoping:_
+_v2.4 Batteries-Included Workflow & Adoption Closure is in planning (scope confirmed 2026-05-29). Concrete REQ-IDs are defined in `REQUIREMENTS.md` during this milestone cycle. Confirmed scope:_
 
-- [ ] Close the adoption gap for the most common Phoenix artifact workflows (batteries-included recipes) so teams reach production with documented paths rather than assembling primitives by hand.
+- [ ] Ship page numbering / running headers-footers ("Page X of Y", repeated region content, carried-forward totals) as a first-class, deterministic, tested primitive — as a dedicated foundational phase, since the new recipes depend on it.
+- [ ] Ship three new production recipes on the three-rung pattern — Statement, Receipt/Report, and Certificate — each runnable from data, docs-contract tested, and documented in a guide.
+- [ ] Upgrade the reference Phoenix app (`examples/phoenix_example`) to executable adoption proof — `mix`-runnable, README'd, and exercised in CI.
 - [ ] Keep viewer claims narrower than blanket "works in every viewer" marketing, blanket compliance narratives, and signer identity trust unless a separate milestone proves them; new surfaces inherit the v2.3 viewer-evidence recording discipline.
-- [ ] Preserve the multi-milestone game plan (v2.4 adoption closure → conditional v2.5 global text shaping) so the next planning pass continues from an explicit trust-and-adoption arc instead of reopening strategy from scratch.
+
+_Held outside v2.4 (sequenced, not abandoned):_
+- [ ] Plan a **1.0 release** (SemVer/API-stability commitment) as the capstone after v2.4 adoption closure — the engine is 1.0-grade and `guides/api_stability.md` already exists.
+- [ ] Preserve the multi-milestone game plan (v2.4 adoption closure → 1.0 capstone → conditional v2.5 global text shaping) so the next planning pass continues from an explicit trust-and-adoption arc.
 
 ### Out of Scope
 
@@ -204,4 +214,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-29 after v2.3 milestone (Viewer Proof & Interop Closure) shipped at tag v0.3.1.*
+*Last updated: 2026-05-29 — started milestone v2.4 (Batteries-Included Workflow & Adoption Closure); scope confirmed, requirements pending.*
