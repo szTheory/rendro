@@ -1,5 +1,5 @@
 {
-  "model_profile": "adaptive",
+  "model_profile": "balanced",
   "commit_docs": true,
   "parallelization": true,
   "search_gitignored": false,
@@ -43,7 +43,7 @@
   "resolve_model_ids": "omit",
   "mode": "yolo",
   "granularity": "coarse",
-  "runtime": "cursor",
+  "runtime": "claude",
   "model_profile_overrides": {
     "cursor": {
       "opus": "inherit",
