@@ -358,8 +358,11 @@ defmodule Rendro.ViewerEvidence.Validator do
 
   defp read_file(absolute, display_path) do
     case File.read(absolute) do
-      {:ok, content} -> {:ok, content}
-      {:error, reason} -> {:error, "unable to read evidence file #{display_path}: #{inspect(reason)}"}
+      {:ok, content} ->
+        {:ok, content}
+
+      {:error, reason} ->
+        {:error, "unable to read evidence file #{display_path}: #{inspect(reason)}"}
     end
   end
 

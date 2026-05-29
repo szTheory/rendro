@@ -11,6 +11,23 @@ This release lifts the v1.5–v2.2 milestone work onto Hex. The 0.2.0 published 
 
 ### Added
 
+#### Viewer Evidence (v2.3)
+
+##### Added
+
+- `Rendro.Adapters.Pdfium` optional PATH-discovered adapter for pdfium-cli form/info observation used by the viewer-evidence live-proof lane.
+- `mix rendro.viewer_evidence record forms chrome_pdfium` to autogenerate evidence files from pdfium-cli observations.
+- Promoted `forms.viewers.chrome_pdfium` to `supported` with evidence at `priv/viewer_evidence/forms/chrome_pdfium.md` (`viewer_kind: pdfium-cli`).
+
+##### Changed
+
+- Document viewer-evidence CHANGELOG discipline in `guides/api_stability.md` — promotions, explicit deferrals, and legacy re-homes require CHANGELOG entries; re-validations refresh `recorded_at` in the log.
+- Re-home `forms.viewers.apple_preview` evidence to `priv/viewer_evidence/forms/apple_preview.md` (**support status unchanged** since v1.8 Phase 47).
+- Re-home `embedded_files.viewers.adobe_acrobat_reader` evidence to `priv/viewer_evidence/embedded_files/adobe_acrobat_reader.md` (**support status unchanged** since v1.9 Phase 50).
+- Re-home `links.viewers.adobe_acrobat_reader` evidence to `priv/viewer_evidence/links/adobe_acrobat_reader.md` (**support status unchanged** since v1.9 Phase 50).
+- Re-home `links.viewers.apple_preview` evidence to `priv/viewer_evidence/links/apple_preview.md` (**support status unchanged** since v1.9 Phase 50).
+- Re-home `protection.viewers.apple_preview` evidence to `priv/viewer_evidence/protection/apple_preview.md` (**support status unchanged** since v1.10 Phase 54).
+
 #### Validation and Trust Surfaces (v1.5)
 
 - `Rendro.Adapters.Poppler` for structural PDF validation through `pdfinfo`/Poppler with stable redacted error reasons. The lane proves PDF structure only; it does not prove interactive viewer behavior.

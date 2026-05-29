@@ -34,6 +34,45 @@ jobs:
           mix deps.get
           mix compile
 
+  viewer-evidence-live-proof:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Beam
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: '28'
+          elixir-version: '1.19.5'
+
+      - name: Install pdfium-cli
+        run: |
+          curl -fsSL -o pdfium-cli "https://github.com/klippa-app/pdfium-cli/releases/download/v0.10.3/pdfium-webassembly-linux-amd64"
+          chmod +x pdfium-cli
+          sudo mv pdfium-cli /usr/local/bin/pdfium-cli
+          pdfium-cli --version
+
+      - name: Install pdfinfo and qpdf
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils qpdf
+          pdfinfo -v
+          qpdf --version
+
+      - name: Install Elixir Dependencies
+        run: mix deps.get
+
+      - name: Run Viewer Evidence Live Proof
+        run: |
+          mix test --include live_pdf_tools \
+            test/rendro/adapters/forms_viewer_evidence_live_test.exs \
+            test/rendro/adapters/embedded_files_viewer_evidence_live_test.exs \
+            test/rendro/adapters/links_viewer_evidence_live_test.exs \
+            test/rendro/adapters/protection_viewer_evidence_live_test.exs
+
   signing-live-proof:
     runs-on: ubuntu-latest
     needs: test

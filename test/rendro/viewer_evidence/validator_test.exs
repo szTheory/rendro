@@ -52,9 +52,9 @@ defmodule Rendro.ViewerEvidence.ValidatorTest do
     end
 
     @tag :template
-    test "run_full succeeds on production matrix with legacy supported warnings" do
+    test "run_full succeeds on production matrix with no legacy promotion warnings" do
       assert {:ok, warnings} = Validator.run_full()
-      assert Enum.count(warnings, &String.contains?(&1, "missing promotion-complete")) == 5
+      refute Enum.any?(warnings, &String.contains?(&1, "missing promotion-complete"))
     end
   end
 
@@ -230,8 +230,8 @@ defmodule Rendro.ViewerEvidence.ValidatorTest do
       matrix = Matrix.load!()
       cells = Matrix.enumerate_viewer_cells(matrix)
 
-      assert Enum.count(cells, &(&1.status == "supported")) == 5
-      assert Enum.count(cells, &(&1.status == "unverified")) == 21
+      assert Enum.count(cells, &(&1.status == "supported")) == 6
+      assert Enum.count(cells, &(&1.status == "unverified")) == 20
       assert Enum.count(cells, &(&1.status == "explicit_deferral")) == 0
     end
 
@@ -243,7 +243,11 @@ defmodule Rendro.ViewerEvidence.ValidatorTest do
       assert Enum.find(cells, &(&1.viewer == "apple_preview" && &1.surface == "forms"))
       assert Enum.find(cells, &(&1.viewer == "pdfjs" && &1.surface == "signature_widget"))
       assert Enum.find(cells, &(&1.viewer == "pdfjs" && &1.surface == "signed_artifact"))
-      assert Enum.find(cells, &(&1.viewer == "pdfjs" && &1.surface == "long_lived_signed_artifact"))
+
+      assert Enum.find(
+               cells,
+               &(&1.viewer == "pdfjs" && &1.surface == "long_lived_signed_artifact")
+             )
 
       refute Enum.any?(cells, &(&1.surface == "signing"))
       refute Enum.any?(cells, &(&1.surface == "long_lived"))
@@ -298,8 +302,8 @@ defmodule Rendro.ViewerEvidence.ValidatorTest do
       statuses = collect_viewer_statuses(matrix)
 
       assert length(statuses) == 26
-      assert Enum.count(statuses, &(&1 == "supported")) == 5
-      assert Enum.count(statuses, &(&1 == "unverified")) == 21
+      assert Enum.count(statuses, &(&1 == "supported")) == 6
+      assert Enum.count(statuses, &(&1 == "unverified")) == 20
       assert Enum.count(statuses, &(&1 == "explicit_deferral")) == 0
     end
 
@@ -360,7 +364,7 @@ defmodule Rendro.ViewerEvidence.ValidatorTest do
     end
 
     @tag :schema_contract
-    test "supported legacy rows pass without promotion keys (Tier-A carve-out)" do
+    test "supported rows require promotion keys after Tier-B schema flip" do
       root = viewer_row_schema_root()
 
       legacy = %{
@@ -368,7 +372,7 @@ defmodule Rendro.ViewerEvidence.ValidatorTest do
         "proof" => ["open", "default_state_visible", "edit_or_toggle", "save"]
       }
 
-      assert {:ok, _} = JSV.validate(legacy, root)
+      assert {:error, _} = JSV.validate(legacy, root)
     end
 
     @tag :schema_contract

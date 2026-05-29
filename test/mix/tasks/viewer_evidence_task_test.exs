@@ -14,8 +14,8 @@ defmodule Mix.Tasks.Rendro.ViewerEvidenceTest do
       assert result == :ok
       output = Enum.join(messages, "\n")
       assert output =~ "Viewer evidence: 26 cells"
-      assert output =~ "supported=5, unverified=21, explicit_deferral=0"
-      assert output =~ "legacy: missing evidence pointer"
+      assert output =~ "supported=6, unverified=20, explicit_deferral=0"
+      refute output =~ "legacy: missing evidence pointer"
     end
 
     test "--json emits summary and cells on stdout only" do
@@ -26,8 +26,8 @@ defmodule Mix.Tasks.Rendro.ViewerEvidenceTest do
 
       assert {:ok, payload} = JSON.decode(json_output)
       assert payload["summary"]["total"] == 26
-      assert payload["summary"]["supported"] == 5
-      assert payload["summary"]["unverified"] == 21
+      assert payload["summary"]["supported"] == 6
+      assert payload["summary"]["unverified"] == 20
       assert payload["summary"]["explicit_deferral"] == 0
       assert length(payload["cells"]) == 26
 
@@ -48,7 +48,7 @@ defmodule Mix.Tasks.Rendro.ViewerEvidenceTest do
 
       assert exit_reason == {:shutdown, 1}
       output = Enum.join(messages, "\n")
-      assert output =~ "21 unverified viewer cell(s)"
+      assert output =~ "20 unverified viewer cell(s)"
     end
 
     test "--json filters to unverified cells only" do
@@ -58,8 +58,8 @@ defmodule Mix.Tasks.Rendro.ViewerEvidenceTest do
         end)
 
       assert {:ok, payload} = JSON.decode(json_output)
-      assert payload["summary"]["total"] == 21
-      assert payload["summary"]["unverified"] == 21
+      assert payload["summary"]["total"] == 20
+      assert payload["summary"]["unverified"] == 20
       assert payload["summary"]["supported"] == 0
       assert Enum.all?(payload["cells"], &(&1["status"] == "unverified"))
     end
@@ -72,7 +72,7 @@ defmodule Mix.Tasks.Rendro.ViewerEvidenceTest do
       assert result == :ok
       output = Enum.join(messages, "\n")
       assert output =~ "Viewer evidence validation passed"
-      assert output =~ "5 warning(s)"
+      refute output =~ "missing promotion-complete"
     end
   end
 

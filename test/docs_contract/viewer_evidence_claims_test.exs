@@ -24,25 +24,44 @@ defmodule Rendro.DocsContract.ViewerEvidenceClaimsTest do
                Validator.validate_evidence_file("priv/viewer_evidence/_template.md", proof)
     end
 
-    test "run_full succeeds on production matrix and does not treat staleness as blocking" do
+    test "production support matrix is promotion-complete for all supported rows" do
       matrix = Matrix.load!()
+      assert :ok = Validator.validate_promotion_complete(matrix)
+    end
 
-      assert {:ok, warnings} = Validator.run_full()
-      assert is_list(warnings)
+    test "api stability guide mirrors all consolidated viewer evidence paths" do
+      guide = File.read!("guides/api_stability.md")
 
-      stale_warnings = Validator.staleness_warnings(matrix)
-
-      if stale_warnings != [] do
-        assert Enum.all?(warnings, &is_binary/1)
-        refute Enum.any?(warnings, &String.contains?(&1, "structural"))
+      for path <- [
+            "priv/viewer_evidence/forms/apple_preview.md",
+            "priv/viewer_evidence/embedded_files/adobe_acrobat_reader.md",
+            "priv/viewer_evidence/links/adobe_acrobat_reader.md",
+            "priv/viewer_evidence/links/apple_preview.md",
+            "priv/viewer_evidence/protection/apple_preview.md"
+          ] do
+        assert guide =~ path
       end
+    end
+
+    test "viewer claim sentences do not reference phase summaries instead of evidence files" do
+      guide = File.read!("guides/api_stability.md")
+
+      refute guide =~ "Phase 47 viewer checklist"
+      refute guide =~ "Phase 54 checklist"
+      refute guide =~ "phase validation record"
+    end
+
+    test "run_full succeeds on production matrix with no legacy promotion warnings" do
+      assert {:ok, warnings} = Validator.run_full()
+
+      refute Enum.any?(warnings, &String.contains?(&1, "missing promotion-complete"))
     end
 
     test "viewer evidence guide references canonical template and worked example paths" do
       guide = File.read!("guides/viewer_evidence.md")
 
       assert guide =~ "priv/viewer_evidence/_template.md"
-      assert guide =~ "priv/viewer_evidence/forms/apple_preview.md"
+      assert guide =~ "priv/viewer_evidence/forms/chrome_pdfium.md"
     end
   end
 

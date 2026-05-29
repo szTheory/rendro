@@ -24,9 +24,51 @@ You need:
 | `supported` | Proof-backed support; promotion keys required on the matrix row | Required at `evidence:` path |
 | `explicit_deferral` | Honest "no" with named reason | Forbidden — matrix-only `evidence_deferred` |
 
-Promotion keys on `supported` rows: `evidence`, `recorded_at`, `viewer_kind` (typically `"manual"`). Do not put `status`, `viewer_kind`, or promotion keys in evidence frontmatter.
+Promotion keys on `supported` rows: `evidence`, `recorded_at`, `viewer_kind` (`manual`, `pdfium-cli`, or `pdfjs-dist`). Do not put `status`, `viewer_kind`, or promotion keys in evidence frontmatter.
 
-## Quick-start
+### Automated path (Linux CI — pdfium-cli, pdfinfo, qpdf)
+
+When `pdfium-cli`, `pdfinfo`, and `qpdf` are on PATH, record Phase 70 consolidated legacy rows without GUI viewers:
+
+```bash
+mix rendro.viewer_evidence record forms chrome_pdfium \
+  --fixture test/fixtures/forms_support_fixture.pdf \
+  --recorded-by ci:viewer-evidence-live-proof
+
+mix rendro.viewer_evidence record forms apple_preview \
+  --fixture test/fixtures/forms_support_fixture.pdf \
+  --recorded-by ci:viewer-evidence-live-proof
+
+mix rendro.viewer_evidence record embedded_files adobe_acrobat_reader \
+  --fixture test/fixtures/embedded_artifact_support_fixture.pdf \
+  --recorded-by ci:viewer-evidence-live-proof
+
+mix rendro.viewer_evidence record links adobe_acrobat_reader \
+  --fixture test/fixtures/embedded_artifact_support_fixture.pdf \
+  --recorded-by ci:viewer-evidence-live-proof
+
+mix rendro.viewer_evidence record links apple_preview \
+  --fixture test/fixtures/embedded_artifact_support_fixture.pdf \
+  --recorded-by ci:viewer-evidence-live-proof
+
+mix rendro.viewer_evidence record protection apple_preview \
+  --fixture test/fixtures/protection_support_fixture.pdf \
+  --recorded-by ci:viewer-evidence-live-proof
+```
+
+Set matrix `viewer_kind` to `"pdfium-cli"`. CI validates committed fixtures via:
+
+```bash
+mix test --include live_pdf_tools \
+  test/rendro/adapters/forms_viewer_evidence_live_test.exs \
+  test/rendro/adapters/embedded_files_viewer_evidence_live_test.exs \
+  test/rendro/adapters/links_viewer_evidence_live_test.exs \
+  test/rendro/adapters/protection_viewer_evidence_live_test.exs
+```
+
+Structural automation proxies do not validate Apple Preview or Adobe Acrobat GUI behavior.
+
+### Manual path (Preview / Acrobat)
 
 Run these steps in order. Each step ends with an observable check.
 
@@ -92,7 +134,7 @@ Add to the `supported` viewer object in `priv/support_matrix.json`:
 
 - `"evidence": "priv/viewer_evidence/<surface>/<viewer>.md"`
 - `"recorded_at": "YYYY-MM-DD"` — **must equal** `recorded_at` in evidence frontmatter
-- `"viewer_kind": "manual"`
+- `"viewer_kind": "manual"` (or `"pdfium-cli"` / `"pdfjs-dist"` for automated observers)
 
 Do not change `status` or `proof[]` for re-attestation. Update `guides/api_stability.md` and `CHANGELOG.md` when closing the public contract (see plan 69-03).
 
@@ -109,22 +151,15 @@ mix test test/docs_contract/viewer_evidence_claims_test.exs
 
 ---
 
-## Worked example — forms × Apple Preview
+## Worked example — forms × chrome_pdfium
 
-The canonical observations for the first promoted cell live only in the repository evidence file:
+The canonical observations for the first CI-automated promoted cell live only in the repository evidence file:
 
-[priv/viewer_evidence/forms/apple_preview.md](https://github.com/szTheory/rendro/blob/main/priv/viewer_evidence/forms/apple_preview.md)
+[priv/viewer_evidence/forms/chrome_pdfium.md](https://github.com/szTheory/rendro/blob/main/priv/viewer_evidence/forms/chrome_pdfium.md)
 
-*(Planned in Phase 69 plan 02 — link is the operator target path.)*
+The guide shows structure and commands; **the canonical file wins** for version strings, platform, behavior notes, and dates.
 
-The guide shows structure and commands; **the canonical file wins** for version strings, platform, behavior notes, and dates. Optional excerpt after promotion:
-
-```yaml
-behaviors:
-  - behavior: open
-    result: pass
-    note: "<see canonical file>"
-```
+Apple Preview consolidated evidence (`priv/viewer_evidence/forms/apple_preview.md`) uses the same pdfium-cli structural proxy lane as Phase 70 automation — GUI Preview is not re-run in CI.
 
 Copy source for new cells: `priv/viewer_evidence/_template.md`.
 
@@ -141,7 +176,14 @@ Representative fixture: `test/fixtures/forms_support_fixture.pdf` (widgets: `ema
 | `edit_or_toggle` | Change email text; toggle terms; switch radio to phone |
 | `save` | Save As to a new path; reopen; edited state persists |
 
-Other surfaces (embedded_files, links, protection, signed_artifact) follow the same pattern: read `proof[]` from the matrix, run the surface fixture, record one note per behavior. Full row consolidation for legacy surfaces is scheduled in later phases — this appendix is the reference shape for forms.
+Other surfaces use the same automated record commands when `pdfium-cli`, `pdfinfo`, and `qpdf` are available:
+
+| Surface | Fixture | Regeneration |
+|---------|---------|--------------|
+| `embedded_files` / `links` | `test/fixtures/embedded_artifact_support_fixture.pdf` | `MIX_ENV=test mix run -e 'Rendro.Test.EmbeddedArtifactSupportFixture.write_fixture("test/fixtures/embedded_artifact_support_fixture.pdf")'` |
+| `protection` | `test/fixtures/protection_support_fixture.pdf` | `mix run scripts/protected_viewer_proof_fixture.exs --output test/fixtures/protection_support_fixture.pdf` |
+
+Protection regen produces **new bytes** — re-run the structural proof lane after regeneration.
 
 ## Appendix B — Explicit deferral discipline
 

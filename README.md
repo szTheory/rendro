@@ -14,6 +14,13 @@ Pure-Elixir PDF generation with deterministic layout and pagination.
 - **Tiered Composition:** Canonical recipes expose `document/2`, `page_template/1`, and `sections/2` for zero-to-one and advanced escape-hatch use.
 - **Production-Ready:** Built-in telemetry, structured diagnostics, and policies.
 
+## Guides
+
+- [User Flows and Jobs To Be Done](guides/user_flows_and_jtbd.md) — the shortest path to understanding which Rendro workflow fits your SaaS use case.
+- [Branding](guides/branding.md) — register fonts and logo assets, then use the branded invoice recipe.
+- [Integrations](guides/integrations.md) — optional adapters for Phoenix ecosystem workflows such as Oban, Threadline, Mailglass, and signing.
+- [API Stability and Support Boundaries](guides/api_stability.md) — the canonical support language for trust-sensitive and proof-backed surfaces.
+
 ## Getting Started with the Builder API
 
 The pipeline builder API is the canonical way to compose documents in Rendro. It mirrors the ergonomics of `Plug.Conn` and `Ecto.Changeset`: each function takes a `%Rendro.Document{}` and returns a new one, making it easy to build documents conditionally and dynamically during a request cycle.

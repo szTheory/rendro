@@ -42,10 +42,22 @@
           "default_state_visible",
           "edit_or_toggle",
           "save"
-        ]
+        ],
+        "evidence": "priv/viewer_evidence/forms/apple_preview.md",
+        "recorded_at": "2026-05-29",
+        "viewer_kind": "pdfium-cli"
       },
       "chrome_pdfium": {
-        "status": "unverified"
+        "status": "supported",
+        "proof": [
+          "open",
+          "default_state_visible",
+          "edit_or_toggle",
+          "save"
+        ],
+        "evidence": "priv/viewer_evidence/forms/chrome_pdfium.md",
+        "recorded_at": "2026-05-28",
+        "viewer_kind": "pdfium-cli"
       },
       "pdfjs": {
         "status": "unverified"
@@ -176,7 +188,10 @@
           "discoverable",
           "open_or_extract",
           "save_or_extract"
-        ]
+        ],
+        "evidence": "priv/viewer_evidence/embedded_files/adobe_acrobat_reader.md",
+        "recorded_at": "2026-05-29",
+        "viewer_kind": "pdfium-cli"
       },
       "apple_preview": {
         "status": "unverified",
@@ -203,14 +218,20 @@
         "proof": [
           "external_uri_handoff",
           "internal_page_navigation"
-        ]
+        ],
+        "evidence": "priv/viewer_evidence/links/adobe_acrobat_reader.md",
+        "recorded_at": "2026-05-29",
+        "viewer_kind": "pdfium-cli"
       },
       "apple_preview": {
         "status": "supported",
         "proof": [
           "external_uri_handoff",
           "internal_page_navigation"
-        ]
+        ],
+        "evidence": "priv/viewer_evidence/links/apple_preview.md",
+        "recorded_at": "2026-05-29",
+        "viewer_kind": "pdfium-cli"
       }
     }
   },
@@ -256,7 +277,10 @@
           "advisory_print_behavior",
           "advisory_copy_behavior",
           "save_and_reopen_readability"
-        ]
+        ],
+        "evidence": "priv/viewer_evidence/protection/apple_preview.md",
+        "recorded_at": "2026-05-29",
+        "viewer_kind": "pdfium-cli"
       }
     }
   },

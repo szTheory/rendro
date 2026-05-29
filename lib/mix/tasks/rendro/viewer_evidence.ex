@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Rendro.ViewerEvidence do
   use Mix.Task
 
-  alias Rendro.ViewerEvidence.{Matrix, Validator}
+  alias Rendro.ViewerEvidence.{Matrix, Recorder, Validator}
 
   @shortdoc "Audit viewer-evidence coverage in the support matrix"
 
@@ -23,6 +23,16 @@ defmodule Mix.Tasks.Rendro.ViewerEvidence do
       mix rendro.viewer_evidence list [--json]
       mix rendro.viewer_evidence missing [--json]
       mix rendro.viewer_evidence validate
+      mix rendro.viewer_evidence record <surface> <viewer> [--fixture PATH] [--recorded-by ID]
+
+  Supported automated recordings:
+
+      mix rendro.viewer_evidence record forms chrome_pdfium
+      mix rendro.viewer_evidence record forms apple_preview
+      mix rendro.viewer_evidence record embedded_files adobe_acrobat_reader
+      mix rendro.viewer_evidence record links adobe_acrobat_reader
+      mix rendro.viewer_evidence record links apple_preview
+      mix rendro.viewer_evidence record protection apple_preview
 
   `list` prints summary counts and a fixed-width table (`surface`, `viewer`,
   `status`, `notes`) sorted by surface then viewer. `missing` filters to
@@ -54,30 +64,69 @@ defmodule Mix.Tasks.Rendro.ViewerEvidence do
 
   @impl Mix.Task
   def run(args) do
-    {command, json?} = parse_args!(args)
+    {command, json?, record_opts} =
+      args
+      |> parse_args!()
+      |> normalize_parsed()
+
     Mix.Task.run("app.start")
 
-    matrix = Matrix.load!()
-    cells = Matrix.enumerate_viewer_cells(matrix)
-
     case command do
-      :list -> run_list(matrix, cells, json?)
-      :missing -> run_missing(matrix, cells, json?)
-      :validate -> run_validate(json?)
+      :record ->
+        run_record(record_opts, json?)
+
+      _ ->
+        matrix = Matrix.load!()
+        cells = Matrix.enumerate_viewer_cells(matrix)
+
+        case command do
+          :list -> run_list(matrix, cells, json?)
+          :missing -> run_missing(matrix, cells, json?)
+          :validate -> run_validate(json?)
+        end
+    end
+  end
+
+  defp normalize_parsed({command, json?}) when command in [:list, :missing, :validate],
+    do: {command, json?, []}
+
+  defp normalize_parsed({:record, json?, record_opts}), do: {:record, json?, record_opts}
+
+  defp run_record(%{surface: surface, viewer: viewer} = opts_map, json?) do
+    opts =
+      opts_map
+      |> Map.drop([:surface, :viewer])
+      |> Enum.reject(fn {_key, value} -> is_nil(value) end)
+      |> Keyword.new()
+
+    case Recorder.record(surface, viewer, opts) do
+      {:ok, result} ->
+        if json? do
+          IO.puts(JSON.encode!(result))
+        else
+          Mix.shell().info("Recorded #{result.evidence_path}")
+          Mix.shell().info("viewer_version=#{result.viewer_version} platform=#{result.platform}")
+        end
+
+        :ok
+
+      {:error, reason} ->
+        Mix.shell().error("Record failed: #{inspect(reason)}")
+        exit({:shutdown, 1})
     end
   end
 
   defp parse_args!([]), do: usage_error!("missing subcommand")
 
   defp parse_args!(args) do
-    {flags, positional} =
-      args
-      |> Enum.split_with(&(&1 == "--json"))
+    {json?, rest} = pop_json_flag(args)
 
-    json? = flags != []
+    case rest do
+      ["record", surface, viewer | record_rest] ->
+        {:record, json?,
+         Map.merge(%{surface: surface, viewer: viewer}, Map.new(parse_record_flags(record_rest)))}
 
-    case positional do
-      [command | rest] when rest == [] ->
+      [command] ->
         case command do
           "list" -> {:list, json?}
           "missing" -> {:missing, json?}
@@ -85,12 +134,28 @@ defmodule Mix.Tasks.Rendro.ViewerEvidence do
           other -> usage_error!("unknown subcommand #{inspect(other)}")
         end
 
-      [command | rest] ->
-        usage_error!("unexpected arguments: #{inspect([command | rest])}")
+      [command | rest_pos] ->
+        usage_error!("unexpected arguments: #{inspect([command | rest_pos])}")
 
       [] ->
         usage_error!("missing subcommand")
     end
+  end
+
+  defp parse_record_flags([]), do: []
+
+  defp parse_record_flags(["--fixture", value | rest]),
+    do: [fixture: value] ++ parse_record_flags(rest)
+
+  defp parse_record_flags(["--recorded-by", value | rest]),
+    do: [recorded_by: value] ++ parse_record_flags(rest)
+
+  defp parse_record_flags([other | _]),
+    do: usage_error!("unexpected record argument #{inspect(other)}")
+
+  defp pop_json_flag(args) do
+    {flags, rest} = Enum.split_with(args, &(&1 == "--json"))
+    {flags != [], rest}
   end
 
   defp run_list(matrix, cells, json?) do
@@ -308,7 +373,11 @@ defmodule Mix.Tasks.Rendro.ViewerEvidence do
 
   defp usage_error!(message) do
     Mix.shell().error(message)
-    Mix.shell().error("Usage: mix rendro.viewer_evidence list|validate|missing [--json]")
+
+    Mix.shell().error(
+      "Usage: mix rendro.viewer_evidence list|validate|missing [--json] | record <surface> <viewer> [--fixture PATH] [--recorded-by ID]"
+    )
+
     exit({:shutdown, 1})
   end
 end

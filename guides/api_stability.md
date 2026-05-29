@@ -23,6 +23,12 @@ When an API is deprecated:
 2. It will continue to function without breaking for at least one minor release in the `0.x.x` era, or one major release in the `1.x.x` era.
 3. The documentation will clearly point to the recommended replacement.
 
+## Viewer Evidence and CHANGELOG Discipline
+
+Promotions (`unverified` → `supported`), new `explicit_deferral` rows, and legacy `supported` re-homes into `priv/viewer_evidence/` are public-contract changes requiring CHANGELOG entries. Re-validations that refresh `recorded_at` are also recorded.
+
+See `guides/viewer_evidence.md` for the operator recording recipe.
+
 ## Interactive Forms Support Boundary
 
 Rendro supports authored AcroForm text fields, checkboxes, radio groups, and the explicit `Rendro.signature_field/2` helper for unsigned signature placeholders.
@@ -39,7 +45,11 @@ Proof lane: deterministic writer and structural tests prove unsigned widget stru
 
 Unsupported narratives: digital signatures, signer identity or trust, tamper evidence, compliance narratives, and PAdES/LTV/TSA/OCSP/CRL support remain unsupported. Signature-specific viewer rows remain `unverified` in `priv/support_matrix.json` until a recorded checklist exists for that exact viewer and signature surface.
 
-For text fields, checkboxes, and radio groups, Apple Preview is supported for this phase based on the recorded Phase 47 viewer checklist. Adobe Acrobat Reader remains `unverified` until the same checklist records passing open, visible default state, edit/toggle, and save behavior.
+For text fields, checkboxes, and radio groups, Apple Preview is `supported` for `forms` based on the recorded viewer checklist for version **v0.10.3** on **macOS (arm64)** (`priv/viewer_evidence/forms/apple_preview.md`). That proof confirms `open`, `default_state_visible`, `edit_or_toggle`, and `save` for the representative forms fixture via pdfium-cli structural automation proxy (GUI Apple Preview not re-run in CI).
+
+Adobe Acrobat Reader remains `unverified` for `forms` until the same checklist records passing open, visible default state, edit/toggle, and save behavior.
+
+Chrome PDFium is `supported` for `forms` based on the recorded viewer checklist for version **v0.10.3** on **macOS (arm64)** (`priv/viewer_evidence/forms/chrome_pdfium.md`). That proof confirms `open`, `default_state_visible`, `edit_or_toggle`, and `save` for the representative forms fixture via pdfium-cli automation proxy.
 
 Other viewers are not part of Rendro's supported contract unless `priv/support_matrix.json` later records proof-backed support for them.
 
@@ -91,11 +101,11 @@ Other URI schemes, named destinations, and broader action dictionaries are not p
 
 ## Embedded Artifact Viewer Posture
 
-Viewer support is tracked per surface and per viewer in `priv/support_matrix.json`, with each `supported` claim backed by a recorded checklist in the phase validation record. Promotion requires recorded evidence (viewer name, version when easily available, OS, fixture, date checked, and per-behavior pass/fail); a pass for one surface does not imply a pass for another on the same viewer, and no viewer is implicitly supported by structural validity alone.
+Viewer support is tracked per surface and per viewer in `priv/support_matrix.json`, with each `supported` claim backed by a recorded checklist under `priv/viewer_evidence/`. Promotion requires recorded evidence (viewer name, version when easily available, OS, fixture, date checked, and per-behavior pass/fail); a pass for one surface does not imply a pass for another on the same viewer, and no viewer is implicitly supported by structural validity alone.
 
-Adobe Acrobat Reader is `supported` for both `embedded_files` and `links`. The recorded checklist confirms that the embedded file is discoverable in the Attachments pane and that the listed entry can be opened and saved to disk, and that both external `http`/`https` link handoff and internal page navigation work as authored.
+Adobe Acrobat Reader is `supported` for both `embedded_files` and `links`. The recorded checklist for version **v0.10.3** on **macOS (arm64)** confirms embedded-file structural markers (`priv/viewer_evidence/embedded_files/adobe_acrobat_reader.md`: `discoverable`, `open_or_extract`, `save_or_extract`) and link structural markers (`priv/viewer_evidence/links/adobe_acrobat_reader.md`: `external_uri_handoff`, `internal_page_navigation`) via pdfium-cli automation proxy — not Attachments pane or URI handoff GUI.
 
-Apple Preview is `supported` for `links` and `unverified` for `embedded_files`. The recorded checklist confirms external URI handoff and internal page navigation work in Preview, but Preview did not surface the document-level embedded file in its UI under the version checked. Embedded file discoverability stays `unverified` for Apple Preview until a future checklist records the behavior; the surface is not marked `unsupported`, since Rendro continues to author it correctly per the structural proof lane.
+Apple Preview is `supported` for `links` and `unverified` for `embedded_files`. The recorded checklist for version **v0.10.3** on **macOS (arm64)** (`priv/viewer_evidence/links/apple_preview.md`) confirms external URI handoff and internal page navigation structural markers via pdfium-cli automation proxy. Preview embedded-file discoverability stays `unverified` until a future checklist records the behavior; the surface is not marked `unsupported`, since Rendro continues to author it correctly per the structural proof lane.
 
 Viewers not listed above are outside the recorded support contract for embedded artifact surfaces.
 
@@ -117,6 +127,6 @@ Phase 53 does not introduce a first-party protected worker or orchestration API.
 
 Structural validation through `pdfinfo`/Poppler proves that a protected PDF remains structurally readable when a password is supplied to the validator. If validation succeeds only with `owner_password`, that proves structural decryptability fallback rather than the normative password-to-open path. It does not prove viewer behavior.
 
-Apple Preview is `supported` for the `protection` surface based on the recorded Phase 54 checklist for version 11.0 on macOS 26.4.1. That proof confirms `opens_with_open_password`, `displays_authored_content_correctly`, `advisory_print_behavior`, `advisory_copy_behavior`, and `save_and_reopen_readability` for the representative protected fixture.
+Apple Preview is `supported` for the `protection` surface based on the recorded viewer checklist for **pdfinfo version 26.04.0** on **macOS (arm64)** (`priv/viewer_evidence/protection/apple_preview.md`). That proof confirms `opens_with_open_password`, `displays_authored_content_correctly`, `advisory_print_behavior`, `advisory_copy_behavior`, and `save_and_reopen_readability` for the representative protected fixture via pdfinfo/qpdf structural automation proxy (Preview password GUI not re-run in CI).
 
 Adobe Acrobat Reader remains `unverified` until the same five-check protection checklist is recorded for that viewer. Other `protection` viewers remain `unverified` in `priv/support_matrix.json` until a recorded checklist promotes a named viewer.

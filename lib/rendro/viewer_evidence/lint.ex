@@ -27,8 +27,7 @@ defmodule Rendro.ViewerEvidence.Lint do
 
   @spec evidence_body(String.t()) :: {:ok, :clean} | {:error, String.t()}
   def evidence_body(body) do
-    Enum.reduce_while(@evidence_body_patterns, {:ok, :clean}, fn {pattern, message},
-                                                                 _acc ->
+    Enum.reduce_while(@evidence_body_patterns, {:ok, :clean}, fn {pattern, message}, _acc ->
       if Regex.match?(pattern, body) do
         {:halt, {:error, message}}
       else

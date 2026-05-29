@@ -148,6 +148,15 @@
               ]
             }
           }
+        },
+        {
+          "if": {
+            "properties": { "status": { "const": "supported" } },
+            "required": ["status"]
+          },
+          "then": {
+            "required": ["evidence", "recorded_at", "viewer_kind"]
+          }
         }
       ]
     }
