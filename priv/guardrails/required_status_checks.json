@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "branch": "main",
+  "strict": true,
+  "policy": "additive_only",
+  "since_milestone": "v2.3",
+  "required_contexts": [
+    "long-lived-live-proof",
+    "release-proof",
+    "signing-live-proof",
+    "test"
+  ],
+  "contexts": [
+    {
+      "name": "test",
+      "semantic_class": "deterministic",
+      "ci_job": "test",
+      "command": "mix ci",
+      "notes": "Includes mix test (8 docs-contract lanes), format, hex.build, compile --warnings-as-errors, docs, credo, dialyzer. Viewer-evidence schema/lint folded here per Phase 68 D-18 — not a separate required context."
+    },
+    {
+      "name": "signing-live-proof",
+      "semantic_class": "behavioral_live_proof",
+      "ci_job": "signing-live-proof",
+      "command": "mix test --include live_signing test/rendro/adapters/signing_live_test.exs"
+    },
+    {
+      "name": "long-lived-live-proof",
+      "semantic_class": "behavioral_live_proof",
+      "ci_job": "long-lived-live-proof",
+      "command": "mix test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs"
+    },
+    {
+      "name": "release-proof",
+      "semantic_class": "release",
+      "ci_job": "release-proof",
+      "command": "mix run scripts/release_preflight_proof.exs --current-version-tag --worktree <isolated>"
+    }
+  ],
+  "advisory_contexts": [
+    {
+      "name": "viewer-evidence-live-proof",
+      "semantic_class": "behavioral_live_proof",
+      "ci_job": "viewer-evidence-live-proof",
+      "command": "mix test --include live_pdf_tools test/rendro/adapters/forms_viewer_evidence_live_test.exs test/rendro/adapters/embedded_files_viewer_evidence_live_test.exs test/rendro/adapters/links_viewer_evidence_live_test.exs test/rendro/adapters/protection_viewer_evidence_live_test.exs test/rendro/adapters/signature_widget_viewer_evidence_live_test.exs test/rendro/adapters/signed_artifact_viewer_evidence_live_test.exs test/rendro/adapters/trust_sensitive_viewer_evidence_live_test.exs",
+      "notes": "Phase 71 structural-proxy evidence regen; not required on main per D-18/D-32."
+    }
+  ],
+  "supersedes_planning_refs": {
+    "pitfalls_7_viewer_evidence_schema_required": false,
+    "rationale": "Structural viewer-evidence enforcement folds into test job; no fourth required GitHub context."
+  }
+}
