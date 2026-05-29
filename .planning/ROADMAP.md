@@ -141,7 +141,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 73. Page-Numbering / Running-Region Primitive | 5/5 | Complete   | 2026-05-29 |
+| 73. Page-Numbering / Running-Region Primitive | 5/5 | Complete    | 2026-05-29 |
 | 74. Statement Recipe | 0/? | Not started | - |
 | 75. Receipt/Report and Certificate Recipes + Support Contract | 0/? | Not started | - |
 | 76. Reference Phoenix App, CI, and Documentation Closure | 0/? | Not started | - |
