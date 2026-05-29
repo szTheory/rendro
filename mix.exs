@@ -44,6 +44,7 @@ defmodule Rendro.MixProject do
       {:telemetry, "~> 1.4"},
       {:harfbuzz_ex, "~> 1.2"},
       {:unicode_data, "~> 0.8.0"},
+      {:decimal, "~> 2.3"},
       {:phoenix, "~> 1.7", optional: true},
       {:plug, "~> 1.14", optional: true},
       {:oban, "~> 2.17", optional: true},
