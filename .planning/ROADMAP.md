@@ -21,7 +21,7 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 
 - [x] **Phase 68: Viewer Evidence Schema, Mix Task, and Docs-Contract Lane** — Land the additive matrix vocabulary, the schema validator, the operator mix task, and the docs-contract enforcement lane that everything else depends on. (completed 2026-05-28)
 - [x] **Phase 69: Operator Recipe + First Cell End-to-End** — Publish `guides/viewer_evidence.md` and walk one full cell (forms × Apple Preview) end-to-end as the canonical worked example. (completed 2026-05-28)
-- [ ] **Phase 70: Consolidate Already-Validated Surfaces (Wave 1, parallel-safe)** — Move the five pre-v2.3 `supported` rows into the canonical `priv/viewer_evidence/` home with `evidence:` pointers; no regression in published support.
+- [x] **Phase 70: Consolidate Already-Validated Surfaces (Wave 1, parallel-safe)** — Move the five pre-v2.3 `supported` rows into the canonical `priv/viewer_evidence/` home with `evidence:` pointers; no regression in published support. (completed 2026-05-29)
 - [ ] **Phase 71: Record New Trust-Sensitive Surfaces and Explicit Deferrals (Wave 2, parallel-safe)** — Walk every remaining (surface × viewer) cell across forms, protection, signature widgets, signing prep, signed artifacts, and long-lived; record promotions or `explicit_deferral` rows.
 - [ ] **Phase 72: Closure — Audit, Polish, and Ship** — Verify cell coverage, confirm engine-level required CI lanes remain green and required, polish guides, record the audit ledger, tag and ship.
 
@@ -139,7 +139,7 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 |-------|----------------|--------|-----------|
 | 68. Viewer Evidence Schema, Mix Task, and Docs-Contract Lane | 3/3 | Complete    | 2026-05-28 |
 | 69. Operator Recipe + First Cell End-to-End | 3/3 | Complete    | 2026-05-28 |
-| 70. Consolidate Already-Validated Surfaces | 1/3 | In Progress|  |
+| 70. Consolidate Already-Validated Surfaces | 3/3 | Complete    | 2026-05-29 |
 | 71. Record New Trust-Sensitive Surfaces and Explicit Deferrals | 0/0 | Not started | - |
 | 72. Closure — Audit, Polish, and Ship | 0/0 | Not started | - |
 

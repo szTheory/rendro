@@ -28,7 +28,7 @@ This is intentionally a **recording-discipline milestone**, not an engineering o
 
 ### Recorded Per-Viewer Evidence
 
-- [ ] **VIEWER-01**: The five existing `supported` viewer rows shipped before v2.3 (forms × Apple Preview from v1.8 Phase 47; embedded_files × Acrobat, links × Acrobat, links × Apple Preview from v1.9; protection × Apple Preview from v1.10 Phase 54) are consolidated into the canonical `priv/viewer_evidence/<surface>/<viewer>.md` home with `evidence:` pointers added to their matrix entries, with no regression in published support.
+- [x] **VIEWER-01**: The five existing `supported` viewer rows shipped before v2.3 (forms × Apple Preview from v1.8 Phase 47; embedded_files × Acrobat, links × Acrobat, links × Apple Preview from v1.9; protection × Apple Preview from v1.10 Phase 54) are consolidated into the canonical `priv/viewer_evidence/<surface>/<viewer>.md` home with `evidence:` pointers added to their matrix entries, with no regression in published support.
 - [ ] **VIEWER-02**: A `forms` per-viewer behavioral checklist (`open` → `default_state_visible` → `edit_or_toggle` → `save`) is recorded against Adobe Acrobat Reader; the matrix `forms.viewers.acrobat_reader` row is promoted to `supported` with an `evidence:` pointer.
 - [ ] **VIEWER-03**: A `protection` per-viewer behavioral checklist (`opens_with_open_password` → `displays_authored_content_correctly` → `advisory_print_behavior` → `advisory_copy_behavior` → `save_and_reopen_readability`) is recorded against Adobe Acrobat Reader; the matrix `protection.viewers.acrobat_reader` row is promoted to `supported` with an `evidence:` pointer.
 - [ ] **VIEWER-04**: A `signature widgets` per-viewer behavioral checklist (`opens_without_signature_warning_or_with_truthful_warning` → `widget_renders_as_unsigned_placeholder_rectangle` → `does_not_falsely_claim_signed` → `signature_panel_or_equivalent_reports_unsigned_or_silent` → `save_and_reopen_preserves_widget`) is recorded against Adobe Acrobat Reader, Apple Preview, and PDFium where the viewer renders the placeholder truthfully; PDF.js × signature widgets is recorded as `explicit_deferral` with the Mozilla `#4202` non-implementation as the named reason.
@@ -83,7 +83,7 @@ Populated by gsd-roadmapper on 2026-05-08 from the v2.3 roadmap (phases 68–72)
 | RECIPE-03 | 69 | Complete |
 | RECIPE-04 | 68 | Complete |
 | RECIPE-05 | 69 | Complete |
-| VIEWER-01 | 70 | Pending |
+| VIEWER-01 | 70 | Complete |
 | VIEWER-02 | 71 | Pending |
 | VIEWER-03 | 71 | Pending |
 | VIEWER-04 | 71 | Pending |
