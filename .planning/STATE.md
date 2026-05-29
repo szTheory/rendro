@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: Batteries-Included Workflow & Adoption Closure
 status: executing
-last_updated: "2026-05-29T16:09:22.597Z"
+last_updated: "2026-05-29T16:15:12.247Z"
 last_activity: 2026-05-29
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 5
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-05-29 after v2.3 milestone shipped)
 ## Current Position
 
 Phase: 73 (page-numbering-running-region-primitive) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-05-29
 
-Progress: [████░░░░░░] 40%
+Progress: [██████░░░░] 60%
 
 ## Milestone Snapshot
 
@@ -119,6 +119,7 @@ Items intentionally held outside v2.4 scope (carried from v2.3 + v2.4 planning):
 | release | 1.0 release capstone (SemVer/API-stability commitment) | after v2.4 ships |
 | Phase 73-page-numbering-running-region-primitive P01 | 9m | 2 tasks | 5 files |
 | Phase 73-page-numbering-running-region-primitive P02 | 12m | 2 tasks | 3 files |
+| Phase 73 P03 | 8min | 1 tasks | 2 files |
 
 ## Operator Next Steps
 

@@ -75,7 +75,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 73-03-PLAN.md — replace_page_numbers/3 extension + total threading single-pass (PAGE-01)
+- [x] 73-03-PLAN.md — replace_page_numbers/3 extension + total threading single-pass (PAGE-01)
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -141,7 +141,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 73. Page-Numbering / Running-Region Primitive | 2/5 | In Progress|  |
+| 73. Page-Numbering / Running-Region Primitive | 3/5 | In Progress|  |
 | 74. Statement Recipe | 0/? | Not started | - |
 | 75. Receipt/Report and Certificate Recipes + Support Contract | 0/? | Not started | - |
 | 76. Reference Phoenix App, CI, and Documentation Closure | 0/? | Not started | - |
