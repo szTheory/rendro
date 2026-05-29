@@ -3,14 +3,14 @@ status: gaps_found
 phase: 72-closure-audit-polish-and-ship
 verified: 2026-05-29T18:00:00Z
 requirements: [GUARDRAIL-02]
-score: 9/10
+score: 10/10
 ---
 
-# Phase 72 Verification Report (Plan 72-02)
+# Phase 72 Verification Report (Plans 72-01 / 72-02 / 72-03)
 
-**Phase goal:** Operator/release `validate --strict` staleness gate and closure verification ledger with machine matrix export and GUARDRAIL-02 audit evidence.
+**Phase goal:** GUARDRAIL-02 durable baseline (72-01), operator/release `validate --strict` staleness gate + machine matrix ledger (72-02), and surgical guide/docs-contract polish, `v0.3.1` CHANGELOG split, Hex-honesty negative test, release-workflow preflight hardening, and the full ship gate (72-03).
 
-**Result:** Automated checks PASSED; live GitHub branch-protection audit pending (`GITHUB_TOKEN` unset at verification time).
+**Result:** All automated ship-gate checks PASSED at `@version 0.3.1`, including the isolated-worktree release-preflight proof (synthetic exact-tag, Overall: PASS). The only open item is the live GitHub branch-protection audit, which requires `GITHUB_TOKEN` (unset in this environment) — an accepted, documented operator action before the `v0.3.1` tag push, not a code or contract gap.
 
 ## Must-Haves Verified
 
@@ -114,6 +114,52 @@ Viewer evidence validation passed.
 Viewer evidence validation passed.
 ```
 
+## Plan 72-03 Ship Gate (polish, v0.3.1 artifacts, release hardening)
+
+### Must-haves verified (72-03)
+
+| # | Criterion | Status | Evidence |
+|---|-----------|--------|----------|
+| 1 | `guides/viewer_evidence.md` documents Phase 71 automated path, fixes stale manual step 1 (exit 0), adds Appendix D `--strict` row (D-10, D-24) | PASS | commit `2b1140f`; grep `validate --strict` + `trust_sensitive_viewer_evidence_live_test`; no `expected today` |
+| 2 | Docs-contract asserts `forms/chrome_pdfium.md` + `signature_widget/chrome_pdfium.md` and deferral-substring mirror (D-26) | PASS | commit `a2c44b6`; `viewer_evidence_claims_test.exs` 21 tests, 0 failures |
+| 3 | CHANGELOG splits `0.3.0` (2026-05-08, pre-v2.3) from `0.3.1` (v2.3 viewer bullets); `mix.exs` `@version` `0.3.1` (D-12, D-13) | PASS | commit `20293d8`; grep `## [0.3.1] - Unreleased`, `## [0.3.0] - 2026-05-08`, `@version "0.3.1"` |
+| 4 | `mix.exs` `package files:` whitelist unchanged — no `priv/viewer_evidence/` or `priv/support_matrix.json` (D-29) | PASS | whitelist grep clean |
+| 5 | Negative hex.build test refutes `priv/viewer_evidence/` + `priv/support_matrix.json` in tarball (D-30) | PASS | commit `fc4a160`; `branding_claims_test.exs` 9 tests, 0 failures |
+| 6 | `release.yml` runs `mix release.preflight` before `hex.publish`; `mix ci` retained (D-14) | PASS | commit `fc4a160`; release.yml step grep |
+| 7 | `mix docs.contract` 8/8 lanes green; `mix ci` green at `0.3.1` | PASS | docs contract VERIFIED; `mix ci` `done (passed successfully)` |
+| 8 | Release-preflight proof green in isolated worktree at synthetic `v0.3.1` exact tag | PASS | `release_preflight_proof.exs --current-version-tag` → Overall: PASS, exit 0 |
+
+### Ship-gate command results (72-03)
+
+| Command | Result |
+|---------|--------|
+| `mix ci` | **PASS** (format, hex.build, compile --warnings-as-errors, test, docs, credo --strict, dialyzer 0 errors) |
+| `mix docs.contract` | **PASS** (8/8 lanes) |
+| `mix rendro.viewer_evidence missing` | **PASS** (exit 0, 0 unverified) |
+| `mix rendro.viewer_evidence validate` | **PASS** (exit 0) |
+| `mix rendro.viewer_evidence validate --strict` | **PASS** (exit 0) |
+| `mix test test/guardrails/` | **PASS** (11 tests, 0 failures) |
+| `mix test test/docs_contract/` | **PASS** (1 doctest, 59 tests, 0 failures) |
+| `mix run scripts/release_preflight_proof.exs --current-version-tag --worktree /tmp/rendro-preflight-72` | **PASS** (Overall: PASS, exit 0; synthetic tag + worktree cleaned up) |
+| `mix release.preflight` (direct, main tree) | **Phase 2 PASS**; Phase 1 `Clean worktree`/`Exact tag parity` FAIL by design — no real `v0.3.1` tag yet and execution worktree has the untracked out-of-scope stray. Authoritative green signal is the isolated-worktree proof above. Phase 1 substantive checks (Package metadata, Changelog release tail, Hex Build Artifacts) PASS. |
+
+### Pre-existing blocking issues fixed during 72-03 (deviations)
+
+| Fix | Rule | Detail | Commit |
+|-----|------|--------|--------|
+| `viewer_evidence.ex` record dispatch | Rule 1 (bug) | `parse_args!` returned a 4-tuple for `record` but `normalize_parsed` only matched the 3-tuple form; `record` subcommand would raise `FunctionClauseError` at runtime, and dialyzer flagged `:record`/`run_record/2` as unreachable dead code. Pre-existing from 72-02/Phase 71. | `3beaf1a` |
+| `viewer_evidence_task_test.exs` formatting | Rule 3 (blocking) | Prior-wave commit `7adeae7` left the file unformatted; `mix format --check-formatted` (inside `mix ci`/preflight) failed. | `3beaf1a` |
+| `release_preflight_test.exs` stub tags | Rule 1 (bug) | Stubbed `git describe --exact-match` as `v0.3.0`; after the 0.3.1 bump `check_exact_tag` compares against `v0.3.1`, so Phase 1 failed and Phase 2 assertions never ran inside the nested `mix ci` of the preflight proof worktree. | `68f56c5` |
+
+### Operator post-execute sequence (D-15 — not automated in this plan)
+
+1. Merge Phase 72 PR to `main`.
+2. Run live GitHub branch-protection audit with a repo-admin token (closes the one remaining gap below):
+   `GITHUB_TOKEN=… mix run scripts/audit_branch_protection.exs` → paste normalized JSON into this file.
+3. `git tag v0.3.1 && git push origin v0.3.1` → `release.yml` runs `mix ci` + `mix release.preflight`, then publishes to Hex.
+4. `/gsd-audit-milestone v2.3`
+5. `/gsd-complete-milestone v2.3`
+
 ## Gaps
 
-- `GITHUB_TOKEN unset — live audit pending before tag` (D-06). Re-run `mix run scripts/audit_branch_protection.exs` with repo admin read token and update this file with ISO-8601 timestamp + fenced JSON snapshot.
+- `GITHUB_TOKEN unset — live branch-protection audit pending before tag` (D-06). Re-run `mix run scripts/audit_branch_protection.exs` with a repo admin read token and update this file with an ISO-8601 timestamp + fenced JSON snapshot. This is an accepted operator action (no code/contract change required); all in-repo automated ship-gate checks are green.
