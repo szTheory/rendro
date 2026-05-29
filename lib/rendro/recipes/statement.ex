@@ -248,9 +248,9 @@ defmodule Rendro.Recipes.Statement do
   # ---------------------------------------------------------------------------
 
   defp header_section(%{period: period, account: account, opening_balance: ob} = _data, opts) do
-    fmt_amount = formatter(opts, :amount, &Rendro.Format.money/1)
-    fmt_date = formatter(opts, :date, &Rendro.Format.date/1)
-    lbl = label_resolver(opts)
+    fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
+    fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
+    lbl = Rendro.Recipes.Pagination.label_resolver(opts)
 
     period_str = "#{fmt_date.(period.from)} to #{fmt_date.(period.to)}"
     ob_str = "#{lbl.(:opening_balance)}: #{fmt_amount.(ob)}"
@@ -268,9 +268,9 @@ defmodule Rendro.Recipes.Statement do
   end
 
   defp body_section(%{opening_balance: ob, lines: lines} = _data, opts) do
-    fmt_amount = formatter(opts, :amount, &Rendro.Format.money/1)
-    fmt_date = formatter(opts, :date, &Rendro.Format.date/1)
-    lbl = label_resolver(opts)
+    fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
+    fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
+    lbl = Rendro.Recipes.Pagination.label_resolver(opts)
 
     rows_with_balance = fold_balance(ob, lines)
 
@@ -299,7 +299,26 @@ defmodule Rendro.Recipes.Statement do
     # Chunk rows into pages, accounting for the repeated table header on each page
     # and the brought/carried-forward extra rows. Reserve a conservative one-row
     # epsilon margin (D-09) so sub-pixel rounding never causes :content_overflow.
-    pages = chunk_into_pages(rows_with_balance, formatted_rows, row_heights, header_h, capacity)
+    #
+    # Build rows_with_meta triples for the shared chunker.
+    rows_with_meta =
+      Enum.zip([formatted_rows, row_heights, rows_with_balance])
+      |> Enum.map(fn {fmt_row, height, row_data} -> {fmt_row, height, row_data.balance} end)
+
+    # Estimate a typical row height for the CF/BF overhead reservation.
+    typical_row_h =
+      if Enum.empty?(row_heights) do
+        14.4
+      else
+        Enum.sum(row_heights) / length(row_heights)
+      end
+
+    # Effective capacity per page:
+    # header_h (repeated on every page) + brought-forward row + carried-forward row + epsilon
+    # We reserve space for at most 2 extra rows (bf + cf) and the epsilon margin.
+    effective_capacity = capacity - header_h - 2 * typical_row_h - @row_epsilon
+
+    pages = Rendro.Recipes.Pagination.chunk_rows_into_pages(rows_with_meta, effective_capacity)
 
     # D-02 / D-10: inject brought-forward / carried-forward rows.
     # Each page's rows are structured as: [brought_forward?, ...txns, carried_forward?]
@@ -347,7 +366,7 @@ defmodule Rendro.Recipes.Statement do
 
         # Page row structure: [brought_forward?, ...txns, carried_forward?]
         full_page_rows =
-          [bf_row | page_rows] ++ [cf_row]
+          ([bf_row | page_rows] ++ [cf_row])
           |> Enum.reject(&is_nil/1)
 
         table = Rendro.table(full_page_rows, table_opts)
@@ -362,77 +381,6 @@ defmodule Rendro.Recipes.Statement do
       region: :body,
       content: blocks
     )
-  end
-
-  # ---------------------------------------------------------------------------
-  # Per-page chunking (D-09 / D-10)
-  # ---------------------------------------------------------------------------
-
-  # Chunks rows into pages by cumulative height, packing to capacity − epsilon.
-  # Accounts for the repeated table header and extra brought/carried-forward rows.
-  # Returns a list of {page_rows (formatted), balance_at_break} tuples.
-  # balance_at_break is the running balance at the end of the last txn row on the page.
-  defp chunk_into_pages(rows_with_balance, formatted_rows, row_heights, header_h, capacity) do
-    # Estimate a typical row height for epsilon margin and brought/carried-forward overhead.
-    # Use the median/mean or a conservative max to reserve space.
-    typical_row_h =
-      if Enum.empty?(row_heights) do
-        14.4
-      else
-        Enum.sum(row_heights) / length(row_heights)
-      end
-
-    # Effective capacity per page:
-    # header_h (repeated on every page) + brought-forward row + carried-forward row + epsilon
-    # We reserve space for at most 2 extra rows (bf + cf) and the epsilon margin.
-    effective_capacity = capacity - header_h - 2 * typical_row_h - @row_epsilon
-
-    # Pair each formatted row with its balance and height.
-    rows_with_meta =
-      Enum.zip([formatted_rows, row_heights, rows_with_balance])
-      |> Enum.map(fn {fmt_row, height, row_data} ->
-        {fmt_row, height, row_data.balance}
-      end)
-
-    do_chunk_pages(rows_with_meta, effective_capacity, [], 0.0, [])
-  end
-
-  # Recursive page-chunker. Returns [{page_formatted_rows, balance_at_break}] list.
-  defp do_chunk_pages([], _cap, current_page, _current_h, pages) do
-    if current_page == [] do
-      Enum.reverse(pages)
-    else
-      {page_rows, balance} = finalize_page(current_page)
-      Enum.reverse([{page_rows, balance} | pages])
-    end
-  end
-
-  defp do_chunk_pages([{fmt_row, height, balance} | rest], cap, current_page, current_h, pages) do
-    new_h = current_h + height
-
-    if new_h <= cap or current_page == [] do
-      # Row fits (or page is empty — always add at least one row to prevent infinite loop)
-      do_chunk_pages(rest, cap, [{fmt_row, balance} | current_page], new_h, pages)
-    else
-      # Row would overflow — start a new page
-      {page_rows, page_balance} = finalize_page(current_page)
-      do_chunk_pages(
-        [{fmt_row, height, balance} | rest],
-        cap,
-        [],
-        0.0,
-        [{page_rows, page_balance} | pages]
-      )
-    end
-  end
-
-  # Finalizes a page: reverses accumulator (rows were added head-first) and
-  # returns {formatted_rows, balance_at_break} where balance is from the last row.
-  defp finalize_page(page_acc) do
-    reversed = Enum.reverse(page_acc)
-    rows = Enum.map(reversed, fn {fmt_row, _balance} -> fmt_row end)
-    {_last_fmt, last_balance} = List.last(reversed)
-    {rows, last_balance}
   end
 
   defp footer_section(_data, opts) do
@@ -542,7 +490,7 @@ defmodule Rendro.Recipes.Statement do
 
     What:  :opening_balance must be a Decimal.
     Where: Rendro.Recipes.Statement.validate_data!/1
-    Why:   Received: #{inspect(value)} (#{type_name(value)}).
+    Why:   Received: #{inspect(value)} (#{Rendro.Recipes.Pagination.type_name(value)}).
     Next:  Use Decimal.new/1 — e.g. Decimal.new("100.00").
     """
   end
@@ -566,7 +514,7 @@ defmodule Rendro.Recipes.Statement do
 
     What:  :lines must be a list of transaction maps.
     Where: Rendro.Recipes.Statement.validate_data!/1
-    Why:   Received: #{inspect(lines)} (#{type_name(lines)}).
+    Why:   Received: #{inspect(lines)} (#{Rendro.Recipes.Pagination.type_name(lines)}).
     Next:  Pass a list: [%{date: ~D[...], description: "...", amount: Decimal.new("...")}].
     """
   end
@@ -671,7 +619,7 @@ defmodule Rendro.Recipes.Statement do
 
     What:  Each line's :amount must be a Decimal.
     Where: Rendro.Recipes.Statement.validate_data!/1
-    Why:   lines[#{idx}].amount = #{inspect(value)} (#{type_name(value)}).
+    Why:   lines[#{idx}].amount = #{inspect(value)} (#{Rendro.Recipes.Pagination.type_name(value)}).
     Next:  Use Decimal.new/1 — e.g. Decimal.new("50.00").
     """
   end
@@ -693,7 +641,7 @@ defmodule Rendro.Recipes.Statement do
 
     What:  :closing_balance must be a Decimal.
     Where: Rendro.Recipes.Statement.validate_data!/1
-    Why:   Received: #{inspect(cb)} (#{type_name(cb)}).
+    Why:   Received: #{inspect(cb)} (#{Rendro.Recipes.Pagination.type_name(cb)}).
     Next:  Use Decimal.new/1 — e.g. Decimal.new("100.00").
     """
   end
@@ -750,37 +698,4 @@ defmodule Rendro.Recipes.Statement do
   end
 
   defp maybe_validate_summary!(_data), do: :ok
-
-  # ---------------------------------------------------------------------------
-  # Formatting helpers
-  # ---------------------------------------------------------------------------
-
-  # Returns the formatter function for `key` from opts[:formatters], or
-  # falls back to `default_fn`.
-  defp formatter(opts, key, default_fn) do
-    formatters = Keyword.get(opts, :formatters, [])
-    Keyword.get(formatters, key, default_fn)
-  end
-
-  # Returns a function that resolves a label key, merging caller-supplied
-  # :labels over the default Rendro.Format labels.
-  defp label_resolver(opts) do
-    user_labels = Keyword.get(opts, :labels, %{})
-
-    fn key ->
-      case Map.fetch(user_labels, key) do
-        {:ok, val} -> val
-        :error -> Rendro.Format.label(key)
-      end
-    end
-  end
-
-  # Returns a human-readable type name for error messages.
-  defp type_name(value) when is_binary(value), do: "String"
-  defp type_name(value) when is_integer(value), do: "Integer"
-  defp type_name(value) when is_float(value), do: "Float"
-  defp type_name(value) when is_atom(value), do: "Atom"
-  defp type_name(value) when is_list(value), do: "List"
-  defp type_name(value) when is_map(value), do: "Map"
-  defp type_name(_value), do: "Unknown"
 end
