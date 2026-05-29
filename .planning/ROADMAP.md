@@ -79,7 +79,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 73-04-PLAN.md — fn primitive + suppress_on selector + page_number/1 helper (PAGE-02)
+- [x] 73-04-PLAN.md — fn primitive + suppress_on selector + page_number/1 helper (PAGE-02)
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
@@ -141,7 +141,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 73. Page-Numbering / Running-Region Primitive | 3/5 | In Progress|  |
+| 73. Page-Numbering / Running-Region Primitive | 4/5 | In Progress|  |
 | 74. Statement Recipe | 0/? | Not started | - |
 | 75. Receipt/Report and Certificate Recipes + Support Contract | 0/? | Not started | - |
 | 76. Reference Phoenix App, CI, and Documentation Closure | 0/? | Not started | - |
