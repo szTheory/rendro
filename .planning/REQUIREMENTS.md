@@ -20,10 +20,10 @@ The foundational primitive. Must ship before any multi-page recipe depends on it
 
 ### Statement Recipe (STMT)
 
-- [ ] **STMT-01**: User can generate an account/billing statement from a data map via `Rendro.Recipes.Statement.document/2` (statement period, opening/closing balance, transaction lines, summary).
-- [ ] **STMT-02**: Statement paginates across multiple pages with carried-forward / brought-forward running balance computed in data-assembly (`sections/2`), deterministic and correct across page breaks.
-- [ ] **STMT-03**: Statement supports the three-rung escape hatch (`document/2`, `page_template/1`, `sections/2`) consistent with `Rendro.Recipes.Invoice`.
-- [ ] **STMT-04**: Statement uses the PAGE primitive for "Page X of Y" running footers.
+- [x] **STMT-01**: User can generate an account/billing statement from a data map via `Rendro.Recipes.Statement.document/2` (statement period, opening/closing balance, transaction lines, summary).
+- [x] **STMT-02**: Statement paginates across multiple pages with carried-forward / brought-forward running balance computed in data-assembly (`sections/2`), deterministic and correct across page breaks.
+- [x] **STMT-03**: Statement supports the three-rung escape hatch (`document/2`, `page_template/1`, `sections/2`) consistent with `Rendro.Recipes.Invoice`.
+- [x] **STMT-04**: Statement uses the PAGE primitive for "Page X of Y" running footers.
 
 ### Receipt / Report Recipe (RCPT)
 
@@ -87,10 +87,10 @@ Which phases cover which requirements. Updated on roadmap creation 2026-05-29.
 | PAGE-02 | Phase 73 | Complete |
 | PAGE-03 | Phase 73 | Complete |
 | PAGE-04 | Phase 73 | Complete |
-| STMT-01 | Phase 74 | Pending |
-| STMT-02 | Phase 74 | Pending |
-| STMT-03 | Phase 74 | Pending |
-| STMT-04 | Phase 74 | Pending |
+| STMT-01 | Phase 74 | Complete |
+| STMT-02 | Phase 74 | Complete |
+| STMT-03 | Phase 74 | Complete |
+| STMT-04 | Phase 74 | Complete |
 | RCPT-01 | Phase 75 | Pending |
 | RCPT-02 | Phase 75 | Pending |
 | RCPT-03 | Phase 75 | Pending |
