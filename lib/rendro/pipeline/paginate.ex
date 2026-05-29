@@ -56,6 +56,10 @@ defmodule Rendro.Pipeline.Paginate do
       {:error, :unsupported_table_split_policy, details} ->
         {:error,
          Rendro.Error.from_stage(:paginate, :unsupported_table_split_policy, %{details: details})}
+
+      {:error, :running_content_error, details} ->
+        {:error,
+         Rendro.Error.from_stage(:paginate, :running_content_error, %{details: details})}
     end
   end
 
@@ -472,9 +476,10 @@ defmodule Rendro.Pipeline.Paginate do
             end
           rescue
             reason ->
-              raise Rendro.Error.from_stage(:paginate, {:running_content_error, inspect(reason)},
-                      %{details: %{page_num: page_num}}
-                    )
+              throw(
+                {:error, :running_content_error,
+                 %{page_num: page_num, reason: inspect(reason)}}
+              )
           end
 
         _ ->

@@ -840,6 +840,71 @@ defmodule Rendro.Pipeline.PaginateTest do
                doc_with_suppression.options.layout.body_capacity
     end
 
+    test "CR-01 regression: raising running-content fn returns {:error, %Rendro.Error{}} instead of escaping as unhandled exception" do
+      # A RunningContent fn that raises must NOT escape as an unhandled exception.
+      # It must produce {:error, %Rendro.Error{stage: :paginate, reason: :running_content_error}}.
+      template =
+        %PageTemplate{
+          name: :rc_error_test,
+          width: 420,
+          height: 240,
+          margin_top: 20,
+          margin_right: 24,
+          margin_bottom: 28,
+          margin_left: 24,
+          regions: [
+            %Region{
+              name: :footer,
+              role: :footer,
+              anchor: :bottom,
+              x: 24,
+              y: 200,
+              width: 372,
+              height: 20
+            },
+            %Region{
+              name: :body,
+              role: :body,
+              anchor: :flow,
+              x: 24,
+              y: 52,
+              width: 372,
+              height: 100
+            }
+          ]
+        }
+
+      raising_fn_block =
+        %Rendro.Block{
+          content: %Rendro.RunningContent{
+            fun: fn {_pn, _tp} ->
+              raise ArgumentError, message: "intentional test error"
+            end
+          },
+          height: 14.4
+        }
+
+      section = Rendro.section(region: :footer, content: [raising_fn_block])
+
+      doc =
+        Rendro.flow(
+          [Rendro.block(Rendro.text("Content"))],
+          page_template: :rc_error_test,
+          page_templates: [template],
+          sections: [section]
+        )
+
+      {:ok, doc} = Build.run(doc)
+      {:ok, doc} = Compose.run(doc)
+      {:ok, doc} = Measure.run(doc)
+
+      result = Paginate.run(doc)
+      assert {:error, %Rendro.Error{} = error} = result
+      assert error.stage == :paginate
+      assert error.reason == :running_content_error
+      assert error.next =~ "running-content function"
+    end
+
     test "flow_layout/1 fallback subtracts footer height from body_capacity" do
       # The flow_layout/1 fallback uses %PageTemplate{} (default) whose header and
       # footer regions both have height: 0, so body_capacity = body_region.height - 0 - 0.

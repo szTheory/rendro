@@ -209,6 +209,12 @@ defmodule Rendro.Error do
   defp why(_stage, {:adapter_failure, adapter, reason}),
     do: "Protection adapter #{inspect(adapter)} failed: #{inspect(reason)}"
 
+  defp why(_stage, :running_content_error),
+    do: "A running-content function raised an unexpected error during page rendering."
+
+  defp why(_stage, %{reason: reason}) when is_binary(reason),
+    do: "Running-content function raised an error: #{reason}"
+
   defp why(_stage, reason) when is_atom(reason),
     do: reason |> Atom.to_string() |> String.replace("_", " ")
 
@@ -249,6 +255,10 @@ defmodule Rendro.Error do
 
   defp next_step(:paginate, :unsupported_table_split_policy) do
     "Use split_policy: :row_atomic on Rendro.table/2 (temporary alias :atomic is also accepted) so table continuation semantics stay explicit."
+  end
+
+  defp next_step(:paginate, :running_content_error) do
+    "Ensure the running-content function is a pure, terminating fn {page_number, total_pages} -> [Block.t()] | nil and does not raise."
   end
 
   defp next_step(:paginate, :max_pages_exceeded) do
