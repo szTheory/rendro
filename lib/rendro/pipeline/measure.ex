@@ -439,7 +439,32 @@ defmodule Rendro.Pipeline.Measure do
     end)
   end
 
-  defp body_capacity(%{body_region: %Region{height: height}}) when is_number(height), do: height
+  defp body_capacity(%{
+         body_region: %Region{y: body_y, height: body_h},
+         header_region: header_region,
+         footer_region: footer_region
+       })
+       when is_number(body_h) do
+    header_h =
+      if header_region && is_number(header_region.height) && is_number(header_region.y) &&
+           is_number(body_y) && body_y < header_region.y + header_region.height do
+        header_region.height
+      else
+        0
+      end
+
+    footer_h =
+      if footer_region && is_number(footer_region.height) && is_number(footer_region.y) &&
+           is_number(body_y) && is_number(body_h) &&
+           body_y + body_h >= footer_region.y do
+        footer_region.height
+      else
+        0
+      end
+
+    body_h - header_h - footer_h
+  end
+
   defp body_capacity(_layout), do: 0
 
   defp wrap_text(text, nil, font_chain, font_size) do

@@ -691,7 +691,22 @@ defmodule Rendro.Pipeline.PaginateTest do
     end
 
     test "flow_layout/1 fallback subtracts footer height from body_capacity" do
-      flunk "not yet implemented"
+      # The flow_layout/1 fallback uses %PageTemplate{} (default) whose header and
+      # footer regions both have height: 0, so body_capacity = body_region.height - 0 - 0.
+      # We verify the fallback path produces correct pagination: ~48 blocks of 14.4 height
+      # each fit into body_capacity 697.89 (≈ 48.46 blocks per page).
+      # Two pages means blocks 1..48 on page 1, block 49 on page 2.
+      blocks = for i <- 1..49, do: %Rendro.Block{content: Rendro.text("Block #{i}"), height: 14.4}
+
+      doc = %Rendro.Document{
+        content: blocks,
+        header: [],
+        footer: [],
+        metadata: %Rendro.Metadata{}
+      }
+
+      assert {:ok, paginated} = Paginate.run(doc)
+      assert length(paginated.pages) == 2
     end
   end
 

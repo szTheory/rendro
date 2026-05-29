@@ -488,10 +488,15 @@ defmodule Rendro.Pipeline.Paginate do
       height: template.height - template.margin_top - template.margin_bottom
     }
 
+    header_region = Enum.find(template.regions, &(&1.name == :header))
+    footer_region = Enum.find(template.regions, &(&1.name == :footer))
+    header_h = if header_region, do: header_region.height || 0, else: 0
+    footer_h = if footer_region, do: footer_region.height || 0, else: 0
+
     %{
       template: template,
       body_region: body_region,
-      body_capacity: body_region.height,
+      body_capacity: body_region.height - header_h - footer_h,
       region_blocks: %{
         body: doc.content,
         header: doc.header,
