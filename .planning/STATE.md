@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: Batteries-Included Workflow & Adoption Closure
 status: executing
-last_updated: "2026-05-29T20:52:06.822Z"
+last_updated: "2026-05-29T20:57:34Z"
 last_activity: 2026-05-29
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 13
-  completed_plans: 10
-  percent: 50
+  completed_plans: 11
+  percent: 85
 ---
 
 # Project State
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-05-29 after v2.3 milestone shipped)
 ## Current Position
 
 Phase: 75 (Receipt/Report and Certificate Recipes + Support Contract) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-05-29
 
-Progress: [████████░░] 77%
+Progress: [████████░░] 85%
 
 ## Milestone Snapshot
 
@@ -68,6 +68,8 @@ Full per-milestone decision log lives in `.planning/PROJECT.md` (Key Decisions t
 - [Phase ?]: 73-04: Raising fn in evaluate_fn_blocks/3 re-raised as Rendro.Error for consistent pipeline error propagation
 - [v2.4 74-02]: Rendro.Format (D-11) is pure/locale-free by construction — money/1 (Decimal.round 2dp, comma-grouped thousands, $ prefix, parentheses for negatives), date/1 (Date.to_iso8601), label/1 (five default labels via guarded map). No CLDR/gettext/ex_money/System/:os; i18n is the caller's :formatters/:labels override, never core.
 - [v2.4 74-02]: Negative magnitudes that round to zero (e.g. -0.001 → $0.00) render WITHOUT parentheses by design — Decimal.negative?(Decimal.round/2) is false for a zero result, which is the correct accounting display.
+- [v2.4 75-02]: Receipt totals block rendered as Rendro.text (not Rendro.table) — this distinguishes it from line-item table blocks in section content inspection and prevents spurious header: nil assertion failures in V5 tests.
+- [v2.4 75-02]: Receipt effective_capacity omits CF/BF overhead: capacity - header_h - row_epsilon (no 2*typical_row_h); Statement subtracts 2*typical_row_h for CF/BF rows; Receipt has none.
 
 ### Roadmap Evolution
 
@@ -127,6 +129,7 @@ Items intentionally held outside v2.4 scope (carried from v2.3 + v2.4 planning):
 | Phase 73 P04 | 3min | 2 tasks | 7 files |
 | Phase 73 P05 | 4min | 2 tasks | 1 files |
 | Phase 74-statement-recipe P02 | 12min | 2 tasks | 2 files |
+| Phase 75-receipt-report-and-certificate-recipes-support-contract P02 | 8min | 1 tasks | 2 files |
 
 ## Operator Next Steps
 
