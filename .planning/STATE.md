@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: Batteries-Included Workflow & Adoption Closure
 status: executing
-last_updated: "2026-05-29T22:07:36.026Z"
+last_updated: "2026-05-29T22:16:34.677Z"
 last_activity: 2026-05-29
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 17
-  completed_plans: 15
+  completed_plans: 16
   percent: 75
 ---
 
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-05-29 after v2.3 milestone shipped)
 ## Current Position
 
 Phase: 76 (reference-phoenix-app-ci-and-documentation-closure) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-05-29
 
-Progress: [█████████░] 88%
+Progress: [█████████░] 94%
 
 ## Milestone Snapshot
 
@@ -138,6 +138,7 @@ Items intentionally held outside v2.4 scope (carried from v2.3 + v2.4 planning):
 | Phase 75 P04 | 5 | 2 tasks | 1 files |
 | Phase 76 P01 | 2m | 2 tasks | 3 files |
 | Phase 76 P03 | 10min | 2 tasks | 3 files |
+| Phase 76 P04 | 15m | 2 tasks | 7 files |
 
 ## Operator Next Steps
 

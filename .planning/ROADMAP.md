@@ -165,7 +165,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 - [x] 76-01-PLAN.md — App modernization: dep floors (Phoenix ~>1.8 / plug ~>1.18 / jason ~>1.4 / elixir ~>1.19), ErrorJSON load-bearing fix, README (REF-01)
 - [x] 76-03-PLAN.md — CI isolation: graph-disconnected advisory `example-phoenix` job, remove redundant test step, guardrail manifest + contract test (advisory `Enum.find`, lane count 8→10) (REF-03)
-- [ ] 76-04-PLAN.md — Guides + docs-contract: `guides/page_primitive.md` + `guides/recipes.md`, ExDoc wiring, 3 docs-contract tests, 2 verify_docs lanes (CONTRACT-02)
+- [x] 76-04-PLAN.md — Guides + docs-contract: `guides/page_primitive.md` + `guides/recipes.md`, ExDoc wiring, 3 docs-contract tests, 2 verify_docs lanes (CONTRACT-02)
 
 **Wave 2** *(blocked on 76-01 — shares example-app boot)*
 
@@ -180,7 +180,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 | 73. Page-Numbering / Running-Region Primitive | 5/5 | Complete    | 2026-05-29 |
 | 74. Statement Recipe | 4/4 | Complete    | 2026-05-29 |
 | 75. Receipt/Report and Certificate Recipes + Support Contract | 4/4 | Complete    | 2026-05-29 |
-| 76. Reference Phoenix App, CI, and Documentation Closure | 2/4 | In Progress|  |
+| 76. Reference Phoenix App, CI, and Documentation Closure | 3/4 | In Progress|  |
 
 ---
 *v2.3 archived 2026-05-29 on milestone completion. v2.4 roadmap created 2026-05-29. Phase numbering: 73-76.*
