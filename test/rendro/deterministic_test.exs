@@ -189,19 +189,74 @@ defmodule Rendro.DeterministicTest do
 
   describe "running-region determinism (D-11)" do
     test "(a) two deterministic renders with running footer are byte-identical" do
-      flunk "not yet implemented"
+      doc = running_footer_doc("Page {{page_number}} of {{total_pages}}")
+      {:ok, pdf1} = Rendro.render(doc, deterministic: true)
+      {:ok, pdf2} = Rendro.render(doc, deterministic: true)
+      # Confirm the footer substitution path was exercised
+      assert pdf1 =~ "(Page 1 of"
+      assert pdf1 == pdf2
     end
 
     test "(b) body_capacity is identical for 9-page vs 100-page document" do
-      flunk "not yet implemented"
+      # D-09: body_capacity is a pure function of declared geometry, not page count or content volume.
+      # Use a template with footer_height: 30 to verify the subtraction is geometry-only.
+      cap_9 = measure_body_capacity(9)
+      cap_100 = measure_body_capacity(100)
+      assert_in_delta cap_9, cap_100, 1.0e-9
     end
 
     test "(c) page count and body-block assignment identical with total_pages vs static placeholder" do
-      flunk "not yet implemented"
+      # D-11(c): {{total_pages}} token presence does NOT affect pagination geometry.
+      doc_token = running_footer_doc("Page {{page_number}} of {{total_pages}}")
+      doc_static = running_footer_doc("Page {{page_number}} of 999")
+
+      {:ok, built_t} = Build.run(doc_token)
+      {:ok, composed_t} = Compose.run(built_t)
+      {:ok, measured_t} = Measure.run(composed_t)
+      {:ok, paginated_token} = Paginate.run(measured_t)
+
+      {:ok, built_s} = Build.run(doc_static)
+      {:ok, composed_s} = Compose.run(built_s)
+      {:ok, measured_s} = Measure.run(composed_s)
+      {:ok, paginated_static} = Paginate.run(measured_s)
+
+      assert length(paginated_token.pages) == length(paginated_static.pages)
+
+      token_counts = body_block_counts(paginated_token)
+      static_counts = body_block_counts(paginated_static)
+      assert token_counts == static_counts
     end
 
     test "(d) replace_page_numbers does not change MeasuredText geometry" do
-      flunk "not yet implemented"
+      # D-11(d) / D-10: run.width and block.height must be frozen at measure time.
+      # Geometry on page 1 and page 2 must be identical (both measured from token string,
+      # not re-measured from the substituted digit string).
+      doc = running_footer_doc("Page {{page_number}} of {{total_pages}}")
+
+      {:ok, built} = Build.run(doc)
+      {:ok, composed} = Compose.run(built)
+      {:ok, measured} = Measure.run(composed)
+      {:ok, paginated} = Paginate.run(measured)
+
+      assert length(paginated.pages) >= 2
+
+      [page1, page2 | _] = paginated.pages
+
+      footer1 = find_footer_block(page1)
+      footer2 = find_footer_block(page2)
+
+      assert footer1 != nil, "expected footer block on page 1"
+      assert footer2 != nil, "expected footer block on page 2"
+
+      # Geometry must be frozen: run widths identical across pages
+      runs1 = footer_run_widths(footer1)
+      runs2 = footer_run_widths(footer2)
+      assert runs1 == runs2,
+             "expected run widths to be identical on page 1 and page 2 (geometry frozen at measure), got p1=#{inspect(runs1)} p2=#{inspect(runs2)}"
+
+      # Block height also frozen
+      assert footer1.height == footer2.height,
+             "expected block height identical on page 1 and page 2, got p1=#{footer1.height} p2=#{footer2.height}"
     end
   end
 
@@ -413,4 +468,155 @@ defmodule Rendro.DeterministicTest do
       :nomatch -> raise "missing #{needle} in PDF output"
     end
   end
+
+  # --- D-11 helpers ---
+
+  # Builds a multi-page flow document with a running footer containing footer_text.
+  # Uses an explicit template with footer_height=20 so body_capacity is geometry-driven.
+  # Generates 60 body lines to ensure at least 2 pages with the small body region.
+  defp running_footer_doc(footer_text) do
+    template =
+      %Rendro.PageTemplate{
+        name: :d11_test,
+        width: 420,
+        height: 300,
+        margin_top: 20,
+        margin_right: 24,
+        margin_bottom: 20,
+        margin_left: 24,
+        regions: [
+          %Rendro.Region{
+            name: :body,
+            role: :body,
+            anchor: :flow,
+            x: 24,
+            y: 40,
+            width: 372,
+            height: 220
+          },
+          %Rendro.Region{
+            name: :footer,
+            role: :footer,
+            anchor: :bottom,
+            x: 24,
+            y: 268,
+            width: 372,
+            height: 20
+          }
+        ]
+      }
+
+    footer_section =
+      Rendro.section(
+        region: :footer,
+        content: [Rendro.block(Rendro.text(footer_text))]
+      )
+
+    content = for i <- 1..60, do: Rendro.block(Rendro.text("Line #{i}"))
+
+    Rendro.flow(
+      content,
+      page_template: :d11_test,
+      page_templates: [template],
+      sections: [footer_section]
+    )
+  end
+
+  # Runs Build → Compose → Measure on a doc with `n` body lines and
+  # an explicit template with footer_height=30, then returns body_capacity.
+  defp measure_body_capacity(n) do
+    template =
+      %Rendro.PageTemplate{
+        name: :d11_cap_test,
+        width: 420,
+        height: 300,
+        margin_top: 20,
+        margin_right: 24,
+        margin_bottom: 20,
+        margin_left: 24,
+        regions: [
+          %Rendro.Region{
+            name: :body,
+            role: :body,
+            anchor: :flow,
+            x: 24,
+            y: 40,
+            width: 372,
+            height: 220
+          },
+          %Rendro.Region{
+            name: :footer,
+            role: :footer,
+            anchor: :bottom,
+            x: 24,
+            y: 268,
+            width: 372,
+            height: 30
+          }
+        ]
+      }
+
+    footer_section =
+      Rendro.section(
+        region: :footer,
+        content: [Rendro.block(Rendro.text("Page {{page_number}} of {{total_pages}}"))]
+      )
+
+    content = for i <- 1..n, do: Rendro.block(Rendro.text("Line #{i}"))
+
+    doc =
+      Rendro.flow(
+        content,
+        page_template: :d11_cap_test,
+        page_templates: [template],
+        sections: [footer_section]
+      )
+
+    {:ok, built} = Build.run(doc)
+    {:ok, composed} = Compose.run(built)
+    {:ok, measured} = Measure.run(composed)
+    measured.options.layout.body_capacity
+  end
+
+  # Counts body blocks per page (blocks that are NOT footer/header blocks).
+  # A body block is any block whose content was placed by the body region (not a running region).
+  # We use a heuristic: after paginate, body blocks appear before region blocks in page.blocks;
+  # we count blocks whose x/y matches body region positioning (non-zero y from body stack).
+  # Simpler: count blocks NOT having the substituted footer text pattern.
+  defp body_block_counts(%{pages: pages}) do
+    Enum.map(pages, fn page ->
+      Enum.count(page.blocks, &body_block?/1)
+    end)
+  end
+
+  defp body_block?(%Rendro.Block{content: %Rendro.Pipeline.MeasuredText{source: source}}) do
+    # Footer blocks contain page-number tokens (substituted) — body blocks do not
+    not (String.contains?(source.content, "Page") and
+           String.contains?(source.content, "of"))
+  end
+
+  defp body_block?(%Rendro.Block{content: %Rendro.Text{content: text}}) do
+    not (String.contains?(text, "Page") and String.contains?(text, "of"))
+  end
+
+  defp body_block?(_), do: true
+
+  # Finds a footer block (MeasuredText containing page number pattern) on a page.
+  defp find_footer_block(%Rendro.Page{blocks: blocks}) do
+    Enum.find(blocks, fn block ->
+      case block.content do
+        %Rendro.Pipeline.MeasuredText{source: %Rendro.Text{content: text}} ->
+          String.contains?(text, "Page") or String.contains?(text, "{{page_number}}")
+        _ ->
+          false
+      end
+    end)
+  end
+
+  # Extracts run widths from a footer block's MeasuredText lines.
+  defp footer_run_widths(%Rendro.Block{content: %Rendro.Pipeline.MeasuredText{lines: lines}}) do
+    Enum.flat_map(lines, fn line -> Enum.map(line, & &1.width) end)
+  end
+
+  defp footer_run_widths(_), do: []
 end
