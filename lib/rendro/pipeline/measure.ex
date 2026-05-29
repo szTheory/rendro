@@ -282,8 +282,8 @@ defmodule Rendro.Pipeline.Measure do
     case result do
       {:ok, {grid_map, measured_rows, row_heights}} ->
         grid_layout =
-          for r <- 0..(length(rows) - 1) do
-            for c <- 0..(col_count - 1) do
+          for r <- 0..(length(rows) - 1)//1 do
+            for c <- 0..(col_count - 1)//1 do
               Map.get(grid_map, {r, c}, %{is_continuation: false, cell: nil})
             end
           end
