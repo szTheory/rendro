@@ -475,6 +475,26 @@ defmodule Rendro.Recipes.StatementTest do
         Statement.document("not a map")
       end
     end
+
+    test "top-level :closing_balance that disagrees with the derived value raises (WR-01)" do
+      # fixture_data(0): opening 1000.00, no lines -> derived closing 1000.00.
+      # The moduledoc promises the top-level assertion is validated via
+      # Decimal.equal?/2 — a wrong value must NOT be silently accepted.
+      data = fixture_data(0) |> Map.put(:closing_balance, Decimal.new("99999.99"))
+
+      assert_raise ArgumentError, ~r/closing_balance/i, fn ->
+        Statement.document(data)
+      end
+    end
+
+    test "top-level :closing_balance that matches the derived value is accepted (WR-01)" do
+      data = fixture_data(0) |> Map.put(:closing_balance, Decimal.new("1000.00"))
+
+      doc = Statement.document(data)
+      assert %Rendro.Document{} = doc
+      assert {:ok, pdf} = Rendro.render(doc)
+      assert is_binary(pdf)
+    end
   end
 
   # ---------------------------------------------------------------------------
