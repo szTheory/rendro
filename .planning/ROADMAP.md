@@ -130,8 +130,20 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
   4. Receipt/Report and Certificate each support the three-rung escape hatch consistent with `Rendro.Recipes.Invoice`
   5. Every new public surface (running-header, running-footer, Statement, Receipt/Report, Certificate) has a `priv/support_matrix.json` row in terminal state — `supported` with a resolvable evidence pointer, or `explicit_deferral` with a named viewer-behavior reason; no surface ships as silent `unverified`
 
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 4 plans
+
+**Wave 1**
+
+- [ ] 75-01-PLAN.md — D-04 shared pagination helper (Rendro.Recipes.Pagination) + D-07 page-size helper (Rendro.PageSize) + Statement refactor + regression gate (51 tests)
+
+**Wave 2** *(parallel — no file overlap; blocked on Wave 1)*
+
+- [ ] 75-02-PLAN.md — Receipt recipe: three-rung, validate_data!/1, body chunking via Pagination helper, totals, "Page X of Y" footer (RCPT-01/02/03)
+- [ ] 75-03-PLAN.md — Certificate recipe: geometry-derived layout, landscape default, optional branding, multi-size test (CERT-01/02/03)
+
+**Wave 3** *(blocked on Wave 2)*
+
+- [ ] 75-04-PLAN.md — Support-matrix rows for all 5 surfaces (page_numbering, statement backfill, receipt_report, certificate) + mix.exs Canonical Recipes group + full suite gate (CONTRACT-01)
 
 ---
 
@@ -157,7 +169,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 |-------|----------------|--------|-----------|
 | 73. Page-Numbering / Running-Region Primitive | 5/5 | Complete    | 2026-05-29 |
 | 74. Statement Recipe | 4/4 | Complete    | 2026-05-29 |
-| 75. Receipt/Report and Certificate Recipes + Support Contract | 0/? | Not started | - |
+| 75. Receipt/Report and Certificate Recipes + Support Contract | 0/4 | Not started | - |
 | 76. Reference Phoenix App, CI, and Documentation Closure | 0/? | Not started | - |
 
 ---
