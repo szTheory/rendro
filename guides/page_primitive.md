@@ -7,50 +7,29 @@ recipe (Statement, Receipt/Report, Certificate) builds on.
 ## What it does
 
 When you author a running header or footer region, Rendro uses a single-pass
-substitution to replace `{page}` and `{total}` tokens with the resolved page
-number and total page count before rendering. The token substitution is
+substitution to replace `{{page_number}}` and `{{total_pages}}` tokens with the
+resolved page number and total page count before rendering. The token substitution is
 deterministic: given the same input data the same bytes are produced every time.
 
 ```elixir
 # docs-contract: page-primitive-basic
-import Rendro
+data = %{
+  period: %{from: ~D[2026-05-01], to: ~D[2026-05-31]},
+  account: %{name: "Acme Corp"},
+  opening_balance: Decimal.new("1000.00"),
+  lines: [
+    %{date: ~D[2026-05-02], description: "Invoice #1", amount: Decimal.new("500.00")},
+    %{date: ~D[2026-05-15], description: "Payment", amount: Decimal.new("-200.00")}
+  ]
+}
 
-doc =
-  Rendro.Document.new()
-  |> Rendro.Document.add_template(
-    Rendro.PageTemplate.new(
-      name: :minimal,
-      width: 595,
-      height: 842,
-      body: Rendro.region(name: :body, x: 50, y: 100, width: 495, height: 692),
-      footer:
-        Rendro.region(
-          name: :footer,
-          x: 50,
-          y: 802,
-          width: 495,
-          height: 30
-        )
-    )
-  )
-  |> Rendro.Document.set_template(:minimal)
-  |> Rendro.Document.add_section(
-    Rendro.section(
-      name: :footer_section,
-      region: :footer,
-      content: [Rendro.page_number(format: "{page} of {total}")]
-    )
-  )
-  |> Rendro.Document.add_section(
-    Rendro.section(
-      name: :body_content,
-      region: :body,
-      content: [Rendro.text("Account Statement")]
-    )
-  )
+doc = Rendro.Recipes.Statement.document(data)
+assert doc.page_template == :statement
 
-assert doc.page_template == :minimal
-assert length(doc.sections) == 2
+# The statement recipe wires the PAGE primitive into the running footer region.
+# Page X of Y substitution is single-pass and deterministic.
+{:ok, pdf} = Rendro.render(doc, deterministic: true)
+assert binary_part(pdf, 0, 5) == "%PDF-"
 ```
 
 ## Capabilities (bounded by support matrix)
@@ -61,26 +40,32 @@ proof in `test/rendro/pipeline/paginate_test.exs`:
 
 | Capability | Status |
 |---|---|
-| Single-pass `{page}` / `{total}` substitution | supported |
+| Single-pass `{{page_number}}` / `{{total_pages}}` substitution | supported |
 | Deterministic output (same input → same bytes) | supported |
 | First-page suppression via `suppress_on` | supported |
 
 Use `Rendro.page_number/1` to author a running footer or header. Pass
-`suppress_on: [:first]` to omit the page number on the first page:
+`suppress_on: :first` to omit the page number on the first page:
 
 ```elixir
 # docs-contract: page-primitive-suppress
+block = Rendro.page_number(format: "Page {{page_number}} of {{total_pages}}")
+
+# page_number/1 returns a %Rendro.Block{} wrapping a %Rendro.Text{}
+assert %Rendro.Block{} = block
+assert %Rendro.Text{} = block.content
+assert block.content.content =~ "{{page_number}}"
+
+# First-page suppression is applied on the Section level via suppress_on:
 section =
   Rendro.section(
-    name: :footer_suppress,
+    name: :footer_suppressed,
     region: :footer,
-    content: [Rendro.page_number(format: "Page {page} of {total}", suppress_on: [:first])]
+    suppress_on: :first,
+    content: [block]
   )
 
-assert section.name == :footer_suppress
-assert section.region == :footer
-[block] = section.content
-assert block.suppress_on == [:first]
+assert section.suppress_on == :first
 ```
 
 ## "Page X of Y" pattern
@@ -89,10 +74,10 @@ The standard running-footer pattern for a billing statement or report:
 
 ```elixir-schematic
 # Illustrative only — a real recipe assigns section content from data.
-Rendro.page_number(format: "Page {page} of {total}")
+Rendro.page_number(format: "Page {{page_number}} of {{total_pages}}")
 ```
 
-The tokens `{page}` and `{total}` are substituted after pagination completes,
+The tokens `{{page_number}}` and `{{total_pages}}` are substituted after pagination completes,
 so the total page count is always accurate. A single rendering pass is sufficient
 — no two-pass layout or back-patching is required.
 

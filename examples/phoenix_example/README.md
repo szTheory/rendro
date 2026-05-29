@@ -23,7 +23,9 @@ plain HTML chooser listing all available download and preview links.
 
 ## Demonstrated Recipes
 
-All routes are under the `:api` pipeline (`plug :accepts, ["json"]`).
+The recipe download/preview routes are under the `:api` pipeline
+(`plug :accepts, ["json"]`); the root chooser route (`/`) is under `:browser`
+and returns plain HTML.
 
 ### Invoice
 
@@ -47,8 +49,6 @@ carried-forward / brought-forward balances.
 - `GET /statement/download` — renders `Rendro.Recipes.Statement` as an attachment (`statement.pdf`)
 - `GET /statement/preview` — renders inline for browser preview
 
-_(Routes wired in plan 76-02.)_
-
 ### Receipt / Report
 
 Single module scaling 1 to N pages — a long tabular report is a receipt that
@@ -56,8 +56,6 @@ overflows, with repeating table headers and per-page footers.
 
 - `GET /receipt/download` — renders `Rendro.Recipes.Receipt` as an attachment (`receipt.pdf`)
 - `GET /receipt/preview` — renders inline for browser preview
-
-_(Routes wired in plan 76-02.)_
 
 ### Certificate
 
@@ -67,8 +65,6 @@ branding mirrors `BrandedInvoice`.
 
 - `GET /certificate/download` — renders `Rendro.Recipes.Certificate` as an attachment (`certificate.pdf`)
 - `GET /certificate/preview` — renders inline for browser preview
-
-_(Routes wired in plan 76-02.)_
 
 ## Adapter Pattern
 

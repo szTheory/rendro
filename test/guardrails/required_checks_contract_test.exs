@@ -93,7 +93,7 @@ defmodule Guardrails.RequiredChecksContractTest do
   end
 
   describe "docs-contract lane count" do
-    test "verify_docs.exs registers exactly eight lanes with viewer evidence as lane 8" do
+    test "verify_docs.exs registers exactly ten lanes including the recipes and page-primitive lanes" do
       script = File.read!(@verify_docs_path)
 
       lane_entries = Regex.scan(~r/\{"[^"]+", \["test", "test\/docs_contract\/[^"]+"\]\}/, script)
