@@ -33,6 +33,8 @@ defmodule Mix.Tasks.Rendro.ViewerEvidence do
       mix rendro.viewer_evidence record links adobe_acrobat_reader
       mix rendro.viewer_evidence record links apple_preview
       mix rendro.viewer_evidence record protection apple_preview
+      mix rendro.viewer_evidence record signature_widget chrome_pdfium
+      mix rendro.viewer_evidence record signed_artifact chrome_pdfium
 
   `list` prints summary counts and a fixed-width table (`surface`, `viewer`,
   `status`, `notes`) sorted by surface then viewer. `missing` filters to

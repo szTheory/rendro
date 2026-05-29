@@ -1,6 +1,11 @@
 defmodule Rendro.ViewerEvidence.Recorder do
   @moduledoc false
 
+  alias Rendro.Adapters.{
+    SignedArtifactPdfiumProof,
+    SignatureWidgetPdfiumProof
+  }
+
   alias Rendro.ViewerEvidence.{
     EmbeddedFilesPdfiumProof,
     FormsApplePreviewProof,
@@ -12,6 +17,8 @@ defmodule Rendro.ViewerEvidence.Recorder do
   @default_fixture "test/fixtures/forms_support_fixture.pdf"
   @embedded_fixture "test/fixtures/embedded_artifact_support_fixture.pdf"
   @protection_fixture "test/fixtures/protection_support_fixture.pdf"
+  @signature_widget_fixture "test/fixtures/signature_widget_support_fixture.pdf"
+  @signed_artifact_fixture "test/fixtures/signed_artifact_viewer_proof.pdf"
 
   @spec record!(String.t(), String.t(), keyword()) :: map()
   def record!(surface, viewer, opts \\ []) do
@@ -74,6 +81,18 @@ defmodule Rendro.ViewerEvidence.Recorder do
         fixture: @protection_fixture,
         evidence_path: "priv/viewer_evidence/protection/apple_preview.md",
         body: &protection_preview_body/1
+      },
+      {"signature_widget", "chrome_pdfium"} => %{
+        proof: SignatureWidgetPdfiumProof,
+        fixture: @signature_widget_fixture,
+        evidence_path: "priv/viewer_evidence/signature_widget/chrome_pdfium.md",
+        body: &signature_widget_chrome_pdfium_body/1
+      },
+      {"signed_artifact", "chrome_pdfium"} => %{
+        proof: SignedArtifactPdfiumProof,
+        fixture: @signed_artifact_fixture,
+        evidence_path: "priv/viewer_evidence/signed_artifact/chrome_pdfium.md",
+        body: &signed_artifact_chrome_pdfium_body/1
       }
     }
   end
@@ -265,6 +284,42 @@ defmodule Rendro.ViewerEvidence.Recorder do
     ```
 
     Open passwords are supplied to validators at runtime only — never recorded in this evidence file.
+    """
+    |> String.trim()
+  end
+
+  defp signature_widget_chrome_pdfium_body(_fixture) do
+    """
+    This evidence records **signature_widget × chrome_pdfium** using pdfium-cli on Linux/macOS CI.
+    PDFium CLI structural and form-field extraction is an automation proxy — it does not
+    validate GUI Apple Preview or Adobe Acrobat signature panel behavior.
+
+    Fixture regeneration:
+
+    ```elixir
+    MIX_ENV=test mix run -e 'Rendro.Test.SigningViewerSupportFixture.write_signature_widget_fixture("test/fixtures/signature_widget_support_fixture.pdf")'
+    ```
+
+    Boundary: pdfium-cli form extraction and pdfsig integrity posture prove authored unsigned
+    `/Sig` widget bytes only. Promoting this cell does not promote manual GUI viewers or other surfaces.
+    """
+    |> String.trim()
+  end
+
+  defp signed_artifact_chrome_pdfium_body(_fixture) do
+    """
+    This evidence records **signed_artifact × chrome_pdfium** using pdfium-cli plus pdfsig on Linux/macOS CI.
+    PDFium CLI open and form extraction is an automation proxy — it does not validate GUI signature panels
+    in Apple Preview or Adobe Acrobat Reader.
+
+    Fixture regeneration:
+
+    ```bash
+    mix run scripts/signed_artifact_viewer_proof_fixture.exs --output test/fixtures/signed_artifact_viewer_proof.pdf
+    ```
+
+    Boundary: pdfium-cli proves open/parse and widget presence; pdfsig lane supplies integrity and trust
+    posture separately with honest "no validation panel" notes for PDFium CLI itself.
     """
     |> String.trim()
   end
