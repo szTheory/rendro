@@ -34,7 +34,7 @@ metrics:
   duration: ~12m
   tasks_completed: 2
   files_changed: 2
-  commits: 2
+  commits: 3
 completed: 2026-05-29
 ---
 
@@ -50,10 +50,11 @@ Created `test/rendro/format_test.exs` (`use ExUnit.Case, async: true`) covering 
 
 ## Task Commits
 
-- `44b5d22` test(74-02): add failing test for Rendro.Format (RED) — Task 1 RED gate + Task 2 test artifact
-- `ad2ce3d` feat(74-02): implement pure deterministic Rendro.Format (GREEN, D-11) — Task 1 GREEN gate
+- `ef4523b` test(74-02): add failing test for Rendro.Format (RED) — Task 1 RED gate + Task 2 test artifact
+- `efadcbc` feat(74-02): implement pure deterministic Rendro.Format (GREEN, D-11) — Task 1 GREEN gate
+- `06f4a65` docs(74-02): complete Rendro.Format plan (SUMMARY, STATE, ROADMAP)
 
-(Plan 74-02 has 2 tasks; Task 1 is `tdd="true"`. The RED `test(...)` commit holds `test/rendro/format_test.exs` — which also fully satisfies Task 2's acceptance criteria (the test file is the single test artifact for both tasks) — and the GREEN `feat(...)` commit holds `lib/rendro/format.ex`. No separate Task 2 commit was needed: Task 2's deliverable is the same test file, already authored at RED and green at GREEN. No REFACTOR commit — the GREEN implementation needed no cleanup pass.)
+(Plan 74-02 has 2 tasks; Task 1 is `tdd="true"`. The RED `test(...)` commit holds `test/rendro/format_test.exs` — which also fully satisfies Task 2's acceptance criteria (the test file is the single test artifact for both tasks) — and the GREEN `feat(...)` commit holds `lib/rendro/format.ex`. No separate Task 2 commit was needed: Task 2's deliverable is the same test file, already authored at RED and green at GREEN. No REFACTOR commit — the GREEN implementation needed no cleanup pass. `06f4a65` is the plan-completion metadata commit.)
 
 ## Key Implementation Details
 
@@ -90,8 +91,18 @@ None affecting scope. The plan listed Task 1 (implement, `tdd="true"`) and Task 
 - **Determinism contract:** never introduce locale/runtime reads into this module; the grep gate and determinism tests will catch regressions. i18n belongs in the caller's `:formatters` closure, never in core.
 - **Negative-zero accounting display:** `-0.00x` rounds to `$0.00` (no parens) by design.
 
+## Deferred Issues
+
+- **Pre-existing project-wide `mix format` drift** (out of scope): `mix format --check-formatted`
+  fails on `lib/rendro/pipeline/paginate.ex` and `test/rendro/deterministic_test.exs` (Phase 73
+  files), NOT on this plan's files. Logged in `deferred-items.md`. My files
+  (`lib/rendro/format.ex`, `test/rendro/format_test.exs`) pass `mix format --check-formatted`
+  individually (rc=0). The `mix ci` alias runs format-check first, so this should be cleaned up
+  before the phase gate (recommended in 74-03/74-04, which already touch `paginate.ex`).
+
 ## Self-Check: PASSED
 
 - Files: FOUND lib/rendro/format.ex, FOUND test/rendro/format_test.exs
-- Commits: FOUND 44b5d22 (test/RED), FOUND ad2ce3d (feat/GREEN)
+- Commits: FOUND ef4523b (test/RED), FOUND efadcbc (feat/GREEN), FOUND 06f4a65 (docs)
 - Grep gate: 0 matches for `Cldr|Gettext|ex_money|System.|:os.`
+- Full suite: 12 doctests, 3 properties, 765 tests, 0 failures
