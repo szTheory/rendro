@@ -1,6 +1,6 @@
 # Roadmap: Rendro
 
-**Phase numbering:** sequential and continuous across milestones (never restarts at 01). v2.3 closed at phase 72; the next milestone continues from phase 73.
+**Phase numbering:** sequential and continuous across milestones (never restarts at 01). v2.3 closed at phase 72; v2.4 continues from phase 73.
 
 ## Milestones
 
@@ -17,7 +17,7 @@
 - ✅ **v2.1 Cryptographic Signing** — Phases 60-63 (shipped 2026-05-07)
 - ✅ **v2.2 Long-Lived Signatures** — Phases 64-67 (shipped 2026-05-08)
 - ✅ **v2.3 Viewer Proof & Interop Closure** — Phases 68-72 (shipped 2026-05-29)
-- 📋 **v2.4 Batteries-Included Workflow & Adoption Closure** — planned (next, from phase 73)
+- 📋 **v2.4 Batteries-Included Workflow & Adoption Closure** — Phases 73-76 (active)
 
 ## Phases
 
@@ -43,17 +43,77 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 </details>
 
-### 📋 v2.4 Batteries-Included Workflow & Adoption Closure (Next)
+### 📋 v2.4 Batteries-Included Workflow & Adoption Closure (Phases 73-76)
 
-Not yet planned. Run `/gsd-new-milestone` to define requirements and roadmap (phase numbering continues from 73). Per `MILESTONE-ARC.md`, v2.4 follows viewer/interop closure in the active "production-ready trust and adoption" arc; conditional v2.5 (Global Text Shaping & Script Support) follows only if demand justifies the core investment.
+- [ ] **Phase 73: Page-Numbering / Running-Region Primitive** - Foundational: fix body_capacity, ship single-pass page-number token substitution, determinism proof
+- [ ] **Phase 74: Statement Recipe** - First end-to-end exercise of PAGE primitive; carried-forward totals in data assembly; three-rung escape hatch
+- [ ] **Phase 75: Receipt/Report and Certificate Recipes + Support Contract** - Batched lower-complexity recipes; support-matrix rows for all new surfaces
+- [ ] **Phase 76: Reference Phoenix App, CI, and Documentation Closure** - Isolated CI job; all recipes demonstrated; HexDocs guides; docs-contract tests
+
+## Phase Details
+
+### Phase 73: Page-Numbering / Running-Region Primitive
+**Goal**: Running header/footer regions with deterministic "Page X of Y" substitution are a proven, tested engine capability — body content never overlaps footers, and the layout-fix prerequisite is closed
+**Depends on**: Nothing (first phase of v2.4)
+**Requirements**: PAGE-01, PAGE-02, PAGE-03, PAGE-04
+**Success Criteria** (what must be TRUE):
+  1. A document with a running footer containing `{{page_number}}` and `{{total_pages}}` renders the correct page number and real total on every page in a single pipeline pass
+  2. A running footer with non-zero height does not overlap the last body lines on any page — `body_capacity` subtracts all non-body region heights
+  3. Running region content can be authored as a named helper (`Rendro.page_number/1`-style) or a raw `fn {page, total} -> ... end`, and can be suppressed on specific pages (e.g. first page)
+  4. Rendering the same document twice with `deterministic: true` produces byte-identical output — no non-determinism introduced by running-region substitution
+**Plans**: TBD
+
+---
+
+### Phase 74: Statement Recipe
+**Goal**: A caller with account transaction data can generate a multi-page billing statement with correct "Page X of Y" footers and carried-forward / brought-forward balances — all via `Rendro.Recipes.Statement`
+**Depends on**: Phase 73
+**Requirements**: STMT-01, STMT-02, STMT-03, STMT-04
+**Success Criteria** (what must be TRUE):
+  1. `Rendro.Recipes.Statement.document/2` accepts a data map (period, opening/closing balance, transaction lines) and returns a renderable document — runnable from data alone, no template authoring required
+  2. A statement spanning multiple pages shows a correct carried-forward balance at the bottom of each page and a brought-forward balance at the top of the next page, pre-computed in `sections/2` (not in the engine)
+  3. The three-rung escape hatch (`document/2`, `page_template/1`, `sections/2`) is available and consistent with `Rendro.Recipes.Invoice` — callers can override at any rung without touching the rungs above
+  4. "Page X of Y" appears in the running footer using the Phase 73 PAGE primitive, and the page count is correct on every page including the last
+**Plans**: TBD
+
+---
+
+### Phase 75: Receipt/Report and Certificate Recipes + Support Contract
+**Goal**: Callers can generate payment receipts, tabular operational reports, and completion certificates from data; every new public surface (PAGE primitive, Statement, Receipt, Report, Certificate) has a terminal support-matrix row — either recorded proof or a named explicit_deferral
+**Depends on**: Phase 73 (for RCPT running footers); Phase 74 (for Recipes.Base extraction)
+**Requirements**: RCPT-01, RCPT-02, RCPT-03, CERT-01, CERT-02, CERT-03, CONTRACT-01
+**Success Criteria** (what must be TRUE):
+  1. `Rendro.Recipes.Receipt.document/2` (or equivalent) accepts a data map (header summary, line items, totals) and returns a renderable receipt or tabular report; table column headers repeat across pages and "Page X of Y" appears in the running footer on multi-page reports
+  2. `Rendro.Recipes.Certificate.document/2` accepts a data map (title, recipient, body statement, issue date, signature/seal line) and returns a renderable certificate with all element coordinates derived from template geometry — not hardcoded A4 numerics; the recipe renders correctly at both A4 and US Letter (verified by a multi-size test)
+  3. Certificate supports branded output (registered fonts/images) consistent with `Rendro.Recipes.BrandedInvoice`
+  4. Receipt/Report and Certificate each support the three-rung escape hatch consistent with `Rendro.Recipes.Invoice`
+  5. Every new public surface (running-header, running-footer, Statement, Receipt/Report, Certificate) has a `priv/support_matrix.json` row in terminal state — `supported` with a resolvable evidence pointer, or `explicit_deferral` with a named viewer-behavior reason; no surface ships as silent `unverified`
+**Plans**: TBD
+**UI hint**: yes
+
+---
+
+### Phase 76: Reference Phoenix App, CI, and Documentation Closure
+**Goal**: A Phoenix engineer arriving at the repository can run the reference app locally, read a guide for each recipe in HexDocs, and see CI prove the example is exercised — all without touching engine-critical proof lanes
+**Depends on**: Phase 75
+**Requirements**: REF-01, REF-02, REF-03, CONTRACT-02
+**Success Criteria** (what must be TRUE):
+  1. `examples/phoenix_example` is `mix`-runnable (`mix deps.get && mix phx.server`) with a README documenting setup, each recipe demonstrated via `Rendro.Adapters.Phoenix`, and non-stale dependency constraints (Phoenix `~> 1.8`, Jason `~> 1.4`, Elixir `~> 1.19`)
+  2. The reference app demonstrates all five shipped recipes (Invoice, BrandedInvoice, Statement, Receipt/Report, Certificate) via `Rendro.Adapters.Phoenix`
+  3. An isolated `example-phoenix` CI job runs `mix test` against the reference app; its success or failure is visible independently and it is NOT a required branch-protection check — a Phoenix-dependency failure never blocks `signing-live-proof`, `long-lived-live-proof`, `release-proof`, or `test`
+  4. Each new public surface (PAGE primitive and each recipe) has a guide wired into HexDocs extras, and docs-contract tests reject any guide language that claims beyond what `priv/support_matrix.json` and proof lanes cover
+**Plans**: TBD
+
+---
 
 ## Progress
 
-| Milestone | Phases | Status | Shipped |
-|-----------|--------|--------|---------|
-| v1.0 – v2.2 | 1-67 | Complete | through 2026-05-08 |
-| v2.3 Viewer Proof & Interop Closure | 68-72 | Complete | 2026-05-29 |
-| v2.4 Batteries-Included Workflow & Adoption Closure | 73+ | Not started | - |
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 73. Page-Numbering / Running-Region Primitive | 0/? | Not started | - |
+| 74. Statement Recipe | 0/? | Not started | - |
+| 75. Receipt/Report and Certificate Recipes + Support Contract | 0/? | Not started | - |
+| 76. Reference Phoenix App, CI, and Documentation Closure | 0/? | Not started | - |
 
 ---
-*v2.3 archived 2026-05-29 on milestone completion. Working roadmap collapsed to the milestone index; per-milestone detail lives in `.planning/milestones/`.*
+*v2.3 archived 2026-05-29 on milestone completion. v2.4 roadmap created 2026-05-29. Phase numbering: 73-76.*

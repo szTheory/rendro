@@ -79,35 +79,35 @@ Explicitly excluded for v2.4. Documented to prevent scope creep.
 
 ## Traceability
 
-Which phases cover which requirements. Populated during roadmap creation.
+Which phases cover which requirements. Updated on roadmap creation 2026-05-29.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PAGE-01 | TBD | Pending |
-| PAGE-02 | TBD | Pending |
-| PAGE-03 | TBD | Pending |
-| PAGE-04 | TBD | Pending |
-| STMT-01 | TBD | Pending |
-| STMT-02 | TBD | Pending |
-| STMT-03 | TBD | Pending |
-| STMT-04 | TBD | Pending |
-| RCPT-01 | TBD | Pending |
-| RCPT-02 | TBD | Pending |
-| RCPT-03 | TBD | Pending |
-| CERT-01 | TBD | Pending |
-| CERT-02 | TBD | Pending |
-| CERT-03 | TBD | Pending |
-| REF-01 | TBD | Pending |
-| REF-02 | TBD | Pending |
-| REF-03 | TBD | Pending |
-| CONTRACT-01 | TBD | Pending |
-| CONTRACT-02 | TBD | Pending |
+| PAGE-01 | Phase 73 | Pending |
+| PAGE-02 | Phase 73 | Pending |
+| PAGE-03 | Phase 73 | Pending |
+| PAGE-04 | Phase 73 | Pending |
+| STMT-01 | Phase 74 | Pending |
+| STMT-02 | Phase 74 | Pending |
+| STMT-03 | Phase 74 | Pending |
+| STMT-04 | Phase 74 | Pending |
+| RCPT-01 | Phase 75 | Pending |
+| RCPT-02 | Phase 75 | Pending |
+| RCPT-03 | Phase 75 | Pending |
+| CERT-01 | Phase 75 | Pending |
+| CERT-02 | Phase 75 | Pending |
+| CERT-03 | Phase 75 | Pending |
+| CONTRACT-01 | Phase 75 | Pending |
+| REF-01 | Phase 76 | Pending |
+| REF-02 | Phase 76 | Pending |
+| REF-03 | Phase 76 | Pending |
+| CONTRACT-02 | Phase 76 | Pending |
 
 **Coverage:**
 - v1 requirements: 19 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 19 ⚠️
+- Mapped to phases: 19
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-05-29*
-*Last updated: 2026-05-29 after initial definition for milestone v2.4*
+*Last updated: 2026-05-29 — traceability populated on roadmap creation for milestone v2.4*
