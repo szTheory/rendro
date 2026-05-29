@@ -60,60 +60,6 @@ defmodule Rendro.Pipeline.Measure do
     end
   end
 
-  @doc """
-  Public read-only projection of the engine's table measurement.
-
-  Measures `rows` (optionally with a `:header` and `:columns` from `table_opts`)
-  laid out at `width` points using `doc`'s font metrics, and returns
-  `{:ok, {header_height, row_heights}}` (both in points). This is exactly the
-  geometry the private Table branch of `measure_block/3` computes — it delegates
-  to the same `measure_table/3` logic, so the projection and the real
-  measurement are guaranteed identical.
-
-  Read-only: it builds nothing persistent, paginates nothing, renders nothing,
-  and mutates no engine state. It exists so recipes can chunk rows by the
-  engine's OWN row heights (not an estimate) and place page breaks /
-  carried-forward rows correctly. PAGE-04 single-pass behavior is unchanged.
-  """
-  @spec measure_rows(Rendro.Document.t(), [Rendro.Table.row()], number(), keyword()) ::
-          {:ok, {number(), [number()]}} | {:error, term()}
-  def measure_rows(%Rendro.Document{} = doc, rows, width, table_opts \\ [])
-      when is_list(rows) and is_number(width) and is_list(table_opts) do
-    table = Rendro.table(rows, table_opts)
-
-    with {:ok, {_measured_table, header_h, row_heights}} <- measure_table(doc, table, width) do
-      {:ok, {header_h, row_heights}}
-    end
-  end
-
-  # Shared table-measuring logic used by both the private measure_block/3 Table
-  # branch and the public measure_rows/4 projection. Returns the fully measured
-  # %Table{} alongside its header height and per-row heights.
-  defp measure_table(doc, %Rendro.Table{} = table, width) do
-    normalized_header = normalize_header(table.header)
-    normalized_rows = normalize_rows(table.rows)
-
-    col_count = max_columns(normalized_header, normalized_rows)
-    col_widths = resolve_columns(table.columns, col_count, width)
-
-    with {:ok, {measured_header, header_h}} <-
-           measure_table_header(doc, normalized_header, col_widths),
-         {:ok, {measured_rows, row_heights, grid_layout}} <-
-           project_and_measure_grid(doc, normalized_rows, col_widths) do
-      measured_table = %{
-        table
-        | header: measured_header,
-          rows: measured_rows,
-          column_widths: col_widths,
-          row_heights: row_heights,
-          header_height: header_h,
-          _grid_layout: grid_layout
-      }
-
-      {:ok, {measured_table, header_h, row_heights}}
-    end
-  end
-
   defp measure_block(doc, %Rendro.Block{content: %Rendro.Text{} = text} = block, _container_width) do
     with [] <- Rendro.I18n.Analyzer.analyze(text.content),
          {:ok, font_chain} <- resolve_font_chain(doc, text),
@@ -199,6 +145,55 @@ defmodule Rendro.Pipeline.Measure do
   end
 
   defp measure_block(_doc, block, _container_width), do: {:ok, block}
+
+  # Public read-only projection of the engine's table measurement.
+  #
+  # Measures `rows` (optionally with a `:header`/`:columns` from `table_opts`)
+  # laid out at `width` points using `doc`'s font metrics and returns
+  # `{:ok, {header_height, row_heights}}` (points). It is exactly the geometry
+  # the private Table branch of `measure_block/3` computes — it delegates to the
+  # same `measure_table/3` logic, so the projection and the real measurement are
+  # guaranteed identical. Read-only: paginates/renders/mutates nothing, so
+  # PAGE-04 single-pass behavior is unchanged. The user-facing @doc lives on the
+  # public `Rendro.measure_rows/4` builder (this module is @moduledoc false).
+  @spec measure_rows(Rendro.Document.t(), [Rendro.Table.row()], number(), keyword()) ::
+          {:ok, {number(), [number()]}} | {:error, term()}
+  def measure_rows(%Rendro.Document{} = doc, rows, width, table_opts \\ [])
+      when is_list(rows) and is_number(width) and is_list(table_opts) do
+    table = Rendro.table(rows, table_opts)
+
+    with {:ok, {_measured_table, header_h, row_heights}} <- measure_table(doc, table, width) do
+      {:ok, {header_h, row_heights}}
+    end
+  end
+
+  # Shared table-measuring logic used by both the private measure_block/3 Table
+  # branch and the public measure_rows/4 projection. Returns the fully measured
+  # %Table{} alongside its header height and per-row heights.
+  defp measure_table(doc, %Rendro.Table{} = table, width) do
+    normalized_header = normalize_header(table.header)
+    normalized_rows = normalize_rows(table.rows)
+
+    col_count = max_columns(normalized_header, normalized_rows)
+    col_widths = resolve_columns(table.columns, col_count, width)
+
+    with {:ok, {measured_header, header_h}} <-
+           measure_table_header(doc, normalized_header, col_widths),
+         {:ok, {measured_rows, row_heights, grid_layout}} <-
+           project_and_measure_grid(doc, normalized_rows, col_widths) do
+      measured_table = %{
+        table
+        | header: measured_header,
+          rows: measured_rows,
+          column_widths: col_widths,
+          row_heights: row_heights,
+          header_height: header_h,
+          _grid_layout: grid_layout
+      }
+
+      {:ok, {measured_table, header_h, row_heights}}
+    end
+  end
 
   defp normalize_header(nil), do: nil
 
