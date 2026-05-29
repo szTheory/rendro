@@ -47,7 +47,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 - [x] **Phase 73: Page-Numbering / Running-Region Primitive** - Foundational: fix body_capacity, ship single-pass page-number token substitution, determinism proof (completed 2026-05-29)
 - [x] **Phase 74: Statement Recipe** - First end-to-end exercise of PAGE primitive; carried-forward totals in data assembly; three-rung escape hatch (completed 2026-05-29)
-- [ ] **Phase 75: Receipt/Report and Certificate Recipes + Support Contract** - Batched lower-complexity recipes; support-matrix rows for all new surfaces
+- [x] **Phase 75: Receipt/Report and Certificate Recipes + Support Contract** - Batched lower-complexity recipes; support-matrix rows for all new surfaces (completed 2026-05-29)
 - [ ] **Phase 76: Reference Phoenix App, CI, and Documentation Closure** - Isolated CI job; all recipes demonstrated; HexDocs guides; docs-contract tests
 
 ## Phase Details
@@ -143,7 +143,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 **Wave 3** *(blocked on Wave 2)*
 
-- [ ] 75-04-PLAN.md — Support-matrix rows for all 5 surfaces (page_numbering, statement backfill, receipt_report, certificate) + mix.exs Canonical Recipes group + full suite gate (CONTRACT-01)
+- [x] 75-04-PLAN.md — Support-matrix rows for all 5 surfaces (page_numbering, statement backfill, receipt_report, certificate) + mix.exs Canonical Recipes group + full suite gate (CONTRACT-01)
 
 ---
 
@@ -169,7 +169,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 |-------|----------------|--------|-----------|
 | 73. Page-Numbering / Running-Region Primitive | 5/5 | Complete    | 2026-05-29 |
 | 74. Statement Recipe | 4/4 | Complete    | 2026-05-29 |
-| 75. Receipt/Report and Certificate Recipes + Support Contract | 3/4 | In Progress|  |
+| 75. Receipt/Report and Certificate Recipes + Support Contract | 4/4 | Complete   | 2026-05-29 |
 | 76. Reference Phoenix App, CI, and Documentation Closure | 0/? | Not started | - |
 
 ---

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: Batteries-Included Workflow & Adoption Closure
-status: executing
-last_updated: "2026-05-29T21:04:35.008Z"
+status: verifying
+last_updated: "2026-05-29T21:08:04.093Z"
 last_activity: 2026-05-29
 progress:
   total_phases: 4
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 13
-  completed_plans: 12
-  percent: 50
+  completed_plans: 13
+  percent: 75
 ---
 
 # Project State
@@ -26,10 +26,10 @@ See: .planning/PROJECT.md (updated 2026-05-29 after v2.3 milestone shipped)
 
 Phase: 75 (Receipt/Report and Certificate Recipes + Support Contract) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-05-29
 
-Progress: [█████████░] 92%
+Progress: [██████████] 100%
 
 ## Milestone Snapshot
 
@@ -70,6 +70,7 @@ Full per-milestone decision log lives in `.planning/PROJECT.md` (Key Decisions t
 - [v2.4 74-02]: Negative magnitudes that round to zero (e.g. -0.001 → $0.00) render WITHOUT parentheses by design — Decimal.negative?(Decimal.round/2) is false for a zero result, which is the correct accounting display.
 - [v2.4 75-02]: Receipt totals block rendered as Rendro.text (not Rendro.table) — this distinguishes it from line-item table blocks in section content inspection and prevents spurious header: nil assertion failures in V5 tests.
 - [v2.4 75-02]: Receipt effective_capacity omits CF/BF overhead: capacity - header_h - row_epsilon (no 2*typical_row_h); Statement subtracts 2*typical_row_h for CF/BF rows; Receipt has none.
+- [Phase ?]: D-09/D-10 CONTRACT-01: Non-viewer surface rows are flat objects at support_matrix.json root level (no viewers sub-key), bypassing viewer_row schema validation; four terminal rows added for page_numbering, statement, receipt_report, certificate
 
 ### Roadmap Evolution
 
@@ -131,6 +132,7 @@ Items intentionally held outside v2.4 scope (carried from v2.3 + v2.4 planning):
 | Phase 74-statement-recipe P02 | 12min | 2 tasks | 2 files |
 | Phase 75-receipt-report-and-certificate-recipes-support-contract P02 | 8min | 1 tasks | 2 files |
 | Phase 75 P03 | 4 | 1 tasks | 3 files |
+| Phase 75 P04 | 5 | 2 tasks | 1 files |
 
 ## Operator Next Steps
 

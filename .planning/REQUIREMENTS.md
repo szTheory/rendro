@@ -47,7 +47,7 @@ The foundational primitive. Must ship before any multi-page recipe depends on it
 
 Cross-cutting; closes out alongside the surfaces it covers.
 
-- [ ] **CONTRACT-01**: Each new public surface (PAGE primitive and each recipe) has a `priv/support_matrix.json` row; any unproven viewer behavior is recorded as `explicit_deferral` with a named reason — never silent `unverified` (inherits the v2.3 discipline).
+- [x] **CONTRACT-01**: Each new public surface (PAGE primitive and each recipe) has a `priv/support_matrix.json` row; any unproven viewer behavior is recorded as `explicit_deferral` with a named reason — never silent `unverified` (inherits the v2.3 discipline).
 - [ ] **CONTRACT-02**: The PAGE primitive and each new recipe are documented in guides wired into HexDocs, and docs-contract tests reject claims beyond what proof and the support matrix cover.
 
 ## v2 Requirements
@@ -97,7 +97,7 @@ Which phases cover which requirements. Updated on roadmap creation 2026-05-29.
 | CERT-01 | Phase 75 | Complete |
 | CERT-02 | Phase 75 | Complete |
 | CERT-03 | Phase 75 | Complete |
-| CONTRACT-01 | Phase 75 | Pending |
+| CONTRACT-01 | Phase 75 | Complete |
 | REF-01 | Phase 76 | Pending |
 | REF-02 | Phase 76 | Pending |
 | REF-03 | Phase 76 | Pending |
