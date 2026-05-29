@@ -27,8 +27,11 @@ defmodule Rendro.ViewerEvidence.ObservationEnvironment do
   def pdfsig_cli(_opts \\ []) do
     version =
       case System.cmd("pdfsig", ["-v"], stderr_to_stdout: true) do
-        {output, 0} -> output |> String.trim() |> String.split("\n") |> List.first() |> to_string()
-        _ -> "pdfsig"
+        {output, 0} ->
+          output |> String.trim() |> String.split("\n") |> List.first() |> to_string()
+
+        _ ->
+          "pdfsig"
       end
 
     {:ok, %{viewer_version: version, platform: platform_string()}}
