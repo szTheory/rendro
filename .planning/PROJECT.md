@@ -10,7 +10,7 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Active Milestone:** v2.3 Viewer Proof & Interop Closure — Phase 68 complete (2026-05-28): JSON Schema contracts for viewer evidence, shared `Rendro.ViewerEvidence.*` validation modules, `mix rendro.viewer_evidence` operator tooling, and the eighth docs-contract lane. Production `priv/support_matrix.json` unchanged; two-tier validation (Tier A structural, Tier B promotion-complete in fixtures) with 26 viewer cells (5 legacy supported, 21 unverified).
+**Active Milestone:** v2.3 Viewer Proof & Interop Closure — Phase 70 complete (2026-05-29): five pre-v2.3 legacy `supported` viewer rows consolidated into canonical `priv/viewer_evidence/` homes with matrix `evidence:` pointers, Tier-B promotion-complete schema enforcement, api_stability STACK mirrors, and zero legacy validation warnings. Six promotion-complete supported rows (including Phase 69 chrome_pdfium); 20 unverified cells remain for Phase 71.
 
 **Shipped Version:** v2.2 Long-Lived Signatures & Compliance Evidence (2026-05-08)
 
