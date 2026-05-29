@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: Batteries-Included Workflow & Adoption Closure
 status: executing
-last_updated: "2026-05-29T15:51:04.142Z"
-last_activity: 2026-05-29 -- Phase 73 planning complete
+last_updated: "2026-05-29T15:57:05.827Z"
+last_activity: 2026-05-29
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 5
-  completed_plans: 0
+  completed_plans: 1
   percent: 0
 ---
 
@@ -20,16 +20,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-29 after v2.3 milestone shipped)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** v2.4 Batteries-Included Workflow & Adoption Closure — Phase 73 (Page-Numbering / Running-Region Primitive) is next.
+**Current focus:** Phase 73 — page-numbering-running-region-primitive
 
 ## Current Position
 
-Phase: 73 — Page-Numbering / Running-Region Primitive (not started)
-Plan: —
+Phase: 73 (page-numbering-running-region-primitive) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-05-29 -- Phase 73 planning complete
+Last activity: 2026-05-29
 
-Progress: [░░░░░░░░░░] 0% (0/4 phases complete)
+Progress: [██░░░░░░░░] 20%
 
 ## Milestone Snapshot
 
@@ -116,6 +116,7 @@ Items intentionally held outside v2.4 scope (carried from v2.3 + v2.4 planning):
 | recipes | Chart/graph rendering in Report body (major new rendering surface) | post-v2.4 |
 | recipes | Table of contents with page numbers (forward-reference, multi-pass concern) | post-v2.4 |
 | release | 1.0 release capstone (SemVer/API-stability commitment) | after v2.4 ships |
+| Phase 73-page-numbering-running-region-primitive P01 | 9m | 2 tasks | 5 files |
 
 ## Operator Next Steps
 

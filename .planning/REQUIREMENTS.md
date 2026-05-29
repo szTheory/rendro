@@ -13,10 +13,10 @@ Requirements for the v2.4 milestone. Each maps to exactly one roadmap phase.
 
 The foundational primitive. Must ship before any multi-page recipe depends on it.
 
-- [ ] **PAGE-01**: User can place a deterministic "Page X of Y" in a running region of any flow document, where Y resolves to the real total page count (single-pass; no second render).
-- [ ] **PAGE-02**: User can define running header/footer region content as a function of `{page_number, total_pages}` — with a named helper (`Rendro.page_number/1`-style) for the common case and acceptance of a raw `fn {page, total} -> ... end`, enabling per-page variation (e.g. suppress on first page).
-- [ ] **PAGE-03**: Running header/footer regions reserve their height so body content never overlaps them — `body_capacity` subtracts header/footer region heights in flow layout (prerequisite bug fix).
-- [ ] **PAGE-04**: Running-region and page-number output is deterministic and test-covered — identical inputs produce byte-identical output, with no layout-convergence loop.
+- [x] **PAGE-01**: User can place a deterministic "Page X of Y" in a running region of any flow document, where Y resolves to the real total page count (single-pass; no second render).
+- [x] **PAGE-02**: User can define running header/footer region content as a function of `{page_number, total_pages}` — with a named helper (`Rendro.page_number/1`-style) for the common case and acceptance of a raw `fn {page, total} -> ... end`, enabling per-page variation (e.g. suppress on first page).
+- [x] **PAGE-03**: Running header/footer regions reserve their height so body content never overlaps them — `body_capacity` subtracts header/footer region heights in flow layout (prerequisite bug fix).
+- [x] **PAGE-04**: Running-region and page-number output is deterministic and test-covered — identical inputs produce byte-identical output, with no layout-convergence loop.
 
 ### Statement Recipe (STMT)
 
@@ -83,10 +83,10 @@ Which phases cover which requirements. Updated on roadmap creation 2026-05-29.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PAGE-01 | Phase 73 | Pending |
-| PAGE-02 | Phase 73 | Pending |
-| PAGE-03 | Phase 73 | Pending |
-| PAGE-04 | Phase 73 | Pending |
+| PAGE-01 | Phase 73 | Complete |
+| PAGE-02 | Phase 73 | Complete |
+| PAGE-03 | Phase 73 | Complete |
+| PAGE-04 | Phase 73 | Complete |
 | STMT-01 | Phase 74 | Pending |
 | STMT-02 | Phase 74 | Pending |
 | STMT-03 | Phase 74 | Pending |

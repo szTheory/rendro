@@ -67,7 +67,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 **Plans**: 5 plansPlans:
 **Wave 1**
 
-- [ ] 73-01-PLAN.md — Wave 0 test scaffolding: all failing stubs for PAGE-01..04 (RED state)
+- [x] 73-01-PLAN.md — Wave 0 test scaffolding: all failing stubs for PAGE-01..04 (RED state)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -141,7 +141,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 73. Page-Numbering / Running-Region Primitive | 0/5 | In progress | - |
+| 73. Page-Numbering / Running-Region Primitive | 1/5 | In Progress|  |
 | 74. Statement Recipe | 0/? | Not started | - |
 | 75. Receipt/Report and Certificate Recipes + Support Contract | 0/? | Not started | - |
 | 76. Reference Phoenix App, CI, and Documentation Closure | 0/? | Not started | - |
