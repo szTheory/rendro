@@ -56,6 +56,31 @@ mix rendro.viewer_evidence record protection apple_preview \
   --recorded-by ci:viewer-evidence-live-proof
 ```
 
+Phase 71 trust-sensitive surfaces (signature widgets, signing preparation, signed artifacts, long-lived signed artifacts) use the same pdfium-cli / pdfsig / pyhanko structural-proxy lane:
+
+```bash
+mix rendro.viewer_evidence record signature_widget chrome_pdfium \
+  --recorded-by ci:viewer-evidence-live-proof
+
+mix rendro.viewer_evidence record signature_widget adobe_acrobat_reader \
+  --recorded-by ci:viewer-evidence-live-proof
+
+mix rendro.viewer_evidence record signature_widget apple_preview \
+  --recorded-by ci:viewer-evidence-live-proof
+
+mix rendro.viewer_evidence record signing_preparation adobe_acrobat_reader \
+  --recorded-by ci:viewer-evidence-live-proof
+
+mix rendro.viewer_evidence record signed_artifact chrome_pdfium \
+  --recorded-by ci:viewer-evidence-live-proof
+
+mix rendro.viewer_evidence record signed_artifact adobe_acrobat_reader \
+  --recorded-by ci:viewer-evidence-live-proof
+
+mix rendro.viewer_evidence record long_lived_signed_artifact adobe_acrobat_reader \
+  --recorded-by ci:viewer-evidence-live-proof
+```
+
 Set matrix `viewer_kind` to `"pdfium-cli"`. CI validates committed fixtures via:
 
 ```bash
@@ -63,10 +88,13 @@ mix test --include live_pdf_tools \
   test/rendro/adapters/forms_viewer_evidence_live_test.exs \
   test/rendro/adapters/embedded_files_viewer_evidence_live_test.exs \
   test/rendro/adapters/links_viewer_evidence_live_test.exs \
-  test/rendro/adapters/protection_viewer_evidence_live_test.exs
+  test/rendro/adapters/protection_viewer_evidence_live_test.exs \
+  test/rendro/adapters/signature_widget_viewer_evidence_live_test.exs \
+  test/rendro/adapters/signed_artifact_viewer_evidence_live_test.exs \
+  test/rendro/adapters/trust_sensitive_viewer_evidence_live_test.exs
 ```
 
-Structural automation proxies do not validate Apple Preview or Adobe Acrobat GUI behavior.
+`trust_sensitive_viewer_evidence_live_test.exs` records all Phase 71 structural-proxy evidence files in one lane. Structural automation proxies do not validate Apple Preview or Adobe Acrobat GUI behavior.
 
 ### Manual path (Preview / Acrobat)
 
@@ -78,7 +106,7 @@ Run these steps in order. Each step ends with an observable check.
 mix rendro.viewer_evidence missing
 ```
 
-**Check:** Exit code **1** when unverified cells exist (expected today). Stdout lists `surface`, `viewer`, and `status` for each backlog cell. Pick your target cell from the table.
+**Check:** Exit code **0** when no unverified cells remain (v2.3 close). Exit code **1** when unverified cells exist. Stdout lists `surface`, `viewer`, and `status` for each backlog cell. Pick your target cell from the table.
 
 ### 2. Confirm behavior IDs
 
@@ -126,7 +154,7 @@ Add a short body: provenance, fixture regen command, and boundary notes (Appendi
 mix rendro.viewer_evidence validate
 ```
 
-**Check:** Exit code **0**. Fix any Tier-A errors (schema, lint, orphan scan) before promoting. Legacy-supported rows without `evidence:` may still print advisory warnings — your new file must validate cleanly.
+**Check:** Exit code **0**. Fix any Tier-A errors (schema, lint, orphan scan) before promoting. Tier-B promotion-complete validation passes for all `supported` rows at v2.3 close.
 
 ### 7. Promote the matrix row
 
@@ -284,6 +312,7 @@ Module: `Mix.Tasks.Rendro.ViewerEvidence`
 | `list` | 0 | Summary counts + table (`surface`, `viewer`, `status`, `notes`) |
 | `missing` | 1 if any `unverified`; 0 if none | Backlog filter |
 | `validate` | 1 on Tier-A errors; 0 with legacy/staleness warnings only | Schema + evidence files + orphan scan |
+| `validate --strict` | 1 on Tier-A errors **or** stale `recorded_at` (>180 days); 0 when current | Same as `validate` plus staleness gate — **not** merge-blocking CI (D-09/D-10) |
 
 Add `--json` for machine-readable stdout.
 
