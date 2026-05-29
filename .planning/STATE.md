@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: Batteries-Included Workflow & Adoption Closure
 status: executing
-last_updated: "2026-05-29T17:59:28.032Z"
-last_activity: 2026-05-29 -- Phase 74 planning complete
+last_updated: "2026-05-29T18:20:00.000Z"
+last_activity: 2026-05-29 -- Phase 74 Plan 02 (Rendro.Format) complete
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 9
-  completed_plans: 6
-  percent: 25
+  completed_plans: 7
+  percent: 28
 ---
 
 # Project State
@@ -25,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-05-29 after v2.3 milestone shipped)
 ## Current Position
 
 Phase: 74
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-05-29 -- Phase 74 planning complete
+Plan: 74-03 (next)
+Status: Executing -- 74-01 + 74-02 complete
+Last activity: 2026-05-29 -- Phase 74 Plan 02 (Rendro.Format) complete
 
 Progress: [██████████] 100%
 
@@ -66,6 +66,8 @@ Full per-milestone decision log lives in `.planning/PROJECT.md` (Key Decisions t
 - [v2.4 73-02]: D-04 body_capacity geometric overlap check — in `measure.ex body_capacity/1`, subtract footer height only when `body_y + body_h >= footer_y`; subtract header height only when `body_y < header_y + header_h`. Simple formula `body_h - header_h - footer_h` is correct for `paginate.ex flow_layout/1` (body spans full column) but breaks templates where body is explicitly positioned between header and footer regions.
 - [Phase ?]: 73-04: region_suppress_on map in compose.ex layout — threaded to paginate stage for per-region suppression
 - [Phase ?]: 73-04: Raising fn in evaluate_fn_blocks/3 re-raised as Rendro.Error for consistent pipeline error propagation
+- [v2.4 74-02]: Rendro.Format (D-11) is pure/locale-free by construction — money/1 (Decimal.round 2dp, comma-grouped thousands, $ prefix, parentheses for negatives), date/1 (Date.to_iso8601), label/1 (five default labels via guarded map). No CLDR/gettext/ex_money/System/:os; i18n is the caller's :formatters/:labels override, never core.
+- [v2.4 74-02]: Negative magnitudes that round to zero (e.g. -0.001 → $0.00) render WITHOUT parentheses by design — Decimal.negative?(Decimal.round/2) is false for a zero result, which is the correct accounting display.
 
 ### Roadmap Evolution
 
@@ -124,6 +126,7 @@ Items intentionally held outside v2.4 scope (carried from v2.3 + v2.4 planning):
 | Phase 73 P03 | 8min | 1 tasks | 2 files |
 | Phase 73 P04 | 3min | 2 tasks | 7 files |
 | Phase 73 P05 | 4min | 2 tasks | 1 files |
+| Phase 74-statement-recipe P02 | 12min | 2 tasks | 2 files |
 
 ## Operator Next Steps
 
