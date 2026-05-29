@@ -5,7 +5,7 @@ defmodule PhoenixExample.MixProject do
     [
       app: :phoenix_example,
       version: "0.1.0",
-      elixir: "~> 1.15",
+      elixir: "~> 1.19",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps()
@@ -24,10 +24,10 @@ defmodule PhoenixExample.MixProject do
 
   defp deps do
     [
-      {:phoenix, "~> 1.7"},
-      {:plug, "~> 1.14"},
+      {:phoenix, "~> 1.8"},
+      {:plug, "~> 1.18"},
       {:bandit, "~> 1.0"},
-      {:jason, "~> 1.2"},
+      {:jason, "~> 1.4"},
       {:rendro, path: "../.."}
     ]
   end
