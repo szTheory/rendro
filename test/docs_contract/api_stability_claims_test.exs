@@ -56,8 +56,6 @@ defmodule Rendro.DocsContract.ApiStabilityClaimsTest do
     assert Code.ensure_loaded?(Rendro.Adapters.Qpdf),
            "Expected Rendro.Adapters.Qpdf to be loaded — was it renamed or deleted?"
 
-    # DO NOT assert Code.ensure_loaded?(Rendro.Inspector) — tier=adapter, NOT Tier-1 (D-09 landmine)
-
     # Ensure the top-level Rendro module is loaded before checking function exports
     assert Code.ensure_loaded?(Rendro),
            "Expected Rendro to be loaded — was it renamed or deleted?"
