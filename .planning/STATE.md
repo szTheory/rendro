@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v2.5
 milestone_name: 1.0 Release Capstone
-status: roadmapped
-last_updated: "2026-05-30T13:00:00.000Z"
-last_activity: 2026-05-30
+status: Roadmapped — awaiting `/gsd-plan-phase 78`
+last_updated: "2026-05-30T12:59:57.933Z"
+last_activity: 2026-05-30 — v2.5 roadmap created from the approved deep-research + audit phase decomposition
 progress:
   total_phases: 5
   completed_phases: 0
