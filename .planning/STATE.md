@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v2.5
 milestone_name: 1.0 Release Capstone
-status: planning
-last_updated: "2026-05-30T12:35:48.911Z"
+status: roadmapped
+last_updated: "2026-05-30T13:00:00.000Z"
 last_activity: 2026-05-30
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,20 +20,30 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-30 after v2.4 milestone shipped)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** v2.5 1.0 Release Capstone — formal SemVer/API-stability commitment + first 1.x public hex release (`1.0.0`), consolidating unreleased v2.3 + v2.4 work (then conditional v2.6 global text shaping). Defining requirements → roadmap.
+**Current focus:** v2.5 1.0 Release Capstone — formal SemVer/API-stability commitment + first 1.x public hex release (`1.0.0`), consolidating unreleased v2.3 + v2.4 work (then conditional v2.6 global text shaping). Roadmap created (Phases 78–82); next: plan Phase 78.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Not started (roadmap created — Phases 78–82)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-30 — Milestone v2.5 started
+Status: Roadmapped — awaiting `/gsd-plan-phase 78`
+Last activity: 2026-05-30 — v2.5 roadmap created from the approved deep-research + audit phase decomposition
 
 ## Milestone Snapshot
 
 - Shipped milestone: `v2.4 Batteries-Included Workflow & Adoption Closure` — phases 73-77, 21 plans, 19/19 requirements, milestone audit `passed`. Archived in `milestones/v2.4-ROADMAP.md` / `milestones/v2.4-REQUIREMENTS.md` / `milestones/v2.4-MILESTONE-AUDIT.md`.
 - Previous shipped milestone: `v2.3 Viewer Proof & Interop Closure` (shipped 2026-05-29 at tag `v0.3.1`).
-- Active milestone: **v2.5 1.0 Release Capstone** (phases 78–82) — formal SemVer/API-stability commitment + first 1.x public hex release (`1.0.0`), single consolidation of unreleased v2.3 + v2.4. Then conditional `v2.6 Global Text Shaping & Script Support` only if adopter demand justifies the core investment.
+- Active milestone: **v2.5 1.0 Release Capstone** (phases 78–82, 16 requirements API-01..05 / STAB-01..05 / REL-01..06) — formal SemVer/API-stability commitment + first 1.x public hex release (`1.0.0`), single consolidation of unreleased v2.3 + v2.4. Phase 82 is the irreversible 1.0.0 publish. Then conditional `v2.6 Global Text Shaping & Script Support` only if adopter demand justifies the core investment.
+
+## v2.5 Phase Map
+
+| Phase | Name | Requirements | Depends on |
+|-------|------|--------------|-----------|
+| 78 | Public API Surface Definition & Cleanup | API-01, API-02, API-03, API-05 | — |
+| 79 | Public API Contract Enforcement Lane | API-04 | 78 |
+| 80 | Stability Contract & Migration Docs | STAB-01..05 | 78 |
+| 81 | Release Hardening | REL-01, REL-02, REL-03, REL-05 | 78, 79, 80 |
+| 82 | 1.0.0 Consolidation & Publish (IRREVERSIBLE) | REL-04, REL-06 | 81 (all required CI lanes green) |
 
 ## Performance Metrics
 
@@ -43,12 +53,13 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 
 ### Decisions
 
-Full per-milestone decision log lives in `.planning/PROJECT.md` (Key Decisions table) and per-milestone archives. v2.4 decisions (page primitive built foundational-first; stateless engine / stateful-data totals; shared `Rendro.Recipes.Pagination`+`PageSize`; pure locale-free `Rendro.Format`; geometry-derived Certificate; advisory-isolated example CI; structured `ArgumentError` recipe validation) are recorded in PROJECT.md.
+Full per-milestone decision log lives in `.planning/PROJECT.md` (Key Decisions table) and per-milestone archives. v2.5 scoping decisions (locked 2026-05-30): single consolidated `1.0.0` publish (last published is `0.3.0`, v2.3+v2.4 unreleased); cleanup-first (no intermediate `0.4.0`, audit found ~zero real breaking changes); "public ≡ what ExDoc renders"; two user-facing tiers (Tier-1 Stable strict SemVer / Tier-2 Evolving adapters + diagnostics, additive-only); soft-deprecation-first (since `mix ci` compiles `--warnings-as-errors`); release-please deferred (AUTO-01); one new dev dep `:mix_audit`, no new runtime deps. Build order: define+clean surface → enforce → stability docs → release hardening → publish.
 
 ### Roadmap Evolution
 
 - `v2.3` closed 2026-05-29 at tag `v0.3.1` — viewer proof and interop closure; phases 68–72.
 - `v2.4` closed 2026-05-30 — batteries-included workflow and adoption closure; phases 73–77; all 19 requirements satisfied; audit `passed`.
+- `v2.5` roadmap created 2026-05-30 — 1.0 Release Capstone; phases 78–82; 16 requirements (API/STAB/REL); structure adopted verbatim from the approved deep-research + audit phase decomposition.
 
 ### Resolved Threads
 
@@ -64,8 +75,10 @@ Items intentionally held outside shipped scope, carried forward for future miles
 
 | Category | Item | Status |
 |----------|------|--------|
-| release | 1.0 release capstone (SemVer/API-stability commitment + migration note) | next up — after v2.4 |
-| globalization | Global text shaping, RTL support, broader script coverage | conditional v2.5, only if demand justifies the core investment |
+| globalization | Global text shaping, RTL support, broader script coverage | conditional v2.6, only if demand justifies the core investment |
+| automation | release-please (conventional-commit changelog + tag) for the 1.x train | deferred post-1.0 (AUTO-01) — avoids churn on the irreversible cut + legacy-tag collisions |
+| packaging | Split into separate `rendro` / `rendro_adapters` hex packages | deferred — tier differentiation via documented tiers, not package surgery |
+| stability | Retrofitting `@doc since:` across the 0.x surface | deferred — adopt going-forward only |
 | adoption | Optional first-party `Rendro.Adapters.Pdfium` / `Rendro.Adapters.PdfJs` automatable observer adapters | deferred |
 | automation | Headless-browser PDF.js / PDFium rendering CI lanes | deferred to a dedicated automation milestone if at all |
 | viewer_proof | Mobile viewer evidence (iOS Files, Android default viewer) | deferred |
@@ -79,4 +92,4 @@ Items intentionally held outside shipped scope, carried forward for future miles
 
 ## Operator Next Steps
 
-- `/clear` then `/gsd-new-milestone` to scope the 1.0 release capstone (or the next milestone).
+- `/gsd-plan-phase 78` to decompose the first phase (Public API Surface Definition & Cleanup) into executable plans.
