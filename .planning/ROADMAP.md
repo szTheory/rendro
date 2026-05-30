@@ -63,7 +63,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 78-04-PLAN.md — Rendro.PublicApi introspection module + Loader + Validator + priv/schemas/public_api.schema.json
+- [x] 78-04-PLAN.md — Rendro.PublicApi introspection module + Loader + Validator + priv/schemas/public_api.schema.json
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -132,7 +132,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 78. Public API Surface Definition & Cleanup | v2.5 | 3/5 | In Progress|  |
+| 78. Public API Surface Definition & Cleanup | v2.5 | 4/5 | In Progress|  |
 | 79. Public API Contract Enforcement Lane | v2.5 | 0/0 | Not started | - |
 | 80. Stability Contract & Migration Docs | v2.5 | 0/0 | Not started | - |
 | 81. Release Hardening | v2.5 | 0/0 | Not started | - |
