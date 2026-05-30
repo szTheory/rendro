@@ -1,0 +1,456 @@
+{
+  "modules": {
+    "Elixir.Rendro": {
+      "functions": [
+        "block/2",
+        "document/1",
+        "fixed/2",
+        "flow/2",
+        "form_field/3",
+        "link/2",
+        "measure_rows/4",
+        "metadata/1",
+        "page/1",
+        "page_number/1",
+        "page_template/1",
+        "put_default_font/2",
+        "region/1",
+        "register_embedded_file/4",
+        "register_embedded_font/3",
+        "register_embedded_font_family/3",
+        "register_font/3",
+        "render/2",
+        "render_protected/3",
+        "render_signed/3",
+        "render_to_artifact/2",
+        "render_with_diagnostics/2",
+        "section/1",
+        "signature_field/2",
+        "table/2",
+        "text/2"
+      ],
+      "tier": "stable",
+      "types": [
+        "render_option/0",
+        "render_options/0"
+      ]
+    },
+    "Elixir.Rendro.Adapters.Oban.RenderWorker": {
+      "functions": [],
+      "tier": "adapter",
+      "types": []
+    },
+    "Elixir.Rendro.Adapters.Pdfium": {
+      "functions": [
+        "form_fields/2",
+        "info/2",
+        "version/1"
+      ],
+      "tier": "adapter",
+      "types": [
+        "form_field/0"
+      ]
+    },
+    "Elixir.Rendro.Adapters.Pdfsig": {
+      "functions": [
+        "validate/2"
+      ],
+      "tier": "adapter",
+      "types": []
+    },
+    "Elixir.Rendro.Adapters.Phoenix": {
+      "functions": [
+        "preview_pdf/2",
+        "render_pdf/3"
+      ],
+      "tier": "adapter",
+      "types": []
+    },
+    "Elixir.Rendro.Adapters.Poppler": {
+      "functions": [
+        "validate/2"
+      ],
+      "tier": "adapter",
+      "types": []
+    },
+    "Elixir.Rendro.Adapters.PyHanko": {
+      "functions": [
+        "validate/2"
+      ],
+      "tier": "adapter",
+      "types": [
+        "augment_opts/0",
+        "sign_opts/0"
+      ]
+    },
+    "Elixir.Rendro.Adapters.Qpdf": {
+      "functions": [
+        "protect/2"
+      ],
+      "tier": "adapter",
+      "types": [
+        "protect_opts/0"
+      ]
+    },
+    "Elixir.Rendro.Artifact": {
+      "functions": [
+        "new/3",
+        "wrap/3"
+      ],
+      "tier": "stable",
+      "types": [
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.AssetRegistry": {
+      "functions": [
+        "fetch/2",
+        "new/0",
+        "register_image/3"
+      ],
+      "tier": "stable",
+      "types": [
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.AssetRegistry.InvalidAssetError": {
+      "functions": [],
+      "tier": "stable",
+      "types": []
+    },
+    "Elixir.Rendro.Block": {
+      "functions": [],
+      "tier": "stable",
+      "types": [
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.Cell": {
+      "functions": [],
+      "tier": "stable",
+      "types": [
+        "split_policy/0",
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.Component": {
+      "functions": [
+        "image/2",
+        "render_component/2"
+      ],
+      "tier": "stable",
+      "types": []
+    },
+    "Elixir.Rendro.Document": {
+      "functions": [
+        "add_section/2",
+        "add_template/2",
+        "new/0",
+        "new/1",
+        "put_default_font/2",
+        "put_metadata/2",
+        "put_options/2",
+        "register_embedded_file/4",
+        "register_embedded_font/3",
+        "register_embedded_font_family/3",
+        "register_font/3",
+        "register_image/3",
+        "set_template/2"
+      ],
+      "tier": "stable",
+      "types": [
+        "diagnostic/0",
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.EmbeddedFileRegistry": {
+      "functions": [
+        "fetch/2",
+        "new/0",
+        "register/4"
+      ],
+      "tier": "stable",
+      "types": [
+        "descriptor/0",
+        "logical_name/0",
+        "source/0",
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.Error": {
+      "functions": [
+        "from_stage/3"
+      ],
+      "tier": "stable",
+      "types": [
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.FontRegistry": {
+      "functions": [
+        "built_in/1",
+        "built_in/2",
+        "default_font/0",
+        "fetch/2",
+        "helvetica/0",
+        "new/0",
+        "preflight/1",
+        "put_default_font/2",
+        "register/3",
+        "register_embedded/4",
+        "register_embedded_family/3",
+        "resolve/3",
+        "resolve_pdf_font/3",
+        "resolve_pdf_font_chain/3",
+        "variant_logical_name/2"
+      ],
+      "tier": "stable",
+      "types": [
+        "built_in_descriptor/0",
+        "built_in_family/0",
+        "descriptor/0",
+        "embedded_descriptor/0",
+        "embedded_normalized_source/0",
+        "embedded_source_kind/0",
+        "embedded_variant/0",
+        "logical_name/0",
+        "resolve_error/0",
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.FontRegistry.EmbeddedFontFamilyError": {
+      "functions": [],
+      "tier": "stable",
+      "types": []
+    },
+    "Elixir.Rendro.FormField": {
+      "functions": [],
+      "tier": "stable",
+      "types": [
+        "editing_font/0",
+        "field_type/0",
+        "signature_rejection/0",
+        "signature_rejection_key/0",
+        "signature_rejections/0",
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.Image": {
+      "functions": [],
+      "tier": "stable",
+      "types": [
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.Inspector": {
+      "functions": [
+        "inspect/1"
+      ],
+      "tier": "adapter",
+      "types": []
+    },
+    "Elixir.Rendro.Link": {
+      "functions": [],
+      "tier": "stable",
+      "types": [
+        "t/0",
+        "target/0"
+      ]
+    },
+    "Elixir.Rendro.Metadata": {
+      "functions": [],
+      "tier": "stable",
+      "types": [
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.Page": {
+      "functions": [],
+      "tier": "stable",
+      "types": [
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.PageTemplate": {
+      "functions": [],
+      "tier": "stable",
+      "types": [
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.Protect": {
+      "functions": [
+        "password/2",
+        "render_protected/3",
+        "supported_permissions/0"
+      ],
+      "tier": "stable",
+      "types": [
+        "option/0",
+        "options/0",
+        "permission/0"
+      ]
+    },
+    "Elixir.Rendro.Protect.Adapter": {
+      "functions": [],
+      "tier": "adapter",
+      "types": []
+    },
+    "Elixir.Rendro.Recipes": {
+      "functions": [
+        "branded_invoice/1",
+        "invoice/1"
+      ],
+      "tier": "stable",
+      "types": []
+    },
+    "Elixir.Rendro.Recipes.BrandedInvoice": {
+      "functions": [
+        "document/2",
+        "page_template/1",
+        "sections/2"
+      ],
+      "tier": "adapter",
+      "types": []
+    },
+    "Elixir.Rendro.Recipes.Certificate": {
+      "functions": [
+        "document/2",
+        "page_template/1",
+        "sections/2"
+      ],
+      "tier": "adapter",
+      "types": []
+    },
+    "Elixir.Rendro.Recipes.Invoice": {
+      "functions": [
+        "document/2",
+        "page_template/1",
+        "sections/2"
+      ],
+      "tier": "adapter",
+      "types": []
+    },
+    "Elixir.Rendro.Recipes.Receipt": {
+      "functions": [
+        "document/2",
+        "page_template/1",
+        "sections/2"
+      ],
+      "tier": "adapter",
+      "types": []
+    },
+    "Elixir.Rendro.Recipes.Statement": {
+      "functions": [
+        "document/2",
+        "page_template/1",
+        "sections/2"
+      ],
+      "tier": "adapter",
+      "types": []
+    },
+    "Elixir.Rendro.Region": {
+      "functions": [],
+      "tier": "stable",
+      "types": [
+        "anchor/0",
+        "role/0",
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.Row": {
+      "functions": [],
+      "tier": "stable",
+      "types": [
+        "split_policy/0",
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.RunningContent": {
+      "functions": [],
+      "tier": "stable",
+      "types": [
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.Section": {
+      "functions": [],
+      "tier": "stable",
+      "types": [
+        "suppress_on/0",
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.Sign": {
+      "functions": [
+        "augment/2",
+        "prepare/2",
+        "render_signed/3",
+        "sign/2",
+        "validate/2",
+        "validate_trust/2"
+      ],
+      "tier": "stable",
+      "types": [
+        "augment_option/0",
+        "augment_options/0",
+        "prepare_option/0",
+        "prepare_options/0",
+        "sign_option/0",
+        "sign_options/0",
+        "validate_option/0",
+        "validate_options/0"
+      ]
+    },
+    "Elixir.Rendro.Sign.Adapter": {
+      "functions": [],
+      "tier": "adapter",
+      "types": []
+    },
+    "Elixir.Rendro.Storage": {
+      "functions": [],
+      "tier": "adapter",
+      "types": []
+    },
+    "Elixir.Rendro.Storage.Local": {
+      "functions": [],
+      "tier": "adapter",
+      "types": []
+    },
+    "Elixir.Rendro.Table": {
+      "functions": [],
+      "tier": "stable",
+      "types": [
+        "column_rule/0",
+        "decoration_break/0",
+        "row/0",
+        "split_policy/0",
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.Telemetry": {
+      "functions": [
+        "all_event_names/0",
+        "event_prefixes/0",
+        "generate_render_id/0",
+        "render_prefix/0",
+        "stage_names/0"
+      ],
+      "tier": "adapter",
+      "types": []
+    },
+    "Elixir.Rendro.Text": {
+      "functions": [
+        "default_font/0",
+        "normalize_font/1"
+      ],
+      "tier": "stable",
+      "types": [
+        "compatibility_font_alias/0",
+        "font_ref/0",
+        "logical_font_name/0",
+        "t/0"
+      ]
+    }
+  }
+}
