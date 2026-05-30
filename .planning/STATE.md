@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.5
 milestone_name: 1.0 Release Capstone
 status: executing
-last_updated: "2026-05-30T13:58:54.034Z"
-last_activity: 2026-05-30 -- Phase 78 planning complete
+last_updated: "2026-05-30T14:18:53.517Z"
+last_activity: 2026-05-30 -- Phase 78 execution started
 progress:
   total_phases: 5
   completed_phases: 0
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-30 after v2.4 milestone shipped)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** v2.5 1.0 Release Capstone — formal SemVer/API-stability commitment + first 1.x public hex release (`1.0.0`), consolidating unreleased v2.3 + v2.4 work (then conditional v2.6 global text shaping). Roadmap created (Phases 78–82); next: plan Phase 78.
+**Current focus:** Phase 78 — public-api-surface-definition-cleanup
 
 ## Current Position
 
-Phase: Not started (roadmap created — Phases 78–82)
-Plan: —
-Status: Ready to execute
-Last activity: 2026-05-30 -- Phase 78 planning complete
+Phase: 78 (public-api-surface-definition-cleanup) — EXECUTING
+Plan: 1 of 5
+Status: Executing Phase 78
+Last activity: 2026-05-30 -- Phase 78 execution started
 
 ## Milestone Snapshot
 

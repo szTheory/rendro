@@ -57,9 +57,9 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 Plans:
 **Wave 1**
 
-- [ ] 78-01-PLAN.md — Hiding sweep: @moduledoc false on 6 internals + @doc false on redact_* helpers + flip Rendro.Metadata to documented
+- [x] 78-01-PLAN.md — Hiding sweep: @moduledoc false on 6 internals + @doc false on redact_* helpers + flip Rendro.Metadata to documented
 - [ ] 78-02-PLAN.md — Tier tagging: @moduledoc tags: [:stable|:adapter] across all public modules + mix.exs badge CSS/JS + groups_for_modules reconciliation
-- [ ] 78-03-PLAN.md — Recipe opts normalization: Invoice + BrandedInvoice sections/2 opts threading
+- [x] 78-03-PLAN.md — Recipe opts normalization: Invoice + BrandedInvoice sections/2 opts threading
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -132,7 +132,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 78. Public API Surface Definition & Cleanup | v2.5 | 0/5 | Planned | - |
+| 78. Public API Surface Definition & Cleanup | v2.5 | 2/5 | In Progress|  |
 | 79. Public API Contract Enforcement Lane | v2.5 | 0/0 | Not started | - |
 | 80. Stability Contract & Migration Docs | v2.5 | 0/0 | Not started | - |
 | 81. Release Hardening | v2.5 | 0/0 | Not started | - |
