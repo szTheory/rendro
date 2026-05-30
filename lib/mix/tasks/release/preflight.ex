@@ -4,6 +4,7 @@ defmodule Mix.Tasks.Release.Preflight do
   @moduledoc """
   Runs preflight checks before release.
   """
+  @moduledoc tags: [:adapter]
 
   @shortdoc "Runs preflight checks before release"
   @phase_2_checks [

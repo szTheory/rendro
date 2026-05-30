@@ -1,25 +1,5 @@
 defmodule Rendro.Test.Mocks do
-  @moduledoc """
-  Minimal in-test stand-ins for optional ecosystem libraries (`Threadline`,
-  `Mailglass`) and any Swoosh helpers that aren't part of the test
-  dependency graph.
-
-  These modules are defined in the test environment only. They allow the
-  optional adapters in `Rendro.Adapters.*` to compile and be exercised
-  without pulling the real packages into `mix.exs`.
-
-  ## Threadline
-
-  Records calls to `record_action/2` in an ETS table keyed by the test
-  process pid so tests can assert on what the adapter forwarded — even
-  when telemetry handlers fire in a different process (e.g. inside a
-  `Task.async` spawned by the render pipeline).
-
-  ## Mailglass.Message
-
-  Provides a minimal struct wrapping a `Swoosh.Email`, plus
-  `update_swoosh/2` so the Mailglass attach path can be verified.
-  """
+  @moduledoc false
 
   @table :rendro_threadline_calls
   @result_key :threadline_result
@@ -203,14 +183,7 @@ unless Code.ensure_loaded?(Accrue) do
 end
 
 defmodule Rendro.Test.Mocks.AdapterReloader do
-  @moduledoc """
-  Force-recompiles optional adapter modules so their `Code.ensure_loaded?/1`
-  guards re-evaluate after stub modules above have been defined.
-
-  In `lib/` the adapter files were compiled before the stubs existed, so
-  the module bodies inside `if Code.ensure_loaded?(...) do ... end` were
-  skipped. Calling `recompile/0` from `test_helper.exs` brings them online.
-  """
+  @moduledoc false
 
   @adapter_files [
     "lib/rendro/adapters/threadline.ex",

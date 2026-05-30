@@ -5,6 +5,7 @@ defmodule Rendro.Adapters.Pdfsig do
   This adapter validates that a PDF exposes one or more signatures and reports
   cryptographic-signature posture separately from certificate trust.
   """
+  @moduledoc tags: [:adapter]
 
   @doc """
   Validates a signed PDF at the given path using `pdfsig`.

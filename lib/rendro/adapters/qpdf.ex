@@ -5,6 +5,7 @@ defmodule Rendro.Adapters.Qpdf do
   qpdf is an external executable, not a Hex dependency. Rendro keeps it behind
   an artifact-first boundary so the core rendering pipeline stays pure Elixir.
   """
+  @moduledoc tags: [:adapter]
 
   @behaviour Rendro.Protect.Adapter
 

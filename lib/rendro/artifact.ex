@@ -5,6 +5,7 @@ defmodule Rendro.Artifact do
 
   This is the primary boundary struct for async and ecosystem operations.
   """
+  @moduledoc tags: [:stable]
 
   @enforce_keys [:binary, :hash, :diagnostics, :metadata]
   defstruct [:binary, :hash, :diagnostics, :metadata]

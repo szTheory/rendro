@@ -3,6 +3,7 @@ defmodule Rendro.Adapters.Poppler do
   External binary adapter for Poppler's pdfinfo tool.
   Provides structural validation of generated PDF files.
   """
+  @moduledoc tags: [:adapter]
 
   @doc """
   Validates a PDF file at the given path using `pdfinfo`.

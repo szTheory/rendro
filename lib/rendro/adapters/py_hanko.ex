@@ -6,6 +6,7 @@ defmodule Rendro.Adapters.PyHanko do
   behind an artifact-first boundary so the core rendering pipeline stays pure
   Elixir and signing credentials stay adapter-local.
   """
+  @moduledoc tags: [:adapter]
 
   @behaviour Rendro.Sign.Adapter
 

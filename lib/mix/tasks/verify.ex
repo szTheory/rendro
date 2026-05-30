@@ -4,6 +4,7 @@ defmodule Mix.Tasks.Verify do
   @moduledoc """
   Runs full verification suite with deterministic and advisory lanes.
   """
+  @moduledoc tags: [:adapter]
 
   @shortdoc "Runs full verification suite with deterministic and advisory lanes"
 

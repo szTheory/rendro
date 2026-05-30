@@ -468,6 +468,11 @@ defmodule Rendro.FontRegistry do
 end
 
 defmodule Rendro.FontRegistry.EmbeddedFontFamilyError do
+  @moduledoc """
+  Raised when an embedded font family registration fails due to missing or unexpected variants.
+  """
+  @moduledoc tags: [:stable]
+
   defexception [
     :message,
     :family_name,

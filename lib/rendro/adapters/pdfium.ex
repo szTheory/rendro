@@ -5,6 +5,7 @@ defmodule Rendro.Adapters.Pdfium do
   pdfium-cli is an external executable, not a Hex dependency. Rendro uses it only for
   automatable viewer-evidence observation (`viewer_kind: pdfium-cli`), not for core rendering.
   """
+  @moduledoc tags: [:adapter]
 
   @type form_field :: %{
           optional(String.t()) => term()

@@ -1,7 +1,5 @@
 defprotocol Rendro.Fragmentable do
-  @moduledoc """
-  Protocol for splitting layout components across page boundaries.
-  """
+  @moduledoc false
 
   @doc """
   Splits a component given the available height on the current page.

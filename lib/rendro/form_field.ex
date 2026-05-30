@@ -9,6 +9,7 @@ defmodule Rendro.FormField do
   placeholder contract is preserved only on a narrow rejection-only carrier so
   validation can fail it before render.
   """
+  @moduledoc tags: [:stable]
 
   @typedoc "Supported AcroForm widget families exposed through Rendro's form-field builders."
   @type field_type :: :text | :checkbox | :radio | :signature

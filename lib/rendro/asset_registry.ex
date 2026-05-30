@@ -5,6 +5,11 @@ defmodule Rendro.AssetRegistry do
   @moduledoc tags: [:stable]
 
   defmodule InvalidAssetError do
+    @moduledoc """
+    Raised when a registered asset fails validation (missing file, unsupported format, etc.).
+    """
+    @moduledoc tags: [:stable]
+
     defexception [:message, :logical_name, :reason]
   end
 

@@ -1,9 +1,5 @@
 defmodule Rendro.Test.ComplexFonts do
-  @moduledoc """
-  Provides shared paths for testing complex typography without checking in massive fonts.
-  In a real CI environment, these would be downloaded or mocked. For now, we mock the font
-  calls by bypassing Harfbuzz or using standard fonts with basic glyphs.
-  """
+  @moduledoc false
 
   # Since we are not checking in CJK fonts, we can use the branded B612 font
   # for basic tests, and mock the shaper for CJK/Arabic if needed.

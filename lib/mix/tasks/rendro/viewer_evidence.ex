@@ -69,6 +69,7 @@ defmodule Mix.Tasks.Rendro.ViewerEvidence do
 
   Human workflow guide: `guides/viewer_evidence.md`.
   """
+  @moduledoc tags: [:adapter]
 
   @matrix_path "priv/support_matrix.json"
   @evidence_root "priv/viewer_evidence"

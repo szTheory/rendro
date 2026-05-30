@@ -4,6 +4,7 @@ defmodule Mix.Tasks.Docs.Contract do
   @moduledoc """
   Runs the canonical docs-contract verification command.
   """
+  @moduledoc tags: [:adapter]
 
   @shortdoc "Runs the canonical docs-contract verification command"
 

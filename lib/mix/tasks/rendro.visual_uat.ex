@@ -22,6 +22,7 @@ defmodule Mix.Tasks.Rendro.VisualUat do
   Optional env:
     * `RENDRO_VISUAL_UAT_MODEL` — defaults to `claude-opus-4-7`
   """
+  @moduledoc tags: [:adapter]
 
   @api_url "https://api.anthropic.com/v1/messages"
   @anthropic_version "2023-06-01"

@@ -1,29 +1,5 @@
 defmodule Rendro.Test.EmbeddedArtifactSupportFixture do
-  @moduledoc """
-  Representative embedded-artifact fixture for Phase 50 structural proof.
-
-  Builds one deterministic PDF that exercises the supported v1.9
-  artifact surface in a single document:
-
-  - one document-level embedded file with explicit deterministic
-    metadata and authored timestamps
-  - one external `http`/`https` link annotation
-  - one internal page-destination link annotation
-
-  The same generated PDF feeds two distinct lanes:
-
-  1. The automated structural proof lane through
-     `Rendro.Adapters.Poppler.validate/1` and the companion
-     `Rendro.EmbeddedArtifactSupportFixtureTest`.
-  2. The manual viewer proof lane recorded in
-     `.planning/phases/50-support-boundary-and-proof-closure/50-VALIDATION.md`.
-
-  The fixture must stay strictly inside the surfaces authored in
-  Phases 48 and 49 — `Rendro.register_embedded_file/4` and
-  `Rendro.link/2` — and must not introduce new PDF features,
-  generic annotation surfaces, extra URI schemes, or named
-  destinations. See Phase 50 `50-CONTEXT.md` decisions D-15..D-17.
-  """
+  @moduledoc false
 
   @creation_timestamp ~U[2026-05-05 14:00:00Z]
 
