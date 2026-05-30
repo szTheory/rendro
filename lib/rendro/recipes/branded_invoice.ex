@@ -96,14 +96,14 @@ defmodule Rendro.Recipes.BrandedInvoice do
   to the `:logo`, `:header`, `:body`, and `:footer` regions.
   """
   @spec sections(map(), keyword()) :: [Rendro.Section.t()]
-  def sections(data, _opts \\ []) do
+  def sections(data, opts \\ []) do
     validate_data!(data)
 
     [
-      logo_section(data),
-      header_section(data),
-      body_section(data),
-      footer_section(data)
+      logo_section(data, opts),
+      header_section(data, opts),
+      body_section(data, opts),
+      footer_section(data, opts)
     ]
   end
 
@@ -135,7 +135,7 @@ defmodule Rendro.Recipes.BrandedInvoice do
     end)
   end
 
-  defp logo_section(%{brand: %{logo_name: logo_name}}) do
+  defp logo_section(%{brand: %{logo_name: logo_name}}, _opts) do
     Rendro.section(
       name: :branded_invoice_logo,
       region: :logo,
@@ -145,7 +145,7 @@ defmodule Rendro.Recipes.BrandedInvoice do
     )
   end
 
-  defp header_section(%{brand: %{font_name: font_name}, id: id, date: date}) do
+  defp header_section(%{brand: %{font_name: font_name}, id: id, date: date}, _opts) do
     # Industry-standard invoice typography: brand is the heading, invoice id
     # is subordinate metadata. Stacking brand/id/date as three independent
     # blocks lets each size to its natural text width — `Rendro.Pipeline.Paginate`
@@ -163,7 +163,7 @@ defmodule Rendro.Recipes.BrandedInvoice do
     )
   end
 
-  defp body_section(%{items: items}) do
+  defp body_section(%{items: items}, _opts) do
     table_rows =
       Enum.map(items, fn item ->
         [item.name, Integer.to_string(item.qty), "$#{item.price}"]
@@ -182,7 +182,7 @@ defmodule Rendro.Recipes.BrandedInvoice do
     )
   end
 
-  defp footer_section(_data) do
+  defp footer_section(_data, _opts) do
     Rendro.section(
       name: :branded_invoice_footer,
       region: :footer,
