@@ -45,7 +45,7 @@ defmodule Rendro.DocsContract.ProtectionClaimsTest do
              "Rendro supports password-to-open PDF protection through an external artifact-first boundary."
 
     assert guide =~ "`Rendro.Protect.password/2`"
-    assert guide =~ "Rendro v1.10 supports only `:aes_256`"
+    assert guide =~ "Rendro supports only `:aes_256`"
     assert guide =~ "Advisory permissions are an honor-system PDF flag surface"
     assert guide =~ "Protection is not compliance, not tamper evidence, and not digital signing."
 
@@ -53,7 +53,7 @@ defmodule Rendro.DocsContract.ProtectionClaimsTest do
              "Delivery and storage seams should transport already-protected artifacts, not password material."
 
     assert guide =~
-             "Phase 53 does not introduce a first-party protected worker or orchestration API."
+             "Rendro does not introduce a first-party protected worker or orchestration API."
 
     assert guide =~ "If validation succeeds only with `owner_password`"
     assert guide =~ "Apple Preview is `supported` for the `protection` surface"

@@ -1,33 +1,68 @@
 # API Stability and Support Boundaries
 
-## Semantic Versioning Expectations
+## Tier-1 Stable
 
-Rendro adheres to Semantic Versioning (SemVer).
+The following modules and functions receive strict SemVer guarantees: breaking changes only in major versions (`1.x.x` → `2.0.0`), additive changes allowed in any minor.
 
-### The `0.x.x` Era (Current)
-During the `0.x.x` era, the API is considered stable enough for production use, but minor versions (for example `0.1.x` to `0.2.0`) may introduce breaking changes. We commit to providing clear upgrade paths and changelogs for any breaking changes during this era. Patch versions (for example `0.2.0` to `0.2.1`) will remain strictly backward compatible and only contain bug fixes or additive features.
+**Core document model:** `Rendro.Document`, `Rendro.PageTemplate`, `Rendro.Section`, `Rendro.Metadata`
 
-### The `1.x.x` Era (Future)
-Once Rendro reaches `1.0.0`, breaking changes will only occur in major version bumps (e.g., `1.x.x` to `2.0.0`).
+**Artifact struct:** `Rendro.Artifact` (the `%Rendro.Artifact{}` struct and its documented fields)
 
-## Core API vs Adapters
+**Signing surface:** `Rendro.Sign` — `prepare/2`, `sign/2`, `augment/2`, `validate/2`
 
-- **Core API (`Rendro.Document`, `Rendro.PageTemplate`, `Rendro.Section`, `Rendro.flow/2`):** This is the primary surface area. Breaking changes here will be minimal and heavily telegraphed.
-- **Adapters (`Rendro.Adapters.*`):** Adapters integrate with third-party libraries (e.g., Phoenix, Oban, Threadline). Since these depend on external ecosystems, their APIs may need to evolve more frequently. We will strive to align adapter breaking changes with major version changes of their underlying dependencies.
-- **Diagnostics (`Rendro.Inspector`, `:diagnostics` map):** The structure of diagnostics maps is intended for developer-facing debugging and is considered stable for common keys (`:level`, `:type`), but additive keys may be introduced in any release.
+**Protection surface:** `Rendro.Protect` — `password/2`
+
+**Top-level pipeline functions:** `Rendro.flow/2`, `Rendro.signature_field/2`, `Rendro.render_signed/3`, `Rendro.render_protected/3`
+
+**Diagnostics map contract:** The `:diagnostics` map common keys — `:level` and `:type` — are stable. Adopters consuming diagnostics maps should key only on documented common keys; additive keys may appear in any release. The implementation module (`Rendro.Inspector`) is adapter-tier and not part of the Tier-1 contract.
+
+## Tier-2 Evolving
+
+The following are additive-only within a major version but may break to follow upstream library majors:
+
+**Adapter modules:** `Rendro.Adapters.PyHanko`, `Rendro.Adapters.Qpdf`, and all other `Rendro.Adapters.*` modules. These track the major versions of their underlying tools (pyHanko, qpdf, etc.).
+
+**Extended diagnostics shape:** The `:diagnostics` map beyond the documented common keys (`:level`, `:type`) is Tier-2. New keys may appear in any release.
+
+## NOT covered by SemVer
+
+The following are explicitly outside the stability guarantee:
+
+1. **Byte-for-byte rendered PDF output across versions** — deterministic within a version, not frozen across versions. Layout/shaping/rendering improvements may change output bytes in any minor release.
+2. **Internal modules and functions** marked `@moduledoc false` / `@doc false` (e.g., `Rendro.PDF.CidFont`, `Rendro.PDF.FontSubsetter`, the `redact_*` helpers). Public ≡ what ExDoc renders.
+3. **Exact shape of `:diagnostics` / metadata maps beyond documented common keys** — Tier-2 additive-only; documented common keys are stable, but new additive keys may appear in any release.
+4. **Adapter APIs that track upstream library majors** (`Rendro.Adapters.*` — Tier-2, may break to follow underlying tools' majors).
+5. **Error-message wording** — the presence and category of an error is contract; the human-readable string is not.
+6. **Log/telemetry message text** — documented event names and measurements are covered; free-text descriptions are not.
 
 ## Deprecation Policy
 
-When an API is deprecated:
-1. It will be marked with Elixir's `@deprecated` attribute.
-2. It will continue to function without breaking for at least one minor release in the `0.x.x` era, or one major release in the `1.x.x` era.
-3. The documentation will clearly point to the recommended replacement.
+Rendro follows a soft-deprecate-first lifecycle:
+
+1. A symbol is first soft-deprecated via `@doc deprecated:` annotation and a CHANGELOG entry. The symbol remains fully functional.
+2. The hard `@deprecated` attribute — which emits a compiler warning — is applied only once no in-tree caller remains, because `mix ci` compiles with `--warnings-as-errors`.
+3. Removal happens only in a major version (`2.0`).
+
+**Illustrative example (example, not a live deprecation):**
+
+```elixir
+@doc deprecated: "Use `Rendro.new_function/2` instead. This function will be removed in 2.0."
+def old_function(doc, opts), do: new_function(doc, opts)
+```
+
+## Deprecations
+
+| Symbol | Soft-deprecated (`@doc deprecated:`) | Hard-deprecated (`@deprecated`) | Removed | Replacement |
+|--------|--------------------------------------|----------------------------------|---------|-------------|
+| _None as of 1.0.0_ | — | — | — | — |
 
 ## Viewer Evidence and CHANGELOG Discipline
 
 Promotions (`unverified` → `supported`), new `explicit_deferral` rows, and legacy `supported` re-homes into `priv/viewer_evidence/` are public-contract changes requiring CHANGELOG entries. Re-validations that refresh `recorded_at` are also recorded.
 
 See `guides/viewer_evidence.md` for the operator recording recipe.
+
+## Per-Surface Support Boundaries
 
 ## Interactive Forms Support Boundary
 
@@ -51,7 +86,7 @@ Adobe Acrobat Reader is `supported` for `forms` based on the recorded viewer che
 
 Chrome PDFium is `supported` for `forms` based on the recorded viewer checklist for version **v0.10.3** on **macOS (arm64)** (`priv/viewer_evidence/forms/chrome_pdfium.md`). That proof confirms `open`, `default_state_visible`, `edit_or_toggle`, and `save` for the representative forms fixture via pdfium-cli automation proxy.
 
-PDF.js is `explicit_deferral` for `forms` because the four-check save-and-reopen round-trip failed on the representative fixture during Phase 71 review — edit/toggle persistence is not reliable.
+PDF.js is `explicit_deferral` for `forms` because the four-check save-and-reopen round-trip failed on the representative fixture during operator review — edit/toggle persistence is not reliable.
 
 Adobe Acrobat Reader is `supported` for unsigned `signature_widget` based on the recorded checklist (`priv/viewer_evidence/signature_widget/adobe_acrobat_reader.md`). Apple Preview is `supported` with evidence at `priv/viewer_evidence/signature_widget/apple_preview.md`. Chrome PDFium is `supported` with evidence at `priv/viewer_evidence/signature_widget/chrome_pdfium.md`. PDF.js is `explicit_deferral` for signature widgets per mozilla/pdf.js#4202.
 
@@ -115,7 +150,7 @@ Viewer support is tracked per surface and per viewer in `priv/support_matrix.jso
 
 Adobe Acrobat Reader is `supported` for both `embedded_files` and `links`. The recorded checklist for version **v0.10.3** on **macOS (arm64)** confirms embedded-file structural markers (`priv/viewer_evidence/embedded_files/adobe_acrobat_reader.md`: `discoverable`, `open_or_extract`, `save_or_extract`) and link structural markers (`priv/viewer_evidence/links/adobe_acrobat_reader.md`: `external_uri_handoff`, `internal_page_navigation`) via pdfium-cli automation proxy — not Attachments pane or URI handoff GUI.
 
-Apple Preview is `supported` for `links` and `explicit_deferral` for `embedded_files`. The recorded checklist for version **v0.10.3** on **macOS (arm64)** (`priv/viewer_evidence/links/apple_preview.md`) confirms external URI handoff and internal page navigation structural markers via pdfium-cli automation proxy. Preview embedded-file discoverability is `explicit_deferral` because the Attachments UI still does not discover, open, or extract the representative fixture after Phase 71 re-verify; the surface is not marked `unsupported`, since Rendro continues to author it correctly per the structural proof lane.
+Apple Preview is `supported` for `links` and `explicit_deferral` for `embedded_files`. The recorded checklist for version **v0.10.3** on **macOS (arm64)** (`priv/viewer_evidence/links/apple_preview.md`) confirms external URI handoff and internal page navigation structural markers via pdfium-cli automation proxy. Preview embedded-file discoverability is `explicit_deferral` because the Attachments UI still does not discover, open, or extract the representative fixture on the version recorded; the surface is not marked `unsupported`, since Rendro continues to author it correctly per the structural proof lane.
 
 Viewers not listed above are outside the recorded support contract for embedded artifact surfaces.
 
@@ -125,7 +160,7 @@ Rendro supports password-to-open PDF protection through an external artifact-fir
 
 The canonical API is `Rendro.Protect.password/2`, which wraps an already-rendered `%Rendro.Artifact{}` through a protection adapter such as `Rendro.Adapters.Qpdf`. The core render pipeline remains deterministic; the protected output does not. Protected artifacts therefore set `metadata.deterministic` to `false` and carry read-only `metadata.protection` details describing the algorithm and advisory-permission posture.
 
-Rendro v1.10 supports only `:aes_256` on this public protection surface. AES-128, RC4, and native in-core encryption are not part of the supported contract for this release.
+Rendro supports only `:aes_256` on this public protection surface. AES-128, RC4, and native in-core encryption are not part of the supported contract for this release.
 
 Advisory permissions are an honor-system PDF flag surface, not a cryptographic enforcement mechanism. Use the term `advisory_permissions` deliberately: compliant viewers may honor print/copy/modify-related flags, and non-compliant viewers or command-line tools may ignore them. Rendro does not market advisory permissions as hard security.
 
@@ -133,7 +168,7 @@ Protection is not compliance, not tamper evidence, and not digital signing. Pass
 
 Delivery and storage seams should transport already-protected artifacts, not password material.
 
-Phase 53 does not introduce a first-party protected worker or orchestration API.
+Rendro does not introduce a first-party protected worker or orchestration API.
 
 Structural validation through `pdfinfo`/Poppler proves that a protected PDF remains structurally readable when a password is supplied to the validator. If validation succeeds only with `owner_password`, that proves structural decryptability fallback rather than the normative password-to-open path. It does not prove viewer behavior.
 
@@ -145,11 +180,11 @@ Adobe Acrobat Reader is `supported` for the `protection` surface based on the re
 
 Every `explicit_deferral` viewer row in `priv/support_matrix.json` carries a named `evidence_deferred` reason. These are mirrored verbatim here so the adopter-visible contract states why a viewer is deferred rather than `unsupported`:
 
-- forms × PDF.js: PDF.js failed the forms four-check save-and-reopen round-trip on the representative fixture during Phase 71 operator review; edit_or_toggle persistence is not reliable.
+- forms × PDF.js: PDF.js failed the forms four-check save-and-reopen round-trip on the representative fixture during operator review; edit_or_toggle persistence is not reliable.
 - signature_widget × PDF.js / signing_preparation × PDF.js: PDF.js does not implement AcroForm signature widget editing or unsigned placeholder rendering per mozilla/pdf.js#4202; promotion requires upstream signature-field support.
 - signed_artifact × Apple Preview: Apple Preview does not validate /Sig digital signatures and append-save invalidates signature dictionaries; signed-artifact viewer promotion requires Acrobat or pdfium-cli structural lanes.
 - signed_artifact × PDF.js: PDF.js exposes no /Sig validation UI or signed-artifact integrity panel for the representative fixture; viewer promotion deferred until signature validation surfaces exist.
 - long_lived_signed_artifact × Apple Preview: Apple Preview does not surface long-term-validation timestamp, revocation, or expiry indicators for augmented PDF signatures on the representative certomancer fixture.
 - long_lived_signed_artifact × Chrome PDFium: pdfium-cli structural open and form extraction do not expose long-term-validation timestamp, revocation, or expiry indicators; LTV posture remains Acrobat-only for viewer promotion.
 - long_lived_signed_artifact × PDF.js: PDF.js does not implement long-term-validation timestamp, revocation, or expiry indicators for augmented signatures; viewer promotion deferred until LTV UI exists upstream.
-- embedded_files × Apple Preview: Apple Preview Attachments UI still does not discover, open, or extract the representative embedded-artifact fixture after Phase 71 re-verify; v1.9 deferral stands.
+- embedded_files × Apple Preview: Apple Preview Attachments UI still does not discover, open, or extract the representative embedded-artifact fixture on the version recorded; the deferral stands.
