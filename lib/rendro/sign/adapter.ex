@@ -6,6 +6,7 @@ defmodule Rendro.Sign.Adapter do
   that prepared artifact, derive adapter-local handoff data, and return updated
   bytes plus namespaced metadata without widening the shared core manifest.
   """
+  @moduledoc tags: [:adapter]
 
   @optional_callbacks augment: 2
 

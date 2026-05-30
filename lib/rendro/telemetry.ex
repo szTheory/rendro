@@ -22,6 +22,7 @@ defmodule Rendro.Telemetry do
 
       %{kind: atom(), reason: term(), stacktrace: list()}
   """
+  @moduledoc tags: [:adapter]
 
   @stage_names [:build, :compose, :measure, :paginate, :validate, :render]
 

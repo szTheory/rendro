@@ -38,6 +38,7 @@ if Code.ensure_loaded?(Threadline) do
 
         Rendro.Adapters.Threadline.detach()
     """
+    @moduledoc tags: [:adapter]
 
     @behaviour Rendro.Audit
 

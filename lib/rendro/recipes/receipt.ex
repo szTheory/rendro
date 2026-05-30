@@ -73,6 +73,7 @@ defmodule Rendro.Recipes.Receipt do
         ]
       )
   """
+  @moduledoc tags: [:adapter]
 
   # ---------------------------------------------------------------------------
   # Layout geometry constants (all in points)

@@ -3,6 +3,7 @@ defmodule Rendro.Inspector do
   Deterministic layout inspector for ASCII snapshot testing.
   Provides string serialization of document structure and diagnostics.
   """
+  @moduledoc tags: [:adapter]
 
   alias Rendro.Document
 

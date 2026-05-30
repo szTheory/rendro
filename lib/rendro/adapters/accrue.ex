@@ -49,6 +49,7 @@ if Code.ensure_loaded?(Accrue) do
     policies (max pages/bytes/timeout) and error tuples flow through the
     normal pipeline.
     """
+    @moduledoc tags: [:adapter]
 
     @spec recipe(term()) ::
             {:ok, Rendro.Document.t()} | {:error, {:invalid_invoice, term()}}

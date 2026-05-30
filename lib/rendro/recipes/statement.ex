@@ -76,6 +76,7 @@ defmodule Rendro.Recipes.Statement do
         labels: %{carried_forward: "Saldo a cuenta nueva"}
       )
   """
+  @moduledoc tags: [:adapter]
 
   # ---------------------------------------------------------------------------
   # Layout geometry constants (all in points)

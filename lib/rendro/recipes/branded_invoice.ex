@@ -39,6 +39,7 @@ defmodule Rendro.Recipes.BrandedInvoice do
       iex> Map.has_key?(doc.asset_registry.assets, :company_logo)
       true
   """
+  @moduledoc tags: [:adapter]
 
   @doc """
   Returns a `%Rendro.PageTemplate{}` with four named regions:

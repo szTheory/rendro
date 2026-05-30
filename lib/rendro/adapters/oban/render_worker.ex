@@ -3,6 +3,7 @@ if Code.ensure_loaded?(Oban) do
     @moduledoc """
     Oban worker pattern for background PDF rendering.
     """
+    @moduledoc tags: [:adapter]
 
     use Oban.Worker, queue: :render, max_attempts: 3
 

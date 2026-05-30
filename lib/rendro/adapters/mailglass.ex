@@ -47,6 +47,7 @@ if Code.ensure_loaded?(Mailglass) do
         to the existing core render policy (max pages/bytes), bounding the size of
         attachments produced.
     """
+    @moduledoc tags: [:adapter]
 
     @default_filename "document.pdf"
     @content_type "application/pdf"

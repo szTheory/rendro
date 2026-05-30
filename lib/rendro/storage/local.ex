@@ -2,6 +2,7 @@ defmodule Rendro.Storage.Local do
   @moduledoc """
   A simple local filesystem storage adapter for Rendro artifacts.
   """
+  @moduledoc tags: [:adapter]
   @behaviour Rendro.Storage
 
   alias Rendro.Artifact

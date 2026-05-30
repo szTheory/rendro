@@ -6,6 +6,7 @@ defmodule Rendro.Storage do
   storage systems (S3, local disk, database, etc.) without coupling core
   rendering logic to any specific storage implementation.
   """
+  @moduledoc tags: [:adapter]
 
   @doc """
   Persists an artifact.

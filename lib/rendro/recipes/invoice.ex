@@ -29,6 +29,7 @@ defmodule Rendro.Recipes.Invoice do
         |> then(fn d -> Enum.reduce(sections, d, &Rendro.Document.add_section(&2, &1)) end)
 
   """
+  @moduledoc tags: [:adapter]
 
   @doc """
   Returns a `%Rendro.PageTemplate{}` with three named regions: `:header`, `:body`, `:footer`.

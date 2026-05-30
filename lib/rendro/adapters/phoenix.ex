@@ -6,6 +6,7 @@ if Code.ensure_loaded?(Plug.Conn) and Code.ensure_loaded?(Phoenix) do
     This module provides helpers for serving PDFs in Phoenix controllers.
     It requires `:phoenix` and `:plug` to be available.
     """
+    @moduledoc tags: [:adapter]
 
     import Plug.Conn
 

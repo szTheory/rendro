@@ -6,6 +6,7 @@ defmodule Rendro.Protect.Adapter do
   artifact-level PDF binary protected by an external tool or post-processing
   step.
   """
+  @moduledoc tags: [:adapter]
 
   @callback protect(Rendro.Artifact.t(), map()) ::
               {:ok, binary()} | {:error, term()}

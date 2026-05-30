@@ -35,6 +35,7 @@ defmodule Rendro.Recipes.Certificate do
       :certificate
 
   """
+  @moduledoc tags: [:adapter]
 
   # Non-dimensional defaults only — NO geometry constants.
   # All x/y/width/height values are computed at runtime from PageSize.resolve/2.
