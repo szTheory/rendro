@@ -991,7 +991,7 @@ No new security surfaces introduced. This phase is pure test-writing.
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Single test file vs. sibling spec-coverage file (Claude's Discretion)**
    - What we know: D-04 is the heaviest assertion and the one that starts RED (until backfill done); manifest equality + hidden + tier assertions start passing from day 1 if the backfill is done first
