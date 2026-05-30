@@ -7,6 +7,7 @@ defmodule Rendro.Text do
   through its owned font registry. A narrow Helvetica compatibility path remains
   available for the current built-in default behavior.
   """
+  @moduledoc tags: [:stable]
 
   @helvetica_aliases ["Helvetica", "helvetica"]
 

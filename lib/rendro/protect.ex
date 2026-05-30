@@ -6,6 +6,7 @@ defmodule Rendro.Protect do
   `%Rendro.Artifact{}` first and then apply a protection adapter such as
   `Rendro.Adapters.Qpdf`.
   """
+  @moduledoc tags: [:stable]
 
   alias Rendro.{Artifact, Error}
 

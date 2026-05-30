@@ -2,6 +2,7 @@ defmodule Rendro.Table do
   @moduledoc """
   Table primitive for structured data.
   """
+  @moduledoc tags: [:stable]
 
   @enforce_keys [:rows]
   defstruct [

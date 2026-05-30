@@ -9,6 +9,7 @@ defmodule Rendro.RunningContent do
   Functions must be pure and terminating. Infinite loops are not defended against
   (Elixir has no timeout primitive without Task). Use simple, deterministic functions.
   """
+  @moduledoc tags: [:stable]
 
   @enforce_keys [:fun]
   defstruct fun: nil

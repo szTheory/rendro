@@ -2,6 +2,7 @@ defmodule Rendro.AssetRegistry do
   @moduledoc """
   State container for registered assets and their metadata.
   """
+  @moduledoc tags: [:stable]
 
   defmodule InvalidAssetError do
     defexception [:message, :logical_name, :reason]

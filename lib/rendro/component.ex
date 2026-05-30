@@ -2,6 +2,7 @@ defmodule Rendro.Component do
   @moduledoc """
   Component-based layout pattern for reusable PDF UI parts.
   """
+  @moduledoc tags: [:stable]
 
   @doc """
   Renders a component by calling its `render/1` function.

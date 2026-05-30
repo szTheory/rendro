@@ -2,6 +2,7 @@ defmodule Rendro.Page do
   @moduledoc """
   A page with blocks, dimensions, and margins.
   """
+  @moduledoc tags: [:stable]
 
   @default_width 595.28
   @default_height 841.89

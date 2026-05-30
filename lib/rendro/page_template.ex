@@ -2,6 +2,7 @@ defmodule Rendro.PageTemplate do
   @moduledoc """
   Explicit flow-page layout template with page geometry and named regions.
   """
+  @moduledoc tags: [:stable]
 
   @default_width 595.28
   @default_height 841.89

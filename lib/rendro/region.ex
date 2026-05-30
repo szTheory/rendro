@@ -2,6 +2,7 @@ defmodule Rendro.Region do
   @moduledoc """
   Bounded layout region with named role and anchoring metadata.
   """
+  @moduledoc tags: [:stable]
 
   @enforce_keys []
   defstruct name: nil,

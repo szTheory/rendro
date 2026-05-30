@@ -2,6 +2,7 @@ defmodule Rendro.Image do
   @moduledoc """
   AST representation of a registered image asset to be rendered.
   """
+  @moduledoc tags: [:stable]
 
   @enforce_keys [:logical_name]
   defstruct [

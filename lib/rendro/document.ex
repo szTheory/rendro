@@ -31,13 +31,14 @@ defmodule Rendro.Document do
   registry keeps a narrow Helvetica-compatible path available out of the box
   while letting callers register additional logical names as pure data.
 
-  Rendro embraces an "honest I18n" model: text crossing into unsupported scripts 
-  (e.g., RTL, complex shaping) or unmapped glyphs will not silently degrade into 
-  squares or overlapping text. Instead, the rendering pipeline will explicitly trap 
-  the boundary and return an actionable `Rendro.Error`. Callers can configure 
-  fallback font chains when registering fonts to automatically substitute missing 
+  Rendro embraces an "honest I18n" model: text crossing into unsupported scripts
+  (e.g., RTL, complex shaping) or unmapped glyphs will not silently degrade into
+  squares or overlapping text. Instead, the rendering pipeline will explicitly trap
+  the boundary and return an actionable `Rendro.Error`. Callers can configure
+  fallback font chains when registering fonts to automatically substitute missing
   glyphs.
   """
+  @moduledoc tags: [:stable]
 
   @enforce_keys []
   defstruct pages: [],

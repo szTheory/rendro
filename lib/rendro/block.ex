@@ -2,6 +2,7 @@ defmodule Rendro.Block do
   @moduledoc """
   Content container with position and size.
   """
+  @moduledoc tags: [:stable]
 
   @enforce_keys [:content]
   defstruct [

@@ -6,6 +6,7 @@ defmodule Rendro.Recipes do
   invoices and reports, demonstrating best practices for layout
   and pagination.
   """
+  @moduledoc tags: [:stable]
 
   @doc """
   Builds a standard invoice document using the canonical Tiered Composition recipe.

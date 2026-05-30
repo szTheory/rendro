@@ -5,6 +5,7 @@ defmodule Rendro.Error do
   The pipeline wraps stage failures in this struct so callers receive
   actionable context (`what/where/why/next`) plus correlation metadata.
   """
+  @moduledoc tags: [:stable]
 
   @enforce_keys [:what, :where, :why, :next, :stage]
   defstruct [:what, :where, :why, :next, :stage, :reason, :render_id, details: %{}]

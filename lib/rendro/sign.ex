@@ -9,6 +9,7 @@ defmodule Rendro.Sign do
   - `sign/2` signs the original unsigned rendered artifact through a narrow
     optional adapter boundary.
   """
+  @moduledoc tags: [:stable]
 
   alias Rendro.{Artifact, Error}
 

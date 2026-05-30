@@ -2,6 +2,7 @@ defmodule Rendro.EmbeddedFileRegistry do
   @moduledoc """
   Pure data registry for document-owned embedded-file registrations.
   """
+  @moduledoc tags: [:stable]
 
   @enforce_keys [:files]
   defstruct files: %{}

@@ -2,6 +2,7 @@ defmodule Rendro.Section do
   @moduledoc """
   Reusable flow section that targets a named template region.
   """
+  @moduledoc tags: [:stable]
 
   @enforce_keys []
   defstruct name: nil,

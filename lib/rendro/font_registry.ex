@@ -6,6 +6,7 @@ defmodule Rendro.FontRegistry do
   against a narrow built-in descriptor. PDF object names and writer resource
   allocation stay private implementation details.
   """
+  @moduledoc tags: [:stable]
 
   @default_font :default
   @helvetica_descriptor %{source: :built_in, family: :helvetica}

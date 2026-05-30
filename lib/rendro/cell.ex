@@ -2,6 +2,7 @@ defmodule Rendro.Cell do
   @moduledoc """
   Cell primitive for explicit table fragmentation configuration.
   """
+  @moduledoc tags: [:stable]
 
   @enforce_keys [:content]
   defstruct [

@@ -2,6 +2,7 @@ defmodule Rendro.Row do
   @moduledoc """
   Row primitive for explicit table fragmentation configuration.
   """
+  @moduledoc tags: [:stable]
 
   @enforce_keys [:cells]
   defstruct [
