@@ -91,7 +91,7 @@ defmodule Rendro.DocsContract.ViewerEvidenceClaimsTest do
       refute matrix =~ ~r/"signing".*?"status"\s*:\s*"unverified"/s
     end
 
-    test "viewer evidence guide documents Phase 71 deferral templates" do
+    test "viewer evidence guide documents deferral templates" do
       guide = File.read!("guides/viewer_evidence.md")
 
       assert guide =~ "UPSTREAM_ISSUE"

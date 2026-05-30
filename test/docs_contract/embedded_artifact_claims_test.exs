@@ -35,7 +35,7 @@ defmodule Rendro.DocsContract.EmbeddedArtifactClaimsTest do
              ~r/"embedded_files".*?"viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
 
     # Apple Preview did not surface the embedded file in its UI under the version
-    # checked → explicit_deferral per Phase 71 re-verify. Not `unsupported` (D-09):
+    # checked → explicit_deferral on the version checked. Not `unsupported` (D-09):
     # Rendro authors the surface correctly per the structural lane; the gap is on
     # the viewer side.
     assert matrix =~

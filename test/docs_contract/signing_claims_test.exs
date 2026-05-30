@@ -30,7 +30,7 @@ defmodule Rendro.DocsContract.SigningClaimsTest do
     refute matrix =~ ~r/^  "long_lived"\s*:/m
   end
 
-  test "signature-specific and long-lived viewer rows are terminal after Phase 71" do
+  test "signature-specific and long-lived viewer rows are terminal" do
     matrix = File.read!("priv/support_matrix.json")
 
     assert matrix =~

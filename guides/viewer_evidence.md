@@ -28,7 +28,7 @@ Promotion keys on `supported` rows: `evidence`, `recorded_at`, `viewer_kind` (`m
 
 ### Automated path (Linux CI — pdfium-cli, pdfinfo, qpdf)
 
-When `pdfium-cli`, `pdfinfo`, and `qpdf` are on PATH, record Phase 70 consolidated legacy rows without GUI viewers:
+When `pdfium-cli`, `pdfinfo`, and `qpdf` are on PATH, record legacy rows without GUI viewers:
 
 ```bash
 mix rendro.viewer_evidence record forms chrome_pdfium \
@@ -56,7 +56,7 @@ mix rendro.viewer_evidence record protection apple_preview \
   --recorded-by ci:viewer-evidence-live-proof
 ```
 
-Phase 71 trust-sensitive surfaces (signature widgets, signing preparation, signed artifacts, long-lived signed artifacts) use the same pdfium-cli / pdfsig / pyhanko structural-proxy lane:
+Trust-sensitive surfaces (signature widgets, signing preparation, signed artifacts, long-lived signed artifacts) use the same pdfium-cli / pdfsig / pyhanko structural-proxy lane:
 
 ```bash
 mix rendro.viewer_evidence record signature_widget chrome_pdfium \
@@ -94,7 +94,7 @@ mix test --include live_pdf_tools \
   test/rendro/adapters/trust_sensitive_viewer_evidence_live_test.exs
 ```
 
-`trust_sensitive_viewer_evidence_live_test.exs` records all Phase 71 structural-proxy evidence files in one lane. Structural automation proxies do not validate Apple Preview or Adobe Acrobat GUI behavior.
+`trust_sensitive_viewer_evidence_live_test.exs` records all structural-proxy evidence files in one lane. Structural automation proxies do not validate Apple Preview or Adobe Acrobat GUI behavior.
 
 ### Manual path (Preview / Acrobat)
 
@@ -106,7 +106,7 @@ Run these steps in order. Each step ends with an observable check.
 mix rendro.viewer_evidence missing
 ```
 
-**Check:** Exit code **0** when no unverified cells remain (v2.3 close). Exit code **1** when unverified cells exist. Stdout lists `surface`, `viewer`, and `status` for each backlog cell. Pick your target cell from the table.
+**Check:** Exit code **0** when no unverified cells remain. Exit code **1** when unverified cells exist. Stdout lists `surface`, `viewer`, and `status` for each backlog cell. Pick your target cell from the table.
 
 ### 2. Confirm behavior IDs
 
@@ -154,7 +154,7 @@ Add a short body: provenance, fixture regen command, and boundary notes (Appendi
 mix rendro.viewer_evidence validate
 ```
 
-**Check:** Exit code **0**. Fix any Tier-A errors (schema, lint, orphan scan) before promoting. Tier-B promotion-complete validation passes for all `supported` rows at v2.3 close.
+**Check:** Exit code **0**. Fix any Tier-A errors (schema, lint, orphan scan) before promoting. Tier-B promotion-complete validation passes for all `supported` rows.
 
 ### 7. Promote the matrix row
 
@@ -187,7 +187,7 @@ The canonical observations for the first CI-automated promoted cell live only in
 
 The guide shows structure and commands; **the canonical file wins** for version strings, platform, behavior notes, and dates.
 
-Apple Preview consolidated evidence (`priv/viewer_evidence/forms/apple_preview.md`) uses the same pdfium-cli structural proxy lane as Phase 70 automation — GUI Preview is not re-run in CI.
+Apple Preview consolidated evidence (`priv/viewer_evidence/forms/apple_preview.md`) uses the same pdfium-cli structural proxy lane — GUI Preview is not re-run in CI.
 
 Copy source for new cells: `priv/viewer_evidence/_template.md`.
 
@@ -324,9 +324,9 @@ Full API and CI notes: see `Mix.Tasks.Rendro.ViewerEvidence` moduledoc (`mix hel
 |---------|--------------|--------|
 | `mix docs.contract` fails lane 8 | Orphan evidence, schema error, bad frontmatter | Run `mix rendro.viewer_evidence validate`; fix paths and lint |
 | Promotion-complete test fails in fixtures only | Tier-B fixture matrix missing `evidence` | Production tier-A still passes until promotion; add keys when recording |
-| `forms_claims_test` fails after `api_stability` edit | Broke Adobe `unverified` wording or refute guards | Preserve narrow claims; see Phase 69 plan 03 |
+| `forms_claims_test` fails after `api_stability` edit | Broke Adobe `unverified` wording or refute guards | Preserve narrow claims; see the implementation notes |
 
-Docs-contract proves **structural** alignment (matrix JSON, evidence schema, path references, lint). The `viewer-evidence-live-proof` GitHub Actions lane runs pdfium-cli, pdfsig, pyhanko, and poppler structural-proxy proofs that regenerate committed evidence files — no GUI viewer sessions required for Phase 71 trust-sensitive closures.
+Docs-contract proves **structural** alignment (matrix JSON, evidence schema, path references, lint). The `viewer-evidence-live-proof` GitHub Actions lane runs pdfium-cli, pdfsig, pyhanko, and poppler structural-proxy proofs that regenerate committed evidence files — no GUI viewer sessions required for trust-sensitive closures.
 
 ## Appendix F — Overclaim boundaries
 
