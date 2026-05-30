@@ -86,6 +86,6 @@ status: draft
 
 ## Notes
 
-- **Correction to RESEARCH.md:** there are **no existing custom mix tasks** in the repo (`lib/mix/tasks/` does not exist; no `use Mix.Task` anywhere in `lib/`). `mix rendro.api.gen` is greenfield — use standard `Mix.Task` boilerplate, no in-repo task analog to mirror.
+- **Mix task analog:** the repo has existing custom mix tasks under `lib/mix/tasks/` — `lib/mix/tasks/rendro/viewer_evidence.ex` is the direct analog for the new `lib/mix/tasks/rendro/api.gen.ex` (`use Mix.Task`, `@shortdoc`, `@impl Mix.Task def run/1`, `Mix.Task.run("compile")`). The generator must call `Rendro.PublicApi.recompile_conditional_adapters/0` (mirroring `test/support/mocks.ex` `AdapterReloader.recompile/0`) before introspecting, or conditional adapters (Threadline/Mailglass/Accrue) silently vanish from the manifest.
 
 *Source: RESEARCH.md Validation Architecture section*
