@@ -92,10 +92,24 @@ defmodule Rendro.DocsContract.PublicApiContractTest do
       ]
 
       for module <- hidden_modules do
+        # Guard against a false pass: a missing/uncompiled module must FAIL this
+        # assertion, not be silently treated as :hidden. Otherwise renaming or
+        # deleting a tracked internal would pass the very check meant to catch it.
+        assert Code.ensure_loaded?(module),
+               "Expected internal module #{inspect(module)} to exist and be compiled, " <>
+                 "but it could not be loaded — was it renamed or deleted? " <>
+                 "The hidden-internals contract must track real modules."
+
         module_doc =
           case Code.fetch_docs(module) do
-            {:docs_v1, _, _, _, module_doc, _, _} -> module_doc
-            {:error, _} -> :hidden
+            {:docs_v1, _, _, _, module_doc, _, _} ->
+              module_doc
+
+            {:error, reason} ->
+              flunk(
+                "Could not fetch docs for #{inspect(module)} (#{inspect(reason)}); " <>
+                  "expected it to report :hidden via @moduledoc false."
+              )
           end
 
         assert module_doc == :hidden,
@@ -112,7 +126,17 @@ defmodule Rendro.DocsContract.PublicApiContractTest do
       ]
 
       for {module, names} <- hidden_helpers do
-        {:docs_v1, _, _, _, _, _, docs} = Code.fetch_docs(module)
+        docs =
+          case Code.fetch_docs(module) do
+            {:docs_v1, _, _, _, _, _, docs} ->
+              docs
+
+            other ->
+              flunk(
+                "Could not fetch docs for #{inspect(module)} (got #{inspect(other)}); " <>
+                  "expected its redact_* helpers to report doc: :hidden."
+              )
+          end
 
         for name <- names do
           matching_entries =
@@ -144,27 +168,33 @@ defmodule Rendro.DocsContract.PublicApiContractTest do
       violations =
         manifest["modules"]
         |> Enum.flat_map(fn {mod_key, _entry} ->
-          module = String.to_existing_atom(mod_key)
-
-          tags =
-            case Code.fetch_docs(module) do
-              {:docs_v1, _, _, _, _, %{tags: tags}, _} -> tags
-              _ -> []
-            end
-
-          tier_tags = Enum.filter(tags, &(&1 in [:stable, :adapter]))
-
-          cond do
-            length(tier_tags) == 1 ->
+          case resolve_manifest_module(mod_key) do
+            # A manifest key with no live module is reported cleanly by Assertion 2's
+            # surface-equality drift diff; skip here to avoid confusing parallel crashes.
+            :stale ->
               []
 
-            tier_tags == [] ->
-              ["#{mod_key}: no tier tag (expected exactly one: :stable or :adapter)"]
+            {:ok, module} ->
+              tags =
+                case Code.fetch_docs(module) do
+                  {:docs_v1, _, _, _, _, %{tags: tags}, _} -> tags
+                  _ -> []
+                end
 
-            true ->
-              [
-                "#{mod_key}: #{length(tier_tags)} tier tags #{inspect(tier_tags)} (expected exactly one)"
-              ]
+              tier_tags = Enum.filter(tags, &(&1 in [:stable, :adapter]))
+
+              cond do
+                length(tier_tags) == 1 ->
+                  []
+
+                tier_tags == [] ->
+                  ["#{mod_key}: no tier tag (expected exactly one: :stable or :adapter)"]
+
+                true ->
+                  [
+                    "#{mod_key}: #{length(tier_tags)} tier tags #{inspect(tier_tags)} (expected exactly one)"
+                  ]
+              end
           end
         end)
 
@@ -185,24 +215,39 @@ defmodule Rendro.DocsContract.PublicApiContractTest do
         manifest["modules"]
         |> Enum.filter(fn {_key, entry} -> entry["tier"] == "stable" end)
         |> Enum.flat_map(fn {mod_key, entry} ->
-          module = String.to_existing_atom(mod_key)
+          case resolve_manifest_module(mod_key) do
+            # Stale key → reported by Assertion 2; skip to avoid confusing parallel crashes.
+            :stale ->
+              []
 
-          specced =
-            case Code.Typespec.fetch_specs(module) do
-              {:ok, specs} ->
-                Enum.map(specs, fn {{name, arity}, _} -> "#{name}/#{arity}" end)
+            {:ok, module} ->
+              specced =
+                case Code.Typespec.fetch_specs(module) do
+                  {:ok, specs} ->
+                    Enum.map(specs, fn {{name, arity}, _} -> "#{name}/#{arity}" end)
 
-              :error ->
-                []
-            end
+                  :error ->
+                    []
+                end
 
-          entry["functions"]
-          |> Enum.reject(fn fn_str -> fn_str in specced end)
-          |> Enum.map(fn fn_str -> "#{mod_key}.#{fn_str}" end)
+              entry["functions"]
+              |> Enum.reject(fn fn_str -> fn_str in specced end)
+              |> Enum.map(fn fn_str -> "#{mod_key}.#{fn_str}" end)
+          end
         end)
 
       assert unspecced == [],
              "Stable-tier functions missing @spec:\n  " <> Enum.join(unspecced, "\n  ")
     end
+  end
+
+  # Resolves a manifest module key (e.g. "Elixir.Rendro.Table") to its atom.
+  # A stale key (module renamed/deleted) returns :stale rather than crashing with
+  # ArgumentError — the surface-equality assertion (Assertion 2) is the authoritative
+  # reporter for that drift, so degrading cleanly here keeps failure output readable.
+  defp resolve_manifest_module(mod_key) do
+    {:ok, String.to_existing_atom(mod_key)}
+  rescue
+    ArgumentError -> :stale
   end
 end

@@ -492,7 +492,7 @@ defmodule Rendro.Recipes.ReceiptTest do
   # V8: validate_data!/1 rejects malformed :customer and :date
   # ---------------------------------------------------------------------------
 
-  describe "V8: validate_data!/1 rejects malformed input" do
+  describe "V11: validate_data!/1 rejects malformed input" do
     test "non-map :customer raises ArgumentError mentioning customer" do
       data = fixture_data(0) |> Map.put(:customer, "not-a-map")
 
