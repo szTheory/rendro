@@ -49,7 +49,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 - [x] **Phase 74: Statement Recipe** - First end-to-end exercise of PAGE primitive; carried-forward totals in data assembly; three-rung escape hatch (completed 2026-05-29)
 - [x] **Phase 75: Receipt/Report and Certificate Recipes + Support Contract** - Batched lower-complexity recipes; support-matrix rows for all new surfaces (completed 2026-05-29)
 - [x] **Phase 76: Reference Phoenix App, CI, and Documentation Closure** - Isolated CI job; all recipes demonstrated; HexDocs guides; docs-contract tests (completed 2026-05-29)
-- [ ] **Phase 77: v2.4 Closure — Format Gate, Nyquist Drafts, Recipe Input-Validation Polish** - Audit-discovered cleanup: green the `mix ci` format gate, fill Nyquist VALIDATION drafts (73/74/75), structured `ArgumentError` validation across recipes (added 2026-05-29)
+- [x] **Phase 77: v2.4 Closure — Format Gate, Nyquist Drafts, Recipe Input-Validation Polish** - Audit-discovered cleanup: green the `mix ci` format gate, fill Nyquist VALIDATION drafts (73/74/75), structured `ArgumentError` validation across recipes (added 2026-05-29) (completed 2026-05-30)
 
 ## Phase Details
 
@@ -182,7 +182,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 | 74. Statement Recipe | 4/4 | Complete    | 2026-05-29 |
 | 75. Receipt/Report and Certificate Recipes + Support Contract | 4/4 | Complete    | 2026-05-29 |
 | 76. Reference Phoenix App, CI, and Documentation Closure | 4/4 | Complete    | 2026-05-29 |
-| 77. v2.4 Closure — Format Gate, Nyquist Drafts, Input-Validation Polish | 3/4 | In Progress|  |
+| 77. v2.4 Closure — Format Gate, Nyquist Drafts, Input-Validation Polish | 4/4 | Complete   | 2026-05-30 |
 
 ### Phase 77: v2.4 Closure — Format Gate, Nyquist Drafts, Recipe Input-Validation Polish
 
@@ -197,7 +197,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
   3. Phases 73, 74, and 75 have `nyquist_compliant: true` VALIDATION.md records (currently unfilled drafts); run `/gsd-validate-phase` for each rather than hand-editing
   4. Statement, Receipt, and Certificate raise structured `ArgumentError` (not `BadMapError`/`FunctionClauseError`) for malformed `:account`/`:customer`, non-`%Date{}` `:date`, and non-binary `:body` (closes 74 WARNINGs + 75 WR-01..06); cosmetic dead bindings and misleading comments cleaned up
 
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 Plans:
 **Wave 1**
 
@@ -207,7 +207,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 77-04-PLAN.md — Terminal gate: format offenders + final mix format + full suite + commit working-tree changes with intent + prove clean-tree mix ci format gate green (D-01/D-02/D-10)
+- [x] 77-04-PLAN.md — Terminal gate: format offenders + final mix format + full suite + commit working-tree changes with intent + prove clean-tree mix ci format gate green (D-01/D-02/D-10)
 
 ---
 *v2.3 archived 2026-05-29 on milestone completion. v2.4 roadmap created 2026-05-29. Phase numbering: 73-77 (Phase 77 added 2026-05-29 from v2.4 milestone audit).*

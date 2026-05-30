@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: Batteries-Included Workflow & Adoption Closure
 status: executing
-last_updated: "2026-05-30T01:46:03.458Z"
+last_updated: "2026-05-30T09:14:49.940Z"
 last_activity: 2026-05-30
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 21
-  completed_plans: 19
-  percent: 80
+  completed_plans: 21
+  percent: 100
 ---
 
 # Project State
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-05-29 after v2.3 milestone shipped)
 ## Current Position
 
 Phase: 77 (v2-4-closure-format-gate-nyquist-drafts-recipe-input-validat) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-05-30
 
-Progress: [█████████░] 90%
+Progress: [██████████] 100%
 
 ## Milestone Snapshot
 
@@ -140,6 +140,7 @@ Items intentionally held outside v2.4 scope (carried from v2.3 + v2.4 planning):
 | Phase 76 P01 | 2m | 2 tasks | 3 files |
 | Phase 76 P03 | 10min | 2 tasks | 3 files |
 | Phase 76 P04 | 15m | 2 tasks | 7 files |
+| Phase 77 P04 | 5m | 2 tasks | 7 files |
 
 ## Operator Next Steps
 
