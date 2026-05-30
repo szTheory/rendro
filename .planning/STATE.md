@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.5
 milestone_name: 1.0 Release Capstone
 status: executing
-last_updated: "2026-05-30T17:44:47.816Z"
-last_activity: 2026-05-30 -- Phase 79 planning complete
+last_updated: "2026-05-30T17:49:48.478Z"
+last_activity: 2026-05-30
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 8
-  completed_plans: 5
+  completed_plans: 6
   percent: 20
 ---
 
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-30 after v2.4 milestone shipped)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 79 — public api contract enforcement lane
+**Current focus:** Phase 79 — public-api-contract-enforcement-lane
 
 ## Current Position
 
-Phase: 79
-Plan: Not started
+Phase: 79 (public-api-contract-enforcement-lane) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-05-30 -- Phase 79 planning complete
+Last activity: 2026-05-30
 
 ## Milestone Snapshot
 
@@ -89,6 +89,7 @@ Items intentionally held outside shipped scope, carried forward for future miles
 | recipes | Decorative border frame on Certificate (depends on drawn-path primitive) | post-v2.4 |
 | recipes | Chart/graph rendering in Report body (major new rendering surface) | post-v2.4 |
 | recipes | Table of contents with page numbers (forward-reference, multi-pass concern) | post-v2.4 |
+| Phase 79 P01 | 74 | 1 tasks | 1 files |
 
 ## Operator Next Steps
 
