@@ -11,41 +11,31 @@ progress:
   total_plans: 21
   completed_plans: 21
   percent: 100
-stopped_at: Milestone complete (Phase 77 was final phase)
+stopped_at: Milestone v2.4 shipped and archived 2026-05-30 (Phase 77 was final phase)
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-29 after v2.3 milestone shipped)
+See: .planning/PROJECT.md (updated 2026-05-30 after v2.4 milestone shipped)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Milestone complete
+**Current focus:** No milestone active — v2.4 shipped. Next up: the 1.0 release capstone (then conditional v2.5). Run `/gsd-new-milestone` to begin.
 
 ## Current Position
 
-Phase: 77
-Plan: Not started
-Status: Milestone complete
-Last activity: 2026-05-30
+Milestone: v2.4 Batteries-Included Workflow & Adoption Closure — **SHIPPED & ARCHIVED 2026-05-30**
+Phase: 77 (final) complete
+Status: Milestone complete and archived
 
-Progress: [██████████] 100%
+Progress: [██████████] 100% (5/5 phases, 21/21 plans, 19/19 requirements)
 
 ## Milestone Snapshot
 
-- Milestone: `v2.4 Batteries-Included Workflow & Adoption Closure` (active; roadmap created 2026-05-29; phases 73-76)
-- Previous shipped milestone: `v2.3 Viewer Proof & Interop Closure` (shipped and archived on 2026-05-29 at tag `v0.3.1`; see `milestones/v2.3-MILESTONE-AUDIT.md`). All 26 (surface × viewer) cells terminal — 17 supported, 9 explicit_deferral, 0 silently unverified.
-- Strategic next-up after v2.4: conditional `v2.5 Global Text Shaping & Script Support` only if demand justifies the core investment; then 1.0 release capstone.
-
-## Phase Map
-
-| Phase | Name | Requirements | Status |
-|-------|------|--------------|--------|
-| 73 | Page-Numbering / Running-Region Primitive | PAGE-01, PAGE-02, PAGE-03, PAGE-04 | Not started |
-| 74 | Statement Recipe | STMT-01, STMT-02, STMT-03, STMT-04 | Not started |
-| 75 | Receipt/Report and Certificate Recipes + Support Contract | RCPT-01, RCPT-02, RCPT-03, CERT-01, CERT-02, CERT-03, CONTRACT-01 | Not started |
-| 76 | Reference Phoenix App, CI, and Documentation Closure | REF-01, REF-02, REF-03, CONTRACT-02 | Not started |
+- Shipped milestone: `v2.4 Batteries-Included Workflow & Adoption Closure` — phases 73-77, 21 plans, 19/19 requirements, milestone audit `passed`. Archived in `milestones/v2.4-ROADMAP.md` / `milestones/v2.4-REQUIREMENTS.md` / `milestones/v2.4-MILESTONE-AUDIT.md`.
+- Previous shipped milestone: `v2.3 Viewer Proof & Interop Closure` (shipped 2026-05-29 at tag `v0.3.1`).
+- Strategic next-up: **1.0 release capstone** (SemVer/API-stability commitment + migration note — the engine is 1.0-grade and `guides/api_stability.md` exists). Then conditional `v2.5 Global Text Shaping & Script Support` only if adopter demand justifies the core investment.
 
 ## Performance Metrics
 
@@ -55,94 +45,40 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 
 ### Decisions
 
-Full per-milestone decision log lives in `.planning/PROJECT.md` (Key Decisions table) and per-milestone archives. Carried forward into v2.4:
-
-- [v2.3]: Support rows use a three-state vocabulary — `supported` (with evidence) / `explicit_deferral` (with a named reason) / `unverified` (un-attempted); silent `unverified` for a known-unsupportable cell is a recording-discipline failure.
-- [v2.3]: Public-contract data files (`priv/support_matrix.json`) evolve strictly additively under a wired-in JSON-Schema validator in the required `test` job; viewer gaps are recorded as `explicit_deferral`, never patched into the writer.
-- [v2.3]: Viewer evidence is text-only Markdown under `priv/viewer_evidence/`, fixtures by repo-path or content hash, with a durable operator recipe (`guides/viewer_evidence.md`) future surfaces inherit.
-- [carried]: Lock the public contract before any first-party adapter ships; operationally enforce live proof as a required `main` status check; publish trust-sensitive support as distinct posture signals, not one binary "supported" row.
-- [v2.4 roadmap]: Recipe base extraction (`Rendro.Recipes.Base`, `@moduledoc false`) is enabling work for the Statement phase (Phase 74), not a standalone requirement. It is folded into Phase 74's plan scope at coarse granularity.
-- [v2.4 roadmap]: CONTRACT-01 (support-matrix rows for all new surfaces) is the exit criterion for Phase 75 — the last recipe phase, when all new surfaces exist. CONTRACT-02 (HexDocs guides + docs-contract tests) is the exit criterion for Phase 76 — the documentation/adoption closure phase.
-- [v2.4 roadmap]: The `example-phoenix` CI job must be isolated (separate from `test`, not a required branch-protection check) before it is upgraded from `mix compile` to `mix test`. This prevents Phoenix flakiness from blocking `signing-live-proof`, `long-lived-live-proof`, `release-proof`, and `test`.
-- [v2.4 73-02]: D-04 body_capacity geometric overlap check — in `measure.ex body_capacity/1`, subtract footer height only when `body_y + body_h >= footer_y`; subtract header height only when `body_y < header_y + header_h`. Simple formula `body_h - header_h - footer_h` is correct for `paginate.ex flow_layout/1` (body spans full column) but breaks templates where body is explicitly positioned between header and footer regions.
-- [Phase ?]: 73-04: region_suppress_on map in compose.ex layout — threaded to paginate stage for per-region suppression
-- [Phase ?]: 73-04: Raising fn in evaluate_fn_blocks/3 re-raised as Rendro.Error for consistent pipeline error propagation
-- [v2.4 74-02]: Rendro.Format (D-11) is pure/locale-free by construction — money/1 (Decimal.round 2dp, comma-grouped thousands, $ prefix, parentheses for negatives), date/1 (Date.to_iso8601), label/1 (five default labels via guarded map). No CLDR/gettext/ex_money/System/:os; i18n is the caller's :formatters/:labels override, never core.
-- [v2.4 74-02]: Negative magnitudes that round to zero (e.g. -0.001 → $0.00) render WITHOUT parentheses by design — Decimal.negative?(Decimal.round/2) is false for a zero result, which is the correct accounting display.
-- [v2.4 75-02]: Receipt totals block rendered as Rendro.text (not Rendro.table) — this distinguishes it from line-item table blocks in section content inspection and prevents spurious header: nil assertion failures in V5 tests.
-- [v2.4 75-02]: Receipt effective_capacity omits CF/BF overhead: capacity - header_h - row_epsilon (no 2*typical_row_h); Statement subtracts 2*typical_row_h for CF/BF rows; Receipt has none.
-- [Phase ?]: D-09/D-10 CONTRACT-01: Non-viewer surface rows are flat objects at support_matrix.json root level (no viewers sub-key), bypassing viewer_row schema validation; four terminal rows added for page_numbering, statement, receipt_report, certificate
-- [Phase ?]: D-02: Dep floor bumps to Phoenix ~> 1.8, Plug ~> 1.18, Jason ~> 1.4, Elixir ~> 1.19; mix.lock resolves above all floors
-- [Phase ?]: D-03: ErrorJSON uses Phoenix.Controller.status_message_from_template/1 — load-bearing fix; no Ecto/LiveView/gettext per D-01 minimal mandate
-- [Phase ?]: D-04: example-phoenix README is minimal arriving-engineer north star; advisory-CI not a required branch-protection check (REF-03)
+Full per-milestone decision log lives in `.planning/PROJECT.md` (Key Decisions table) and per-milestone archives. v2.4 decisions (page primitive built foundational-first; stateless engine / stateful-data totals; shared `Rendro.Recipes.Pagination`+`PageSize`; pure locale-free `Rendro.Format`; geometry-derived Certificate; advisory-isolated example CI; structured `ArgumentError` recipe validation) are recorded in PROJECT.md.
 
 ### Roadmap Evolution
 
-- `v2.0` closed 2026-05-07 — unsigned signature authoring, deterministic unsigned widget serialization, artifact-first signing preparation.
-- `v2.1` closed 2026-05-07 — cryptographic signing and signed-artifact proof with enforced `signing-live-proof` gate.
-- `v2.2` closed 2026-05-08 — long-lived signatures and compliance evidence; phases 64–67; `long-lived-live-proof` required on `main`.
-- `v2.3` closed 2026-05-29 at tag `v0.3.1` — viewer proof and interop closure; phases 68–72; all 19 requirements satisfied; all 26 (surface × viewer) cells terminal.
-- `v2.4` active — Batteries-Included Workflow & Adoption Closure; phases 73–76; roadmap created 2026-05-29.
-- Phase 77 added: v2.4 closure: format gate, Nyquist drafts, recipe input-validation polish
+- `v2.3` closed 2026-05-29 at tag `v0.3.1` — viewer proof and interop closure; phases 68–72.
+- `v2.4` closed 2026-05-30 — batteries-included workflow and adoption closure; phases 73–77; all 19 requirements satisfied; audit `passed`.
 
-### Pending Todos
+### Resolved Threads
 
-- Run `/gsd-plan-phase 73` to begin Phase 73: Page-Numbering / Running-Region Primitive.
-- Confirm `body_capacity` fix location (paginate vs. compose stage) in Phase 73 planning before implementation starts.
-- Resolve page-number authoring API shape (named helper vs. raw function vs. both) before Phase 73 API surface is finalized.
-- Carry the viewer-evidence recording discipline forward to all new surfaces — every new `priv/support_matrix.json` row must be `supported` (with evidence) or `explicit_deferral` (with a named reason).
+- `v24-adoption-scoping` — **resolved 2026-05-30** at v2.4 close. All findings shipped (page primitive → 73, recipes → 74/75, reference app → 76); open questions answered. See `.planning/threads/v24-adoption-scoping.md`.
 
-### Assessment (2026-05-29)
+### Open Blockers
 
-Roadmap created with 4 phases covering all 19 v1 requirements. Build order is:
+None.
 
-1. Phase 73: Engine primitive (prerequisite for multi-page recipes)
-2. Phase 74: Statement recipe (first full exercise of PAGE primitive, includes recipe-base extraction)
-3. Phase 75: Receipt/Report + Certificate recipes + support-matrix closure for all new surfaces
-4. Phase 76: Reference Phoenix app + isolated CI + HexDocs documentation closure
+### Deferred Items
 
-The `body_capacity` prerequisite bug (footer/header region heights not subtracted from body capacity in `flow_layout/1`) is a hard exit criterion for Phase 73. No multi-page recipe with a real-height running footer can ship until it is fixed.
-
-### Blockers/Concerns
-
-- Phase 73: `body_capacity` fix location must be confirmed (paginate vs. compose stage) before implementation. Running-token substitution test with `maybe_validate_region_fit` and non-zero footer height is a required coverage point.
-- Phase 75: Certificate coordinates must be geometry-derived, not hardcoded A4 numerics. Multi-size test (A4 + US Letter) is a non-negotiable exit criterion.
-- Phase 76: `example-phoenix` CI isolation must happen before upgrading the step from `mix compile` to `mix test`. Do not add this as a required branch-protection check.
-- Keep all new surfaces under the v2.3 viewer-evidence recording discipline — no new surface ships as a silent `unverified`.
-
-## Deferred Items
-
-Items intentionally held outside v2.4 scope (carried from v2.3 + v2.4 planning):
+Items intentionally held outside shipped scope, carried forward for future milestones:
 
 | Category | Item | Status |
 |----------|------|--------|
-| adoption | Optional first-party `Rendro.Adapters.Pdfium` / `Rendro.Adapters.PdfJs` automatable observer adapters | deferred (v2.3 shipped manual-only recording) |
+| release | 1.0 release capstone (SemVer/API-stability commitment + migration note) | next up — after v2.4 |
+| globalization | Global text shaping, RTL support, broader script coverage | conditional v2.5, only if demand justifies the core investment |
+| adoption | Optional first-party `Rendro.Adapters.Pdfium` / `Rendro.Adapters.PdfJs` automatable observer adapters | deferred |
 | automation | Headless-browser PDF.js / PDFium rendering CI lanes | deferred to a dedicated automation milestone if at all |
 | viewer_proof | Mobile viewer evidence (iOS Files, Android default viewer) | deferred |
 | viewer_proof | Annual/semi-annual re-verification cadence enforcement | advisory; possibly blocking later |
-| adoption | Additional signing or long-lived adapters beyond the first proof-backed path | deferred until demand and proof justify them |
-| workflows | Multi-signature workflows and signer orchestration | deferred beyond v2.3 |
-| globalization | Global text shaping, RTL support, and broader script coverage | conditional v2.5, only if demand justifies the core investment |
+| workflows | Multi-signature workflows and signer orchestration | deferred |
 | layout | Even/odd header content variants (book-style duplex) | post-v2.4 |
 | layout | Section-local page number restart | post-v2.4 |
 | recipes | Decorative border frame on Certificate (depends on drawn-path primitive) | post-v2.4 |
 | recipes | Chart/graph rendering in Report body (major new rendering surface) | post-v2.4 |
 | recipes | Table of contents with page numbers (forward-reference, multi-pass concern) | post-v2.4 |
-| release | 1.0 release capstone (SemVer/API-stability commitment) | after v2.4 ships |
-| Phase 73-page-numbering-running-region-primitive P01 | 9m | 2 tasks | 5 files |
-| Phase 73-page-numbering-running-region-primitive P02 | 12m | 2 tasks | 3 files |
-| Phase 73 P03 | 8min | 1 tasks | 2 files |
-| Phase 73 P04 | 3min | 2 tasks | 7 files |
-| Phase 73 P05 | 4min | 2 tasks | 1 files |
-| Phase 74-statement-recipe P02 | 12min | 2 tasks | 2 files |
-| Phase 75-receipt-report-and-certificate-recipes-support-contract P02 | 8min | 1 tasks | 2 files |
-| Phase 75 P03 | 4 | 1 tasks | 3 files |
-| Phase 75 P04 | 5 | 2 tasks | 1 files |
-| Phase 76 P01 | 2m | 2 tasks | 3 files |
-| Phase 76 P03 | 10min | 2 tasks | 3 files |
-| Phase 76 P04 | 15m | 2 tasks | 7 files |
-| Phase 77 P04 | 5m | 2 tasks | 7 files |
 
 ## Operator Next Steps
 
-- Run `/gsd-plan-phase 73` to plan Phase 73: Page-Numbering / Running-Region Primitive.
+- `/clear` then `/gsd-new-milestone` to scope the 1.0 release capstone (or the next milestone).

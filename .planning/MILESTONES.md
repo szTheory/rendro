@@ -1,5 +1,26 @@
 # Milestones
 
+## v2.4 Batteries-Included Workflow & Adoption Closure (Shipped: 2026-05-30)
+
+**Phases completed:** 5 phases (73, 74, 75, 76, 77), 21 plans
+
+**Delivered:** Closed the adoption gap — the common Phoenix document workflows are now batteries-included. A foundational page-numbering / running-region primitive plus three data-driven recipes (Statement, Receipt/Report, Certificate) on the proven three-rung escape hatch, an executable reference Phoenix app exercised in CI, and HexDocs guides — so teams reach production with documented recipes instead of hand-assembling primitives.
+
+**Key accomplishments:**
+
+- Shipped a first-class page-numbering / running-region primitive: single-pass deterministic "Page X of Y" (`{{page_number}}`/`{{total_pages}}`), region content as a named `page_number/1` helper or raw `fn {page, total} -> ... end` with `suppress_on`, plus the prerequisite `body_capacity` overlap fix so footers never collide with body content (PAGE-01..04).
+- Shipped `Rendro.Recipes.Statement` — multi-page billing statements generated from data alone, with exact signed-`Decimal` carried-forward / brought-forward balances computed in `sections/2` and "Page X of Y" footers; landed engine enablers `Rendro.measure_rows/4` and the pure, locale-free `Rendro.Format` (STMT-01..04).
+- Shipped `Rendro.Recipes.Receipt` (one module scaling 1→N pages with repeating table headers — a long report is just a receipt that overflows) and `Rendro.Recipes.Certificate` (landscape-default, all coordinates geometry-derived with zero hardcoded A4, renders at A4 + US Letter via a multi-size test, optional branding mirroring `BrandedInvoice`), on a shared `Rendro.Recipes.Pagination` + `Rendro.PageSize` extracted from Statement (RCPT-01..03, CERT-01..03).
+- Closed the support contract: four terminal `priv/support_matrix.json` rows for every new surface (`page_numbering`, `statement`, `receipt_report`, `certificate`), passing the schema validator + docs-contract lanes — inheriting the v2.3 evidence discipline, never a silent `unverified` (CONTRACT-01).
+- Upgraded `examples/phoenix_example` to executable adoption proof: mix-runnable on modern floors (Phoenix ~>1.8 / plug ~>1.18 / jason ~>1.4 / elixir ~>1.19), README'd, demonstrating all five recipes via `Rendro.Adapters.Phoenix`, with an isolated graph-disconnected advisory `example-phoenix` CI job that never gates the four engine-critical lanes; plus `guides/page_primitive.md` + `guides/recipes.md` wired into HexDocs with docs-contract tests bounding every claim to proof (REF-01..03, CONTRACT-02).
+- Ran a closure phase (77) off the milestone audit: greened the clean-tree `mix ci` format gate, filled the Nyquist VALIDATION records for Phases 73/74/75, and hardened recipe input-validation to raise structured `ArgumentError` (not raw `BadMapError`/`FunctionClauseError`) on malformed input — ending at a clean committed tree with the 925-test suite green.
+
+**Audit status:** `passed` — all 19 requirements satisfied, all 5 phases closed, integration PASS, 6/6 E2E flows complete (Statement/Receipt/Certificate/Invoice/BrandedInvoice render data → PDF end-to-end). All 5 phases `nyquist_compliant: true`. See `milestones/v2.4-MILESTONE-AUDIT.md`.
+
+**Tech debt (non-critical, all severity `info`):** `Rendro.Recipes` facade is asymmetric (only `invoice/1`/`branded_invoice/1` delegates exist; statement/receipt/certificate are called fully-qualified — no flow broken); SUMMARY `requirements-completed:` frontmatter lists 10/19 REQ-IDs while VERIFICATION.md confirms all 19 (metadata drift only); minor recipe input-validation polish items (WR/IN series) recorded in `77-REVIEW.md`.
+
+---
+
 ## v2.3 Viewer Proof & Interop Closure (Shipped: 2026-05-29)
 
 **Phases completed:** 5 phases (68, 69, 70, 71, 72), 15 plans, 32 tasks

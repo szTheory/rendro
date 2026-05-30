@@ -94,6 +94,50 @@
 
 ---
 
+## Milestone: v2.4 — Batteries-Included Workflow & Adoption Closure
+
+**Shipped:** 2026-05-30
+**Phases:** 5 (73-77) | **Plans:** 21
+
+### What Was Built
+- A first-class page-numbering / running-region primitive: single-pass deterministic "Page X of Y" (`{{page_number}}`/`{{total_pages}}`), region content as a named `page_number/1` helper or raw `fn {page, total} -> ... end` with `suppress_on`, and the prerequisite `body_capacity` overlap fix so footers never collide with body content.
+- `Rendro.Recipes.Statement` — multi-page billing statements from data alone, with exact signed-`Decimal` carried/brought-forward balances computed in `sections/2`; plus engine enablers `Rendro.measure_rows/4` and the pure locale-free `Rendro.Format`.
+- `Rendro.Recipes.Receipt` (one module scaling 1→N pages with repeating headers) and `Rendro.Recipes.Certificate` (geometry-derived, A4+Letter multi-size test, optional branding), on a shared `Rendro.Recipes.Pagination` + `Rendro.PageSize` extracted from Statement.
+- Support-contract closure: four terminal `priv/support_matrix.json` rows for the new non-viewer surfaces, passing the schema validator + docs-contract lanes.
+- An executable reference Phoenix app on modern dependency floors demonstrating all five recipes via `Rendro.Adapters.Phoenix`, behind an isolated graph-disconnected advisory CI job; `guides/page_primitive.md` + `guides/recipes.md` wired into HexDocs with docs-contract tests.
+- A closure phase (77) sourced from the milestone audit: greened the clean-tree `mix ci` format gate, filled Nyquist VALIDATION for 73/74/75, and added structured `ArgumentError` recipe input-validation. Final state: clean committed tree, 925-test suite green.
+
+### What Worked
+- **Foundation-first sequencing.** Building the page primitive (Phase 73) before the recipes that depend on it meant 74/75 consumed a tested, deterministic capability instead of each hand-rolling page numbers. The `body_capacity` overlap fix as a hard Phase-73 exit criterion prevented a latent footer-collision bug from propagating into every recipe.
+- **Extract-after-second-use.** Statement's pagination machinery was generalized into `Rendro.Recipes.Pagination` + `Rendro.PageSize` only once Receipt needed it, and Statement's 51-test determinism gate was preserved verbatim through the refactor — no speculative abstraction.
+- **Pure core kept determinism free.** `Rendro.Format` and the stateless single-pass substitution kept output byte-identical with no convergence loop; i18n stayed a caller override, so globalization could remain a conditional v2.5 rather than core debt.
+- **Audit-sourced closure phase.** Rather than shipping with the tech-debt audit's blocker (red `mix ci` format gate, draft Nyquist records, raw error leaks), Phase 77 was inserted to close them, and the re-run audit went `tech_debt` → `passed`. The milestone shipped clean instead of with a known-red required lane.
+- **Isolated reference-app CI.** Making the `example-phoenix` job graph-disconnected and advisory (recorded in `advisory_contexts`) added executable adoption proof without ever coupling Phoenix-dependency flakiness to the four engine-critical required lanes.
+
+### What Was Inefficient
+- **Doubled audit filename, again.** The audit was written as `v2.4-v2.4-MILESTONE-AUDIT.md` (passing `v2.4` to the audit tool doubled the prefix) — the same glitch logged in the v2.2 and v2.3 retros. It had to be detected and renamed into `milestones/` at close, on top of the older superseded `tech_debt` audit also sitting in the root.
+- **Audit ran before the milestone was actually clean.** The first v2.4 audit (2026-05-29) returned `tech_debt` with a ship-blocking red format gate; it sourced Phase 77 and then had to be regenerated. Same "audit only when complete" lesson as v2.3 — though here the early audit was useful precisely because it scoped the closure phase.
+- **STATE.md accumulated per-plan metric noise.** The "Deferred Items" table collected per-plan timing/file rows (`Phase 73 P03 | 8min | 1 tasks`) mixed in with genuine deferrals, making the real deferred-scope list harder to read at close.
+
+### Patterns Established
+- **Foundational-primitive-before-recipes.** When multiple planned recipes need the same capability, build it once as a tested engine primitive in a dedicated first phase rather than letting each recipe reinvent it.
+- **Stateless-engine, stateful-data.** Cross-page accumulation (carried/brought-forward totals) lives in recipe `sections/2` data-assembly, never in the engine — protecting determinism. Engine substitution is limited to curated, post-layout running-region tokens.
+- **Audit-sourced closure phase.** A `tech_debt` milestone audit can legitimately spawn a final closure phase (greened gates, filled validation, hardened errors) so the milestone ships `passed` rather than with documented debt.
+- **Advisory-isolated example CI.** Adoption/example surfaces get their own graph-disconnected advisory CI lane, recorded in `advisory_contexts`, kept off required branch-protection checks by design.
+
+### Key Lessons
+1. **Sequence the prerequisite as its own phase.** The page primitive as a dedicated Phase 73 (with the `body_capacity` fix as a hard exit criterion) was the difference between thin, consistent recipes and three divergent hand-rolled implementations.
+2. **Let a tech-debt audit buy a closure phase.** Shipping `passed` after a deliberate cleanup phase beats shipping with a red required lane and a list of caveats — especially when the gate is branch-protection-required.
+3. **The doubled-audit-filename glitch is now a standing tax.** Three milestones running. Worth a project close-helper that normalizes `v[X.Y]-v[X.Y]-MILESTONE-AUDIT.md` → `milestones/v[X.Y]-MILESTONE-AUDIT.md` automatically.
+4. **Extract abstractions on the second real use, not the first.** `Rendro.Recipes.Pagination` earned its existence when Receipt needed Statement's machinery — and the determinism gate proved the extraction was behavior-preserving.
+
+### Cost Observations
+- 5 phases / 21 plans across two calendar days (2026-05-29 → 2026-05-30); Phase 77 added mid-milestone from the audit.
+- Rework: one early `tech_debt` audit (regenerated to `passed` after Phase 77), one manual audit-file move/rename at close, one manual MILESTONES.md curation.
+- New surface area concentrated in `lib/rendro/recipes/` (Statement/Receipt/Certificate + Pagination/PageSize), the page-primitive engine path, `Rendro.Format`, the example Phoenix app, and two HexDocs guides — engine trust spine unchanged.
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -104,6 +148,7 @@
 | v2.1 | 4 (60-63) | 8 | Established public-contract-before-adapters discipline and operationally enforced live-proof gate (`signing-live-proof` required on `main`). |
 | v2.2 | 4 (64-67) | 8 | Extended live-proof gate pattern to long-lived (`long-lived-live-proof` required on `main`); established augmentation-as-separate-seam pattern and posture-vs-tool metadata split. |
 | v2.3 | 5 (68-72) | 15 | Recording-discipline (not engineering) milestone: added the `explicit_deferral` three-state support vocabulary, schema-enforced additive matrix evolution, the `mix rendro.viewer_evidence` operator task + 8th docs-contract lane, and the durable `guides/viewer_evidence.md` recipe. |
+| v2.4 | 5 (73-77) | 21 | Adoption-ergonomics milestone: foundational-primitive-before-recipes sequencing (page primitive in its own Phase 73), stateless-engine/stateful-data pagination, an audit-sourced closure phase (Phase 77 took the audit from `tech_debt` → `passed`), and an advisory-isolated reference-app CI lane. |
 
 ### Cumulative Quality
 
@@ -113,6 +158,7 @@
 | v2.1 | 1 (`signing-live-proof`) | 2 (pyHanko signing, pdfsig validation) |
 | v2.2 | 2 (`signing-live-proof`, `long-lived-live-proof`) | 2 (pyHanko long-lived augmentation reuses signing adapter; pyHanko-backed validation) |
 | v2.3 | 2 (engine lanes unchanged; viewer-evidence lane folded into required `test`, not a new context) | 0 new (manual-only recording; observer adapters deferred to a later milestone) |
+| v2.4 | 2 (engine lanes unchanged; reference-app `example-phoenix` lane is advisory/isolated, never required) | 0 new (recipes are pure-core; no new runtime adapter or Hex dependency) |
 
 ### Top Lessons (Verified Across Milestones)
 
