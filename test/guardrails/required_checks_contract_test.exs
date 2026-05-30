@@ -30,7 +30,9 @@ defmodule Guardrails.RequiredChecksContractTest do
     test "advisory contexts document viewer-evidence-live-proof as not required" do
       baseline = load_baseline!()
 
-      viewer = Enum.find(baseline["advisory_contexts"], &(&1["name"] == "viewer-evidence-live-proof"))
+      viewer =
+        Enum.find(baseline["advisory_contexts"], &(&1["name"] == "viewer-evidence-live-proof"))
+
       assert viewer["notes"] =~ "not required"
       assert viewer["notes"] =~ "D-32"
 

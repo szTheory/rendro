@@ -58,8 +58,7 @@ defmodule Rendro.Pipeline.Paginate do
          Rendro.Error.from_stage(:paginate, :unsupported_table_split_policy, %{details: details})}
 
       {:error, :running_content_error, details} ->
-        {:error,
-         Rendro.Error.from_stage(:paginate, :running_content_error, %{details: details})}
+        {:error, Rendro.Error.from_stage(:paginate, :running_content_error, %{details: details})}
     end
   end
 
@@ -453,7 +452,14 @@ defmodule Rendro.Pipeline.Paginate do
               end)
             end)
 
-          %{block | content: %{measured | source: %{source | content: new_source_text}, lines: new_lines}}
+          %{
+            block
+            | content: %{
+                measured
+                | source: %{source | content: new_source_text},
+                  lines: new_lines
+              }
+          }
 
         _ ->
           block
@@ -477,8 +483,7 @@ defmodule Rendro.Pipeline.Paginate do
           rescue
             reason ->
               throw(
-                {:error, :running_content_error,
-                 %{page_num: page_num, reason: inspect(reason)}}
+                {:error, :running_content_error, %{page_num: page_num, reason: inspect(reason)}}
               )
           end
 
@@ -490,12 +495,20 @@ defmodule Rendro.Pipeline.Paginate do
 
   defp apply_suppression(blocks, suppress_on, page_idx) do
     case suppress_on do
-      nil -> blocks
-      :first when page_idx == 1 -> []
-      :first -> blocks
+      nil ->
+        blocks
+
+      :first when page_idx == 1 ->
+        []
+
+      :first ->
+        blocks
+
       {:pages, page_list} when is_list(page_list) ->
         if page_idx in page_list, do: [], else: blocks
-      _ -> blocks
+
+      _ ->
+        blocks
     end
   end
 

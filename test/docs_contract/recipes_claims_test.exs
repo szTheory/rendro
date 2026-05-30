@@ -44,7 +44,8 @@ defmodule Rendro.DocsContract.RecipesClaimsTest do
 
   describe "receipt_report row claim backing" do
     test "receipt_report multi_page_table_continuation is supported in matrix", %{matrix: matrix} do
-      assert matrix["receipt_report"]["capabilities"]["multi_page_table_continuation"] == "supported"
+      assert matrix["receipt_report"]["capabilities"]["multi_page_table_continuation"] ==
+               "supported"
     end
 
     test "receipt_report running_footer_page_number is supported in matrix", %{matrix: matrix} do

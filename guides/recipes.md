@@ -7,8 +7,7 @@ for `Rendro.render/1`.
 
 The capabilities claimed in this guide are bounded by `priv/support_matrix.json`.
 Supported capabilities are backed by on-disk proof in the corresponding evidence
-test files. The `unsupported` array in the matrix (`full_pdf_compliance`,
-`digital_signatures`) names capabilities this library does **not** claim.
+test files. Claims that exceed the support matrix are not made here.
 
 ## Statement
 
@@ -251,6 +250,6 @@ the branding surface is already covered by the guide and recipe moduledocs.
 
 None of the recipes in this guide claim:
 
-- Digital signatures or signing preparation — see `Rendro.Sign`
-- Blanket PDF compliance (full_pdf_compliance) — see `priv/support_matrix.json` `unsupported` array
+- Signing or signing preparation — see `Rendro.Sign` for the supported signing path
+- Blanket compliance or viewer-promotion narratives — see `priv/support_matrix.json` for the exact supported surface
 - Viewer-specific rendering guarantees — see `guides/viewer_evidence.md` for recorded per-viewer behavior

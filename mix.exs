@@ -98,6 +98,7 @@ defmodule Rendro.MixProject do
         "guides/integrations.md",
         "guides/page_primitive.md",
         "guides/recipes.md",
+        "guides/user_flows_and_jtbd.md",
         "lib/rendro/document.ex",
         "lib/rendro/font_registry.ex",
         "lib/rendro.ex"
@@ -110,12 +111,14 @@ defmodule Rendro.MixProject do
         "guides/api_stability.md",
         "guides/viewer_evidence.md",
         "guides/page_primitive.md",
-        "guides/recipes.md"
+        "guides/recipes.md",
+        "guides/user_flows_and_jtbd.md"
       ],
       groups_for_extras: [
         Guides: [
           "guides/branding.md",
-          "guides/integrations.md"
+          "guides/integrations.md",
+          "guides/user_flows_and_jtbd.md"
         ],
         Policies: [
           "guides/api_stability.md",

@@ -251,6 +251,7 @@ defmodule Rendro.DeterministicTest do
       # Geometry must be frozen: run widths identical across pages
       runs1 = footer_run_widths(footer1)
       runs2 = footer_run_widths(footer2)
+
       assert runs1 == runs2,
              "expected run widths to be identical on page 1 and page 2 (geometry frozen at measure), got p1=#{inspect(runs1)} p2=#{inspect(runs2)}"
 
@@ -607,6 +608,7 @@ defmodule Rendro.DeterministicTest do
       case block.content do
         %Rendro.Pipeline.MeasuredText{source: %Rendro.Text{content: text}} ->
           String.contains?(text, "Page") or String.contains?(text, "{{page_number}}")
+
         _ ->
           false
       end
