@@ -2,16 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: Batteries-Included Workflow & Adoption Closure
-status: milestone_complete
-last_updated: 2026-05-29T22:34:02.117Z
-last_activity: 2026-05-29
+status: executing
+last_updated: "2026-05-30T01:27:24.265Z"
+last_activity: 2026-05-30 -- Phase 77 planning complete
 progress:
-  total_phases: 4
+  total_phases: 5
   completed_phases: 4
-  total_plans: 17
+  total_plans: 21
   completed_plans: 17
-  percent: 100
-stopped_at: Milestone complete (Phase 76 was final phase)
+  percent: 80
 ---
 
 # Project State
@@ -21,14 +20,14 @@ stopped_at: Milestone complete (Phase 76 was final phase)
 See: .planning/PROJECT.md (updated 2026-05-29 after v2.3 milestone shipped)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Milestone complete
+**Current focus:** Phase 77 — v2.4 audit closure
 
 ## Current Position
 
-Phase: 76
+Phase: 77
 Plan: Not started
-Status: Milestone complete
-Last activity: 2026-05-29
+Status: Ready to execute
+Last activity: 2026-05-30 -- Phase 77 planning complete
 
 Progress: [██████████] 100%
 
@@ -83,6 +82,7 @@ Full per-milestone decision log lives in `.planning/PROJECT.md` (Key Decisions t
 - `v2.2` closed 2026-05-08 — long-lived signatures and compliance evidence; phases 64–67; `long-lived-live-proof` required on `main`.
 - `v2.3` closed 2026-05-29 at tag `v0.3.1` — viewer proof and interop closure; phases 68–72; all 19 requirements satisfied; all 26 (surface × viewer) cells terminal.
 - `v2.4` active — Batteries-Included Workflow & Adoption Closure; phases 73–76; roadmap created 2026-05-29.
+- Phase 77 added: v2.4 closure: format gate, Nyquist drafts, recipe input-validation polish
 
 ### Pending Todos
 

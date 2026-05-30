@@ -198,11 +198,15 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
   4. Statement, Receipt, and Certificate raise structured `ArgumentError` (not `BadMapError`/`FunctionClauseError`) for malformed `:account`/`:customer`, non-`%Date{}` `:date`, and non-binary `:body` (closes 74 WARNINGs + 75 WR-01..06); cosmetic dead bindings and misleading comments cleaned up
 
 **Plans:** 4 plans (2 waves)
-
 Plans:
+**Wave 1**
+
 - [ ] 77-01-PLAN.md — Recipe input-validation (structured ArgumentError for Statement :account, Receipt :customer/:date, Certificate :date/:body) + D-09 cosmetic cleanup + negative-path tests (D-05..D-09)
 - [ ] 77-02-PLAN.md — Wire untracked JTBD guide into ExDoc extras/groups_for_extras, keep within support matrix (D-02/D-03)
 - [ ] 77-03-PLAN.md — Fill 73/74/75 Nyquist VALIDATION drafts via top-level /gsd-validate-phase runs (autonomous: false) (D-04)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 77-04-PLAN.md — Terminal gate: format offenders + final mix format + full suite + commit working-tree changes with intent + prove clean-tree mix ci format gate green (D-01/D-02/D-10)
 
 ---
