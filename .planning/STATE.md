@@ -26,8 +26,9 @@ See: .planning/PROJECT.md (updated 2026-05-30 after v2.4 milestone shipped)
 
 Phase: 80
 Plan: Not started
-Status: Ready to plan
+Status: Context gathered — ready to plan
 Last activity: 2026-05-30
+Resume file: .planning/phases/80-stability-contract-migration-docs/80-CONTEXT.md
 
 ## Milestone Snapshot
 
