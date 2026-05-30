@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.5
 milestone_name: 1.0 Release Capstone
-status: Roadmapped — awaiting `/gsd-plan-phase 78`
-last_updated: "2026-05-30T12:59:57.933Z"
-last_activity: 2026-05-30 — v2.5 roadmap created from the approved deep-research + audit phase decomposition
+status: executing
+last_updated: "2026-05-30T13:58:54.034Z"
+last_activity: 2026-05-30 -- Phase 78 planning complete
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
+  total_plans: 5
   completed_plans: 0
   percent: 0
 ---
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-05-30 after v2.4 milestone shipped)
 
 Phase: Not started (roadmap created — Phases 78–82)
 Plan: —
-Status: Roadmapped — awaiting `/gsd-plan-phase 78`
-Last activity: 2026-05-30 — v2.5 roadmap created from the approved deep-research + audit phase decomposition
+Status: Ready to execute
+Last activity: 2026-05-30 -- Phase 78 planning complete
 
 ## Milestone Snapshot
 

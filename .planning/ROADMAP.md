@@ -54,13 +54,21 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
   5. All five recipes handle `sections/2` opts uniformly (invoice/branded no longer silently ignore `_opts`); the normalization is additive and breaks no existing caller
 
 **Plans**: 5 plans
-
 Plans:
+**Wave 1**
+
 - [ ] 78-01-PLAN.md — Hiding sweep: @moduledoc false on 6 internals + @doc false on redact_* helpers + flip Rendro.Metadata to documented
 - [ ] 78-02-PLAN.md — Tier tagging: @moduledoc tags: [:stable|:adapter] across all public modules + mix.exs badge CSS/JS + groups_for_modules reconciliation
 - [ ] 78-03-PLAN.md — Recipe opts normalization: Invoice + BrandedInvoice sections/2 opts threading
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 78-04-PLAN.md — Rendro.PublicApi introspection module + Loader + Validator + priv/schemas/public_api.schema.json
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 78-05-PLAN.md — mix rendro.api.gen task + priv/public_api.json generation + manifest integration tests
+
 ### Phase 79: Public API Contract Enforcement Lane
 
 **Goal**: API surface drift can no longer reach `main` silently — an introspection-based docs-contract test mechanically pins the documented surface to the manifest and is a required CI status check, so any accidental public/internal change fails the build with an errors-as-product diff
