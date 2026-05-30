@@ -8,7 +8,7 @@ defmodule Rendro.DocsContract.RecipesContractTest do
 
     test "every #{guide} fence body is evaluable and free of skeleton placeholders" do
       fences = DocsContract.verified_fences(@guide)
-      assert length(fences) > 0
+      assert fences != []
 
       Enum.each(fences, fn %{code: code} ->
         refute String.contains?(code, "...")
@@ -19,7 +19,7 @@ defmodule Rendro.DocsContract.RecipesContractTest do
 
     test "every #{guide} fence has a valid docs-contract id" do
       fences = DocsContract.verified_fences(@guide)
-      assert length(fences) > 0
+      assert fences != []
 
       for %{id: id} <- fences do
         assert is_binary(id) and id != ""

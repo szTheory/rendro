@@ -268,8 +268,8 @@ defmodule Rendro.Recipes.ReceiptTest do
       blocks = body_blocks(3)
       table_blocks = Enum.filter(blocks, fn b -> is_struct(b.content, Rendro.Table) end)
       non_table_blocks = Enum.reject(blocks, fn b -> is_struct(b.content, Rendro.Table) end)
-      assert length(table_blocks) >= 1, "Expected at least one table block"
-      assert length(non_table_blocks) >= 1, "Expected at least one totals block"
+      assert table_blocks != [], "Expected at least one table block"
+      assert non_table_blocks != [], "Expected at least one totals block"
     end
 
     test "validate_data! raises when totals.subtotal != sum of line amounts" do
@@ -458,7 +458,7 @@ defmodule Rendro.Recipes.ReceiptTest do
   describe "V10: break_before and no keep_together" do
     test "single-page: first body block has no break_before" do
       blocks = body_blocks(3)
-      assert length(blocks) >= 1
+      assert blocks != []
       refute hd(blocks).break_before
     end
 

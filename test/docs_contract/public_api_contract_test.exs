@@ -106,7 +106,8 @@ defmodule Rendro.DocsContract.PublicApiContractTest do
 
     test "known redact_* helpers have @doc false in Rendro.Sign and Rendro.Protect" do
       hidden_helpers = [
-        {Rendro.Sign, [:redact_opts, :redact_prepare_opts, :redact_sign_opts, :redact_augment_opts]},
+        {Rendro.Sign,
+         [:redact_opts, :redact_prepare_opts, :redact_sign_opts, :redact_augment_opts]},
         {Rendro.Protect, [:redact_opts]}
       ]
 
@@ -157,7 +158,7 @@ defmodule Rendro.DocsContract.PublicApiContractTest do
             length(tier_tags) == 1 ->
               []
 
-            length(tier_tags) == 0 ->
+            tier_tags == [] ->
               ["#{mod_key}: no tier tag (expected exactly one: :stable or :adapter)"]
 
             true ->

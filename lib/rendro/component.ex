@@ -7,6 +7,7 @@ defmodule Rendro.Component do
   @doc """
   Renders a component by calling its `render/1` function.
   """
+  @spec render_component(module(), keyword()) :: term()
   def render_component(module, assigns \\ []) do
     module.render(assigns)
   end
@@ -15,6 +16,7 @@ defmodule Rendro.Component do
   Creates a standard `Rendro.Block` containing a `Rendro.Image`.
   Requires at least one constraint: `:width`, `:height`, or `:fit`.
   """
+  @spec image(atom(), keyword()) :: Rendro.Block.t()
   def image(logical_name, opts \\ []) do
     width = Keyword.get(opts, :width)
     height = Keyword.get(opts, :height)

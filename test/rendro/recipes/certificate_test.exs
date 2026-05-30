@@ -60,7 +60,7 @@ defmodule Rendro.Recipes.CertificateTest do
         |> Enum.flat_map(fn s -> s.content end)
 
       # At least some content blocks exist
-      assert length(all_content) > 0
+      assert all_content != []
     end
   end
 
@@ -212,7 +212,7 @@ defmodule Rendro.Recipes.CertificateTest do
     test "sections/2 returns list of %Rendro.Section{} without calling document/2" do
       sections = Certificate.sections(fixture_data())
       assert is_list(sections)
-      assert length(sections) > 0
+      assert sections != []
       assert Enum.all?(sections, &match?(%Rendro.Section{}, &1))
     end
   end

@@ -21,7 +21,7 @@ defmodule Rendro.PublicApiTest do
     test "returns a sorted list of public function strings for Rendro.Error" do
       functions = PublicApi.public_functions(Rendro.Error)
       assert is_list(functions)
-      assert length(functions) > 0
+      assert functions != []
       # All entries should be in "name/arity" format
       assert Enum.all?(functions, fn f -> String.contains?(f, "/") end)
       # List must be sorted
@@ -36,7 +36,7 @@ defmodule Rendro.PublicApiTest do
     test "returns a sorted list of type strings for Rendro.Document" do
       types = PublicApi.public_types(Rendro.Document)
       assert is_list(types)
-      assert length(types) > 0
+      assert types != []
       # All entries should be in "name/arity" format
       assert Enum.all?(types, fn t -> String.contains?(t, "/") end)
       # List must be sorted
