@@ -34,7 +34,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 - [x] **Phase 78: Public API Surface Definition & Cleanup** - Hide accidentally-public internals, expose returned structs, author the tiered `priv/public_api.json` manifest, add ExDoc stability badges, normalize recipe opts (completed 2026-05-30)
 - [x] **Phase 79: Public API Contract Enforcement Lane** - An introspection-based docs-contract test asserts documented surface == manifest (drift fails CI), wired into required status checks (completed 2026-05-30)
-- [ ] **Phase 80: Stability Contract & Migration Docs** - Two-tier SemVer contract + byte-output carve-out + soft-deprecation policy, `upgrading_to_1.0.md`, internal-label scrub, Tier-1 claims test
+- [x] **Phase 80: Stability Contract & Migration Docs** - Two-tier SemVer contract + byte-output carve-out + soft-deprecation policy, `upgrading_to_1.0.md`, internal-label scrub, Tier-1 claims test (completed 2026-05-30)
 - [ ] **Phase 81: Release Hardening** - Bump to 1.0.0, allowlist tarball audit + hex.audit/deps.audit, fix the CHANGELOG self-block, SHA-pin the publish lane
 - [ ] **Phase 82: 1.0.0 Consolidation & Publish** - Write the consolidated `## [1.0.0]` CHANGELOG, then the irreversible proof-gated publish (hex package + docs, GitHub Release, post-publish verification)
 
@@ -118,7 +118,7 @@ Plans:
 
 **Wave 3** *(blocked on 80-01 + 80-03 completion)*
 
-- [ ] 80-04-PLAN.md — Create api_stability_claims_test.exs (STAB-05) + register lane 12 in scripts/verify_docs.exs
+- [x] 80-04-PLAN.md — Create api_stability_claims_test.exs (STAB-05) + register lane 12 in scripts/verify_docs.exs
 
 ### Phase 81: Release Hardening
 
@@ -156,7 +156,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 78. Public API Surface Definition & Cleanup | v2.5 | 5/5 | Complete    | 2026-05-30 |
 | 79. Public API Contract Enforcement Lane | v2.5 | 3/3 | Complete    | 2026-05-30 |
-| 80. Stability Contract & Migration Docs | v2.5 | 3/4 | In Progress|  |
+| 80. Stability Contract & Migration Docs | v2.5 | 4/4 | Complete   | 2026-05-30 |
 | 81. Release Hardening | v2.5 | 0/0 | Not started | - |
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 0/0 | Not started | - |
 

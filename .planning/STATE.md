@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.5
 milestone_name: 1.0 Release Capstone
-status: executing
-last_updated: "2026-05-30T19:25:51.543Z"
+status: verifying
+last_updated: "2026-05-30T19:33:09.484Z"
 last_activity: 2026-05-30
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 12
-  completed_plans: 11
-  percent: 40
+  completed_plans: 12
+  percent: 60
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-30 after v2.4 milestone shipped)
 
 Phase: 80 (stability-contract-migration-docs) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-05-30
 Resume file: None
 

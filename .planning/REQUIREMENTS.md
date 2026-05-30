@@ -23,7 +23,7 @@ Requirements for the v2.5 milestone. Each maps to exactly one roadmap phase.
 - [x] **STAB-02**: A written deprecation policy (soft-deprecate-first lifecycle; `@doc deprecated:` + CHANGELOG by default, `@deprecated` hard-warning only once no in-tree caller remains, removal only in 2.0) plus a Deprecations table is added to the guide.
 - [x] **STAB-03**: `guides/upgrading_to_1.0.md` migration note created ("what 1.0 means for you" + tier summary + support-matrix pointer + any residual notes), added to `mix.exs` ExDoc `extras` and the Policies group.
 - [x] **STAB-04**: Internal milestone/phase labels are scrubbed from public guides (`api_stability.md` "Rendro v1.10", "Phase 53", "Phase 71" refs), with their string-pinned docs-contract tests (`protection_claims_test.exs` and siblings) updated in lockstep so `release-proof` stays green.
-- [ ] **STAB-05**: A docs-contract test (`test/docs_contract/api_stability_claims_test.exs`) proves every Tier-1 symbol the guide names exists/is exported (`function_exported?` / `Code.ensure_loaded?` / struct presence) and asserts the tier headers, key promise sentences, and upgrade-guide presence.
+- [x] **STAB-05**: A docs-contract test (`test/docs_contract/api_stability_claims_test.exs`) proves every Tier-1 symbol the guide names exists/is exported (`function_exported?` / `Code.ensure_loaded?` / struct presence) and asserts the tier headers, key promise sentences, and upgrade-guide presence.
 
 ### Release Hardening & 1.0.0 Publish (REL)
 
@@ -75,7 +75,7 @@ Which phases cover which requirements. All 16 v1 requirements mapped — each to
 | STAB-02 | Phase 80 | Complete |
 | STAB-03 | Phase 80 | Complete |
 | STAB-04 | Phase 80 | Complete |
-| STAB-05 | Phase 80 | Pending |
+| STAB-05 | Phase 80 | Complete |
 | REL-01 | Phase 81 | Pending |
 | REL-02 | Phase 81 | Pending |
 | REL-03 | Phase 81 | Pending |
