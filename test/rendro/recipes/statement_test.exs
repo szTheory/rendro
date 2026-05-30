@@ -46,6 +46,7 @@ defmodule Rendro.Recipes.StatementTest do
     opening = Decimal.new("1000.00")
 
     range = if n <= 0, do: [], else: 1..n//1
+
     Enum.reduce(range, opening, fn i, bal ->
       amount = if rem(i, 2) == 1, do: Decimal.new("100.00"), else: Decimal.new("-50.00")
       Decimal.add(bal, amount)
@@ -61,7 +62,12 @@ defmodule Rendro.Recipes.StatementTest do
     # @row_epsilon = 2.0
     # capacity = @body_height - @header_height - @footer_height = 553.89
     content_width = 595.28 - 2 * 72
-    table_opts = [header: ["Date", "Description", "Amount", "Balance"], columns: [{:fixed, 72}, {:share, 1}, {:fixed, 72}, {:fixed, 72}]]
+
+    table_opts = [
+      header: ["Date", "Description", "Amount", "Balance"],
+      columns: [{:fixed, 72}, {:share, 1}, {:fixed, 72}, {:fixed, 72}]
+    ]
+
     row = ["2026-05-01", "Transaction 1", "$100.00", "$1,100.00"]
     doc = Rendro.Document.new()
     {header_h, row_heights} = Rendro.measure_rows([row], content_width, doc, table_opts)
@@ -75,6 +81,7 @@ defmodule Rendro.Recipes.StatementTest do
   # Renders a statement document and returns the PDF binary or raises on error.
   defp render_statement!(n, opts \\ []) do
     doc = Statement.document(fixture_data(n), opts)
+
     case Rendro.render(doc) do
       {:ok, pdf} -> pdf
       {:error, err} -> raise "Render failed: #{inspect(err)}"
@@ -192,6 +199,7 @@ defmodule Rendro.Recipes.StatementTest do
       for n <- [cap + 1, cap + 2, 2 * cap, 2 * cap + 1] do
         expected_pages = ceil(n / cap)
         pdf = render_statement!(n)
+
         assert pdf =~ "(Page #{expected_pages} of #{expected_pages})",
                "Expected #{expected_pages} pages for #{n} rows (cap=#{cap}); PDF did not contain expected page marker"
       end
@@ -208,15 +216,16 @@ defmodule Rendro.Recipes.StatementTest do
       assert length(blocks) == 1, "single page should produce exactly one body block"
       block = hd(blocks)
 
-      row_texts = Enum.flat_map(block.content.rows, fn row ->
-        Enum.map(row, fn cell ->
-          case cell do
-            %{content: %{content: text}} -> text
-            %{content: text} when is_binary(text) -> text
-            _ -> inspect(cell)
-          end
+      row_texts =
+        Enum.flat_map(block.content.rows, fn row ->
+          Enum.map(row, fn cell ->
+            case cell do
+              %{content: %{content: text}} -> text
+              %{content: text} when is_binary(text) -> text
+              _ -> inspect(cell)
+            end
+          end)
         end)
-      end)
 
       flat = Enum.join(row_texts, " ")
       refute flat =~ "Carried forward"
@@ -236,6 +245,7 @@ defmodule Rendro.Recipes.StatementTest do
         assert last_row != nil
 
         first_cell_text = row_cell_text(last_row, 0)
+
         assert first_cell_text =~ "Carried forward",
                "Expected last row of non-final page to be 'Carried forward', got: #{inspect(first_cell_text)}"
       end
@@ -254,6 +264,7 @@ defmodule Rendro.Recipes.StatementTest do
         assert first_row != nil
 
         first_cell_text = row_cell_text(first_row, 0)
+
         assert first_cell_text =~ "Brought forward",
                "Expected first row of non-first page to be 'Brought forward', got: #{inspect(first_cell_text)}"
       end
@@ -399,6 +410,7 @@ defmodule Rendro.Recipes.StatementTest do
         # Y in "Page X of Y" must equal the real page count
         assert pdf =~ "of #{expected_pages})",
                "Expected Y=#{expected_pages} in footer for #{n} rows"
+
         refute pdf =~ "of #{expected_pages + 1})"
         refute pdf =~ "of #{expected_pages - 1})" and expected_pages > 1
       end
@@ -425,7 +437,10 @@ defmodule Rendro.Recipes.StatementTest do
     end
 
     test "Float line amount raises ArgumentError mentioning Decimal" do
-      data = %{fixture_data(0) | lines: [%{date: ~D[2026-05-01], description: "X", amount: 100.0}]}
+      data = %{
+        fixture_data(0)
+        | lines: [%{date: ~D[2026-05-01], description: "X", amount: 100.0}]
+      }
 
       assert_raise ArgumentError, ~r/Decimal|float/i, fn ->
         Statement.document(data)
@@ -495,6 +510,14 @@ defmodule Rendro.Recipes.StatementTest do
       assert {:ok, pdf} = Rendro.render(doc)
       assert is_binary(pdf)
     end
+
+    test "non-map :account raises ArgumentError mentioning account" do
+      data = fixture_data(0) |> Map.put(:account, "not-a-map")
+
+      assert_raise ArgumentError, ~r/account/i, fn ->
+        Statement.document(data)
+      end
+    end
   end
 
   # ---------------------------------------------------------------------------
@@ -515,9 +538,9 @@ defmodule Rendro.Recipes.StatementTest do
       assert :body in region_names
       assert :footer in region_names
 
-      header = Enum.find(template.regions, & &1.name == :header)
-      body = Enum.find(template.regions, & &1.name == :body)
-      footer = Enum.find(template.regions, & &1.name == :footer)
+      header = Enum.find(template.regions, &(&1.name == :header))
+      body = Enum.find(template.regions, &(&1.name == :body))
+      footer = Enum.find(template.regions, &(&1.name == :footer))
 
       assert header.role == :header
       assert body.role == :body
@@ -526,7 +549,7 @@ defmodule Rendro.Recipes.StatementTest do
 
     test "footer region has non-zero height (reserves space for Page X of Y)" do
       template = Statement.page_template()
-      footer = Enum.find(template.regions, & &1.role == :footer)
+      footer = Enum.find(template.regions, &(&1.role == :footer))
       assert footer.height > 0
     end
 
@@ -600,6 +623,7 @@ defmodule Rendro.Recipes.StatementTest do
       for n <- [0, 1, cap - 1, cap, cap + 1, 2 * cap, 2 * cap + 1] do
         doc = Statement.document(fixture_data(n))
         result = Rendro.render(doc)
+
         assert match?({:ok, _}, result),
                "Expected {:ok, _} for #{n} rows; got: #{inspect(result)}"
       end
@@ -632,6 +656,7 @@ defmodule Rendro.Recipes.StatementTest do
 
       [first | rest] = blocks
       refute first.break_before, "First block should NOT have break_before"
+
       Enum.each(rest, fn block ->
         assert block.break_before == true, "Non-first blocks should have break_before: true"
       end)
@@ -651,6 +676,7 @@ defmodule Rendro.Recipes.StatementTest do
       n = 2 * cap + 1
       blocks = body_blocks(n)
       expected_pages = ceil(n / cap)
+
       assert length(blocks) == expected_pages,
              "Expected #{expected_pages} blocks for #{n} rows (cap=#{cap}); got #{length(blocks)}"
     end

@@ -111,6 +111,10 @@ defmodule Rendro.Recipes.Statement do
   # A blank trailing row is a far better failure mode than a render error.
   @row_epsilon 2.0
 
+  # Fallback typical row height (pt) used when no rows have been measured yet
+  # (empty statement). This is an empirical average for the default table style.
+  @default_row_height 14.4
+
   # ---------------------------------------------------------------------------
   # Public API — three-rung escape hatch (consistent with Invoice / STMT-03)
   # ---------------------------------------------------------------------------
@@ -290,10 +294,10 @@ defmodule Rendro.Recipes.Statement do
     {header_h, row_heights} =
       Rendro.measure_rows(formatted_rows, @content_width, doc_for_measure, table_opts)
 
-    # Body capacity formula (mirrors measure.ex body_capacity/1):
-    # capacity = body.height − header.height (if overlaps) − footer.height (if overlaps)
-    # With the recipe's fixed geometry, header and footer are always adjacent to body,
-    # so the full subtraction applies.
+    # Body capacity: @body_height already excludes header and footer regions
+    # (it is derived as page_height − 2×margin − @header_height − @footer_height).
+    # Subtracting them again gives a conservative ~8% under-pack with no overflow
+    # risk — a small blank gap at the bottom is always preferable to :content_overflow.
     capacity = @body_height - @header_height - @footer_height
 
     # Chunk rows into pages, accounting for the repeated table header on each page
@@ -305,10 +309,11 @@ defmodule Rendro.Recipes.Statement do
       Enum.zip([formatted_rows, row_heights, rows_with_balance])
       |> Enum.map(fn {fmt_row, height, row_data} -> {fmt_row, height, row_data.balance} end)
 
-    # Estimate a typical row height for the CF/BF overhead reservation.
+    # Average row height for CF/BF overhead reservation; fall back to the
+    # module-attribute default when no rows have been measured (empty statement).
     typical_row_h =
       if Enum.empty?(row_heights) do
-        14.4
+        @default_row_height
       else
         Enum.sum(row_heights) / length(row_heights)
       end
@@ -444,6 +449,7 @@ defmodule Rendro.Recipes.Statement do
     validate_required_keys!(data)
     validate_opening_balance!(data.opening_balance)
     validate_period!(data.period)
+    validate_account!(data.account)
     validate_lines!(data.lines)
     maybe_validate_closing_balance!(data)
     maybe_validate_summary!(data)
@@ -505,6 +511,19 @@ defmodule Rendro.Recipes.Statement do
     Where: Rendro.Recipes.Statement.validate_data!/1
     Why:   Received: #{inspect(value)}.
     Next:  Use %{from: ~D[YYYY-MM-DD], to: ~D[YYYY-MM-DD]}.
+    """
+  end
+
+  defp validate_account!(%{name: name}) when is_binary(name), do: :ok
+
+  defp validate_account!(value) do
+    raise ArgumentError, """
+    Rendro.Recipes.Statement.document/2 — invalid :account shape.
+
+    What:  :account must be a map with a string :name.
+    Where: Rendro.Recipes.Statement.validate_data!/1
+    Why:   Received: #{inspect(value)} (#{Rendro.Recipes.Pagination.type_name(value)}).
+    Next:  Use %{name: "Acme Corp"}.
     """
   end
 
@@ -673,13 +692,8 @@ defmodule Rendro.Recipes.Statement do
 
   defp maybe_validate_summary!(%{summary: summary, opening_balance: ob, lines: lines})
        when is_map(summary) do
-    {rows, derived_closing} =
-      Enum.map_reduce(lines, ob, fn %{amount: amt}, bal ->
-        nb = Decimal.add(bal, amt)
-        {nb, nb}
-      end)
-
-    _ = rows
+    derived_closing =
+      Enum.reduce(lines, ob, fn %{amount: amt}, bal -> Decimal.add(bal, amt) end)
 
     if Map.has_key?(summary, :closing_balance) do
       unless Decimal.equal?(summary.closing_balance, derived_closing) do
