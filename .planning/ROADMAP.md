@@ -132,7 +132,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 78. Public API Surface Definition & Cleanup | v2.5 | 5/5 | Complete   | 2026-05-30 |
+| 78. Public API Surface Definition & Cleanup | v2.5 | 5/5 | Complete    | 2026-05-30 |
 | 79. Public API Contract Enforcement Lane | v2.5 | 0/0 | Not started | - |
 | 80. Stability Contract & Migration Docs | v2.5 | 0/0 | Not started | - |
 | 81. Release Hardening | v2.5 | 0/0 | Not started | - |

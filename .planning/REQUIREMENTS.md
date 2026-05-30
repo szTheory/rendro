@@ -11,11 +11,11 @@ Requirements for the v2.5 milestone. Each maps to exactly one roadmap phase.
 
 ### Public API Surface, Cleanup & Enforcement (API)
 
-- [ ] **API-01**: Public API surface is formally defined in a checked-in manifest `priv/public_api.json` (schema-versioned like `support_matrix.json`), with every documented module/function assigned a tier (`stable` | `adapter`).
-- [ ] **API-02**: Accidentally-public internals are hidden — `@moduledoc false` on `Rendro.PDF.CidFont` + `Rendro.PDF.FontSubsetter` (confirmed leaking); `@doc false` on the `Rendro.Sign`/`Rendro.Protect` `redact_*` helpers; a full sweep of all currently-public `lib/` modules so each lands in the manifest or is hidden.
-- [ ] **API-03**: Returned/accepted types of public functions are themselves documented — expose `Rendro.Metadata` with a real `@moduledoc` + `@type t` (it is the return type of public `Rendro.metadata/1`), and fix any other invisible-type gaps surfaced by the sweep.
+- [x] **API-01**: Public API surface is formally defined in a checked-in manifest `priv/public_api.json` (schema-versioned like `support_matrix.json`), with every documented module/function assigned a tier (`stable` | `adapter`).
+- [x] **API-02**: Accidentally-public internals are hidden — `@moduledoc false` on `Rendro.PDF.CidFont` + `Rendro.PDF.FontSubsetter` (confirmed leaking); `@doc false` on the `Rendro.Sign`/`Rendro.Protect` `redact_*` helpers; a full sweep of all currently-public `lib/` modules so each lands in the manifest or is hidden.
+- [x] **API-03**: Returned/accepted types of public functions are themselves documented — expose `Rendro.Metadata` with a real `@moduledoc` + `@type t` (it is the return type of public `Rendro.metadata/1`), and fix any other invisible-type gaps surfaced by the sweep.
 - [ ] **API-04**: A docs-contract lane (`test/docs_contract/public_api_contract_test.exs`) introspects `Code.fetch_docs/1` and asserts the documented surface exactly equals the manifest (drift fails CI with an errors-as-product diff), asserts known internals are `:hidden`, asserts Tier-1 `@spec` coverage, and asserts every public module carries exactly one tier tag — wired into `priv/guardrails/required_status_checks.json`.
-- [ ] **API-05**: ExDoc renders a per-module stability badge (Stable / Adapter) from `@moduledoc` metadata, and recipe `sections/2` opts handling is normalized across all five recipes (invoice/branded currently ignore `_opts`; normalization is additive).
+- [x] **API-05**: ExDoc renders a per-module stability badge (Stable / Adapter) from `@moduledoc` metadata, and recipe `sections/2` opts handling is normalized across all five recipes (invoice/branded currently ignore `_opts`; normalization is additive).
 
 ### Stability Contract, Deprecation Policy & Migration Docs (STAB)
 
@@ -66,11 +66,11 @@ Which phases cover which requirements. All 16 v1 requirements mapped — each to
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| API-01 | Phase 78 | Pending |
-| API-02 | Phase 78 | Pending |
-| API-03 | Phase 78 | Pending |
+| API-01 | Phase 78 | Complete |
+| API-02 | Phase 78 | Complete |
+| API-03 | Phase 78 | Complete |
 | API-04 | Phase 79 | Pending |
-| API-05 | Phase 78 | Pending |
+| API-05 | Phase 78 | Complete |
 | STAB-01 | Phase 80 | Pending |
 | STAB-02 | Phase 80 | Pending |
 | STAB-03 | Phase 80 | Pending |
