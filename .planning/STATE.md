@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: Batteries-Included Workflow & Adoption Closure
 status: executing
-last_updated: "2026-05-30T01:27:24.265Z"
-last_activity: 2026-05-30 -- Phase 77 planning complete
+last_updated: "2026-05-30T01:43:12.882Z"
+last_activity: 2026-05-30
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 21
-  completed_plans: 17
+  completed_plans: 18
   percent: 80
 ---
 
@@ -20,16 +20,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-29 after v2.3 milestone shipped)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 77 — v2.4 audit closure
+**Current focus:** Phase 77 — v2-4-closure-format-gate-nyquist-drafts-recipe-input-validat
 
 ## Current Position
 
-Phase: 77
-Plan: Not started
+Phase: 77 (v2-4-closure-format-gate-nyquist-drafts-recipe-input-validat) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-05-30 -- Phase 77 planning complete
+Last activity: 2026-05-30
 
-Progress: [██████████] 100%
+Progress: [█████████░] 86%
 
 ## Milestone Snapshot
 
