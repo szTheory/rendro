@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "public_api.schema.json",
+  "title": "Rendro Public API Manifest",
+  "description": "Structural contract for priv/public_api.json module surface entries.",
+  "type": "object",
+  "required": ["modules"],
+  "properties": {
+    "modules": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/module_entry" }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "module_entry": {
+      "type": "object",
+      "required": ["tier", "functions", "types"],
+      "additionalProperties": false,
+      "properties": {
+        "tier": {
+          "type": "string",
+          "enum": ["stable", "adapter"]
+        },
+        "functions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "types": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}
