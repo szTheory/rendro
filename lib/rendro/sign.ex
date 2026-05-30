@@ -170,9 +170,11 @@ defmodule Rendro.Sign do
     Rendro.render_signed(doc, render_opts, sign_opts)
   end
 
+  @doc false
   @spec redact_opts(prepare_options() | map()) :: map()
   def redact_opts(opts), do: redact_prepare_opts(opts)
 
+  @doc false
   @spec redact_prepare_opts(prepare_options() | map()) :: map()
   def redact_prepare_opts(opts) when is_list(opts) do
     opts
@@ -188,6 +190,7 @@ defmodule Rendro.Sign do
     }
   end
 
+  @doc false
   @spec redact_sign_opts(sign_options() | map()) :: map()
   def redact_sign_opts(opts) when is_list(opts) do
     opts
@@ -212,6 +215,7 @@ defmodule Rendro.Sign do
     }
   end
 
+  @doc false
   @spec redact_augment_opts(augment_options() | map()) :: map()
   def redact_augment_opts(opts) when is_list(opts) do
     opts

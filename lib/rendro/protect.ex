@@ -74,6 +74,7 @@ defmodule Rendro.Protect do
     Rendro.render_protected(doc, render_opts, protect_opts)
   end
 
+  @doc false
   @spec redact_opts(options() | map()) :: map()
   def redact_opts(opts) when is_list(opts) do
     opts
