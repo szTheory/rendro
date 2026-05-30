@@ -33,7 +33,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 ### 📋 v2.5 1.0 Release Capstone (Phases 78-82)
 
 - [x] **Phase 78: Public API Surface Definition & Cleanup** - Hide accidentally-public internals, expose returned structs, author the tiered `priv/public_api.json` manifest, add ExDoc stability badges, normalize recipe opts (completed 2026-05-30)
-- [ ] **Phase 79: Public API Contract Enforcement Lane** - An introspection-based docs-contract test asserts documented surface == manifest (drift fails CI), wired into required status checks
+- [x] **Phase 79: Public API Contract Enforcement Lane** - An introspection-based docs-contract test asserts documented surface == manifest (drift fails CI), wired into required status checks (completed 2026-05-30)
 - [ ] **Phase 80: Stability Contract & Migration Docs** - Two-tier SemVer contract + byte-output carve-out + soft-deprecation policy, `upgrading_to_1.0.md`, internal-label scrub, Tier-1 claims test
 - [ ] **Phase 81: Release Hardening** - Bump to 1.0.0, allowlist tarball audit + hex.audit/deps.audit, fix the CHANGELOG self-block, SHA-pin the publish lane
 - [ ] **Phase 82: 1.0.0 Consolidation & Publish** - Write the consolidated `## [1.0.0]` CHANGELOG, then the irreversible proof-gated publish (hex package + docs, GitHub Release, post-publish verification)
@@ -90,7 +90,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 79-03-PLAN.md — Guardrails lockstep triple: verify_docs.exs lane 11 + required_checks_contract_test.exs count bump + required_status_checks.json notes update
+- [x] 79-03-PLAN.md — Guardrails lockstep triple: verify_docs.exs lane 11 + required_checks_contract_test.exs count bump + required_status_checks.json notes update
 
 ### Phase 80: Stability Contract & Migration Docs
 
@@ -142,7 +142,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 78. Public API Surface Definition & Cleanup | v2.5 | 5/5 | Complete    | 2026-05-30 |
-| 79. Public API Contract Enforcement Lane | v2.5 | 2/3 | In Progress|  |
+| 79. Public API Contract Enforcement Lane | v2.5 | 3/3 | Complete   | 2026-05-30 |
 | 80. Stability Contract & Migration Docs | v2.5 | 0/0 | Not started | - |
 | 81. Release Hardening | v2.5 | 0/0 | Not started | - |
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 0/0 | Not started | - |
