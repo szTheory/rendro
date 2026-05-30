@@ -7,8 +7,8 @@ defmodule Rendro.Metadata do
 
   The `custom` field accepts an open map of `atom() => term()` pairs (additive
   contract — new keys may be added by the caller without version friction).
-  """,
-  tags: [:stable]
+  """
+  @moduledoc tags: [:stable]
 
   @enforce_keys []
   defstruct [
