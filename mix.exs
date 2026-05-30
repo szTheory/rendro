@@ -110,6 +110,7 @@ defmodule Rendro.MixProject do
         "guides/integrations.md",
         "guides/branding.md",
         "guides/api_stability.md",
+        "guides/upgrading_to_1.0.md",
         "guides/viewer_evidence.md",
         "guides/page_primitive.md",
         "guides/recipes.md",
@@ -123,6 +124,7 @@ defmodule Rendro.MixProject do
         ],
         Policies: [
           "guides/api_stability.md",
+          "guides/upgrading_to_1.0.md",
           "guides/viewer_evidence.md"
         ],
         "Recipes & Primitives": [
