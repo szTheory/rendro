@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.5
 milestone_name: 1.0 Release Capstone
 status: executing
-last_updated: "2026-05-30T19:09:10.131Z"
-last_activity: 2026-05-30 -- Phase 80 planning complete
+last_updated: "2026-05-30T19:17:13.143Z"
+last_activity: 2026-05-30
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 12
-  completed_plans: 8
+  completed_plans: 9
   percent: 40
 ---
 
@@ -20,15 +20,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-30 after v2.4 milestone shipped)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 80 — stability contract & migration docs
+**Current focus:** Phase 80 — stability-contract-migration-docs
 
 ## Current Position
 
-Phase: 80
-Plan: Not started
+Phase: 80 (stability-contract-migration-docs) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-05-30 -- Phase 80 planning complete
-Resume file: .planning/phases/80-stability-contract-migration-docs/80-CONTEXT.md
+Last activity: 2026-05-30
+Resume file: None
 
 ## Milestone Snapshot
 
@@ -55,6 +55,10 @@ Per-phase metrics for shipped milestones live in their archives under `.planning
 ### Decisions
 
 Full per-milestone decision log lives in `.planning/PROJECT.md` (Key Decisions table) and per-milestone archives. v2.5 scoping decisions (locked 2026-05-30): single consolidated `1.0.0` publish (last published is `0.3.0`, v2.3+v2.4 unreleased); cleanup-first (no intermediate `0.4.0`, audit found ~zero real breaking changes); "public ≡ what ExDoc renders"; two user-facing tiers (Tier-1 Stable strict SemVer / Tier-2 Evolving adapters + diagnostics, additive-only); soft-deprecation-first (since `mix ci` compiles `--warnings-as-errors`); release-please deferred (AUTO-01); one new dev dep `:mix_audit`, no new runtime deps. Build order: define+clean surface → enforce → stability docs → release hardening → publish.
+
+- [Phase ?]: D-01 executed: two-tier contract leads api_stability.md; per-surface blocks relocated byte-identical (D-02 zero test churn confirmed)
+- [Phase ?]: D-09 reconcile: Rendro.Inspector removed from Tier-1; :diagnostics map common keys (:level, :type) are the stable contract
+- [Phase ?]: D-05 lockstep applied: guide + protection_claims_test.exs updated atomically; no CI red window
 
 ### Roadmap Evolution
 
@@ -91,6 +95,7 @@ Items intentionally held outside shipped scope, carried forward for future miles
 | recipes | Chart/graph rendering in Report body (major new rendering surface) | post-v2.4 |
 | recipes | Table of contents with page numbers (forward-reference, multi-pass concern) | post-v2.4 |
 | Phase 79 P01 | 74 | 1 tasks | 1 files |
+| Phase 80 P01 | 8 | 1 tasks | 2 files |
 
 ## Operator Next Steps
 

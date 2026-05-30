@@ -109,7 +109,7 @@ Plans:
 Plans:
 **Wave 1** *(can run in parallel)*
 
-- [ ] 80-01-PLAN.md — api_stability.md rewrite: contract-first restructure + label scrub (D-05 lockstep: protection_claims_test.exs lines 48 & 56)
+- [x] 80-01-PLAN.md — api_stability.md rewrite: contract-first restructure + label scrub (D-05 lockstep: protection_claims_test.exs lines 48 & 56)
 - [ ] 80-02-PLAN.md — viewer_evidence.md free-prose label scrub + test title/comment hygiene (signing_claims_test.exs, viewer_evidence_claims_test.exs, embedded_artifact_claims_test.exs)
 
 **Wave 2** *(blocked on 80-01 completion)*
@@ -156,7 +156,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 78. Public API Surface Definition & Cleanup | v2.5 | 5/5 | Complete    | 2026-05-30 |
 | 79. Public API Contract Enforcement Lane | v2.5 | 3/3 | Complete    | 2026-05-30 |
-| 80. Stability Contract & Migration Docs | v2.5 | 0/4 | In progress | - |
+| 80. Stability Contract & Migration Docs | v2.5 | 1/4 | In Progress|  |
 | 81. Release Hardening | v2.5 | 0/0 | Not started | - |
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 0/0 | Not started | - |
 
