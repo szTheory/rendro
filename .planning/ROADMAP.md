@@ -81,7 +81,16 @@ Plans:
   3. The test asserts Tier-1 `@spec` coverage and that every public module carries exactly one tier tag
   4. The lane is wired into `priv/guardrails/required_status_checks.json` so it gates merges to `main` alongside the existing engine-critical lanes
 
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+**Wave 1**
+
+- [ ] 79-01-PLAN.md — Contract test: public_api_contract_test.exs with all 4 API-04 sub-assertions (manifest equality, schema, hidden-internals, tier-tag, @spec — @spec starts RED)
+- [ ] 79-02-PLAN.md — @spec backfill: add 2 @spec annotations to lib/rendro/component.ex to turn @spec assertion GREEN
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 79-03-PLAN.md — Guardrails lockstep triple: verify_docs.exs lane 11 + required_checks_contract_test.exs count bump + required_status_checks.json notes update
 
 ### Phase 80: Stability Contract & Migration Docs
 
@@ -133,7 +142,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 78. Public API Surface Definition & Cleanup | v2.5 | 5/5 | Complete    | 2026-05-30 |
-| 79. Public API Contract Enforcement Lane | v2.5 | 0/0 | Not started | - |
+| 79. Public API Contract Enforcement Lane | v2.5 | 0/3 | Not started | - |
 | 80. Stability Contract & Migration Docs | v2.5 | 0/0 | Not started | - |
 | 81. Release Hardening | v2.5 | 0/0 | Not started | - |
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 0/0 | Not started | - |
