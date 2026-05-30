@@ -105,7 +105,20 @@ Plans:
   4. No public guide contains internal milestone/phase labels (e.g. "Rendro v1.10", "Phase 53", "Phase 71"); the string-pinned docs-contract tests (`protection_claims_test.exs` and siblings) were updated in lockstep, so `release-proof` stays green
   5. `test/docs_contract/api_stability_claims_test.exs` proves every Tier-1 symbol the guide names exists/is exported (`function_exported?` / `Code.ensure_loaded?` / struct presence) and asserts the tier headers, key promise sentences, and upgrade-guide presence
 
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+**Wave 1** *(can run in parallel)*
+
+- [ ] 80-01-PLAN.md — api_stability.md rewrite: contract-first restructure + label scrub (D-05 lockstep: protection_claims_test.exs lines 48 & 56)
+- [ ] 80-02-PLAN.md — viewer_evidence.md free-prose label scrub + test title/comment hygiene (signing_claims_test.exs, viewer_evidence_claims_test.exs, embedded_artifact_claims_test.exs)
+
+**Wave 2** *(blocked on 80-01 completion)*
+
+- [ ] 80-03-PLAN.md — Create guides/upgrading_to_1.0.md + wire into mix.exs ExDoc extras + Policies group
+
+**Wave 3** *(blocked on 80-01 + 80-03 completion)*
+
+- [ ] 80-04-PLAN.md — Create api_stability_claims_test.exs (STAB-05) + register lane 12 in scripts/verify_docs.exs
 
 ### Phase 81: Release Hardening
 
@@ -143,7 +156,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 78. Public API Surface Definition & Cleanup | v2.5 | 5/5 | Complete    | 2026-05-30 |
 | 79. Public API Contract Enforcement Lane | v2.5 | 3/3 | Complete    | 2026-05-30 |
-| 80. Stability Contract & Migration Docs | v2.5 | 0/0 | Not started | - |
+| 80. Stability Contract & Migration Docs | v2.5 | 0/4 | In progress | - |
 | 81. Release Hardening | v2.5 | 0/0 | Not started | - |
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 0/0 | Not started | - |
 
