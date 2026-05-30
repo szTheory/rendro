@@ -93,6 +93,7 @@ defmodule Rendro.MixProject do
   defp docs do
     [
       main: "readme",
+      before_closing_head_tag: &before_closing_head_tag/1,
       skip_undefined_reference_warnings_on: [
         "guides/branding.md",
         "guides/integrations.md",
@@ -140,7 +141,16 @@ defmodule Rendro.MixProject do
           Rendro.Text,
           Rendro.Table,
           Rendro.Image,
-          Rendro.Page
+          Rendro.Page,
+          Rendro.Cell,
+          Rendro.Row,
+          Rendro.Component,
+          Rendro.Metadata,
+          Rendro.FontRegistry,
+          Rendro.AssetRegistry,
+          Rendro.EmbeddedFileRegistry,
+          Rendro.RunningContent,
+          Rendro.Error
         ],
         "Canonical Recipes": [
           Rendro.Recipes,
@@ -156,7 +166,9 @@ defmodule Rendro.MixProject do
           Rendro.Adapters.Threadline,
           Rendro.Adapters.Mailglass,
           Rendro.Adapters.Accrue,
-          Rendro.Adapters.Qpdf
+          Rendro.Adapters.Qpdf,
+          Rendro.Adapters.PyHanko,
+          Rendro.Adapters.Pdfsig
         ],
         Protection: [
           Rendro.Protect,
@@ -164,20 +176,34 @@ defmodule Rendro.MixProject do
         ],
         Signing: [
           Rendro.Sign,
-          Rendro.Sign.Adapter,
-          Rendro.Adapters.PyHanko,
-          Rendro.Adapters.Pdfsig
+          Rendro.Sign.Adapter
         ],
         "Inspection & Observability": [
           Rendro.Inspector,
-          Rendro.Error,
           Rendro.Telemetry
         ],
-        Registries: [
-          Rendro.FontRegistry,
-          Rendro.AssetRegistry
+        Storage: [
+          Rendro.Storage,
+          Rendro.Storage.Local
         ]
       ]
     ]
   end
+
+  defp before_closing_head_tag(:html) do
+    """
+    <style>
+      .note.tier-stable { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+      .note.tier-adapter { background-color: #cce5ff; color: #004085; border-color: #b8daff; }
+    </style>
+    <script>
+      document.querySelectorAll('.note').forEach(function(s) {
+        if (s.textContent.includes('stable')) s.classList.add('tier-stable');
+        if (s.textContent.includes('adapter')) s.classList.add('tier-adapter');
+      });
+    </script>
+    """
+  end
+
+  defp before_closing_head_tag(_), do: ""
 end
