@@ -99,8 +99,15 @@ defmodule Mix.Tasks.Rendro.Api.Gen do
     Mix.Task.run("compile")
     Rendro.PublicApi.recompile_conditional_adapters()
 
-    # Filter to only modules that are actually loaded (conditional adapters may not be)
-    loaded_modules = Enum.filter(@public_modules, &Code.ensure_loaded?/1)
+    # Filter to only modules that have BEAM documentation chunks available.
+    # Code.ensure_loaded?/1 covers in-memory compiled modules (via Code.compile_file),
+    # but Code.fetch_docs/1 requires a BEAM file on disk to read the docs chunk.
+    # Conditional adapters compiled in-memory only (no BEAM on disk) would produce
+    # :untagged tier — we skip them so the manifest only contains properly documented modules.
+    loaded_modules =
+      Enum.filter(@public_modules, fn mod ->
+        Code.ensure_loaded?(mod) and match?({:docs_v1, _, _, _, _, _, _}, Code.fetch_docs(mod))
+      end)
 
     manifest = Rendro.PublicApi.build_manifest(loaded_modules)
 
@@ -113,6 +120,10 @@ defmodule Mix.Tasks.Rendro.Api.Gen do
       Mix.shell().error("Generation failed: #{Exception.message(e)}")
       exit({:shutdown, 1})
   end
+
+  # Expose the public module list for test use (byte-equality test in manifest_test.exs).
+  @doc false
+  def public_modules, do: @public_modules
 
   # Encode the manifest to JSON with deterministic (alphabetically sorted) key order.
   # Jason does not sort large map keys; we use Jason.OrderedObject to guarantee order.
