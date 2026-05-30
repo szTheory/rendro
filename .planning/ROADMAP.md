@@ -32,7 +32,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 ### 📋 v2.5 1.0 Release Capstone (Phases 78-82)
 
-- [ ] **Phase 78: Public API Surface Definition & Cleanup** - Hide accidentally-public internals, expose returned structs, author the tiered `priv/public_api.json` manifest, add ExDoc stability badges, normalize recipe opts
+- [x] **Phase 78: Public API Surface Definition & Cleanup** - Hide accidentally-public internals, expose returned structs, author the tiered `priv/public_api.json` manifest, add ExDoc stability badges, normalize recipe opts (completed 2026-05-30)
 - [ ] **Phase 79: Public API Contract Enforcement Lane** - An introspection-based docs-contract test asserts documented surface == manifest (drift fails CI), wired into required status checks
 - [ ] **Phase 80: Stability Contract & Migration Docs** - Two-tier SemVer contract + byte-output carve-out + soft-deprecation policy, `upgrading_to_1.0.md`, internal-label scrub, Tier-1 claims test
 - [ ] **Phase 81: Release Hardening** - Bump to 1.0.0, allowlist tarball audit + hex.audit/deps.audit, fix the CHANGELOG self-block, SHA-pin the publish lane
@@ -67,7 +67,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 78-05-PLAN.md — mix rendro.api.gen task + priv/public_api.json generation + manifest integration tests
+- [x] 78-05-PLAN.md — mix rendro.api.gen task + priv/public_api.json generation + manifest integration tests
 
 ### Phase 79: Public API Contract Enforcement Lane
 
@@ -132,7 +132,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 78. Public API Surface Definition & Cleanup | v2.5 | 4/5 | In Progress|  |
+| 78. Public API Surface Definition & Cleanup | v2.5 | 5/5 | Complete   | 2026-05-30 |
 | 79. Public API Contract Enforcement Lane | v2.5 | 0/0 | Not started | - |
 | 80. Stability Contract & Migration Docs | v2.5 | 0/0 | Not started | - |
 | 81. Release Hardening | v2.5 | 0/0 | Not started | - |
