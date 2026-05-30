@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.5
 milestone_name: 1.0 Release Capstone
-status: planning
-last_updated: "2026-05-30T18:27:12.499Z"
-last_activity: 2026-05-30
+status: executing
+last_updated: "2026-05-30T19:09:10.131Z"
+last_activity: 2026-05-30 -- Phase 80 planning complete
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 8
+  total_plans: 12
   completed_plans: 8
   percent: 40
 ---
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-05-30 after v2.4 milestone shipped)
 
 Phase: 80
 Plan: Not started
-Status: Context gathered — ready to plan
-Last activity: 2026-05-30
+Status: Ready to execute
+Last activity: 2026-05-30 -- Phase 80 planning complete
 Resume file: .planning/phases/80-stability-contract-migration-docs/80-CONTEXT.md
 
 ## Milestone Snapshot
