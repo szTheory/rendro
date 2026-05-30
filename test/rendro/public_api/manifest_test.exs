@@ -46,6 +46,7 @@ defmodule Rendro.PublicApi.ManifestTest do
   describe "Rendro.Metadata visibility" do
     test "Rendro.Metadata is present in the manifest with tier stable" do
       manifest = Loader.load!()
+
       assert Map.has_key?(manifest["modules"], "Elixir.Rendro.Metadata"),
              "Elixir.Rendro.Metadata should be present in the manifest"
 

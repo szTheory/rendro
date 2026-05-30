@@ -27,7 +27,8 @@ defmodule Rendro.PublicApiTest do
       # List must be sorted
       assert functions == Enum.sort(functions)
       # from_stage/2 and from_stage/3 have defaults; to_string/1 is public
-      assert "from_stage/3" in functions or "from_stage/2" in functions or "to_string/1" in functions
+      assert "from_stage/3" in functions or "from_stage/2" in functions or
+               "to_string/1" in functions
     end
   end
 
@@ -69,6 +70,7 @@ defmodule Rendro.PublicApiTest do
 
     test "all 'functions' and 'types' lists in build_manifest output are sorted" do
       manifest = PublicApi.build_manifest([Rendro, Rendro.Document])
+
       for {_mod, entry} <- manifest["modules"] do
         assert entry["functions"] == Enum.sort(entry["functions"])
         assert entry["types"] == Enum.sort(entry["types"])

@@ -15,9 +15,9 @@ defmodule Mix.Tasks.Rendro.Api.Gen do
   output. Module keys and function/type lists are sorted alphabetically so the
   file can be diffed and committed without spurious ordering changes.
 
-  Conditional adapters (`Threadline`, `Mailglass`, `Accrue`, `Phoenix`,
-  `Oban.RenderWorker`) are recompiled before introspection to ensure they
-  appear in the manifest when their optional dependencies are present.
+  Conditional adapters (Threadline, Mailglass, Accrue, Phoenix, Oban.RenderWorker)
+  are recompiled before introspection to ensure they appear in the manifest when
+  their optional dependencies are present.
 
   ## Usage
 
