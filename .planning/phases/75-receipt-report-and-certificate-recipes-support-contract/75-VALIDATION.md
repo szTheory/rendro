@@ -1,10 +1,11 @@
 ---
 phase: 75
 slug: receipt-report-and-certificate-recipes-support-contract
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: validated
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-05-29
+validated: 2026-05-30
 ---
 
 # Phase 75 — Validation Strategy
@@ -40,10 +41,10 @@ created: 2026-05-29
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 75-01-xx | 01 | 1 | D-04 | — | N/A | regression | `mix test test/rendro/recipes/statement_test.exs` | ✅ (51 tests) | ⬜ pending |
-| 75-02-xx | 02 | 2 | RCPT-01/02/03, D-10 | — | N/A | unit | `mix test test/rendro/recipes/receipt_test.exs` | ❌ W0 | ⬜ pending |
-| 75-03-xx | 03 | 2 | CERT-01/02/03, D-05/D-06 | — | N/A | unit | `mix test test/rendro/recipes/certificate_test.exs` | ❌ W0 | ⬜ pending |
-| 75-04-xx | 04 | 3 | CONTRACT-01 | — | input not trusted as proof | docs-contract | `mix test test/docs_contract/viewer_evidence_claims_test.exs` | ✅ (21 tests) | ⬜ pending |
+| 75-01-xx | 01 | 1 | D-04 | — | N/A | regression | `mix test test/rendro/recipes/statement_test.exs` | ✅ | ✅ green |
+| 75-02-xx | 02 | 2 | RCPT-01/02/03, D-10 | — | N/A | unit | `mix test test/rendro/recipes/receipt_test.exs` | ✅ (V1–V10) | ✅ green |
+| 75-03-xx | 03 | 2 | CERT-01/02/03, D-05/D-06 | — | N/A | unit | `mix test test/rendro/recipes/certificate_test.exs` | ✅ (C1–C14) | ✅ green |
+| 75-04-xx | 04 | 3 | CONTRACT-01 | — | input not trusted as proof | docs-contract | `mix test test/docs_contract/viewer_evidence_claims_test.exs` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -66,10 +67,10 @@ created: 2026-05-29
 
 ## Wave 0 Requirements
 
-- [ ] `test/rendro/recipes/receipt_test.exs` — covers RCPT-01..03, V1..V10
-- [ ] `test/rendro/recipes/certificate_test.exs` — covers CERT-01..03, C1..C13
-- [ ] `lib/rendro/recipes/pagination.ex` (or chosen name) — shared helper scaffold with function stubs
-- [ ] `lib/rendro/page_size.ex` (or chosen placement) — page-size helper stub (`:a4`, `:us_letter`, landscape swap)
+- [x] `test/rendro/recipes/receipt_test.exs` — covers RCPT-01..03, V1..V10 (+ V8 malformed-input block)
+- [x] `test/rendro/recipes/certificate_test.exs` — covers CERT-01..03, C1..C14 (C14 malformed-input block)
+- [x] `lib/rendro/recipes/pagination.ex` — shared helper (present)
+- [x] `lib/rendro/page_size.ex` — page-size helper (`:a4`, `:us_letter`, landscape swap) (present)
 
 *Statement test suite already exists (51 tests) and is the D-04 regression gate — no Wave 0 work for it.*
 
@@ -87,11 +88,35 @@ created: 2026-05-29
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references (receipt_test, certificate_test, shared helper, page-size helper)
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 30s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references (receipt_test, certificate_test, shared helper, page-size helper)
+- [x] No watch-mode flags
+- [x] Feedback latency < 30s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** validated 2026-05-30
+
+---
+
+## Validation Audit 2026-05-30
+
+Audited via `/gsd-validate-phase 75` (top-level workflow, run as part of phase 77 / plan 77-03). Coverage verified by execution — every Per-Task Map row and Requirement→Behavior row maps to a test on disk that runs green.
+
+| Requirement | Test | Status |
+|-------------|------|--------|
+| RCPT-01/02/03, D-10 | `receipt_test.exs` V1–V10 | ✅ green |
+| CERT-01/02/03, D-05/D-06 | `certificate_test.exs` C1–C14 | ✅ green |
+| CONTRACT-01 | `docs_contract/viewer_evidence_claims_test.exs` | ✅ green |
+| D-04 (Statement regression) | `statement_test.exs` | ✅ green |
+| Statement support-matrix row (manual-only) | `grep '"statement"' priv/support_matrix.json` → 2 hits | ✅ present |
+
+| Metric | Count |
+|--------|-------|
+| Requirements | 4 (+1 manual-only, now auto-checkable via grep) |
+| COVERED (green) | all |
+| MISSING | 0 |
+| Gaps found | 0 |
+| Tests generated | 0 (all coverage already present from execution) |
+
+**Test run:** `mix test test/rendro/recipes/receipt_test.exs test/rendro/recipes/certificate_test.exs test/rendro/recipes/statement_test.exs test/docs_contract/viewer_evidence_claims_test.exs` → **142 tests, 0 failures**.
