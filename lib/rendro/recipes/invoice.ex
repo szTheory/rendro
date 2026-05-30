@@ -66,11 +66,11 @@ defmodule Rendro.Recipes.Invoice do
 
   """
   @spec sections(map(), keyword()) :: [Rendro.Section.t()]
-  def sections(data, _opts \\ []) do
+  def sections(data, opts \\ []) do
     [
-      header_section(data),
-      body_section(data),
-      footer_section(data)
+      header_section(data, opts),
+      body_section(data, opts),
+      footer_section(data, opts)
     ]
   end
 
@@ -108,7 +108,7 @@ defmodule Rendro.Recipes.Invoice do
   # Private builders
   # ---------------------------------------------------------------------------
 
-  defp header_section(%{id: id, date: date} = _data) do
+  defp header_section(%{id: id, date: date} = _data, _opts) do
     Rendro.section(
       name: :invoice_header,
       region: :header,
@@ -119,7 +119,7 @@ defmodule Rendro.Recipes.Invoice do
     )
   end
 
-  defp body_section(%{items: items} = _data) do
+  defp body_section(%{items: items} = _data, _opts) do
     table_rows =
       Enum.map(items, fn item ->
         [item.name, Integer.to_string(item.qty), "$#{item.price}"]
@@ -138,7 +138,7 @@ defmodule Rendro.Recipes.Invoice do
     )
   end
 
-  defp footer_section(_data) do
+  defp footer_section(_data, _opts) do
     Rendro.section(
       name: :invoice_footer,
       region: :footer,
