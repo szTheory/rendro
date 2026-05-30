@@ -114,7 +114,7 @@ Plans:
 
 **Wave 2** *(blocked on 80-01 completion)*
 
-- [ ] 80-03-PLAN.md — Create guides/upgrading_to_1.0.md + wire into mix.exs ExDoc extras + Policies group
+- [x] 80-03-PLAN.md — Create guides/upgrading_to_1.0.md + wire into mix.exs ExDoc extras + Policies group
 
 **Wave 3** *(blocked on 80-01 + 80-03 completion)*
 
@@ -156,7 +156,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 78. Public API Surface Definition & Cleanup | v2.5 | 5/5 | Complete    | 2026-05-30 |
 | 79. Public API Contract Enforcement Lane | v2.5 | 3/3 | Complete    | 2026-05-30 |
-| 80. Stability Contract & Migration Docs | v2.5 | 2/4 | In Progress|  |
+| 80. Stability Contract & Migration Docs | v2.5 | 3/4 | In Progress|  |
 | 81. Release Hardening | v2.5 | 0/0 | Not started | - |
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 0/0 | Not started | - |
 
