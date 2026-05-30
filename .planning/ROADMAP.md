@@ -182,7 +182,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 | 74. Statement Recipe | 4/4 | Complete    | 2026-05-29 |
 | 75. Receipt/Report and Certificate Recipes + Support Contract | 4/4 | Complete    | 2026-05-29 |
 | 76. Reference Phoenix App, CI, and Documentation Closure | 4/4 | Complete    | 2026-05-29 |
-| 77. v2.4 Closure — Format Gate, Nyquist Drafts, Input-Validation Polish | 4/4 | Complete   | 2026-05-30 |
+| 77. v2.4 Closure — Format Gate, Nyquist Drafts, Input-Validation Polish | 4/4 | Complete    | 2026-05-30 |
 
 ### Phase 77: v2.4 Closure — Format Gate, Nyquist Drafts, Recipe Input-Validation Polish
 
