@@ -17,7 +17,7 @@
 - ✅ **v2.1 Cryptographic Signing** — Phases 60-63 (shipped 2026-05-07)
 - ✅ **v2.2 Long-Lived Signatures** — Phases 64-67 (shipped 2026-05-08)
 - ✅ **v2.3 Viewer Proof & Interop Closure** — Phases 68-72 (shipped 2026-05-29)
-- 📋 **v2.4 Batteries-Included Workflow & Adoption Closure** — Phases 73-76 (active)
+- 📋 **v2.4 Batteries-Included Workflow & Adoption Closure** — Phases 73-77 (active)
 
 ## Phases
 
@@ -43,12 +43,13 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 </details>
 
-### 📋 v2.4 Batteries-Included Workflow & Adoption Closure (Phases 73-76)
+### 📋 v2.4 Batteries-Included Workflow & Adoption Closure (Phases 73-77)
 
 - [x] **Phase 73: Page-Numbering / Running-Region Primitive** - Foundational: fix body_capacity, ship single-pass page-number token substitution, determinism proof (completed 2026-05-29)
 - [x] **Phase 74: Statement Recipe** - First end-to-end exercise of PAGE primitive; carried-forward totals in data assembly; three-rung escape hatch (completed 2026-05-29)
 - [x] **Phase 75: Receipt/Report and Certificate Recipes + Support Contract** - Batched lower-complexity recipes; support-matrix rows for all new surfaces (completed 2026-05-29)
 - [x] **Phase 76: Reference Phoenix App, CI, and Documentation Closure** - Isolated CI job; all recipes demonstrated; HexDocs guides; docs-contract tests (completed 2026-05-29)
+- [ ] **Phase 77: v2.4 Closure — Format Gate, Nyquist Drafts, Recipe Input-Validation Polish** - Audit-discovered cleanup: green the `mix ci` format gate, fill Nyquist VALIDATION drafts (73/74/75), structured `ArgumentError` validation across recipes (added 2026-05-29)
 
 ## Phase Details
 
@@ -181,6 +182,28 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 | 74. Statement Recipe | 4/4 | Complete    | 2026-05-29 |
 | 75. Receipt/Report and Certificate Recipes + Support Contract | 4/4 | Complete    | 2026-05-29 |
 | 76. Reference Phoenix App, CI, and Documentation Closure | 4/4 | Complete    | 2026-05-29 |
+| 77. v2.4 Closure — Format Gate, Nyquist Drafts, Input-Validation Polish | 0/4 | Planned     | — |
+
+### Phase 77: v2.4 Closure — Format Gate, Nyquist Drafts, Recipe Input-Validation Polish
+
+**Goal:** The v2.4 milestone is shippable with no outstanding hygiene blockers — the required `test` CI lane is green (no `mix ci` format failures), the audit-discovered working-tree changes are resolved, Phases 73/74/75 carry completed Nyquist VALIDATION records, and the new recipes raise structured `ArgumentError`s on malformed input instead of raw `BadMapError`/`FunctionClauseError`.
+**Depends on:** Phase 76
+**Requirements**: None new (closure phase — addresses v2.4-MILESTONE-AUDIT.md tech debt; no new REQ-IDs)
+**Source:** `.planning/v2.4-MILESTONE-AUDIT.md` (audited 2026-05-29)
+**Success Criteria** (what must be TRUE):
+
+  1. `mix ci` passes from a clean tree — `mix format --check-formatted` reports no unformatted files (currently fails on `test/docs_contract/recipes_claims_test.exs` and `test/guardrails/required_checks_contract_test.exs`), so the required `test` branch-protection lane is green
+  2. The audit-flagged uncommitted working-tree changes (`paginate.ex`, `deterministic_test.exs`, `statement_test.exs`, `guides/recipes.md`, untracked `guides/user_flows_and_jtbd.md`) are reviewed and either committed with intent or reverted — no stray milestone drift remains
+  3. Phases 73, 74, and 75 have `nyquist_compliant: true` VALIDATION.md records (currently unfilled drafts); run `/gsd-validate-phase` for each rather than hand-editing
+  4. Statement, Receipt, and Certificate raise structured `ArgumentError` (not `BadMapError`/`FunctionClauseError`) for malformed `:account`/`:customer`, non-`%Date{}` `:date`, and non-binary `:body` (closes 74 WARNINGs + 75 WR-01..06); cosmetic dead bindings and misleading comments cleaned up
+
+**Plans:** 4 plans (2 waves)
+
+Plans:
+- [ ] 77-01-PLAN.md — Recipe input-validation (structured ArgumentError for Statement :account, Receipt :customer/:date, Certificate :date/:body) + D-09 cosmetic cleanup + negative-path tests (D-05..D-09)
+- [ ] 77-02-PLAN.md — Wire untracked JTBD guide into ExDoc extras/groups_for_extras, keep within support matrix (D-02/D-03)
+- [ ] 77-03-PLAN.md — Fill 73/74/75 Nyquist VALIDATION drafts via top-level /gsd-validate-phase runs (autonomous: false) (D-04)
+- [ ] 77-04-PLAN.md — Terminal gate: format offenders + final mix format + full suite + commit working-tree changes with intent + prove clean-tree mix ci format gate green (D-01/D-02/D-10)
 
 ---
-*v2.3 archived 2026-05-29 on milestone completion. v2.4 roadmap created 2026-05-29. Phase numbering: 73-76.*
+*v2.3 archived 2026-05-29 on milestone completion. v2.4 roadmap created 2026-05-29. Phase numbering: 73-77 (Phase 77 added 2026-05-29 from v2.4 milestone audit).*
