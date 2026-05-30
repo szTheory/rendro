@@ -353,8 +353,7 @@ defmodule Rendro.Metadata do
 
   The `custom` field accepts an open map of `atom() => term()` pairs (additive
   contract — new keys may be added by the caller without version friction).
-  """
-  tags: [:stable]
+  """, tags: [:stable]
 ```
 
 Keep the existing `@type t` (line 14) and `defstruct` (lines 4–12) unchanged.

@@ -79,10 +79,10 @@ status: draft
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. Generator env strategy: inline-recompile conditional adapters vs `MIX_ENV=test` (research recommends inline-recompile mirroring `AdapterReloader`).
-2. Whether the manifest carries a `conditional: true` marker on adapter entries, or handles conditional presence silently.
+1. Generator env strategy: inline-recompile conditional adapters vs `MIX_ENV=test` — **RESOLVED: inline-recompile chosen** (Plan 04 implements `recompile_conditional_adapters/0` with all five adapter paths including phoenix.ex and oban/render_worker.ex; mirrors `AdapterReloader` from test/support/mocks.ex).
+2. Whether the manifest carries a `conditional: true` marker on adapter entries, or handles conditional presence silently — **RESOLVED: no `conditional:` field**; conditional presence handled by the recompile step at generation time; manifest schema stays flat (no conditional marker).
 
 ## Notes
 

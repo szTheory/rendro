@@ -200,11 +200,11 @@ JSON.encode!(%{b: 1, a: 2})          # => {"b":1,"a":2}
 
 ---
 
-## Open Questions for Planner
+## Open Questions for Planner (RESOLVED)
 
-1. `mix rendro.api.gen` env: inline-recompile adapters vs `MIX_ENV=test` (recommend inline-recompile for operator usability)
-2. `conditional: true` field in manifest for adapters — include in JSON, or handle silently via the test-env approach?
-3. `Cell` / `Row` / `Component` (D-04 stable) not explicitly in `mix.exs` `groups_for_modules` — planner should add them to the "Core Builder API" group while reconciling the group list with the actual compiled module set.
+1. `mix rendro.api.gen` env: inline-recompile adapters vs `MIX_ENV=test` — **RESOLVED: inline-recompile chosen** (Plan 04/05 implement `recompile_conditional_adapters/0` mirroring `AdapterReloader`, covering all five conditional adapter paths including phoenix.ex and oban/render_worker.ex).
+2. `conditional: true` field in manifest for adapters — include in JSON, or handle silently? — **RESOLVED: no `conditional:` field** — conditional adapter presence is handled by the recompile step in Plan 04; manifest schema has no conditional marker, keeping it flat and schema-stable.
+3. `Cell` / `Row` / `Component` (D-04 stable) not in `mix.exs` `groups_for_modules` — **RESOLVED: added to Core Builder API group** in Plan 02 Task 3 along with Metadata, FontRegistry, AssetRegistry, EmbeddedFileRegistry, RunningContent, Error.
 
 ---
 
