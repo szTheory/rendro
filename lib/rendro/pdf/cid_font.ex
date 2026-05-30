@@ -1,7 +1,5 @@
 defmodule Rendro.PDF.CidFont do
-  @moduledoc """
-  Generates PDF dictionaries for CID-keyed (Type0 / Identity-H) fonts.
-  """
+  @moduledoc false
 
   alias Rendro.PDF.{Font, Object}
 

@@ -1,35 +1,5 @@
 defmodule Rendro.Format do
-  @moduledoc """
-  Pure, deterministic, locale-free default formatter for the Statement recipe.
-
-  `Rendro.Format` renders money, dates, and statement labels into stable strings
-  that are **byte-identical across runs** regardless of the host's ambient locale,
-  process dictionary, or system time zone. It deliberately takes **no** dependency
-  on any locale-aware library (no CLDR, no message-translation framework, no
-  currency-locale package): locale-aware formatting is runtime-locale-dependent
-  and would break Rendro's deterministic output contract.
-
-  This is the *default* applied to both caller-supplied amounts and the
-  running/carried balances the recipe computes itself. Callers who need
-  locale-aware or currency-specific output override the default from their own
-  application via the recipe's escape hatch — wiring in their own currency/locale
-  library without pulling that dependency into Rendro's core:
-
-      Rendro.Recipes.Statement.document(data,
-        formatters: [
-          amount: fn %Decimal{} = d -> MyApp.Money.format(d) end,
-          date: fn %Date{} = d -> MyApp.Locale.format_date(d) end
-        ],
-        labels: %{carried_forward: "Saldo a cuenta nueva"}
-      )
-
-  ## Default forms
-
-    * Money: `$1,234.50`, thousands grouped with `,`, always 2 decimal places,
-      negatives wrapped in parentheses (`($1,234.50)`) with no leading minus.
-    * Dates: ISO 8601 `YYYY-MM-DD` via `Date.to_iso8601/1`.
-    * Labels: the five default statement labels (see `label/1`).
-  """
+  @moduledoc false
 
   @labels %{
     balance: "Balance",

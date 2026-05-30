@@ -1,7 +1,5 @@
 defmodule Rendro.Text.Bidi do
-  @moduledoc """
-  Splits text into unidirectional, single-script runs.
-  """
+  @moduledoc false
 
   @doc """
   Splits mixed string into distinct runs.

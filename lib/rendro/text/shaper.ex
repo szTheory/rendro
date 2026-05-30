@@ -1,9 +1,5 @@
 defmodule Rendro.Text.Shaper do
-  @moduledoc """
-  Wraps the `harfbuzz_ex` text shaping engine to return exact glyphs and bounding boxes.
-  Also detects missing glyph IDs from the shaping engine and emits structured Telemetry
-  events instead of crashing.
-  """
+  @moduledoc false
 
   @doc """
   Shapes a given text string using the specified font.

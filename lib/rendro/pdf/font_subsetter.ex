@@ -1,8 +1,5 @@
 defmodule Rendro.PDF.FontSubsetter do
-  @moduledoc """
-  Pure Elixir TrueType binary subsetter.
-  Strips unused glyphs and updates `loca` / `glyf` tables correctly to minimize PDF size.
-  """
+  @moduledoc false
 
   import Bitwise
 
