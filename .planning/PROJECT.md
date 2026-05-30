@@ -10,7 +10,7 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Shipped milestone:** v2.4 Batteries-Included Workflow & Adoption Closure — **SHIPPED 2026-05-30** (Phases 73–77, 21 plans, 19/19 requirements; milestone audit `passed`). The proof/trust axis is at diminishing returns; v2.4 spent the next increment of leverage on adoption ergonomics. The full phase-delivery narrative is archived in `milestones/v2.4-ROADMAP.md`. **No milestone is currently active — next up is the 1.0 release capstone (conditional v2.5 global text shaping after).**
+**Shipped milestone:** v2.4 Batteries-Included Workflow & Adoption Closure — **SHIPPED 2026-05-30** (Phases 73–77, 21 plans, 19/19 requirements; milestone audit `passed`). The proof/trust axis is at diminishing returns; v2.4 spent the next increment of leverage on adoption ergonomics. The full phase-delivery narrative is archived in `milestones/v2.4-ROADMAP.md`. **Active milestone: v2.5 1.0 Release Capstone — the formal SemVer/API-stability commitment + first 1.x public hex release (`1.0.0`), consolidating all unreleased v2.3 + v2.4 work. Conditional v2.6 global text shaping after.**
 
 <details>
 <summary>v2.4 phase delivery detail</summary> **Phase 76 (Reference Phoenix app, CI, and documentation closure) complete 2026-05-29** — a Phoenix engineer can now run `examples/phoenix_example` locally (modernized to Phoenix ~>1.8 / plug ~>1.18 / jason ~>1.4 / elixir ~>1.19, the previously-missing `PhoenixExampleWeb.ErrorJSON` module added, README documenting setup + all five recipes), all five recipes (Invoice, BrandedInvoice, Statement, Receipt/Report, Certificate) are demonstrated through `Rendro.Adapters.Phoenix` (`render_pdf/3` attachment + `preview_pdf/2` inline) with 12 ConnCase/structural tests green, an isolated graph-disconnected (`needs: []`, no `continue-on-error`) advisory `example-phoenix` CI job runs `mix test` against the example without gating the four engine lanes (recorded in `priv/guardrails/required_status_checks.json` `advisory_contexts`; guardrail contract test refactored off its single-element advisory destructure and bumped to 10 docs-contract lanes), and two HexDocs guides (`guides/page_primitive.md`, `guides/recipes.md`) are wired into ExDoc under a "Recipes & Primitives" group with three new docs-contract tests bounding every claim to `priv/support_matrix.json` + on-disk proof evidence (REF-01..03, CONTRACT-02). Verified 18/18 must-haves. Code review caught and fixed a doc-correctness blocker (the page-primitive guide had shown non-functional `{page}`/`{total}` tokens in an unevaluated schematic fence; corrected to the engine's real `{{page_number}}`/`{{total_pages}}`). Previously: **Phase 75 (Receipt/Report and Certificate recipes + support contract) complete 2026-05-29** — two new data-driven recipes ship on the three-rung escape hatch: `Rendro.Recipes.Receipt` (one module scaling 1→N pages — a long multi-page tabular "report" is just a receipt that overflows, with repeating table headers and "Page X of Y" footers; RCPT-01..03) and `Rendro.Recipes.Certificate` (landscape-default, ALL element coordinates derived from template geometry with zero hardcoded A4 numerics, renders at A4 and US Letter via a multi-size test, optional branding mirroring `BrandedInvoice`; CERT-01..03). Statement's pagination/formatting machinery was extracted into a private shared `Rendro.Recipes.Pagination` helper (generalizing the per-row `balance` to opaque `meta`) plus a pure `Rendro.PageSize` resolver, with Statement refactored onto it and its 51-test determinism gate preserved verbatim (D-04). The support contract closed via four terminal non-viewer-sensitive `priv/support_matrix.json` rows (`page_numbering`, `statement` backfill, `receipt_report`, `certificate`) — flat objects with `supported` status + resolvable test-evidence pointers and no `viewers` sub-key, passing the existing schema validator + 21 docs-contract tests unchanged (CONTRACT-01). Verified 5/5 success criteria, 882 tests green. Code review flagged 6 non-blocking errors-as-product robustness gaps (WR-01..06: the new recipes validate key presence but not type/shape for some optional fields, leaking `BadMapError`/`FunctionClauseError` instead of instructive `ArgumentError`) — tracked in `75-REVIEW.md`, fixable via `/gsd-code-review 75 --fix`. Previously: **Phase 74 (Statement recipe) complete 2026-05-29** — `Rendro.Recipes.Statement` is the first end-to-end consumer of the PAGE primitive: a caller with account-transaction data generates a multi-page billing statement with correct "Page X of Y" footers and carried-forward / brought-forward balances, all through the three-rung escape hatch (`document/2` → `page_template/1` → `sections/2`) consistent with `Invoice`. Engine enablers landed first (`Rendro.measure_rows/4` for recipe-owned chunking by the engine's own row heights; the pure locale-free `Rendro.Format` module), the running-balance fold is exact signed Decimal, and `validate_data!/1` is errors-as-product including a `Decimal.equal?/2` assertion on caller-supplied closing balances (STMT-01..04). Verified passed after closing two code-review gaps (CR-01 descending-range guard in `measure_rows`; WR-01 top-level closing-balance validation). Previously: **Phase 73 (Page-Numbering / Running-Region Primitive) complete 2026-05-29** — the `fn {page, total}` running header/footer primitive + `page_number/1` helper + `suppress_on` selector with single-pass deterministic substitution. Next: Phase 76 (Reference Phoenix app, CI, and documentation closure).
@@ -59,24 +59,24 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 **Foundation Already Shipped:** v1.3 release readiness, v1.2 typography/assets truth, v1.1 layout-authoring maturity, and v1.0 deterministic core rendering.
 
-## Current Milestone: v2.4 Batteries-Included Workflow & Adoption Closure
+## Current Milestone: v2.5 1.0 Release Capstone (hex `1.0.0`)
 
-**Goal:** Close the adoption gap — make the common Phoenix document workflows batteries-included so teams can reach production with documented recipes rather than assembling primitives by hand.
+**Goal:** Cut and publish a permanent, proof-backed `rendro 1.0.0` to hex.pm — a formal two-tier SemVer/API-stability commitment with a clean, enforced public API boundary, a migration guide, and hardened release gates — consolidating all unreleased v2.3 + v2.4 work into a single release.
 
 **Target features:**
-- **Page numbering / running headers-footers primitive** — first-class, foundational (a dedicated phase first, since the recipes depend on it): "Page X of Y", repeated header/footer region content, and carried-forward totals; deterministic and tested. Idiomatic analogs: ReportLab `onPage`, fpdf2 header/footer overrides.
-- **Three new production recipes** on the proven three-rung escape-hatch pattern (`document` / `page_template` / `sections`): **Statement**, **Receipt/Report**, and **Certificate** — each runnable from data, docs-contract tested, and documented in a guide.
-- **Reference Phoenix app** (`examples/phoenix_example`) upgraded to executable adoption proof — `mix`-runnable, README'd, and exercised in CI.
+- **Formal public API boundary** — a checked-in tiered manifest (`priv/public_api.json`), accidentally-public internals hidden (`@moduledoc false`), returned structs exposed (e.g. `Rendro.Metadata`), and a docs-contract enforcement lane (`public_api_contract_test.exs`) that fails CI on surface drift. Two user-facing tiers: Tier 1 Stable (strict SemVer core) and Tier 2 Evolving (adapters + diagnostics/metadata map contents, additive-only).
+- **Stability contract + migration docs** — `guides/api_stability.md` rewritten with the two-tier SemVer promise (incl. the byte-output carve-out), a soft-deprecation-first policy, a new `guides/upgrading_to_1.0.md`, and a claims test proving every Tier-1 symbol exists. Internal milestone/phase labels scrubbed from public guides.
+- **Release hardening + `1.0.0` publish** — `@version` → `1.0.0`, preflight hardened with an exact-allowlist tarball content audit (operator/evidence artifacts must be absent) + `hex.audit`/`deps.audit`, the CHANGELOG self-block fixed, `release.yml` Action SHAs pinned, then a single consolidated `1.0.0` published via the proof-gated tag pipeline.
 
-**Why now:** v2.3 closed the last recorded-truth gap (viewer behavior across Acrobat, Preview, PDFium, PDF.js). The proof/trust axis is now at diminishing returns; the highest-leverage step is reducing time-to-production for the most common artifact workflows. **1.0 release is held as the capstone after v2.4** (engine is 1.0-grade; `guides/api_stability.md` exists). Conditional v2.5 (Global Text Shaping & Script Support) follows only if demand justifies the core investment. Scoping detail in `threads/v24-adoption-scoping.md`.
+**Why now:** v2.4 closed the adoption gap; the proof/trust and adoption axes are both at diminishing returns. The engine is 1.0-grade and `guides/api_stability.md` already exists, so the highest-leverage step is the formal stability commitment + first 1.x public release. The last *published* hex release is `0.3.0`; v2.3 and v2.4 are both unreleased, so `1.0.0` is a single consolidation carrying everything since `0.3.0`. The cleanup audit found ~zero real breaking changes, so no intermediate `0.4.0` is needed. **Conditional Global Text Shaping & Script Support follows as v2.6, only if adopter demand justifies the core investment.** Plan + research detail in the approved milestone plan.
 
 ## Strategic Arc
 
-**Active strategic arc:** production-ready trust and adoption
+**Active strategic arc:** production-ready trust and adoption → public 1.0 commitment
 
-**Planned sequence after v2.3:**
-- v2.4 Batteries-Included Workflow & Adoption Closure
-- v2.5 Global Text Shaping & Script Support (conditional, only if demand stays strong enough to justify the core investment)
+**Planned sequence after v2.4:**
+- v2.5 1.0 Release Capstone — formal SemVer/API-stability commitment + first 1.x public hex release (`1.0.0`)
+- v2.6 Global Text Shaping & Script Support (conditional, only if demand stays strong enough to justify the core investment)
 
 ## Requirements
 
@@ -101,10 +101,12 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-_No milestone is currently active. v2.4 shipped 2026-05-30; concrete REQ-IDs for the next milestone are defined in a fresh `REQUIREMENTS.md` during the next cycle (`/gsd-new-milestone`). Sequenced next steps:_
+_Milestone **v2.5 1.0 Release Capstone** is active (concrete REQ-IDs in `REQUIREMENTS.md`, phases 78–82 in `ROADMAP.md`). Headline requirements:_
 
-- [ ] Cut the **1.0 release** (SemVer/API-stability commitment + migration note) as the capstone now that v2.4 adoption closure has shipped — the engine is 1.0-grade and `guides/api_stability.md` already exists.
-- [ ] Hold **v2.5 Global Text Shaping & Script Support** as conditional — pursue only if adopter demand justifies the core investment.
+- [ ] **Formal public API boundary** — tiered manifest + cleanup of accidentally-public internals + a docs-contract enforcement lane that fails CI on surface drift (API-01..05).
+- [ ] **Two-tier stability contract + migration docs** — rewritten `api_stability.md` (strict-SemVer core / additive-only adapters + byte-output carve-out), soft-deprecation-first policy, `upgrading_to_1.0.md`, and a Tier-1-symbols-exist claims test (STAB-01..05).
+- [ ] **Release hardening + single `1.0.0` publish** — version bump, preflight content-audit + `hex.audit`/`deps.audit`, CHANGELOG self-block fix, SHA-pinned release workflow, consolidated `1.0.0` to hex.pm (REL-01..06).
+- [ ] Hold **v2.6 Global Text Shaping & Script Support** as conditional — pursue only if adopter demand justifies the core investment.
 - [ ] Keep viewer claims narrower than blanket "works in every viewer" marketing, blanket compliance narratives, and signer identity trust unless a separate milestone proves them; every new surface inherits the v2.3 viewer-evidence recording discipline.
 
 ### Out of Scope
@@ -226,4 +228,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-30 — after v2.4 milestone (Batteries-Included Workflow & Adoption Closure) shipped. Phases 73–77 complete (21 plans, 19/19 requirements); milestone audit `passed`. All v2.4 requirements moved to Validated; Active reset to the sequenced next steps (1.0 release capstone, conditional v2.5). Archived in `milestones/v2.4-*`. Next: `/gsd-new-milestone`.*
+*Last updated: 2026-05-30 — started milestone v2.5 (1.0 Release Capstone). Current Milestone + Strategic Arc updated (Global Text Shaping renumbered to conditional v2.6); Active reset to v2.5 headline requirements (API/STAB/REL). Concrete REQ-IDs in `REQUIREMENTS.md`, phases 78–82 in `ROADMAP.md`. Prior milestone v2.4 archived in `milestones/v2.4-*`. Next: `/gsd-plan-phase 78`.*

@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.4
-milestone_name: Batteries-Included Workflow & Adoption Closure
-status: milestone_complete
-last_updated: 2026-05-30T09:23:01.432Z
+milestone: v2.5
+milestone_name: 1.0 Release Capstone
+status: planning
+last_updated: "2026-05-30T12:35:48.911Z"
 last_activity: 2026-05-30
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 21
-  completed_plans: 21
-  percent: 100
-stopped_at: Milestone v2.4 shipped and archived 2026-05-30 (Phase 77 was final phase)
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,21 +20,20 @@ stopped_at: Milestone v2.4 shipped and archived 2026-05-30 (Phase 77 was final p
 See: .planning/PROJECT.md (updated 2026-05-30 after v2.4 milestone shipped)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** No milestone active — v2.4 shipped. Next up: the 1.0 release capstone (then conditional v2.5). Run `/gsd-new-milestone` to begin.
+**Current focus:** v2.5 1.0 Release Capstone — formal SemVer/API-stability commitment + first 1.x public hex release (`1.0.0`), consolidating unreleased v2.3 + v2.4 work (then conditional v2.6 global text shaping). Defining requirements → roadmap.
 
 ## Current Position
 
-Milestone: v2.4 Batteries-Included Workflow & Adoption Closure — **SHIPPED & ARCHIVED 2026-05-30**
-Phase: 77 (final) complete
-Status: Milestone complete and archived
-
-Progress: [██████████] 100% (5/5 phases, 21/21 plans, 19/19 requirements)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-30 — Milestone v2.5 started
 
 ## Milestone Snapshot
 
 - Shipped milestone: `v2.4 Batteries-Included Workflow & Adoption Closure` — phases 73-77, 21 plans, 19/19 requirements, milestone audit `passed`. Archived in `milestones/v2.4-ROADMAP.md` / `milestones/v2.4-REQUIREMENTS.md` / `milestones/v2.4-MILESTONE-AUDIT.md`.
 - Previous shipped milestone: `v2.3 Viewer Proof & Interop Closure` (shipped 2026-05-29 at tag `v0.3.1`).
-- Strategic next-up: **1.0 release capstone** (SemVer/API-stability commitment + migration note — the engine is 1.0-grade and `guides/api_stability.md` exists). Then conditional `v2.5 Global Text Shaping & Script Support` only if adopter demand justifies the core investment.
+- Active milestone: **v2.5 1.0 Release Capstone** (phases 78–82) — formal SemVer/API-stability commitment + first 1.x public hex release (`1.0.0`), single consolidation of unreleased v2.3 + v2.4. Then conditional `v2.6 Global Text Shaping & Script Support` only if adopter demand justifies the core investment.
 
 ## Performance Metrics
 
