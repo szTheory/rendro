@@ -182,7 +182,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 | 74. Statement Recipe | 4/4 | Complete    | 2026-05-29 |
 | 75. Receipt/Report and Certificate Recipes + Support Contract | 4/4 | Complete    | 2026-05-29 |
 | 76. Reference Phoenix App, CI, and Documentation Closure | 4/4 | Complete    | 2026-05-29 |
-| 77. v2.4 Closure — Format Gate, Nyquist Drafts, Input-Validation Polish | 2/4 | In Progress|  |
+| 77. v2.4 Closure — Format Gate, Nyquist Drafts, Input-Validation Polish | 3/4 | In Progress|  |
 
 ### Phase 77: v2.4 Closure — Format Gate, Nyquist Drafts, Recipe Input-Validation Polish
 
@@ -197,13 +197,13 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
   3. Phases 73, 74, and 75 have `nyquist_compliant: true` VALIDATION.md records (currently unfilled drafts); run `/gsd-validate-phase` for each rather than hand-editing
   4. Statement, Receipt, and Certificate raise structured `ArgumentError` (not `BadMapError`/`FunctionClauseError`) for malformed `:account`/`:customer`, non-`%Date{}` `:date`, and non-binary `:body` (closes 74 WARNINGs + 75 WR-01..06); cosmetic dead bindings and misleading comments cleaned up
 
-**Plans:** 2/4 plans executed
+**Plans:** 3/4 plans executed
 Plans:
 **Wave 1**
 
 - [x] 77-01-PLAN.md — Recipe input-validation (structured ArgumentError for Statement :account, Receipt :customer/:date, Certificate :date/:body) + D-09 cosmetic cleanup + negative-path tests (D-05..D-09)
 - [x] 77-02-PLAN.md — Wire untracked JTBD guide into ExDoc extras/groups_for_extras, keep within support matrix (D-02/D-03)
-- [ ] 77-03-PLAN.md — Fill 73/74/75 Nyquist VALIDATION drafts via top-level /gsd-validate-phase runs (autonomous: false) (D-04)
+- [x] 77-03-PLAN.md — Fill 73/74/75 Nyquist VALIDATION drafts via top-level /gsd-validate-phase runs (autonomous: false) (D-04)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
