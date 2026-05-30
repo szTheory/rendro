@@ -487,4 +487,26 @@ defmodule Rendro.Recipes.ReceiptTest do
       end)
     end
   end
+
+  # ---------------------------------------------------------------------------
+  # V8: validate_data!/1 rejects malformed :customer and :date
+  # ---------------------------------------------------------------------------
+
+  describe "V8: validate_data!/1 rejects malformed input" do
+    test "non-map :customer raises ArgumentError mentioning customer" do
+      data = fixture_data(0) |> Map.put(:customer, "not-a-map")
+
+      assert_raise ArgumentError, ~r/customer/i, fn ->
+        Receipt.document(data)
+      end
+    end
+
+    test "non-%Date{} :date raises ArgumentError mentioning date" do
+      data = fixture_data(0) |> Map.put(:date, "2026-05-29")
+
+      assert_raise ArgumentError, ~r/date/i, fn ->
+        Receipt.document(data)
+      end
+    end
+  end
 end

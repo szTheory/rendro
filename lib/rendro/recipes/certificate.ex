@@ -169,15 +169,11 @@ defmodule Rendro.Recipes.Certificate do
   # Private section builders
   # ---------------------------------------------------------------------------
 
-  defp body_section(data, opts, template) do
+  defp body_section(data, opts, _template) do
     fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
 
     body_text = Map.get(data, :body, "")
     seal_text = Map.get(data, :seal_line, "")
-
-    # content_w is derived from the template (geometry-derived — CERT-02).
-    # All blocks flow within the content area; text sizing uses body width for context.
-    _content_w = template.width - template.margin_left - template.margin_right
 
     Rendro.section(
       name: :certificate_body,
@@ -219,22 +215,47 @@ defmodule Rendro.Recipes.Certificate do
       """
     end
 
-    # Body length guard (T-75-03-01: prevents multi-page overflow from pathological input).
-    body = Map.get(data, :body, "")
-
-    if is_binary(body) and byte_size(body) > 2000 do
-      raise ArgumentError, """
-      Rendro.Recipes.Certificate.document/2 — data.body is too long.
-
-      What:  data.body exceeds the single-page body-length limit.
-      Where: Rendro.Recipes.Certificate.validate_data!/1
-      Why:   #{byte_size(body)} bytes (limit: 2000). Certificate is a single-page recipe;
-             very long body text would overflow the page and split across multiple pages.
-      Next:  Shorten data.body to 2000 bytes or fewer.
-      """
-    end
-
+    validate_date!(data.date)
+    validate_body!(Map.get(data, :body, ""))
     validate_brand!(Map.get(data, :brand))
+  end
+
+  defp validate_date!(%Date{}), do: :ok
+
+  defp validate_date!(value) do
+    raise ArgumentError, """
+    Rendro.Recipes.Certificate.document/2 — invalid :date type.
+
+    What:  :date must be a %Date{} struct.
+    Where: Rendro.Recipes.Certificate.validate_data!/1
+    Why:   Received: #{inspect(value)} (#{Rendro.Recipes.Pagination.type_name(value)}).
+    Next:  Use the ~D[YYYY-MM-DD] sigil or Date.new!/3.
+    """
+  end
+
+  defp validate_body!(body) when is_binary(body) and byte_size(body) > 2000 do
+    raise ArgumentError, """
+    Rendro.Recipes.Certificate.document/2 — data.body is too long.
+
+    What:  data.body exceeds the single-page body-length limit.
+    Where: Rendro.Recipes.Certificate.validate_data!/1
+    Why:   #{byte_size(body)} bytes (limit: 2000). Certificate is a single-page recipe;
+           very long body text would overflow the page and split across multiple pages.
+    Next:  Shorten data.body to 2000 bytes or fewer.
+    """
+  end
+
+  defp validate_body!(body) when is_binary(body), do: :ok
+
+  defp validate_body!(value) do
+    raise ArgumentError, """
+    Rendro.Recipes.Certificate.document/2 — invalid :body type.
+
+    What:  :body must be a string.
+    Where: Rendro.Recipes.Certificate.validate_data!/1
+    Why:   Received: #{inspect(value)} (#{Rendro.Recipes.Pagination.type_name(value)}).
+    Next:  Pass a binary string (max 2000 bytes).
+    """
   end
 
   defp validate_brand!(nil), do: :ok

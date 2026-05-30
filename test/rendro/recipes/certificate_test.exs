@@ -240,4 +240,26 @@ defmodule Rendro.Recipes.CertificateTest do
       end
     end
   end
+
+  # ---------------------------------------------------------------------------
+  # C14: validate_data!/1 rejects malformed :date and :body
+  # ---------------------------------------------------------------------------
+
+  describe "C14: validate_data!/1 rejects malformed input" do
+    test "non-%Date{} :date raises ArgumentError mentioning date" do
+      data = fixture_data() |> Map.put(:date, "2026-05-29")
+
+      assert_raise ArgumentError, ~r/date/i, fn ->
+        Certificate.document(data)
+      end
+    end
+
+    test "non-binary :body raises ArgumentError mentioning body" do
+      data = fixture_data() |> Map.put(:body, 12_345)
+
+      assert_raise ArgumentError, ~r/body/i, fn ->
+        Certificate.document(data)
+      end
+    end
+  end
 end

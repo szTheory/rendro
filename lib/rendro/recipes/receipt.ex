@@ -372,6 +372,8 @@ defmodule Rendro.Recipes.Receipt do
 
   defp validate_data!(data) do
     validate_required_keys!(data)
+    validate_customer!(data.customer)
+    validate_date!(data.date)
     validate_lines!(data.lines)
     maybe_validate_totals!(data)
     :ok
@@ -395,6 +397,32 @@ defmodule Rendro.Recipes.Receipt do
       Next:  Provide all required keys: :title, :date, :customer, :lines.
       """
     end
+  end
+
+  defp validate_customer!(%{name: name}) when is_binary(name), do: :ok
+
+  defp validate_customer!(value) do
+    raise ArgumentError, """
+    Rendro.Recipes.Receipt.document/2 — invalid :customer shape.
+
+    What:  :customer must be a map with a string :name.
+    Where: Rendro.Recipes.Receipt.validate_data!/1
+    Why:   Received: #{inspect(value)} (#{Rendro.Recipes.Pagination.type_name(value)}).
+    Next:  Use %{name: "Acme Corp"}.
+    """
+  end
+
+  defp validate_date!(%Date{}), do: :ok
+
+  defp validate_date!(value) do
+    raise ArgumentError, """
+    Rendro.Recipes.Receipt.document/2 — invalid :date type.
+
+    What:  :date must be a %Date{} struct.
+    Where: Rendro.Recipes.Receipt.validate_data!/1
+    Why:   Received: #{inspect(value)} (#{Rendro.Recipes.Pagination.type_name(value)}).
+    Next:  Use the ~D[YYYY-MM-DD] sigil or Date.new!/3.
+    """
   end
 
   defp validate_lines!(lines) when not is_list(lines) do
