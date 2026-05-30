@@ -1,12 +1,14 @@
 ---
 thread: v24-adoption-scoping
-status: open
+status: resolved
 opened: 2026-05-29
+resolved: 2026-05-30
+resolution: All findings shipped — page primitive (Phase 73), Statement/Receipt/Certificate recipes (Phases 74–75), reference Phoenix app + CI + docs (Phase 76). Open questions answered (primitive folded into v2.4; statement+receipt/report+certificate shipped; reference-app CI lane shipped in-milestone as an isolated non-required job). Closed at v2.4 milestone completion.
 context: Milestone next-step assessment after v2.3 (Hex v0.3.1) shipped
 related: .planning/STATE.md, .planning/PROJECT.md, .planning/ROADMAP.md
 ---
 
-# v2.4 Adoption Scoping — open investigation
+# v2.4 Adoption Scoping — RESOLVED (closed 2026-05-30 at v2.4 close)
 
 Scoping inputs for **v2.4 Batteries-Included Workflow & Adoption Closure**, surfaced by the
 2026-05-29 milestone next-step assessment (direct inspection of `lib/`, `test/`, `examples/`,
