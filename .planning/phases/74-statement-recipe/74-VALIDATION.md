@@ -2,7 +2,9 @@
 phase: 74
 phase_slug: statement-recipe
 created: 2026-05-29
-status: draft
+status: validated
+nyquist_compliant: true
+validated: 2026-05-30
 ---
 
 # Phase 74 Validation Strategy
@@ -79,3 +81,35 @@ Additional load-bearing checks (from D-09/D-10):
 - Locale/currency-aware formatting (the `:formatters` escape hatch is the
   supported i18n path; only the deterministic default formatter is validated).
 - Conventional Debit/Credit display columns (deferred `:columns` ergonomic).
+
+---
+
+## Validation Audit 2026-05-30
+
+Audited via `/gsd-validate-phase 74` (top-level workflow, run as part of phase 77 / plan 77-03). Coverage verified by execution — every behavior V1–V10 and the load-bearing D-09/D-10 checks have a dedicated describe block in `test/rendro/recipes/statement_test.exs` that runs green.
+
+| Behavior | Maps to | Test (`statement_test.exs`) | Status |
+|----------|---------|------------------------------|--------|
+| V1 renderable Document from data map | STMT-01 | `describe "V1: ..."` (line 103) | ✅ green |
+| V2 page count == ceil(rows/capacity) | STMT-02 | `describe "V2: multi-page page count"` (line 153) | ✅ green |
+| V3/V4 carried/brought-forward placement | STMT-02 | `describe "V3/V4: ..."` (line 213) | ✅ green |
+| V5 CF/BF suppression | STMT-02 | `describe "V5: ..."` (line 293) | ✅ green |
+| V6 running balance across breaks (Decimal fold) | STMT-02 | `describe "V6: balance continuity ..."` (line 321) | ✅ green |
+| V7 "Page X of Y" footer every page | STMT-04 | `describe "V7: ..."` (line 383) | ✅ green |
+| V8 malformed input → instructive ArgumentError | STMT-01 | `describe "V8: validate_data!/1 rejects ..."` (line 430) | ✅ green |
+| V9 three-rung override consistency | STMT-03 | `describe "V9: three-rung escape hatch"` (line 527) | ✅ green |
+| V10 deterministic byte-identical render | STMT-02 | `describe "V10: ..."` (line 590) + `deterministic_test.exs` | ✅ green |
+| No `:content_overflow` (D-09) | cross-cutting | `describe "load-bearing: no content_overflow"` (line 619) | ✅ green |
+| Page-grouping invariant (D-10) | STMT-02 | `describe "page-grouping invariant (D-10)"` (line 644) | ✅ green |
+
+| Metric | Count |
+|--------|-------|
+| Behaviors (V1–V10 + load-bearing) | 11 |
+| COVERED (green) | 11 |
+| MISSING | 0 |
+| Gaps found | 0 |
+| Tests generated | 0 (all coverage already present from execution) |
+
+**Test run:** `mix test test/rendro/recipes/statement_test.exs test/rendro/deterministic_test.exs` → **3 properties, 64 tests, 0 failures**.
+
+**Sign-off:** All V1–V10 behaviors and all `validate_data!/1` error branches have automated verification. `nyquist_compliant: true`. Approved 2026-05-30.
