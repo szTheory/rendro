@@ -86,7 +86,7 @@ Plans:
 **Wave 1**
 
 - [x] 79-01-PLAN.md — Contract test: public_api_contract_test.exs with all 4 API-04 sub-assertions (manifest equality, schema, hidden-internals, tier-tag, @spec — @spec starts RED)
-- [ ] 79-02-PLAN.md — @spec backfill: add 2 @spec annotations to lib/rendro/component.ex to turn @spec assertion GREEN
+- [x] 79-02-PLAN.md — @spec backfill: add 2 @spec annotations to lib/rendro/component.ex to turn @spec assertion GREEN
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -142,7 +142,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 78. Public API Surface Definition & Cleanup | v2.5 | 5/5 | Complete    | 2026-05-30 |
-| 79. Public API Contract Enforcement Lane | v2.5 | 1/3 | In Progress|  |
+| 79. Public API Contract Enforcement Lane | v2.5 | 2/3 | In Progress|  |
 | 80. Stability Contract & Migration Docs | v2.5 | 0/0 | Not started | - |
 | 81. Release Hardening | v2.5 | 0/0 | Not started | - |
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 0/0 | Not started | - |
