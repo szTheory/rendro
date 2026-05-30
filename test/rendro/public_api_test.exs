@@ -98,4 +98,34 @@ defmodule Rendro.PublicApiTest do
       assert Code.ensure_loaded?(Rendro.Adapters.Threadline) == true
     end
   end
+
+  describe "full-surface sweep" do
+    @tag :sweep
+    test "full-surface sweep: every :rendro application module is hidden or tagged" do
+      # Ensure conditional adapter modules are compiled and available
+      PublicApi.recompile_conditional_adapters()
+
+      # Get the ground truth: all modules compiled into the :rendro OTP application
+      {:ok, all_modules} = :application.get_key(:rendro, :modules)
+
+      # For each module, check: hidden OR tagged [:stable | :adapter]
+      untagged_visible =
+        Enum.filter(all_modules, fn module ->
+          module_doc =
+            case Code.fetch_docs(module) do
+              {:docs_v1, _, _, _, module_doc, _, _} -> module_doc
+              {:error, _} -> :hidden
+            end
+
+          # Only flag modules that are visible (not :hidden) AND untagged
+          module_doc != :hidden and PublicApi.tier_of(module) == :untagged
+        end)
+
+      assert untagged_visible == [],
+             "Found #{length(untagged_visible)} visible-but-untagged modules. " <>
+               "Each must be tagged @moduledoc tags: [:stable] or [:adapter], " <>
+               "or hidden with @moduledoc false. Offending modules:\n" <>
+               Enum.map_join(untagged_visible, "\n", fn m -> "  #{inspect(m)}" end)
+    end
+  end
 end
