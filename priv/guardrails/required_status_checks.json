@@ -16,7 +16,7 @@
       "semantic_class": "deterministic",
       "ci_job": "test",
       "command": "mix ci",
-      "notes": "Includes mix test (8 docs-contract lanes), format, hex.build, compile --warnings-as-errors, docs, credo, dialyzer. Viewer-evidence schema/lint folded here per Phase 68 D-18 — not a separate required context."
+      "notes": "Includes mix test (11 docs-contract lanes), format, hex.build, compile --warnings-as-errors, docs, credo, dialyzer. Viewer-evidence schema/lint folded here per Phase 68 D-18 — not a separate required context. Public-api contract lane added Phase 79 D-07."
     },
     {
       "name": "signing-live-proof",
