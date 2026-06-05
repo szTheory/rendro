@@ -29,6 +29,8 @@ jobs:
         run: mix ci
 
       - name: Run Release Preflight
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
         run: mix release.preflight
 
       - name: Publish to Hex
