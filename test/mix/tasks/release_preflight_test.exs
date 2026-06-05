@@ -45,7 +45,9 @@ defmodule Mix.Tasks.Release.PreflightTest do
         {"mix", ["ci"]} => {"ci ok", 0},
         {"mix", ["docs.contract"]} => {"docs drifted", 1},
         {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0},
-        {"mix", ["hex.publish", "--dry-run", "--yes"]} => {"dry run ok", 0}
+        {"mix", ["hex.publish", "--dry-run", "--yes"]} => {"dry run ok", 0},
+        {"mix", ["hex.audit"]} => {"hex audit ok", 0},
+        {"mix", ["deps.audit"]} => {"deps audit ok", 0}
       })
 
     Application.put_env(:rendro, :release_preflight_command_runner, runner)
@@ -88,11 +90,11 @@ defmodule Mix.Tasks.Release.PreflightTest do
     File.write!(changelog_path, """
     # Changelog
 
-    ## [0.2.0] - Unreleased
+    ## [0.2.0] - TBD
 
     ### Added
 
-    - protection support without the canonical release-tail pointer
+    - protection support
     """)
 
     on_exit(fn ->
@@ -111,6 +113,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
         Preflight.run_with_context(%{
           project_config: [
             version: "0.2.0",
+            docs: [source_ref: "v0.2.0"],
             package: [licenses: ["Apache-2.0"], links: %{"GitHub" => "https://example.test"}]
           ],
           command_runner: runner,
@@ -122,7 +125,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
 
     assert match?({:error, _}, result)
     assert output =~ "Changelog release tail: FAIL"
-    assert output =~ "CHANGELOG.md is missing the current release-tail protected-delivery pointer"
+    assert output =~ "CHANGELOG.md is missing the current release-tail pointer or date"
     refute output =~ "Phase 2: release parity checks"
     refute_received {:preflight_command, "mix", ["ci"]}
   end

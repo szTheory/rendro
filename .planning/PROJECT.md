@@ -232,4 +232,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-30 — started milestone v2.5 (1.0 Release Capstone). Current Milestone + Strategic Arc updated (Global Text Shaping renumbered to conditional v2.6); Active reset to v2.5 headline requirements (API/STAB/REL). Concrete REQ-IDs in `REQUIREMENTS.md`, phases 78–82 in `ROADMAP.md`. Prior milestone v2.4 archived in `milestones/v2.4-*`. Phase 79 complete (public API contract enforcement lane: introspection-based docs-contract test pins the documented surface to `priv/public_api.json` with an errors-as-product drift diff, asserts hidden-internals + exactly-one tier tag + stable-tier `@spec` coverage, folded into the required `test` CI context per D-07; `@spec` backfill was just 2 specs on `Rendro.Component`). Next: `/gsd-discuss-phase 80` or `/gsd-plan-phase 80` (Stability Contract & Migration Docs / STAB-04).*
+*Last updated: 2026-06-05 — Started discuss phase for Phase 82. Phase 81 is marked complete (with REL-02 and REL-03 rolling over into Phase 82). Next: `/gsd-plan-phase 82`.*

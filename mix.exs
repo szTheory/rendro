@@ -1,7 +1,7 @@
 defmodule Rendro.MixProject do
   use Mix.Project
 
-  @version "0.3.1"
+  @version "1.0.0"
   @source_url "https://github.com/szTheory/rendro"
 
   def project do
@@ -44,7 +44,7 @@ defmodule Rendro.MixProject do
       {:telemetry, "~> 1.4"},
       {:harfbuzz_ex, "~> 1.2"},
       {:unicode_data, "~> 0.8.0"},
-      {:decimal, "~> 2.3"},
+      {:decimal, ">= 2.3.0 and < 4.0.0"},
       {:phoenix, "~> 1.7", optional: true},
       {:plug, "~> 1.14", optional: true},
       {:oban, "~> 2.17", optional: true},
@@ -54,7 +54,8 @@ defmodule Rendro.MixProject do
       {:ex_doc, "~> 0.40", only: [:dev, :test], runtime: false},
       {:req, "~> 0.5", only: [:dev, :test]},
       {:jsv, "~> 0.18", only: [:dev, :test], runtime: false},
-      {:yaml_elixir, "~> 2.12", only: [:dev, :test], runtime: false}
+      {:yaml_elixir, "~> 2.12", only: [:dev, :test], runtime: false},
+      {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -104,6 +105,7 @@ defmodule Rendro.MixProject do
         "lib/rendro/font_registry.ex",
         "lib/rendro.ex"
       ],
+      source_ref: "v#{@version}",
       source_url: @source_url,
       extras: [
         "README.md",

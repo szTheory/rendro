@@ -11,7 +11,9 @@ defmodule Mix.Tasks.Release.Preflight do
     {"CI", ["ci"]},
     {"Docs Contract", ["docs.contract"]},
     {"Hex Build Unpack", ["hex.build", "--unpack"]},
-    {"Hex Publish Dry Run", ["hex.publish", "--dry-run", "--yes"]}
+    {"Hex Publish Dry Run", ["hex.publish", "--dry-run", "--yes"]},
+    {"Hex Audit", ["hex.audit"]},
+    {"Deps Audit", ["deps.audit"]}
   ]
 
   def run(_args) do
@@ -34,6 +36,7 @@ defmodule Mix.Tasks.Release.Preflight do
       check_clean_worktree(context),
       check_exact_tag(context, version),
       check_package_metadata(context.project_config),
+      check_source_ref_parity(context, version),
       check_changelog_release_tail(context),
       check_hex_artifacts(context, version)
     ]
@@ -124,18 +127,13 @@ defmodule Mix.Tasks.Release.Preflight do
     version = context.project_config[:version]
 
     with {:ok, changelog} <- File.read(changelog_path),
-         true <- String.contains?(changelog, "## [#{version}] - Unreleased"),
-         true <-
-           String.contains?(
-             changelog,
-             "`render_to_artifact -> Protect.password -> store/deliver`"
-           ) do
+         true <- Regex.match?(~r/## \[#{version}\] - (\d{4}-\d{2}-\d{2}|Unreleased)/, changelog) do
       pass("Changelog release tail")
     else
       false ->
         fail(
           "Changelog release tail",
-          "CHANGELOG.md is missing the current release-tail protected-delivery pointer"
+          "CHANGELOG.md is missing the current release-tail pointer or date"
         )
 
       {:error, reason} ->
@@ -162,20 +160,55 @@ defmodule Mix.Tasks.Release.Preflight do
             File.exists?(Path.join(dir, file))
           end)
 
+        forbidden_paths = [
+          "priv/support_matrix.json",
+          "priv/viewer_evidence/",
+          "priv/guardrails/",
+          "scripts/",
+          "test/"
+        ]
+
+        leaked_files =
+          Enum.filter(forbidden_paths, fn path ->
+            File.exists?(Path.join(dir, path))
+          end)
+
         File.rm_rf!(dir)
         File.rm(dir <> ".tar")
 
-        if missing_files == [] do
-          pass("Hex Build Artifacts")
-        else
-          fail(
-            "Hex Build Artifacts",
-            "missing files in unpacked artifact: #{Enum.join(missing_files, ", ")}"
-          )
+        cond do
+          missing_files != [] ->
+            fail(
+              "Hex Build Artifacts",
+              "missing files in unpacked artifact: #{Enum.join(missing_files, ", ")}"
+            )
+
+          leaked_files != [] ->
+            fail(
+              "Hex Build Artifacts",
+              "forbidden files leaked into unpacked artifact: #{Enum.join(leaked_files, ", ")}"
+            )
+
+          true ->
+            pass("Hex Build Artifacts")
         end
 
       {output, status} ->
         fail("Hex Build Artifacts", "hex.build failed (#{status})\n#{output}")
+    end
+  end
+
+  defp check_source_ref_parity(context, version) do
+    docs_config = context.project_config[:docs] || []
+    expected_ref = "v#{version}"
+
+    if docs_config[:source_ref] == expected_ref do
+      pass("Source Ref Parity")
+    else
+      fail(
+        "Source Ref Parity",
+        "expected docs[:source_ref] to be #{expected_ref}, got #{inspect(docs_config[:source_ref])}"
+      )
     end
   end
 

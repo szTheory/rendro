@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.5
 milestone_name: 1.0 Release Capstone
-status: verifying
-last_updated: "2026-05-30T19:33:09.484Z"
-last_activity: 2026-05-30
+status: discussing
+last_updated: "2026-06-05T14:30:00.000Z"
+last_activity: 2026-06-05
 progress:
   total_phases: 5
-  completed_phases: 3
-  total_plans: 12
-  completed_plans: 12
-  percent: 60
+  completed_phases: 4
+  total_plans: 13
+  completed_plans: 13
+  percent: 80
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-30 after v2.4 milestone shipped)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 80 — stability-contract-migration-docs
+**Current focus:** Phase 82 — 1.0.0-consolidation-and-publish
 
 ## Current Position
 
-Phase: 80 (stability-contract-migration-docs) — EXECUTING
-Plan: 4 of 4
-Status: Phase complete — ready for verification
-Last activity: 2026-05-30
+Phase: 82 (1.0.0-consolidation-and-publish) — DISCUSSING
+Plan: 0 of 0
+Status: Context gathered — ready for planning
+Last activity: 2026-06-05
 Resume file: None
 
 ## Milestone Snapshot

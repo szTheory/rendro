@@ -5,11 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.3.1] - Unreleased
+## [1.0.0] - 2026-06-05
 
-This release lands the v2.3 Viewer Evidence milestone onto Hex. The published `0.3.0` surface lifted v1.5–v2.2 work but left per-viewer evidence as the next milestone with trust-sensitive viewer rows recorded as `unverified`. Phase 71 closes all trust-sensitive viewer cells as `supported` with CI structural-proxy evidence or `explicit_deferral` with named reasons — zero bare `unverified` rows remain in those surfaces. Operator-only evidence artifacts (`priv/viewer_evidence/` and `priv/support_matrix.json`) intentionally remain out of the Hex package; the public contract is mirrored in `guides/api_stability.md`.
+This release marks the `1.0.0` milestone, establishing the first formal SemVer commitment. It consolidates the v2.3 Viewer Evidence work, the v2.4 Batteries-Included workflow features, and the v2.5 API stability cleanup.
+
+The published `0.3.0` surface lifted v1.5–v2.2 work. This 1.0.0 release closes out the remaining core milestones. Operator-only evidence artifacts (`priv/viewer_evidence/` and `priv/support_matrix.json`) intentionally remain out of the Hex package; the public contract is mirrored in `guides/api_stability.md`.
+
+### Stability
+
+For details on the two-tier stability contract, the byte-output carve-out, and the soft-deprecation policy, see the [Upgrading to 1.0 guide](guides/upgrading_to_1.0.md).
 
 ### Added
+
+#### API Stability & Surface (v2.5)
+
+- Formal two-tier SemVer contract (`stable` and `adapter`).
+- `priv/public_api.json` manifest as the canonical source of truth for the public API surface.
+- ExDoc stability badges for all public modules.
+- Introspection-based docs-contract tests to mechanically pin the documented surface to the manifest.
+
+#### Batteries-Included Workflow (v2.4)
+
+- `Rendro.Page` primitive for explicit page-level content control.
+- Five canonical, tested recipes: `Rendro.Recipes.Invoice`, `BrandedInvoice`, `Statement`, `Receipt`, and `Certificate`.
+- Reference Phoenix application (`examples/phoenix_example`) demonstrating integration, async delivery, and testing.
 
 #### Viewer Evidence (v2.3)
 
@@ -28,6 +47,14 @@ This release lands the v2.3 Viewer Evidence milestone onto Hex. The published `0
 - Explicit deferrals for `forms.viewers.pdfjs`, `forms.signature_widget_viewers.pdfjs`, `signing_preparation.viewers.pdfjs`, `signing.viewers.apple_preview`, `signing.viewers.pdfjs`, `signing.long_lived.viewers.{apple_preview,chrome_pdfium,pdfjs}`, and `embedded_files.viewers.apple_preview` with named reasons in `priv/support_matrix.json`.
 
 ### Changed
+
+#### API Cleanup & Normalization (v2.5)
+
+- Accidentally-public internals (`Rendro.PDF.CidFont`, `Rendro.PDF.FontSubsetter`, `Rendro.Sign.redact_*`, `Rendro.Protect.redact_*`) are now hidden (`@moduledoc false` or `@doc false`).
+- `Rendro.Metadata` is now fully documented with a public `@type t`.
+- Recipe options (`sections/2`) for `Invoice` and `BrandedInvoice` correctly thread options instead of silently ignoring them.
+
+#### Viewer Evidence (v2.3)
 
 - Document viewer-evidence CHANGELOG discipline in `guides/api_stability.md` — promotions, explicit deferrals, and legacy re-homes require CHANGELOG entries; re-validations refresh `recorded_at` in the log.
 - Re-home `forms.viewers.apple_preview` evidence to `priv/viewer_evidence/forms/apple_preview.md` (**support status unchanged** since v1.8 Phase 47).
