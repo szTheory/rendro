@@ -212,8 +212,8 @@ defmodule Rendro.Recipes.CertificateTest do
     test "sections/2 returns list of %Rendro.Section{} without calling document/2" do
       sections = Certificate.sections(fixture_data())
       assert is_list(sections)
-      assert sections != []
       assert Enum.all?(sections, &match?(%Rendro.Section{}, &1))
+      assert sections != []
     end
   end
 
