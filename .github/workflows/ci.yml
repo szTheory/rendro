@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@5304e04ea2b155300f60bf5f51276082f1bbaec1 # v1.18.2
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
@@ -33,10 +33,10 @@ jobs:
     # no `needs:` -> graph-disconnected (D-09); no continue-on-error (D-10)
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@5304e04ea2b155300f60bf5f51276082f1bbaec1 # v1.18.2
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
@@ -53,10 +53,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@5304e04ea2b155300f60bf5f51276082f1bbaec1 # v1.18.2
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
@@ -107,10 +107,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@5304e04ea2b155300f60bf5f51276082f1bbaec1 # v1.18.2
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
@@ -141,10 +141,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@5304e04ea2b155300f60bf5f51276082f1bbaec1 # v1.18.2
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
@@ -176,10 +176,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@5304e04ea2b155300f60bf5f51276082f1bbaec1 # v1.18.2
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
