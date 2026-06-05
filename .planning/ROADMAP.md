@@ -36,7 +36,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 - [x] **Phase 79: Public API Contract Enforcement Lane** - An introspection-based docs-contract test asserts documented surface == manifest (drift fails CI), wired into required status checks (completed 2026-05-30)
 - [x] **Phase 80: Stability Contract & Migration Docs** - Two-tier SemVer contract + byte-output carve-out + soft-deprecation policy, `upgrading_to_1.0.md`, internal-label scrub, Tier-1 claims test (completed 2026-05-30)
 - [ ] **Phase 81: Release Hardening** - Bump to 1.0.0, allowlist tarball audit + hex.audit/deps.audit, fix the CHANGELOG self-block, SHA-pin the publish lane
-- [ ] **Phase 82: 1.0.0 Consolidation & Publish** - Write the consolidated `## [1.0.0]` CHANGELOG, then the irreversible proof-gated publish (hex package + docs, GitHub Release, post-publish verification)
+- [ ] **Phase 82: 1.0.0 Consolidation & Publish** - Write the consolidated `## [1.0.0]` CHANGELOG, then the irreversible proof-gated publish
 
 ## Phase Details
 
@@ -148,7 +148,16 @@ Plans:
 
 **Notes**: This is the final, IRREVERSIBLE phase. Hex `1.0.0` is permanent once the ~60-minute retirement window closes — there is no second attempt at the same version. Execute only after every required CI lane (docs-contract incl. the new public-api lane from Phase 79 + the api-stability lane from Phase 80, `signing-live-proof`, `long-lived-live-proof`, `release-proof`, `test`) is green and the Phase 81 preflight passes against the dated 1.0.0 CHANGELOG. The publish is tag-triggered and proof-gated by design; the `mix hex.publish` step is the point of no return.
 
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+**Wave 1**
+- [ ] 82-01-PLAN.md — Preflight Artifact & Parity Checks (Fixing REL-02, REL-03)
+
+**Wave 2** *(blocked on 82-01 completion)*
+- [ ] 82-02-PLAN.md — 1.0.0 Version & Changelog Consolidation (REL-04, REL-06)
+
+**Wave 3** *(blocked on 82-02 completion)*
+- [ ] 82-03-PLAN.md — Irreversible Hex Publish Checkpoint (REL-06)
 
 ## Progress
 
@@ -157,7 +166,7 @@ Plans:
 | 78. Public API Surface Definition & Cleanup | v2.5 | 5/5 | Complete    | 2026-05-30 |
 | 79. Public API Contract Enforcement Lane | v2.5 | 3/3 | Complete    | 2026-05-30 |
 | 80. Stability Contract & Migration Docs | v2.5 | 4/4 | Complete   | 2026-05-30 |
-| 81. Release Hardening | v2.5 | 0/0 | Not started | - |
+| 81. Release Hardening | v2.5 | 1/1 | Complete    | 2026-06-05 |
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 0/0 | Not started | - |
 
 ---
