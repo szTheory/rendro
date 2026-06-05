@@ -47,7 +47,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
         {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0},
         {"mix", ["hex.publish", "--dry-run", "--yes"]} => {"dry run ok", 0},
         {"mix", ["hex.audit"]} => {"hex audit ok", 0},
-        {"mix", ["deps.audit"]} => {"deps audit ok", 0}
+        {"mix", ["deps.audit", "--ignore-file", ".mix_audit.ignore"]} => {"deps audit ok", 0}
       })
 
     Application.put_env(:rendro, :release_preflight_command_runner, runner)

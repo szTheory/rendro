@@ -13,7 +13,7 @@ defmodule Mix.Tasks.Release.Preflight do
     {"Hex Build Unpack", ["hex.build", "--unpack"]},
     {"Hex Publish Dry Run", ["hex.publish", "--dry-run", "--yes"]},
     {"Hex Audit", ["hex.audit"]},
-    {"Deps Audit", ["deps.audit"]}
+    {"Deps Audit", ["deps.audit", "--ignore-file", ".mix_audit.ignore"]}
   ]
 
   def run(_args) do
