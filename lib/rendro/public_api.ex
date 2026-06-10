@@ -4,6 +4,7 @@ defmodule Rendro.PublicApi do
   # Do NOT call from application code.
 
   @adapter_files [
+    "lib/rendro/adapters/harfbuzz.ex",
     "lib/rendro/adapters/threadline.ex",
     "lib/rendro/adapters/mailglass.ex",
     "lib/rendro/adapters/accrue.ex",

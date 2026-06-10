@@ -86,7 +86,6 @@ defmodule Rendro.DocsContract.PublicApiContractTest do
         Rendro.PDF.CidFont,
         Rendro.PDF.FontSubsetter,
         Rendro.Text.Bidi,
-        Rendro.Text.Shaper,
         Rendro.Format,
         Rendro.Audit
       ]

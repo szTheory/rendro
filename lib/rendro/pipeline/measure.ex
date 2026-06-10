@@ -604,29 +604,33 @@ defmodule Rendro.Pipeline.Measure do
                                                                     {:ok, {lines, current_line}} ->
         case find_font_for_grapheme(grapheme, font_chain) do
           {:ok, font} ->
-            {:ok, glyphs} = Rendro.Text.Shaper.shape(font, grapheme)
+            case Rendro.Text.Shaper.shape(font, grapheme) do
+              {:ok, glyphs} ->
+                width =
+                  glyphs
+                  |> Enum.reduce(0, fn g, acc -> acc + g.x_advance end)
+                  |> Kernel.*(font_size / font.units_per_em)
 
-            width =
-              glyphs
-              |> Enum.reduce(0, fn g, acc -> acc + g.x_advance end)
-              |> Kernel.*(font_size / font.units_per_em)
+                grapheme_run = [%{font: font, text: grapheme, width: width}]
 
-            grapheme_run = [%{font: font, text: grapheme, width: width}]
+                candidate_line = merge_runs(current_line, grapheme_run)
 
-            candidate_line = merge_runs(current_line, grapheme_run)
+                cond do
+                  current_line == [] and width <= max_width ->
+                    {:cont, {:ok, {lines, candidate_line}}}
 
-            cond do
-              current_line == [] and width <= max_width ->
-                {:cont, {:ok, {lines, candidate_line}}}
+                  current_line == [] ->
+                    {:cont, {:ok, {[candidate_line | lines], []}}}
 
-              current_line == [] ->
-                {:cont, {:ok, {[candidate_line | lines], []}}}
+                  runs_width(candidate_line) <= max_width ->
+                    {:cont, {:ok, {lines, candidate_line}}}
 
-              runs_width(candidate_line) <= max_width ->
-                {:cont, {:ok, {lines, candidate_line}}}
+                  true ->
+                    {:cont, {:ok, {[current_line | lines], grapheme_run}}}
+                end
 
-              true ->
-                {:cont, {:ok, {[current_line | lines], grapheme_run}}}
+              {:error, reason} ->
+                {:halt, {:error, reason}}
             end
 
           :error ->
@@ -662,19 +666,26 @@ defmodule Rendro.Pipeline.Measure do
       Enum.reduce_while(bidi_runs, {:ok, []}, fn bidi_run, {:ok, acc_runs} ->
         case resolve_fonts_for_run(bidi_run.text, font_chain) do
           {:ok, font_runs} ->
-            measured =
-              Enum.map(font_runs, fn {font, sub_text} ->
-                {:ok, glyphs} = Rendro.Text.Shaper.shape(font, sub_text)
+            measured_result =
+              Enum.reduce_while(font_runs, {:ok, []}, fn {font, sub_text}, {:ok, run_acc} ->
+                case Rendro.Text.Shaper.shape(font, sub_text, script: bidi_run.script) do
+                  {:ok, glyphs} ->
+                    width =
+                      glyphs
+                      |> Enum.reduce(0, fn g, acc -> acc + g.x_advance end)
+                      |> Kernel.*(font_size / font.units_per_em)
 
-                width =
-                  glyphs
-                  |> Enum.reduce(0, fn g, acc -> acc + g.x_advance end)
-                  |> Kernel.*(font_size / font.units_per_em)
+                    {:cont, {:ok, run_acc ++ [%{font: font, text: sub_text, width: width}]}}
 
-                %{font: font, text: sub_text, width: width}
+                  {:error, _reason} = err ->
+                    {:halt, err}
+                end
               end)
 
-            {:cont, {:ok, acc_runs ++ measured}}
+            case measured_result do
+              {:ok, measured} -> {:cont, {:ok, acc_runs ++ measured}}
+              {:error, _} = err -> {:halt, err}
+            end
 
           {:error, _} = err ->
             {:halt, err}
