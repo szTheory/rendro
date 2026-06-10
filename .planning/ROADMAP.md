@@ -121,7 +121,21 @@ Plans:
   3. The raster advisory CI lane (`needs: []`, graph-disconnected) runs in CI but never gates the four required engine lanes (`signing-live-proof`, `long-lived-live-proof`, `release-proof`, `test`); a pdfium-cli download failure cannot block engine merges.
   4. `priv/support_matrix.json` and evidence files use `viewer_kind: "pdfium-render"` for raster evidence; a docs-contract guard prevents raster evidence from upgrading GUI-viewer claims (Adobe/Preview rows remain structural proxies).
 
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 85-01-PLAN.md — Wave 0 test scaffolding: pdfium_raster_snapshot_test.exs stubs, raster_claims_test.exs stubs, pdfium_pin.json, raster_refs/.gitkeep
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 85-02-PLAN.md — render/2 implementation in pdfium.ex + pdfium_test.exs render unit tests
+- [ ] 85-03-PLAN.md — Atomic dual-schema sync (viewer_kind enum + @viewer_kinds) + support_matrix.json raster section
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 85-04-PLAN.md — Advisory CI lane (raster-advisory) + guardrails registration + verify_docs.exs lane entry
 
 ### Phase 86: Self-Proving Launch Artifacts
 
