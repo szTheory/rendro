@@ -32,7 +32,7 @@ defmodule Rendro.Text.ScriptTags do
   def to_opentype_tag(:nabataean), do: :nbat
   def to_opentype_tag(:old_north_arabian), do: :narb
   def to_opentype_tag(:old_south_arabian), do: :sarb
-  def to_opentype_tag(:old_turkic), do: :otk
+  def to_opentype_tag(:old_turkic), do: :orkh
   def to_opentype_tag(:palmyrene), do: :palm
   def to_opentype_tag(:psalter_pahlavi), do: :phlp
   def to_opentype_tag(:inscriptional_pahlavi), do: :phli
@@ -161,7 +161,6 @@ defmodule Rendro.Text.ScriptTags do
   def to_opentype_tag(:ahom), do: :ahom
   def to_opentype_tag(:anatolian_hieroglyphs), do: :hluw
   def to_opentype_tag(:braille), do: :brai
-  def to_opentype_tag(:byzantine_music), do: :byzm
   def to_opentype_tag(:carian), do: :cari
   def to_opentype_tag(:cham), do: :cham
   def to_opentype_tag(:coptic), do: :copt
@@ -185,7 +184,7 @@ defmodule Rendro.Text.ScriptTags do
   def to_opentype_tag(:signwriting), do: :sgnw
   def to_opentype_tag(:tifinagh), do: :tfng
   def to_opentype_tag(:ugaritic), do: :ugar
-  def to_opentype_tag(:bhaisuki), do: :bhks
+  def to_opentype_tag(:bhaiksuki), do: :bhks
 
   # Fallback: pass atom through unchanged
   # Prevents crashes on scripts not in the table

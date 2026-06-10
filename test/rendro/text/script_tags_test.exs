@@ -116,5 +116,39 @@ defmodule Rendro.Text.ScriptTagsTest do
       assert ScriptTags.to_opentype_tag(:unknown_script) == :unknown_script
       assert ScriptTags.to_opentype_tag(:some_made_up_script) == :some_made_up_script
     end
+
+    test "maps :old_turkic to the registered OpenType tag :orkh (WR-05)" do
+      assert ScriptTags.to_opentype_tag(:old_turkic) == :orkh
+    end
+
+    test "maps :bhaiksuki (the real Unicode script atom) to :bhks (WR-05)" do
+      # Unicode.script(0x11C00) == :bhaiksuki — the previous :bhaisuki clause
+      # head was a typo and therefore unreachable dead code.
+      assert Unicode.script(0x11C00) == :bhaiksuki
+      assert ScriptTags.to_opentype_tag(:bhaiksuki) == :bhks
+    end
+  end
+
+  describe "clause-head hygiene (WR-05)" do
+    test "every explicit clause head is a script atom Unicode.Script.scripts/0 can return" do
+      # Parse the clause heads out of the source so a future typo'd clause
+      # (e.g. :bhaisuki) or a non-script atom (e.g. the :byzantine_music
+      # block name) is caught as unreachable dead code.
+      source = File.read!("lib/rendro/text/script_tags.ex")
+
+      clause_heads =
+        Regex.scan(~r/def to_opentype_tag\(:([a-z_0-9]+)\)/, source)
+        |> Enum.map(fn [_, name] -> String.to_atom(name) end)
+
+      assert clause_heads != []
+
+      known_scripts = Unicode.Script.scripts() |> Map.keys() |> MapSet.new()
+
+      unreachable = Enum.reject(clause_heads, &MapSet.member?(known_scripts, &1))
+
+      assert unreachable == [],
+             "ScriptTags clause heads that Unicode.script/1 can never return " <>
+               "(dead code / typos): #{inspect(unreachable)}"
+    end
   end
 end
