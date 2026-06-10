@@ -37,7 +37,8 @@ defmodule Rendro do
     :reference
   ]
 
-  @type render_option :: {:output, Path.t()} | {:deterministic, boolean()}
+  @type render_option ::
+          {:output, Path.t()} | {:deterministic, boolean()} | {:shaper, module()}
   @type render_options :: [render_option()]
 
   @spec render(Document.t(), render_options()) :: {:ok, binary()} | {:error, Rendro.Error.t()}
@@ -85,6 +86,17 @@ defmodule Rendro do
       if Keyword.get(opts, :deterministic, false),
         do: [deterministic: true],
         else: []
+
+    # Per-render shaper override (D-01). Precedence at the shaping seam:
+    # per-render opt > app config (:rendro, :shaper) > Shaper.Simple default.
+    render_opts =
+      case Keyword.fetch(opts, :shaper) do
+        {:ok, shaper} when is_atom(shaper) and not is_nil(shaper) ->
+          Keyword.put(render_opts, :shaper, shaper)
+
+        _ ->
+          render_opts
+      end
 
     doc = put_in(doc.options[:render], render_opts)
 

@@ -1,3 +1,19 @@
+defmodule Rendro.Text.ShaperTest.ConfigShaper do
+  @moduledoc false
+  @behaviour Rendro.Text.Shaper
+
+  @impl Rendro.Text.Shaper
+  def shape(_font, _text, _opts), do: {:error, :config_shaper_called}
+end
+
+defmodule Rendro.Text.ShaperTest.OverrideShaper do
+  @moduledoc false
+  @behaviour Rendro.Text.Shaper
+
+  @impl Rendro.Text.Shaper
+  def shape(_font, _text, _opts), do: {:error, :override_shaper_called}
+end
+
 defmodule Rendro.Text.ShaperTest do
   # async: false required — setup uses Application.delete_env to test default (no-config) behavior.
   use ExUnit.Case, async: false
@@ -62,6 +78,44 @@ defmodule Rendro.Text.ShaperTest do
       }
 
       assert {:ok, _glyphs} = Shaper.shape(font, "Hi")
+    end
+  end
+
+  describe "per-render shaper override (D-01 / CR-02)" do
+    test "per-render :shaper render option wins over app config" do
+      Application.put_env(:rendro, :shaper, Rendro.Text.ShaperTest.ConfigShaper)
+      doc = Rendro.flow([Rendro.block(Rendro.text("Hello"))])
+
+      assert {:error, %Rendro.Error{stage: :measure, reason: :override_shaper_called}} =
+               Rendro.render(doc, shaper: Rendro.Text.ShaperTest.OverrideShaper)
+    end
+
+    test "app config wins over the Simple default when no per-render option is given" do
+      Application.put_env(:rendro, :shaper, Rendro.Text.ShaperTest.ConfigShaper)
+      doc = Rendro.flow([Rendro.block(Rendro.text("Hello"))])
+
+      assert {:error, %Rendro.Error{stage: :measure, reason: :config_shaper_called}} =
+               Rendro.render(doc)
+    end
+
+    test "shape/3 honors opts[:shaper] directly over app config" do
+      Application.put_env(:rendro, :shaper, Rendro.Text.ShaperTest.ConfigShaper)
+
+      font = %Rendro.PDF.Font{
+        source: :built_in,
+        name: "Helvetica",
+        base_font: "Helvetica",
+        subtype: :type1,
+        units_per_em: 1000,
+        ascent: 718,
+        descent: -207,
+        default_width: 500,
+        widths: %{},
+        cmap: nil
+      }
+
+      assert {:error, :override_shaper_called} =
+               Shaper.shape(font, "Hi", shaper: Rendro.Text.ShaperTest.OverrideShaper)
     end
   end
 

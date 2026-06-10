@@ -62,7 +62,8 @@ defmodule Rendro.Pipeline.Measure do
 
   defp measure_block(doc, %Rendro.Block{content: %Rendro.Text{} = text} = block, _container_width) do
     with {:ok, font_chain} <- resolve_font_chain(doc, text),
-         {:ok, lines} <- wrap_text(text.content, block.width, font_chain, text.size) do
+         {:ok, lines} <-
+           wrap_text(text.content, block.width, font_chain, text.size, shape_opts(doc)) do
       measured_width = measured_text_width(lines)
       width = block.width || measured_width
       measured_height = text.size * text.line_height * length(lines)
@@ -503,31 +504,42 @@ defmodule Rendro.Pipeline.Measure do
 
   defp body_capacity(_layout), do: 0
 
-  defp wrap_text(text, nil, font_chain, font_size) do
+  # Builds the keyword opts forwarded to Rendro.Text.Shaper.shape/3 for this
+  # render. Carries the per-render :shaper override (D-01) when present in
+  # doc.options[:render]; precedence is resolved inside Shaper.shape/3
+  # (per-render opt > app config > Shaper.Simple default).
+  defp shape_opts(%Rendro.Document{options: options}) do
+    case options[:render][:shaper] do
+      nil -> []
+      shaper when is_atom(shaper) -> [shaper: shaper]
+    end
+  end
+
+  defp wrap_text(text, nil, font_chain, font_size, shape_opts) do
     text
     |> String.split("\n", trim: false)
     |> Enum.reduce_while({:ok, []}, fn segment, {:ok, lines} ->
-      case measure_text_into_runs(segment, font_chain, font_size) do
+      case measure_text_into_runs(segment, font_chain, font_size, shape_opts) do
         {:ok, runs} -> {:cont, {:ok, lines ++ [runs]}}
         err -> {:halt, err}
       end
     end)
   end
 
-  defp wrap_text(text, max_width, font_chain, font_size) do
+  defp wrap_text(text, max_width, font_chain, font_size, shape_opts) do
     text
     |> String.split("\n", trim: false)
     |> Enum.reduce_while({:ok, []}, fn segment, {:ok, lines} ->
-      case wrap_segment(segment, max_width, font_chain, font_size) do
+      case wrap_segment(segment, max_width, font_chain, font_size, shape_opts) do
         {:ok, segment_lines} -> {:cont, {:ok, lines ++ segment_lines}}
         err -> {:halt, err}
       end
     end)
   end
 
-  defp wrap_segment("", _max_width, _font_chain, _font_size), do: {:ok, [[]]}
+  defp wrap_segment("", _max_width, _font_chain, _font_size, _shape_opts), do: {:ok, [[]]}
 
-  defp wrap_segment(segment, max_width, font_chain, font_size) do
+  defp wrap_segment(segment, max_width, font_chain, font_size, shape_opts) do
     chunks = Regex.scan(~r/\s+|\S+/, segment) |> List.flatten()
 
     case chunks do
@@ -535,19 +547,20 @@ defmodule Rendro.Pipeline.Measure do
         {:ok, [[]]}
 
       [chunk | rest] ->
-        with {:ok, split_lines} <- split_chunk(chunk, max_width, font_chain, font_size),
+        with {:ok, split_lines} <-
+               split_chunk(chunk, max_width, font_chain, font_size, shape_opts),
              {:ok, wrapped_lines} <-
-               wrap_chunks(split_lines, rest, max_width, font_chain, font_size) do
+               wrap_chunks(split_lines, rest, max_width, font_chain, font_size, shape_opts) do
           {:ok, wrapped_lines}
         end
     end
   end
 
-  defp wrap_chunks(lines, chunks, max_width, font_chain, font_size) do
+  defp wrap_chunks(lines, chunks, max_width, font_chain, font_size, shape_opts) do
     Enum.reduce_while(chunks, {:ok, lines}, fn chunk, {:ok, acc_lines} ->
       {leading_lines, [current_line]} = Enum.split(acc_lines, length(acc_lines) - 1)
 
-      case measure_text_into_runs(chunk, font_chain, font_size) do
+      case measure_text_into_runs(chunk, font_chain, font_size, shape_opts) do
         {:ok, chunk_runs} ->
           candidate_line = merge_runs(current_line, chunk_runs)
           candidate_width = runs_width(candidate_line)
@@ -555,7 +568,7 @@ defmodule Rendro.Pipeline.Measure do
           if candidate_width <= max_width do
             {:cont, {:ok, leading_lines ++ [candidate_line]}}
           else
-            case split_chunk(chunk, max_width, font_chain, font_size) do
+            case split_chunk(chunk, max_width, font_chain, font_size, shape_opts) do
               {:ok, chunk_lines} ->
                 {:cont, {:ok, acc_lines ++ chunk_lines}}
 
@@ -570,13 +583,13 @@ defmodule Rendro.Pipeline.Measure do
     end)
   end
 
-  defp split_chunk(chunk, max_width, font_chain, font_size) do
-    case measure_text_into_runs(chunk, font_chain, font_size) do
+  defp split_chunk(chunk, max_width, font_chain, font_size, shape_opts) do
+    case measure_text_into_runs(chunk, font_chain, font_size, shape_opts) do
       {:ok, chunk_runs} ->
         if runs_width(chunk_runs) <= max_width do
           {:ok, [chunk_runs]}
         else
-          split_graphemes(chunk, max_width, font_chain, font_size)
+          split_graphemes(chunk, max_width, font_chain, font_size, shape_opts)
         end
 
       err ->
@@ -605,7 +618,7 @@ defmodule Rendro.Pipeline.Measure do
   # to a grapheme and behaviour is identical to the old per-grapheme loop. Under
   # Rendro.Adapters.HarfBuzz (cluster=byte offset), ligature clusters are treated as
   # atomic units for line-breaking. The per-grapheme shaping call is gone.
-  defp split_graphemes(text, max_width, font_chain, font_size) do
+  defp split_graphemes(text, max_width, font_chain, font_size, shape_opts) do
     graphemes = String.graphemes(text)
 
     # Step 1: Resolve font for each grapheme, accumulating into font-homogeneous runs.
@@ -637,7 +650,11 @@ defmodule Rendro.Pipeline.Measure do
                 _ -> :latn
               end
 
-            case Rendro.Text.Shaper.shape(font, run_text, script: script) do
+            case Rendro.Text.Shaper.shape(
+                   font,
+                   run_text,
+                   Keyword.put(shape_opts, :script, script)
+                 ) do
               {:ok, glyphs} ->
                 cluster_structs =
                   glyphs_to_cluster_runs(glyphs, run_text, font, font_size)
@@ -750,7 +767,7 @@ defmodule Rendro.Pipeline.Measure do
     |> Enum.max(fn -> 0 end)
   end
 
-  defp measure_text_into_runs(text, font_chain, font_size) do
+  defp measure_text_into_runs(text, font_chain, font_size, shape_opts) do
     bidi_runs = Rendro.Text.Bidi.split_runs(text)
 
     result =
@@ -759,7 +776,11 @@ defmodule Rendro.Pipeline.Measure do
           {:ok, font_runs} ->
             measured_result =
               Enum.reduce_while(font_runs, {:ok, []}, fn {font, sub_text}, {:ok, run_acc} ->
-                case Rendro.Text.Shaper.shape(font, sub_text, script: bidi_run.script) do
+                case Rendro.Text.Shaper.shape(
+                       font,
+                       sub_text,
+                       Keyword.put(shape_opts, :script, bidi_run.script)
+                     ) do
                   {:ok, glyphs} ->
                     width =
                       glyphs
