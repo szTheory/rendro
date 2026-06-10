@@ -34,6 +34,10 @@ findings:
   info: 6
   total: 18
 status: issues_found
+fixes_applied: 12
+fixed_at: 2026-06-10T00:00:00Z
+fix_scope: critical_warning
+fix_status: all_critical_and_warning_fixed
 ---
 
 # Phase 83: Code Review Report
@@ -42,6 +46,19 @@ status: issues_found
 **Depth:** standard
 **Files Reviewed:** 24
 **Status:** issues_found
+
+## Fix Summary (2026-06-10)
+
+All 5 Critical and all 7 Warning findings fixed (Info findings out of scope). One
+atomic commit per finding (`fix(83): <id> ...`); WR-01 was resolved by CR-01's
+commit. Full suite (`mix compile --warnings-as-errors && mix test`) green at
+every commit — now 1022 tests, 0 failures, running under the default
+`Shaper.Simple` path. Public surface changes (`shape/3` on Simple/HarfBuzz,
+`{:shaper, module()}` render option) covered by a regenerated
+`priv/public_api.json`. One sub-item deferred upstream: real glyph ids in the
+HarfBuzz adapter (CR-04) — `harfbuzz_ex` 1.2 exposes no gid/cluster fields; see
+the CR-04 resolution note. Per-finding `**Resolution:**` notes follow each
+finding below.
 
 ## Summary
 
@@ -72,6 +89,8 @@ end
 ```
 If embedded shaping must remain HarfBuzz-only, then the moduledoc, `latin_and_cjk` matrix row, and branded recipes must all change, and the error must name the actual script (see WR-01) — but that contradicts the recipes' stable contract, so shaping embedded fonts in Simple is the correct fix.
 
+**Resolution:** fixed in `b9356de` — `do_shape/2` now matches `source in [:built_in, :embedded]` (widths/default_width are populated by `Font.embedded/1`); the embedded rejection clause is gone. The D-07 script gate still applies to embedded fonts. Tests: embedded Latin shapes under Simple; embedded + `:arab` still gated.
+
 ### CR-02: Stable-tier moduledoc documents a per-render `shaper:` override that does not exist
 
 **File:** `lib/rendro/text/shaper.ex:13-15`
@@ -84,6 +103,8 @@ If embedded shaping must remain HarfBuzz-only, then the moduledoc, `latin_and_cj
 No such option exists. `Rendro.render_option` is `{:output, Path.t()} | {:deterministic, boolean()}` (`lib/rendro.ex:40`), nothing in `lib/rendro.ex` or `lib/rendro/pipeline.ex` reads a `:shaper` option, and `Shaper.impl/0` reads only `Application.get_env(:rendro, :shaper, ...)`. A user following the stable-tier docs passes a silently-ignored option and still gets `shaping_required` errors (or, worse, believes complex-script output is HarfBuzz-shaped when it is not). This is a documented stable API that was never implemented — a direct claim-accuracy failure on the new public surface.
 **Fix:** Either implement the option (thread `opts[:shaper]` from `Rendro.render/2` through the pipeline into `Shaper.shape/3` calls, and add it to `render_option`), or delete the "Per-render override" section from the moduledoc before release. Add a docs-contract assertion that every option shown in stable moduledocs appears in `render_option`.
 
+**Resolution:** fixed in `8914a4f` — option implemented per D-01. `render_option` now includes `{:shaper, module()}`; `render_with_diagnostics/2` threads it into `doc.options[:render]`; the measure stage forwards it to every `Shaper.shape/3` call; `Shaper.shape/3` resolves `opts[:shaper] || impl()`. Tests prove per-render opt > app config > Simple default.
+
 ### CR-03: Silent character loss in `glyphs_to_cluster_runs` when a shaped run collapses to a single cluster
 
 **File:** `lib/rendro/pipeline/measure.ex:704-718`
@@ -93,6 +114,8 @@ Enum.zip(graphemes, glyphs)
 ```
 Under the HarfBuzz adapter, `enrich_with_cluster` assigns clusters positionally (0, then byte offsets), so a multi-grapheme run that HarfBuzz fully ligates into **one glyph** (e.g., Arabic lam-alef "لا", or an "fi" liga in an embedded font) yields `clusters == [0]` → simple path → `Enum.zip(["ل", "ا"], [glyph])` keeps only the first grapheme. The dropped grapheme never appears in the measured line, and the writer renders `run.text` from measured lines (`lib/rendro/pdf/writer.ex:600-607`), so **characters silently vanish from the PDF bytes**. Reachable whenever an oversized token (split_graphemes path) contains a whole-run ligature under a configured HarfBuzz shaper. This violates the no-silent-degradation invariant in the worst possible way: data loss with `{:ok, ...}` returned.
 **Fix:** Make the dispatch explicit instead of heuristic — e.g., require shapers to mark cluster semantics (a `cluster_semantics: :byte_offset | :none` callback or per-glyph guarantee), or in the simple path assert `length(glyphs) == length(graphemes)` and fall back to the byte-offset grouping branch (which preserves all text by slicing `run_text`) when counts differ.
+
+**Resolution:** fixed in `99a2182` — the 1:1 zip now applies only when glyph count equals grapheme count; otherwise the run becomes one atomic cluster-run carrying the full text and summed advances (no character can ever be dropped). The byte-offset branch also guards against a non-zero first cluster offset. The semantics are now contractual via WR-06's typedoc. Regression test renders a whole-run-collapsing fake shaper through `split_graphemes` and asserts every grapheme survives.
 
 ### CR-04: HarfBuzz adapter cluster approximation assigns wrong clusters for ligatures, decompositions, and RTL; drops glyph advances; hardcodes `gid: 0`
 
@@ -109,6 +132,8 @@ This is wrong in every case where shaping is non-trivial — i.e., exactly the c
 
 The phase context calls this the "byte-offset approximation"; as implemented it is not an approximation of clusters — it is positional indexing that is incorrect whenever glyph count ≠ grapheme count or direction is RTL.
 **Fix:** Use HarfBuzz's own cluster values (HarfBuzz reports a cluster per glyph keyed to input offsets — preserve the field from the `HarfbuzzEx` glyph struct instead of overwriting it). If `harfbuzz_ex` 1.2 does not expose clusters, sum advances per run and do not fabricate per-glyph clusters; have `glyphs_to_cluster_runs` treat the run as a single atomic cluster rather than inventing wrong boundaries. Preserve the real glyph ID instead of `gid: 0`.
+
+**Resolution:** fixed in `743ca91` — verified `HarfbuzzEx.Shaper.Glyph` exposes only `name/x_advance/y_advance/x_offset/y_offset` (no cluster, no gid), so the conservative path applies: byte-offset clusters only when glyph count == grapheme count (exact for 1:1 LTR), all-zero clusters otherwise (measure treats the run as one atomic cluster via CR-03 — no truncated advances, no invented boundaries). gid preservation is deferred upstream — the NIF exposes no glyph ids; documented in code, the writer keys on run text, not gids. RTL 1:1 width attribution coarseness is documented in code (visual reordering itself is the deferred v2.7 slice).
 
 ### CR-05: Temp-file font cache is vulnerable to symlink/pre-planting attacks, write races, and stale-partial-file poisoning
 
@@ -134,6 +159,8 @@ File.rename!(tmp, font_path)
 ```
 And on cache hit, verify the existing file's SHA256 matches `hash` before use (rewrite atomically if not). Reject paths whose `File.lstat` reports a symlink.
 
+**Resolution:** fixed in `6d8759c` — cache moved to a rendro-private subdirectory created/re-chmodded 0700; cache hits trusted only when `File.lstat` reports a regular file AND content equals the font bytes exactly (stronger than hash compare; defeats pre-planting, symlinks, and stale partial files); writes go to a unique temp name published via atomic `File.rename`. Dependency-free. Regression test poisons the cache path and asserts rewrite + successful shaping.
+
 ## Warnings
 
 ### WR-01: `{:shaping_required, :embedded_font_requires_harfbuzz}` abuses the script slot, producing a nonsense instructive error
@@ -142,11 +169,15 @@ And on cache hit, verify the existing file's SHA256 matches `hash` before use (r
 **Issue:** The error tuple's second element is documented/handled everywhere else as a script atom. `Rendro.Error.why/2` renders this reason as "Script :embedded_font_requires_harfbuzz requires a shaping adapter; Shaper.Simple cannot produce correct output for this script." and `next_step` says "Script :embedded_font_requires_harfbuzz requires a shaping adapter. Add {:harfbuzz_ex, ...}". The errors-as-product invariant requires the error to name the actual script; this names an implementation detail dressed as a script.
 **Fix:** If CR-01's fix lands, this clause disappears. Otherwise use a distinct reason shape (e.g., `{:embedded_font_shaping_unavailable, font.logical_name}`) with dedicated `why/2` and `next_step/2` clauses.
 
+**Resolution:** resolved by CR-01 (`b9356de`) — the rejection clause and its pseudo-script reason no longer exist. The generic 2-tuple `{:shaping_required, script}` clauses in `Rendro.Error` remain as robustness for genuine script atoms (still covered by error_test).
+
 ### WR-02: shaping_required errors wrapped inside Measure lose render_id and correlation metadata
 
 **File:** `lib/rendro/pipeline/measure.ex:84-88`
 **Issue:** `measure_block` wraps shaping errors with `Rendro.Error.from_stage(:measure, reason)` using the default empty context, so `render_id`, `document_type`, and `deterministic` are all nil. The pipeline's `span` (`lib/rendro/pipeline.ex:139-140`) passes pre-built `%Error{}` structs through without backfilling `base_meta`. Every other stage error carries `render_id` (asserted in `test/rendro/error_test.exs:26`); shaping errors uniquely do not, breaking the "correlation metadata" promise in `Rendro.Error`'s moduledoc. The wrapping is also unnecessary: returning the raw tuple would let `span`'s `{:error, reason}` branch build the identical instructive error *with* `base_meta`.
 **Fix:** Delete the two wrapping clauses in `measure_block`'s `else` block and return the raw `{:error, {:shaping_required, ...}}` tuple; the pipeline already wraps it at `pipeline.ex:142-143`. (The HYG-02 test calls `Measure.run/1` directly and would need to assert on the raw tuple instead.)
+
+**Resolution:** fixed in `5e56c88` — wrapping clauses deleted; `Pipeline.span/4` now builds the instructive error with `base_meta`. HYG-02 test asserts the raw tuple from `Measure.run/1`; a new full-render test asserts `render_id`, `document_type`, and `deterministic` are populated on shaping errors.
 
 ### WR-03: test_helper auto-activates HarfBuzz via `Code.ensure_loaded?`, so the default Simple path is never exercised end-to-end
 
@@ -154,11 +185,15 @@ And on cache hit, verify the existing file's SHA256 matches `hash` before use (r
 **Issue:** `if Code.ensure_loaded?(HarfbuzzEx) ... Application.put_env(:rendro, :shaper, Rendro.Adapters.HarfBuzz)` means the entire suite — including `deterministic_test.exs` and the embedded-font measure tests — runs under the HarfBuzz adapter, not the `Shaper.Simple` default that hex consumers receive. This is precisely the `Code.ensure_loaded?` auto-activation pattern the phase banned from `lib/`, relocated into the test harness, and it is what masks CR-01: no end-to-end test renders an embedded font under default config. Determinism proofs are also now proofs about the HarfBuzz engine, not the shipped default.
 **Fix:** Run the default suite with the default shaper; tag HarfBuzz-dependent tests (e.g., `@tag :harfbuzz`) and opt them into the adapter via per-test `Application.put_env` in their own `setup` (async: false), or a dedicated `mix test --include harfbuzz` lane. At minimum add one end-to-end test that renders an embedded Latin font with the shaper env deleted.
 
+**Resolution:** fixed in `1537f60` — auto-activation removed from test_helper; the full 1000+-test suite now runs (green) under the shipped `Shaper.Simple` default, including all embedded-font and determinism tests. HarfBuzz coverage opts in explicitly via direct adapter calls in `test/rendro/adapters/harfbuzz_test.exs` (compile-gated on dep presence, no global env mutation). End-to-end embedded-Latin-with-env-deleted test added.
+
 ### WR-04: Misleading fix instruction when HarfBuzz is already configured (built-in font + complex script)
 
 **File:** `lib/rendro/text/shaper/simple.ex:48-53`; `lib/rendro/adapters/harfbuzz.ex:24-27`
 **Issue:** `Rendro.Adapters.HarfBuzz.shape/3` delegates `:built_in` fonts to `Shaper.Simple`, whose complex-script gate fires with a hint chosen by `Code.ensure_loaded?(HarfbuzzEx)` — which is true — so the user is told: "Add to your config: config :rendro, shaper: Rendro.Adapters.HarfBuzz". They already did. The actual fix is to register an embedded font for that script (built-in Type1 fonts cannot carry Arabic/Indic glyphs). The instructive error names the wrong next step, violating the errors-as-product invariant.
 **Fix:** The hint should depend on the *configured* impl, not dep presence: when `Rendro.Text.Shaper.impl() != Rendro.Text.Shaper.Simple` (or when called via the HarfBuzz adapter's delegation), say "Script :arab requires an embedded font that contains its glyphs; built-in PDF fonts cannot render this script. Register one with register_embedded_font/3."
+
+**Resolution:** fixed in `5a1a104` — `shaping_hint/3` keys on the effective shaper (`opts[:shaper] || Shaper.impl()`): a `:built_in` font hitting the gate while a non-Simple shaper is effective now gets the register-embedded-font hint; the dep-presence wording applies only when Simple is genuinely the effective shaper. Tested.
 
 ### WR-05: ScriptTags wrong/dead mappings: `:old_turkic → :otk`, `:bhaisuki` typo, `:byzantine_music`
 
@@ -169,6 +204,8 @@ And on cache hit, verify the existing file's SHA256 matches `hash` before use (r
 - Line 164: `:byzantine_music` is a Unicode block, not a script; `Unicode.script/1` never returns it — dead clause.
 **Fix:** `def to_opentype_tag(:old_turkic), do: :orkh`; `def to_opentype_tag(:bhaiksuki), do: :bhks`; delete the `:byzantine_music` clause. Consider a generated test cross-checking every clause head against `Unicode.Script.scripts/0` to catch future typos.
 
+**Resolution:** fixed in `caa4a83` — all three applied exactly as suggested, plus the generated hygiene test: every clause head is cross-checked against `Unicode.Script.scripts/0` keys so future typos fail the suite.
+
 ### WR-06: Stable-tier `glyph()` contract is under-specified and already violated by both first-party implementations
 
 **File:** `lib/rendro/text/shaper.ex:19-29`
@@ -178,11 +215,15 @@ And on cache hit, verify the existing file's SHA256 matches `hash` before use (r
 - The meaning of the `opts` keyword (the `:script` key the whole gate depends on) is not documented on the callback.
 **Fix:** Document cluster semantics ("byte offset of the first input byte of the cluster, non-decreasing in logical order"), add optional `name` to the type (`optional(:name) => String.t()` via a non-literal map type), and document `opts` (`:script` OpenType tag atom) in the `@callback` doc.
 
+**Resolution:** fixed in `3933b7e` — `@typedoc` defines cluster semantics including the defined interpretation of all-zero clusters (matching CR-03/CR-04 behavior), the type admits `optional(:name) => String.t()`, and the `@callback` doc specifies the `:script` and (new, CR-02) `:shaper` opts.
+
 ### WR-07: Tier-1 claim for Shaper.Simple is vacuous — its only function is hidden from ExDoc and the manifest
 
 **File:** `guides/api_stability.md:15`; `priv/public_api.json:470-474`; `lib/rendro/text/shaper/simple.ex:43-44`
 **Issue:** `Simple.shape/3` has `@impl` and no `@doc`, so the compiler marks it hidden; the manifest records `"Elixir.Rendro.Text.Shaper.Simple": {"functions": []}` and ExDoc renders no functions. The guide's own rule is "Public ≡ what ExDoc renders" (api_stability.md:34), so the Tier-1 promise for Simple covers an empty surface, and the stable-tier @spec-coverage assertion (public_api_contract_test Assertion 5) is vacuous for it. Same for `Rendro.Adapters.HarfBuzz` (`functions: []`).
 **Fix:** Add `@doc` to `Simple.shape/3` (and HarfBuzz's `shape/3`) so the stable implementation's entry point is actually public, then regenerate `priv/public_api.json` (the byte-equality test will force this).
+
+**Resolution:** fixed in `451d71a` — `@doc` added to both `shape/3` implementations; `mix rendro.api.gen` regenerated the manifest (both modules now list `shape/3`); byte-equality and stable-tier `@spec` assertions green.
 
 ## Info
 
