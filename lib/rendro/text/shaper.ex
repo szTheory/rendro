@@ -1,58 +1,41 @@
 defmodule Rendro.Text.Shaper do
-  @moduledoc false
+  @moduledoc """
+  Behaviour for text shaping adapters.
 
-  @doc """
-  Shapes a given text string using the specified font.
-  Returns `{:ok, glyphs}` where `glyphs` is a list of `HarfbuzzEx.Shaper.Glyph` structs.
+  Implement this behaviour to provide a custom text shaping engine.
+  The default implementation is `Rendro.Text.Shaper.Simple` (pure Elixir, cmap + advance widths).
+  For complex scripts (Arabic, Indic, Thai, etc.) configure `Rendro.Adapters.HarfBuzz`.
+
+  ## Configuration
+
+      config :rendro, shaper: Rendro.Adapters.HarfBuzz
+
+  ## Per-render override
+
+      Rendro.render(doc, shaper: Rendro.Adapters.HarfBuzz)
   """
-  def shape(%Rendro.PDF.Font{source: :built_in} = font, text) do
-    # Built-in fonts do not have font files to shape with HarfBuzz.
-    # Return mock glyphs based on their widths.
-    glyphs =
-      text
-      |> String.graphemes()
-      |> Enum.map(fn grapheme ->
-        width = Rendro.PDF.Font.text_width(font, grapheme, 1000) |> round()
+  @moduledoc tags: [:stable]
 
-        %{
-          name: grapheme,
-          x_advance: width,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0
+  @type glyph :: %{
+          gid: non_neg_integer(),
+          cluster: non_neg_integer(),
+          x_advance: integer(),
+          y_advance: integer(),
+          x_offset: integer(),
+          y_offset: integer()
         }
-      end)
 
-    {:ok, glyphs}
+  @callback shape(Rendro.PDF.Font.t(), String.t(), keyword()) ::
+              {:ok, [glyph()]} | {:error, term()}
+
+  @spec impl() :: module()
+  def impl do
+    Application.get_env(:rendro, :shaper, Rendro.Text.Shaper.Simple)
   end
 
-  def shape(%Rendro.PDF.Font{source: :embedded, font_bytes: bytes}, text)
-      when is_binary(bytes) and is_binary(text) do
-    # Use a cached temp file for shaping
-    hash = :crypto.hash(:sha256, bytes) |> Base.encode16()
-    temp_dir = System.tmp_dir() || "/tmp"
-    font_path = Path.join(temp_dir, "rendro_font_#{hash}.ttf")
-
-    unless File.exists?(font_path) do
-      File.write!(font_path, bytes)
-    end
-
-    # Use HarfbuzzEx.get! to quickly shape the text and return all glyph information.
-    glyphs = HarfbuzzEx.get!(font_path, text, :all)
-
-    # Check for missing glyphs
-    missing_count = Enum.count(glyphs, fn g -> g.name == ".notdef" end)
-
-    if missing_count > 0 do
-      :telemetry.execute(
-        [:rendro, :shaper, :missing_glyph],
-        %{count: missing_count},
-        %{font: font_path, text: text}
-      )
-    end
-
-    {:ok, glyphs}
-  rescue
-    e -> {:error, e}
+  @spec shape(Rendro.PDF.Font.t(), String.t(), keyword()) ::
+          {:ok, [glyph()]} | {:error, term()}
+  def shape(font, text, opts \\ []) do
+    impl().shape(font, text, opts)
   end
 end
