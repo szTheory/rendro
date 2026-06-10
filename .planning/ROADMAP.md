@@ -53,7 +53,14 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
   2. Rendering text in Arabic, Hebrew, Devanagari, or Thai with no shaping adapter configured raises a deterministic, instructive error that names the script and the fix — never silent wrong/disconnected glyph output.
   3. All existing Latin-script golden tests pass byte-identically (or are deliberately re-blessed with a changelog note) after the `split_graphemes` cluster-boundary fix and the `ex_unicode` migration.
   4. `priv/support_matrix.json` contains `explicit_deferral` rows for Arabic, Hebrew/RTL, Devanagari, and Thai with named reasons, and README/guide script-support claims align with those rows — no overclaim.
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 83-01-PLAN.md — Behaviour split: shaper.ex → behaviour + Shaper.Simple + Adapters.HarfBuzz, mix.exs dep flip
+- [ ] 83-02-PLAN.md — Unicode migration: bidi.ex + ScriptTags helper (unicode_data → unicode)
+- [ ] 83-03-PLAN.md — Complex-script gate + measure.ex hard-match softening + error.ex clauses
+- [ ] 83-04-PLAN.md — Cluster-boundary fix in split_graphemes + StreamData property test + re-bless event
+- [ ] 83-05-PLAN.md — Support matrix rows, script_support_claims_test, API manifest regen, api_stability.md
 
 ### Phase 84: Drawn-Path Primitive & Visible Polish
 **Goal**: A Phoenix engineer can author deterministic vector graphics via a declarative `%Rendro.Path{}` element, tables can opt in to borders and rules, and the Certificate recipe gains a decorative border frame — so the gallery shows visually compelling output.
@@ -119,7 +126,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 | 80. Stability Contract & Migration Docs | v2.5 | 4/4 | Complete | 2026-05-30 |
 | 81. Release Hardening | v2.5 | 1/1 | Complete | 2026-06-05 |
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 3/3 | Complete | 2026-06-05 |
-| 83. Claim-Accuracy & Shaping Hygiene | v2.6 | 0/? | Not started | - |
+| 83. Claim-Accuracy & Shaping Hygiene | v2.6 | 0/5 | Planned | - |
 | 84. Drawn-Path Primitive & Visible Polish | v2.6 | 0/? | Not started | - |
 | 85. Deterministic Raster Lane | v2.6 | 0/? | Not started | - |
 | 86. Self-Proving Launch Artifacts | v2.6 | 0/? | Not started | - |
