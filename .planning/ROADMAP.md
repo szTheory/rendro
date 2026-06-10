@@ -70,7 +70,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 83-04-PLAN.md — Cluster-boundary fix in split_graphemes + StreamData property test + re-bless event
+- [x] 83-04-PLAN.md — Cluster-boundary fix in split_graphemes + StreamData property test + re-bless event
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -155,7 +155,7 @@ Plans:
 | 80. Stability Contract & Migration Docs | v2.5 | 4/4 | Complete | 2026-05-30 |
 | 81. Release Hardening | v2.5 | 1/1 | Complete | 2026-06-05 |
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 3/3 | Complete | 2026-06-05 |
-| 83. Claim-Accuracy & Shaping Hygiene | v2.6 | 3/5 | In Progress|  |
+| 83. Claim-Accuracy & Shaping Hygiene | v2.6 | 4/5 | In Progress|  |
 | 84. Drawn-Path Primitive & Visible Polish | v2.6 | 0/? | Not started | - |
 | 85. Deterministic Raster Lane | v2.6 | 0/? | Not started | - |
 | 86. Self-Proving Launch Artifacts | v2.6 | 0/? | Not started | - |
