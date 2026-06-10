@@ -353,6 +353,14 @@ defmodule Rendro do
   end
 
   defp normalize_table_attrs(attrs) do
+    attrs
+    |> normalize_table_split_policy()
+    |> normalize_table_borders()
+    |> normalize_table_border_style()
+    |> normalize_table_header_fill()
+  end
+
+  defp normalize_table_split_policy(attrs) do
     case Keyword.get(attrs, :split_policy, :row_atomic) do
       :row_atomic ->
         Keyword.put(attrs, :split_policy, :row_atomic)
@@ -364,6 +372,84 @@ defmodule Rendro do
         raise ArgumentError,
               "Rendro.table/2 only supports split_policy: :row_atomic" <>
                 " (or temporary alias :atomic); got: #{inspect(split_policy)}"
+    end
+  end
+
+  @valid_border_atoms [:none, :outer, :rows, :columns, :grid, :all]
+
+  defp normalize_table_borders(attrs) do
+    case Keyword.get(attrs, :borders, :none) do
+      borders ->
+        normalized = normalize_borders(borders)
+        Keyword.put(attrs, :borders, normalized)
+    end
+  end
+
+  defp normalize_borders(borders) do
+    atoms =
+      case borders do
+        atom when is_atom(atom) ->
+          validate_border_atom!(atom)
+          [atom]
+
+        list when is_list(list) ->
+          Enum.each(list, &validate_border_atom!/1)
+          list
+
+        other ->
+          raise ArgumentError,
+                "Rendro.table/2 received invalid borders value: #{inspect(other)}. " <>
+                  "Valid values are atoms (#{Enum.map_join(@valid_border_atoms, ", ", &inspect/1)}) " <>
+                  "or a list of those atoms."
+      end
+
+    # Expand shorthands, deduplicate, and sort for canonical form
+    atoms
+    |> Enum.flat_map(&List.wrap(expand_border_atom(&1)))
+    |> Enum.uniq()
+    |> Enum.sort()
+  end
+
+  defp validate_border_atom!(atom) when atom in @valid_border_atoms, do: :ok
+
+  defp validate_border_atom!(atom) do
+    raise ArgumentError,
+          "Unknown borders atom: #{inspect(atom)}. " <>
+            "Valid atoms: #{Enum.map_join(@valid_border_atoms, ", ", &inspect/1)}."
+  end
+
+  # Expand shorthand atoms to canonical sets
+  defp expand_border_atom(:all), do: [:outer, :rows, :columns]
+  defp expand_border_atom(:grid), do: [:rows, :columns]
+  defp expand_border_atom(:none), do: []
+  defp expand_border_atom(atom), do: atom
+
+  defp normalize_table_border_style(attrs) do
+    case Keyword.get(attrs, :border_style) do
+      nil ->
+        attrs
+
+      %{color: color} ->
+        case Rendro.Color.validate(color) do
+          :ok -> attrs
+          {:error, msg} -> raise ArgumentError, msg
+        end
+
+      _other ->
+        attrs
+    end
+  end
+
+  defp normalize_table_header_fill(attrs) do
+    case Keyword.get(attrs, :header_fill) do
+      nil ->
+        attrs
+
+      color ->
+        case Rendro.Color.validate(color) do
+          :ok -> attrs
+          {:error, msg} -> raise ArgumentError, msg
+        end
     end
   end
 

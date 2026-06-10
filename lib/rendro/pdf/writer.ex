@@ -510,7 +510,7 @@ defmodule Rendro.PDF.Writer do
 
   defp render_block(
          doc,
-         %Rendro.Block{content: %Rendro.Table{} = table},
+         %Rendro.Block{content: %Rendro.Table{} = table} = outer_block,
          page,
          font_map,
          image_map
@@ -531,7 +531,16 @@ defmodule Rendro.PDF.Writer do
         end)
       end)
 
-    [header_ops | rows_ops] |> List.flatten() |> Enum.join("\n")
+    cells_content = [header_ops | rows_ops] |> List.flatten() |> Enum.join("\n")
+
+    # Prepend border/fill decoration when active — Pitfall 3 guard (no stray newline)
+    decoration = table_decoration(table, page, outer_block)
+
+    if decoration == "" do
+      cells_content
+    else
+      decoration <> "\n" <> cells_content
+    end
   end
 
   defp render_block(
@@ -1974,5 +1983,308 @@ defmodule Rendro.PDF.Writer do
       # Close path
       "h\n"
     ]
+  end
+
+  # ---------------------------------------------------------------------------
+  # Table decoration (D-13..D-16): borders, rules, header fill
+  # ---------------------------------------------------------------------------
+
+  # Early exit when all decoration fields are inert (D-15, Pitfall 3 guard)
+  defp table_decoration(table, page, block) do
+    borders = table.borders
+
+    if borders in [:none, [], nil] and is_nil(table.header_fill) do
+      ""
+    else
+      do_table_decoration(table, page, block)
+    end
+  end
+
+  defp do_table_decoration(table, page, block) do
+    # Block origin in PDF Y-up coordinate space (bottom-left of block)
+    bx = (block.x + page.margin_left) * 1.0
+    by = (page.height - (block.y + block.height) - page.margin_top) * 1.0
+
+    col_widths = table.column_widths || []
+    row_heights = table.row_heights || []
+    header_h = table.header_height || 0.0
+
+    total_w = Enum.sum(col_widths) * 1.0
+    total_h = (header_h + Enum.sum(row_heights)) * 1.0
+
+    # Expand borders to canonical list (already canonical from normalize_table_attrs,
+    # but handle :none/:nil edge cases from direct struct construction)
+    borders = expand_table_borders(table.borders)
+
+    # 1. Header fill (emitted first — painted under strokes and cell content)
+    fill_ops =
+      if not is_nil(table.header_fill) and header_h > 0 do
+        header_h_f = header_h * 1.0
+        # Header band occupies the TOP of the table (y-down author → top in PDF)
+        # In PDF Y-up: header band starts at by + total_h - header_h
+        band_y = by + total_h - header_h_f
+        [
+          Rendro.Color.rg(table.header_fill),
+          format_num(bx), " ", format_num(band_y), " ",
+          format_num(total_w), " ", format_num(header_h_f), " re\nf\n"
+        ]
+      else
+        []
+      end
+
+    # 2. Stroke setup — default hairline {0,0,0} 0.5pt, emit once
+    stroke_color = get_table_stroke_color(table.border_style)
+    stroke_width = get_table_stroke_width(table.border_style)
+
+    stroke_setup_ops = [
+      Rendro.Color.rg_stroke(stroke_color),
+      format_num(stroke_width), " w\n"
+    ]
+
+    # 3. Outer border rectangle (if :outer in borders)
+    outer_ops =
+      if :outer in borders do
+        [
+          format_num(bx), " ", format_num(by), " ",
+          format_num(total_w), " ", format_num(total_h), " re\n S\n"
+        ]
+      else
+        []
+      end
+
+    # 4. Interior horizontal rules (if :rows in borders)
+    h_rule_ops =
+      if :rows in borders do
+        render_table_h_rules(table, bx, by, total_w, col_widths, row_heights, header_h)
+      else
+        []
+      end
+
+    # 5. Interior vertical rules (if :columns in borders)
+    v_rule_ops =
+      if :columns in borders do
+        render_table_v_rules(table, bx, by, total_h, col_widths, row_heights, header_h)
+      else
+        []
+      end
+
+    IO.iodata_to_binary([
+      "q\n",
+      fill_ops,
+      stroke_setup_ops,
+      outer_ops,
+      h_rule_ops,
+      v_rule_ops,
+      "Q\n"
+    ])
+  end
+
+  defp expand_table_borders(nil), do: []
+  defp expand_table_borders(:none), do: []
+  defp expand_table_borders([]), do: []
+  defp expand_table_borders(:all), do: [:outer, :rows, :columns]
+  defp expand_table_borders(:grid), do: [:rows, :columns]
+  defp expand_table_borders(:outer), do: [:outer]
+  defp expand_table_borders(:rows), do: [:rows]
+  defp expand_table_borders(:columns), do: [:columns]
+  defp expand_table_borders(list) when is_list(list), do: list
+
+  defp get_table_stroke_color(nil), do: {0, 0, 0}
+  defp get_table_stroke_color(%{color: color}), do: color
+  defp get_table_stroke_color(_), do: {0, 0, 0}
+
+  defp get_table_stroke_width(nil), do: 0.5
+  defp get_table_stroke_width(%{width: w}) when is_number(w), do: w * 1.0
+  defp get_table_stroke_width(_), do: 0.5
+
+  # Interior horizontal rules between rows (D-16 draw-once collapse model)
+  defp render_table_h_rules(table, bx, by, total_w, col_widths, row_heights, header_h) do
+    grid = table._grid_layout
+    num_rows = length(row_heights)
+
+    total_h = (header_h + Enum.sum(row_heights)) * 1.0
+
+    # Interior boundaries between rows: after rows 0..num_rows-2
+    # y_author is Y-down from table top
+    row_boundaries =
+      row_heights
+      |> Enum.scan(header_h * 1.0, fn h, acc -> acc + h * 1.0 end)
+      |> Enum.take(num_rows - 1)
+
+    row_boundaries
+    |> Enum.with_index()
+    |> Enum.flat_map(fn {y_author, row_idx} ->
+      y_pdf = by + total_h - y_author
+
+      if is_nil(grid) do
+        # No grid layout — draw full-width horizontal line
+        [
+          format_num(bx), " ", format_num(y_pdf), " m\n",
+          format_num(bx + total_w), " ", format_num(y_pdf), " l\n S\n"
+        ]
+      else
+        render_h_rule_with_span_check(grid, bx, y_pdf, col_widths, row_idx)
+      end
+    end)
+  end
+
+  # Render a horizontal rule between row r and r+1, suppressing columns spanned by rowspan
+  defp render_h_rule_with_span_check(grid, bx, y_pdf, col_widths, r) do
+    num_cols = length(col_widths)
+    row_r = Enum.at(grid, r, [])
+    row_r1 = Enum.at(grid, r + 1, [])
+
+    segments =
+      0..(num_cols - 1)//1
+      |> Enum.map(fn c ->
+        cell_r = Enum.at(row_r, c, %{ref_r: r, ref_c: c})
+        cell_r1 = Enum.at(row_r1, c, %{ref_r: r + 1, ref_c: c})
+
+        # Suppress if rowspan crosses this boundary:
+        # Both cells share same ref_r AND that ref_r is before row r+1
+        spanned = cell_r.ref_r == cell_r1.ref_r and cell_r.ref_r != r + 1
+
+        {c, not spanned}
+      end)
+
+    # Cumulative x positions: [bx, bx+w0, bx+w0+w1, ...]
+    x_positions =
+      col_widths
+      |> Enum.scan(bx, fn w, acc -> acc + w * 1.0 end)
+      |> List.insert_at(0, bx)
+
+    segments
+    |> Enum.chunk_by(fn {_c, drawn} -> drawn end)
+    |> Enum.flat_map(fn chunk ->
+      drawn = chunk |> List.first({0, false}) |> elem(1)
+
+      if drawn do
+        first_col = chunk |> List.first({0, false}) |> elem(0)
+        last_col = chunk |> List.last({0, false}) |> elem(0)
+        x_start = Enum.at(x_positions, first_col)
+        x_end = Enum.at(x_positions, last_col + 1)
+        [
+          format_num(x_start * 1.0), " ", format_num(y_pdf), " m\n",
+          format_num(x_end * 1.0), " ", format_num(y_pdf), " l\n S\n"
+        ]
+      else
+        []
+      end
+    end)
+  end
+
+  # Interior vertical rules between columns (D-16 draw-once collapse model)
+  defp render_table_v_rules(table, bx, by, total_h, col_widths, row_heights, header_h) do
+    grid = table._grid_layout
+    num_cols = length(col_widths)
+
+    # Compute cumulative x positions for vertical rule boundaries
+    x_boundaries =
+      col_widths
+      |> Enum.scan(0.0, fn w, acc -> acc + w end)
+      # Remove last (= total_w, the right edge = outer, not interior)
+      |> Enum.take(num_cols - 1)
+
+    num_rows = length(row_heights)
+
+    # Y positions: full table height
+    # In PDF Y-up: bottom = by, top = by + total_h
+    x_boundaries
+    |> Enum.with_index()
+    |> Enum.flat_map(fn {x_rel, c} ->
+      x_pdf = bx + x_rel * 1.0
+
+      if is_nil(grid) do
+        # No grid layout — draw full-height vertical line
+        [
+          format_num(x_pdf), " ", format_num(by), " m\n",
+          format_num(x_pdf), " ", format_num(by + total_h), " l\n S\n"
+        ]
+      else
+        # Colspan suppression: for boundary between col c and c+1,
+        # check each row — if a cell spans across this boundary, suppress that row's segment
+        render_v_rule_with_span_check(
+          grid, bx, by, x_pdf, total_h, c, num_rows, row_heights, header_h
+        )
+      end
+    end)
+  end
+
+  # Render a vertical rule between col c and c+1, suppressing rows with colspan
+  defp render_v_rule_with_span_check(
+         grid, _bx, by, x_pdf, total_h, c, num_rows, row_heights, header_h
+       ) do
+    # For each row r, check if the cell at [r][c] spans across this boundary
+    # (i.e., ref_c < c, meaning the cell's origin is in a column to the left)
+    # Also: the cell at [r][c+1] should have ref_c == c+1 (not spanning from left)
+    num_rows_actual = max(num_rows, 0)
+    header_h_f = header_h * 1.0
+
+    row_y_bounds =
+      if num_rows_actual == 0 do
+        []
+      else
+        # y_author positions for rows (Y-down from table top)
+        # row 0 starts at header_h, row 1 at header_h+row_heights[0], etc.
+        row_heights
+        |> Enum.scan({header_h_f, header_h_f}, fn h, {_start, prev_end} ->
+          {prev_end, prev_end + h}
+        end)
+        |> Enum.map(fn {y_start, y_end} ->
+          # Convert to PDF Y-up:
+          # bottom of row = by + total_h - y_end
+          # top of row = by + total_h - y_start
+          {by + total_h - y_end * 1.0, by + total_h - y_start * 1.0}
+        end)
+      end
+
+    # Also include header row if present (y 0..header_h)
+    header_bounds =
+      if header_h_f > 0 do
+        [{by + total_h - header_h_f, by + total_h}]
+      else
+        []
+      end
+
+    # Combine header + row bounds for span checking
+    all_bounds = header_bounds ++ row_y_bounds
+
+    # For grid, rows in grid are DATA rows only (no header row in _grid_layout)
+    # so we only do span suppression for data rows (row_heights)
+    segments =
+      0..(num_rows_actual - 1)//1
+      |> Enum.map(fn r ->
+        row_r = Enum.at(grid, r, [])
+        cell_c = Enum.at(row_r, c, %{ref_r: r, ref_c: c})
+        cell_c1 = Enum.at(row_r, c + 1, %{ref_r: r, ref_c: c + 1})
+
+        # Suppressed if the cell at [r][c] or [r][c+1] spans across the boundary
+        spanned = cell_c.ref_c == cell_c1.ref_c and cell_c.ref_c != c + 1
+
+        {r, not spanned}
+      end)
+
+    # Group consecutive unspanned rows into single m/l segments
+    # Use data row bounds (index offset by header_bounds length)
+    header_count = length(header_bounds)
+
+    segments
+    |> Enum.chunk_by(fn {_r, drawn} -> drawn end)
+    |> Enum.flat_map(fn chunk ->
+      drawn = chunk |> List.first({0, false}) |> elem(1)
+
+      if drawn do
+        first_row = chunk |> List.first({0, false}) |> elem(0)
+        last_row = chunk |> List.last({0, false}) |> elem(0)
+        {y_bot, _} = Enum.at(all_bounds, first_row + header_count, {by, by + total_h})
+        {_, y_top} = Enum.at(all_bounds, last_row + header_count, {by, by + total_h})
+        [
+          format_num(x_pdf), " ", format_num(y_bot), " m\n",
+          format_num(x_pdf), " ", format_num(y_top), " l\n S\n"
+        ]
+      else
+        []
+      end
+    end)
   end
 end

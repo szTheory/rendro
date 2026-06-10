@@ -12,6 +12,10 @@ defmodule Rendro.Table do
     split_policy: :row_atomic,
     repeat_header: true,
     decoration_break: :slice,
+    # Opt-in borders / shading fields (all inert by default)
+    borders: :none,
+    border_style: nil,
+    header_fill: nil,
     # Pipeline geometry fields populated by Measure
     column_widths: nil,
     row_heights: nil,
@@ -23,6 +27,14 @@ defmodule Rendro.Table do
   @type column_rule :: {:fixed, number()} | {:share, number()}
   @type split_policy :: :row_atomic | :atomic | :fragment
   @type decoration_break :: :slice | :clone
+  @type borders ::
+          :none
+          | :outer
+          | :rows
+          | :columns
+          | :grid
+          | :all
+          | [atom()]
   @type t :: %__MODULE__{
           rows: [row()],
           header: row() | nil,
@@ -30,6 +42,10 @@ defmodule Rendro.Table do
           split_policy: split_policy(),
           repeat_header: boolean(),
           decoration_break: decoration_break(),
+          borders: borders(),
+          border_style: nil | map(),
+          header_fill:
+            nil | {non_neg_integer(), non_neg_integer(), non_neg_integer()},
           column_widths: [number()] | nil,
           row_heights: [number()] | nil,
           header_height: number() | nil,
