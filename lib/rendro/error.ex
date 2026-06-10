@@ -113,6 +113,14 @@ defmodule Rendro.Error do
 
   defp why(_stage, {:unsupported_glyph, char}), do: "Missing glyph for character: #{char}"
 
+  defp why(_stage, {:shaping_required, script, _hint}),
+    do:
+      "Script #{inspect(script)} requires a shaping adapter; Shaper.Simple cannot produce correct output for this script."
+
+  defp why(_stage, {:shaping_required, script}),
+    do:
+      "Script #{inspect(script)} requires a shaping adapter; Shaper.Simple cannot produce correct output for this script."
+
   defp why(_stage, {:unsupported_script, reason}) when is_atom(reason),
     do: "Unsupported script boundary: #{reason |> Atom.to_string() |> String.replace("_", " ")}"
 
@@ -244,6 +252,18 @@ defmodule Rendro.Error do
 
   defp next_step(:measure, {:unsupported_script, _reason}) do
     "Rendro does not currently support complex text shaping or RTL boundaries. Ensure input text falls within supported Unicode boundaries."
+  end
+
+  defp next_step(:measure, {:shaping_required, script, hint}) do
+    "Script #{inspect(script)} requires a shaping adapter. #{hint}"
+  end
+
+  defp next_step(:measure, {:shaping_required, script}) do
+    if Code.ensure_loaded?(HarfbuzzEx) do
+      "Script #{inspect(script)} requires a shaping adapter. Add to your config: config :rendro, shaper: Rendro.Adapters.HarfBuzz"
+    else
+      "Script #{inspect(script)} requires a shaping adapter. Add {:harfbuzz_ex, \"~> 1.2\", optional: true} to deps and: config :rendro, shaper: Rendro.Adapters.HarfBuzz"
+    end
   end
 
   defp next_step(:paginate, :content_overflow) do
