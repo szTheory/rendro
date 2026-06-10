@@ -45,76 +45,105 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 ## Phase Details
 
 ### Phase 83: Claim-Accuracy & Shaping Hygiene
+
 **Goal**: The "pure Elixir core / no hard NIF dependencies" claim is restored to truth before any launch content ships — `harfbuzz_ex` is an optional dep behind a behaviour, complex scripts fail instructively, the shaping bug is fixed, and dead `unicode_data` is replaced.
 **Depends on**: Nothing (first phase; must merge before Phase 88 executes)
 **Requirements**: HYG-01, HYG-02, HYG-03, HYG-04, HYG-05
 **Success Criteria** (what must be TRUE):
+
   1. A project that does not include `harfbuzz_ex` in its `mix.exs` can compile and render Latin-script PDFs without any NIF-compilation step — `mix.exs` lists `harfbuzz_ex` as `optional: true`.
   2. Rendering text in Arabic, Hebrew, Devanagari, or Thai with no shaping adapter configured raises a deterministic, instructive error that names the script and the fix — never silent wrong/disconnected glyph output.
   3. All existing Latin-script golden tests pass byte-identically (or are deliberately re-blessed with a changelog note) after the `split_graphemes` cluster-boundary fix and the `ex_unicode` migration.
   4. `priv/support_matrix.json` contains `explicit_deferral` rows for Arabic, Hebrew/RTL, Devanagari, and Thai with named reasons, and README/guide script-support claims align with those rows — no overclaim.
+
 **Plans**: 5 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 83-01-PLAN.md — Behaviour split: shaper.ex → behaviour + Shaper.Simple + Adapters.HarfBuzz, mix.exs dep flip
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 83-02-PLAN.md — Unicode migration: bidi.ex + ScriptTags helper (unicode_data → unicode)
 - [ ] 83-03-PLAN.md — Complex-script gate + measure.ex hard-match softening + error.ex clauses
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 83-04-PLAN.md — Cluster-boundary fix in split_graphemes + StreamData property test + re-bless event
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 83-05-PLAN.md — Support matrix rows, script_support_claims_test, API manifest regen, api_stability.md
 
 ### Phase 84: Drawn-Path Primitive & Visible Polish
+
 **Goal**: A Phoenix engineer can author deterministic vector graphics via a declarative `%Rendro.Path{}` element, tables can opt in to borders and rules, and the Certificate recipe gains a decorative border frame — so the gallery shows visually compelling output.
 **Depends on**: Nothing (parallel to 83; gallery depends on both 84 and 85)
 **Requirements**: PATH-01, PATH-02, PATH-03, PATH-04
 **Success Criteria** (what must be TRUE):
+
   1. A caller can declare `%Rendro.Path{ops: [{:rect, x, y, w, h}], stroke: %{color: "#000", width: 1.0}}` in a document and the rendered PDF contains the corresponding visible rectangle — verified by the raster lane's golden-PNG harness.
   2. Passing `borders: :all` (or equivalent) to a table renders visible cell rules in the PDF; omitting the option produces output byte-identical to today's borderless rendering.
   3. The Certificate recipe accepts a `border: true` (or `border: frame_opts`) option and renders a decorative frame at both A4 and US Letter sizes, with all coordinates derived from page geometry — zero hardcoded A4 numerics.
   4. The path surface has terminal `priv/support_matrix.json` rows and byte-determinism golden tests; transforms, clipping, and gradients are listed as explicit deferrals.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 85: Deterministic Raster Lane
+
 **Goal**: `Rendro.Adapters.Pdfium` can rasterize PDFs to PNG and the project has a golden-PNG snapshot harness in CI that is advisory (never gates the four required engine lanes) and uses honest `pdfium-render` evidence vocabulary that cannot be conflated with GUI-viewer proof.
 **Depends on**: Nothing (parallel to 83 and 84; Phase 86 depends on this)
 **Requirements**: RAST-01, RAST-02, RAST-03
 **Success Criteria** (what must be TRUE):
+
   1. `Rendro.Adapters.Pdfium.render/2` accepts a PDF binary and options (dpi, page range) and returns `{:ok, [png_binary]}` — with pdfium-cli pinned by version + sha256 in the project configuration.
   2. `mix test` includes a golden-PNG snapshot harness that compares rendered PNGs against committed ref hashes; the harness uses a hash-equality fast path and a pinned-CI-only bless command — refs generated only in the containerized environment, never on dev laptops.
   3. The raster advisory CI lane (`needs: []`, graph-disconnected) runs in CI but never gates the four required engine lanes (`signing-live-proof`, `long-lived-live-proof`, `release-proof`, `test`); a pdfium-cli download failure cannot block engine merges.
   4. `priv/support_matrix.json` and evidence files use `viewer_kind: "pdfium-render"` for raster evidence; a docs-contract guard prevents raster evidence from upgrading GUI-viewer claims (Adobe/Preview rows remain structural proxies).
+
 **Plans**: TBD
 
 ### Phase 86: Self-Proving Launch Artifacts
+
 **Goal**: Any evaluating engineer visiting the repo or HexDocs sees all five recipes as rendered images in the README and docs — images that are CI-hash-checked so they cannot drift; plus a `manual.pdf` generated by Rendro itself with its SHA-256 machine-published and CI-verified; all presentation conforming to the Rendro brand book.
 **Depends on**: Phase 84 (path primitive needed for gallery polish), Phase 85 (raster lane needed to generate PNGs)
 **Requirements**: GAL-01, GAL-02, GAL-03
 **Success Criteria** (what must be TRUE):
+
   1. An evaluating engineer sees rendered recipe images for all five recipes (Invoice, BrandedInvoice, Statement, Receipt/Report, Certificate) in the README and HexDocs — not placeholder text or ASCII art.
   2. A docs-contract CI lane fails if the committed gallery images do not match hashes regenerated from the current engine — the gallery cannot silently drift.
   3. A `manual.pdf` generated by Rendro itself (exercising recipes, the path primitive, and page numbering) is committed or CI-fetchable; its SHA-256 is machine-published in the README/guide and CI-verified on every engine change so the hash cannot go stale.
   4. Gallery images and docs presentation conform to the Rendro brand book (`prompts/Rendro Brand Book.txt`) — typography, palette, and layout consistent with the brand before public launch.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 87: Comparison Page & Livebook
+
 **Goal**: HexDocs contains a reproducible "PDFs in Elixir without Chrome" comparison guide whose every claim is bounded to checked-in benchmark results, and a Livebook tutorial that is executed in CI so it cannot rot — giving evaluating engineers honest signal and a zero-friction try path.
 **Depends on**: Phase 83 (comparison claims must be based on accurate dependency facts — "pure Elixir core" must be true before the guide ships)
 **Requirements**: CMP-01, CMP-02, CMP-03
 **Success Criteria** (what must be TRUE):
+
   1. A checked-in benchmark harness (`bench/` scripts + committed results) measures cold start, memory, container image size, and dependency count vs ChromicPDF, pdf_generator, and Typst-CLI — with pinned versions, published hardware, and honest acknowledgment of where HTML→PDF wins.
   2. The HexDocs comparison guide has every claim bounded to committed benchmark results by a docs-contract test — a false claim or an unbounded claim fails CI.
   3. A `.livemd` Livebook tutorial (invoice data → render → inline Kino preview → download) runs in an advisory CI lane; the tutorial has "Run in Livebook" badges in HexDocs and the README; the advisory lane is graph-disconnected and never gates the four required engine lanes.
+
 **Plans**: TBD
 
 ### Phase 88: Launch Execution & Demand Instrumentation
+
 **Goal**: Rendro is visible to the Elixir community — the coordinated ecosystem launch is executed, existing demand threads are answered genuinely, mobile viewer evidence is published as a content beat, and the conditional v2.7 text-shaping demand gate is concrete, measurable, and recorded in an ADOPTION.md ledger.
 **Depends on**: Phase 83 (claim accuracy must be true before announcing), Phase 84 (output must be visually polished), Phase 85 (raster evidence vocabulary in place), Phase 86 (launch artifacts exist), Phase 87 (comparison guide + Livebook exist)
 **Requirements**: LNCH-01, LNCH-02, LNCH-03
 **Success Criteria** (what must be TRUE):
+
   1. An ElixirForum #announcing thread, an ElixirStatus post, an awesome-elixir PR, and genuine replies in the two existing "PDF without Chromium" demand threads are published — only after all HYG/GAL/CMP requirements are shipped.
   2. 2-4 mobile viewer-evidence rows (iOS Files/Mail preview, Android default viewer x forms/signed surfaces) are recorded via the existing evidence recipe, published in `priv/support_matrix.json`, and referenced in launch content.
   3. An ADOPTION.md ledger exists with concrete, numeric signal thresholds for the v2.7 text-shaping demand gate (e.g., N non-self GitHub issues/asks, a downloads floor, first external contributor), and GitHub Discussions / issue templates route adopter needs to the ledger.
+
 **Plans**: TBD
 
 ## Progress
