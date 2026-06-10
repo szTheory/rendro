@@ -1,6 +1,7 @@
 defmodule Rendro.Text.ShaperTest do
   # async: false required — setup uses Application.delete_env to test default (no-config) behavior.
   use ExUnit.Case, async: false
+  use ExUnitProperties
 
   alias Rendro.Text.Shaper
   alias Rendro.Text.Shaper.Simple
@@ -153,6 +154,59 @@ defmodule Rendro.Text.ShaperTest do
 
       assert {:error, {:shaping_required, :embedded_font_requires_harfbuzz}} =
                Simple.shape(font, "Hello", [])
+    end
+  end
+
+  describe "Rendro.Text.Shaper.Simple — per-grapheme == per-run width property" do
+    # Font with widths for all printable ASCII codepoints (32–126).
+    # default_width covers anything not explicitly listed.
+    setup do
+      widths =
+        for cp <- 32..126, into: %{} do
+          # Vary widths realistically: space=278, others 500-722 based on codepoint
+          w =
+            case cp do
+              32 -> 278
+              _ -> 500 + rem(cp, 223)
+            end
+
+          {cp, w}
+        end
+
+      font = %Rendro.PDF.Font{
+        source: :built_in,
+        name: "TestAsciiFont",
+        base_font: "TestAsciiFont",
+        subtype: :type1,
+        units_per_em: 1000,
+        ascent: 718,
+        descent: -207,
+        default_width: 500,
+        widths: widths,
+        cmap: nil
+      }
+
+      {:ok, font: font}
+    end
+
+    property "per-grapheme width sum equals per-run width under Shaper.Simple (D-12)", %{
+      font: font
+    } do
+      check all(text <- StreamData.string(:ascii, min_length: 1)) do
+        {:ok, per_run_glyphs} = Simple.shape(font, text, [])
+        per_run_total = Enum.sum(Enum.map(per_run_glyphs, & &1.x_advance))
+
+        per_grapheme_total =
+          text
+          |> String.graphemes()
+          |> Enum.map(fn g ->
+            {:ok, glyphs} = Simple.shape(font, g, [])
+            Enum.sum(Enum.map(glyphs, & &1.x_advance))
+          end)
+          |> Enum.sum()
+
+        assert per_run_total == per_grapheme_total
+      end
     end
   end
 end
