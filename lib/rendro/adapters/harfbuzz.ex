@@ -51,18 +51,43 @@ if Code.ensure_loaded?(HarfbuzzEx) do
       e -> {:error, e}
     end
 
+    # HarfbuzzEx 1.2 (rustybuzz wrapper) exposes only name/advances/offsets per
+    # glyph — no cluster values and no glyph ids. Cluster mapping is therefore
+    # derived conservatively rather than positionally fabricated (CR-04):
+    #
+    #   * glyph count == grapheme count (no ligation/decomposition): assign each
+    #     glyph the byte offset of the grapheme at the same index. Exact for the
+    #     1:1 LTR case. (For RTL output HarfBuzz returns visual order, so the
+    #     per-index pairing can attribute swapped advances within a run; widths
+    #     still sum exactly and boundaries stay grapheme-aligned. Visual
+    #     reordering itself is deferred to the v2.7 shaping slice.)
+    #
+    #   * glyph count != grapheme count (ligatures, decompositions, marks):
+    #     emit cluster: 0 for every glyph. The measure stage then treats the run
+    #     as a single atomic cluster-run with summed advances — correct total
+    #     width and no fabricated (wrong) cluster boundaries.
+    #
+    # gid stays 0 because the NIF does not expose glyph ids (only glyph names);
+    # the writer keys rendering on run text, not gids.
     defp enrich_with_cluster(raw_glyphs, text) do
-      grapheme_offsets =
-        text
-        |> String.graphemes()
-        |> Enum.scan(0, fn g, offset -> offset + byte_size(g) end)
-        |> List.insert_at(0, 0)
-        |> Enum.drop(-1)
+      graphemes = String.graphemes(text)
 
-      Enum.zip(raw_glyphs, grapheme_offsets)
-      |> Enum.map(fn {g, cluster} ->
-        Map.from_struct(g) |> Map.put(:cluster, cluster) |> Map.put(:gid, 0)
-      end)
+      if length(raw_glyphs) == length(graphemes) do
+        grapheme_offsets =
+          graphemes
+          |> Enum.scan(0, fn g, offset -> offset + byte_size(g) end)
+          |> List.insert_at(0, 0)
+          |> Enum.drop(-1)
+
+        Enum.zip(raw_glyphs, grapheme_offsets)
+        |> Enum.map(fn {g, cluster} ->
+          Map.from_struct(g) |> Map.put(:cluster, cluster) |> Map.put(:gid, 0)
+        end)
+      else
+        Enum.map(raw_glyphs, fn g ->
+          Map.from_struct(g) |> Map.put(:cluster, 0) |> Map.put(:gid, 0)
+        end)
+      end
     end
   end
 end
