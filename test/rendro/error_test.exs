@@ -42,6 +42,25 @@ defmodule Rendro.ErrorTest do
       assert err.next =~
                "Rendro does not currently support complex text shaping or RTL boundaries"
     end
+
+    test ":shaping_required with hint emits adapter guidance with hint text" do
+      hint = "\n    Add to your config: config :rendro, shaper: Rendro.Adapters.HarfBuzz"
+      err = Rendro.Error.from_stage(:measure, {:shaping_required, :arab, hint}, %{})
+      assert err.stage == :measure
+      assert err.reason == {:shaping_required, :arab, hint}
+      assert err.why =~ "requires a shaping adapter"
+      assert err.why =~ ":arab"
+      assert err.next =~ "config :rendro, shaper: Rendro.Adapters.HarfBuzz"
+    end
+
+    test ":shaping_required without hint emits adapter guidance based on HarfbuzzEx availability" do
+      err = Rendro.Error.from_stage(:measure, {:shaping_required, :hebr}, %{})
+      assert err.stage == :measure
+      assert err.reason == {:shaping_required, :hebr}
+      assert err.why =~ "requires a shaping adapter"
+      assert err.why =~ ":hebr"
+      assert err.next =~ "shaping adapter"
+    end
   end
 
   describe "from_stage/3 with stage :validate (Phase 6 D-09)" do

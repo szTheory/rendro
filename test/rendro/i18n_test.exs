@@ -21,7 +21,9 @@ defmodule Rendro.I18nTest do
     end
 
     test "traps unsupported scripts natively" do
-      # Arabic string
+      # Arabic string with the default Helvetica font (which has no Arabic glyphs).
+      # Font resolution fails for Arabic characters, returning an unsupported_glyph
+      # error that propagates as a structured Rendro.Error from the measure stage.
       doc =
         Rendro.document(
           pages: [
@@ -35,7 +37,8 @@ defmodule Rendro.I18nTest do
 
       assert {:error, %Rendro.Error{} = error} = Rendro.render(doc)
       assert error.stage == :measure
-      assert error.reason == {:unsupported_script, :rtl_required}
+      assert {:unsupported_glyph, _char} = error.reason
+      assert error.next =~ "fallback font"
     end
   end
 end
