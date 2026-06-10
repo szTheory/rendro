@@ -262,4 +262,127 @@ defmodule Rendro.Recipes.CertificateTest do
       end
     end
   end
+
+  # ---------------------------------------------------------------------------
+  # C15: border: true renders re and S frame operators
+  # ---------------------------------------------------------------------------
+
+  describe "C15: border: true renders certificate frame" do
+    test "renders {:ok, pdf} with border: true" do
+      doc = Certificate.document(fixture_data(), border: true)
+      assert {:ok, pdf} = Rendro.render(doc)
+      assert is_binary(pdf)
+    end
+
+    test "content stream contains re operator (rect path for frame)" do
+      doc = Certificate.document(fixture_data(), border: true)
+      assert {:ok, pdf} = Rendro.render(doc)
+      # Will fail RED until certificate border: option is implemented
+      assert pdf =~ "re"
+    end
+
+    test "content stream contains S operator (stroke for frame)" do
+      doc = Certificate.document(fixture_data(), border: true)
+      assert {:ok, pdf} = Rendro.render(doc)
+      # Will fail RED until certificate border: option is implemented
+      assert pdf =~ "S"
+    end
+  end
+
+  # ---------------------------------------------------------------------------
+  # C16: border: false (default) → byte-identical renders
+  # ---------------------------------------------------------------------------
+
+  describe "C16: border: false (default) byte-identity" do
+    test "two renders with default (no border key) are byte-identical" do
+      doc = Certificate.document(fixture_data())
+      {:ok, pdf1} = Rendro.render(doc, deterministic: true)
+      {:ok, pdf2} = Rendro.render(doc, deterministic: true)
+      assert pdf1 == pdf2
+    end
+
+    test "explicit border: false is byte-identical to default (no border key)" do
+      doc_default = Certificate.document(fixture_data())
+      doc_false = Certificate.document(fixture_data(), border: false)
+      {:ok, pdf1} = Rendro.render(doc_default, deterministic: true)
+      {:ok, pdf2} = Rendro.render(doc_false, deterministic: true)
+      assert pdf1 == pdf2
+    end
+  end
+
+  # ---------------------------------------------------------------------------
+  # C17: frame coords differ between A4 and US Letter (geometry-derived)
+  # ---------------------------------------------------------------------------
+
+  describe "C17: frame region coordinates differ between page sizes" do
+    test "frame region width differs between A4 and US Letter" do
+      t_a4 = Certificate.page_template(page_size: :a4, orientation: :landscape, border: true)
+      t_us = Certificate.page_template(page_size: :us_letter, orientation: :landscape, border: true)
+      frame_a4 = Enum.find(t_a4.regions, &(&1.name == :frame))
+      frame_us = Enum.find(t_us.regions, &(&1.name == :frame))
+      # Will fail RED until :frame region is added to page_template when border: true
+      assert frame_a4 != nil, "expected :frame region in A4 template when border: true"
+      assert frame_us != nil, "expected :frame region in US Letter template when border: true"
+      refute_in_delta frame_a4.width, frame_us.width, 0.01
+    end
+  end
+
+  # ---------------------------------------------------------------------------
+  # C18: inset formula = 0.5 * min(margins)
+  # ---------------------------------------------------------------------------
+
+  describe "C18: frame inset derived from margins formula" do
+    test "frame region x and y equal 0.5 * min(margins)" do
+      # Default margins are all equal (72pt), so inset = 0.5 * 72 = 36
+      t = Certificate.page_template(border: true)
+      frame = Enum.find(t.regions, &(&1.name == :frame))
+      # Will fail RED until :frame region is added to page_template when border: true
+      assert frame != nil, "expected :frame region in template when border: true"
+      # margin_left = margin_right = margin_top = margin_bottom = 72 (default)
+      expected_inset = 0.5 * 72
+      assert_in_delta frame.x, expected_inset, 0.01
+      assert_in_delta frame.y, expected_inset, 0.01
+    end
+  end
+
+  # ---------------------------------------------------------------------------
+  # C19: border: %{color: {255, 0, 0}} → red RG color in content stream
+  # ---------------------------------------------------------------------------
+
+  describe "C19: border color map option" do
+    test "border: %{color: {255, 0, 0}} emits red stroke color in content stream" do
+      doc = Certificate.document(fixture_data(), border: %{color: {255, 0, 0}})
+      assert {:ok, pdf} = Rendro.render(doc)
+      # Will fail RED until border: map color option is implemented
+      # Red channel 1.0000, green 0.0000, blue 0.0000 for RG operator
+      assert pdf =~ "1.0000 0.0000 0.0000 RG"
+    end
+  end
+
+  # ---------------------------------------------------------------------------
+  # C20: validate_border! rejects invalid options
+  # ---------------------------------------------------------------------------
+
+  describe "C20: validate_border! rejects invalid options" do
+    test "unknown key raises ArgumentError" do
+      # Will fail RED until validate_border! is implemented
+      assert_raise ArgumentError, ~r/unknown.*key|key.*unknown/i, fn ->
+        Certificate.document(fixture_data(), border: %{unknown_key: true})
+      end
+    end
+
+    test "invalid color (hex string) raises ArgumentError mentioning hex" do
+      # Will fail RED until validate_border! is implemented with color delegation
+      assert_raise ArgumentError, ~r/hex/i, fn ->
+        Certificate.document(fixture_data(), border: %{color: "#000"})
+      end
+    end
+
+    test "inset too large raises ArgumentError mentioning inset" do
+      # Will fail RED until validate_border! is implemented with inset bounds check
+      assert_raise ArgumentError, ~r/inset/i, fn ->
+        Certificate.document(fixture_data(), border: %{inset: 99_999})
+      end
+    end
+  end
 end

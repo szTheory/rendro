@@ -17,7 +17,8 @@ lanes = [
   {"Page-primitive semantic-claims lane", ["test", "test/docs_contract/page_primitive_claims_test.exs"]},
   {"Public API contract lane", ["test", "test/docs_contract/public_api_contract_test.exs"]},
   {"API stability claims lane", ["test", "test/docs_contract/api_stability_claims_test.exs"]},
-  {"Script support claims lane", ["test", "test/docs_contract/script_support_claims_test.exs"]}
+  {"Script support claims lane", ["test", "test/docs_contract/script_support_claims_test.exs"]},
+  {"Path claims lane", ["test", "test/docs_contract/path_claims_test.exs"]}
 ]
 
 Mix.shell().info("Running explicit docs-contract lanes...")
