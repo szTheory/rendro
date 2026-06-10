@@ -21,6 +21,10 @@ if Code.ensure_loaded?(HarfbuzzEx) do
 
     @behaviour Rendro.Text.Shaper
 
+    @doc """
+    Shapes `text` with HarfBuzz (rustybuzz) for embedded fonts; built-in fonts
+    are delegated to `Rendro.Text.Shaper.Simple` (no NIF required for them).
+    """
     @spec shape(Rendro.PDF.Font.t(), String.t(), keyword()) ::
             {:ok, [Rendro.Text.Shaper.glyph()]} | {:error, term()}
     @impl Rendro.Text.Shaper

@@ -36,7 +36,9 @@
       ]
     },
     "Elixir.Rendro.Adapters.HarfBuzz": {
-      "functions": [],
+      "functions": [
+        "shape/3"
+      ],
       "tier": "adapter",
       "types": []
     },
@@ -468,7 +470,9 @@
       ]
     },
     "Elixir.Rendro.Text.Shaper.Simple": {
-      "functions": [],
+      "functions": [
+        "shape/3"
+      ],
       "tier": "stable",
       "types": []
     }

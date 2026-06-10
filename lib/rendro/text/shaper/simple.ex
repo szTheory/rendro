@@ -38,6 +38,15 @@ defmodule Rendro.Text.Shaper.Simple do
                       :tibt
                     ])
 
+  @doc """
+  Shapes `text` using cmap advance widths only (one glyph per grapheme,
+  `cluster: 0`).
+
+  Works for both built-in and embedded fonts. Returns
+  `{:error, {:shaping_required, script, hint}}` when `opts[:script]` is one of
+  the requires-shaping scripts this engine cannot render correctly (Arabic,
+  Indic, Thai, Hebrew, and the rest of the curated complex-shaping set).
+  """
   @spec shape(Rendro.PDF.Font.t(), String.t(), keyword()) ::
           {:ok, [Rendro.Text.Shaper.glyph()]} | {:error, term()}
   @impl Rendro.Text.Shaper
