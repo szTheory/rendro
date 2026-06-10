@@ -119,7 +119,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 _Milestone **v2.6 Public Launch & Adoption Bootstrap** is active (concrete REQ-IDs in `REQUIREMENTS.md`, phases 83–88 in `ROADMAP.md`). Headline requirements:_
 
-- [ ] **Claim-accuracy & shaping hygiene** — `harfbuzz_ex` optional behind a `Rendro.Text.Shaper` behaviour with pure-Elixir `Shaper.Simple` in core, per-grapheme shaping bug fixed, `unicode_data` → `ex_unicode` migration, `explicit_deferral` matrix rows for complex scripts (HYG-xx).
+- [x] **Claim-accuracy & shaping hygiene** — `harfbuzz_ex` optional behind a `Rendro.Text.Shaper` behaviour with pure-Elixir `Shaper.Simple` in core, per-grapheme shaping bug fixed, `unicode_data` → `unicode` migration, `explicit_deferral` matrix rows for complex scripts (HYG-01..05). Validated in Phase 83: Claim-Accuracy & Shaping Hygiene (2026-06-10, 4/4 success criteria, 1022 tests green; 12 code-review findings fixed incl. per-render `shaper:` override and embedded-font default-install fix).
 - [ ] **Drawn-path primitive + visible polish** — declarative `%Rendro.Path{}`, table rules/borders, Certificate border frame, determinism golden tests (PATH-xx).
 - [ ] **Deterministic raster lane** — `Pdfium.render/2`, golden-PNG snapshot harness, advisory CI lane, honest `pdfium-render` evidence vocabulary (RAST-xx).
 - [ ] **Self-proving launch artifacts** — CI-hash-checked visual recipe gallery, self-rendered `manual.pdf` with published SHA-256, reproducible benchmark/comparison page, CI-executed Livebook tutorial (GAL-xx, CMP-xx).
@@ -253,4 +253,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-10 — Started milestone v2.6 Public Launch & Adoption Bootstrap (deep-research-backed scoping; five parallel research agents). Next: define REQUIREMENTS.md, create roadmap (phases 83–88).*
+*Last updated: 2026-06-10 — Phase 83 (Claim-Accuracy & Shaping Hygiene) complete: "pure Elixir core" claim restored — `harfbuzz_ex` optional behind the public `Rendro.Text.Shaper` behaviour, complex scripts fail instructively, cluster-boundary line breaking fixed, `unicode` migration done, matrix deferral rows enforced by docs-contract lane. Next: Phase 84 (Drawn-Path Primitive & Visible Polish).*
