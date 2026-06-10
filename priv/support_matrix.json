@@ -449,6 +449,33 @@
       "evidence_deferred": "Thai and other SEA scripts require cluster-aware line breaking, vowel positioning, and tone mark handling that Shaper.Simple does not implement; deferred to v2.7 behind the LNCH-03 demand gate."
     }
   },
+  "path_primitive": {
+    "capabilities": {
+      "move_line_curve_rect_rounded_rect": "supported",
+      "stroke_color_width_dash_cap_join": "supported",
+      "fill": "supported",
+      "deterministic_output": "supported"
+    },
+    "behaviors": {
+      "block_relative_y_down_coords": "supported",
+      "ops_extent_bbox_fallback": "supported",
+      "format_num_determinism": "supported"
+    },
+    "explicit_deferrals": {
+      "transforms_cm": {
+        "status": "explicit_deferral",
+        "evidence_deferred": "Affine transforms (cm operator) deferred — adds viewer-compat surface; v1 path surface is move/line/curve/rect/rounded-rect + stroke/fill only. Tracked in support_matrix.json deferral rows per PATH-04."
+      },
+      "clipping_W": {
+        "status": "explicit_deferral",
+        "evidence_deferred": "Clipping paths (W/W* operators) deferred — adds viewer-compat surface requiring cross-viewer testing; v1 path surface deferred per PATH-04."
+      },
+      "gradients": {
+        "status": "explicit_deferral",
+        "evidence_deferred": "Gradients (PDF shading dictionaries) deferred — adds significant viewer-compat surface; v1 path surface is stroke/fill only per PATH-04."
+      }
+    }
+  },
   "unsupported": [
     "full_pdf_compliance",
     "digital_signatures"

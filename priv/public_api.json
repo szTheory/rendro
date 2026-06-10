@@ -440,6 +440,7 @@
       "functions": [],
       "tier": "stable",
       "types": [
+        "borders/0",
         "column_rule/0",
         "decoration_break/0",
         "row/0",
