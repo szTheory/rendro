@@ -194,3 +194,6 @@ Every `explicit_deferral` viewer row in `priv/support_matrix.json` carries a nam
 - text_shaping × hebrew_rtl: Hebrew rendering requires UAX #9 bidi reordering which is not implemented in Rendro.Text.Bidi; visual reordering and RTL line presentation are deferred to v2.7 behind the LNCH-03 demand gate.
 - text_shaping × devanagari: Devanagari and other Indic scripts require complex glyph reordering, conjunct formation, and matra positioning that Shaper.Simple does not implement; deferred to v2.7 behind the LNCH-03 demand gate.
 - text_shaping × thai: Thai and other SEA scripts require cluster-aware line breaking, vowel positioning, and tone mark handling that Shaper.Simple does not implement; deferred to v2.7 behind the LNCH-03 demand gate.
+- path_primitive × transforms_cm: Affine transforms (cm operator) deferred — adds viewer-compat surface; v1 path surface is move/line/curve/rect/rounded-rect + stroke/fill only. Tracked in support_matrix.json deferral rows per PATH-04.
+- path_primitive × clipping_W: Clipping paths (W/W* operators) deferred — adds viewer-compat surface requiring cross-viewer testing; v1 path surface deferred per PATH-04.
+- path_primitive × gradients: Gradients (PDF shading dictionaries) deferred — adds significant viewer-compat surface; v1 path surface is stroke/fill only per PATH-04.
