@@ -61,8 +61,7 @@ defmodule Rendro.Pipeline.Measure do
   end
 
   defp measure_block(doc, %Rendro.Block{content: %Rendro.Text{} = text} = block, _container_width) do
-    with [] <- Rendro.I18n.Analyzer.analyze(text.content),
-         {:ok, font_chain} <- resolve_font_chain(doc, text),
+    with {:ok, font_chain} <- resolve_font_chain(doc, text),
          {:ok, lines} <- wrap_text(text.content, block.width, font_chain, text.size) do
       measured_width = measured_text_width(lines)
       width = block.width || measured_width
@@ -82,8 +81,11 @@ defmodule Rendro.Pipeline.Measure do
 
       {:ok, %{block | content: measured_text, width: width, height: height}}
     else
-      [%{type: :unsupported_script, reason: reason} | _] ->
-        {:error, {:unsupported_script, reason}}
+      {:error, {:shaping_required, _, _} = reason} ->
+        {:error, Rendro.Error.from_stage(:measure, reason)}
+
+      {:error, {:shaping_required, _} = reason} ->
+        {:error, Rendro.Error.from_stage(:measure, reason)}
 
       {:error, _} = err ->
         err

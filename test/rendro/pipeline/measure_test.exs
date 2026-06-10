@@ -549,6 +549,90 @@ defmodule Rendro.Pipeline.MeasureTest do
     end
   end
 
+  describe "HYG-02: shaping_required error propagation" do
+    # Build a fake font that reports Arabic codepoints as present (so font resolution passes)
+    # but has source: :built_in so the HarfBuzz adapter delegates to Shaper.Simple,
+    # which returns {:error, {:shaping_required, :arab, hint}} for Arabic script.
+    defp arabic_capable_fake_font do
+      # Arabic codepoints for "مرحبا" (م ر ح ب ا) and space
+      arabic_widths =
+        [32, 1575, 1576, 1581, 1585, 1605, 1576, 1575]
+        |> Enum.uniq()
+        |> Map.new(fn cp -> {cp, 500} end)
+
+      %Rendro.PDF.Font{
+        source: :built_in,
+        logical_name: :fake_arabic,
+        name: "F_FAKE_ARABIC",
+        base_font: "FakeArabic",
+        subtype: :type1,
+        units_per_em: 1000,
+        ascent: 800,
+        descent: -200,
+        default_width: 500,
+        widths: arabic_widths,
+        cmap: nil,
+        font_bytes: nil
+      }
+    end
+
+    # Build a document with a fake Arabic-capable font registered in the font registry.
+    # The descriptor uses source: :embedded with a pre-built pdf_font to inject the
+    # fake font struct directly (bypasses font byte loading).
+    defp doc_with_arabic_text do
+      fake_font = arabic_capable_fake_font()
+
+      fake_descriptor = %{
+        source: :embedded,
+        source_kind: :binary,
+        variant: :regular,
+        source_data: %{status: :ok, kind: :binary, bytes: <<>>, byte_size: 0},
+        pdf_font: fake_font
+      }
+
+      base_registry = Rendro.FontRegistry.new()
+
+      custom_registry = %Rendro.FontRegistry{
+        base_registry
+        | fonts: Map.put(base_registry.fonts, :fake_arabic, fake_descriptor),
+          default_font: :fake_arabic
+      }
+
+      text = %Rendro.Text{content: "مرحبا", font: :fake_arabic, size: 12, color: {0, 0, 0}}
+      block = %Rendro.Block{content: text, x: 0, y: 0, width: nil, height: nil}
+      page = %Rendro.Page{blocks: [block]}
+
+      %Rendro.Document{
+        pages: [page],
+        font_registry: custom_registry,
+        default_font: :fake_arabic,
+        metadata: %Rendro.Metadata{}
+      }
+    end
+
+    test "Arabic text with Shaper.Simple returns a structured shaping_required error" do
+      # HarfBuzz adapter delegates source: :built_in fonts to Shaper.Simple.
+      # Shaper.Simple returns {:error, {:shaping_required, :arab, hint}} for Arabic script.
+      # measure_block wraps this in Rendro.Error.from_stage(:measure, reason).
+      result = Measure.run(doc_with_arabic_text())
+
+      assert {:error, %Rendro.Error{stage: :measure} = error} = result
+      assert {:shaping_required, :arab, _hint} = error.reason
+      assert error.why =~ "requires a shaping adapter"
+      assert error.why =~ ":arab"
+      assert error.next =~ "shaping adapter"
+    end
+
+    test "Latin text measured returns ok unchanged" do
+      text = %Rendro.Text{content: "Hello", font: "Helvetica", size: 12, color: {0, 0, 0}}
+      block = %Rendro.Block{content: text, x: 0, y: 0, width: nil, height: nil}
+      page = %Rendro.Page{blocks: [block]}
+      doc = %Rendro.Document{pages: [page], metadata: %Rendro.Metadata{}}
+
+      assert {:ok, _result} = Measure.run(doc)
+    end
+  end
+
   describe "Grid Projection" do
     test "measure_block/3 normalizes lists into Row/Cell structs and builds 2D Grid" do
       table = %Rendro.Table{
