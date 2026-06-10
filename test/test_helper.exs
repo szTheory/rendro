@@ -9,10 +9,12 @@ Rendro.Test.Mocks.ensure_table!()
 # guards in lib/ re-evaluate against the test environment.
 Rendro.Test.Mocks.AdapterReloader.recompile()
 
-# Configure the HarfBuzz shaper for the test environment when harfbuzz_ex is available.
-# Tests that use embedded fonts require a shaping adapter; Shaper.Simple only handles
-# built-in fonts. Production callers set: config :rendro, shaper: Rendro.Adapters.HarfBuzz
-# HarfBuzz delegates built-in font calls to Shaper.Simple, so all tests remain correct.
-if Code.ensure_loaded?(HarfbuzzEx) and Code.ensure_loaded?(Rendro.Adapters.HarfBuzz) do
-  Application.put_env(:rendro, :shaper, Rendro.Adapters.HarfBuzz)
-end
+# The default suite intentionally runs under the DEFAULT shaper
+# (Rendro.Text.Shaper.Simple) — the code path hex consumers actually receive
+# on a clean install. Do NOT auto-activate the HarfBuzz adapter here via
+# Code.ensure_loaded? (WR-03): that masks default-path regressions and turns
+# determinism proofs into proofs about the optional NIF engine. Tests that
+# need the HarfBuzz adapter must opt in explicitly — either by calling
+# Rendro.Adapters.HarfBuzz directly (see test/rendro/adapters/harfbuzz_test.exs)
+# or via the per-render `shaper:` option / a per-test Application.put_env in
+# their own async: false setup.

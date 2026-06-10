@@ -81,6 +81,24 @@ defmodule Rendro.Text.ShaperTest do
     end
   end
 
+  describe "default-install end-to-end (WR-03)" do
+    test "an embedded Latin font renders under the default Simple shaper with zero config" do
+      # The setup block deleted the :rendro, :shaper env — this is exactly the
+      # clean hex install path: no harfbuzz_ex config, no shaper option.
+      font_path = Path.join(:code.priv_dir(:rendro), "branded/fonts/B612-Regular.ttf")
+
+      doc =
+        Rendro.flow([
+          Rendro.block(Rendro.text("Hello from an embedded font", font: :brand, size: 12))
+        ])
+        |> Rendro.register_embedded_font(:brand, {:path, font_path})
+
+      assert {:ok, pdf} = Rendro.render(doc)
+      assert is_binary(pdf)
+      assert byte_size(pdf) > 0
+    end
+  end
+
   describe "per-render shaper override (D-01 / CR-02)" do
     test "per-render :shaper render option wins over app config" do
       Application.put_env(:rendro, :shaper, Rendro.Text.ShaperTest.ConfigShaper)
