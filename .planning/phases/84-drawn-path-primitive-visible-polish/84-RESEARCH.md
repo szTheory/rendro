@@ -841,7 +841,7 @@ frame_region = Rendro.region(
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Does `apply_page_template` handle `anchor: :fixed` identity with a `region_suppress_on` check?**
    - What we know: `apply_page_template` uses `region_suppress_on = Map.get(layout, :region_suppress_on, %{})` to optionally suppress region content on specific pages.
