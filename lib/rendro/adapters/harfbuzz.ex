@@ -8,7 +8,10 @@ if Code.ensure_loaded?(HarfbuzzEx) do
         config :rendro, shaper: Rendro.Adapters.HarfBuzz
 
     This adapter handles all scripts including Arabic, Indic, Thai, Hebrew, and other
-    complex scripts. It delegates to `HarfbuzzEx.get!/3` with SHA256-keyed font temp files.
+    complex scripts. It delegates to `HarfbuzzEx.get!/3` with a SHA256-keyed font cache
+    kept in a rendro-private (0700) subdirectory of the system temp dir; cached files
+    are content-verified before reuse and written atomically. Cache files persist for
+    the host's lifetime (one file per distinct embedded font).
 
     This module is only compiled when `HarfbuzzEx` is available at compile time
     (via `Code.ensure_loaded?/1`). If `harfbuzz_ex` is not in your dependencies,
@@ -28,10 +31,7 @@ if Code.ensure_loaded?(HarfbuzzEx) do
 
     def shape(%Rendro.PDF.Font{source: :embedded, font_bytes: bytes}, text, _opts)
         when is_binary(bytes) and is_binary(text) do
-      hash = :crypto.hash(:sha256, bytes) |> Base.encode16()
-      temp_dir = System.tmp_dir() || "/tmp"
-      font_path = Path.join(temp_dir, "rendro_font_#{hash}.ttf")
-      unless File.exists?(font_path), do: File.write!(font_path, bytes)
+      font_path = cached_font_path(bytes)
 
       raw_glyphs = HarfbuzzEx.get!(font_path, text, :all)
       glyphs = enrich_with_cluster(raw_glyphs, text)
@@ -49,6 +49,62 @@ if Code.ensure_loaded?(HarfbuzzEx) do
       {:ok, glyphs}
     rescue
       e -> {:error, e}
+    end
+
+    # SHA256-keyed font cache hardened against shared-tmp attacks (CR-05):
+    #
+    #   * Files live in a rendro-private subdirectory created (and re-chmodded)
+    #     with 0700 permissions instead of directly in the world-writable tmp dir.
+    #   * A cache hit is only trusted when File.lstat reports a regular file
+    #     (symlinks are rejected) AND its content matches the font bytes exactly
+    #     — pre-planted or stale/partial files are detected and rewritten.
+    #   * Writes go to a unique temp name and are published with an atomic
+    #     File.rename, so concurrent renders can never observe a torn write.
+    #
+    # Dependency-free by design; raised filesystem errors are converted to
+    # {:error, exception} by the rescue clause in shape/3.
+    defp cached_font_path(bytes) do
+      hash = :crypto.hash(:sha256, bytes) |> Base.encode16()
+      dir = Path.join(System.tmp_dir!(), "rendro_fonts_#{:erlang.phash2({node(), :rendro})}")
+      File.mkdir_p!(dir)
+      _ = File.chmod(dir, 0o700)
+      font_path = Path.join(dir, "#{hash}.ttf")
+
+      if cached_font_valid?(font_path, bytes) do
+        font_path
+      else
+        write_font_atomically(dir, font_path, bytes)
+      end
+    end
+
+    defp cached_font_valid?(font_path, bytes) do
+      with {:ok, %File.Stat{type: :regular}} <- File.lstat(font_path),
+           {:ok, existing} <- File.read(font_path) do
+        existing == bytes
+      else
+        _ -> false
+      end
+    end
+
+    defp write_font_atomically(dir, font_path, bytes) do
+      tmp =
+        Path.join(dir, "#{Path.basename(font_path)}.#{System.unique_integer([:positive])}.tmp")
+
+      File.write!(tmp, bytes)
+      _ = File.chmod(tmp, 0o600)
+
+      # If font_path exists as a symlink or stale file, rename atomically
+      # replaces the link/file itself (not its target). If it is something
+      # rename cannot replace (e.g. a planted directory), remove it first.
+      case File.rename(tmp, font_path) do
+        :ok ->
+          font_path
+
+        {:error, _} ->
+          _ = File.rm_rf(font_path)
+          File.rename!(tmp, font_path)
+          font_path
+      end
     end
 
     # HarfbuzzEx 1.2 (rustybuzz wrapper) exposes only name/advances/offsets per

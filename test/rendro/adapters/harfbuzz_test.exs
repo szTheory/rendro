@@ -32,6 +32,27 @@ if Code.ensure_loaded?(Rendro.Adapters.HarfBuzz) do
       |> Enum.drop(-1)
     end
 
+    describe "font cache hardening (CR-05)" do
+      test "a poisoned/stale cache file is detected and atomically rewritten" do
+        font = b612_font()
+        hash = :crypto.hash(:sha256, font.font_bytes) |> Base.encode16()
+
+        cache_dir =
+          Path.join(System.tmp_dir!(), "rendro_fonts_#{:erlang.phash2({node(), :rendro})}")
+
+        File.mkdir_p!(cache_dir)
+        cache_path = Path.join(cache_dir, "#{hash}.ttf")
+
+        # Simulate a pre-planted / truncated cache entry at the predictable name.
+        File.write!(cache_path, "not a font")
+
+        # Shaping must not trust the poisoned file: it rewrites it and succeeds.
+        assert {:ok, glyphs} = Rendro.Adapters.HarfBuzz.shape(font, "Hello", script: :latn)
+        assert glyphs != []
+        assert File.read!(cache_path) == font.font_bytes
+      end
+    end
+
     describe "cluster semantics (CR-04)" do
       test "1:1 output gets grapheme byte-offset clusters; non-1:1 output gets all-zero clusters" do
         font = b612_font()
