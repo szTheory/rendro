@@ -23,6 +23,21 @@ defmodule Rendro.Recipes.Certificate do
     - `:seal_line` — signature / seal line (default `""`)
     - `:brand` — `%{font_name: atom(), logo_name: atom()}` for branded output
 
+  ## Border frame option
+
+  The `border:` option adds a decorative keyline frame to the certificate.
+  All frame geometry is derived from page dimensions and margins — zero
+  hardcoded numerics.
+
+    - `border: false` (default) — no frame; output is byte-identical to prior output
+    - `border: true` — single near-ink keyline (`{34, 34, 34}`), geometry-derived
+    - `border: %{...}` — map with any subset of override keys:
+        - `:color` — `{r, g, b}` integer tuple (0–255), default `{34, 34, 34}`
+        - `:style` — `:single` (default) or `:double`
+        - `:inset` — float in pt, default `0.5 * min(margins)`
+        - `:weight` — line width in pt, default `max(1.0, short / 400)`
+        - `:gap` — gap between rules for `:double` style, default `0`
+
   ## Examples
 
       iex> template = Rendro.Recipes.Certificate.page_template()
@@ -43,6 +58,9 @@ defmodule Rendro.Recipes.Certificate do
   @default_orientation :landscape
   @default_margin 72
 
+  # Closed allowlist for border map keys (D-21)
+  @border_allowed_keys [:style, :color, :inset, :gap, :weight]
+
   @doc """
   Returns a `%Rendro.PageTemplate{}` with geometry derived from the page size
   and orientation options. Default is A4 landscape.
@@ -53,6 +71,7 @@ defmodule Rendro.Recipes.Certificate do
     - `:orientation` — `:landscape` (default) or `:portrait`
     - `:margin_top` / `:margin_right` / `:margin_bottom` / `:margin_left` — margin in pt (default 72)
     - `:name` — template name atom (default `:certificate`)
+    - `:border` — `false` (default), `true`, or a border options map
 
   ## Examples
 
@@ -79,6 +98,40 @@ defmodule Rendro.Recipes.Certificate do
     content_w = pw - ml - mr
     content_h = ph - mt - mb
 
+    border = Keyword.get(opts, :border, false)
+
+    body_region =
+      Rendro.region(
+        name: :body,
+        role: :body,
+        anchor: :flow,
+        x: ml,
+        y: mt,
+        width: content_w,
+        height: content_h
+      )
+
+    regions =
+      if border do
+        frame_opts = resolve_frame_opts(border, pw, ph, ml, mr, mt, mb)
+        inset = frame_opts.inset
+
+        frame_region =
+          Rendro.region(
+            name: :frame,
+            role: :custom,
+            anchor: :fixed,
+            x: inset,
+            y: inset,
+            width: pw - 2 * inset,
+            height: ph - 2 * inset
+          )
+
+        [body_region, frame_region]
+      else
+        [body_region]
+      end
+
     Rendro.page_template(
       name: Keyword.get(opts, :name, :certificate),
       width: pw,
@@ -87,17 +140,7 @@ defmodule Rendro.Recipes.Certificate do
       margin_right: mr,
       margin_bottom: mb,
       margin_left: ml,
-      regions: [
-        Rendro.region(
-          name: :body,
-          role: :body,
-          anchor: :flow,
-          x: ml,
-          y: mt,
-          width: content_w,
-          height: content_h
-        )
-      ]
+      regions: regions
     )
   end
 
@@ -115,7 +158,47 @@ defmodule Rendro.Recipes.Certificate do
   @spec sections(map(), keyword()) :: [Rendro.Section.t()]
   def sections(data, opts \\ []) do
     template = page_template(opts)
-    [body_section(data, opts, template)]
+    body = body_section(data, opts, template)
+
+    border = Keyword.get(opts, :border, false)
+
+    if border do
+      page_size = Keyword.get(opts, :page_size, @default_page_size)
+      orientation = Keyword.get(opts, :orientation, @default_orientation)
+      {pw, ph} = Rendro.PageSize.resolve(page_size, orientation)
+
+      ml = Keyword.get(opts, :margin_left, @default_margin)
+      mr = Keyword.get(opts, :margin_right, @default_margin)
+      mt = Keyword.get(opts, :margin_top, @default_margin)
+      mb = Keyword.get(opts, :margin_bottom, @default_margin)
+
+      frame_opts = resolve_frame_opts(border, pw, ph, ml, mr, mt, mb)
+      inset = frame_opts.inset
+      region_w = pw - 2 * inset
+      region_h = ph - 2 * inset
+
+      frame_block = %Rendro.Block{
+        width: region_w,
+        height: region_h,
+        x: 0,
+        y: 0,
+        content: %Rendro.Path{
+          ops: [{:rect, 0, 0, region_w, region_h}],
+          stroke: %{color: frame_opts.color, width: frame_opts.weight}
+        }
+      }
+
+      frame_section =
+        Rendro.section(
+          name: :certificate_frame,
+          region: :frame,
+          content: [frame_block]
+        )
+
+      [body, frame_section]
+    else
+      [body]
+    end
   end
 
   @doc """
@@ -128,6 +211,7 @@ defmodule Rendro.Recipes.Certificate do
 
     - `:page_number_opts` — options forwarded to `Rendro.page_number/1` (unused
       for single-page certificates; included for API consistency)
+    - `:border` — `false` (default), `true`, or a border options map (see module docs)
 
   ## Examples
 
@@ -140,6 +224,24 @@ defmodule Rendro.Recipes.Certificate do
   @spec document(map(), keyword()) :: Rendro.Document.t()
   def document(data, opts \\ []) do
     validate_data!(data)
+
+    border = Keyword.get(opts, :border, false)
+
+    if border do
+      page_size = Keyword.get(opts, :page_size, @default_page_size)
+      orientation = Keyword.get(opts, :orientation, @default_orientation)
+      {_pw, _ph} = Rendro.PageSize.resolve(page_size, orientation)
+
+      ml = Keyword.get(opts, :margin_left, @default_margin)
+      mr = Keyword.get(opts, :margin_right, @default_margin)
+      mt = Keyword.get(opts, :margin_top, @default_margin)
+      mb = Keyword.get(opts, :margin_bottom, @default_margin)
+
+      min_margin = Enum.min([ml, mr, mt, mb])
+      border_map = if is_map(border), do: border, else: %{}
+      validate_border!(border_map, min_margin)
+    end
+
     template = page_template(opts)
     secs = sections(data, opts)
 
@@ -191,8 +293,129 @@ defmodule Rendro.Recipes.Certificate do
   end
 
   # ---------------------------------------------------------------------------
+  # Frame geometry helpers
+  # ---------------------------------------------------------------------------
+
+  # Resolves frame opts, computing geometry-derived defaults.
+  # Returns a fully resolved map with :style, :color, :inset, :weight, :gap.
+  defp resolve_frame_opts(border, pw, ph, ml, mr, mt, mb) do
+    border_map = if is_map(border), do: border, else: %{}
+
+    short = min(pw, ph)
+    default_inset = 0.5 * Enum.min([ml, mr, mt, mb])
+    default_weight = max(1.0, short / 400)
+
+    %{
+      style: Map.get(border_map, :style, :single),
+      color: Map.get(border_map, :color, {34, 34, 34}),
+      inset: Map.get(border_map, :inset, default_inset),
+      weight: Map.get(border_map, :weight, default_weight),
+      gap: Map.get(border_map, :gap, 0)
+    }
+  end
+
+  # ---------------------------------------------------------------------------
   # Validation
   # ---------------------------------------------------------------------------
+
+  defp validate_border!(border_map, min_margin) do
+    # Closed key allowlist check
+    unknown_keys = Map.keys(border_map) -- @border_allowed_keys
+
+    unless unknown_keys == [] do
+      raise ArgumentError, """
+      Rendro.Recipes.Certificate.document/2 — unknown border option key(s).
+
+      What:  The border: map contains unrecognised keys.
+      Where: Rendro.Recipes.Certificate.validate_border!/2
+      Why:   Unknown key(s): #{inspect(unknown_keys)}.
+      Next:  Valid border keys are: #{inspect(@border_allowed_keys)}.
+      """
+    end
+
+    # :style must be :single or :double
+    if style = Map.get(border_map, :style) do
+      unless style in [:single, :double] do
+        raise ArgumentError, """
+        Rendro.Recipes.Certificate.document/2 — invalid :style value.
+
+        What:  :style must be :single or :double.
+        Where: Rendro.Recipes.Certificate.validate_border!/2
+        Why:   Got #{inspect(style)}.
+        Next:  Use border: %{style: :single} or border: %{style: :double}.
+        """
+      end
+    end
+
+    # :color must be a valid {r,g,b} tuple — delegate to Rendro.Color
+    if color = Map.get(border_map, :color) do
+      case Rendro.Color.validate(color) do
+        :ok -> :ok
+        {:error, msg} -> raise ArgumentError, msg
+      end
+    end
+
+    # :inset must be numeric and < min_margin
+    if Map.has_key?(border_map, :inset) do
+      inset = Map.get(border_map, :inset)
+
+      unless is_number(inset) do
+        raise ArgumentError, """
+        Rendro.Recipes.Certificate.document/2 — invalid :inset value.
+
+        What:  :inset must be a number.
+        Where: Rendro.Recipes.Certificate.validate_border!/2
+        Why:   Got #{inspect(inset)}.
+        Next:  Provide a numeric value in points, e.g. border: %{inset: 36}.
+        """
+      end
+
+      if inset >= min_margin do
+        raise ArgumentError, """
+        Rendro.Recipes.Certificate.document/2 — :inset too large.
+
+        What:  :inset would cross into the content area.
+        Where: Rendro.Recipes.Certificate.validate_border!/2
+        Why:   inset #{inset} would cross into content area. Safe maximum: less than #{min_margin}.
+        Next:  Use an inset value less than #{min_margin} (the smallest page margin).
+        """
+      end
+    end
+
+    # :weight must be numeric
+    if Map.has_key?(border_map, :weight) do
+      weight = Map.get(border_map, :weight)
+
+      unless is_number(weight) do
+        raise ArgumentError, """
+        Rendro.Recipes.Certificate.document/2 — invalid :weight value.
+
+        What:  :weight must be a number.
+        Where: Rendro.Recipes.Certificate.validate_border!/2
+        Why:   Got #{inspect(weight)}.
+        Next:  Provide a numeric value in points, e.g. border: %{weight: 1.5}.
+        """
+      end
+    end
+
+    # :gap must be numeric
+    if Map.has_key?(border_map, :gap) do
+      gap = Map.get(border_map, :gap)
+
+      unless is_number(gap) do
+        raise ArgumentError, """
+        Rendro.Recipes.Certificate.document/2 — invalid :gap value.
+
+        What:  :gap must be a number.
+        Where: Rendro.Recipes.Certificate.validate_border!/2
+        Why:   Got #{inspect(gap)}.
+        Next:  Provide a numeric value in points, e.g. border: %{gap: 4}.
+        """
+      end
+    end
+
+    :ok
+  end
 
   defp validate_data!(data) do
     required = [:title, :recipient, :date]
