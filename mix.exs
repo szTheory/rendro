@@ -42,8 +42,8 @@ defmodule Rendro.MixProject do
   defp deps do
     [
       {:telemetry, "~> 1.4"},
-      {:harfbuzz_ex, "~> 1.2"},
-      {:unicode_data, "~> 0.8.0"},
+      {:harfbuzz_ex, "~> 1.2", optional: true},
+      {:unicode, "~> 1.22"},
       {:decimal, ">= 2.3.0 and < 4.0.0"},
       {:phoenix, "~> 1.7", optional: true},
       {:plug, "~> 1.14", optional: true},
@@ -154,7 +154,9 @@ defmodule Rendro.MixProject do
           Rendro.AssetRegistry,
           Rendro.EmbeddedFileRegistry,
           Rendro.RunningContent,
-          Rendro.Error
+          Rendro.Error,
+          Rendro.Text.Shaper,
+          Rendro.Text.Shaper.Simple
         ],
         "Canonical Recipes": [
           Rendro.Recipes,
@@ -165,6 +167,7 @@ defmodule Rendro.MixProject do
           Rendro.Recipes.Certificate
         ],
         "Ecosystem Adapters": [
+          Rendro.Adapters.HarfBuzz,
           Rendro.Adapters.Phoenix,
           Rendro.Adapters.Oban.RenderWorker,
           Rendro.Adapters.Threadline,
