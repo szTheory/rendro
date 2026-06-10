@@ -138,6 +138,22 @@ defmodule Rendro.Pipeline.Measure do
     end
   end
 
+  defp measure_block(
+         _doc,
+         %Rendro.Block{content: %Rendro.Path{} = path} = block,
+         _container_width
+       ) do
+    {width, height} =
+      case {block.width, block.height} do
+        {w, h} when not is_nil(w) and not is_nil(h) -> {w, h}
+        {w, nil} when not is_nil(w) -> {w, compute_ops_height(path.ops)}
+        {nil, h} when not is_nil(h) -> {compute_ops_width(path.ops), h}
+        {nil, nil} -> compute_ops_extent(path.ops)
+      end
+
+    {:ok, %{block | width: width, height: height}}
+  end
+
   defp measure_block(_doc, block, _container_width), do: {:ok, block}
 
   # Public read-only projection of the engine's table measurement.
@@ -887,5 +903,34 @@ defmodule Rendro.Pipeline.Measure do
 
   defp runs_width(runs) do
     Enum.reduce(runs, 0, fn run, acc -> acc + run.width end)
+  end
+
+  # ---------------------------------------------------------------------------
+  # Path ops extent helpers (D-08: conservative bounds)
+  # ---------------------------------------------------------------------------
+
+  defp compute_ops_extent(ops) do
+    Enum.reduce(ops, {0.0, 0.0}, fn op, {max_x, max_y} ->
+      case op do
+        {:move, x, y} -> {max(max_x, x * 1.0), max(max_y, y * 1.0)}
+        {:line, x, y} -> {max(max_x, x * 1.0), max(max_y, y * 1.0)}
+        {:curve, x1, y1, x2, y2, x3, y3} ->
+          {max(max_x, max(x1, max(x2, x3)) * 1.0), max(max_y, max(y1, max(y2, y3)) * 1.0)}
+        {:rect, x, y, w, h} -> {max(max_x, (x + w) * 1.0), max(max_y, (y + h) * 1.0)}
+        {:rounded_rect, x, y, w, h, _r} -> {max(max_x, (x + w) * 1.0), max(max_y, (y + h) * 1.0)}
+        :close -> {max_x, max_y}
+        _ -> {max_x, max_y}
+      end
+    end)
+  end
+
+  defp compute_ops_width(ops) do
+    {w, _h} = compute_ops_extent(ops)
+    w
+  end
+
+  defp compute_ops_height(ops) do
+    {_w, h} = compute_ops_extent(ops)
+    h
   end
 end
