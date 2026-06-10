@@ -1,3 +1,26 @@
+defmodule Rendro.Pipeline.MeasureTest.CollapsingShaper do
+  @moduledoc false
+  @behaviour Rendro.Text.Shaper
+
+  # Always collapses the entire shaped text into ONE glyph with cluster: 0,
+  # simulating a whole-run ligature from a shaper exposing no cluster data.
+  @impl Rendro.Text.Shaper
+  def shape(_font, text, _opts) do
+    {:ok,
+     [
+       %{
+         gid: 0,
+         cluster: 0,
+         name: text,
+         x_advance: 600 * String.length(text),
+         y_advance: 0,
+         x_offset: 0,
+         y_offset: 0
+       }
+     ]}
+  end
+end
+
 defmodule Rendro.Pipeline.MeasureTest do
   use ExUnit.Case, async: true
 
@@ -621,6 +644,28 @@ defmodule Rendro.Pipeline.MeasureTest do
       assert error.why =~ "requires a shaping adapter"
       assert error.why =~ ":arab"
       assert error.next =~ "shaping adapter"
+    end
+
+    test "CR-03: a run collapsing to a single glyph keeps every grapheme in measured lines" do
+      text = %Rendro.Text{content: "abcdef", font: "Helvetica", size: 12, color: {0, 0, 0}}
+      # Narrow width forces split_graphemes on the oversized token; the
+      # CollapsingShaper then returns one glyph (cluster: 0) for the whole run,
+      # which previously dropped all graphemes after the first in the zip path.
+      block = %Rendro.Block{content: text, x: 0, y: 0, width: 20, height: nil}
+      page = %Rendro.Page{blocks: [block]}
+
+      doc = %Rendro.Document{
+        pages: [page],
+        metadata: %Rendro.Metadata{},
+        options: %{render: [shaper: Rendro.Pipeline.MeasureTest.CollapsingShaper]}
+      }
+
+      assert {:ok, result} = Measure.run(doc)
+      [measured_page] = result.pages
+      [measured_block] = measured_page.blocks
+
+      all_text = measured_block.content |> lines_text() |> Enum.join("")
+      assert all_text == "abcdef"
     end
 
     test "Latin text measured returns ok unchanged" do

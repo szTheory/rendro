@@ -724,22 +724,41 @@ defmodule Rendro.Pipeline.Measure do
     simple_path? = Enum.all?(clusters, &(&1 == 0))
 
     if simple_path? do
-      # Shaper.Simple: one glyph per grapheme, cluster=0 for all.
-      # Zip glyphs with graphemes to produce per-grapheme run structs.
+      # All-zero clusters: either one glyph per grapheme (Shaper.Simple) or a
+      # shaper that produced no usable cluster data.
       graphemes = String.graphemes(run_text)
 
-      Enum.zip(graphemes, glyphs)
-      |> Enum.map(fn {grapheme, glyph} ->
-        width = glyph.x_advance * (font_size / font.units_per_em)
-        %{font: font, text: grapheme, width: width}
-      end)
+      if length(glyphs) == length(graphemes) do
+        # One glyph per grapheme — zip to per-grapheme run structs.
+        Enum.zip(graphemes, glyphs)
+        |> Enum.map(fn {grapheme, glyph} ->
+          width = glyph.x_advance * (font_size / font.units_per_em)
+          %{font: font, text: grapheme, width: width}
+        end)
+      else
+        # Glyph count != grapheme count with no cluster data (e.g. a run that
+        # fully ligated into fewer glyphs). Never drop characters: treat the
+        # entire run as one atomic cluster-run carrying the full text and the
+        # summed advances (CR-03). Coarser line breaking, never data loss.
+        total_advance = Enum.reduce(glyphs, 0, fn g, acc -> acc + g.x_advance end)
+        width = total_advance * (font_size / font.units_per_em)
+        [%{font: font, text: run_text, width: width}]
+      end
     else
-      # HarfBuzz path: group glyphs by cluster byte offset.
+      # Cluster-offset path: group glyphs by cluster byte offset.
       # Each cluster group corresponds to a ligature or multi-codepoint sequence.
       # Reconstruct the text segment for each cluster by slicing run_text at cluster boundaries.
       sorted_glyphs = Enum.sort_by(glyphs, & &1.cluster)
       cluster_groups = Enum.group_by(sorted_glyphs, & &1.cluster)
-      sorted_offsets = cluster_groups |> Map.keys() |> Enum.sort()
+
+      # Guard against a non-zero first offset (a conforming shaper must emit a
+      # cluster for byte 0; if not, prepend a zero-width cluster so the leading
+      # text slice is never dropped).
+      sorted_offsets =
+        case cluster_groups |> Map.keys() |> Enum.sort() do
+          [first | _] = offsets when first > 0 -> [0 | offsets]
+          offsets -> offsets
+        end
 
       text_bytes = byte_size(run_text)
 
