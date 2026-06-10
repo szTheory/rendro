@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v2.6
 milestone_name: Public Launch & Adoption Bootstrap
 status: planning
-last_updated: "2026-06-10T14:02:31.202Z"
+last_updated: "2026-06-10T00:00:00.000Z"
 last_activity: 2026-06-10
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -17,85 +17,75 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-30 after v2.4 milestone shipped)
+See: .planning/PROJECT.md (updated 2026-06-10 — v2.6 milestone started)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Post 1.0.0 Release
+**Current focus:** Phase 83 — Claim-Accuracy & Shaping Hygiene (ready to plan)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 83 of 88 (Claim-Accuracy & Shaping Hygiene)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-06-10 — Milestone v2.6 started
+Status: Ready to plan
+Last activity: 2026-06-10 — v2.6 roadmap created (Phases 83–88, 21 requirements)
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Milestone Snapshot
 
-- Shipped milestone: `v2.5 1.0 Release Capstone` — phases 78-82, 16 requirements, milestone audit `passed`. Archived in `milestones/v2.5-ROADMAP.md` / `milestones/v2.5-REQUIREMENTS.md` / `milestones/v2.5-MILESTONE-AUDIT.md`.
-- Previous shipped milestone: `v2.4 Batteries-Included Workflow & Adoption Closure` (shipped 2026-05-30).
-- Active milestone: **none**. `1.0.0` is published. Conditional `v2.6 Global Text Shaping & Script Support` only if adopter demand justifies the core investment.
+- Shipped milestone: `v2.5 1.0 Release Capstone` — phases 78-82, 16 requirements, audit `passed`. Archived in `milestones/v2.5-ROADMAP.md`.
+- Active milestone: `v2.6 Public Launch & Adoption Bootstrap` — phases 83-88, 21 requirements (HYG-01..05, PATH-01..04, RAST-01..03, GAL-01..03, CMP-01..03, LNCH-01..03).
 
-## v2.5 Phase Map
+## v2.6 Phase Map
 
 | Phase | Name | Requirements | Depends on |
 |-------|------|--------------|-----------|
-| 78 | Public API Surface Definition & Cleanup | API-01, API-02, API-03, API-05 | — |
-| 79 | Public API Contract Enforcement Lane | API-04 | 78 |
-| 80 | Stability Contract & Migration Docs | STAB-01..05 | 78 |
-| 81 | Release Hardening | REL-01, REL-02, REL-03, REL-05 | 78, 79, 80 |
-| 82 | 1.0.0 Consolidation & Publish (IRREVERSIBLE) | REL-04, REL-06 | 81 (all required CI lanes green) |
-
-## Performance Metrics
-
-Per-phase metrics for shipped milestones live in their archives under `.planning/milestones/v[X.Y]-ROADMAP.md` and per-plan SUMMARY frontmatter.
+| 83 | Claim-Accuracy & Shaping Hygiene | HYG-01..05 | — (must merge before 88) |
+| 84 | Drawn-Path Primitive & Visible Polish | PATH-01..04 | — (parallel to 83) |
+| 85 | Deterministic Raster Lane | RAST-01..03 | — (parallel to 83/84) |
+| 86 | Self-Proving Launch Artifacts | GAL-01..03 | 84, 85 |
+| 87 | Comparison Page & Livebook | CMP-01..03 | 83 |
+| 88 | Launch Execution & Demand Instrumentation | LNCH-01..03 | 83, 84, 85, 86, 87 |
 
 ## Accumulated Context
 
 ### Decisions
 
-Full per-milestone decision log lives in `.planning/PROJECT.md` (Key Decisions table) and per-milestone archives. v2.5 scoping decisions (locked 2026-05-30): single consolidated `1.0.0` publish (last published is `0.3.0`, v2.3+v2.4 unreleased); cleanup-first (no intermediate `0.4.0`, audit found ~zero real breaking changes); "public ≡ what ExDoc renders"; two user-facing tiers (Tier-1 Stable strict SemVer / Tier-2 Evolving adapters + diagnostics, additive-only); soft-deprecation-first (since `mix ci` compiles `--warnings-as-errors`); release-please deferred (AUTO-01); one new dev dep `:mix_audit`, no new runtime deps. Build order: define+clean surface → enforce → stability docs → release hardening → publish.
+Full decision log in PROJECT.md Key Decisions table. v2.6 scoping decisions (locked 2026-06-10):
 
-- [Phase ?]: D-01 executed: two-tier contract leads api_stability.md; per-surface blocks relocated byte-identical (D-02 zero test churn confirmed)
-- [Phase ?]: D-09 reconcile: Rendro.Inspector removed from Tier-1; :diagnostics map common keys (:level, :type) are the stable contract
-- [Phase ?]: D-05 lockstep applied: guide + protection_claims_test.exs updated atomically; no CI red window
+- v2.6 is a launch/adoption milestone, not a feature milestone — Rendro has 1.0-grade depth at ~856 self/CI downloads, 0 stars, never announced.
+- Fix "pure Elixir core" claim before launch — `harfbuzz_ex` is currently a hard NIF dep; Phase 83 must merge before Phase 88 executes.
+- Path primitive is declarative (`%Rendro.Path{}`), not imperative canvas; all coordinates route through `format_num` for byte-determinism.
+- Raster lane is always advisory — `pdfium-render` evidence vocabulary stays distinct from GUI-viewer proof; a pdfium download failure must never block the four required engine lanes.
+- Benchmark guide is honest about ChromicPDF's strengths; unfair benchmarks poison the launch.
+- Demand gate thresholds (LNCH-03) must be concrete and numeric — "adopter demand" failed as a gate before.
 
-### Roadmap Evolution
-
-- `v2.3` closed 2026-05-29 at tag `v0.3.1` — viewer proof and interop closure; phases 68–72.
-- `v2.4` closed 2026-05-30 — batteries-included workflow and adoption closure; phases 73–77; all 19 requirements satisfied; audit `passed`.
-- `v2.5` roadmap created 2026-05-30 — 1.0 Release Capstone; phases 78–82; 16 requirements (API/STAB/REL); structure adopted verbatim from the approved deep-research + audit phase decomposition.
-
-### Resolved Threads
-
-- `v24-adoption-scoping` — **resolved 2026-05-30** at v2.4 close. All findings shipped (page primitive → 73, recipes → 74/75, reference app → 76); open questions answered. See `.planning/threads/v24-adoption-scoping.md`.
-
-### Open Blockers
+### Pending Todos
 
 None.
 
-### Deferred Items
+### Blockers/Concerns
 
-Items intentionally held outside shipped scope, carried forward for future milestones:
+None.
+
+## Deferred Items
 
 | Category | Item | Status |
 |----------|------|--------|
-| globalization | Global text shaping, RTL support, broader script coverage | conditional v2.6, only if demand justifies the core investment |
-| automation | release-please (conventional-commit changelog + tag) for the 1.x train | deferred post-1.0 (AUTO-01) — avoids churn on the irreversible cut + legacy-tag collisions |
-| packaging | Split into separate `rendro` / `rendro_adapters` hex packages | deferred — tier differentiation via documented tiers, not package surgery |
-| stability | Retrofitting `@doc since:` across the 0.x surface | deferred — adopt going-forward only |
-| adoption | Optional first-party `Rendro.Adapters.Pdfium` / `Rendro.Adapters.PdfJs` automatable observer adapters | deferred |
-| automation | Headless-browser PDF.js / PDFium rendering CI lanes | deferred to a dedicated automation milestone if at all |
-| viewer_proof | Mobile viewer evidence (iOS Files, Android default viewer) | deferred |
-| viewer_proof | Annual/semi-annual re-verification cadence enforcement | advisory; possibly blocking later |
+| globalization | v2.7 Global Text Shaping & Script Support | conditional — pursue only when LNCH-03 gate triggers |
+| automation | release-please / publish automation | deferred — BEAM norm is manual/semi-manual; `git_ops` is the cheap future alternative |
+| packaging | Split into separate `rendro` / `rendro_adapters` hex packages | deferred |
+| layout | Even/odd header content variants (duplex) | post-v2.6 |
+| layout | Section-local page number restart | post-v2.6 |
+| layout | TOC primitive (no-fixpoint reserve-space design) | post-v2.6 |
+| layout | Charts (`%Rendro.Chart{}` lowering to Path+Text) | post-v2.6 |
+| viewer_proof | PDF.js render lane (Node-based `pdfjs-dist` adapter) | post-v2.6 |
+| viewer_proof | Annual/semi-annual re-verification cadence enforcement | advisory |
 | workflows | Multi-signature workflows and signer orchestration | deferred |
-| layout | Even/odd header content variants (book-style duplex) | post-v2.4 |
-| layout | Section-local page number restart | post-v2.4 |
-| recipes | Decorative border frame on Certificate (depends on drawn-path primitive) | post-v2.4 |
-| recipes | Chart/graph rendering in Report body (major new rendering surface) | post-v2.4 |
-| recipes | Table of contents with page numbers (forward-reference, multi-pass concern) | post-v2.4 |
-| Phase 79 P01 | 74 | 1 tasks | 1 files |
-| Phase 80 P01 | 8 | 1 tasks | 2 files |
+| path | Transforms, clipping, gradients (explicit matrix deferrals) | post-v2.6 |
 
-## Operator Next Steps
+## Session Continuity
 
-- `/gsd-plan-phase 78` to decompose the first phase (Public API Surface Definition & Cleanup) into executable plans.
+Last session: 2026-06-10
+Stopped at: Roadmap created — 6 phases (83-88), 21 requirements mapped, REQUIREMENTS.md traceability updated.
+Resume file: None

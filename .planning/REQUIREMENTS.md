@@ -73,4 +73,26 @@ Deferred to future milestones. Tracked but not in the current roadmap.
 
 ## Traceability
 
-_Filled by roadmap creation._
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| HYG-01 | Phase 83 | Pending |
+| HYG-02 | Phase 83 | Pending |
+| HYG-03 | Phase 83 | Pending |
+| HYG-04 | Phase 83 | Pending |
+| HYG-05 | Phase 83 | Pending |
+| PATH-01 | Phase 84 | Pending |
+| PATH-02 | Phase 84 | Pending |
+| PATH-03 | Phase 84 | Pending |
+| PATH-04 | Phase 84 | Pending |
+| RAST-01 | Phase 85 | Pending |
+| RAST-02 | Phase 85 | Pending |
+| RAST-03 | Phase 85 | Pending |
+| GAL-01 | Phase 86 | Pending |
+| GAL-02 | Phase 86 | Pending |
+| GAL-03 | Phase 86 | Pending |
+| CMP-01 | Phase 87 | Pending |
+| CMP-02 | Phase 87 | Pending |
+| CMP-03 | Phase 87 | Pending |
+| LNCH-01 | Phase 88 | Pending |
+| LNCH-02 | Phase 88 | Pending |
+| LNCH-03 | Phase 88 | Pending |
