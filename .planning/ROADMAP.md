@@ -102,8 +102,8 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 84-03-PLAN.md — Table borders: borders/border_style/header_fill fields + table_decoration draw-once collapse
-- [ ] 84-04-PLAN.md — Certificate border frame: validate_border! + :frame anchored region + sections + document
+- [x] 84-03-PLAN.md — Table borders: borders/border_style/header_fill fields + table_decoration draw-once collapse
+- [x] 84-04-PLAN.md — Certificate border frame: validate_border! + :frame anchored region + sections + document
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -174,7 +174,7 @@ Plans:
 | 81. Release Hardening | v2.5 | 1/1 | Complete | 2026-06-05 |
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 3/3 | Complete | 2026-06-05 |
 | 83. Claim-Accuracy & Shaping Hygiene | v2.6 | 5/5 | Complete    | 2026-06-10 |
-| 84. Drawn-Path Primitive & Visible Polish | v2.6 | 2/5 | In Progress|  |
+| 84. Drawn-Path Primitive & Visible Polish | v2.6 | 4/5 | In Progress|  |
 | 85. Deterministic Raster Lane | v2.6 | 0/? | Not started | - |
 | 86. Self-Proving Launch Artifacts | v2.6 | 0/? | Not started | - |
 | 87. Comparison Page & Livebook | v2.6 | 0/? | Not started | - |
