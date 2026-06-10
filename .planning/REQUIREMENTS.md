@@ -1,84 +1,76 @@
-# Requirements: Rendro — v2.5 1.0 Release Capstone
+# Requirements: Rendro — v2.6 Public Launch & Adoption Bootstrap
 
-**Defined:** 2026-05-30
+**Defined:** 2026-06-10
 **Core Value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
 
-> Scope confirmed 2026-05-30 via parallel research + live-codebase audit (3 Explore + 3 Plan subagents, grounded in `prompts/` research). Decisions locked: **publish a single consolidated `1.0.0` to hex.pm** (last published is `0.3.0`; v2.3 + v2.4 are both unreleased), **cleanup first** (audit found ~zero real breaking changes, so no intermediate `0.4.0`), **formal stability tags** (a checked-in tiered manifest enforced by a docs-contract lane). "public ≡ what ExDoc renders." Two user-facing tiers: Tier 1 Stable (strict SemVer core) / Tier 2 Evolving (adapters + diagnostics/metadata map contents, additive-only). Soft-deprecation-first because `mix ci` compiles `--warnings-as-errors`. release-please deferred. Implementable with one new dev dep (`:mix_audit`); no new runtime deps. Build order: define+clean the surface → enforce it → stability docs → release hardening → publish.
+> Scope locked 2026-06-10 via deep parallel research (5 research agents: repo vision/state digest, text shaping, release/render automation, layout primitives, post-1.0 adoption strategy — full findings in `.planning/research/`). Decisions locked: **v2.6 is a launch/adoption milestone, not a feature milestone** (Rendro has 1.0-grade depth, ~856 self/CI downloads, 0 stars, never announced; two live ElixirForum threads ask for exactly this library); **fix the "pure Elixir core" claim before announcing** (`harfbuzz_ex` is currently a hard NIF dep); **ship the path primitive so the gallery shows bordered tables**; **the proof culture is the marketing asset** (byte-reproducible manual + published hash, checked-in benchmarks, honest viewer matrix). Deferred with named reasons: full text shaping (conditional v2.7 behind a now-measurable demand gate), release-please, multi-signature, charts, TOC, duplex headers, PDF.js lane. Build order: truth fix → visible polish → raster tooling → launch artifacts → launch + instrumentation.
 
 ## v1 Requirements
 
-Requirements for the v2.5 milestone. Each maps to exactly one roadmap phase.
+Requirements for the v2.6 milestone. Each maps to exactly one roadmap phase.
 
-### Public API Surface, Cleanup & Enforcement (API)
+### Claim Accuracy & Shaping Hygiene (HYG)
 
-- [x] **API-01**: Public API surface is formally defined in a checked-in manifest `priv/public_api.json` (schema-versioned like `support_matrix.json`), with every documented module/function assigned a tier (`stable` | `adapter`).
-- [x] **API-02**: Accidentally-public internals are hidden — `@moduledoc false` on `Rendro.PDF.CidFont` + `Rendro.PDF.FontSubsetter` (confirmed leaking); `@doc false` on the `Rendro.Sign`/`Rendro.Protect` `redact_*` helpers; a full sweep of all currently-public `lib/` modules so each lands in the manifest or is hidden.
-- [x] **API-03**: Returned/accepted types of public functions are themselves documented — expose `Rendro.Metadata` with a real `@moduledoc` + `@type t` (it is the return type of public `Rendro.metadata/1`), and fix any other invisible-type gaps surfaced by the sweep.
-- [x] **API-04**: A docs-contract lane (`test/docs_contract/public_api_contract_test.exs`) introspects `Code.fetch_docs/1` and asserts the documented surface exactly equals the manifest (drift fails CI with an errors-as-product diff), asserts known internals are `:hidden`, asserts Tier-1 `@spec` coverage, and asserts every public module carries exactly one tier tag — wired into `priv/guardrails/required_status_checks.json`.
-- [x] **API-05**: ExDoc renders a per-module stability badge (Stable / Adapter) from `@moduledoc` metadata, and recipe `sections/2` opts handling is normalized across all five recipes (invoice/branded currently ignore `_opts`; normalization is additive).
+- [ ] **HYG-01**: `harfbuzz_ex` is an optional dependency behind a public `Rendro.Text.Shaper` behaviour — core ships a pure-Elixir `Shaper.Simple` (current cmap+width capability), the HarfBuzz adapter activates when the optional dep is loaded, and the "pure Elixir core / no hard NIF dependencies" claim is true again before any launch content ships.
+- [ ] **HYG-02**: Rendering text in a complex script with no shaping adapter configured produces a deterministic, instructive error naming the script and the fix — never silently disconnected/wrong glyph output.
+- [ ] **HYG-03**: The per-grapheme shaping bug in the line-breaking path (`measure.ex` `split_graphemes`) is fixed to shape runs and break at cluster boundaries, with existing Latin golden output byte-identical (or deliberately re-blessed with a changelog note).
+- [ ] **HYG-04**: The dead `unicode_data 0.8.0` dependency is replaced by the maintained `ex_unicode` stack, with run-itemization behavior on existing fixtures verified unchanged (or changes deliberate and documented).
+- [ ] **HYG-05**: `priv/support_matrix.json` gains `explicit_deferral` rows for complex-script support (Arabic, Hebrew/RTL, Devanagari, Thai) with named reasons, and README/guide script-support claims align with the matrix.
 
-### Stability Contract, Deprecation Policy & Migration Docs (STAB)
+### Drawn-Path Primitive & Visible Polish (PATH)
 
-- [x] **STAB-01**: `guides/api_stability.md` rewritten with the formal two-tier SemVer contract — Tier-1 strict SemVer; Tier-2 additive-only / adapter-tracking; the byte-output carve-out ("deterministic within a version, not frozen across versions"); and an explicit "NOT covered by SemVer" list.
-- [x] **STAB-02**: A written deprecation policy (soft-deprecate-first lifecycle; `@doc deprecated:` + CHANGELOG by default, `@deprecated` hard-warning only once no in-tree caller remains, removal only in 2.0) plus a Deprecations table is added to the guide.
-- [x] **STAB-03**: `guides/upgrading_to_1.0.md` migration note created ("what 1.0 means for you" + tier summary + support-matrix pointer + any residual notes), added to `mix.exs` ExDoc `extras` and the Policies group.
-- [x] **STAB-04**: Internal milestone/phase labels are scrubbed from public guides (`api_stability.md` "Rendro v1.10", "Phase 53", "Phase 71" refs), with their string-pinned docs-contract tests (`protection_claims_test.exs` and siblings) updated in lockstep so `release-proof` stays green.
-- [x] **STAB-05**: A docs-contract test (`test/docs_contract/api_stability_claims_test.exs`) proves every Tier-1 symbol the guide names exists/is exported (`function_exported?` / `Code.ensure_loaded?` / struct presence) and asserts the tier headers, key promise sentences, and upgrade-guide presence.
+- [ ] **PATH-01**: A Phoenix engineer can author deterministic vector graphics via a declarative `%Rendro.Path{}` block element (move/line/curve/rect/rounded-rect; stroke color/width/dash/cap/join; fill) rendered through the standard pipeline — with transforms, clipping, and gradients explicitly deferred in the support matrix.
+- [ ] **PATH-02**: Tables support opt-in borders, row/column rules, and header-band shading, with the default output byte-identical to today's borderless rendering.
+- [ ] **PATH-03**: The Certificate recipe supports a decorative `border:` frame option with all coordinates derived from template geometry (proven at A4 and US Letter).
+- [ ] **PATH-04**: The path surface carries byte-determinism golden tests and terminal support-matrix rows.
 
-### Release Hardening & 1.0.0 Publish (REL)
+### Deterministic Raster Lane (RAST)
 
-- [ ] **REL-01**: `mix.exs` bumped to `@version "1.0.0"`, `docs[:source_ref]` pinned to `v1.0.0`, `Changelog`/`Docs` package links added, `{:mix_audit, ...}` dev dep added, and the declared `elixir:` requirement matches the CI-proven matrix.
-- [ ] **REL-02**: Preflight hardened with an exact-allowlist tarball content audit — asserts operator/evidence artifacts are **absent** (`priv/support_matrix.json`, `priv/viewer_evidence/`, `priv/guardrails/`, `scripts/`, `test/`, `*.pem`/`*.key`/cert globs) and required files present — plus `mix hex.audit` + `mix deps.audit` and a version/`source_ref` parity check.
-- [ ] **REL-03**: The preflight CHANGELOG gate is generalized to accept a **dated** `## [1.0.0]` (regex `\d{4}-\d{2}-\d{2}`, not "Unreleased") and the brittle hardcoded protected-delivery pointer string is dropped — fixing the self-block that would otherwise block the 1.0 cut.
-- [ ] **REL-04**: A CHANGELOG `## [1.0.0] - <date>` entry consolidates `0.3.0 → 1.0.0` (v2.3 viewer evidence currently stubbed under "0.3.1 - Unreleased" + the uncatalogued v2.4 batteries-included features + the 1.0 stability/cleanup work), with a "Stability" subsection linking the upgrade guide.
-- [ ] **REL-05**: GitHub Actions on `release.yml`'s publish lane are SHA-pinned (the lane holds `HEX_API_KEY`), and the `v*.*.*` trigger is confirmed not to match legacy two-segment milestone tags (`v1.0`…`v2.4`).
-- [ ] **REL-06**: `1.0.0` is published to hex.pm (package + docs) via the tag-triggered, proof-gated pipeline following the safe publish sequence; a GitHub Release is cut from `v1.0.0`; and post-publish verification confirms HexDocs render, version shield, and a tarball spot-check.
+- [ ] **RAST-01**: `Rendro.Adapters.Pdfium` gains `render/2` producing PNG rasters via a version+sha256-pinned pdfium-cli.
+- [ ] **RAST-02**: A golden-PNG snapshot harness runs in `mix test` (small committed refs, pinned-CI-only bless command, hash-equality fast path) in an advisory CI lane that never gates the four required engine lanes.
+- [ ] **RAST-03**: The viewer-evidence vocabulary gains an automated `viewer_kind: "pdfium-render"` distinct from GUI observation (evidence records renderer, version, dpi, png_sha256), with a docs-contract guard preventing raster evidence from upgrading GUI-viewer claims.
+
+### Self-Proving Launch Artifacts (GAL)
+
+- [ ] **GAL-01**: An evaluating engineer sees all five recipes as rendered images in README + HexDocs (visual recipe gallery), regenerated and hash-checked by a CI docs-contract lane so the gallery cannot drift from the engine.
+- [ ] **GAL-02**: A `manual.pdf` generated by Rendro itself (exercising recipes, the path primitive, and page numbering) ships with its SHA-256 machine-published and CI-verified — "this manual is byte-reproducible; verify it."
+- [ ] **GAL-03**: Gallery and docs presentation conform to the Rendro brand book (`prompts/Rendro Brand Book.txt`).
+
+### Comparison Page & Livebook (CMP)
+
+- [ ] **CMP-01**: A reproducible benchmark harness (checked-in scripts + committed results) measures cold start, memory, container image size, and dependency count vs ChromicPDF, pdf_generator, and Typst-CLI.
+- [ ] **CMP-02**: A "Generating PDFs in Elixir without Chrome" comparison guide ships in HexDocs with every claim bounded to checked-in benchmark results by a docs-contract test — honest about where HTML→PDF wins (arbitrary CSS, complex scripts).
+- [ ] **CMP-03**: A Livebook tutorial (`.livemd`: invoice data → render → inline Kino preview → download) ships with "Run in Livebook" badges and is executed in an advisory CI lane so it cannot rot.
+
+### Launch Execution & Demand Instrumentation (LNCH)
+
+- [ ] **LNCH-01**: The coordinated launch is executed: ElixirForum #announcing thread, ElixirStatus post, awesome-elixir PR, and genuine, helpful replies in the two existing demand threads (optional Show HN) — only after HYG/GAL/CMP requirements are shipped.
+- [ ] **LNCH-02**: 2–4 mobile viewer-evidence rows (iOS Files/Mail preview, Android default viewer × forms/signed surfaces) are recorded via the existing evidence recipe and published as a launch-adjacent content beat.
+- [ ] **LNCH-03**: The conditional-v2.7 text-shaping demand gate is concrete and measurable: defined signal thresholds (non-self issues/asks, download floor, first external contributor), an ADOPTION.md signal ledger, and GitHub Discussions/issue templates routing adopter needs.
 
 ## v2 Requirements
 
-Deferred to future release. Tracked but not in the current roadmap.
+Deferred to future milestones. Tracked but not in the current roadmap.
 
-### Globalization (conditional v2.6)
-
-- **GLOBAL-01**: Global text shaping, RTL support, and broader complex-script coverage — only if adopter demand justifies the core investment.
-
-### Release automation (post-1.0)
-
-- **AUTO-01**: Adopt release-please (conventional-commit-driven changelog + tag) for the 1.x train, if commit hygiene warrants — deferred from this milestone to avoid churn on the irreversible 1.0 cut and tag-scheme collisions with legacy milestone tags.
+- **Global text shaping (conditional v2.7)** — pure-Elixir UAX #9 bidi + cluster-aware line breaking + Arabic/Hebrew vertical slice with named fonts and per-script proof lanes; pursue only when the LNCH-03 gate triggers. Design in `research/ARCHITECTURE.md`.
+- **TOC primitive** — reserve-space, no-fixpoint design over the existing substitution machinery (fixed-height rows, fixed-width number column, `{{toc_page:*}}` tokens, free `/Outlines`). Design in `research/ARCHITECTURE.md`.
+- **Charts** — `%Rendro.Chart{}` lowering to Path+Text, Decimal tick selection, never SVG import.
+- **Even/odd running-header variants + section-local page restart** — trivial `suppress_on`/token extensions when demanded.
+- **PDF.js render lane** — Node-based `pdfjs-dist` adapter re-testing the two pdfjs deferral rows mechanically.
+- **Counter-signing recipe doc** — documented one-Rendro-signature + external counter-sign flow (cheap multi-sig hedge).
 
 ## Out of Scope
 
-Explicitly excluded for v2.5. Documented to prevent scope creep.
-
-| Feature | Reason |
-|---------|--------|
-| Intermediate `0.4.0` feature release before 1.0 | Cleanup audit found ~zero real breaking changes; a single consolidated `1.0.0` is cleaner. |
-| `1.0.0-rc.1` soak release | Project's existing proof gates (docs-contract, live-proof, release-proof) already de-risk the cut; user chose single consolidation. |
-| Splitting into separate `rendro` / `rendro_adapters` hex packages | Large restructure during a stability milestone; tier differentiation achieved via documented tiers, not package surgery. Revisit only if adapter churn proves painful. |
-| release-please / conventional-commits pipeline | Conflicts with hand-curated narrative CHANGELOG that preflight asserts; collides with legacy `v1.0`-style tags; adds a moving part to an irreversible event. Deferred (AUTO-01). |
-| Retrofitting `@doc since:` across the existing 0.x surface | Would misstate history (0.x funcs didn't ship in 1.0) and burn freeze time for zero enforcement value; adopt going-forward only. |
-| Byte-for-byte output stability across versions | A deterministic engine can't freeze rendered bytes across versions without blocking every layout/shaping fix; output is stable *within* a version (carve-out documented in STAB-01). |
-| New rendering surfaces / features (TOC, charts, borders, duplex headers) | Held in PROJECT.md Deferred Items; 1.0 is a stability/promise milestone, not a feature milestone. |
+| Item | Reason |
+|---|---|
+| Full complex-script shaping claims in v2.6 | Multi-quarter effort (fpdf2: ~6 expert-months for shaping alone; ReportLab: still experimental after a year; iText: paid add-on); zero recorded Elixir demand; gate becomes measurable via LNCH-03 |
+| release-please / publish automation | BEAM norm is manual/semi-manual; requires a PAT credential on an irreversible proof-gated pipeline to save minutes/year; `git_ops` is the cheap future alternative if version-sync pain materializes |
+| Multi-signature workflows / signer orchestration | DocuSign-shaped demand — the hard part is signer identity/UX/audit-trail, not PDF bytes; deepens the trust axis already at diminishing returns |
+| Charts / TOC in v2.6 | Charts are a DX scope sink (ReportLab precedent); TOC demand is book/report-shaped, not invoice-shaped; both have recorded designs for later |
+| Path transforms, clipping, gradients | Each is a viewer-compat surface; v1 path surface stays minimal with explicit matrix deferrals |
+| Hosted playground | Livebook achieves ~80% of the value at ~10% of the cost; revisit post-launch |
+| Headless-browser viewer CI | Browser runtime in core CI remains forbidden by project constraints; the pdfium WASM-static-binary lane covers the raster need |
 
 ## Traceability
 
-Which phases cover which requirements. All 16 v1 requirements mapped — each to exactly one phase.
-
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| API-01 | Phase 78 | Complete |
-| API-02 | Phase 78 | Complete |
-| API-03 | Phase 78 | Complete |
-| API-04 | Phase 79 | Complete |
-| API-05 | Phase 78 | Complete |
-| STAB-01 | Phase 80 | Complete |
-| STAB-02 | Phase 80 | Complete |
-| STAB-03 | Phase 80 | Complete |
-| STAB-04 | Phase 80 | Complete |
-| STAB-05 | Phase 80 | Complete |
-| REL-01 | Phase 81 | Pending |
-| REL-02 | Phase 81 | Pending |
-| REL-03 | Phase 81 | Pending |
-| REL-04 | Phase 82 | Pending |
-| REL-05 | Phase 81 | Pending |
-| REL-06 | Phase 82 | Pending |
+_Filled by roadmap creation._
