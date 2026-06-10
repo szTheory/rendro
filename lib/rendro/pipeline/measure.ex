@@ -81,15 +81,6 @@ defmodule Rendro.Pipeline.Measure do
       }
 
       {:ok, %{block | content: measured_text, width: width, height: height}}
-    else
-      {:error, {:shaping_required, _, _} = reason} ->
-        {:error, Rendro.Error.from_stage(:measure, reason)}
-
-      {:error, {:shaping_required, _} = reason} ->
-        {:error, Rendro.Error.from_stage(:measure, reason)}
-
-      {:error, _} = err ->
-        err
     end
   end
 

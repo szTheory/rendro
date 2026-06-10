@@ -633,14 +633,25 @@ defmodule Rendro.Pipeline.MeasureTest do
       }
     end
 
-    test "Arabic text with Shaper.Simple returns a structured shaping_required error" do
+    test "Arabic text with Shaper.Simple returns a raw shaping_required tuple from Measure.run/1" do
       # HarfBuzz adapter delegates source: :built_in fonts to Shaper.Simple.
       # Shaper.Simple returns {:error, {:shaping_required, :arab, hint}} for Arabic script.
-      # measure_block wraps this in Rendro.Error.from_stage(:measure, reason).
+      # Measure propagates the raw tuple; the pipeline boundary (Pipeline.span/4)
+      # wraps it in Rendro.Error WITH base_meta so render_id is never lost (WR-02).
       result = Measure.run(doc_with_arabic_text())
 
-      assert {:error, %Rendro.Error{stage: :measure} = error} = result
+      assert {:error, {:shaping_required, :arab, hint}} = result
+      assert is_binary(hint)
+    end
+
+    test "shaping_required error from a full render carries render_id and correlation metadata (WR-02)" do
+      assert {:error, %Rendro.Error{stage: :measure} = error} =
+               Rendro.render(doc_with_arabic_text())
+
       assert {:shaping_required, :arab, _hint} = error.reason
+      assert is_binary(error.render_id)
+      assert error.details.document_type == :pdf
+      assert is_boolean(error.details.deterministic)
       assert error.why =~ "requires a shaping adapter"
       assert error.why =~ ":arab"
       assert error.next =~ "shaping adapter"
