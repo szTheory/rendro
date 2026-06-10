@@ -83,13 +83,31 @@ Plans:
 **Requirements**: PATH-01, PATH-02, PATH-03, PATH-04
 **Success Criteria** (what must be TRUE):
 
-  1. A caller can declare `%Rendro.Path{ops: [{:rect, x, y, w, h}], stroke: %{color: "#000", width: 1.0}}` in a document and the rendered PDF contains the corresponding visible rectangle — verified by the raster lane's golden-PNG harness.
+  1. A caller can declare `%Rendro.Path{ops: [{:rect, x, y, w, h}], stroke: %{color: {0, 0, 0}, width: 1.0}}` in a document and the rendered PDF contains the corresponding visible rectangle — verified by the raster lane's golden-PNG harness.
   2. Passing `borders: :all` (or equivalent) to a table renders visible cell rules in the PDF; omitting the option produces output byte-identical to today's borderless rendering.
   3. The Certificate recipe accepts a `border: true` (or `border: frame_opts`) option and renders a decorative frame at both A4 and US Letter sizes, with all coordinates derived from page geometry — zero hardcoded A4 numerics.
   4. The path surface has terminal `priv/support_matrix.json` rows and byte-determinism golden tests; transforms, clipping, and gradients are listed as explicit deferrals.
 
-**Plans**: TBD
+**Plans**: 5 plans
 **UI hint**: yes
+
+Plans:
+**Wave 1**
+
+- [ ] 84-01-PLAN.md — Rendro.Color helper + %Rendro.Path{} struct + Wave 0 test stubs (RED state)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 84-02-PLAN.md — Path pipeline dispatch: measure clause + writer render_block + Rendro.path/2 builder + D-03 Text color retrofit
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 84-03-PLAN.md — Table borders: borders/border_style/header_fill fields + table_decoration draw-once collapse
+- [ ] 84-04-PLAN.md — Certificate border frame: validate_border! + :frame anchored region + sections + document
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 84-05-PLAN.md — Manifests: support_matrix path_primitive rows + public_api regen + ROADMAP D-05 correction
 
 ### Phase 85: Deterministic Raster Lane
 
@@ -156,7 +174,7 @@ Plans:
 | 81. Release Hardening | v2.5 | 1/1 | Complete | 2026-06-05 |
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 3/3 | Complete | 2026-06-05 |
 | 83. Claim-Accuracy & Shaping Hygiene | v2.6 | 5/5 | Complete    | 2026-06-10 |
-| 84. Drawn-Path Primitive & Visible Polish | v2.6 | 0/? | Not started | - |
+| 84. Drawn-Path Primitive & Visible Polish | v2.6 | 0/5 | Not started | - |
 | 85. Deterministic Raster Lane | v2.6 | 0/? | Not started | - |
 | 86. Self-Proving Launch Artifacts | v2.6 | 0/? | Not started | - |
 | 87. Comparison Page & Livebook | v2.6 | 0/? | Not started | - |
