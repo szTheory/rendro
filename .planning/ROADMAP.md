@@ -35,7 +35,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 **Milestone Goal:** Convert Rendro's proof-backed depth into its first real adopters — fix claim accuracy, polish visible output, build the deterministic raster toolchain, ship self-proving launch artifacts, execute a coordinated ecosystem launch, and define a concrete demand gate for conditional v2.7 global text shaping.
 
-- [ ] **Phase 83: Claim-Accuracy & Shaping Hygiene** - Make `harfbuzz_ex` optional, fix shaping bug, migrate off dead `unicode_data`, declare complex-script deferrals — restoring the "pure Elixir core" claim before any launch content ships
+- [x] **Phase 83: Claim-Accuracy & Shaping Hygiene** - Make `harfbuzz_ex` optional, fix shaping bug, migrate off dead `unicode_data`, declare complex-script deferrals — restoring the "pure Elixir core" claim before any launch content ships (completed 2026-06-10)
 - [ ] **Phase 84: Drawn-Path Primitive & Visible Polish** - Declarative `%Rendro.Path{}` block element, opt-in table borders/rules/header-band, Certificate border frame, byte-determinism goldens
 - [ ] **Phase 85: Deterministic Raster Lane** - `Pdfium.render/2`, golden-PNG snapshot harness, advisory CI lane, honest `pdfium-render` evidence vocabulary
 - [ ] **Phase 86: Self-Proving Launch Artifacts** - CI-hash-checked visual recipe gallery in README/HexDocs, self-rendered `manual.pdf` with published SHA-256, brand-book-conformant presentation
@@ -74,7 +74,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 83-05-PLAN.md — Support matrix rows, script_support_claims_test, API manifest regen, api_stability.md
+- [x] 83-05-PLAN.md — Support matrix rows, script_support_claims_test, API manifest regen, api_stability.md
 
 ### Phase 84: Drawn-Path Primitive & Visible Polish
 
@@ -155,7 +155,7 @@ Plans:
 | 80. Stability Contract & Migration Docs | v2.5 | 4/4 | Complete | 2026-05-30 |
 | 81. Release Hardening | v2.5 | 1/1 | Complete | 2026-06-05 |
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 3/3 | Complete | 2026-06-05 |
-| 83. Claim-Accuracy & Shaping Hygiene | v2.6 | 4/5 | In Progress|  |
+| 83. Claim-Accuracy & Shaping Hygiene | v2.6 | 5/5 | Complete   | 2026-06-10 |
 | 84. Drawn-Path Primitive & Visible Polish | v2.6 | 0/? | Not started | - |
 | 85. Deterministic Raster Lane | v2.6 | 0/? | Not started | - |
 | 86. Self-Proving Launch Artifacts | v2.6 | 0/? | Not started | - |
