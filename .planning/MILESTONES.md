@@ -1,5 +1,20 @@
 # Milestones
 
+## v2.5 1.0 Release Capstone (Shipped: 2026-06-05)
+
+**Phases completed:** 5 phases (78, 79, 80, 81, 82)
+
+**Key accomplishments:**
+- Formal SemVer/API-stability commitment established.
+- First 1.x public hex release (`1.0.0`) shipped.
+- Public API contract enforcement lanes implemented.
+- Release machinery hardened with preflight checks and dependency audits.
+- Irreversible proof-gated publish completed.
+
+**Audit status:** `passed` — all 16 requirements satisfied.
+
+---
+
 ## v2.4 Batteries-Included Workflow & Adoption Closure (Shipped: 2026-05-30)
 
 **Phases completed:** 5 phases (73, 74, 75, 76, 77), 21 plans

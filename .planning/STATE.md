@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.5
-milestone_name: 1.0 Release Capstone
-status: discussing
-last_updated: "2026-06-05T14:30:00.000Z"
+milestone: none
+milestone_name: none
+status: idle
+last_updated: "2026-06-05T15:00:00.000Z"
 last_activity: 2026-06-05
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 13
   completed_plans: 13
-  percent: 80
+  percent: 100
 ---
 
 # Project State
@@ -20,21 +20,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-30 after v2.4 milestone shipped)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 82 — 1.0.0-consolidation-and-publish
+**Current focus:** Post 1.0.0 Release
 
 ## Current Position
 
-Phase: 82 (1.0.0-consolidation-and-publish) — DISCUSSING
+Phase: none
 Plan: 0 of 0
-Status: Context gathered — ready for planning
+Status: Idle - v2.5 1.0.0 shipped
 Last activity: 2026-06-05
 Resume file: None
 
 ## Milestone Snapshot
 
-- Shipped milestone: `v2.4 Batteries-Included Workflow & Adoption Closure` — phases 73-77, 21 plans, 19/19 requirements, milestone audit `passed`. Archived in `milestones/v2.4-ROADMAP.md` / `milestones/v2.4-REQUIREMENTS.md` / `milestones/v2.4-MILESTONE-AUDIT.md`.
-- Previous shipped milestone: `v2.3 Viewer Proof & Interop Closure` (shipped 2026-05-29 at tag `v0.3.1`).
-- Active milestone: **v2.5 1.0 Release Capstone** (phases 78–82, 16 requirements API-01..05 / STAB-01..05 / REL-01..06) — formal SemVer/API-stability commitment + first 1.x public hex release (`1.0.0`), single consolidation of unreleased v2.3 + v2.4. Phase 82 is the irreversible 1.0.0 publish. Then conditional `v2.6 Global Text Shaping & Script Support` only if adopter demand justifies the core investment.
+- Shipped milestone: `v2.5 1.0 Release Capstone` — phases 78-82, 16 requirements, milestone audit `passed`. Archived in `milestones/v2.5-ROADMAP.md` / `milestones/v2.5-REQUIREMENTS.md` / `milestones/v2.5-MILESTONE-AUDIT.md`.
+- Previous shipped milestone: `v2.4 Batteries-Included Workflow & Adoption Closure` (shipped 2026-05-30).
+- Active milestone: **none**. `1.0.0` is published. Conditional `v2.6 Global Text Shaping & Script Support` only if adopter demand justifies the core investment.
 
 ## v2.5 Phase Map
 
