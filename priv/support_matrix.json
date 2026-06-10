@@ -426,6 +426,29 @@
       "deterministic_output": "supported"
     }
   },
+  "text_shaping": {
+    "latin_and_cjk": {
+      "status": "supported",
+      "capabilities": ["cmap_advance_widths", "font_fallback_chain"],
+      "engine": "Rendro.Text.Shaper.Simple"
+    },
+    "arabic": {
+      "status": "explicit_deferral",
+      "evidence_deferred": "Arabic shaping requires contextual glyph substitution, joining forms, and right-to-left reordering that Shaper.Simple does not implement; full shaping is demand-gated at LNCH-03. Use harfbuzz_ex optional dep with config :rendro, shaper: Rendro.Adapters.HarfBuzz."
+    },
+    "hebrew_rtl": {
+      "status": "explicit_deferral",
+      "evidence_deferred": "Hebrew rendering requires UAX #9 bidi reordering which is not implemented in Rendro.Text.Bidi; visual reordering and RTL line presentation are deferred to v2.7 behind the LNCH-03 demand gate."
+    },
+    "devanagari": {
+      "status": "explicit_deferral",
+      "evidence_deferred": "Devanagari and other Indic scripts require complex glyph reordering, conjunct formation, and matra positioning that Shaper.Simple does not implement; deferred to v2.7 behind the LNCH-03 demand gate."
+    },
+    "thai": {
+      "status": "explicit_deferral",
+      "evidence_deferred": "Thai and other SEA scripts require cluster-aware line breaking, vowel positioning, and tone mark handling that Shaper.Simple does not implement; deferred to v2.7 behind the LNCH-03 demand gate."
+    }
+  },
   "unsupported": [
     "full_pdf_compliance",
     "digital_signatures"
