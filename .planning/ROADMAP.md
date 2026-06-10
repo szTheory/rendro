@@ -155,7 +155,7 @@ Plans:
 | 80. Stability Contract & Migration Docs | v2.5 | 4/4 | Complete | 2026-05-30 |
 | 81. Release Hardening | v2.5 | 1/1 | Complete | 2026-06-05 |
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 3/3 | Complete | 2026-06-05 |
-| 83. Claim-Accuracy & Shaping Hygiene | v2.6 | 5/5 | Complete   | 2026-06-10 |
+| 83. Claim-Accuracy & Shaping Hygiene | v2.6 | 5/5 | Complete    | 2026-06-10 |
 | 84. Drawn-Path Primitive & Visible Polish | v2.6 | 0/? | Not started | - |
 | 85. Deterministic Raster Lane | v2.6 | 0/? | Not started | - |
 | 86. Self-Proving Launch Artifacts | v2.6 | 0/? | Not started | - |

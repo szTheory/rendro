@@ -11,11 +11,11 @@ Requirements for the v2.6 milestone. Each maps to exactly one roadmap phase.
 
 ### Claim Accuracy & Shaping Hygiene (HYG)
 
-- [ ] **HYG-01**: `harfbuzz_ex` is an optional dependency behind a public `Rendro.Text.Shaper` behaviour — core ships a pure-Elixir `Shaper.Simple` (current cmap+width capability), the HarfBuzz adapter activates when the optional dep is loaded, and the "pure Elixir core / no hard NIF dependencies" claim is true again before any launch content ships.
-- [ ] **HYG-02**: Rendering text in a complex script with no shaping adapter configured produces a deterministic, instructive error naming the script and the fix — never silently disconnected/wrong glyph output.
-- [ ] **HYG-03**: The per-grapheme shaping bug in the line-breaking path (`measure.ex` `split_graphemes`) is fixed to shape runs and break at cluster boundaries, with existing Latin golden output byte-identical (or deliberately re-blessed with a changelog note).
-- [ ] **HYG-04**: The dead `unicode_data 0.8.0` dependency is replaced by the maintained `ex_unicode` stack, with run-itemization behavior on existing fixtures verified unchanged (or changes deliberate and documented).
-- [ ] **HYG-05**: `priv/support_matrix.json` gains `explicit_deferral` rows for complex-script support (Arabic, Hebrew/RTL, Devanagari, Thai) with named reasons, and README/guide script-support claims align with the matrix.
+- [x] **HYG-01**: `harfbuzz_ex` is an optional dependency behind a public `Rendro.Text.Shaper` behaviour — core ships a pure-Elixir `Shaper.Simple` (current cmap+width capability), the HarfBuzz adapter activates when the optional dep is loaded, and the "pure Elixir core / no hard NIF dependencies" claim is true again before any launch content ships.
+- [x] **HYG-02**: Rendering text in a complex script with no shaping adapter configured produces a deterministic, instructive error naming the script and the fix — never silently disconnected/wrong glyph output.
+- [x] **HYG-03**: The per-grapheme shaping bug in the line-breaking path (`measure.ex` `split_graphemes`) is fixed to shape runs and break at cluster boundaries, with existing Latin golden output byte-identical (or deliberately re-blessed with a changelog note).
+- [x] **HYG-04**: The dead `unicode_data 0.8.0` dependency is replaced by the maintained `ex_unicode` stack, with run-itemization behavior on existing fixtures verified unchanged (or changes deliberate and documented).
+- [x] **HYG-05**: `priv/support_matrix.json` gains `explicit_deferral` rows for complex-script support (Arabic, Hebrew/RTL, Devanagari, Thai) with named reasons, and README/guide script-support claims align with the matrix.
 
 ### Drawn-Path Primitive & Visible Polish (PATH)
 
@@ -75,11 +75,11 @@ Deferred to future milestones. Tracked but not in the current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HYG-01 | Phase 83 | Pending |
-| HYG-02 | Phase 83 | Pending |
-| HYG-03 | Phase 83 | Pending |
-| HYG-04 | Phase 83 | Pending |
-| HYG-05 | Phase 83 | Pending |
+| HYG-01 | Phase 83 | Complete |
+| HYG-02 | Phase 83 | Complete |
+| HYG-03 | Phase 83 | Complete |
+| HYG-04 | Phase 83 | Complete |
+| HYG-05 | Phase 83 | Complete |
 | PATH-01 | Phase 84 | Pending |
 | PATH-02 | Phase 84 | Pending |
 | PATH-03 | Phase 84 | Pending |

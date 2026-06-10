@@ -2,15 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.6
 milestone_name: Public Launch & Adoption Bootstrap
-status: executing
-last_updated: "2026-06-10T15:58:01.722Z"
+status: ready_to_plan
+last_updated: 2026-06-10T18:58:16.449Z
 last_activity: 2026-06-10 -- Phase 83 execution started
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 5
-  completed_plans: 0
+  completed_plans: 5
   percent: 0
+stopped_at: Phase 83 complete (5/5) — ready to discuss Phase 84
 ---
 
 # Project State
@@ -20,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-10 — v2.6 milestone started)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 83 — Claim-Accuracy & Shaping Hygiene
+**Current focus:** Phase 84 — drawn path primitive & visible polish
 
 ## Current Position
 
-Phase: 83 (Claim-Accuracy & Shaping Hygiene) — EXECUTING
-Plan: 1 of 5
-Status: Executing Phase 83
-Last activity: 2026-06-10 -- Phase 83 execution started
+Phase: 84
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-06-10
 
 Progress: [░░░░░░░░░░] 0%
 
