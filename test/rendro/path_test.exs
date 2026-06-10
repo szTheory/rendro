@@ -131,12 +131,16 @@ defmodule Rendro.PathTest do
   # ---------------------------------------------------------------------------
 
   describe "P01d: rounded_rect uses kappa approximation" do
-    test "rounded_rect content stream contains 0.5523 (kappa-derived control point)" do
+    test "rounded_rect content stream contains kappa-derived control point coordinate" do
       doc = doc_with_rounded_rect_path()
       assert {:ok, pdf} = Rendro.render(doc, deterministic: true)
-      # The kappa 0.5522847498 * radius produces control points containing "0.5523"
-      # when rounded to 4 decimal places. Will fail RED until rounded_rect is implemented.
-      assert pdf =~ "0.5523"
+      # The fixture: {rounded_rect, 5, 5, 90, 40, 10} with block_h=70.
+      # control = 10 * 0.5522847498 = 5.5228. This offset appears in the control points:
+      # right(95) - r(10) + control(5.5228) = 90.5228
+      # top(65) - r(10) + control(5.5228) = 60.5228
+      # Both of these "kappa-derived" coordinate values must appear in the stream.
+      assert pdf =~ "90.5228"
+      assert pdf =~ "60.5228"
     end
   end
 
