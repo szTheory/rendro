@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: none
-milestone_name: none
-status: idle
-last_updated: "2026-06-05T15:00:00.000Z"
-last_activity: 2026-06-05
+milestone: v2.6
+milestone_name: Public Launch & Adoption Bootstrap
+status: planning
+last_updated: "2026-06-10T14:02:31.202Z"
+last_activity: 2026-06-10
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 13
-  completed_plans: 13
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -24,11 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-30 after v2.4 milestone shipped)
 
 ## Current Position
 
-Phase: none
-Plan: 0 of 0
-Status: Idle - v2.5 1.0.0 shipped
-Last activity: 2026-06-05
-Resume file: None
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-06-10 — Milestone v2.6 started
 
 ## Milestone Snapshot
 
