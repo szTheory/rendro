@@ -134,7 +134,7 @@ defmodule Rendro.Text.ShaperTest do
       assert length(glyphs) == 5
     end
 
-    test "shape/3 for embedded font without HarfBuzz returns shaping_required error" do
+    test "shape/3 shapes embedded fonts via the same advance-width path (CR-01)" do
       font_path = Path.join(:code.priv_dir(:rendro), "branded/fonts/B612-Regular.ttf")
       font_bytes = File.read!(font_path)
 
@@ -148,12 +148,33 @@ defmodule Rendro.Text.ShaperTest do
         ascent: 718,
         descent: -207,
         default_width: 500,
+        widths: %{?H => 600, ?e => 500, ?l => 250, ?o => 520},
+        cmap: nil
+      }
+
+      assert {:ok, glyphs} = Simple.shape(font, "Hello", [])
+      assert length(glyphs) == 5
+      assert [%{name: "H", x_advance: 600} | _] = glyphs
+      assert Enum.all?(glyphs, &(&1.x_advance > 0))
+    end
+
+    test "shape/3 still gates requires-shaping scripts for embedded fonts (D-07)" do
+      font = %Rendro.PDF.Font{
+        source: :embedded,
+        font_bytes: <<0>>,
+        name: "embedded",
+        base_font: "Embedded",
+        subtype: :truetype,
+        units_per_em: 1000,
+        ascent: 718,
+        descent: -207,
+        default_width: 500,
         widths: %{},
         cmap: nil
       }
 
-      assert {:error, {:shaping_required, :embedded_font_requires_harfbuzz}} =
-               Simple.shape(font, "Hello", [])
+      assert {:error, {:shaping_required, :arab, _hint}} =
+               Simple.shape(font, "مرحبا", script: :arab)
     end
   end
 

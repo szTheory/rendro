@@ -58,7 +58,13 @@ defmodule Rendro.Text.Shaper.Simple do
     end
   end
 
-  defp do_shape(%Rendro.PDF.Font{source: :built_in} = font, text) do
+  # The widths map and default_width are populated for both :built_in fonts
+  # (Font.helvetica/0) and :embedded fonts (Font.embedded/1), so the
+  # cmap + advance-width path works identically for both sources. The
+  # requires-shaping script gate above applies to embedded fonts exactly as
+  # it does to built-in ones (D-07).
+  defp do_shape(%Rendro.PDF.Font{source: source} = font, text)
+       when source in [:built_in, :embedded] do
     glyphs =
       text
       |> String.graphemes()
@@ -77,9 +83,5 @@ defmodule Rendro.Text.Shaper.Simple do
       end)
 
     {:ok, glyphs}
-  end
-
-  defp do_shape(%Rendro.PDF.Font{source: :embedded}, _text) do
-    {:error, {:shaping_required, :embedded_font_requires_harfbuzz}}
   end
 end
