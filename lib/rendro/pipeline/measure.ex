@@ -600,21 +600,69 @@ defmodule Rendro.Pipeline.Measure do
     end)
   end
 
+  # Rewritten per D-11: shapes runs (not individual graphemes) and breaks at cluster
+  # boundaries. Under Shaper.Simple (cluster=0 for all glyphs), each glyph maps 1:1
+  # to a grapheme and behaviour is identical to the old per-grapheme loop. Under
+  # Rendro.Adapters.HarfBuzz (cluster=byte offset), ligature clusters are treated as
+  # atomic units for line-breaking. The per-grapheme shaping call is gone.
   defp split_graphemes(text, max_width, font_chain, font_size) do
-    result =
-      Enum.reduce_while(String.graphemes(text), {:ok, {[], []}}, fn grapheme,
-                                                                    {:ok, {lines, current_line}} ->
+    graphemes = String.graphemes(text)
+
+    # Step 1: Resolve font for each grapheme, accumulating into font-homogeneous runs.
+    # Each run is {font, accumulated_text}.
+    font_runs_result =
+      Enum.reduce_while(graphemes, {:ok, []}, fn grapheme, {:ok, acc} ->
         case find_font_for_grapheme(grapheme, font_chain) do
-          {:ok, font} ->
-            case Rendro.Text.Shaper.shape(font, grapheme) do
+          {:ok, font} -> {:cont, {:ok, append_font_run(acc, font, grapheme)}}
+          :error -> {:halt, {:error, {:unsupported_glyph, grapheme}}}
+        end
+      end)
+
+    case font_runs_result do
+      {:error, _} = err ->
+        err
+
+      {:ok, raw_font_runs} ->
+        font_runs = Enum.reverse(raw_font_runs)
+
+        # Step 2: For each font-homogeneous run, shape the entire run text at once.
+        # Use the bidi script for the run text to pass correct script context.
+        # walk glyph list by cluster boundaries to produce per-cluster {font, text, width} structs.
+        cluster_runs_result =
+          Enum.reduce_while(font_runs, {:ok, []}, fn {font, run_text}, {:ok, acc} ->
+            # Determine script for this run via bidi itemization (same as measure_text_into_runs)
+            script =
+              case Rendro.Text.Bidi.split_runs(run_text) do
+                [%{script: s} | _] -> s
+                _ -> :latn
+              end
+
+            case Rendro.Text.Shaper.shape(font, run_text, script: script) do
               {:ok, glyphs} ->
-                width =
-                  glyphs
-                  |> Enum.reduce(0, fn g, acc -> acc + g.x_advance end)
-                  |> Kernel.*(font_size / font.units_per_em)
+                cluster_structs =
+                  glyphs_to_cluster_runs(glyphs, run_text, font, font_size)
 
-                grapheme_run = [%{font: font, text: grapheme, width: width}]
+                {:cont, {:ok, acc ++ cluster_structs}}
 
+              {:error, reason} ->
+                {:halt, {:error, reason}}
+            end
+          end)
+
+        case cluster_runs_result do
+          {:error, _} = err ->
+            err
+
+          {:ok, cluster_run_list} ->
+            # Step 3: Apply line-breaking using the per-cluster run structs.
+            # Each cluster_run is %{font: font, text: text, width: width} — same shape
+            # as the run structs produced by measure_text_into_runs.
+            result =
+              Enum.reduce_while(cluster_run_list, {:ok, {[], []}}, fn cluster_run,
+                                                                       {:ok,
+                                                                        {lines, current_line}} ->
+                width = cluster_run.width
+                grapheme_run = [cluster_run]
                 candidate_line = merge_runs(current_line, grapheme_run)
 
                 cond do
@@ -630,28 +678,69 @@ defmodule Rendro.Pipeline.Measure do
                   true ->
                     {:cont, {:ok, {[current_line | lines], grapheme_run}}}
                 end
+              end)
 
-              {:error, reason} ->
-                {:halt, {:error, reason}}
+            case result do
+              {:ok, {lines, current_line}} ->
+                final_lines =
+                  case current_line do
+                    [] -> Enum.reverse(lines)
+                    _ -> Enum.reverse([current_line | lines])
+                  end
+
+                {:ok, final_lines}
+
+              err ->
+                err
             end
-
-          :error ->
-            {:halt, {:error, {:unsupported_glyph, grapheme}}}
         end
-      end)
+    end
+  end
 
-    case result do
-      {:ok, {lines, current_line}} ->
-        final_lines =
-          case current_line do
-            [] -> Enum.reverse(lines)
-            _ -> Enum.reverse([current_line | lines])
+  # Converts a shaped glyph list to per-cluster run structs with widths.
+  # Under Shaper.Simple, cluster=0 for all glyphs — we use grapheme order instead
+  # (zip glyphs with the graphemes of run_text since Simple produces one glyph per grapheme).
+  # Under HarfBuzz, cluster = byte offset into run_text — group glyphs by cluster value.
+  defp glyphs_to_cluster_runs(glyphs, run_text, font, font_size) do
+    # Check if all cluster values are 0 (Simple path) or vary (HarfBuzz path)
+    clusters = Enum.map(glyphs, & &1.cluster)
+    simple_path? = Enum.all?(clusters, &(&1 == 0))
+
+    if simple_path? do
+      # Shaper.Simple: one glyph per grapheme, cluster=0 for all.
+      # Zip glyphs with graphemes to produce per-grapheme run structs.
+      graphemes = String.graphemes(run_text)
+
+      Enum.zip(graphemes, glyphs)
+      |> Enum.map(fn {grapheme, glyph} ->
+        width = glyph.x_advance * (font_size / font.units_per_em)
+        %{font: font, text: grapheme, width: width}
+      end)
+    else
+      # HarfBuzz path: group glyphs by cluster byte offset.
+      # Each cluster group corresponds to a ligature or multi-codepoint sequence.
+      # Reconstruct the text segment for each cluster by slicing run_text at cluster boundaries.
+      sorted_glyphs = Enum.sort_by(glyphs, & &1.cluster)
+      cluster_groups = Enum.group_by(sorted_glyphs, & &1.cluster)
+      sorted_offsets = cluster_groups |> Map.keys() |> Enum.sort()
+
+      text_bytes = byte_size(run_text)
+
+      sorted_offsets
+      |> Enum.with_index()
+      |> Enum.map(fn {offset, idx} ->
+        next_offset =
+          case Enum.at(sorted_offsets, idx + 1) do
+            nil -> text_bytes
+            n -> n
           end
 
-        {:ok, final_lines}
-
-      err ->
-        err
+        cluster_text = binary_part(run_text, offset, next_offset - offset)
+        cluster_glyphs = Map.get(cluster_groups, offset, [])
+        total_advance = Enum.reduce(cluster_glyphs, 0, fn g, acc -> acc + g.x_advance end)
+        width = total_advance * (font_size / font.units_per_em)
+        %{font: font, text: cluster_text, width: width}
+      end)
     end
   end
 
