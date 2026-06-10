@@ -208,4 +208,26 @@ defmodule Rendro.PathTest do
       assert :ok == Rendro.Color.validate({44, 107, 237})
     end
   end
+
+  describe "Rendro.path/2 builder (D-12: supports width:/height: block attrs)" do
+    test "routes block-level width/height to the Block, not the Path struct" do
+      # This is the exact Rendro.Path @moduledoc example — must not crash.
+      block = Rendro.path([{:rect, 10, 10, 100, 50}], stroke: {0, 0, 0}, width: 200, height: 70)
+
+      assert %Rendro.Block{content: %Rendro.Path{}, width: 200, height: 70} = block
+      assert %Rendro.Path{ops: [{:rect, 10, 10, 100, 50}], stroke: {0, 0, 0}} = block.content
+    end
+
+    test "path-level attrs (stroke/fill) still reach the Path struct" do
+      block = Rendro.path([{:rect, 0, 0, 100, 50}], stroke: {0, 0, 0}, fill: {255, 0, 0})
+
+      assert %Rendro.Block{content: %Rendro.Path{stroke: {0, 0, 0}, fill: {255, 0, 0}}} = block
+    end
+
+    test "no attrs yields a Block wrapping a stroke/fill-less Path" do
+      block = Rendro.path([{:rect, 0, 0, 10, 10}])
+
+      assert %Rendro.Block{content: %Rendro.Path{stroke: nil, fill: nil}} = block
+    end
+  end
 end

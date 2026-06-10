@@ -241,11 +241,25 @@ defmodule Rendro do
 
   @spec path([term()], keyword()) :: Block.t()
   def path(ops, attrs \\ []) do
-    attrs
-    |> normalize_path_attrs()
-    |> Keyword.put(:ops, ops)
-    |> then(&struct!(Rendro.Path, &1))
-    |> then(&struct!(Block, content: &1))
+    {block_attrs, path_attrs} =
+      Keyword.split(attrs, [
+        :x,
+        :y,
+        :width,
+        :height,
+        :keep_together,
+        :keep_with_next,
+        :break_before,
+        :break_after
+      ])
+
+    path =
+      path_attrs
+      |> normalize_path_attrs()
+      |> Keyword.put(:ops, ops)
+      |> then(&struct!(Rendro.Path, &1))
+
+    struct!(Block, Keyword.put(block_attrs, :content, path))
   end
 
   @spec form_field(String.t(), String.t(), keyword()) :: Block.t()
