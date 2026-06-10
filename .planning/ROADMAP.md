@@ -94,7 +94,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 84-01-PLAN.md — Rendro.Color helper + %Rendro.Path{} struct + Wave 0 test stubs (RED state)
+- [x] 84-01-PLAN.md — Rendro.Color helper + %Rendro.Path{} struct + Wave 0 test stubs (RED state)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -174,7 +174,7 @@ Plans:
 | 81. Release Hardening | v2.5 | 1/1 | Complete | 2026-06-05 |
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 3/3 | Complete | 2026-06-05 |
 | 83. Claim-Accuracy & Shaping Hygiene | v2.6 | 5/5 | Complete    | 2026-06-10 |
-| 84. Drawn-Path Primitive & Visible Polish | v2.6 | 0/5 | Not started | - |
+| 84. Drawn-Path Primitive & Visible Polish | v2.6 | 1/5 | In Progress|  |
 | 85. Deterministic Raster Lane | v2.6 | 0/? | Not started | - |
 | 86. Self-Proving Launch Artifacts | v2.6 | 0/? | Not started | - |
 | 87. Comparison Page & Livebook | v2.6 | 0/? | Not started | - |
