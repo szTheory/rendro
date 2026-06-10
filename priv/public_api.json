@@ -13,6 +13,7 @@
         "page/1",
         "page_number/1",
         "page_template/1",
+        "path/2",
         "put_default_font/2",
         "region/1",
         "register_embedded_file/4",
@@ -282,6 +283,17 @@
       "functions": [],
       "tier": "stable",
       "types": [
+        "t/0"
+      ]
+    },
+    "Elixir.Rendro.Path": {
+      "functions": [],
+      "tier": "stable",
+      "types": [
+        "color/0",
+        "fill_style/0",
+        "op/0",
+        "stroke_style/0",
         "t/0"
       ]
     },

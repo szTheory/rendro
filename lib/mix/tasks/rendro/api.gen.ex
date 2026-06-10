@@ -60,6 +60,7 @@ defmodule Mix.Tasks.Rendro.Api.Gen do
     Rendro.Metadata,
     Rendro.Page,
     Rendro.PageTemplate,
+    Rendro.Path,
     Rendro.Protect,
     Rendro.Recipes,
     Rendro.Region,

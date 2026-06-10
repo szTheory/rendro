@@ -574,6 +574,41 @@ defmodule Rendro.PDF.Writer do
     render_block(doc, block, page, font_map, image_map, 0, 0)
   end
 
+  defp render_block(
+         _doc,
+         %Rendro.Block{content: %Rendro.Path{} = path} = block,
+         page,
+         _font_map,
+         _image_map
+       ) do
+    # Block origin in PDF coordinate space (Y-up, bottom-left)
+    x = block.x + page.margin_left
+    y = page.height - (block.y + block.height) - page.margin_top
+    h = block.height
+
+    # Graphics-state ops (omit defaults per D-10)
+    gstate_ops = render_path_gstate(path)
+
+    # Fill color op (emitted before path construction ops)
+    fill_color_op = render_path_fill_color(path.fill)
+
+    # Path construction ops (each op's y-coord is Y-flipped via h - y_author)
+    path_ops = render_path_ops(path.ops, h)
+
+    # Paint op selection: {nil,nil}→n, {nil,fill}→f, {stroke,nil}→S, {stroke,fill}→B
+    paint = paint_op(path.stroke, path.fill)
+
+    IO.iodata_to_binary([
+      "q\n",
+      "1 0 0 1 ", format_num(x), " ", format_num(y), " cm\n",
+      gstate_ops,
+      fill_color_op,
+      path_ops,
+      paint, "\n",
+      "Q"
+    ])
+  end
+
   defp render_block(_doc, _block, _page, _font_map, _image_map), do: ""
 
   defp render_block(
@@ -635,8 +670,7 @@ defmodule Rendro.PDF.Writer do
   defp render_text_block(block, page, ox, oy, text, lines, line_height, font_map) do
     x = block.x + ox + page.margin_left
     y = page.height - (block.y + oy) - page.margin_top - text.size
-    {r, g, b} = text.color
-    color_op = "#{format_num(r / 255)} #{format_num(g / 255)} #{format_num(b / 255)} rg"
+    color_op = Rendro.Color.rg(text.color) |> String.trim_trailing("\n")
     line_offset = text.size * line_height
 
     line_ops =
@@ -1780,5 +1814,165 @@ defmodule Rendro.PDF.Writer do
       end
     end)
     |> IO.iodata_to_binary()
+  end
+
+  # ---------------------------------------------------------------------------
+  # Path rendering helpers (D-07..D-12)
+  # ---------------------------------------------------------------------------
+
+  # Graphics-state ops: emit only non-default values (D-10 byte-clean defaults)
+  defp render_path_gstate(%Rendro.Path{stroke: stroke}) do
+    case stroke do
+      nil ->
+        []
+
+      {_r, _g, _b} = color ->
+        [Rendro.Color.rg_stroke(color)]
+
+      %{color: color} = style ->
+        [
+          Rendro.Color.rg_stroke(color),
+          render_line_width(Map.get(style, :width)),
+          render_cap(Map.get(style, :cap)),
+          render_join(Map.get(style, :join)),
+          render_dash(Map.get(style, :dash))
+        ]
+
+      %{} = style ->
+        [
+          render_line_width(Map.get(style, :width)),
+          render_cap(Map.get(style, :cap)),
+          render_join(Map.get(style, :join)),
+          render_dash(Map.get(style, :dash))
+        ]
+    end
+  end
+
+  defp render_line_width(nil), do: []
+  defp render_line_width(w) when w == 1.0, do: []
+  defp render_line_width(w), do: [format_num(w * 1.0), " w\n"]
+
+  defp render_cap(nil), do: []
+  defp render_cap(:butt), do: []
+  defp render_cap(:round), do: ["1 J\n"]
+  defp render_cap(:square), do: ["2 J\n"]
+
+  defp render_join(nil), do: []
+  defp render_join(:miter), do: []
+  defp render_join(:round), do: ["1 j\n"]
+  defp render_join(:bevel), do: ["2 j\n"]
+
+  defp render_dash(nil), do: []
+  defp render_dash([on, off]), do: ["[", format_num(on * 1.0), " ", format_num(off * 1.0), "] 0 d\n"]
+
+  # Fill color op — emitted before path construction if fill is set
+  defp render_path_fill_color(nil), do: []
+  defp render_path_fill_color({_r, _g, _b} = color), do: [Rendro.Color.rg(color)]
+  defp render_path_fill_color(%{color: color}), do: [Rendro.Color.rg(color)]
+  defp render_path_fill_color(%{}), do: []
+
+  # Paint op selection: {stroke, fill} → operator
+  defp paint_op(nil, nil), do: "n"
+  defp paint_op(nil, _fill), do: "f"
+  defp paint_op(_stroke, nil), do: "S"
+  defp paint_op(_stroke, _fill), do: "B"
+
+  # Path construction ops — all y coords are Y-flipped via h - y_author
+  defp render_path_ops(ops, h) do
+    Enum.map(ops, fn op -> render_path_op(op, h) end)
+  end
+
+  defp render_path_op({:move, x, y}, h) do
+    [format_num(x * 1.0), " ", format_num((h - y) * 1.0), " m\n"]
+  end
+
+  defp render_path_op({:line, x, y}, h) do
+    [format_num(x * 1.0), " ", format_num((h - y) * 1.0), " l\n"]
+  end
+
+  defp render_path_op({:curve, x1, y1, x2, y2, x3, y3}, h) do
+    [
+      format_num(x1 * 1.0), " ", format_num((h - y1) * 1.0), " ",
+      format_num(x2 * 1.0), " ", format_num((h - y2) * 1.0), " ",
+      format_num(x3 * 1.0), " ", format_num((h - y3) * 1.0), " c\n"
+    ]
+  end
+
+  defp render_path_op({:rect, x, y, w, rh}, h) do
+    # PDF re: bottom-left x/y, width, height
+    # Y-flip: h - y - rh gives bottom in PDF Y-up coords
+    [
+      format_num(x * 1.0), " ", format_num((h - y - rh) * 1.0), " ",
+      format_num(w * 1.0), " ", format_num(rh * 1.0), " re\n"
+    ]
+  end
+
+  defp render_path_op({:rounded_rect, x, y, w, rh, r}, h) do
+    rounded_rect_path(x, y, w, rh, r, h)
+  end
+
+  defp render_path_op(:close, _h) do
+    ["h\n"]
+  end
+
+  defp render_path_op(_unknown, _h) do
+    # Unknown ops produce empty string — no crash, no injection (T-84-04)
+    []
+  end
+
+  # Rounded rect decomposition via kappa 0.5522847498 (D-09)
+  # Author coords (x, y, w, h, r) Y-down; all y values flipped to PDF Y-up
+  defp rounded_rect_path(x, y, w, rh, r, block_h) do
+    control = r * 0.5522847498
+
+    # Author Y-down corner points flipped to PDF Y-up:
+    # y_pdf = block_h - y_author
+    # Start at (x+r, y) — top-left start on top edge, going clockwise
+    top = block_h - y * 1.0
+    bottom = block_h - (y + rh) * 1.0
+    left = x * 1.0
+    right = (x + w) * 1.0
+    r_f = r * 1.0
+    ctrl = control * 1.0
+
+    [
+      # Move to start of top edge (just right of top-left corner)
+      format_num(left + r_f), " ", format_num(top), " m\n",
+
+      # Top edge — line to just left of top-right corner
+      format_num(right - r_f), " ", format_num(top), " l\n",
+
+      # Top-right arc (Y-up: going from top edge down to right edge)
+      format_num(right - r_f + ctrl), " ", format_num(top), " ",
+      format_num(right), " ", format_num(top - r_f + ctrl), " ",
+      format_num(right), " ", format_num(top - r_f), " c\n",
+
+      # Right edge — line to just above bottom-right corner
+      format_num(right), " ", format_num(bottom + r_f), " l\n",
+
+      # Bottom-right arc
+      format_num(right), " ", format_num(bottom + r_f - ctrl), " ",
+      format_num(right - r_f + ctrl), " ", format_num(bottom), " ",
+      format_num(right - r_f), " ", format_num(bottom), " c\n",
+
+      # Bottom edge — line to just right of bottom-left corner
+      format_num(left + r_f), " ", format_num(bottom), " l\n",
+
+      # Bottom-left arc
+      format_num(left + r_f - ctrl), " ", format_num(bottom), " ",
+      format_num(left), " ", format_num(bottom + r_f - ctrl), " ",
+      format_num(left), " ", format_num(bottom + r_f), " c\n",
+
+      # Left edge — line to just below top-left corner
+      format_num(left), " ", format_num(top - r_f), " l\n",
+
+      # Top-left arc — back to start
+      format_num(left), " ", format_num(top - r_f + ctrl), " ",
+      format_num(left + r_f - ctrl), " ", format_num(top), " ",
+      format_num(left + r_f), " ", format_num(top), " c\n",
+
+      # Close path
+      "h\n"
+    ]
   end
 end

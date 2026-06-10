@@ -239,6 +239,15 @@ defmodule Rendro do
     |> then(&struct!(Text, &1))
   end
 
+  @spec path([term()], keyword()) :: Block.t()
+  def path(ops, attrs \\ []) do
+    attrs
+    |> normalize_path_attrs()
+    |> Keyword.put(:ops, ops)
+    |> then(&struct!(Rendro.Path, &1))
+    |> then(&struct!(Block, content: &1))
+  end
+
   @spec form_field(String.t(), String.t(), keyword()) :: Block.t()
   def form_field(name, value \\ "", attrs \\ []) do
     type = Keyword.get(attrs, :type, :text)
@@ -355,6 +364,34 @@ defmodule Rendro do
         raise ArgumentError,
               "Rendro.table/2 only supports split_policy: :row_atomic" <>
                 " (or temporary alias :atomic); got: #{inspect(split_policy)}"
+    end
+  end
+
+  defp normalize_path_attrs(attrs) do
+    attrs
+    |> validate_color_attr(:stroke)
+    |> validate_color_attr(:fill)
+  end
+
+  defp validate_color_attr(attrs, key) do
+    case Keyword.get(attrs, key) do
+      nil ->
+        attrs
+
+      {_r, _g, _b} = color ->
+        case Rendro.Color.validate(color) do
+          :ok -> attrs
+          {:error, msg} -> raise ArgumentError, msg
+        end
+
+      %{color: color} = _map ->
+        case Rendro.Color.validate(color) do
+          :ok -> attrs
+          {:error, msg} -> raise ArgumentError, msg
+        end
+
+      _other ->
+        attrs
     end
   end
 
