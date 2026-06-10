@@ -30,7 +30,6 @@ defmodule Rendro.PublicApi.ManifestTest do
         "Elixir.Rendro.PDF.CidFont",
         "Elixir.Rendro.PDF.FontSubsetter",
         "Elixir.Rendro.Text.Bidi",
-        "Elixir.Rendro.Text.Shaper",
         "Elixir.Rendro.Format",
         "Elixir.Rendro.Audit"
       ]
