@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+#### HYG-03: Cluster-boundary split_graphemes rewrite (D-11, D-12, D-13)
+
+- Rewrote `split_graphemes/4` in `lib/rendro/pipeline/measure.ex` to shape runs at
+  cluster boundaries instead of calling `Shaper.shape/3` once per grapheme. The old
+  per-grapheme shaping call is removed entirely.
+- Under `Shaper.Simple` (cluster=0 for all glyphs), the new run-shaping path is
+  byte-identical to the old per-grapheme path by construction — each glyph still maps
+  1:1 to a grapheme and x_advance values are unchanged. **No golden regressions.**
+- Under `Rendro.Adapters.HarfBuzz` (cluster=byte offset), ligature clusters are now
+  treated as atomic units for line-breaking, which was objectively wrong before.
+- StreamData property test added (`test/rendro/text/shaper_test.exs`) formally proving
+  per-grapheme width sum == per-run width under `Shaper.Simple` for random ASCII strings (D-12).
+- **Re-bless event (D-13): No golden files changed.** The Latin/Shaper.Simple path is
+  byte-identical by construction (proven by property test). No HarfBuzz-path golden
+  fixtures exist in the test suite, so no re-blessing was required.
+
 ## [1.0.0] - 2026-06-05
 
 This release marks the `1.0.0` milestone, establishing the first formal SemVer commitment. It consolidates the v2.3 Viewer Evidence work, the v2.4 Batteries-Included workflow features, and the v2.5 API stability cleanup.
