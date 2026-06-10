@@ -67,7 +67,7 @@ defmodule Rendro.Text.Bidi do
       if script_atom in [:common, :inherited, :unknown] do
         :common
       else
-        to_opentype_tag(script_atom)
+        Rendro.Text.ScriptTags.to_opentype_tag(script_atom)
       end
 
     bidi_class = Unicode.BidiClass.bidi_class(cp)
@@ -90,55 +90,4 @@ defmodule Rendro.Text.Bidi do
     %{text: text, script: script, direction: direction}
   end
 
-  # OpenType 4-letter script tag mapping from Unicode script atom names
-  # Covers the 20 complex scripts gated in Shaper.Simple plus common supported scripts
-  defp to_opentype_tag(:arabic), do: :arab
-  defp to_opentype_tag(:syriac), do: :syrc
-  defp to_opentype_tag(:nko), do: :nkoo
-  defp to_opentype_tag(:mongolian), do: :mong
-  defp to_opentype_tag(:hebrew), do: :hebr
-  defp to_opentype_tag(:devanagari), do: :deva
-  defp to_opentype_tag(:bengali), do: :beng
-  defp to_opentype_tag(:gurmukhi), do: :guru
-  defp to_opentype_tag(:gujarati), do: :gujr
-  defp to_opentype_tag(:oriya), do: :orya
-  defp to_opentype_tag(:tamil), do: :taml
-  defp to_opentype_tag(:telugu), do: :telu
-  defp to_opentype_tag(:kannada), do: :knda
-  defp to_opentype_tag(:malayalam), do: :mlym
-  defp to_opentype_tag(:sinhala), do: :sinh
-  defp to_opentype_tag(:thai), do: :thai
-  defp to_opentype_tag(:lao), do: :laoo
-  defp to_opentype_tag(:khmer), do: :khmr
-  defp to_opentype_tag(:myanmar), do: :mymr
-  defp to_opentype_tag(:tibetan), do: :tibt
-  defp to_opentype_tag(:latin), do: :latn
-  defp to_opentype_tag(:greek), do: :grek
-  defp to_opentype_tag(:cyrillic), do: :cyrl
-  defp to_opentype_tag(:armenian), do: :armn
-  defp to_opentype_tag(:georgian), do: :geor
-  defp to_opentype_tag(:han), do: :hani
-  defp to_opentype_tag(:hiragana), do: :hira
-  defp to_opentype_tag(:katakana), do: :kana
-  defp to_opentype_tag(:hangul), do: :hang
-  defp to_opentype_tag(:bopomofo), do: :bopo
-  defp to_opentype_tag(:cherokee), do: :cher
-  defp to_opentype_tag(:ethiopic), do: :ethi
-  defp to_opentype_tag(:gothic), do: :goth
-  defp to_opentype_tag(:runic), do: :runr
-  defp to_opentype_tag(:khojki), do: :khoj
-  defp to_opentype_tag(:old_italic), do: :ital
-  defp to_opentype_tag(:ogham), do: :ogam
-  defp to_opentype_tag(:old_turkic), do: :otk
-  defp to_opentype_tag(:rejang), do: :rjng
-  defp to_opentype_tag(:shavian), do: :shaw
-  defp to_opentype_tag(:sundanese), do: :sund
-  defp to_opentype_tag(:syloti_nagri), do: :sylo
-  defp to_opentype_tag(:tagalog), do: :tglg
-  defp to_opentype_tag(:tagbanwa), do: :tagb
-  defp to_opentype_tag(:tai_le), do: :tale
-  defp to_opentype_tag(:yi), do: :yiii
-  defp to_opentype_tag(:old_persian), do: :xpeo
-  # Fallback: pass atom through unchanged
-  defp to_opentype_tag(script), do: script
 end
