@@ -190,6 +190,21 @@ defmodule Rendro.Text.ShaperTest do
       assert String.starts_with?(hint, "\n    Add")
     end
 
+    test "hint names the embedded-font fix when a shaping adapter is already effective (WR-04)",
+         %{font: font} do
+      # A built-in font reached Simple's gate even though a shaping adapter is
+      # configured (the adapter delegates :built_in fonts to Simple). Telling
+      # the user to configure the adapter again would be wrong.
+      Application.put_env(:rendro, :shaper, Rendro.Text.ShaperTest.ConfigShaper)
+
+      assert {:error, {:shaping_required, :arab, hint}} =
+               Simple.shape(font, "مرحبا", script: :arab)
+
+      assert hint =~ "register_embedded_font/3"
+      assert hint =~ "Built-in PDF fonts cannot contain :arab glyphs"
+      refute hint =~ "config :rendro, shaper:"
+    end
+
     test "shape/3 returns shaping_required error for all complex scripts", %{font: font} do
       complex_scripts = [:syrc, :nkoo, :mong, :hebr, :deva, :beng, :guru, :gujr, :orya, :taml,
                          :telu, :knda, :mlym, :sinh, :thai, :laoo, :khmr, :mymr, :tibt]
