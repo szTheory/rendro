@@ -1,8 +1,26 @@
 defmodule Rendro.Text.ShaperTest do
-  use ExUnit.Case, async: true
+  # async: false required — setup uses Application.delete_env to test default (no-config) behavior.
+  use ExUnit.Case, async: false
 
   alias Rendro.Text.Shaper
   alias Rendro.Text.Shaper.Simple
+
+  # This test module tests Shaper.Simple directly — clear any globally configured shaper.
+  # async: false ensures Application.put_env/delete_env is safe. The test isolates itself
+  # to verify default (no-config) behavior and Simple's explicit logic.
+  setup do
+    prev = Application.get_env(:rendro, :shaper)
+    Application.delete_env(:rendro, :shaper)
+    on_exit(fn ->
+      if prev != nil do
+        Application.put_env(:rendro, :shaper, prev)
+      else
+        Application.delete_env(:rendro, :shaper)
+      end
+    end)
+
+    :ok
+  end
 
   describe "Rendro.Text.Shaper behaviour" do
     test "impl/0 returns Rendro.Text.Shaper.Simple by default (no app config set)" do

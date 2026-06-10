@@ -9,6 +9,7 @@ defmodule Rendro.DeterministicTest do
 
   @moduletag :deterministic
 
+
   describe "property: deterministic byte-identity" do
     property "two deterministic renders of the same document produce identical binaries" do
       check all(doc <- renderable_document_gen(), max_runs: 100) do

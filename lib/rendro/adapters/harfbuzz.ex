@@ -21,6 +21,11 @@ if Code.ensure_loaded?(HarfbuzzEx) do
     @spec shape(Rendro.PDF.Font.t(), String.t(), keyword()) ::
             {:ok, [Rendro.Text.Shaper.glyph()]} | {:error, term()}
     @impl Rendro.Text.Shaper
+    def shape(%Rendro.PDF.Font{source: :built_in} = font, text, opts) do
+      # Delegate built-in fonts to Simple (cmap + advance widths, no NIF required)
+      Rendro.Text.Shaper.Simple.shape(font, text, opts)
+    end
+
     def shape(%Rendro.PDF.Font{source: :embedded, font_bytes: bytes}, text, _opts)
         when is_binary(bytes) and is_binary(text) do
       hash = :crypto.hash(:sha256, bytes) |> Base.encode16()
