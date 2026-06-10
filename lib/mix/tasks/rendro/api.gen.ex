@@ -69,7 +69,10 @@ defmodule Mix.Tasks.Rendro.Api.Gen do
     Rendro.Sign,
     Rendro.Table,
     Rendro.Text,
+    Rendro.Text.Shaper,
+    Rendro.Text.Shaper.Simple,
     # Adapter tier — ecosystem integrations, optional adapters, recipe impls
+    Rendro.Adapters.HarfBuzz,
     Rendro.Adapters.Oban.RenderWorker,
     Rendro.Adapters.Pdfium,
     Rendro.Adapters.Pdfsig,

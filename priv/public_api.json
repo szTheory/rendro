@@ -35,6 +35,11 @@
         "render_options/0"
       ]
     },
+    "Elixir.Rendro.Adapters.HarfBuzz": {
+      "functions": [],
+      "tier": "adapter",
+      "types": []
+    },
     "Elixir.Rendro.Adapters.Oban.RenderWorker": {
       "functions": [],
       "tier": "adapter",
@@ -451,6 +456,21 @@
         "logical_font_name/0",
         "t/0"
       ]
+    },
+    "Elixir.Rendro.Text.Shaper": {
+      "functions": [
+        "impl/0",
+        "shape/3"
+      ],
+      "tier": "stable",
+      "types": [
+        "glyph/0"
+      ]
+    },
+    "Elixir.Rendro.Text.Shaper.Simple": {
+      "functions": [],
+      "tier": "stable",
+      "types": []
     }
   }
 }

@@ -12,6 +12,8 @@ The following modules and functions receive strict SemVer guarantees: breaking c
 
 **Protection surface:** `Rendro.Protect` — `password/2`
 
+**Text shaping behaviour:** `Rendro.Text.Shaper` (behaviour) and `Rendro.Text.Shaper.Simple` (pure-Elixir default implementation)
+
 **Top-level pipeline functions:** `Rendro.flow/2`, `Rendro.signature_field/2`, `Rendro.render_signed/3`, `Rendro.render_protected/3`
 
 **Diagnostics map contract:** The `:diagnostics` map common keys — `:level` and `:type` — are stable. Adopters consuming diagnostics maps should key only on documented common keys; additive keys may appear in any release. The implementation module (`Rendro.Inspector`) is adapter-tier and not part of the Tier-1 contract.
@@ -20,7 +22,7 @@ The following modules and functions receive strict SemVer guarantees: breaking c
 
 The following are additive-only within a major version but may break to follow upstream library majors:
 
-**Adapter modules:** `Rendro.Adapters.PyHanko`, `Rendro.Adapters.Qpdf`, and all other `Rendro.Adapters.*` modules. These track the major versions of their underlying tools (pyHanko, qpdf, etc.).
+**Adapter modules:** `Rendro.Adapters.PyHanko`, `Rendro.Adapters.Qpdf`, `Rendro.Adapters.HarfBuzz`, and all other `Rendro.Adapters.*` modules. These track the major versions of their underlying tools (pyHanko, qpdf, harfbuzz_ex, etc.).
 
 **Extended diagnostics shape:** The `:diagnostics` map beyond the documented common keys (`:level`, `:type`) is Tier-2. New keys may appear in any release.
 
@@ -188,3 +190,7 @@ Every `explicit_deferral` viewer row in `priv/support_matrix.json` carries a nam
 - long_lived_signed_artifact × Chrome PDFium: pdfium-cli structural open and form extraction do not expose long-term-validation timestamp, revocation, or expiry indicators; LTV posture remains Acrobat-only for viewer promotion.
 - long_lived_signed_artifact × PDF.js: PDF.js does not implement long-term-validation timestamp, revocation, or expiry indicators for augmented signatures; viewer promotion deferred until LTV UI exists upstream.
 - embedded_files × Apple Preview: Apple Preview Attachments UI still does not discover, open, or extract the representative embedded-artifact fixture on the version recorded; the deferral stands.
+- text_shaping × arabic: Arabic shaping requires contextual glyph substitution, joining forms, and right-to-left reordering that Shaper.Simple does not implement; full shaping is demand-gated at LNCH-03. Use harfbuzz_ex optional dep with config :rendro, shaper: Rendro.Adapters.HarfBuzz.
+- text_shaping × hebrew_rtl: Hebrew rendering requires UAX #9 bidi reordering which is not implemented in Rendro.Text.Bidi; visual reordering and RTL line presentation are deferred to v2.7 behind the LNCH-03 demand gate.
+- text_shaping × devanagari: Devanagari and other Indic scripts require complex glyph reordering, conjunct formation, and matra positioning that Shaper.Simple does not implement; deferred to v2.7 behind the LNCH-03 demand gate.
+- text_shaping × thai: Thai and other SEA scripts require cluster-aware line breaking, vowel positioning, and tone mark handling that Shaper.Simple does not implement; deferred to v2.7 behind the LNCH-03 demand gate.
