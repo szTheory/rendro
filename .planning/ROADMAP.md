@@ -131,7 +131,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [x] 85-02-PLAN.md — render/2 implementation in pdfium.ex + pdfium_test.exs render unit tests
-- [ ] 85-03-PLAN.md — Atomic dual-schema sync (viewer_kind enum + @viewer_kinds) + support_matrix.json raster section
+- [x] 85-03-PLAN.md — Atomic dual-schema sync (viewer_kind enum + @viewer_kinds) + support_matrix.json raster section
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -189,7 +189,7 @@ Plans:
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 3/3 | Complete | 2026-06-05 |
 | 83. Claim-Accuracy & Shaping Hygiene | v2.6 | 5/5 | Complete    | 2026-06-10 |
 | 84. Drawn-Path Primitive & Visible Polish | v2.6 | 5/5 | Complete   | 2026-06-10 |
-| 85. Deterministic Raster Lane | v2.6 | 2/4 | In Progress|  |
+| 85. Deterministic Raster Lane | v2.6 | 3/4 | In Progress|  |
 | 86. Self-Proving Launch Artifacts | v2.6 | 0/? | Not started | - |
 | 87. Comparison Page & Livebook | v2.6 | 0/? | Not started | - |
 | 88. Launch Execution & Demand Instrumentation | v2.6 | 0/? | Not started | - |
