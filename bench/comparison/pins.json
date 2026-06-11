@@ -1,0 +1,35 @@
+{
+  "rendro": {
+    "version": "1.0.0",
+    "source": "local checkout"
+  },
+  "chromic_pdf": {
+    "constraint": "~> 1.17",
+    "resolved_version": "1.17.1",
+    "external_runtime": "Chrome or Chromium"
+  },
+  "pdf_generator": {
+    "constraint": "~> 0.6.2",
+    "resolved_version": "0.6.2",
+    "external_runtime": "wkhtmltopdf"
+  },
+  "typst_cli": {
+    "version": "recorded during pinned benchmark run",
+    "binary_source": "system typst executable"
+  },
+  "container": {
+    "base_image": "recorded during pinned benchmark run",
+    "digest": "recorded during pinned benchmark run"
+  },
+  "fonts": [
+    "Arial",
+    "Helvetica",
+    "built-in PDF base fonts"
+  ],
+  "tools": {
+    "docker": "29.5.2",
+    "chrome_or_chromium": "required",
+    "wkhtmltopdf": "required",
+    "typst": "required"
+  }
+}

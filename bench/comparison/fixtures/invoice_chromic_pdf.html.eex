@@ -1,0 +1,45 @@
+<!-- fixture_id: invoice_v1 -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title><%= invoice["id"] %></title>
+  <style>
+    body { font-family: Arial, sans-serif; color: #1f2937; margin: 40px; }
+    h1 { font-size: 24px; margin-bottom: 4px; }
+    table { border-collapse: collapse; width: 100%; font-size: 11px; }
+    th, td { border: 1px solid #d1d5db; padding: 6px; text-align: left; }
+    th { background: #f3f4f6; }
+    tfoot td { font-weight: bold; }
+    .meta { margin-bottom: 24px; font-size: 12px; }
+    @page { margin: 18mm; @bottom-center { content: "Page " counter(page) " of " counter(pages); } }
+  </style>
+</head>
+<body>
+  <h1>Invoice <%= invoice["id"] %></h1>
+  <div class="meta">
+    <strong>Fixture:</strong> invoice_v1<br>
+    <strong>Date:</strong> <%= invoice["date"] %><br>
+    <strong>Issuer:</strong> <%= issuer["name"] %><br>
+    <strong>Customer:</strong> <%= customer["name"] %>
+  </div>
+  <table>
+    <thead>
+      <tr><th>Item</th><th>Description</th><th>Qty</th><th>Price</th></tr>
+    </thead>
+    <tbody>
+      <%= for item <- items do %>
+        <tr>
+          <td><%= item["name"] %></td>
+          <td><%= item["description"] %></td>
+          <td><%= item["qty"] %></td>
+          <td>$<%= :erlang.float_to_binary(item["price_cents"] / 100, decimals: 2) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+    <tfoot>
+      <tr><td colspan="3">Total</td><td>$<%= :erlang.float_to_binary(totals["total_cents"] / 100, decimals: 2) %></td></tr>
+    </tfoot>
+  </table>
+</body>
+</html>
