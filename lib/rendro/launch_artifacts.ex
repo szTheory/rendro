@@ -16,6 +16,11 @@ defmodule Rendro.LaunchArtifacts do
   @generated_by "mix rendro.launch_artifacts.gen"
   @manual_source "Rendro.LaunchArtifacts.render_manual_pdf/0"
   @sha256_regex ~r/^[0-9a-f]{64}$/
+  @launch_table_style [
+    borders: [:outer, :rows],
+    border_style: %{color: {216, 210, 195}, width: 0.6},
+    header_fill: {247, 243, 234}
+  ]
   @gallery_required_keys ~w(id title recipe_module png_path png_sha256 source_pdf_sha256 page dpi width_px height_px renderer_kind renderer_version alt caption)
   @expected_gallery_dimensions %{
     "invoice" => {794, 1123},
@@ -236,24 +241,42 @@ defmodule Rendro.LaunchArtifacts do
   end
 
   @spec render_source_pdf(map()) :: {:ok, binary()} | {:error, term()}
-  def render_source_pdf(%{id: "invoice"}) do
-    render_doc(Rendro.Recipes.Invoice.document(invoice_data()))
+  def render_source_pdf(spec) do
+    spec
+    |> source_document_for()
+    |> render_doc()
   end
 
-  def render_source_pdf(%{id: "branded_invoice"}) do
-    render_doc(Rendro.Recipes.BrandedInvoice.document(branded_invoice_data()))
+  @spec source_document_for(map()) :: Rendro.Document.t()
+  def source_document_for(%{id: id}), do: build_source_document(id)
+  def source_document_for(%{"id" => id}), do: build_source_document(id)
+
+  defp build_source_document("invoice") do
+    invoice_data()
+    |> Rendro.Recipes.Invoice.document()
+    |> apply_launch_table_style()
   end
 
-  def render_source_pdf(%{id: "statement"}) do
-    render_doc(Rendro.Recipes.Statement.document(statement_data(45)))
+  defp build_source_document("branded_invoice") do
+    branded_invoice_data()
+    |> Rendro.Recipes.BrandedInvoice.document()
+    |> apply_launch_table_style()
   end
 
-  def render_source_pdf(%{id: "receipt_report"}) do
-    render_doc(Rendro.Recipes.Receipt.document(receipt_data(58)))
+  defp build_source_document("statement") do
+    statement_data(45)
+    |> Rendro.Recipes.Statement.document()
+    |> apply_launch_table_style()
   end
 
-  def render_source_pdf(%{id: "certificate"}) do
-    render_doc(Rendro.Recipes.Certificate.document(certificate_data(), border: true))
+  defp build_source_document("receipt_report") do
+    receipt_data(58)
+    |> Rendro.Recipes.Receipt.document()
+    |> apply_launch_table_style()
+  end
+
+  defp build_source_document("certificate") do
+    Rendro.Recipes.Certificate.document(certificate_data(), border: true)
   end
 
   @spec render_manual_pdf() :: {:ok, binary()} | {:error, term()}
@@ -264,6 +287,20 @@ defmodule Rendro.LaunchArtifacts do
   defp render_doc(%Rendro.Document{} = doc) do
     Rendro.render(doc, deterministic: true)
   end
+
+  defp apply_launch_table_style(%Document{} = doc) do
+    %Document{doc | sections: Enum.map(doc.sections, &style_launch_tables/1)}
+  end
+
+  defp style_launch_tables(%Rendro.Section{content: content} = section) do
+    %Rendro.Section{section | content: Enum.map(content, &style_launch_tables/1)}
+  end
+
+  defp style_launch_tables(%Rendro.Block{content: %Rendro.Table{} = table} = block) do
+    %Rendro.Block{block | content: struct(table, @launch_table_style)}
+  end
+
+  defp style_launch_tables(other), do: other
 
   defp ensure_asset_dirs do
     File.mkdir_p!(@gallery_dir)
