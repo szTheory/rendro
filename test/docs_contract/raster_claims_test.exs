@@ -88,6 +88,20 @@ defmodule Rendro.DocsContract.RasterClaimsTest do
            )
   end
 
+  test "raster evidence points at committed PNG hash" do
+    matrix = File.read!("priv/support_matrix.json") |> JSON.decode!()
+
+    expected_hash =
+      File.read!("priv/raster_refs/forms_support_fixture/page_1.sha256") |> String.trim()
+
+    evidence = matrix["raster"]["evidence"]
+
+    assert evidence["fixture"] == "test/fixtures/forms_support_fixture.pdf"
+    assert evidence["ref"] == "priv/raster_refs/forms_support_fixture/page_1.sha256"
+    assert evidence["png_sha256"] == expected_hash
+    assert evidence["png_sha256"] =~ ~r/\A[0-9a-f]{64}\z/
+  end
+
   # Test 6: GREEN in Plan 04 — verify_docs.exs lane registration added in Plan 04
   test "docs verification script includes the raster claims lane" do
     script = File.read!("scripts/verify_docs.exs")

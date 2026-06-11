@@ -498,6 +498,9 @@
       "viewer_kind": "pdfium-render",
       "platform": "Linux (x86_64) — CI container only",
       "dpi": 150,
+      "fixture": "test/fixtures/forms_support_fixture.pdf",
+      "ref": "priv/raster_refs/forms_support_fixture/page_1.sha256",
+      "png_sha256": "73e33ed6c6d68e461b4317f0551f9ae8f8225b28cf7e0eebcf88fa45d09b8deb",
       "notes": "pdfium-render evidence records what the pdfium engine renders. It does not claim GUI-viewer visual fidelity for Adobe Acrobat, Apple Preview, or Chrome PDF viewer."
     }
   }
