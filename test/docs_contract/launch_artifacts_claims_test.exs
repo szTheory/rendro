@@ -121,7 +121,7 @@ defmodule Rendro.DocsContract.LaunchArtifactsClaimsTest do
     script = File.read!("scripts/verify_docs.exs")
 
     assert script =~
-             ~s|{"Launch artifacts claims lane", ["test", "test/docs_contract/launch_artifacts_claims_test.exs"]}|
+             ~r/\{"Launch artifacts claims lane",\s*\["test",\s*"test\/docs_contract\/launch_artifacts_claims_test\.exs"\]\}/s
   end
 
   test "raster-advisory CI runs the full launch artifact check" do
