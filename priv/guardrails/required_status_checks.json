@@ -51,6 +51,13 @@
       "ci_job": "example-phoenix",
       "command": "mix deps.get && mix test",
       "notes": "Phase 76 reference Phoenix app smoke; not required on main per REF-03/D-09."
+    },
+    {
+      "name": "raster-advisory",
+      "semantic_class": "raster_snapshot",
+      "ci_job": "raster-advisory",
+      "command": "mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs",
+      "notes": "Phase 85 deterministic raster lane; not required on main. Download failure must never block engine merges."
     }
   ],
   "supersedes_planning_refs": {

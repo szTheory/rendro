@@ -31,9 +31,7 @@ defmodule Rendro.DocsContract.RasterClaimsTest do
     refute "raster-advisory" in guardrails["required_contexts"]
   end
 
-  # Test 4: RED in Plan 01 — raster-advisory added to advisory_contexts in Plan 03
-  # @tag :skip removed in Plan 03 once guardrails JSON has the raster-advisory entry
-  @tag :skip
+  # Test 4: GREEN in Plan 04 — raster-advisory added to advisory_contexts in Plan 04
   test "advisory lane is in advisory_contexts" do
     guardrails =
       File.read!("priv/guardrails/required_status_checks.json") |> JSON.decode!()
@@ -60,9 +58,7 @@ defmodule Rendro.DocsContract.RasterClaimsTest do
     end
   end
 
-  # Test 6: RED in Plan 01 — verify_docs.exs lane registration added in Plan 03
-  # @tag :skip removed in Plan 03 once verify_docs.exs has the raster claims lane entry
-  @tag :skip
+  # Test 6: GREEN in Plan 04 — verify_docs.exs lane registration added in Plan 04
   test "docs verification script includes the raster claims lane" do
     script = File.read!("scripts/verify_docs.exs")
 
