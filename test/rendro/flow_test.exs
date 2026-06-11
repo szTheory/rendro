@@ -64,6 +64,41 @@ defmodule Rendro.FlowTest do
     assert pdf =~ "Below Table"
   end
 
+  test "table cell text renders at the paginated table position" do
+    table =
+      Rendro.table(
+        [["A1", "B1"]],
+        header: ["Col A", "Col B"],
+        columns: [{:fixed, 50}, {:share, 1}]
+      )
+
+    doc =
+      Rendro.flow([
+        Rendro.block(Rendro.text("Above Table")),
+        Rendro.block(table)
+      ])
+
+    {:ok, pdf} = Rendro.render(doc)
+
+    refute pdf =~ """
+           72 757.8900 Td
+           /F_DEFAULT 12 Tf
+           (Col A) Tj
+           """
+
+    assert pdf =~ """
+           72 743.4900 Td
+           /F_DEFAULT 12 Tf
+           (Col A) Tj
+           """
+
+    assert pdf =~ """
+           72 729.0900 Td
+           /F_DEFAULT 12 Tf
+           (A1) Tj
+           """
+  end
+
   test "table splitting and header repetition" do
     # 50 rows, each ~14.4 units. Total ~720 units.
     # Header is another 14.4 units. Total ~734.4 units.

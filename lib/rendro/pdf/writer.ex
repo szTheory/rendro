@@ -517,18 +517,14 @@ defmodule Rendro.PDF.Writer do
        ) do
     header_ops =
       if table.header do
-        Enum.map(table.header.cells, fn %Rendro.Cell{content: block} ->
-          render_block(doc, block, page, font_map, image_map)
-        end)
+        Enum.map(table.header.cells, &render_table_cell(doc, &1, page, font_map, image_map))
       else
         []
       end
 
     rows_ops =
       Enum.map(table.rows, fn %Rendro.Row{cells: cells} ->
-        Enum.map(cells, fn %Rendro.Cell{content: block} ->
-          render_block(doc, block, page, font_map, image_map)
-        end)
+        Enum.map(cells, &render_table_cell(doc, &1, page, font_map, image_map))
       end)
 
     cells_content = [header_ops | rows_ops] |> List.flatten() |> Enum.join("\n")
@@ -609,16 +605,37 @@ defmodule Rendro.PDF.Writer do
 
     IO.iodata_to_binary([
       "q\n",
-      "1 0 0 1 ", format_num(x), " ", format_num(y), " cm\n",
+      "1 0 0 1 ",
+      format_num(x),
+      " ",
+      format_num(y),
+      " cm\n",
       gstate_ops,
       fill_color_op,
       path_ops,
-      paint, "\n",
+      paint,
+      "\n",
       "Q"
     ])
   end
 
   defp render_block(_doc, _block, _page, _font_map, _image_map), do: ""
+
+  defp render_table_cell(
+         doc,
+         %Rendro.Cell{content: %Rendro.Block{} = block, x: cell_x, y: cell_y},
+         page,
+         font_map,
+         image_map
+       ) do
+    render_block(
+      doc,
+      %{block | x: block.x + cell_x, y: block.y + cell_y},
+      page,
+      font_map,
+      image_map
+    )
+  end
 
   defp render_block(
          doc,
@@ -1872,7 +1889,9 @@ defmodule Rendro.PDF.Writer do
   defp render_join(:bevel), do: ["2 j\n"]
 
   defp render_dash(nil), do: []
-  defp render_dash([on, off]), do: ["[", format_num(on * 1.0), " ", format_num(off * 1.0), "] 0 d\n"]
+
+  defp render_dash([on, off]),
+    do: ["[", format_num(on * 1.0), " ", format_num(off * 1.0), "] 0 d\n"]
 
   # Fill color op — emitted before path construction if fill is set
   defp render_path_fill_color(nil), do: []
@@ -1901,9 +1920,18 @@ defmodule Rendro.PDF.Writer do
 
   defp render_path_op({:curve, x1, y1, x2, y2, x3, y3}, h) do
     [
-      format_num(x1 * 1.0), " ", format_num((h - y1) * 1.0), " ",
-      format_num(x2 * 1.0), " ", format_num((h - y2) * 1.0), " ",
-      format_num(x3 * 1.0), " ", format_num((h - y3) * 1.0), " c\n"
+      format_num(x1 * 1.0),
+      " ",
+      format_num((h - y1) * 1.0),
+      " ",
+      format_num(x2 * 1.0),
+      " ",
+      format_num((h - y2) * 1.0),
+      " ",
+      format_num(x3 * 1.0),
+      " ",
+      format_num((h - y3) * 1.0),
+      " c\n"
     ]
   end
 
@@ -1911,8 +1939,14 @@ defmodule Rendro.PDF.Writer do
     # PDF re: bottom-left x/y, width, height
     # Y-flip: h - y - rh gives bottom in PDF Y-up coords
     [
-      format_num(x * 1.0), " ", format_num((h - y - rh) * 1.0), " ",
-      format_num(w * 1.0), " ", format_num(rh * 1.0), " re\n"
+      format_num(x * 1.0),
+      " ",
+      format_num((h - y - rh) * 1.0),
+      " ",
+      format_num(w * 1.0),
+      " ",
+      format_num(rh * 1.0),
+      " re\n"
     ]
   end
 
@@ -1946,39 +1980,90 @@ defmodule Rendro.PDF.Writer do
 
     [
       # Move to start of top edge (just right of top-left corner)
-      format_num(left + r_f), " ", format_num(top), " m\n",
+      format_num(left + r_f),
+      " ",
+      format_num(top),
+      " m\n",
 
       # Top edge — line to just left of top-right corner
-      format_num(right - r_f), " ", format_num(top), " l\n",
+      format_num(right - r_f),
+      " ",
+      format_num(top),
+      " l\n",
 
       # Top-right arc (Y-up: going from top edge down to right edge)
-      format_num(right - r_f + ctrl), " ", format_num(top), " ",
-      format_num(right), " ", format_num(top - r_f + ctrl), " ",
-      format_num(right), " ", format_num(top - r_f), " c\n",
+      format_num(right - r_f + ctrl),
+      " ",
+      format_num(top),
+      " ",
+      format_num(right),
+      " ",
+      format_num(top - r_f + ctrl),
+      " ",
+      format_num(right),
+      " ",
+      format_num(top - r_f),
+      " c\n",
 
       # Right edge — line to just above bottom-right corner
-      format_num(right), " ", format_num(bottom + r_f), " l\n",
+      format_num(right),
+      " ",
+      format_num(bottom + r_f),
+      " l\n",
 
       # Bottom-right arc
-      format_num(right), " ", format_num(bottom + r_f - ctrl), " ",
-      format_num(right - r_f + ctrl), " ", format_num(bottom), " ",
-      format_num(right - r_f), " ", format_num(bottom), " c\n",
+      format_num(right),
+      " ",
+      format_num(bottom + r_f - ctrl),
+      " ",
+      format_num(right - r_f + ctrl),
+      " ",
+      format_num(bottom),
+      " ",
+      format_num(right - r_f),
+      " ",
+      format_num(bottom),
+      " c\n",
 
       # Bottom edge — line to just right of bottom-left corner
-      format_num(left + r_f), " ", format_num(bottom), " l\n",
+      format_num(left + r_f),
+      " ",
+      format_num(bottom),
+      " l\n",
 
       # Bottom-left arc
-      format_num(left + r_f - ctrl), " ", format_num(bottom), " ",
-      format_num(left), " ", format_num(bottom + r_f - ctrl), " ",
-      format_num(left), " ", format_num(bottom + r_f), " c\n",
+      format_num(left + r_f - ctrl),
+      " ",
+      format_num(bottom),
+      " ",
+      format_num(left),
+      " ",
+      format_num(bottom + r_f - ctrl),
+      " ",
+      format_num(left),
+      " ",
+      format_num(bottom + r_f),
+      " c\n",
 
       # Left edge — line to just below top-left corner
-      format_num(left), " ", format_num(top - r_f), " l\n",
+      format_num(left),
+      " ",
+      format_num(top - r_f),
+      " l\n",
 
       # Top-left arc — back to start
-      format_num(left), " ", format_num(top - r_f + ctrl), " ",
-      format_num(left + r_f - ctrl), " ", format_num(top), " ",
-      format_num(left + r_f), " ", format_num(top), " c\n",
+      format_num(left),
+      " ",
+      format_num(top - r_f + ctrl),
+      " ",
+      format_num(left + r_f - ctrl),
+      " ",
+      format_num(top),
+      " ",
+      format_num(left + r_f),
+      " ",
+      format_num(top),
+      " c\n",
 
       # Close path
       "h\n"
@@ -2023,10 +2108,17 @@ defmodule Rendro.PDF.Writer do
         # Header band occupies the TOP of the table (y-down author → top in PDF)
         # In PDF Y-up: header band starts at by + total_h - header_h
         band_y = by + total_h - header_h_f
+
         [
           Rendro.Color.rg(table.header_fill),
-          format_num(bx), " ", format_num(band_y), " ",
-          format_num(total_w), " ", format_num(header_h_f), " re\nf\n"
+          format_num(bx),
+          " ",
+          format_num(band_y),
+          " ",
+          format_num(total_w),
+          " ",
+          format_num(header_h_f),
+          " re\nf\n"
         ]
       else
         []
@@ -2038,15 +2130,22 @@ defmodule Rendro.PDF.Writer do
 
     stroke_setup_ops = [
       Rendro.Color.rg_stroke(stroke_color),
-      format_num(stroke_width), " w\n"
+      format_num(stroke_width),
+      " w\n"
     ]
 
     # 3. Outer border rectangle (if :outer in borders)
     outer_ops =
       if :outer in borders do
         [
-          format_num(bx), " ", format_num(by), " ",
-          format_num(total_w), " ", format_num(total_h), " re\n S\n"
+          format_num(bx),
+          " ",
+          format_num(by),
+          " ",
+          format_num(total_w),
+          " ",
+          format_num(total_h),
+          " re\n S\n"
         ]
       else
         []
@@ -2119,8 +2218,14 @@ defmodule Rendro.PDF.Writer do
       if is_nil(grid) do
         # No grid layout — draw full-width horizontal line
         [
-          format_num(bx), " ", format_num(y_pdf), " m\n",
-          format_num(bx + total_w), " ", format_num(y_pdf), " l\n S\n"
+          format_num(bx),
+          " ",
+          format_num(y_pdf),
+          " m\n",
+          format_num(bx + total_w),
+          " ",
+          format_num(y_pdf),
+          " l\n S\n"
         ]
       else
         render_h_rule_with_span_check(grid, bx, y_pdf, col_widths, row_idx)
@@ -2163,9 +2268,16 @@ defmodule Rendro.PDF.Writer do
         last_col = chunk |> List.last({0, false}) |> elem(0)
         x_start = Enum.at(x_positions, first_col)
         x_end = Enum.at(x_positions, last_col + 1)
+
         [
-          format_num(x_start * 1.0), " ", format_num(y_pdf), " m\n",
-          format_num(x_end * 1.0), " ", format_num(y_pdf), " l\n S\n"
+          format_num(x_start * 1.0),
+          " ",
+          format_num(y_pdf),
+          " m\n",
+          format_num(x_end * 1.0),
+          " ",
+          format_num(y_pdf),
+          " l\n S\n"
         ]
       else
         []
@@ -2197,14 +2309,28 @@ defmodule Rendro.PDF.Writer do
       if is_nil(grid) do
         # No grid layout — draw full-height vertical line
         [
-          format_num(x_pdf), " ", format_num(by), " m\n",
-          format_num(x_pdf), " ", format_num(by + total_h), " l\n S\n"
+          format_num(x_pdf),
+          " ",
+          format_num(by),
+          " m\n",
+          format_num(x_pdf),
+          " ",
+          format_num(by + total_h),
+          " l\n S\n"
         ]
       else
         # Colspan suppression: for boundary between col c and c+1,
         # check each row — if a cell spans across this boundary, suppress that row's segment
         render_v_rule_with_span_check(
-          grid, bx, by, x_pdf, total_h, c, num_rows, row_heights, header_h
+          grid,
+          bx,
+          by,
+          x_pdf,
+          total_h,
+          c,
+          num_rows,
+          row_heights,
+          header_h
         )
       end
     end)
@@ -2212,7 +2338,15 @@ defmodule Rendro.PDF.Writer do
 
   # Render a vertical rule between col c and c+1, suppressing rows with colspan
   defp render_v_rule_with_span_check(
-         grid, _bx, by, x_pdf, total_h, c, num_rows, row_heights, header_h
+         grid,
+         _bx,
+         by,
+         x_pdf,
+         total_h,
+         c,
+         num_rows,
+         row_heights,
+         header_h
        ) do
     # For each row r, check if the cell at [r][c] spans across this boundary
     # (i.e., ref_c < c, meaning the cell's origin is in a column to the left)
@@ -2278,9 +2412,16 @@ defmodule Rendro.PDF.Writer do
         last_row = chunk |> List.last({0, false}) |> elem(0)
         {y_bot, _} = Enum.at(all_bounds, first_row + header_count, {by, by + total_h})
         {_, y_top} = Enum.at(all_bounds, last_row + header_count, {by, by + total_h})
+
         [
-          format_num(x_pdf), " ", format_num(y_bot), " m\n",
-          format_num(x_pdf), " ", format_num(y_top), " l\n S\n"
+          format_num(x_pdf),
+          " ",
+          format_num(y_bot),
+          " m\n",
+          format_num(x_pdf),
+          " ",
+          format_num(y_top),
+          " l\n S\n"
         ]
       else
         []

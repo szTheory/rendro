@@ -31,6 +31,16 @@ defmodule Rendro.Recipes.Invoice do
   """
   @moduledoc tags: [:adapter]
 
+  @page_width 595.28
+  @page_height 841.89
+  @margin 72
+  @content_width @page_width - 2 * @margin
+  @header_height 56
+  @footer_height 24
+  @body_y @margin + @header_height
+  @body_height @page_height - 2 * @margin - @header_height - @footer_height
+  @footer_y @page_height - @margin - @footer_height
+
   @doc """
   Returns a `%Rendro.PageTemplate{}` with three named regions: `:header`, `:body`, `:footer`.
 
@@ -50,7 +60,39 @@ defmodule Rendro.Recipes.Invoice do
   """
   @spec page_template(keyword()) :: Rendro.PageTemplate.t()
   def page_template(opts \\ []) do
-    defaults = [name: :invoice]
+    defaults = [
+      name: :invoice,
+      regions: [
+        Rendro.region(
+          name: :header,
+          role: :header,
+          anchor: :top,
+          x: @margin,
+          y: @margin,
+          width: @content_width,
+          height: @header_height
+        ),
+        Rendro.region(
+          name: :body,
+          role: :body,
+          anchor: :flow,
+          x: @margin,
+          y: @body_y,
+          width: @content_width,
+          height: @body_height
+        ),
+        Rendro.region(
+          name: :footer,
+          role: :footer,
+          anchor: :bottom,
+          x: @margin,
+          y: @footer_y,
+          width: @content_width,
+          height: @footer_height
+        )
+      ]
+    ]
+
     Rendro.page_template(Keyword.merge(defaults, opts))
   end
 
