@@ -178,6 +178,32 @@ defmodule Rendro.ComparisonTest do
     assert evidence =~ "[bench:CMP-COLD-START-001]"
   end
 
+  test "generated blocks are deterministic and include real benchmark metadata" do
+    manifest = Rendro.Comparison.read_manifest!()
+
+    blocks = [
+      Rendro.Comparison.fit_block(manifest),
+      Rendro.Comparison.results_block(manifest),
+      Rendro.Comparison.evidence_block(manifest)
+    ]
+
+    combined = Enum.join(blocks, "\n")
+
+    assert Rendro.Comparison.fit_block(manifest) == Rendro.Comparison.fit_block(manifest)
+    assert Rendro.Comparison.results_block(manifest) == Rendro.Comparison.results_block(manifest)
+
+    assert Rendro.Comparison.evidence_block(manifest) ==
+             Rendro.Comparison.evidence_block(manifest)
+
+    assert combined =~ "Measured in this harness"
+    assert combined =~ "chromic_pdf_warm_pool"
+    assert combined =~ "[bench:CMP-"
+
+    refute combined =~ "TODO"
+    refute combined =~ "TBD"
+    refute combined =~ "placeholder"
+  end
+
   test "static contract does not shell out or reference external advisory tools" do
     source = File.read!("lib/rendro/comparison.ex")
 

@@ -174,13 +174,19 @@ defmodule Rendro.Comparison do
 
     """
     #{@evidence_start}
-    - Run id: `#{run["id"]}`
-    - Recorded at: `#{run["recorded_at"]}`
-    - Git SHA: `#{run["git_sha"]}`
-    - Scenario: `#{scenario["id"]}` from `#{scenario["fixture"]}`
-    - Host: #{format_host(run["host"])}
-    - Container: #{format_container(run["container"])}
-    - Repetitions: #{run["repetitions"]}
+    | Field | Value |
+    |---|---|
+    | Run id | `#{run["id"]}` |
+    | Recorded at | `#{run["recorded_at"]}` |
+    | Git SHA | `#{run["git_sha"]}` |
+    | Scenario | `#{scenario["id"]}` from `#{scenario["fixture"]}` |
+    | Host | #{format_host(run["host"])} |
+    | Container | #{format_container(run["container"])} |
+    | Comparator versions | #{format_comparators(manifest)} |
+    | Repetitions | #{run["repetitions"]} |
+
+    Result summaries:
+    #{result_summary_lines(manifest)}
 
     Raw artifacts:
     #{raw_lines}
@@ -424,10 +430,52 @@ defmodule Rendro.Comparison do
     |> Enum.uniq()
   end
 
+  defp format_comparators(manifest) do
+    manifest
+    |> Map.get("comparators")
+    |> list_or_empty()
+    |> Enum.filter(&is_map/1)
+    |> Enum.map(fn comparator ->
+      id = comparator["id"] || "unknown"
+      version = comparator["version"] || "unknown"
+      runtime = comparator["external_runtime"] || "none"
+
+      "`#{id}` #{version} (#{runtime})"
+    end)
+    |> Enum.join("; ")
+  end
+
+  defp result_summary_lines(manifest) do
+    @required_comparator_ids
+    |> Enum.flat_map(fn comparator ->
+      Enum.map(@required_metric_ids, fn metric -> {comparator, metric} end)
+    end)
+    |> Enum.map(fn {comparator, metric} ->
+      manifest
+      |> result_for(comparator, metric)
+      |> format_result_summary(comparator, metric)
+    end)
+    |> Enum.join("\n")
+  end
+
+  defp format_result_summary(nil, comparator, metric) do
+    "- `#{comparator}/#{metric}`: not recorded"
+  end
+
+  defp format_result_summary(result, comparator, metric) do
+    "- `#{comparator}/#{metric}`: median #{format_number(result["median"])} #{result["unit"]}, p95 #{format_number(result["p95"])} #{result["unit"]}, samples #{result["samples"]}, raw `#{result["raw_artifact"]}`"
+  end
+
   defp table_row(values), do: "| #{Enum.join(values, " | ")} |"
 
   defp format_host(host) when is_map(host) do
-    [host["os"], host["arch"], host["cpu"]]
+    memory =
+      case host["memory_limit_mb"] do
+        nil -> nil
+        mb -> "#{mb} MB"
+      end
+
+    [host["os"], host["arch"], host["cpu"], memory]
     |> Enum.reject(&is_nil/1)
     |> Enum.join(", ")
   end
@@ -435,7 +483,13 @@ defmodule Rendro.Comparison do
   defp format_host(_host), do: "not recorded"
 
   defp format_container(container) when is_map(container) do
-    [container["image"], container["digest"]]
+    size =
+      case container["size_mb"] do
+        nil -> nil
+        mb -> "#{mb} MB"
+      end
+
+    [container["image"], container["digest"], size]
     |> Enum.reject(&is_nil/1)
     |> Enum.join(" ")
   end
