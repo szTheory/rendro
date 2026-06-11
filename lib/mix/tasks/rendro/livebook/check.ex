@@ -62,13 +62,7 @@ defmodule Mix.Tasks.Rendro.Livebook.Check do
   defp default_converter(markdown) do
     case Code.ensure_loaded(Livebook) do
       {:module, Livebook} ->
-        case Livebook.live_markdown_to_elixir(markdown) do
-          {:ok, source} when is_binary(source) -> {:ok, source}
-          {:ok, source, _warnings} when is_binary(source) -> {:ok, source}
-          source when is_binary(source) -> {:ok, source}
-          {:error, reason} -> {:error, "Livebook conversion failed: #{inspect(reason)}"}
-          other -> {:error, "Livebook conversion returned unexpected value: #{inspect(other)}"}
-        end
+        {:ok, Livebook.live_markdown_to_elixir(markdown)}
 
       {:error, _reason} ->
         {:error,
