@@ -121,7 +121,7 @@ Plans:
   3. The raster advisory CI lane (`needs: []`, graph-disconnected) runs in CI but never gates the four required engine lanes (`signing-live-proof`, `long-lived-live-proof`, `release-proof`, `test`); a pdfium-cli download failure cannot block engine merges.
   4. `priv/support_matrix.json` and evidence files use `viewer_kind: "pdfium-render"` for raster evidence; a docs-contract guard prevents raster evidence from upgrading GUI-viewer claims (Adobe/Preview rows remain structural proxies).
 
-**Plans**: 4 plans
+**Plans**: 6 plans
 
 Plans:
 **Wave 1**
@@ -136,6 +136,11 @@ Plans:
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [x] 85-04-PLAN.md — Advisory CI lane (raster-advisory) + guardrails registration + verify_docs.exs lane entry
+
+**Wave 4** *(gap closure; blocked on Wave 3 completion)*
+
+- [ ] 85-05-PLAN.md — Render-backed golden PNG snapshot harness + pinned-container committed hash refs
+- [ ] 85-06-PLAN.md — Structural pdfium-render GUI-row exclusion + raster adapter hardening
 
 ### Phase 86: Self-Proving Launch Artifacts
 
