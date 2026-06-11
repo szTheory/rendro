@@ -1,0 +1,290 @@
+{
+  "schema_version": 1,
+  "generated_by": "mix rendro.comparison.gen",
+  "run": {
+    "id": "plan01-static-contract-scaffold",
+    "recorded_at": "2026-06-11T00:00:00Z",
+    "git_sha": "static-contract-scaffold",
+    "host": {
+      "os": "static-contract",
+      "arch": "x86_64",
+      "cpu": "not measured",
+      "memory_limit_mb": 0
+    },
+    "container": {
+      "image": "static-contract-scaffold",
+      "digest": "sha256:8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9"
+    },
+    "commands": [
+      "mix test test/rendro/comparison_test.exs",
+      "mix test test/docs_contract/comparison_claims_test.exs"
+    ],
+    "repetitions": 1,
+    "public": false
+  },
+  "scenario": {
+    "id": "invoice_static_contract_v1",
+    "fixture": "bench/results/raw/plan01-static-fixture.json",
+    "public": false
+  },
+  "comparators": [
+    {
+      "id": "rendro",
+      "label": "Rendro",
+      "version": "1.0.0",
+      "external_runtime": "none",
+      "public": false
+    },
+    {
+      "id": "chromic_pdf",
+      "label": "ChromicPDF cold",
+      "version": "pinned in Plan 02",
+      "external_runtime": "chrome",
+      "public": false
+    },
+    {
+      "id": "chromic_pdf_warm_pool",
+      "label": "ChromicPDF warm pool",
+      "version": "pinned in Plan 02",
+      "external_runtime": "chrome",
+      "public": false
+    },
+    {
+      "id": "pdf_generator",
+      "label": "pdf_generator",
+      "version": "pinned in Plan 02",
+      "external_runtime": "wkhtmltopdf",
+      "public": false
+    },
+    {
+      "id": "typst_cli",
+      "label": "Typst CLI",
+      "version": "pinned in Plan 02",
+      "external_runtime": "typst",
+      "public": false
+    }
+  ],
+  "results": [
+    {
+      "comparator": "rendro",
+      "metric": "cold_start_ms",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "ms",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "rendro",
+      "metric": "rss_mb",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "MB",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "rendro",
+      "metric": "container_image_mb",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "MB",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "rendro",
+      "metric": "dependency_count",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "count",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "chromic_pdf",
+      "metric": "cold_start_ms",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "ms",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "chromic_pdf",
+      "metric": "rss_mb",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "MB",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "chromic_pdf",
+      "metric": "container_image_mb",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "MB",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "chromic_pdf",
+      "metric": "dependency_count",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "count",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "chromic_pdf_warm_pool",
+      "metric": "cold_start_ms",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "ms",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "chromic_pdf_warm_pool",
+      "metric": "rss_mb",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "MB",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "chromic_pdf_warm_pool",
+      "metric": "container_image_mb",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "MB",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "chromic_pdf_warm_pool",
+      "metric": "dependency_count",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "count",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "pdf_generator",
+      "metric": "cold_start_ms",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "ms",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "pdf_generator",
+      "metric": "rss_mb",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "MB",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "pdf_generator",
+      "metric": "container_image_mb",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "MB",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "pdf_generator",
+      "metric": "dependency_count",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "count",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "typst_cli",
+      "metric": "cold_start_ms",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "ms",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "typst_cli",
+      "metric": "rss_mb",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "MB",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "typst_cli",
+      "metric": "container_image_mb",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "MB",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    },
+    {
+      "comparator": "typst_cli",
+      "metric": "dependency_count",
+      "median": 0,
+      "p95": 0,
+      "samples": 1,
+      "unit": "count",
+      "raw_artifact": "bench/results/raw/plan01-static-fixture.json",
+      "raw_sha256": "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9",
+      "public": false
+    }
+  ],
+  "claims": []
+}

@@ -1,0 +1,15 @@
+{
+  "artifact_kind": "phase_87_static_contract_fixture",
+  "public": false,
+  "description": "Non-public fixture used only to prove raw-artifact hash validation before benchmark evidence is generated.",
+  "scenario_id": "invoice_static_contract_v1",
+  "recorded_at": "2026-06-11T00:00:00Z",
+  "samples": [
+    {
+      "comparator": "rendro",
+      "metric": "cold_start_ms",
+      "value": 0,
+      "unit": "ms"
+    }
+  ]
+}
