@@ -1,5 +1,6 @@
 defmodule Rendro.Comparison do
   @moduledoc false
+  @compile {:no_warn_undefined, {Jason, :encode!, 2}}
 
   @manifest_path "bench/results/comparison.json"
   @guide_path "guides/comparison.md"
@@ -58,7 +59,7 @@ defmodule Rendro.Comparison do
   def encode_manifest(manifest) when is_map(manifest) do
     manifest
     |> normalize_for_json()
-    |> Jason.encode!(pretty: true)
+    |> encode_json!()
   end
 
   @spec check() :: :ok | {:error, [String.t()]}
@@ -520,11 +521,13 @@ defmodule Rendro.Comparison do
     map
     |> Enum.sort_by(fn {key, _value} -> to_string(key) end)
     |> Enum.map(fn {key, value} -> {key, normalize_for_json(value)} end)
-    |> then(&%Jason.OrderedObject{values: &1})
+    |> ordered_object()
   end
 
   defp normalize_for_json(list) when is_list(list), do: Enum.map(list, &normalize_for_json/1)
   defp normalize_for_json(value), do: value
+  defp encode_json!(value), do: Jason.encode!(value, pretty: true)
+  defp ordered_object(values), do: struct!(Module.concat(Jason, OrderedObject), values: values)
 
   defp map_or_empty(value) when is_map(value), do: value
   defp map_or_empty(_value), do: %{}

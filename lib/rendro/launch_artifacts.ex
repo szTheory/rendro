@@ -1,5 +1,6 @@
 defmodule Rendro.LaunchArtifacts do
   @moduledoc false
+  @compile {:no_warn_undefined, {Jason, :encode!, 2}}
 
   alias Rendro.Document
 
@@ -935,7 +936,7 @@ defmodule Rendro.LaunchArtifacts do
         {"gallery", gallery}
       ])
 
-    Jason.encode!(ordered, pretty: true)
+    encode_json!(ordered)
   end
 
   defp ordered_gallery_entry(entry) do
@@ -957,7 +958,8 @@ defmodule Rendro.LaunchArtifacts do
     ])
   end
 
-  defp ordered_object(values), do: %Jason.OrderedObject{values: values}
+  defp encode_json!(value), do: Jason.encode!(value, pretty: true)
+  defp ordered_object(values), do: struct!(Module.concat(Jason, OrderedObject), values: values)
 
   defp png_dimensions(
          <<137, 80, 78, 71, 13, 10, 26, 10, _len::32, "IHDR", width::32, height::32,

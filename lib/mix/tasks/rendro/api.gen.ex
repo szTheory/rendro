@@ -1,6 +1,7 @@
 defmodule Mix.Tasks.Rendro.Api.Gen do
   use Mix.Task
 
+  @compile {:no_warn_undefined, {Jason, :encode!, 2}}
   @shortdoc "Generate priv/public_api.json from @moduledoc tags: in source"
 
   @moduledoc """
@@ -138,21 +139,20 @@ defmodule Mix.Tasks.Rendro.Api.Gen do
       |> Enum.sort_by(fn {name, _} -> name end)
       |> Enum.map(fn {name, entry} ->
         sorted_entry =
-          %Jason.OrderedObject{
-            values: [
-              {"functions", entry["functions"]},
-              {"tier", entry["tier"]},
-              {"types", entry["types"]}
-            ]
-          }
+          ordered_object([
+            {"functions", entry["functions"]},
+            {"tier", entry["tier"]},
+            {"types", entry["types"]}
+          ])
 
         {name, sorted_entry}
       end)
 
-    ordered = %Jason.OrderedObject{
-      values: [{"modules", %Jason.OrderedObject{values: sorted_modules}}]
-    }
+    ordered = ordered_object([{"modules", ordered_object(sorted_modules)}])
 
-    Jason.encode!(ordered, pretty: true)
+    encode_json!(ordered)
   end
+
+  defp encode_json!(value), do: Jason.encode!(value, pretty: true)
+  defp ordered_object(values), do: struct!(Module.concat(Jason, OrderedObject), values: values)
 end
