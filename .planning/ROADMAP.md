@@ -37,7 +37,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 - [x] **Phase 83: Claim-Accuracy & Shaping Hygiene** - Make `harfbuzz_ex` optional, fix shaping bug, migrate off dead `unicode_data`, declare complex-script deferrals — restoring the "pure Elixir core" claim before any launch content ships (completed 2026-06-10)
 - [x] **Phase 84: Drawn-Path Primitive & Visible Polish** - Declarative `%Rendro.Path{}` block element, opt-in table borders/rules/header-band, Certificate border frame, byte-determinism goldens (completed 2026-06-10)
-- [x] **Phase 85: Deterministic Raster Lane** - `Pdfium.render/2`, golden-PNG snapshot harness, advisory CI lane, honest `pdfium-render` evidence vocabulary (completed 2026-06-11)
+- [ ] **Phase 85: Deterministic Raster Lane** - `Pdfium.render/2`, golden-PNG snapshot harness, advisory CI lane, honest `pdfium-render` evidence vocabulary (verification found gaps — 6/9 must-haves; gap closure pending)
 - [ ] **Phase 86: Self-Proving Launch Artifacts** - CI-hash-checked visual recipe gallery in README/HexDocs, self-rendered `manual.pdf` with published SHA-256, brand-book-conformant presentation
 - [ ] **Phase 87: Comparison Page & Livebook** - Reproducible benchmark harness vs ChromicPDF/pdf_generator/Typst-CLI, HexDocs comparison guide, CI-executed Livebook tutorial with badges
 - [ ] **Phase 88: Launch Execution & Demand Instrumentation** - Coordinated ecosystem launch, mobile viewer evidence beat, concrete v2.7 shaping demand gate + ADOPTION.md ledger
@@ -189,7 +189,7 @@ Plans:
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 3/3 | Complete | 2026-06-05 |
 | 83. Claim-Accuracy & Shaping Hygiene | v2.6 | 5/5 | Complete    | 2026-06-10 |
 | 84. Drawn-Path Primitive & Visible Polish | v2.6 | 5/5 | Complete   | 2026-06-10 |
-| 85. Deterministic Raster Lane | v2.6 | 4/4 | Complete   | 2026-06-11 |
+| 85. Deterministic Raster Lane | v2.6 | 4/4 | Gaps Found | 2026-06-10 |
 | 86. Self-Proving Launch Artifacts | v2.6 | 0/? | Not started | - |
 | 87. Comparison Page & Livebook | v2.6 | 0/? | Not started | - |
 | 88. Launch Execution & Demand Instrumentation | v2.6 | 0/? | Not started | - |

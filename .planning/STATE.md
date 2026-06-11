@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-06-10 — v2.6 milestone started)
 
 ## Current Position
 
-Phase: 85 (deterministic-raster-lane) — EXECUTING
+Phase: 85 (deterministic-raster-lane) — GAPS FOUND (verification 6/9 must-haves)
 Plan: 4 of 4
-Status: Phase complete — ready for verification
-Last activity: 2026-06-11
+Status: All plans executed, but phase-goal verification found 2 blocker gaps — gap closure pending (/gsd:plan-phase 85 --gaps)
+Last activity: 2026-06-10
 
 Progress: [██████████] 100%
 
