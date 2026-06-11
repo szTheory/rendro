@@ -61,7 +61,7 @@ defmodule Rendro.Text.ShaperTest do
 
       assert {:ok, glyphs} = Shaper.shape(font, "Hello", [])
       assert is_list(glyphs)
-      assert length(glyphs) > 0
+      assert glyphs != []
     end
 
     test "shape/3 with default opts (omitted) works" do

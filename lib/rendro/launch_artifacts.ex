@@ -640,20 +640,18 @@ defmodule Rendro.LaunchArtifacts do
   defp file_hash_errors(_path, nil, label), do: ["#{label} sha256 missing in manifest"]
 
   defp file_hash_errors(path, expected, label) do
-    cond do
-      not File.exists?(path) ->
-        ["#{label} file missing: #{path}"]
+    if File.exists?(path) do
+      actual = path |> File.read!() |> sha256()
 
-      true ->
-        actual = path |> File.read!() |> sha256()
-
-        if actual == expected do
-          []
-        else
-          [
-            "#{label} hash drift for #{path}: expected #{expected}, got #{actual}; run mix rendro.launch_artifacts.gen"
-          ]
-        end
+      if actual == expected do
+        []
+      else
+        [
+          "#{label} hash drift for #{path}: expected #{expected}, got #{actual}; run mix rendro.launch_artifacts.gen"
+        ]
+      end
+    else
+      ["#{label} file missing: #{path}"]
     end
   end
 
