@@ -10,7 +10,7 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Shipped milestone:** v2.5 1.0 Release Capstone — **SHIPPED 2026-06-05** (Phases 78–82, 16/16 requirements; milestone audit `passed`; **`rendro 1.0.0` live on hex.pm**). The formal two-tier SemVer commitment, enforced public API boundary, migration docs, hardened release gates, and the irreversible proof-gated publish are all done. The full phase-delivery narrative is archived in `milestones/v2.5-ROADMAP.md`. **Active milestone: v2.6 Public Launch & Adoption Bootstrap — convert Rendro's proof-backed depth into its first real adopters: fix claim accuracy (optional shaping NIF), ship the drawn-path primitive + table borders, build the deterministic raster lane, publish self-proving launch artifacts (visual gallery, self-rendered manual, benchmark page, Livebook), execute a coordinated ecosystem launch, and define a concrete demand gate for conditional v2.7 global text shaping.**
+**Shipped milestone:** v2.5 1.0 Release Capstone — **SHIPPED 2026-06-05** (Phases 78–82, 16/16 requirements; milestone audit `passed`; **`rendro 1.0.0` live on hex.pm**). The formal two-tier SemVer commitment, enforced public API boundary, migration docs, hardened release gates, and the irreversible proof-gated publish are all done. The full phase-delivery narrative is archived in `milestones/v2.5-ROADMAP.md`. **Active milestone: v2.6 Public Launch & Adoption Bootstrap — convert Rendro's proof-backed depth into its first real adopters. Claim accuracy, drawn-path visible polish, and the deterministic raster lane are complete; next is self-proving launch artifacts (visual gallery, self-rendered manual, benchmark page, Livebook), then coordinated ecosystem launch and a concrete demand gate for conditional v2.7 global text shaping.**
 
 <details>
 <summary>v2.5 phase delivery detail</summary>
@@ -120,8 +120,8 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 _Milestone **v2.6 Public Launch & Adoption Bootstrap** is active (concrete REQ-IDs in `REQUIREMENTS.md`, phases 83–88 in `ROADMAP.md`). Headline requirements:_
 
 - [x] **Claim-accuracy & shaping hygiene** — `harfbuzz_ex` optional behind a `Rendro.Text.Shaper` behaviour with pure-Elixir `Shaper.Simple` in core, per-grapheme shaping bug fixed, `unicode_data` → `unicode` migration, `explicit_deferral` matrix rows for complex scripts (HYG-01..05). Validated in Phase 83: Claim-Accuracy & Shaping Hygiene (2026-06-10, 4/4 success criteria, 1022 tests green; 12 code-review findings fixed incl. per-render `shaper:` override and embedded-font default-install fix).
-- [ ] **Drawn-path primitive + visible polish** — declarative `%Rendro.Path{}`, table rules/borders, Certificate border frame, determinism golden tests (PATH-xx).
-- [ ] **Deterministic raster lane** — `Pdfium.render/2`, golden-PNG snapshot harness, advisory CI lane, honest `pdfium-render` evidence vocabulary (RAST-xx).
+- [x] **Drawn-path primitive + visible polish** — declarative `%Rendro.Path{}`, table rules/borders, Certificate border frame, determinism golden tests (PATH-01..04). Validated in Phase 84: Drawn-Path Primitive & Visible Polish (2026-06-10, 5/5 plans complete; phase verification passed).
+- [x] **Deterministic raster lane** — `Pdfium.render/2`, golden-PNG snapshot harness, advisory CI lane, honest `pdfium-render` evidence vocabulary (RAST-01..03). Validated in Phase 85: Deterministic Raster Lane (2026-06-11, 9/9 must-haves verified after gap closure; full suite and docs-contract lanes green).
 - [ ] **Self-proving launch artifacts** — CI-hash-checked visual recipe gallery, self-rendered `manual.pdf` with published SHA-256, reproducible benchmark/comparison page, CI-executed Livebook tutorial (GAL-xx, CMP-xx).
 - [ ] **Launch execution + demand instrumentation** — coordinated ecosystem launch, mobile-viewer-evidence content beat, concrete v2.7 shaping demand gate + ADOPTION.md ledger (LNCH-xx).
 - [ ] Hold **v2.7 Global Text Shaping & Script Support** as conditional — pursue only when the v2.6-defined demand gate triggers.
@@ -253,4 +253,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-10 — Phase 83 (Claim-Accuracy & Shaping Hygiene) complete: "pure Elixir core" claim restored — `harfbuzz_ex` optional behind the public `Rendro.Text.Shaper` behaviour, complex scripts fail instructively, cluster-boundary line breaking fixed, `unicode` migration done, matrix deferral rows enforced by docs-contract lane. Next: Phase 84 (Drawn-Path Primitive & Visible Polish).*
+*Last updated: 2026-06-11 — Phase 85 (Deterministic Raster Lane) complete: `Pdfium.render/2`, advisory raster CI, render-backed golden PNG snapshot evidence, and the `pdfium-render`/GUI-viewer boundary are verified. Next: Phase 86 (Self-Proving Launch Artifacts).*
