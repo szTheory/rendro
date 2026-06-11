@@ -52,6 +52,108 @@ defmodule Rendro.Adapters.Pdfium do
     end
   end
 
+  @doc """
+  Rasterizes a PDF binary to a list of PNG binaries using pdfium-cli.
+
+  Accepts a PDF binary and keyword opts:
+  - `dpi:` — dots per inch (positive integer, default 150)
+  - `pages:` — page range string passed to pdfium-cli `--pages` (non-empty string, default nil = all pages)
+
+  Writes the PDF to an isolated tmp directory (chmod 0o700 dir, chmod 0o600 file),
+  invokes `pdfium-cli render` with list-form args (no shell interpolation), collects
+  output PNG binaries sorted by page number, and cleans up the tmp directory unconditionally.
+
+  Returns `{:ok, [png_binary]}` on success, or `{:error, term()}` on failure.
+  """
+  @spec render(binary(), keyword()) :: {:ok, [binary()]} | {:error, term()}
+  def render(pdf_binary, opts \\ []) do
+    dpi = Keyword.get(opts, :dpi, 150)
+    pages = Keyword.get(opts, :pages, nil)
+
+    with :ok <- validate_dpi(dpi),
+         :ok <- validate_pages(pages),
+         {:ok, executable} <- find_executable(),
+         {:ok, tmp_dir} <- make_tmp_dir_for_raster() do
+      try do
+        render_in_tmp(executable, tmp_dir, pdf_binary, opts)
+      after
+        File.rm_rf(tmp_dir)
+      end
+    end
+  end
+
+  defp validate_dpi(dpi) when is_integer(dpi) and dpi > 0, do: :ok
+
+  defp validate_dpi(_),
+    do: {:error, {:invalid_option, :dpi, "must be a positive integer"}}
+
+  defp validate_pages(nil), do: :ok
+  defp validate_pages(pages) when is_binary(pages) and pages != "", do: :ok
+
+  defp validate_pages(_),
+    do: {:error, {:invalid_option, :pages, "must be a non-empty string"}}
+
+  defp make_tmp_dir_for_raster do
+    path =
+      Path.join(
+        System.tmp_dir!(),
+        "rendro-raster-#{System.unique_integer([:positive, :monotonic])}"
+      )
+
+    with :ok <- File.mkdir_p(path),
+         :ok <- File.chmod(path, 0o700) do
+      {:ok, path}
+    else
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp write_private_file(path, contents) do
+    File.rm(path)
+
+    with :ok <- File.write(path, contents, [:write, :exclusive, :binary]),
+         :ok <- File.chmod(path, 0o600) do
+      :ok
+    end
+  end
+
+  defp render_in_tmp(executable, tmp_dir, pdf_binary, opts) do
+    input_path = Path.join(tmp_dir, "input.pdf")
+    output_pattern = Path.join(tmp_dir, "page_%d.png")
+    dpi = Keyword.get(opts, :dpi, 150)
+    pages = Keyword.get(opts, :pages, nil)
+
+    with :ok <- write_private_file(input_path, pdf_binary),
+         {:ok, _output} <- run_render(executable, input_path, output_pattern, dpi, pages) do
+      collect_pngs(tmp_dir)
+    end
+  end
+
+  defp run_render(executable, input_path, output_pattern, dpi, pages) do
+    args =
+      render_args(input_path, output_pattern, dpi) ++
+        if pages, do: ["--pages", pages], else: []
+
+    run_command(executable, args)
+  end
+
+  defp render_args(input_path, output_pattern, dpi) do
+    ["render", input_path, output_pattern, "--dpi", Integer.to_string(dpi), "--file-type", "png"]
+  end
+
+  defp collect_pngs(tmp_dir) do
+    pngs =
+      Path.wildcard(Path.join(tmp_dir, "page_*.png"))
+      |> Enum.sort()
+      |> Enum.map(&File.read!/1)
+
+    if Enum.empty?(pngs) do
+      {:error, {:no_pages_rendered, "pdfium-cli produced no output files"}}
+    else
+      {:ok, pngs}
+    end
+  end
+
   defp find_executable do
     finder =
       Application.get_env(:rendro, :pdfium_cli_executable_finder, &default_finder/1)
