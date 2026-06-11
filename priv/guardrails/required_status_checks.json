@@ -56,8 +56,8 @@
       "name": "raster-advisory",
       "semantic_class": "raster_snapshot",
       "ci_job": "raster-advisory",
-      "command": "mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs",
-      "notes": "Phase 85 deterministic raster lane; not required on main. Download failure must never block engine merges."
+      "command": "mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs && mix rendro.launch_artifacts.check",
+      "notes": "Phase 85 deterministic raster snapshots and Phase 86 launch artifact PNG/hash checks; not required on main. Pdfium download or check failures must never block engine merges."
     }
   ],
   "supersedes_planning_refs": {
