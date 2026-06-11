@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v2.6
 milestone_name: Public Launch & Adoption Bootstrap
 status: planning
-last_updated: "2026-06-11T17:19:51.964Z"
+last_updated: "2026-06-11T17:36:44.446Z"
 last_activity: 2026-06-11 -- Phase 85 complete
 progress:
   total_phases: 6
@@ -90,9 +90,9 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-06-11T17:19:51.959Z
-Stopped at: Phase 86 context gathered
-Resume file: .planning/phases/86-self-proving-launch-artifacts/86-CONTEXT.md
+Last session: 2026-06-11T17:36:44.441Z
+Stopped at: Phase 86 UI-SPEC approved
+Resume file: .planning/phases/86-self-proving-launch-artifacts/86-UI-SPEC.md
 
 ## Performance Metrics
 
