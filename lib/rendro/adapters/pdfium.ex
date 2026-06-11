@@ -8,6 +8,7 @@ defmodule Rendro.Adapters.Pdfium do
   @moduledoc tags: [:adapter]
 
   @page_range_pattern ~r/\A[1-9][0-9]*(?:-[1-9][0-9]*)?(?:,[1-9][0-9]*(?:-[1-9][0-9]*)?)*\z/
+  @tmp_dir_attempts 5
 
   @type form_field :: %{
           optional(String.t()) => term()
@@ -102,19 +103,30 @@ defmodule Rendro.Adapters.Pdfium do
   defp validate_pages(_),
     do: {:error, {:invalid_option, :pages, "must be a page range like \"1-3,5\""}}
 
-  defp make_tmp_dir_for_raster do
+  defp make_tmp_dir_for_raster(attempts \\ @tmp_dir_attempts)
+
+  defp make_tmp_dir_for_raster(0), do: {:error, :eexist}
+
+  defp make_tmp_dir_for_raster(attempts) do
     path =
       Path.join(
         System.tmp_dir!(),
-        "rendro-raster-#{System.unique_integer([:positive, :monotonic])}"
+        "rendro-raster-#{random_suffix()}"
       )
 
-    with :ok <- File.mkdir_p(path),
+    with :ok <- File.mkdir(path),
          :ok <- File.chmod(path, 0o700) do
       {:ok, path}
     else
+      {:error, :eexist} -> make_tmp_dir_for_raster(attempts - 1)
       {:error, reason} -> {:error, reason}
     end
+  end
+
+  defp random_suffix do
+    8
+    |> :crypto.strong_rand_bytes()
+    |> Base.encode16(case: :lower)
   end
 
   defp write_private_file(path, contents) do
