@@ -82,7 +82,20 @@ defmodule Rendro.DocsContract.LaunchArtifactsClaimsTest do
   end
 
   test "public copy keeps pdfium-render distinct from GUI-viewer proof" do
+    manifest = Rendro.LaunchArtifacts.read_manifest!()
+
+    generated_copy =
+      Rendro.LaunchArtifacts.readme_block(manifest) <>
+        "\n" <> Rendro.LaunchArtifacts.recipes_block(manifest)
+
     public_copy = File.read!(@readme_path) <> "\n" <> File.read!(@recipes_path)
+
+    assert public_copy =~ "Native PDF layout for Elixir."
+    assert generated_copy =~ "curated deterministic recipe fixtures"
+    assert generated_copy =~ "Source PDFs and the self-rendered manual are byte-checked"
+    assert generated_copy =~ "pinned pdfium-render advisory lane"
+    assert generated_copy =~ "not GUI-viewer proof"
+    assert generated_copy =~ "canonical recipe defaults remain unchanged"
 
     assert public_copy =~ "pdfium-render"
 

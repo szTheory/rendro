@@ -187,7 +187,9 @@ defmodule Rendro.LaunchArtifacts do
     #{@readme_start}
     ## Rendered Recipe Gallery
 
-    These previews are rendered by Rendro from deterministic recipe fixtures. Source PDFs are byte-checked by the docs contract; the PNG rasters are regenerated through the pinned `pdfium-render` advisory lane.
+    These previews are rendered by Rendro from curated deterministic recipe fixtures.
+
+    Source PDFs and the self-rendered manual are byte-checked by the required docs contract. PNG rasters are regenerated and hash-checked in the pinned pdfium-render advisory lane. pdfium-render rasters are render proof, not GUI-viewer proof. Launch fixtures may use opt-in table polish; canonical recipe defaults remain unchanged.
 
     <p>
     #{images}
@@ -226,7 +228,9 @@ defmodule Rendro.LaunchArtifacts do
     #{@recipes_start}
     ## Rendered Gallery
 
-    These images are generated from the current recipe code and recorded in `assets/rendro/artifacts.json`. The required docs contract byte-checks the source PDFs and manifest; the advisory pdfium lane regenerates the PNG rasters.
+    These previews are rendered by Rendro from curated deterministic recipe fixtures and recorded in `assets/rendro/artifacts.json`.
+
+    Source PDFs and the self-rendered manual are byte-checked by the required docs contract. PNG rasters are regenerated and hash-checked in the pinned pdfium-render advisory lane. pdfium-render rasters are render proof, not GUI-viewer proof. Launch fixtures may use opt-in table polish; canonical recipe defaults remain unchanged.
 
     #{entries}
 
