@@ -44,8 +44,7 @@ defmodule Rendro.Table do
           decoration_break: decoration_break(),
           borders: borders(),
           border_style: nil | map(),
-          header_fill:
-            nil | {non_neg_integer(), non_neg_integer(), non_neg_integer()},
+          header_fill: nil | {non_neg_integer(), non_neg_integer(), non_neg_integer()},
           column_widths: [number()] | nil,
           row_heights: [number()] | nil,
           header_height: number() | nil,

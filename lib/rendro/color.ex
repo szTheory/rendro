@@ -97,14 +97,21 @@ defmodule Rendro.Color do
 
         is_tuple(value) and tuple_size(value) == 3 ->
           {r, g, b} = value
-          bad = Enum.reject([{"r", r}, {"g", g}, {"b", b}], fn {_, v} -> is_integer(v) && v >= 0 && v <= 255 end)
-          bad_desc = Enum.map_join(bad, ", ", fn {label, v} ->
-            cond do
-              is_float(v) -> "#{label}=#{inspect(v)} (float, must be integer)"
-              is_integer(v) -> "#{label}=#{inspect(v)} (out of range 0–255)"
-              true -> "#{label}=#{inspect(v)} (not an integer)"
-            end
-          end)
+
+          bad =
+            Enum.reject([{"r", r}, {"g", g}, {"b", b}], fn {_, v} ->
+              is_integer(v) && v >= 0 && v <= 255
+            end)
+
+          bad_desc =
+            Enum.map_join(bad, ", ", fn {label, v} ->
+              cond do
+                is_float(v) -> "#{label}=#{inspect(v)} (float, must be integer)"
+                is_integer(v) -> "#{label}=#{inspect(v)} (out of range 0–255)"
+                true -> "#{label}=#{inspect(v)} (not an integer)"
+              end
+            end)
+
           "Got #{inspect(value)} with invalid component(s): #{bad_desc}."
 
         true ->

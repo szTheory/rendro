@@ -683,8 +683,7 @@ defmodule Rendro.Pipeline.Measure do
             # as the run structs produced by measure_text_into_runs.
             result =
               Enum.reduce_while(cluster_run_list, {:ok, {[], []}}, fn cluster_run,
-                                                                       {:ok,
-                                                                        {lines, current_line}} ->
+                                                                      {:ok, {lines, current_line}} ->
                 width = cluster_run.width
                 grapheme_run = [cluster_run]
                 candidate_line = merge_runs(current_line, grapheme_run)
@@ -912,14 +911,26 @@ defmodule Rendro.Pipeline.Measure do
   defp compute_ops_extent(ops) do
     Enum.reduce(ops, {0.0, 0.0}, fn op, {max_x, max_y} ->
       case op do
-        {:move, x, y} -> {max(max_x, x * 1.0), max(max_y, y * 1.0)}
-        {:line, x, y} -> {max(max_x, x * 1.0), max(max_y, y * 1.0)}
+        {:move, x, y} ->
+          {max(max_x, x * 1.0), max(max_y, y * 1.0)}
+
+        {:line, x, y} ->
+          {max(max_x, x * 1.0), max(max_y, y * 1.0)}
+
         {:curve, x1, y1, x2, y2, x3, y3} ->
           {max(max_x, max(x1, max(x2, x3)) * 1.0), max(max_y, max(y1, max(y2, y3)) * 1.0)}
-        {:rect, x, y, w, h} -> {max(max_x, (x + w) * 1.0), max(max_y, (y + h) * 1.0)}
-        {:rounded_rect, x, y, w, h, _r} -> {max(max_x, (x + w) * 1.0), max(max_y, (y + h) * 1.0)}
-        :close -> {max_x, max_y}
-        _ -> {max_x, max_y}
+
+        {:rect, x, y, w, h} ->
+          {max(max_x, (x + w) * 1.0), max(max_y, (y + h) * 1.0)}
+
+        {:rounded_rect, x, y, w, h, _r} ->
+          {max(max_x, (x + w) * 1.0), max(max_y, (y + h) * 1.0)}
+
+        :close ->
+          {max_x, max_y}
+
+        _ ->
+          {max_x, max_y}
       end
     end)
   end

@@ -317,7 +317,10 @@ defmodule Rendro.Recipes.CertificateTest do
   describe "C17: frame region coordinates differ between page sizes" do
     test "frame region width differs between A4 and US Letter" do
       t_a4 = Certificate.page_template(page_size: :a4, orientation: :landscape, border: true)
-      t_us = Certificate.page_template(page_size: :us_letter, orientation: :landscape, border: true)
+
+      t_us =
+        Certificate.page_template(page_size: :us_letter, orientation: :landscape, border: true)
+
       frame_a4 = Enum.find(t_a4.regions, &(&1.name == :frame))
       frame_us = Enum.find(t_us.regions, &(&1.name == :frame))
       # Will fail RED until :frame region is added to page_template when border: true

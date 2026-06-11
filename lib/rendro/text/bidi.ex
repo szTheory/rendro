@@ -89,5 +89,4 @@ defmodule Rendro.Text.Bidi do
 
     %{text: text, script: script, direction: direction}
   end
-
 end

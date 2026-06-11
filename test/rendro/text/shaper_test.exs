@@ -28,6 +28,7 @@ defmodule Rendro.Text.ShaperTest do
   setup do
     prev = Application.get_env(:rendro, :shaper)
     Application.delete_env(:rendro, :shaper)
+
     on_exit(fn ->
       if prev != nil do
         Application.put_env(:rendro, :shaper, prev)
@@ -184,7 +185,7 @@ defmodule Rendro.Text.ShaperTest do
       font: font
     } do
       assert {:error, {:shaping_required, :arab, hint}} =
-               Simple.shape(font, "مرحبا", [script: :arab])
+               Simple.shape(font, "مرحبا", script: :arab)
 
       assert is_binary(hint)
       assert String.starts_with?(hint, "\n    Add")
@@ -206,18 +207,37 @@ defmodule Rendro.Text.ShaperTest do
     end
 
     test "shape/3 returns shaping_required error for all complex scripts", %{font: font} do
-      complex_scripts = [:syrc, :nkoo, :mong, :hebr, :deva, :beng, :guru, :gujr, :orya, :taml,
-                         :telu, :knda, :mlym, :sinh, :thai, :laoo, :khmr, :mymr, :tibt]
+      complex_scripts = [
+        :syrc,
+        :nkoo,
+        :mong,
+        :hebr,
+        :deva,
+        :beng,
+        :guru,
+        :gujr,
+        :orya,
+        :taml,
+        :telu,
+        :knda,
+        :mlym,
+        :sinh,
+        :thai,
+        :laoo,
+        :khmr,
+        :mymr,
+        :tibt
+      ]
 
       for script <- complex_scripts do
         assert {:error, {:shaping_required, ^script, _hint}} =
-                 Simple.shape(font, "test", [script: script]),
+                 Simple.shape(font, "test", script: script),
                "Expected shaping_required error for script #{inspect(script)}"
       end
     end
 
     test "shape/3 with :latn script (default) returns {:ok, glyphs}", %{font: font} do
-      assert {:ok, glyphs} = Simple.shape(font, "Hello", [script: :latn])
+      assert {:ok, glyphs} = Simple.shape(font, "Hello", script: :latn)
       assert length(glyphs) == 5
     end
 
