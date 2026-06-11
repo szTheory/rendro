@@ -213,7 +213,7 @@ defmodule Rendro.Recipes.CertificateTest do
       sections = Certificate.sections(fixture_data())
       assert is_list(sections)
       assert Enum.all?(sections, &match?(%Rendro.Section{}, &1))
-      assert sections != []
+      assert [_ | _] = sections
     end
   end
 

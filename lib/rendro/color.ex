@@ -132,9 +132,7 @@ defmodule Rendro.Color do
     """
   end
 
-  # Verbatim copy of format_num/1 from lib/rendro/pdf/writer.ex:1758-1762
-  defp format_num(n) when is_integer(n), do: Integer.to_string(n)
-
+  # Color components are produced with `/`, so they are always floats.
   defp format_num(n) when is_float(n) do
     :erlang.float_to_binary(n * 1.0, decimals: 4)
   end
