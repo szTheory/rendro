@@ -112,7 +112,7 @@
         "recorded_at": { "type": "string", "format": "date" },
         "viewer_kind": {
           "type": "string",
-          "enum": ["manual", "pdfium-cli", "pdfjs-dist"]
+          "enum": ["manual", "pdfium-cli", "pdfjs-dist", "pdfium-render"]
         },
         "evidence_deferred": { "type": "string", "minLength": 40 }
       },

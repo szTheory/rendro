@@ -12,7 +12,7 @@ defmodule Rendro.ViewerEvidence.Validator do
 
   @promotion_keys ~w(evidence recorded_at viewer_kind)
   @deferral_conflict_keys ~w(evidence recorded_at viewer_kind)
-  @viewer_kinds ~w(manual pdfium-cli pdfjs-dist)
+  @viewer_kinds ~w(manual pdfium-cli pdfjs-dist pdfium-render)
 
   @spec validate_matrix_structure!(map()) :: :ok
   def validate_matrix_structure!(matrix) do
