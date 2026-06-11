@@ -186,7 +186,29 @@ Plans:
   2. The HexDocs comparison guide has every claim bounded to committed benchmark results by a docs-contract test — a false claim or an unbounded claim fails CI.
   3. A `.livemd` Livebook tutorial (invoice data → render → inline Kino preview → download) runs in an advisory CI lane; the tutorial has "Run in Livebook" badges in HexDocs and the README; the advisory lane is graph-disconnected and never gates the four required engine lanes.
 
-**Plans**: TBD
+**Plans**: 6 plans across 5 waves
+
+Plans:
+**Wave 1**
+
+- [ ] 87-01-PLAN.md - Static comparison proof scaffold: claim registry, manifest fixture, docs contract baseline
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 87-02-PLAN.md - Reproducible benchmark harness and committed results
+- [ ] 87-04-PLAN.md - CI-executed first-invoice Livebook tutorial
+
+**Wave 3** *(blocked on Wave 2 benchmark completion)*
+
+- [ ] 87-03-PLAN.md - Generated comparison guide and claim citation contract
+
+**Wave 4** *(blocked on Wave 3 + Livebook completion)*
+
+- [ ] 87-05-PLAN.md - ExDoc, README, package, and advisory CI wiring
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 87-06-PLAN.md - Final regeneration, fairness review, and verification closure
 
 ### Phase 88: Launch Execution & Demand Instrumentation
 
@@ -214,7 +236,7 @@ Plans:
 | 84. Drawn-Path Primitive & Visible Polish | v2.6 | 5/5 | Complete   | 2026-06-10 |
 | 85. Deterministic Raster Lane | v2.6 | 6/6 | Complete    | 2026-06-11 |
 | 86. Self-Proving Launch Artifacts | v2.6 | 5/5 | Complete   | 2026-06-11 |
-| 87. Comparison Page & Livebook | v2.6 | 0/? | Not started | - |
+| 87. Comparison Page & Livebook | v2.6 | 0/6 | Ready to execute | - |
 | 88. Launch Execution & Demand Instrumentation | v2.6 | 0/? | Not started | - |
 
 ---
