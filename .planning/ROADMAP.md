@@ -140,7 +140,7 @@ Plans:
 **Wave 4** *(gap closure; blocked on Wave 3 completion)*
 
 - [ ] 85-05-PLAN.md — Render-backed golden PNG snapshot harness + pinned-container committed hash refs
-- [ ] 85-06-PLAN.md — Structural pdfium-render GUI-row exclusion + raster adapter hardening
+- [x] 85-06-PLAN.md — Structural pdfium-render GUI-row exclusion + raster adapter hardening
 
 ### Phase 86: Self-Proving Launch Artifacts
 
@@ -194,7 +194,7 @@ Plans:
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 3/3 | Complete | 2026-06-05 |
 | 83. Claim-Accuracy & Shaping Hygiene | v2.6 | 5/5 | Complete    | 2026-06-10 |
 | 84. Drawn-Path Primitive & Visible Polish | v2.6 | 5/5 | Complete   | 2026-06-10 |
-| 85. Deterministic Raster Lane | v2.6 | 4/4 | Gaps Found | 2026-06-10 |
+| 85. Deterministic Raster Lane | v2.6 | 5/6 | In Progress|  |
 | 86. Self-Proving Launch Artifacts | v2.6 | 0/? | Not started | - |
 | 87. Comparison Page & Livebook | v2.6 | 0/? | Not started | - |
 | 88. Launch Execution & Demand Instrumentation | v2.6 | 0/? | Not started | - |

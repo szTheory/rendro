@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.6
 milestone_name: Public Launch & Adoption Bootstrap
 status: executing
-last_updated: "2026-06-11T15:01:07.312Z"
-last_activity: 2026-06-11 -- Phase 85 planning complete
+last_updated: "2026-06-11T15:10:30.098Z"
+last_activity: 2026-06-11 -- Phase 85 Plan 06 complete
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 16
-  completed_plans: 14
+  completed_plans: 15
   percent: 33
 ---
 
@@ -24,12 +24,12 @@ See: .planning/PROJECT.md (updated 2026-06-10 — v2.6 milestone started)
 
 ## Current Position
 
-Phase: 85 (deterministic-raster-lane) — GAP CLOSURE PLANNED (verification 6/9 must-haves)
-Plan: 4 of 6 complete; 2 gap-closure plans ready
+Phase: 85 (deterministic-raster-lane) — EXECUTING GAP CLOSURE
+Plan: 5 of 6 complete; 85-05 remaining
 Status: Ready to execute gap-closure Wave 4
-Last activity: 2026-06-11 -- Phase 85 planning complete
+Last activity: 2026-06-11 -- Phase 85 Plan 06 complete
 
-Progress: [███████░░░] 67%
+Progress: [█████████░] 94%
 
 ## Milestone Snapshot
 
@@ -61,6 +61,8 @@ Full decision log in PROJECT.md Key Decisions table. v2.6 scoping decisions (loc
 - Demand gate thresholds (LNCH-03) must be concrete and numeric — "adopter demand" failed as a gate before.
 - [Phase ?]: Used @tag :skip for RED Wave 0 test stubs — :pending not in ExUnit exclude list; :skip ensures mix test exits 0 during Wave 0 scaffolding
 - [Phase ?]: render_args/3 separate private function
+- [Phase 85]: `pdfium-render` is reserved for top-level raster evidence; GUI-viewer promotion rows stay limited to manual, pdfium-cli, and pdfjs-dist.
+- [Phase 85]: `Pdfium.render/2` validates `pages:` as a strict numeric page range before executable lookup or command execution.
 
 ### Pending Todos
 
@@ -88,8 +90,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-06-11T00:26:28.172Z
-Stopped at: Phase 85 Plan 01 complete — Wave 0 test scaffolding done
+Last session: 2026-06-11T15:10:30.093Z
+Stopped at: Completed 85-06-PLAN.md
 Resume file: None
 
 ## Performance Metrics
@@ -99,3 +101,4 @@ Resume file: None
 | Phase 85-deterministic-raster-lane P01 | 4 | 2 tasks | 6 files |
 | Phase 85 P02 | 2 | 2 tasks | 3 files |
 | Phase 85-deterministic-raster-lane P04 | 3min | 2 tasks | 5 files |
+| Phase 85 P06 | 9 min | 3 tasks | 5 files |
