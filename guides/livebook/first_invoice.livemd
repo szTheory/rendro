@@ -1,0 +1,103 @@
+# First Invoice With Rendro
+
+Render a deterministic invoice PDF from Elixir data, preview it inline, and
+download the same bytes.
+
+## Setup
+
+```elixir
+rendro_dep =
+  if System.get_env("RENDRO_LIVEBOOK_LOCAL") == "1" do
+    {:rendro, path: System.get_env("RENDRO_LIVEBOOK_PATH") || File.cwd!()}
+  else
+    {:rendro, "~> 1.0"}
+  end
+
+Mix.install([
+  rendro_dep,
+  {:jason, "~> 1.4"},
+  {:jsv, "~> 0.19"},
+  {:yaml_elixir, ">= 2.11.0 and < 3.0.0"},
+  {:kino, "~> 0.16"}
+])
+```
+
+## Invoice Data
+
+```elixir
+invoice = %{
+  id: "LB-2026-001",
+  date: ~D[2026-06-11],
+  items: [
+    %{name: "Implementation Sprint", qty: 2, price: 2400},
+    %{name: "Support Retainer", qty: 1, price: 800},
+    %{name: "Validation Report", qty: 1, price: 450}
+  ]
+}
+```
+
+## Render
+
+```elixir
+doc = Rendro.Recipes.Invoice.document(invoice)
+{:ok, pdf} = Rendro.render(doc, deterministic: true)
+
+if binary_part(pdf, 0, 5) != "%PDF-" do
+  raise "expected Rendro to render a PDF"
+end
+
+sha256 = :crypto.hash(:sha256, pdf) |> Base.encode16(case: :lower)
+
+%{
+  bytes: byte_size(pdf),
+  sha256: sha256
+}
+```
+
+## Preview
+
+```elixir
+encoded = Base.encode64(pdf)
+
+Kino.HTML.new("""
+<iframe
+  title="Rendro invoice PDF preview"
+  src="data:application/pdf;base64,#{encoded}"
+  style="width: 100%; height: 640px; border: 1px solid #d1d5db;">
+</iframe>
+""")
+```
+
+## Download
+
+```elixir
+Kino.Download.new(fn -> pdf end, filename: "rendro-invoice.pdf")
+```
+
+## Phoenix Handoff
+
+The controller shape is intentionally schematic and is not executed in this
+notebook.
+
+```elixir-schematic
+defmodule MyAppWeb.InvoiceController do
+  use MyAppWeb, :controller
+
+  def show(conn, %{"id" => id}) do
+    invoice = Billing.get_invoice!(id)
+    doc = Rendro.Recipes.Invoice.document(invoice)
+    {:ok, pdf} = Rendro.render(doc, deterministic: true)
+
+    conn
+    |> put_resp_content_type("application/pdf")
+    |> put_resp_header("content-disposition", "inline; filename=invoice-#{id}.pdf")
+    |> send_resp(200, pdf)
+  end
+end
+```
+
+## Next
+
+- Recipes guide: `guides/recipes.md`
+- Comparison guide: `guides/comparison.md`
+- Self-rendered manual: `assets/rendro/manual.pdf`
