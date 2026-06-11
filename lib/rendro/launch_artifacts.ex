@@ -264,6 +264,7 @@ defmodule Rendro.LaunchArtifacts do
   defp build_source_document("branded_invoice") do
     branded_invoice_data()
     |> Rendro.Recipes.BrandedInvoice.document()
+    |> apply_branded_invoice_launch_header()
     |> apply_launch_table_style()
   end
 
@@ -295,6 +296,22 @@ defmodule Rendro.LaunchArtifacts do
   defp apply_launch_table_style(%Document{} = doc) do
     %Document{doc | sections: Enum.map(doc.sections, &style_launch_tables/1)}
   end
+
+  defp apply_branded_invoice_launch_header(%Document{} = doc) do
+    %Document{doc | sections: Enum.map(doc.sections, &style_branded_invoice_header/1)}
+  end
+
+  defp style_branded_invoice_header(%Rendro.Section{name: :branded_invoice_header} = section) do
+    %Rendro.Section{section | content: Enum.map(section.content, &use_default_header_font/1)}
+  end
+
+  defp style_branded_invoice_header(other), do: other
+
+  defp use_default_header_font(%Rendro.Block{content: %Rendro.Text{} = text} = block) do
+    %Rendro.Block{block | content: %Rendro.Text{text | font: Rendro.Text.default_font()}}
+  end
+
+  defp use_default_header_font(other), do: other
 
   defp style_launch_tables(%Rendro.Section{content: content} = section) do
     %Rendro.Section{section | content: Enum.map(content, &style_launch_tables/1)}

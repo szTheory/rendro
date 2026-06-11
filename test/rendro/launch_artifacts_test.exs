@@ -48,6 +48,10 @@ defmodule Rendro.LaunchArtifactsTest do
       assert "Rendro, Inc." in header_texts
       assert "Invoice #BR-2026-001" in header_texts
       assert "Date: 2026-06-11" in header_texts
+
+      for %Rendro.Block{content: %Rendro.Text{} = text} <- header.content do
+        assert text.font == Rendro.Text.default_font()
+      end
     end
 
     test "certificate fixture keeps the Path-backed frame and does not require table polish" do
