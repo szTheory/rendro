@@ -52,6 +52,7 @@
       "functions": [
         "form_fields/2",
         "info/2",
+        "render/2",
         "version/1"
       ],
       "tier": "adapter",
