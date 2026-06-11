@@ -42,13 +42,30 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert example["notes"] =~ "REF-03"
       refute "example-phoenix" in baseline["required_contexts"]
     end
+
+    test "raster-advisory remains advisory and documents launch artifact checking" do
+      baseline = load_baseline!()
+
+      raster = advisory_context!(baseline, "raster-advisory")
+
+      refute "raster-advisory" in baseline["required_contexts"]
+
+      assert raster["command"] =~
+               "mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs"
+
+      assert raster["command"] =~ "mix rendro.launch_artifacts.check"
+      assert raster["notes"] =~ "Phase 86"
+      assert raster["notes"] =~ "not required"
+    end
   end
 
   describe "ci.yml job names" do
     test "contains required and advisory job keys" do
       ci = File.read!(@ci_path)
 
-      for job <- @required_contexts ++ ["viewer-evidence-live-proof", "example-phoenix"] do
+      for job <-
+            @required_contexts ++
+              ["viewer-evidence-live-proof", "example-phoenix", "raster-advisory"] do
         assert ci =~ "  #{job}:"
       end
     end
@@ -95,11 +112,11 @@ defmodule Guardrails.RequiredChecksContractTest do
   end
 
   describe "docs-contract lane count" do
-    test "verify_docs.exs registers exactly fifteen lanes including the recipes, page-primitive, public-api contract, script-support, path claims, and raster claims lanes" do
+    test "verify_docs.exs registers exactly sixteen lanes including the recipes, page-primitive, public-api contract, script-support, path, raster, and launch-artifact lanes" do
       script = File.read!(@verify_docs_path)
 
       lane_entries = Regex.scan(~r/\{"[^"]+", \["test", "test\/docs_contract\/[^"]+"\]\}/, script)
-      assert length(lane_entries) == 15
+      assert length(lane_entries) == 16
 
       assert script =~
                ~s|{"Viewer evidence semantic-claims lane", ["test", "test/docs_contract/viewer_evidence_claims_test.exs"]}|
@@ -121,6 +138,39 @@ defmodule Guardrails.RequiredChecksContractTest do
                "credo --strict",
                "dialyzer"
              ]
+    end
+  end
+
+  describe "required/advisory CI separation" do
+    test "required test job runs only the deterministic mix ci lane" do
+      ci = File.read!(@ci_path)
+      test_block = ci_job_block!(ci, "test")
+
+      assert test_block =~ "run: mix ci"
+
+      forbidden_required_fragments = [
+        "pdfium-cli",
+        "curl -fsSL",
+        "rendro.launch_artifacts.check",
+        "Rendro.Adapters.Pdfium.render"
+      ]
+
+      for fragment <- forbidden_required_fragments do
+        refute test_block =~ fragment
+      end
+    end
+
+    test "raster-advisory is graph-disconnected and non-blocking" do
+      ci = File.read!(@ci_path)
+      raster_block = ci_job_block!(ci, "raster-advisory")
+
+      assert raster_block =~ "continue-on-error: true"
+
+      assert raster_block =~
+               "mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs"
+
+      assert raster_block =~ "mix rendro.launch_artifacts.check"
+      refute raster_block =~ ~r/^\s+needs:/m
     end
   end
 
@@ -150,5 +200,20 @@ defmodule Guardrails.RequiredChecksContractTest do
     @baseline_path
     |> File.read!()
     |> Jason.decode!()
+  end
+
+  defp advisory_context!(baseline, name) do
+    Enum.find(baseline["advisory_contexts"], &(&1["name"] == name)) ||
+      flunk("expected advisory context #{inspect(name)}")
+  end
+
+  defp ci_job_block!(ci, job_name) do
+    escaped_job_name = Regex.escape(job_name)
+    pattern = ~r/^  #{escaped_job_name}:\n(?:(?!^  [A-Za-z0-9_-]+:).*(?:\n|$))*/m
+
+    case Regex.run(pattern, ci) do
+      [block] -> block
+      _ -> flunk("expected CI job block #{inspect(job_name)}")
+    end
   end
 end
