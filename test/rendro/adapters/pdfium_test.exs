@@ -44,4 +44,45 @@ defmodule Rendro.Adapters.PdfiumTest do
 
     assert {:ok, [<<"FAKEPNG">>]} = Pdfium.render(<<1, 2, 3>>, dpi: 150)
   end
+
+  test "render/2 rejects invalid page range before invoking command runner" do
+    test_pid = self()
+
+    Application.put_env(:rendro, :pdfium_cli_executable_finder, fn _ -> "/usr/bin/echo" end)
+
+    Application.put_env(:rendro, :pdfium_cli_command_runner, fn _exe, _args, _opts ->
+      send(test_pid, :runner_invoked)
+      {"", 0}
+    end)
+
+    on_exit(fn ->
+      Application.delete_env(:rendro, :pdfium_cli_executable_finder)
+      Application.delete_env(:rendro, :pdfium_cli_command_runner)
+    end)
+
+    assert Pdfium.render(<<1, 2, 3>>, pages: "--help") ==
+             {:error, {:invalid_option, :pages, "must be a page range like \"1-3,5\""}}
+
+    refute_received :runner_invoked
+  end
+
+  test "render/2 returns PNGs in numeric page order" do
+    Application.put_env(:rendro, :pdfium_cli_executable_finder, fn _ -> "/usr/bin/echo" end)
+
+    Application.put_env(:rendro, :pdfium_cli_command_runner, fn _exe, args, _opts ->
+      output_pattern = Enum.at(args, 2)
+      tmp_dir = Path.dirname(output_pattern)
+      File.write!(Path.join(tmp_dir, "page_10.png"), "TEN")
+      File.write!(Path.join(tmp_dir, "page_2.png"), "TWO")
+      File.write!(Path.join(tmp_dir, "page_1.png"), "ONE")
+      {"", 0}
+    end)
+
+    on_exit(fn ->
+      Application.delete_env(:rendro, :pdfium_cli_executable_finder)
+      Application.delete_env(:rendro, :pdfium_cli_command_runner)
+    end)
+
+    assert Pdfium.render(<<1, 2, 3>>, pages: "1-10") == {:ok, ["ONE", "TWO", "TEN"]}
+  end
 end

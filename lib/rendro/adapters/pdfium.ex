@@ -7,6 +7,8 @@ defmodule Rendro.Adapters.Pdfium do
   """
   @moduledoc tags: [:adapter]
 
+  @page_range_pattern ~r/\A[1-9][0-9]*(?:-[1-9][0-9]*)?(?:,[1-9][0-9]*(?:-[1-9][0-9]*)?)*\z/
+
   @type form_field :: %{
           optional(String.t()) => term()
         }
@@ -88,10 +90,17 @@ defmodule Rendro.Adapters.Pdfium do
     do: {:error, {:invalid_option, :dpi, "must be a positive integer"}}
 
   defp validate_pages(nil), do: :ok
-  defp validate_pages(pages) when is_binary(pages) and pages != "", do: :ok
+
+  defp validate_pages(pages) when is_binary(pages) do
+    if Regex.match?(@page_range_pattern, pages) do
+      :ok
+    else
+      {:error, {:invalid_option, :pages, "must be a page range like \"1-3,5\""}}
+    end
+  end
 
   defp validate_pages(_),
-    do: {:error, {:invalid_option, :pages, "must be a non-empty string"}}
+    do: {:error, {:invalid_option, :pages, "must be a page range like \"1-3,5\""}}
 
   defp make_tmp_dir_for_raster do
     path =
@@ -109,8 +118,6 @@ defmodule Rendro.Adapters.Pdfium do
   end
 
   defp write_private_file(path, contents) do
-    File.rm(path)
-
     with :ok <- File.write(path, contents, [:write, :exclusive, :binary]),
          :ok <- File.chmod(path, 0o600) do
       :ok
@@ -144,7 +151,7 @@ defmodule Rendro.Adapters.Pdfium do
   defp collect_pngs(tmp_dir) do
     pngs =
       Path.wildcard(Path.join(tmp_dir, "page_*.png"))
-      |> Enum.sort()
+      |> Enum.sort_by(&page_number_from_path/1)
       |> Enum.map(&File.read!/1)
 
     if Enum.empty?(pngs) do
@@ -152,6 +159,13 @@ defmodule Rendro.Adapters.Pdfium do
     else
       {:ok, pngs}
     end
+  end
+
+  defp page_number_from_path(path) do
+    path
+    |> Path.basename()
+    |> then(fn "page_" <> rest -> String.trim_trailing(rest, ".png") end)
+    |> String.to_integer()
   end
 
   defp find_executable do
