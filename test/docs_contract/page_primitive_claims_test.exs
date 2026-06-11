@@ -49,7 +49,7 @@ defmodule Rendro.DocsContract.PagePrimitiveClaimsTest do
       script = File.read!("scripts/verify_docs.exs")
 
       assert script =~
-               ~s|{"Page-primitive semantic-claims lane", ["test", "test/docs_contract/page_primitive_claims_test.exs"]}|
+               ~r/\{"Page-primitive semantic-claims lane",\s*\["test",\s*"test\/docs_contract\/page_primitive_claims_test\.exs"\]\}/s
     end
   end
 end

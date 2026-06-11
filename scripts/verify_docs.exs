@@ -4,6 +4,7 @@
 
 Mix.Task.run("app.start")
 
+# formatter: off
 lanes = [
   {"README doctest lane", ["test", "test/docs_contract/readme_doctest_test.exs"]},
   {"Integration contract lane", ["test", "test/docs_contract/integrations_contract_test.exs"]},
@@ -27,6 +28,8 @@ lanes = [
   {"Launch artifacts claims lane",
    ["test", "test/docs_contract/launch_artifacts_claims_test.exs"]}
 ]
+
+# formatter: on
 
 Mix.shell().info("Running explicit docs-contract lanes...")
 

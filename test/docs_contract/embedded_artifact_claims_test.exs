@@ -124,19 +124,19 @@ defmodule Rendro.DocsContract.EmbeddedArtifactClaimsTest do
     script = File.read!("scripts/verify_docs.exs")
 
     assert script =~
-             ~s|{"Embedded artifact semantic-claims lane", ["test", "test/docs_contract/embedded_artifact_claims_test.exs"]}|
+             ~r/\{"Embedded artifact semantic-claims lane",\s*\["test",\s*"test\/docs_contract\/embedded_artifact_claims_test\.exs"\]\}/s
 
     # Existing lanes must remain present.
     assert script =~
-             ~s|{"README doctest lane", ["test", "test/docs_contract/readme_doctest_test.exs"]}|
+             ~r/\{"README doctest lane",\s*\["test",\s*"test\/docs_contract\/readme_doctest_test\.exs"\]\}/s
 
     assert script =~
-             ~s|{"Integration contract lane", ["test", "test/docs_contract/integrations_contract_test.exs"]}|
+             ~r/\{"Integration contract lane",\s*\["test",\s*"test\/docs_contract\/integrations_contract_test\.exs"\]\}/s
 
     assert script =~
-             ~s|{"Integration semantic-claims lane", ["test", "test/docs_contract/integrations_claims_test.exs"]}|
+             ~r/\{"Integration semantic-claims lane",\s*\["test",\s*"test\/docs_contract\/integrations_claims_test\.exs"\]\}/s
 
     assert script =~
-             ~s|{"Forms semantic-claims lane", ["test", "test/docs_contract/forms_claims_test.exs"]}|
+             ~r/\{"Forms semantic-claims lane",\s*\["test",\s*"test\/docs_contract\/forms_claims_test\.exs"\]\}/s
   end
 end

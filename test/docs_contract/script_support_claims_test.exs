@@ -38,6 +38,6 @@ defmodule Rendro.DocsContract.ScriptSupportClaimsTest do
     script = File.read!("scripts/verify_docs.exs")
 
     assert script =~
-             ~s|{"Script support claims lane", ["test", "test/docs_contract/script_support_claims_test.exs"]}|
+             ~r/\{"Script support claims lane",\s*\["test",\s*"test\/docs_contract\/script_support_claims_test\.exs"\]\}/s
   end
 end

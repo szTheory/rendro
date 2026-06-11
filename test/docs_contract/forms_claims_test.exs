@@ -79,7 +79,7 @@ defmodule Rendro.DocsContract.FormsClaimsTest do
     script = File.read!("scripts/verify_docs.exs")
 
     assert script =~
-             ~s|{"Forms semantic-claims lane", ["test", "test/docs_contract/forms_claims_test.exs"]}|
+             ~r/\{"Forms semantic-claims lane",\s*\["test",\s*"test\/docs_contract\/forms_claims_test\.exs"\]\}/s
   end
 
   test "signature docs-contract lane keeps explicit negative claim guards" do
