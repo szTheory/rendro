@@ -79,6 +79,7 @@ defmodule Rendro.MixProject do
       links: %{"GitHub" => @source_url},
       files: ~w(
         lib
+        assets/rendro
         priv/branded
         guides
         .formatter.exs
@@ -94,6 +95,7 @@ defmodule Rendro.MixProject do
   defp docs do
     [
       main: "readme",
+      assets: %{"assets" => "assets"},
       before_closing_head_tag: &before_closing_head_tag/1,
       skip_undefined_reference_warnings_on: [
         "guides/branding.md",
@@ -202,6 +204,17 @@ defmodule Rendro.MixProject do
     <style>
       .note.tier-stable { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
       .note.tier-adapter { background-color: #cce5ff; color: #004085; border-color: #b8daff; }
+      img[src^="assets/rendro/"] {
+        background: #ffffff;
+        border: 1px solid #d8d2c3;
+        box-shadow: 0 8px 24px rgba(16, 24, 39, 0.08);
+      }
+      @media (prefers-color-scheme: dark) {
+        img[src^="assets/rendro/"] {
+          border-color: #1f2937;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+        }
+      }
     </style>
     <script>
       document.querySelectorAll('.note').forEach(function(s) {

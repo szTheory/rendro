@@ -78,6 +78,9 @@ jobs:
           MIX_RASTER_BLESS: "false"
         run: mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs
 
+      - name: Check Launch Artifacts
+        run: mix rendro.launch_artifacts.check
+
   viewer-evidence-live-proof:
     runs-on: ubuntu-latest
     needs: test
