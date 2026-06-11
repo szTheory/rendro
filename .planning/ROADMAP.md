@@ -186,7 +186,7 @@ Plans:
   2. The HexDocs comparison guide has every claim bounded to committed benchmark results by a docs-contract test — a false claim or an unbounded claim fails CI.
   3. A `.livemd` Livebook tutorial (invoice data → render → inline Kino preview → download) runs in an advisory CI lane; the tutorial has "Run in Livebook" badges in HexDocs and the README; the advisory lane is graph-disconnected and never gates the four required engine lanes.
 
-**Plans**: 4/6 plans complete across 5 waves
+**Plans**: 5/6 plans complete across 5 waves
 
 Plans:
 **Wave 1**
@@ -204,7 +204,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 + Livebook completion)*
 
-- [ ] 87-05-PLAN.md - ExDoc, README, package, and advisory CI wiring
+- [x] 87-05-PLAN.md - ExDoc, README, package, and advisory CI wiring
 
 **Wave 5** *(blocked on Wave 4 completion)*
 

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.6
 milestone_name: Public Launch & Adoption Bootstrap
 status: executing
-last_updated: "2026-06-11T21:32:58.000Z"
+last_updated: "2026-06-11T21:38:55.000Z"
 last_activity: 2026-06-11
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 27
-  completed_plans: 25
+  completed_plans: 26
   percent: 67
 ---
 
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-06-10 — v2.6 milestone started)
 ## Current Position
 
 Phase: 87 (Comparison Page & Livebook) — EXECUTING
-Plan: 5 of 6
-Status: Ready to execute 87-05
+Plan: 6 of 6
+Status: Ready to execute 87-06
 Last activity: 2026-06-11
 
-Progress: [█████████░] 93%
+Progress: [██████████] 96%
 
 ## Milestone Snapshot
 
@@ -90,8 +90,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-06-11T21:32:58.000Z
-Stopped at: Completed 87-03 comparison guide generation; next plan is 87-05 ExDoc/README/package/advisory CI wiring
+Last session: 2026-06-11T21:38:55.000Z
+Stopped at: Completed 87-05 ExDoc/README/package/advisory CI wiring; next plan is 87-06 final regeneration, fairness review, and verification closure
 Resume file: None
 
 ## Performance Metrics
@@ -112,3 +112,4 @@ Resume file: None
 | Phase 87 P02 | 58 min | 3 tasks | 21 files |
 | Phase 87 P04 | 15 min | 3 tasks | 6 files |
 | Phase 87 P03 | 14 min | 3 tasks | 4 files |
+| Phase 87 P05 | 6 min | 3 tasks | 6 files |
