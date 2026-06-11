@@ -39,7 +39,7 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 - [x] **Phase 84: Drawn-Path Primitive & Visible Polish** - Declarative `%Rendro.Path{}` block element, opt-in table borders/rules/header-band, Certificate border frame, byte-determinism goldens (completed 2026-06-10)
 - [x] **Phase 85: Deterministic Raster Lane** - `Pdfium.render/2`, golden-PNG snapshot harness, advisory CI lane, honest `pdfium-render` evidence vocabulary (verified 9/9 must-haves) (completed 2026-06-11)
 - [x] **Phase 86: Self-Proving Launch Artifacts** - CI-hash-checked visual recipe gallery in README/HexDocs, self-rendered `manual.pdf` with published SHA-256, brand-book-conformant presentation (completed 2026-06-11)
-- [ ] **Phase 87: Comparison Page & Livebook** - Reproducible benchmark harness vs ChromicPDF/pdf_generator/Typst-CLI, HexDocs comparison guide, CI-executed Livebook tutorial with badges
+- [x] **Phase 87: Comparison Page & Livebook** - Reproducible benchmark harness vs ChromicPDF/pdf_generator/Typst-CLI, HexDocs comparison guide, CI-executed Livebook tutorial with badges (completed 2026-06-11)
 - [ ] **Phase 88: Launch Execution & Demand Instrumentation** - Coordinated ecosystem launch, mobile viewer evidence beat, concrete v2.7 shaping demand gate + ADOPTION.md ledger
 
 ## Phase Details
@@ -186,7 +186,7 @@ Plans:
   2. The HexDocs comparison guide has every claim bounded to committed benchmark results by a docs-contract test — a false claim or an unbounded claim fails CI.
   3. A `.livemd` Livebook tutorial (invoice data → render → inline Kino preview → download) runs in an advisory CI lane; the tutorial has "Run in Livebook" badges in HexDocs and the README; the advisory lane is graph-disconnected and never gates the four required engine lanes.
 
-**Plans**: 5/6 plans complete across 5 waves
+**Plans**: 6/6 plans complete across 5 waves
 
 Plans:
 **Wave 1**
@@ -208,7 +208,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 87-06-PLAN.md - Final regeneration, fairness review, and verification closure
+- [x] 87-06-PLAN.md - Final regeneration, fairness review, and verification closure
 
 ### Phase 88: Launch Execution & Demand Instrumentation
 
@@ -236,7 +236,7 @@ Plans:
 | 84. Drawn-Path Primitive & Visible Polish | v2.6 | 5/5 | Complete   | 2026-06-10 |
 | 85. Deterministic Raster Lane | v2.6 | 6/6 | Complete    | 2026-06-11 |
 | 86. Self-Proving Launch Artifacts | v2.6 | 5/5 | Complete   | 2026-06-11 |
-| 87. Comparison Page & Livebook | v2.6 | 4/6 | In Progress|  |
+| 87. Comparison Page & Livebook | v2.6 | 6/6 | Complete   | 2026-06-11 |
 | 88. Launch Execution & Demand Instrumentation | v2.6 | 0/? | Not started | - |
 
 ---

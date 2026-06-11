@@ -1,7 +1,7 @@
 ---
 phase: 87
 slug: comparison-page-livebook
-status: draft
+status: complete
 nyquist_compliant: true
 wave_0_complete: false
 created: 2026-06-11
@@ -54,12 +54,12 @@ tutorial.
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | Evidence Files | Status |
 |---------|------|------|-------------|-----------|-------------------|----------------|--------|
-| 87-01 | 01 | 1 | CMP-01, CMP-02 | scaffold/docs contract | `mix test test/docs_contract/comparison_claims_test.exs test/rendro/comparison_test.exs` | `lib/rendro/comparison.ex`, `test/docs_contract/comparison_claims_test.exs`, `test/rendro/comparison_test.exs`, `bench/results/comparison.json` | pending |
-| 87-02 | 02 | 2 | CMP-01 | benchmark harness | `mix test test/rendro/comparison_test.exs` | `bench/comparison/**`, `bench/results/raw/**`, `bench/results/comparison.json`, `lib/mix/tasks/rendro/comparison/*.ex` | pending |
-| 87-04 | 04 | 2 | CMP-03 | notebook execution/unit | `mix test test/mix/tasks/rendro_livebook_check_test.exs`; `mix rendro.livebook.check` | `guides/livebook/first_invoice.livemd`, `lib/mix/tasks/rendro/livebook/check.ex` | pending |
-| 87-03 | 03 | 3 | CMP-02 | docs contract/generated docs | `mix test test/docs_contract/comparison_claims_test.exs`; `mix run scripts/verify_docs.exs` | `guides/comparison.md`, `lib/rendro/comparison.ex`, `scripts/verify_docs.exs` | pending |
-| 87-05 | 05 | 4 | CMP-02, CMP-03 | ExDoc/package/CI guardrails | `mix test test/guardrails/required_checks_contract_test.exs test/docs_contract/comparison_claims_test.exs`; package inspection command | `mix.exs`, `README.md`, `.github/workflows/ci.yml`, `priv/guardrails/required_status_checks.json` | pending |
-| 87-06 | 06 | 5 | CMP-01, CMP-02, CMP-03 | final generation/verification | `mix test`; `mix run scripts/verify_docs.exs`; `mix ci`; `mix rendro.comparison.check`; `mix rendro.livebook.check` | final generated assets, guide, notebook, manifest, CI config | pending |
+| 87-01 | 01 | 1 | CMP-01, CMP-02 | scaffold/docs contract | `mix test test/docs_contract/comparison_claims_test.exs test/rendro/comparison_test.exs` | `lib/rendro/comparison.ex`, `test/docs_contract/comparison_claims_test.exs`, `test/rendro/comparison_test.exs`, `bench/results/comparison.json` | passed |
+| 87-02 | 02 | 2 | CMP-01 | benchmark harness | `mix test test/rendro/comparison_test.exs` | `bench/comparison/**`, `bench/results/raw/**`, `bench/results/comparison.json`, `lib/mix/tasks/rendro/comparison/*.ex` | passed |
+| 87-04 | 04 | 2 | CMP-03 | notebook execution/unit | `mix test test/mix/tasks/rendro_livebook_check_test.exs`; `mix rendro.livebook.check` | `guides/livebook/first_invoice.livemd`, `lib/mix/tasks/rendro/livebook/check.ex` | passed |
+| 87-03 | 03 | 3 | CMP-02 | docs contract/generated docs | `mix test test/docs_contract/comparison_claims_test.exs`; `mix run scripts/verify_docs.exs` | `guides/comparison.md`, `lib/rendro/comparison.ex`, `scripts/verify_docs.exs` | passed |
+| 87-05 | 05 | 4 | CMP-02, CMP-03 | ExDoc/package/CI guardrails | `mix test test/guardrails/required_checks_contract_test.exs test/docs_contract/comparison_claims_test.exs`; package inspection command | `mix.exs`, `README.md`, `.github/workflows/ci.yml`, `priv/guardrails/required_status_checks.json` | passed |
+| 87-06 | 06 | 5 | CMP-01, CMP-02, CMP-03 | final generation/verification | `mix test`; `mix run scripts/verify_docs.exs`; `mix ci`; `mix rendro.comparison.check`; `mix rendro.livebook.check` | final generated assets, guide, notebook, manifest, CI config | passed |
 
 ---
 
@@ -67,30 +67,30 @@ tutorial.
 
 | Behavior | Requirement | Automated Check | Status |
 |----------|-------------|-----------------|--------|
-| Manifest covers `rendro`, `chromic_pdf`, `pdf_generator`, `typst_cli` comparators | CMP-01 | `test/rendro/comparison_test.exs` | pending |
-| Manifest includes pinned tool/library versions and environment metadata | CMP-01 | `test/rendro/comparison_test.exs`; `test/docs_contract/comparison_claims_test.exs` | pending |
-| Raw artifact paths have SHA-256 values that match committed files | CMP-01 | `Rendro.Comparison.static_contract_errors/0`; comparison docs-contract test | pending |
-| Whole-process metrics include cold start, RSS/memory, container image size, and dependency count | CMP-01 | comparison manifest tests | pending |
-| Guide generated blocks equal generator output | CMP-02 | `test/docs_contract/comparison_claims_test.exs` | pending |
-| Every `[bench:CMP-*]` citation resolves to a manifest claim | CMP-02 | `test/docs_contract/comparison_claims_test.exs` | pending |
-| Every public docs claim from manifest appears in `guides/comparison.md` | CMP-02 | `test/docs_contract/comparison_claims_test.exs` | pending |
-| Uncited comparative phrases fail the docs contract | CMP-02 | mutation-friendly tests in `test/docs_contract/comparison_claims_test.exs` | pending |
-| Guide praises alternatives where true and includes complex-script/HTML boundaries | CMP-02 | source assertions in docs-contract test | pending |
-| Notebook is listed in ExDoc extras and Hex package contents | CMP-03 | package/extras assertions in docs-contract tests | pending |
-| Notebook uses `Kino.HTML.new/1` and `Kino.Download.new/2` | CMP-03 | notebook static assertions; livebook check script | pending |
-| Notebook executes through `Livebook.live_markdown_to_elixir/1` in advisory lane | CMP-03 | `mix rendro.livebook.check`; CI guardrail test | pending |
-| Benchmark and Livebook advisory jobs are absent from `required_contexts` | CMP-01, CMP-03 | `test/guardrails/required_checks_contract_test.exs` | pending |
-| Required `test` job remains external-tool free | CMP-01, CMP-03 | scoped CI job-block assertions | pending |
+| Manifest covers `rendro`, `chromic_pdf`, `pdf_generator`, `typst_cli` comparators | CMP-01 | `test/rendro/comparison_test.exs` | passed |
+| Manifest includes pinned tool/library versions and environment metadata | CMP-01 | `test/rendro/comparison_test.exs`; `test/docs_contract/comparison_claims_test.exs` | passed |
+| Raw artifact paths have SHA-256 values that match committed files | CMP-01 | `Rendro.Comparison.static_contract_errors/0`; comparison docs-contract test | passed |
+| Whole-process metrics include cold start, RSS/memory, container image size, and dependency count | CMP-01 | comparison manifest tests | passed |
+| Guide generated blocks equal generator output | CMP-02 | `test/docs_contract/comparison_claims_test.exs` | passed |
+| Every `[bench:CMP-*]` citation resolves to a manifest claim | CMP-02 | `test/docs_contract/comparison_claims_test.exs` | passed |
+| Every public docs claim from manifest appears in `guides/comparison.md` | CMP-02 | `test/docs_contract/comparison_claims_test.exs` | passed |
+| Uncited comparative phrases fail the docs contract | CMP-02 | mutation-friendly tests in `test/docs_contract/comparison_claims_test.exs` | passed |
+| Guide praises alternatives where true and includes complex-script/HTML boundaries | CMP-02 | source assertions in docs-contract test | passed |
+| Notebook is listed in ExDoc extras and Hex package contents | CMP-03 | package/extras assertions in docs-contract tests | passed |
+| Notebook uses `Kino.HTML.new/1` and `Kino.Download.new/2` | CMP-03 | notebook static assertions; livebook check script | passed |
+| Notebook executes through `Livebook.live_markdown_to_elixir/1` in advisory lane | CMP-03 | `mix rendro.livebook.check`; CI guardrail test | passed |
+| Benchmark and Livebook advisory jobs are absent from `required_contexts` | CMP-01, CMP-03 | `test/guardrails/required_checks_contract_test.exs` | passed |
+| Required `test` job remains external-tool free | CMP-01, CMP-03 | scoped CI job-block assertions | passed |
 
 ---
 
 ## Wave 0 Requirements
 
-- [ ] `test/docs_contract/comparison_claims_test.exs` - docs-contract scaffold for manifest shape, citations, generated blocks, forbidden overclaims, ExDoc/package links.
-- [ ] `test/rendro/comparison_test.exs` - pure unit tests for manifest helpers, static contract errors, raw hash validation, and generated block helpers.
-- [ ] `bench/results/comparison.json` - committed initial manifest with required schema fields and placeholder raw artifacts only if clearly marked non-public; final plan must replace placeholders with real pinned results before guide publication.
-- [ ] `test/mix/tasks/rendro_livebook_check_test.exs` - runner test seam for `mix rendro.livebook.check`.
-- [ ] Guardrail tests extended for benchmark and Livebook advisory contexts before adding CI jobs.
+- [x] `test/docs_contract/comparison_claims_test.exs` - docs-contract scaffold for manifest shape, citations, generated blocks, forbidden overclaims, ExDoc/package links.
+- [x] `test/rendro/comparison_test.exs` - pure unit tests for manifest helpers, static contract errors, raw hash validation, and generated block helpers.
+- [x] `bench/results/comparison.json` - committed initial manifest with required schema fields and placeholder raw artifacts only if clearly marked non-public; final plan must replace placeholders with real pinned results before guide publication.
+- [x] `test/mix/tasks/rendro_livebook_check_test.exs` - runner test seam for `mix rendro.livebook.check`.
+- [x] Guardrail tests extended for benchmark and Livebook advisory contexts before adding CI jobs.
 
 ---
 
@@ -116,4 +116,4 @@ All contract and rot-prevention behaviors have automated verification. Manual ch
 - [x] Advisory benchmark/Livebook execution remains separated from required deterministic checks.
 - [x] `nyquist_compliant: true` set in frontmatter.
 
-Approval: planned 2026-06-11
+Approval: completed 2026-06-11
