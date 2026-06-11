@@ -41,6 +41,8 @@ SHA-256: `a9f1a241c3fb331ad5522d905af8acf26d9848b8862cb9a6f3e4033c3ee1dc94`
 - [User Flows and Jobs To Be Done](guides/user_flows_and_jtbd.md) — the shortest path to understanding which Rendro workflow fits your SaaS use case.
 - [Branding](guides/branding.md) — register fonts and logo assets, then use the branded invoice recipe.
 - [Integrations](guides/integrations.md) — optional adapters for Phoenix ecosystem workflows such as Oban, Threadline, Mailglass, and signing.
+- [Generating PDFs in Elixir without Chrome](guides/comparison.md) — an evidence-backed comparison guide for Rendro, ChromicPDF, pdf_generator, and Typst CLI.
+- [First Invoice Livebook](guides/livebook/first_invoice.livemd) — a zero-friction tutorial for rendering and downloading a deterministic invoice PDF.
 - [API Stability and Support Boundaries](guides/api_stability.md) — the canonical support language for trust-sensitive and proof-backed surfaces.
 
 ## Getting Started with the Builder API

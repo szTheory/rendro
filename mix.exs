@@ -82,6 +82,7 @@ defmodule Rendro.MixProject do
         lib
         assets/rendro
         priv/branded
+        bench/results
         guides
         .formatter.exs
         mix.exs
@@ -101,6 +102,8 @@ defmodule Rendro.MixProject do
       skip_undefined_reference_warnings_on: [
         "guides/branding.md",
         "guides/integrations.md",
+        "guides/comparison.md",
+        "guides/livebook/first_invoice.livemd",
         "guides/page_primitive.md",
         "guides/recipes.md",
         "guides/user_flows_and_jtbd.md",
@@ -119,13 +122,19 @@ defmodule Rendro.MixProject do
         "guides/viewer_evidence.md",
         "guides/page_primitive.md",
         "guides/recipes.md",
-        "guides/user_flows_and_jtbd.md"
+        "guides/user_flows_and_jtbd.md",
+        "guides/comparison.md",
+        "guides/livebook/first_invoice.livemd"
       ],
       groups_for_extras: [
         Guides: [
           "guides/branding.md",
           "guides/integrations.md",
           "guides/user_flows_and_jtbd.md"
+        ],
+        Evaluation: [
+          "guides/comparison.md",
+          "guides/livebook/first_invoice.livemd"
         ],
         Policies: [
           "guides/api_stability.md",

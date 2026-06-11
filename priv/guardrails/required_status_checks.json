@@ -58,6 +58,20 @@
       "ci_job": "raster-advisory",
       "command": "mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs && mix rendro.launch_artifacts.check",
       "notes": "Phase 85 deterministic raster snapshots and Phase 86 launch artifact PNG/hash checks; not required on main. Pdfium download or check failures must never block engine merges."
+    },
+    {
+      "name": "comparison-advisory",
+      "semantic_class": "comparison_static_advisory",
+      "ci_job": "comparison-advisory",
+      "command": "mix rendro.comparison.check",
+      "notes": "Phase 87 comparison evidence static check; not required on main and must not rerun external benchmarks."
+    },
+    {
+      "name": "livebook-advisory",
+      "semantic_class": "livebook_execution",
+      "ci_job": "livebook-advisory",
+      "command": "mix rendro.livebook.check",
+      "notes": "Phase 87 Livebook tutorial static execution check; not required on main and must not start a Livebook server."
     }
   ],
   "supersedes_planning_refs": {

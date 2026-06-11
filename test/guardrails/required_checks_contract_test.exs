@@ -57,6 +57,33 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert raster["notes"] =~ "Phase 86"
       assert raster["notes"] =~ "not required"
     end
+
+    test "comparison and livebook checks remain advisory and non-required" do
+      baseline = load_baseline!()
+
+      expected_advisory_contexts = [
+        {"comparison-advisory", "comparison_static_advisory", "mix rendro.comparison.check"},
+        {"livebook-advisory", "livebook_execution", "mix rendro.livebook.check"}
+      ]
+
+      for {name, semantic_class, command} <- expected_advisory_contexts do
+        context = advisory_context!(baseline, name)
+
+        assert context["semantic_class"] == semantic_class
+        assert context["ci_job"] == name
+        assert context["command"] == command
+        assert context["notes"] =~ "Phase 87"
+        assert context["notes"] =~ "not required"
+        refute name in baseline["required_contexts"]
+      end
+    end
+
+    test "ci.yml parses as YAML" do
+      ci = File.read!(@ci_path)
+
+      assert {:ok, %{"jobs" => jobs}} = YamlElixir.read_from_string(ci)
+      assert is_map(jobs)
+    end
   end
 
   describe "ci.yml job names" do
@@ -65,7 +92,13 @@ defmodule Guardrails.RequiredChecksContractTest do
 
       for job <-
             @required_contexts ++
-              ["viewer-evidence-live-proof", "example-phoenix", "raster-advisory"] do
+              [
+                "viewer-evidence-live-proof",
+                "example-phoenix",
+                "raster-advisory",
+                "comparison-advisory",
+                "livebook-advisory"
+              ] do
         assert ci =~ "  #{job}:"
       end
     end
@@ -160,7 +193,15 @@ defmodule Guardrails.RequiredChecksContractTest do
         "pdfium-cli",
         "curl -fsSL",
         "rendro.launch_artifacts.check",
-        "Rendro.Adapters.Pdfium.render"
+        "Rendro.Adapters.Pdfium.render",
+        "rendro.comparison.check",
+        "rendro.livebook.check",
+        "chrome",
+        "wkhtmltopdf",
+        "typst",
+        "Livebook",
+        "Kino",
+        "docker"
       ]
 
       for fragment <- forbidden_required_fragments do
@@ -180,14 +221,32 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert raster_block =~ "mix rendro.launch_artifacts.check"
       refute raster_block =~ ~r/^\s+needs:/m
     end
+
+    test "comparison and livebook advisory jobs are graph-disconnected and non-blocking" do
+      ci = File.read!(@ci_path)
+
+      expected_advisory_jobs = [
+        {"comparison-advisory", "mix rendro.comparison.check"},
+        {"livebook-advisory", "mix rendro.livebook.check"}
+      ]
+
+      for {job, command} <- expected_advisory_jobs do
+        block = ci_job_block!(ci, job)
+
+        assert block =~ "continue-on-error: true"
+        assert block =~ "run: mix deps.get"
+        assert block =~ "run: #{command}"
+        refute block =~ ~r/^\s+needs:/m
+      end
+    end
   end
 
   describe "baseline ci_job alignment" do
-    test "each contexts[].ci_job exists in ci.yml" do
+    test "each required and advisory ci_job exists in ci.yml" do
       baseline = load_baseline!()
       ci = File.read!(@ci_path)
 
-      for context <- baseline["contexts"] do
+      for context <- baseline["contexts"] ++ baseline["advisory_contexts"] do
         assert ci =~ "  #{context["ci_job"]}:"
       end
     end

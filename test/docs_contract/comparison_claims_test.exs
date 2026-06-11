@@ -1,7 +1,10 @@
 defmodule Rendro.DocsContract.ComparisonClaimsTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   @guide_path "guides/comparison.md"
+  @livebook_path "guides/livebook/first_invoice.livemd"
+  @manifest_path "bench/results/comparison.json"
+  @readme_path "README.md"
   @required_sections [
     "The Short Version",
     "Choose By Job",
@@ -140,6 +143,53 @@ defmodule Rendro.DocsContract.ComparisonClaimsTest do
              ~r/\{"Comparison claims lane",\s*\["test",\s*"test\/docs_contract\/comparison_claims_test\.exs"\]\}/s
   end
 
+  test "ExDoc registers comparison guide and Livebook tutorial as evaluation extras" do
+    docs = Rendro.MixProject.project() |> Keyword.fetch!(:docs)
+    extras = Keyword.fetch!(docs, :extras)
+    groups = Keyword.fetch!(docs, :groups_for_extras)
+
+    assert @guide_path in extras
+    assert @livebook_path in extras
+
+    assert Keyword.fetch!(groups, :Evaluation) == [
+             @guide_path,
+             @livebook_path
+           ]
+  end
+
+  test "README Guides section links to comparison guide and Livebook tutorial" do
+    guides_section = readme_guides_section()
+
+    assert guides_section =~ @guide_path
+    assert guides_section =~ @livebook_path
+    assert guides_section =~ "Generating PDFs in Elixir without Chrome"
+    assert guides_section =~ "First Invoice Livebook"
+  end
+
+  test "hex package includes comparison guide, notebook, manifest, and raw artifacts" do
+    tarball = "rendro-#{Mix.Project.config()[:version]}.tar"
+    File.rm(tarball)
+    on_exit(fn -> File.rm(tarball) end)
+
+    {output, 0} = System.cmd("mix", ["hex.build"], stderr_to_stdout: true)
+    assert output =~ tarball
+    assert File.exists?(tarball)
+
+    list_cmd = "tar -xOf #{tarball} contents.tar.gz | tar -tzf -"
+    {contents, 0} = System.cmd("sh", ["-c", list_cmd], stderr_to_stdout: true)
+
+    expected_paths =
+      [
+        @guide_path,
+        @livebook_path,
+        @manifest_path
+      ] ++ manifest_raw_artifacts()
+
+    for path <- expected_paths do
+      assert contents =~ path
+    end
+  end
+
   defp extract_block(content, {start_marker, end_marker}) do
     pattern = ~r/#{Regex.escape(start_marker)}.*?#{Regex.escape(end_marker)}/s
 
@@ -153,5 +203,23 @@ defmodule Rendro.DocsContract.ComparisonClaimsTest do
     line
     |> String.downcase()
     |> String.contains?(String.downcase(phrase))
+  end
+
+  defp manifest_raw_artifacts do
+    Rendro.Comparison.read_manifest!()
+    |> Map.fetch!("results")
+    |> Enum.map(&Map.fetch!(&1, "raw_artifact"))
+    |> Enum.uniq()
+  end
+
+  defp readme_guides_section do
+    readme = File.read!(@readme_path)
+
+    pattern = ~r/## Guides\n(?<section>.*?)\n## Getting Started with the Builder API/s
+
+    case Regex.named_captures(pattern, readme) do
+      %{"section" => section} -> section
+      _ -> flunk("expected README Guides section before Builder API section")
+    end
   end
 end
