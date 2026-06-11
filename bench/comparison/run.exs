@@ -76,6 +76,10 @@ defmodule Rendro.Comparison.Runner do
       abort!("typst executable is required. Install it with `brew install typst`.")
     end
 
+    if "rendro" in selected do
+      compile_rendro!()
+    end
+
     fixture = @fixture_path |> File.read!() |> JSON.decode!()
     html = render_html_fixtures!(fixture)
     docker_info = docker_image_info()
@@ -482,6 +486,13 @@ defmodule Rendro.Comparison.Runner do
 
     if status != 0 do
       abort!("could not build #{@docker_image}:\n#{output}")
+    end
+  end
+
+  defp compile_rendro! do
+    case System.cmd("mix", ["compile"], stderr_to_stdout: true) do
+      {_output, 0} -> :ok
+      {output, _status} -> abort!("could not compile Rendro before benchmark:\n#{output}")
     end
   end
 
