@@ -195,7 +195,7 @@ Plans:
 | 83. Claim-Accuracy & Shaping Hygiene | v2.6 | 5/5 | Complete    | 2026-06-10 |
 | 84. Drawn-Path Primitive & Visible Polish | v2.6 | 5/5 | Complete   | 2026-06-10 |
 | 85. Deterministic Raster Lane | v2.6 | 6/6 | Complete    | 2026-06-11 |
-| 86. Self-Proving Launch Artifacts | v2.6 | 3/5 | In Progress|  |
+| 86. Self-Proving Launch Artifacts | v2.6 | 4/5 | In Progress|  |
 | 87. Comparison Page & Livebook | v2.6 | 0/? | Not started | - |
 | 88. Launch Execution & Demand Instrumentation | v2.6 | 0/? | Not started | - |
 
