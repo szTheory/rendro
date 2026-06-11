@@ -4,15 +4,35 @@
 [![Hex.pm](https://img.shields.io/hexpm/v/rendro.svg)](https://hex.pm/packages/rendro)
 [![HexDocs](https://img.shields.io/badge/hex--docs-purple.svg)](https://hexdocs.pm/rendro)
 
-Pure-Elixir PDF generation with deterministic layout and pagination.
+Native PDF layout for Elixir.
+
+Rendro is an open-source, Elixir-native PDF layout library for Phoenix teams that need reliable PDFs without Chrome.
 
 ## Features
 
-- **Pure Elixir:** No external dependencies like headless Chrome or wkhtmltopdf.
-- **Deterministic:** Same input produces the same binary output (ID, timestamps, dictionary order).
-- **Builder API:** Compose documents via a pipeable `Rendro.Document` API, mirroring `Plug.Conn` ergonomics.
-- **Tiered Composition:** Canonical recipes expose `document/2`, `page_template/1`, and `sections/2` for zero-to-one and advanced escape-hatch use.
-- **Production-Ready:** Built-in telemetry, structured diagnostics, and policies.
+- **Elixir-native core:** Build PDFs from data and components without headless Chrome or wkhtmltopdf.
+- **Deterministic output:** Same input, same binary output when rendered with deterministic options.
+- **Flow and pagination:** Compose fixed-position and flow documents with explicit break semantics.
+- **Canonical recipes:** Use `document/2`, `page_template/1`, and `sections/2` escape hatches for invoices, statements, receipts, reports, and certificates.
+- **Operational proof:** Telemetry, diagnostics, support boundaries, and docs-contract checks keep public claims auditable.
+
+<!-- rendro-launch-artifacts-start -->
+## Rendered Recipe Gallery
+
+These previews are rendered by Rendro from deterministic recipe fixtures. Source PDFs are byte-checked by the docs contract; the PNG rasters are regenerated through the pinned `pdfium-render` advisory lane.
+
+<p>
+<a href="assets/rendro/gallery/invoice.png"><img src="assets/rendro/gallery/invoice.png" alt="Rendered invoice PDF showing invoice header, line-item table, and thank-you footer." width="150"></a>
+<a href="assets/rendro/gallery/branded_invoice.png"><img src="assets/rendro/gallery/branded_invoice.png" alt="Rendered branded invoice PDF showing Rendro logo, embedded brand font, and invoice table." width="150"></a>
+<a href="assets/rendro/gallery/statement.png"><img src="assets/rendro/gallery/statement.png" alt="Rendered account statement PDF showing transaction rows, running balances, and Page 1 of 2 footer." width="150"></a>
+<a href="assets/rendro/gallery/receipt_report.png"><img src="assets/rendro/gallery/receipt_report.png" alt="Rendered receipt report PDF showing repeated table header, line items, totals, and Page 1 of 2 footer." width="150"></a>
+<a href="assets/rendro/gallery/certificate.png"><img src="assets/rendro/gallery/certificate.png" alt="Rendered landscape certificate PDF showing recipient text and geometry-derived keyline border." width="150"></a>
+</p>
+
+Self-rendered manual: [manual.pdf](assets/rendro/manual.pdf)
+
+SHA-256: `9e2922d281723c10143fdab644657202a73125d8378957836aa17c1377ab3468`
+<!-- rendro-launch-artifacts-end -->
 
 ## Guides
 
@@ -228,7 +248,8 @@ Rendro tables are intentionally narrow and focused on deterministic data reporti
 - **Explicit columns:** You must provide `columns:` with `{:fixed, points}` or `{:share, weight}`. There is no content-based auto-sizing.
 - **Atomic rows:** Rows do not fragment across pages. If a single row exceeds the available region height, it produces a layout error instead of silently truncating.
 - **Repeated headers:** If a table splits across pages, the `header:` row repeats automatically.
-- **No styling DSL:** There is no border, shading, or CSS-like styling DSL on the table struct itself.
+- **Opt-in rules and shading:** `borders:`, `border_style:`, and `header_fill:` provide deterministic table polish without changing borderless defaults.
+- **No CSS-like styling DSL:** There is no per-cell CSS cascade or browser-style layout model.
 - **No continuation chrome:** There are no automatic "continued on next page" labels.
 
 ### Fixed-Position API

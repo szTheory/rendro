@@ -1,13 +1,69 @@
 # Canonical Recipes
 
-Rendro ships four canonical recipes on the three-rung escape-hatch pattern
-(`document/2` → `page_template/1` → `sections/2`). Each recipe accepts a
-validated data map and returns a fully assembled `%Rendro.Document{}` ready
-for `Rendro.render/1`.
+Rendro ships canonical recipes on the three-rung escape-hatch pattern
+(`document/2` → `page_template/1` → `sections/2`). This guide includes five rendered gallery entries, including a branded invoice variant, so you can see the launch fixtures while still using canonical recipe defaults in code.
 
 The capabilities claimed in this guide are bounded by `priv/support_matrix.json`.
 Supported capabilities are backed by on-disk proof in the corresponding evidence
 test files. Claims that exceed the support matrix are not made here.
+
+<!-- rendro-recipe-gallery-start -->
+## Rendered Gallery
+
+These images are generated from the current recipe code and recorded in `assets/rendro/artifacts.json`. The required docs contract byte-checks the source PDFs and manifest; the advisory pdfium lane regenerates the PNG rasters.
+
+### Invoice
+
+<a href="assets/rendro/gallery/invoice.png"><img src="assets/rendro/gallery/invoice.png" alt="Rendered invoice PDF showing invoice header, line-item table, and thank-you footer." width="320"></a>
+
+Standard invoice from Elixir data through the canonical Invoice recipe.
+
+- Source PDF SHA-256: `ac8122ea63dabe8ddb1a0782e519a2932c7a49edaec9e62a1a32d1fc934b2229`
+- PNG SHA-256: `bf85d6408ff1cef9ed25638b3c089b528631e78becb2deb39e57ea77c27f0f1c`
+
+### Branded Invoice
+
+<a href="assets/rendro/gallery/branded_invoice.png"><img src="assets/rendro/gallery/branded_invoice.png" alt="Rendered branded invoice PDF showing Rendro logo, embedded brand font, and invoice table." width="320"></a>
+
+Branded invoice with registered font and logo assets.
+
+- Source PDF SHA-256: `94bfc5d95df476211ecf14db862c75cbdb49a50f057916064a145744b6cbf298`
+- PNG SHA-256: `5f1662db6901235e6ecbb8ebc8680311acb0fc78daee0f44cce7b6ab41265edd`
+
+### Statement
+
+<a href="assets/rendro/gallery/statement.png"><img src="assets/rendro/gallery/statement.png" alt="Rendered account statement PDF showing transaction rows, running balances, and Page 1 of 2 footer." width="320"></a>
+
+Multi-page statement with carried-forward balances and running page numbers.
+
+- Source PDF SHA-256: `6ebb66d1cf633dff677bef6a8efaaead289669c640757b3f2fd5db9a21af10c8`
+- PNG SHA-256: `af189c763228f59bf983c88179c3b68247ed0f2b1f3bb4bfaa54e5af6f249bde`
+
+### Receipt / Report
+
+<a href="assets/rendro/gallery/receipt_report.png"><img src="assets/rendro/gallery/receipt_report.png" alt="Rendered receipt report PDF showing repeated table header, line items, totals, and Page 1 of 2 footer." width="320"></a>
+
+Receipt recipe scaled into a multi-page tabular report.
+
+- Source PDF SHA-256: `c1ca4aa3342a7347c6a1c5a68130e17821e2af44b21909ad224f95f7f797cc0f`
+- PNG SHA-256: `a08471f68df1265e246b6fcddff1629290a51d2cd1d7fc5fc8ab688ea322a29b`
+
+### Certificate
+
+<a href="assets/rendro/gallery/certificate.png"><img src="assets/rendro/gallery/certificate.png" alt="Rendered landscape certificate PDF showing recipient text and geometry-derived keyline border." width="320"></a>
+
+Landscape certificate with a Path-backed, geometry-derived border frame.
+
+- Source PDF SHA-256: `51b43c00c1e7afba093c6f6a682630576c639fb65912f504ddc9c6c6db0d3c95`
+- PNG SHA-256: `7194ebe35228f4026cc804b0b38913545ef997335d08f6d579f5d450a5c3fcf4`
+
+
+## Self-Rendered Manual
+
+Rendro also renders its own compact launch manual: [manual.pdf](assets/rendro/manual.pdf).
+
+SHA-256: `9e2922d281723c10143fdab644657202a73125d8378957836aa17c1377ab3468`
+<!-- rendro-recipe-gallery-end -->
 
 ## Statement
 
