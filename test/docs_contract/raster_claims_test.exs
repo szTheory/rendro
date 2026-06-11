@@ -1,9 +1,7 @@
 defmodule Rendro.DocsContract.RasterClaimsTest do
   use ExUnit.Case, async: true
 
-  # Test 1: RED in Plan 01 — raster section added to support_matrix.json in Plan 03
-  # @tag :skip removed in Plan 03 once support_matrix.json has the raster section
-  @tag :skip
+  # Test 1: GREEN in Plan 03 — raster section added to support_matrix.json in Plan 03
   test "support matrix has raster section with boundary declarations" do
     matrix = File.read!("priv/support_matrix.json")
 
@@ -44,10 +42,22 @@ defmodule Rendro.DocsContract.RasterClaimsTest do
   end
 
   # Test 5: PASSES in Plan 01 — no GUI-viewer rows carry pdfium-render viewer_kind
+  # Note: uses parsed JSON to check viewer_map rows specifically (regex approach breaks
+  # once the raster section adds a top-level evidence.viewer_kind of "pdfium-render")
   test "GUI-viewer rows do not carry viewer_kind pdfium-render" do
-    matrix = File.read!("priv/support_matrix.json")
+    matrix = File.read!("priv/support_matrix.json") |> JSON.decode!()
 
-    refute matrix =~ ~r/"forms".*?"viewer_kind"\s*:\s*"pdfium-render"/s
+    viewer_sections = ["forms", "signing", "signing_preparation", "embedded_files", "links", "protection"]
+
+    for section_key <- viewer_sections do
+      section = Map.get(matrix, section_key, %{})
+      viewers = Map.get(section, "viewers", %{})
+
+      for {viewer, row} <- viewers do
+        refute Map.get(row, "viewer_kind") == "pdfium-render",
+               "GUI-viewer row #{section_key}.viewers.#{viewer} must not carry viewer_kind pdfium-render"
+      end
+    end
   end
 
   # Test 6: RED in Plan 01 — verify_docs.exs lane registration added in Plan 03

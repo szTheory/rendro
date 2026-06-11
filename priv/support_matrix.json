@@ -479,5 +479,26 @@
   "unsupported": [
     "full_pdf_compliance",
     "digital_signatures"
-  ]
+  ],
+  "raster": {
+    "renderer": "pdfium-render",
+    "capabilities": {
+      "pdf_to_png": "supported",
+      "dpi_configurable": "supported",
+      "page_range": "supported",
+      "byte_deterministic_on_pinned_container": "supported"
+    },
+    "boundaries": {
+      "gui_viewer_equivalence": "unsupported",
+      "adobe_acrobat_visual_fidelity_claim": "unsupported",
+      "apple_preview_visual_fidelity_claim": "unsupported"
+    },
+    "evidence": {
+      "renderer_version": "v0.11.0",
+      "viewer_kind": "pdfium-render",
+      "platform": "Linux (x86_64) — CI container only",
+      "dpi": 150,
+      "notes": "pdfium-render evidence records what the pdfium engine renders. It does not claim GUI-viewer visual fidelity for Adobe Acrobat, Apple Preview, or Chrome PDF viewer."
+    }
+  }
 }
