@@ -191,7 +191,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 87-01-PLAN.md - Static comparison proof scaffold: claim registry, manifest fixture, docs contract baseline
+- [x] 87-01-PLAN.md - Static comparison proof scaffold: claim registry, manifest fixture, docs contract baseline
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -236,7 +236,7 @@ Plans:
 | 84. Drawn-Path Primitive & Visible Polish | v2.6 | 5/5 | Complete   | 2026-06-10 |
 | 85. Deterministic Raster Lane | v2.6 | 6/6 | Complete    | 2026-06-11 |
 | 86. Self-Proving Launch Artifacts | v2.6 | 5/5 | Complete   | 2026-06-11 |
-| 87. Comparison Page & Livebook | v2.6 | 0/6 | Ready to execute | - |
+| 87. Comparison Page & Livebook | v2.6 | 1/6 | In Progress|  |
 | 88. Launch Execution & Demand Instrumentation | v2.6 | 0/? | Not started | - |
 
 ---
