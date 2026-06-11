@@ -126,7 +126,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 85-01-PLAN.md — Wave 0 test scaffolding: pdfium_raster_snapshot_test.exs stubs, raster_claims_test.exs stubs, pdfium_pin.json, raster_refs/.gitkeep
+- [x] 85-01-PLAN.md — Wave 0 test scaffolding: pdfium_raster_snapshot_test.exs stubs, raster_claims_test.exs stubs, pdfium_pin.json, raster_refs/.gitkeep
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -189,7 +189,7 @@ Plans:
 | 82. 1.0.0 Consolidation & Publish | v2.5 | 3/3 | Complete | 2026-06-05 |
 | 83. Claim-Accuracy & Shaping Hygiene | v2.6 | 5/5 | Complete    | 2026-06-10 |
 | 84. Drawn-Path Primitive & Visible Polish | v2.6 | 5/5 | Complete   | 2026-06-10 |
-| 85. Deterministic Raster Lane | v2.6 | 0/? | Not started | - |
+| 85. Deterministic Raster Lane | v2.6 | 1/4 | In Progress|  |
 | 86. Self-Proving Launch Artifacts | v2.6 | 0/? | Not started | - |
 | 87. Comparison Page & Livebook | v2.6 | 0/? | Not started | - |
 | 88. Launch Execution & Demand Instrumentation | v2.6 | 0/? | Not started | - |

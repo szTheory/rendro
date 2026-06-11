@@ -26,9 +26,9 @@ Requirements for the v2.6 milestone. Each maps to exactly one roadmap phase.
 
 ### Deterministic Raster Lane (RAST)
 
-- [ ] **RAST-01**: `Rendro.Adapters.Pdfium` gains `render/2` producing PNG rasters via a version+sha256-pinned pdfium-cli.
-- [ ] **RAST-02**: A golden-PNG snapshot harness runs in `mix test` (small committed refs, pinned-CI-only bless command, hash-equality fast path) in an advisory CI lane that never gates the four required engine lanes.
-- [ ] **RAST-03**: The viewer-evidence vocabulary gains an automated `viewer_kind: "pdfium-render"` distinct from GUI observation (evidence records renderer, version, dpi, png_sha256), with a docs-contract guard preventing raster evidence from upgrading GUI-viewer claims.
+- [x] **RAST-01**: `Rendro.Adapters.Pdfium` gains `render/2` producing PNG rasters via a version+sha256-pinned pdfium-cli.
+- [x] **RAST-02**: A golden-PNG snapshot harness runs in `mix test` (small committed refs, pinned-CI-only bless command, hash-equality fast path) in an advisory CI lane that never gates the four required engine lanes.
+- [x] **RAST-03**: The viewer-evidence vocabulary gains an automated `viewer_kind: "pdfium-render"` distinct from GUI observation (evidence records renderer, version, dpi, png_sha256), with a docs-contract guard preventing raster evidence from upgrading GUI-viewer claims.
 
 ### Self-Proving Launch Artifacts (GAL)
 
@@ -84,9 +84,9 @@ Deferred to future milestones. Tracked but not in the current roadmap.
 | PATH-02 | Phase 84 | Pending |
 | PATH-03 | Phase 84 | Pending |
 | PATH-04 | Phase 84 | Pending |
-| RAST-01 | Phase 85 | Pending |
-| RAST-02 | Phase 85 | Pending |
-| RAST-03 | Phase 85 | Pending |
+| RAST-01 | Phase 85 | Complete |
+| RAST-02 | Phase 85 | Complete |
+| RAST-03 | Phase 85 | Complete |
 | GAL-01 | Phase 86 | Pending |
 | GAL-02 | Phase 86 | Pending |
 | GAL-03 | Phase 86 | Pending |

@@ -2,15 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.6
 milestone_name: Public Launch & Adoption Bootstrap
-status: completed
-stopped_at: Phase 84 context gathered
-last_updated: "2026-06-10T21:26:25.872Z"
-last_activity: 2026-06-10 -- Phase 84 marked complete
+status: executing
+last_updated: "2026-06-11T00:11:09.945Z"
+last_activity: 2026-06-11
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 14
+  completed_plans: 11
   percent: 33
 ---
 
@@ -21,16 +20,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-10 — v2.6 milestone started)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 84 — drawn-path-primitive-visible-polish
+**Current focus:** Phase 85 — deterministic-raster-lane
 
 ## Current Position
 
-Phase: 84 — COMPLETE
-Plan: 1 of 5
-Status: Phase 84 complete
-Last activity: 2026-06-10 -- Phase 84 marked complete
+Phase: 85 (deterministic-raster-lane) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-06-11
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [████████░░] 79%
 
 ## Milestone Snapshot
 
@@ -60,6 +59,7 @@ Full decision log in PROJECT.md Key Decisions table. v2.6 scoping decisions (loc
 - Raster lane is always advisory — `pdfium-render` evidence vocabulary stays distinct from GUI-viewer proof; a pdfium download failure must never block the four required engine lanes.
 - Benchmark guide is honest about ChromicPDF's strengths; unfair benchmarks poison the launch.
 - Demand gate thresholds (LNCH-03) must be concrete and numeric — "adopter demand" failed as a gate before.
+- [Phase ?]: Used @tag :skip for RED Wave 0 test stubs — :pending not in ExUnit exclude list; :skip ensures mix test exits 0 during Wave 0 scaffolding
 
 ### Pending Todos
 
@@ -87,6 +87,12 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-06-10T19:32:33.742Z
-Stopped at: Phase 84 context gathered
-Resume file: .planning/phases/84-drawn-path-primitive-visible-polish/84-CONTEXT.md
+Last session: 2026-06-11T00:11:09.940Z
+Stopped at: Phase 85 Plan 01 complete — Wave 0 test scaffolding done
+Resume file: None
+
+## Performance Metrics
+
+| Phase | Plan | Duration | Notes |
+|-------|------|----------|-------|
+| Phase 85-deterministic-raster-lane P01 | 4 | 2 tasks | 6 files |
