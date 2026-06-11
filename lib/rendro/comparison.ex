@@ -49,6 +49,46 @@ defmodule Rendro.Comparison do
     |> JSON.decode!()
   end
 
+  @spec write_manifest!(map()) :: :ok
+  def write_manifest!(manifest) when is_map(manifest) do
+    File.write!(@manifest_path, encode_manifest(manifest) <> "\n")
+  end
+
+  @spec encode_manifest(map()) :: String.t()
+  def encode_manifest(manifest) when is_map(manifest) do
+    manifest
+    |> normalize_for_json()
+    |> Jason.encode!(pretty: true)
+  end
+
+  @spec check() :: :ok | {:error, [String.t()]}
+  def check do
+    case static_contract_errors() do
+      [] -> :ok
+      errors -> {:error, errors}
+    end
+  end
+
+  @spec generate(keyword()) :: :ok | {:error, [String.t()]}
+  def generate(opts \\ []) do
+    if Keyword.get(opts, :skip_external, false) do
+      manifest = read_manifest!()
+
+      case public_claims(manifest) do
+        [] ->
+          write_manifest!(manifest)
+
+        _claims ->
+          {:error, ["--skip-external cannot write a manifest with public claims"]}
+      end
+    else
+      {:error,
+       [
+         "benchmark execution is handled by bench/comparison/run.exs; run the documented pinned command"
+       ]}
+    end
+  end
+
   @spec static_contract_errors() :: [String.t()]
   def static_contract_errors do
     if File.exists?(@manifest_path) do
@@ -421,6 +461,17 @@ defmodule Rendro.Comparison do
   defp sha256(binary), do: :crypto.hash(:sha256, binary) |> Base.encode16(case: :lower)
   defp add_error_unless(errors, true, _message), do: errors
   defp add_error_unless(errors, false, message), do: errors ++ [message]
+
+  defp normalize_for_json(map) when is_map(map) do
+    map
+    |> Enum.sort_by(fn {key, _value} -> to_string(key) end)
+    |> Enum.map(fn {key, value} -> {key, normalize_for_json(value)} end)
+    |> then(&%Jason.OrderedObject{values: &1})
+  end
+
+  defp normalize_for_json(list) when is_list(list), do: Enum.map(list, &normalize_for_json/1)
+  defp normalize_for_json(value), do: value
+
   defp map_or_empty(value) when is_map(value), do: value
   defp map_or_empty(_value), do: %{}
   defp list_or_empty(value) when is_list(value), do: value

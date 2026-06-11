@@ -11,6 +11,42 @@ defmodule Rendro.ComparisonTest do
     assert Rendro.Comparison.static_contract_errors() == []
   end
 
+  test "check returns ok for the committed manifest" do
+    assert Rendro.Comparison.check() == :ok
+  end
+
+  test "manifest encoding is deterministic" do
+    manifest = Rendro.Comparison.read_manifest!()
+
+    assert Rendro.Comparison.encode_manifest(manifest) ==
+             Rendro.Comparison.encode_manifest(manifest)
+  end
+
+  test "skip-external generation refuses public claims" do
+    manifest =
+      Map.put(Rendro.Comparison.read_manifest!(), "claims", [
+        %{
+          "id" => "CMP-COLD-START-001",
+          "public" => true,
+          "text" => "A measured claim.",
+          "scope" => "Pinned invoice harness.",
+          "evidence" => [%{"metric" => "cold_start_ms"}]
+        }
+      ])
+
+    path = Rendro.Comparison.manifest_path()
+    original = File.read!(path)
+
+    try do
+      File.write!(path, Jason.encode!(manifest))
+
+      assert {:error, [message]} = Rendro.Comparison.generate(skip_external: true)
+      assert message =~ "--skip-external"
+    after
+      File.write!(path, original)
+    end
+  end
+
   test "static contract catches missing schema version" do
     manifest = Map.delete(Rendro.Comparison.read_manifest!(), "schema_version")
 
