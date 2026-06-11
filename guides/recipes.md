@@ -10,7 +10,9 @@ test files. Claims that exceed the support matrix are not made here.
 <!-- rendro-recipe-gallery-start -->
 ## Rendered Gallery
 
-These images are generated from the current recipe code and recorded in `assets/rendro/artifacts.json`. The required docs contract byte-checks the source PDFs and manifest; the advisory pdfium lane regenerates the PNG rasters.
+These previews are rendered by Rendro from curated deterministic recipe fixtures and recorded in `assets/rendro/artifacts.json`.
+
+Source PDFs and the self-rendered manual are byte-checked by the required docs contract. PNG rasters are regenerated and hash-checked in the pinned pdfium-render advisory lane. pdfium-render rasters are render proof, not GUI-viewer proof. Launch fixtures may use opt-in table polish; canonical recipe defaults remain unchanged.
 
 ### Invoice
 
@@ -18,8 +20,8 @@ These images are generated from the current recipe code and recorded in `assets/
 
 Standard invoice from Elixir data through the canonical Invoice recipe.
 
-- Source PDF SHA-256: `ac8122ea63dabe8ddb1a0782e519a2932c7a49edaec9e62a1a32d1fc934b2229`
-- PNG SHA-256: `bf85d6408ff1cef9ed25638b3c089b528631e78becb2deb39e57ea77c27f0f1c`
+- Source PDF SHA-256: `fc65ac5688462a77e1cc3cdfd8cb25e8ac1d61677d430615443c23f565068105`
+- PNG SHA-256: `8acf5472e4c7a7ec6d04843464536b3f291e8cfc0d2c7fe8040913af4e648988`
 
 ### Branded Invoice
 
@@ -27,8 +29,8 @@ Standard invoice from Elixir data through the canonical Invoice recipe.
 
 Branded invoice with registered font and logo assets.
 
-- Source PDF SHA-256: `94bfc5d95df476211ecf14db862c75cbdb49a50f057916064a145744b6cbf298`
-- PNG SHA-256: `5f1662db6901235e6ecbb8ebc8680311acb0fc78daee0f44cce7b6ab41265edd`
+- Source PDF SHA-256: `9bc4a0ea94e2a7cb09dbeeaf5f57b24f624a34a2c7d8012343bca1c66c8e95c9`
+- PNG SHA-256: `3618e386c02b622dddb785ead24843481aa963e91653614aeab22287354138b5`
 
 ### Statement
 
@@ -36,8 +38,8 @@ Branded invoice with registered font and logo assets.
 
 Multi-page statement with carried-forward balances and running page numbers.
 
-- Source PDF SHA-256: `6ebb66d1cf633dff677bef6a8efaaead289669c640757b3f2fd5db9a21af10c8`
-- PNG SHA-256: `af189c763228f59bf983c88179c3b68247ed0f2b1f3bb4bfaa54e5af6f249bde`
+- Source PDF SHA-256: `fa4fd6f3d84ccdccc8a1812c0212a9b17820cd25ffb615519154e9dd3792b835`
+- PNG SHA-256: `ec13a842b4ea48308ec682f4765c17fa3b70f75efb58739c3f9eb1a6d8963ec0`
 
 ### Receipt / Report
 
@@ -45,8 +47,8 @@ Multi-page statement with carried-forward balances and running page numbers.
 
 Receipt recipe scaled into a multi-page tabular report.
 
-- Source PDF SHA-256: `c1ca4aa3342a7347c6a1c5a68130e17821e2af44b21909ad224f95f7f797cc0f`
-- PNG SHA-256: `a08471f68df1265e246b6fcddff1629290a51d2cd1d7fc5fc8ab688ea322a29b`
+- Source PDF SHA-256: `68f3a44f655c4783bc9bd94ad3c37675edb09cfbe92009b2a54e4a35a91258b5`
+- PNG SHA-256: `c2af63ac8460c85f8eb51240567d06ab71b72fd69be337bc165884f4af98c1c4`
 
 ### Certificate
 
@@ -62,7 +64,7 @@ Landscape certificate with a Path-backed, geometry-derived border frame.
 
 Rendro also renders its own compact launch manual: [manual.pdf](assets/rendro/manual.pdf).
 
-SHA-256: `9e2922d281723c10143fdab644657202a73125d8378957836aa17c1377ab3468`
+SHA-256: `a9f1a241c3fb331ad5522d905af8acf26d9848b8862cb9a6f3e4033c3ee1dc94`
 <!-- rendro-recipe-gallery-end -->
 
 ## Statement

@@ -19,7 +19,9 @@ Rendro is an open-source, Elixir-native PDF layout library for Phoenix teams tha
 <!-- rendro-launch-artifacts-start -->
 ## Rendered Recipe Gallery
 
-These previews are rendered by Rendro from deterministic recipe fixtures. Source PDFs are byte-checked by the docs contract; the PNG rasters are regenerated through the pinned `pdfium-render` advisory lane.
+These previews are rendered by Rendro from curated deterministic recipe fixtures.
+
+Source PDFs and the self-rendered manual are byte-checked by the required docs contract. PNG rasters are regenerated and hash-checked in the pinned pdfium-render advisory lane. pdfium-render rasters are render proof, not GUI-viewer proof. Launch fixtures may use opt-in table polish; canonical recipe defaults remain unchanged.
 
 <p>
 <a href="assets/rendro/gallery/invoice.png"><img src="assets/rendro/gallery/invoice.png" alt="Rendered invoice PDF showing invoice header, line-item table, and thank-you footer." width="150"></a>
@@ -31,7 +33,7 @@ These previews are rendered by Rendro from deterministic recipe fixtures. Source
 
 Self-rendered manual: [manual.pdf](assets/rendro/manual.pdf)
 
-SHA-256: `9e2922d281723c10143fdab644657202a73125d8378957836aa17c1377ab3468`
+SHA-256: `a9f1a241c3fb331ad5522d905af8acf26d9848b8862cb9a6f3e4033c3ee1dc94`
 <!-- rendro-launch-artifacts-end -->
 
 ## Guides

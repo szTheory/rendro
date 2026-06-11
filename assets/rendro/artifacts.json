@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "generated_by": "mix rendro.launch_artifacts.gen",
+  "renderer": {
+    "kind": "pdfium-render",
+    "version": "v0.11.0",
+    "dpi": 96,
+    "pin_path": "priv/pdfium_pin.json",
+    "pin_version": "v0.11.0",
+    "pin_sha256": "b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a"
+  },
+  "manual": {
+    "path": "assets/rendro/manual.pdf",
+    "sha256": "a9f1a241c3fb331ad5522d905af8acf26d9848b8862cb9a6f3e4033c3ee1dc94",
+    "source": "Rendro.LaunchArtifacts.render_manual_pdf/0"
+  },
+  "gallery": [
+    {
+      "id": "invoice",
+      "title": "Invoice",
+      "recipe_module": "Elixir.Rendro.Recipes.Invoice",
+      "png_path": "assets/rendro/gallery/invoice.png",
+      "png_sha256": "8acf5472e4c7a7ec6d04843464536b3f291e8cfc0d2c7fe8040913af4e648988",
+      "source_pdf_sha256": "fc65ac5688462a77e1cc3cdfd8cb25e8ac1d61677d430615443c23f565068105",
+      "page": 1,
+      "dpi": 96,
+      "width_px": 794,
+      "height_px": 1123,
+      "renderer_kind": "pdfium-render",
+      "renderer_version": "v0.11.0",
+      "alt": "Rendered invoice PDF showing invoice header, line-item table, and thank-you footer.",
+      "caption": "Standard invoice from Elixir data through the canonical Invoice recipe."
+    },
+    {
+      "id": "branded_invoice",
+      "title": "Branded Invoice",
+      "recipe_module": "Elixir.Rendro.Recipes.BrandedInvoice",
+      "png_path": "assets/rendro/gallery/branded_invoice.png",
+      "png_sha256": "3618e386c02b622dddb785ead24843481aa963e91653614aeab22287354138b5",
+      "source_pdf_sha256": "9bc4a0ea94e2a7cb09dbeeaf5f57b24f624a34a2c7d8012343bca1c66c8e95c9",
+      "page": 1,
+      "dpi": 96,
+      "width_px": 794,
+      "height_px": 1123,
+      "renderer_kind": "pdfium-render",
+      "renderer_version": "v0.11.0",
+      "alt": "Rendered branded invoice PDF showing Rendro logo, embedded brand font, and invoice table.",
+      "caption": "Branded invoice with registered font and logo assets."
+    },
+    {
+      "id": "statement",
+      "title": "Statement",
+      "recipe_module": "Elixir.Rendro.Recipes.Statement",
+      "png_path": "assets/rendro/gallery/statement.png",
+      "png_sha256": "ec13a842b4ea48308ec682f4765c17fa3b70f75efb58739c3f9eb1a6d8963ec0",
+      "source_pdf_sha256": "fa4fd6f3d84ccdccc8a1812c0212a9b17820cd25ffb615519154e9dd3792b835",
+      "page": 1,
+      "dpi": 96,
+      "width_px": 794,
+      "height_px": 1123,
+      "renderer_kind": "pdfium-render",
+      "renderer_version": "v0.11.0",
+      "alt": "Rendered account statement PDF showing transaction rows, running balances, and Page 1 of 2 footer.",
+      "caption": "Multi-page statement with carried-forward balances and running page numbers."
+    },
+    {
+      "id": "receipt_report",
+      "title": "Receipt / Report",
+      "recipe_module": "Elixir.Rendro.Recipes.Receipt",
+      "png_path": "assets/rendro/gallery/receipt_report.png",
+      "png_sha256": "c2af63ac8460c85f8eb51240567d06ab71b72fd69be337bc165884f4af98c1c4",
+      "source_pdf_sha256": "68f3a44f655c4783bc9bd94ad3c37675edb09cfbe92009b2a54e4a35a91258b5",
+      "page": 1,
+      "dpi": 96,
+      "width_px": 794,
+      "height_px": 1123,
+      "renderer_kind": "pdfium-render",
+      "renderer_version": "v0.11.0",
+      "alt": "Rendered receipt report PDF showing repeated table header, line items, totals, and Page 1 of 2 footer.",
+      "caption": "Receipt recipe scaled into a multi-page tabular report."
+    },
+    {
+      "id": "certificate",
+      "title": "Certificate",
+      "recipe_module": "Elixir.Rendro.Recipes.Certificate",
+      "png_path": "assets/rendro/gallery/certificate.png",
+      "png_sha256": "7194ebe35228f4026cc804b0b38913545ef997335d08f6d579f5d450a5c3fcf4",
+      "source_pdf_sha256": "51b43c00c1e7afba093c6f6a682630576c639fb65912f504ddc9c6c6db0d3c95",
+      "page": 1,
+      "dpi": 96,
+      "width_px": 1123,
+      "height_px": 794,
+      "renderer_kind": "pdfium-render",
+      "renderer_version": "v0.11.0",
+      "alt": "Rendered landscape certificate PDF showing recipient text and geometry-derived keyline border.",
+      "caption": "Landscape certificate with a Path-backed, geometry-derived border frame."
+    }
+  ]
+}
