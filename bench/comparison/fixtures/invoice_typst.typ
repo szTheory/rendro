@@ -1,5 +1,6 @@
 #let fixture_id = "invoice_v1"
-#let data = json(sys.inputs.data)
+#let data_path = sys.inputs.at("data-path", default: "invoice_data.json")
+#let data = json(data_path)
 
 = Invoice #data.invoice.id
 

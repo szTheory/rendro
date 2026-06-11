@@ -110,16 +110,19 @@ defmodule Rendro.ComparisonTest do
   end
 
   test "static contract catches raw SHA-256 drift" do
+    manifest = Rendro.Comparison.read_manifest!()
+    raw_path = manifest |> Map.fetch!("results") |> hd() |> Map.fetch!("raw_artifact")
+
     manifest =
       put_in(
-        Rendro.Comparison.read_manifest!(),
+        manifest,
         ["results", Access.at(0), "raw_sha256"],
         String.duplicate("0", 64)
       )
 
     assert Enum.any?(
              Rendro.Comparison.static_contract_errors(manifest),
-             &String.contains?(&1, "bench/results/raw/plan01-static-fixture.json")
+             &String.contains?(&1, raw_path)
            )
   end
 

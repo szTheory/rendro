@@ -21,7 +21,7 @@ defmodule Rendro.Comparison do
   @claim_id_regex ~r/^CMP-[A-Z0-9-]+$/
 
   @metric_labels %{
-    "cold_start_ms" => "Cold start",
+    "cold_start_ms" => "Render time",
     "rss_mb" => "RSS",
     "container_image_mb" => "Runtime image",
     "dependency_count" => "Runtime dependencies"

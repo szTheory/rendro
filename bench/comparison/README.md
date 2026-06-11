@@ -46,9 +46,12 @@ typesetting, and web-template migration scenarios.
 Required host tools for the pinned local runner:
 
 - Docker
-- Chrome or Chromium
-- wkhtmltopdf
 - Typst CLI
+
+The Docker image built from `bench/comparison/Dockerfile` supplies Chromium,
+wkhtmltopdf, and prewarmed `chromic_pdf` / `pdf_generator` package installs for
+the benchmark rows that require them. Dependency download and build work happens
+while building the image, not inside measured render samples.
 
 Print the runner help:
 
