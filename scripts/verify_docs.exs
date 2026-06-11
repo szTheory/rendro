@@ -26,7 +26,8 @@ lanes = [
   {"Path claims lane", ["test", "test/docs_contract/path_claims_test.exs"]},
   {"Raster claims lane", ["test", "test/docs_contract/raster_claims_test.exs"]},
   {"Launch artifacts claims lane",
-   ["test", "test/docs_contract/launch_artifacts_claims_test.exs"]}
+   ["test", "test/docs_contract/launch_artifacts_claims_test.exs"]},
+  {"Comparison claims lane", ["test", "test/docs_contract/comparison_claims_test.exs"]}
 ]
 
 # formatter: on
