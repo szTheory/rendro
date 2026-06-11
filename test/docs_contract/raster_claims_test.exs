@@ -1,6 +1,8 @@
 defmodule Rendro.DocsContract.RasterClaimsTest do
   use ExUnit.Case, async: true
 
+  alias Rendro.ViewerEvidence.Validator
+
   # Test 1: GREEN in Plan 03 — raster section added to support_matrix.json in Plan 03
   test "support matrix has raster section with boundary declarations" do
     matrix = File.read!("priv/support_matrix.json")
@@ -45,7 +47,14 @@ defmodule Rendro.DocsContract.RasterClaimsTest do
   test "GUI-viewer rows do not carry viewer_kind pdfium-render" do
     matrix = File.read!("priv/support_matrix.json") |> JSON.decode!()
 
-    viewer_sections = ["forms", "signing", "signing_preparation", "embedded_files", "links", "protection"]
+    viewer_sections = [
+      "forms",
+      "signing",
+      "signing_preparation",
+      "embedded_files",
+      "links",
+      "protection"
+    ]
 
     for section_key <- viewer_sections do
       section = Map.get(matrix, section_key, %{})
@@ -56,6 +65,27 @@ defmodule Rendro.DocsContract.RasterClaimsTest do
                "GUI-viewer row #{section_key}.viewers.#{viewer} must not carry viewer_kind pdfium-render"
       end
     end
+  end
+
+  test "schema and validator reject pdfium-render on GUI-viewer rows" do
+    matrix = File.read!("priv/support_matrix.json") |> JSON.decode!()
+
+    mutated =
+      put_in(
+        matrix,
+        ["forms", "viewers", "adobe_acrobat_reader", "viewer_kind"],
+        "pdfium-render"
+      )
+
+    assert {:error, schema_reason} = Validator.validate_matrix_structure(mutated)
+    assert schema_reason =~ "pdfium-render" or schema_reason =~ "viewer_kind"
+
+    assert {:error, promotion_violations} = Validator.validate_promotion_complete(mutated)
+
+    assert Enum.any?(
+             promotion_violations,
+             &String.contains?(&1, "forms.viewers.adobe_acrobat_reader")
+           )
   end
 
   # Test 6: GREEN in Plan 04 — verify_docs.exs lane registration added in Plan 04
