@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+#### LNCH-02: Zero-UAT mobile viewer evidence posture
+
+- Added terminal `explicit_deferral` rows for iOS Files/Preview and Google Drive PDF viewer on Android across `forms` and `signed_artifact`. These rows intentionally publish no mobile GUI support claim until automated device-level CI evidence exists.
+- Mirrored the mobile deferral reasons in `guides/api_stability.md`; signed-artifact deferrals distinguish Markup/drawn signatures from `/Sig` cryptographic validation.
+
 ### Fixed
 
 #### HYG-03: Cluster-boundary split_graphemes rewrite (D-11, D-12, D-13)

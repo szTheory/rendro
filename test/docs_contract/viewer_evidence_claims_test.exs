@@ -46,6 +46,31 @@ defmodule Rendro.DocsContract.ViewerEvidenceClaimsTest do
       assert :ok = Validator.validate_promotion_complete(matrix)
     end
 
+    test "Phase 88 mobile GUI rows are explicit deferrals with no evidence files" do
+      matrix = Matrix.load!()
+
+      rows = [
+        get_in(matrix, ["forms", "viewers", "ios_files_preview"]),
+        get_in(matrix, ["forms", "viewers", "android_drive_viewer"]),
+        get_in(matrix, ["signing", "viewers", "ios_files_preview"]),
+        get_in(matrix, ["signing", "viewers", "android_drive_viewer"])
+      ]
+
+      assert Enum.all?(rows, &(&1["status"] == "explicit_deferral"))
+
+      for row <- rows do
+        assert is_binary(row["evidence_deferred"])
+        refute Map.has_key?(row, "evidence")
+        refute Map.has_key?(row, "recorded_at")
+        refute Map.has_key?(row, "viewer_kind")
+      end
+
+      refute File.exists?("priv/viewer_evidence/forms/ios_files_preview.md")
+      refute File.exists?("priv/viewer_evidence/forms/android_drive_viewer.md")
+      refute File.exists?("priv/viewer_evidence/signed_artifact/ios_files_preview.md")
+      refute File.exists?("priv/viewer_evidence/signed_artifact/android_drive_viewer.md")
+    end
+
     test "api stability guide mirrors all consolidated viewer evidence paths" do
       guide = File.read!("guides/api_stability.md")
 

@@ -65,6 +65,14 @@
       "pdfjs": {
         "status": "explicit_deferral",
         "evidence_deferred": "PDF.js failed the forms four-check save-and-reopen round-trip on the representative fixture during Phase 71 operator review; edit_or_toggle persistence is not reliable."
+      },
+      "ios_files_preview": {
+        "status": "explicit_deferral",
+        "evidence_deferred": "iOS Files/Preview mobile GUI behavior is not part of CI; Phase 88 uses zero-human UAT, so promotion waits for automated device-level proof of open, default_state_visible, edit_or_toggle, and save."
+      },
+      "android_drive_viewer": {
+        "status": "explicit_deferral",
+        "evidence_deferred": "Google Drive PDF viewer on Android mobile GUI behavior is not part of CI; Phase 88 uses zero-human UAT, so promotion waits for automated device-level proof of open, default_state_visible, edit_or_toggle, and save."
       }
     },
     "signature_widget_viewers": {
@@ -267,6 +275,14 @@
       "pdfjs": {
         "status": "explicit_deferral",
         "evidence_deferred": "PDF.js exposes no /Sig validation UI or signed-artifact integrity panel for the representative fixture; viewer promotion deferred until signature validation surfaces exist."
+      },
+      "ios_files_preview": {
+        "status": "explicit_deferral",
+        "evidence_deferred": "iOS Files/Preview does not have automated device-level evidence for /Sig signed-artifact validation in CI; Markup or drawn signatures are separate from cryptographic integrity, certificate-trust, timestamp, and save/reopen validation."
+      },
+      "android_drive_viewer": {
+        "status": "explicit_deferral",
+        "evidence_deferred": "Google Drive PDF viewer on Android does not have automated device-level evidence for /Sig signed-artifact validation in CI; promotion requires observed integrity, certificate-trust, timestamp, and save/reopen validation panels."
       }
     }
   },

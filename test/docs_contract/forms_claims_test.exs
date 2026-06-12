@@ -28,6 +28,12 @@ defmodule Rendro.DocsContract.FormsClaimsTest do
              ~r/"forms".*?"viewers".*?"pdfjs"\s*:\s*\{\s*"status"\s*:\s*"explicit_deferral"/s
 
     assert matrix =~
+             ~r/"forms".*?"viewers".*?"ios_files_preview"\s*:\s*\{\s*"status"\s*:\s*"explicit_deferral"/s
+
+    assert matrix =~
+             ~r/"forms".*?"viewers".*?"android_drive_viewer"\s*:\s*\{\s*"status"\s*:\s*"explicit_deferral"/s
+
+    assert matrix =~
              ~r/"signature_widget_viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
 
     assert matrix =~
@@ -67,12 +73,31 @@ defmodule Rendro.DocsContract.FormsClaimsTest do
     assert guide =~
              "Other viewers are not part of Rendro's supported contract unless `priv/support_matrix.json` later records proof-backed support for them."
 
+    assert guide =~
+             "iOS Files/Preview and Google Drive PDF viewer on Android are `explicit_deferral` for `forms` in Phase 88."
+
     refute guide =~ "standard PDF viewers"
     refute guide =~ "Adobe Acrobat Reader is supported"
     refute guide =~ "digital signatures are supported"
     refute guide =~ "viewer support for signature fields"
     refute guide =~ "PAdES is supported"
     refute guide =~ "viewer-proofed digital signatures"
+    refute guide =~ "mobile PDF support"
+  end
+
+  test "mobile forms rows do not borrow structural or manual evidence without device CI" do
+    matrix = File.read!("priv/support_matrix.json") |> JSON.decode!()
+
+    for viewer <- ["ios_files_preview", "android_drive_viewer"] do
+      row = matrix["forms"]["viewers"][viewer]
+
+      assert row["status"] == "explicit_deferral"
+      assert is_binary(row["evidence_deferred"])
+      refute Map.has_key?(row, "proof")
+      refute Map.has_key?(row, "evidence")
+      refute Map.has_key?(row, "recorded_at")
+      refute Map.has_key?(row, "viewer_kind")
+    end
   end
 
   test "the canonical docs verification script includes the forms claims lane" do

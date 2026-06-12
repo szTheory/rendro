@@ -90,6 +90,8 @@ Chrome PDFium is `supported` for `forms` based on the recorded viewer checklist 
 
 PDF.js is `explicit_deferral` for `forms` because the four-check save-and-reopen round-trip failed on the representative fixture during operator review — edit/toggle persistence is not reliable.
 
+iOS Files/Preview and Google Drive PDF viewer on Android are `explicit_deferral` for `forms` in Phase 88. Rendro has checked-in fixture and structural validation, but no automated device-level CI lane for those mobile GUI viewers; without that lane, zero-human UAT means no supported mobile form row is promoted.
+
 Adobe Acrobat Reader is `supported` for unsigned `signature_widget` based on the recorded checklist (`priv/viewer_evidence/signature_widget/adobe_acrobat_reader.md`). Apple Preview is `supported` with evidence at `priv/viewer_evidence/signature_widget/apple_preview.md`. Chrome PDFium is `supported` with evidence at `priv/viewer_evidence/signature_widget/chrome_pdfium.md`. PDF.js is `explicit_deferral` for signature widgets per mozilla/pdf.js#4202.
 
 Other viewers are not part of Rendro's supported contract unless `priv/support_matrix.json` later records proof-backed support for them.
@@ -119,6 +121,8 @@ Signed output is explicitly non-deterministic.
 Unsupported narratives: signer identity or trust, tamper-evidence marketing, compliance narratives, PAdES/LTV/TSA/OCSP/CRL support, and multi-signature workflows remain unsupported. Signed-artifact viewer rows are promoted only when a recorded checklist exists for that exact viewer and signing surface.
 
 Adobe Acrobat Reader and Chrome PDFium are `supported` for `signed_artifact` with evidence at `priv/viewer_evidence/signed_artifact/adobe_acrobat_reader.md` and `priv/viewer_evidence/signed_artifact/chrome_pdfium.md` (pdfsig/pyhanko structural proxies — not Acrobat or browser signature-trust GUI). Apple Preview and PDF.js are `explicit_deferral` because Preview does not validate `/Sig` digital signatures and PDF.js exposes no signed-artifact integrity panel.
+
+iOS Files/Preview and Google Drive PDF viewer on Android are `explicit_deferral` for `signed_artifact` in Phase 88. Markup or drawn signatures are separate from `/Sig` cryptographic validation; promotion requires automated device-level evidence for integrity, certificate-trust, timestamp, and save/reopen validation behavior.
 
 ## Long-Lived Evidence Support Boundary
 
@@ -183,9 +187,13 @@ Adobe Acrobat Reader is `supported` for the `protection` surface based on the re
 Every `explicit_deferral` viewer row in `priv/support_matrix.json` carries a named `evidence_deferred` reason. These are mirrored verbatim here so the adopter-visible contract states why a viewer is deferred rather than `unsupported`:
 
 - forms × PDF.js: PDF.js failed the forms four-check save-and-reopen round-trip on the representative fixture during operator review; edit_or_toggle persistence is not reliable.
+- forms × iOS Files/Preview: iOS Files/Preview mobile GUI behavior is not part of CI; Phase 88 uses zero-human UAT, so promotion waits for automated device-level proof of open, default_state_visible, edit_or_toggle, and save.
+- forms × Google Drive PDF viewer on Android: Google Drive PDF viewer on Android mobile GUI behavior is not part of CI; Phase 88 uses zero-human UAT, so promotion waits for automated device-level proof of open, default_state_visible, edit_or_toggle, and save.
 - signature_widget × PDF.js / signing_preparation × PDF.js: PDF.js does not implement AcroForm signature widget editing or unsigned placeholder rendering per mozilla/pdf.js#4202; promotion requires upstream signature-field support.
 - signed_artifact × Apple Preview: Apple Preview does not validate /Sig digital signatures and append-save invalidates signature dictionaries; signed-artifact viewer promotion requires Acrobat or pdfium-cli structural lanes.
 - signed_artifact × PDF.js: PDF.js exposes no /Sig validation UI or signed-artifact integrity panel for the representative fixture; viewer promotion deferred until signature validation surfaces exist.
+- signed_artifact × iOS Files/Preview: iOS Files/Preview does not have automated device-level evidence for /Sig signed-artifact validation in CI; Markup or drawn signatures are separate from cryptographic integrity, certificate-trust, timestamp, and save/reopen validation.
+- signed_artifact × Google Drive PDF viewer on Android: Google Drive PDF viewer on Android does not have automated device-level evidence for /Sig signed-artifact validation in CI; promotion requires observed integrity, certificate-trust, timestamp, and save/reopen validation panels.
 - long_lived_signed_artifact × Apple Preview: Apple Preview does not surface long-term-validation timestamp, revocation, or expiry indicators for augmented PDF signatures on the representative certomancer fixture.
 - long_lived_signed_artifact × Chrome PDFium: pdfium-cli structural open and form extraction do not expose long-term-validation timestamp, revocation, or expiry indicators; LTV posture remains Acrobat-only for viewer promotion.
 - long_lived_signed_artifact × PDF.js: PDF.js does not implement long-term-validation timestamp, revocation, or expiry indicators for augmented signatures; viewer promotion deferred until LTV UI exists upstream.

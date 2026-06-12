@@ -13,8 +13,17 @@ Use only these statuses: `Ready`, `Blocked`, `Deferred with reason`.
 | Claim-accuracy fixes are shipped | Ready | HYG-01..05 complete in `.planning/REQUIREMENTS.md` | Pure core and shaping boundaries must stay true before posting. |
 | Launch artifacts are published and byte-checked | Ready | GAL-01..03 complete; gallery and manual SHA are present | Public URLs still need final operator verification. |
 | Comparison guide and Livebook are live | Blocked | `CMP-03` remains pending in `.planning/REQUIREMENTS.md` | Roadmap/state say Phase 87 complete; requirements traceability must be reconciled. |
-| Mobile evidence outcome is recorded | Blocked | Pending Plan 88-04 | Rows must be supported with evidence or deferred with reason. |
+| Mobile evidence outcome is recorded | Ready | Four terminal `explicit_deferral` rows in `priv/support_matrix.json` | Zero-human UAT decision: no mobile GUI support claim is promoted until automated device-level CI evidence exists. |
 | Adoption signal ledger is ready | Blocked | Pending Plan 88-02 | `ADOPTION.md` must exist before launch replies route signals. |
+
+## Mobile Evidence Outcome
+
+| Row | Outcome | Proof / Deferral |
+| --- | --- | --- |
+| `forms.ios_files_preview` | `explicit_deferral` | iOS Files/Preview mobile GUI behavior is not part of CI; Phase 88 uses zero-human UAT, so promotion waits for automated device-level proof of `open`, `default_state_visible`, `edit_or_toggle`, and `save`. |
+| `forms.android_drive_viewer` | `explicit_deferral` | Google Drive PDF viewer on Android mobile GUI behavior is not part of CI; Phase 88 uses zero-human UAT, so promotion waits for automated device-level proof of `open`, `default_state_visible`, `edit_or_toggle`, and `save`. |
+| `signing.ios_files_preview` | `explicit_deferral` | iOS Files/Preview does not have automated device-level evidence for `/Sig` signed-artifact validation in CI; Markup or drawn signatures are separate from cryptographic integrity, certificate-trust, timestamp, and save/reopen validation. |
+| `signing.android_drive_viewer` | `explicit_deferral` | Google Drive PDF viewer on Android does not have automated device-level evidence for `/Sig` signed-artifact validation in CI; promotion requires observed integrity, certificate-trust, timestamp, and save/reopen validation panels. |
 
 ## Public URL Checklist
 

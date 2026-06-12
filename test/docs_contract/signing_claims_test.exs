@@ -46,6 +46,12 @@ defmodule Rendro.DocsContract.SigningClaimsTest do
              ~r/"signing".*?"viewers".*?"adobe_acrobat_reader"\s*:\s*\{\s*"status"\s*:\s*"supported"/s
 
     assert matrix =~
+             ~r/"signing".*?"viewers".*?"ios_files_preview"\s*:\s*\{\s*"status"\s*:\s*"explicit_deferral"/s
+
+    assert matrix =~
+             ~r/"signing".*?"viewers".*?"android_drive_viewer"\s*:\s*\{\s*"status"\s*:\s*"explicit_deferral"/s
+
+    assert matrix =~
              ~r/"signing".*?"long_lived".*?"pdfjs"\s*:\s*\{\s*"status"\s*:\s*"explicit_deferral"/s
 
     refute matrix =~ ~s|targeted for verification|
@@ -79,6 +85,15 @@ defmodule Rendro.DocsContract.SigningClaimsTest do
     assert guide =~
              "For viewers other than Adobe Acrobat Reader, `signing_preparation` and `signature_widget` cells are behaviorally indistinguishable"
 
+    assert guide =~
+             "iOS Files/Preview and Google Drive PDF viewer on Android are `explicit_deferral` for `signed_artifact` in Phase 88."
+
+    assert guide =~
+             "Markup or drawn signatures are separate from `/Sig` cryptographic validation"
+
+    assert guide =~
+             "integrity, certificate-trust, timestamp, and save/reopen validation behavior"
+
     assert guide =~ "priv/viewer_evidence/long_lived_signed_artifact/adobe_acrobat_reader.md"
 
     refute guide =~ "tamper-evident signing"
@@ -90,6 +105,22 @@ defmodule Rendro.DocsContract.SigningClaimsTest do
     refute guide =~ "all signature viewers are supported"
     refute guide =~ "viewer portability is guaranteed"
     refute guide =~ "Rendro owns signer identity trust"
+    refute guide =~ "mobile PDF support"
+  end
+
+  test "mobile signed-artifact rows stay deferred without real signature validation UI evidence" do
+    matrix = File.read!("priv/support_matrix.json") |> JSON.decode!()
+
+    for viewer <- ["ios_files_preview", "android_drive_viewer"] do
+      row = matrix["signing"]["viewers"][viewer]
+
+      assert row["status"] == "explicit_deferral"
+      assert row["evidence_deferred"] =~ "/Sig"
+      refute Map.has_key?(row, "proof")
+      refute Map.has_key?(row, "evidence")
+      refute Map.has_key?(row, "recorded_at")
+      refute Map.has_key?(row, "viewer_kind")
+    end
   end
 
   test "docs verification script includes the signing claims lane" do
