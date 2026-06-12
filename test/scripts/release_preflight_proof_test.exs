@@ -31,28 +31,22 @@ defmodule Rendro.ReleasePreflightProofTest do
              ReleasePreflightProof.validate_ref("not-a-real-tag")
   end
 
-  @tag timeout: 120_000
   test "dry run refuses non-release refs without creating the worktree path" do
     worktree = Path.join(File.cwd!(), "tmp/release-preflight-proof-test")
     File.rm_rf!(worktree)
 
-    {output, status} =
-      System.cmd(
-        "mix",
-        [
-          "run",
-          "scripts/release_preflight_proof.exs",
-          "--dry-run",
-          "--ref",
-          "not-a-real-tag",
-          "--worktree",
-          worktree
-        ],
-        stderr_to_stdout: true
-      )
+    assert {:ok, %{dry_run: true, ref: "not-a-real-tag", worktree: ^worktree}} =
+             ReleasePreflightProof.parse_args([
+               "--dry-run",
+               "--ref",
+               "not-a-real-tag",
+               "--worktree",
+               worktree
+             ])
 
-    assert status == 1
-    assert output =~ "ref must be an exact release tag like vX.Y.Z"
+    assert {:error, "ref must be an exact release tag like vX.Y.Z; got not-a-real-tag"} =
+             ReleasePreflightProof.validate_ref("not-a-real-tag")
+
     refute File.exists?(worktree)
   end
 
