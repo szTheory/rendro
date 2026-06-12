@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.6
 milestone_name: Public Launch & Adoption Bootstrap
 status: executing
-last_updated: "2026-06-12T15:49:00Z"
-last_activity: 2026-06-12 -- Phase 88 Plan 05 blocked at launch publication preflight
+last_updated: "2026-06-12T17:45:00Z"
+last_activity: 2026-06-12 -- Quick task completed: automated HexDocs publish on main
 progress:
   total_phases: 6
   completed_phases: 5
@@ -95,6 +95,12 @@ None.
 Last session: 2026-06-12T15:44:08Z
 Stopped at: Blocked 88-05-PLAN.md Task 1 before public posting
 Resume file: None
+
+## Quick Tasks Completed
+
+| Date | Task | Summary |
+|------|------|---------|
+| 2026-06-12 | Automate HexDocs publish and public URL verification on main | `.github/workflows/hexdocs.yml` publishes docs-only with `HEX_API_KEY` after main pushes and runs `scripts/verify_public_launch_urls.sh`. |
 
 ## Performance Metrics
 
