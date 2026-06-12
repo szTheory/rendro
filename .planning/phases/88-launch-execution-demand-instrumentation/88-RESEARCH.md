@@ -463,17 +463,20 @@ Missing dependencies with fallback:
 | A3 | Launch copy drafts may be source-tracked or kept as planning artifacts; user has not locked storage location. | Planner Notes | Plan should choose one and keep public source clean. |
 | A4 | ElixirForum/ElixirStatus posting accounts are available to the maintainer. | Environment | Launch execution could require manual login/setup. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. Should Phase 88 create source-tracked launch copy files, or keep announcement/reply drafts in planning artifacts only?
    - What we know: UI-SPEC says primary surfaces are external posts and public Markdown/forms. [VERIFIED: 88-UI-SPEC.md]
    - Recommendation: keep final external posts as checklist/drafts in planning unless the user explicitly wants source-tracked launch artifacts. [ASSUMED]
+   - RESOLVED: Plans store launch checklist and copy in `.planning/phases/88-launch-execution-demand-instrumentation/88-LAUNCH-CHECKLIST.md` and `88-LAUNCH-COPY.md`, not as public source files. Public source changes stay limited to proof, intake, support-boundary, and adoption-ledger surfaces. [VERIFIED: 88-01-PLAN.md] [VERIFIED: 88-05-PLAN.md]
 2. Can GitHub Discussions be enabled before templates land?
    - What we know: live repo `has_discussions` is false and categories are empty. [VERIFIED: gh api]
    - Recommendation: add a manual/API checkpoint before committing or relying on `use-cases.yml`. [CITED: https://docs.github.com/en/discussions/managing-discussions-for-your-community/creating-discussion-category-forms]
+   - RESOLVED: Plan 03 creates the template but blocks until Discussions is enabled and `.has_discussions` is exactly `true`; if API enablement is insufficient, execution pauses for maintainer UI confirmation before launch replies route users there. [VERIFIED: 88-03-PLAN.md]
 3. Will mobile form rows pass in the actual app versions on available devices?
    - What we know: Apple and Google document form-filling flows, but actual Rendro fixture behavior must be observed. [CITED: https://support.apple.com/guide/iphone/fill-out-and-sign-pdf-forms-iphd7e3c0c74/ios] [CITED: https://support.google.com/drive/answer/9463834?co=GENIE.Platform%3DAndroid&hl=en]
    - Recommendation: plan both supported and explicit-deferral branches for forms; signed rows are expected deferrals. [VERIFIED: 88-CONTEXT.md]
+   - RESOLVED: Plan 04 records all four mobile observations in `88-LAUNCH-CHECKLIST.md` and branches each row to `supported` only when its proof IDs pass, otherwise to `explicit_deferral`; signed rows remain expected deferrals unless a real `/Sig` trust UI is observed. [VERIFIED: 88-04-PLAN.md]
 
 ## Sources
 
