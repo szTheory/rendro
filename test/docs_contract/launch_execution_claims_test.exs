@@ -38,7 +38,6 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
              ~r/\{"Launch execution claims lane",\s*\["test",\s*"test\/docs_contract\/launch_execution_claims_test\.exs"\]\}/s
   end
 
-  @tag skip: "unskip after 88-LAUNCH-CHECKLIST.md is created"
   test "launch checklist exposes CMP-03 and public URL readiness before publication" do
     checklist = File.read!(@checklist_path)
 
@@ -76,13 +75,13 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     end
   end
 
-  @tag skip: "unskip after 88-LAUNCH-CHECKLIST.md is created"
   test "launch checklist preserves the canonical publication order" do
     checklist = File.read!(@checklist_path)
+    [_before, publication_order] = String.split(checklist, "## Publication Order", parts: 2)
 
     positions =
       Enum.map(@publication_order, fn label ->
-        {label, :binary.match(checklist, label)}
+        {label, :binary.match(publication_order, label)}
       end)
 
     for {label, match} <- positions do
@@ -93,7 +92,6 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
              positions |> Enum.map(fn {_label, {position, _length}} -> position end) |> Enum.sort()
   end
 
-  @tag skip: "unskip after 88-LAUNCH-COPY.md is created"
   test "launch copy contract contains required title, first mention, disclosure, and mobile beat" do
     copy = File.read!(@copy_path)
 
@@ -107,7 +105,6 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     assert copy =~ "What happens when a Rendro PDF reaches a phone?"
   end
 
-  @tag skip: "unskip after 88-LAUNCH-COPY.md is created"
   test "launch copy contract refutes unsupported launch claims" do
     copy = File.read!(@copy_path)
 
