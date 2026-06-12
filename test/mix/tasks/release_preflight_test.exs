@@ -38,6 +38,9 @@ defmodule Mix.Tasks.Release.PreflightTest do
   end
 
   test "runs every phase 2 check and exits only after the final summary" do
+    original_hex_api_key = System.get_env("HEX_API_KEY")
+    System.put_env("HEX_API_KEY", "test-token")
+
     runner =
       command_runner_for(%{
         {"git", ["status", "--short"]} => {"", 0},
@@ -54,6 +57,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
 
     on_exit(fn ->
       Application.delete_env(:rendro, :release_preflight_command_runner)
+      restore_env("HEX_API_KEY", original_hex_api_key)
     end)
 
     {messages, exit_reason} =
@@ -78,6 +82,45 @@ defmodule Mix.Tasks.Release.PreflightTest do
     assert_received {:preflight_command, "mix", ["docs.contract"]}
     assert_received {:preflight_command, "mix", ["hex.build", "--unpack"]}
     assert_received {:preflight_command, "mix", ["hex.publish", "--dry-run", "--yes"]}
+  end
+
+  test "anonymous hex publish dry-run passes after local checks reach the auth boundary" do
+    runner =
+      command_runner_for(%{
+        {"git", ["status", "--short"]} => {"", 0},
+        {"git", ["describe", "--tags", "--exact-match"]} => {"v1.0.0\n", 0},
+        {"mix", ["ci"]} => {"ci ok", 0},
+        {"mix", ["docs.contract"]} => {"docs ok", 0},
+        {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0},
+        {"sh", ["-c", "printf 'n\\n' | mix hex.publish --dry-run --yes"]} =>
+          {"Building rendro 1.0.0\nPublishing package to public repository hexpm.\nNo authenticated user found. Run `mix hex.user auth`\n",
+           1},
+        {"mix", ["hex.audit"]} => {"hex audit ok", 0},
+        {"mix", ["deps.audit", "--ignore-file", ".mix_audit.ignore"]} => {"deps audit ok", 0}
+      })
+
+    {messages, result} =
+      capture_shell_messages(fn ->
+        Preflight.run_with_context(%{
+          project_config: [
+            version: "1.0.0",
+            docs: [source_ref: "v1.0.0"],
+            package: [licenses: ["MIT"], links: %{"GitHub" => "https://example.test"}]
+          ],
+          command_runner: runner,
+          env: %{}
+        })
+      end)
+
+    output = Enum.join(messages, "\n")
+
+    assert match?({:ok, _}, result)
+    assert output =~ "Hex Publish Dry Run: PASS"
+
+    assert_received {:preflight_command, "sh",
+                     ["-c", "printf 'n\\n' | mix hex.publish --dry-run --yes"]}
+
+    refute_received {:preflight_command, "mix", ["hex.publish", "--dry-run", "--yes"]}
   end
 
   test "fails before phase 2 when the changelog release-tail pointer is missing" do
@@ -190,4 +233,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
       :nomatch -> flunk("expected #{inspect(needle)} to appear in #{inspect(output)}")
     end
   end
+
+  defp restore_env(key, nil), do: System.delete_env(key)
+  defp restore_env(key, value), do: System.put_env(key, value)
 end

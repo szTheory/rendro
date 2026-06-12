@@ -74,7 +74,8 @@ defmodule Mix.Tasks.Release.Preflight do
 
     %{
       project_config: project_config,
-      command_runner: command_runner
+      command_runner: command_runner,
+      env: System.get_env()
     }
   end
 
@@ -212,8 +213,37 @@ defmodule Mix.Tasks.Release.Preflight do
     end
   end
 
+  defp run_mix_check(context, "Hex Publish Dry Run" = name, args) do
+    if authenticated_hex?(context) do
+      do_run_mix_check(name, args, run_command(context, "mix", args))
+    else
+      command = "printf 'n\\n' | mix #{Enum.join(args, " ")}"
+
+      case run_command(context, "sh", ["-c", command]) do
+        {output, 0} ->
+          %{name: name, status: :pass, output: output, command: "mix #{Enum.join(args, " ")}"}
+
+        {output, _status} ->
+          if anonymous_publish_dry_run_boundary?(output) do
+            %{
+              name: name,
+              status: :pass,
+              output: output,
+              command: "mix #{Enum.join(args, " ")}"
+            }
+          else
+            fail(name, "hex.publish dry-run failed before authentication boundary\n#{output}")
+          end
+      end
+    end
+  end
+
   defp run_mix_check(context, name, args) do
-    case run_command(context, "mix", args) do
+    do_run_mix_check(name, args, run_command(context, "mix", args))
+  end
+
+  defp do_run_mix_check(name, args, result) do
+    case result do
       {output, 0} ->
         %{name: name, status: :pass, output: output, command: Enum.join(["mix" | args], " ")}
 
@@ -226,6 +256,23 @@ defmodule Mix.Tasks.Release.Preflight do
           command: Enum.join(["mix" | args], " ")
         }
     end
+  end
+
+  defp authenticated_hex?(context) do
+    context
+    |> Map.get(:env, %{})
+    |> Map.get("HEX_API_KEY")
+    |> case do
+      nil -> false
+      "" -> false
+      _key -> true
+    end
+  end
+
+  defp anonymous_publish_dry_run_boundary?(output) do
+    output =~ "Building " and
+      output =~ "Publishing package to public repository hexpm" and
+      output =~ "No authenticated user found"
   end
 
   defp run_command(context, command, args) do
