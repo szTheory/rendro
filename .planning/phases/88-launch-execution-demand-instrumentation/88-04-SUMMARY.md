@@ -70,6 +70,7 @@ completed: 2026-06-12
 ## Task Commits
 
 1. **Task 1: Record zero-human mobile viewer evidence posture** and **Task 2: Update mobile matrix deferrals, docs, changelog, and contract tests** - `ad8e69c` (docs)
+2. **Post-wave integration fix: Refresh stale static expectations** - `ab9e829` (fix)
 
 **Plan metadata:** this summary/tracking commit
 
@@ -82,6 +83,8 @@ completed: 2026-06-12
 - `mix test test/docs_contract/viewer_evidence_claims_test.exs test/docs_contract/forms_claims_test.exs test/docs_contract/signing_claims_test.exs test/docs_contract/raster_claims_test.exs` - passed, 40 tests, 0 failures.
 - `mix docs.contract` - passed all explicit docs-contract lanes.
 - `mix format --check-formatted test/docs_contract/viewer_evidence_claims_test.exs test/docs_contract/forms_claims_test.exs test/docs_contract/signing_claims_test.exs` - passed.
+- `mix test test/guardrails/required_checks_contract_test.exs test/rendro/viewer_evidence/validator_test.exs test/mix/tasks/viewer_evidence_task_test.exs` - passed, 58 tests, 0 failures after static expectation updates.
+- `mix ci` - passed after the post-wave expectation/formatting fix.
 
 ## Files Created/Modified
 
@@ -93,6 +96,10 @@ completed: 2026-06-12
 - `test/docs_contract/viewer_evidence_claims_test.exs` - Added no-mobile-evidence-file guard.
 - `test/docs_contract/forms_claims_test.exs` - Added mobile forms deferral and no evidence-metadata guards.
 - `test/docs_contract/signing_claims_test.exs` - Added mobile signed-artifact deferral and /Sig boundary guards.
+- `test/guardrails/required_checks_contract_test.exs` - Updated docs-contract lane count to 20.
+- `test/mix/tasks/viewer_evidence_task_test.exs` - Updated viewer-evidence list/count expectations to 30 total cells.
+- `test/rendro/viewer_evidence/validator_test.exs` - Updated matrix walker and status split expectations to 30 total cells and 13 explicit deferrals.
+- `test/docs_contract/adoption_claims_test.exs`, `test/docs_contract/launch_execution_claims_test.exs`, `test/docs_contract/github_intake_claims_test.exs` - Formatted earlier Phase 88 docs-contract files so `mix ci` passes.
 
 ## Decisions Made
 
@@ -120,7 +127,7 @@ completed: 2026-06-12
 
 ## Issues Encountered
 
-None.
+- Initial post-wave `mix ci` failed on stale static expectations from earlier Phase 88 work: 26 viewer cells, 9 explicit deferrals, 17 docs-contract lanes, plus formatting drift in three docs-contract files. Updated those expectations to the new contract and reran `mix ci` successfully.
 
 ## User Setup Required
 
