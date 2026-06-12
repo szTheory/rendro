@@ -133,7 +133,7 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     assert workflow =~ "HEX_API_KEY: ${{ secrets.HEX_API_KEY }}"
     assert workflow =~ "mix hex.publish docs --yes"
     assert workflow =~ "scripts/verify_public_launch_urls.sh"
-    assert workflow =~ "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683"
+    assert workflow =~ "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10"
     assert workflow =~ "erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7"
 
     refute workflow =~ ~r/mix hex\.publish --yes/
