@@ -239,6 +239,16 @@ defmodule Guardrails.RequiredChecksContractTest do
         refute block =~ ~r/^\s+needs:/m
       end
     end
+
+    test "release-proof is bounded and runs the isolated proof wrapper" do
+      ci = File.read!(@ci_path)
+      release_block = ci_job_block!(ci, "release-proof")
+
+      assert release_block =~ "timeout-minutes: 45"
+
+      assert release_block =~
+               ~s(mix run scripts/release_preflight_proof.exs --current-version-tag --worktree "$RUNNER_TEMP/rendro-release-proof")
+    end
   end
 
   describe "baseline ci_job alignment" do

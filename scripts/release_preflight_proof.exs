@@ -100,7 +100,13 @@ defmodule Rendro.ReleasePreflightProof do
         with {_, 0} <-
                run_command(context, "git", ["rev-parse", "--verify", "#{options.ref}^{commit}"]),
              {_, 0} <-
-               run_command(context, "git", ["worktree", "add", "--detach", options.worktree, options.ref]),
+               run_command(context, "git", [
+                 "worktree",
+                 "add",
+                 "--detach",
+                 options.worktree,
+                 options.ref
+               ]),
              {deps_output, 0} <-
                run_command(context, "mix", ["deps.get"], cd: options.worktree),
              {preflight_output, status} <-
@@ -125,7 +131,19 @@ defmodule Rendro.ReleasePreflightProof do
   end
 
   defp run_command(context, command, args, opts \\ []) do
+    print_command(command, args, opts)
     context.runner.(command, args, Keyword.put(opts, :stderr_to_stdout, true))
+  end
+
+  defp print_command(command, args, opts) do
+    cd = Keyword.get(opts, :cd)
+    command_line = Enum.join([command | args], " ")
+
+    if cd do
+      IO.puts("$ cd #{cd} && #{command_line}")
+    else
+      IO.puts("$ #{command_line}")
+    end
   end
 
   defp maybe_prepare_synthetic_tag(%{synthetic_tag: false}, _context),
@@ -145,7 +163,15 @@ defmodule Rendro.ReleasePreflightProof do
   end
 
   defp default_context do
-    %{runner: &System.cmd/3, project_config: Mix.Project.config()}
+    %{runner: &streaming_system_cmd/3, project_config: Mix.Project.config()}
+  end
+
+  defp streaming_system_cmd(command, args, opts) do
+    System.cmd(
+      command,
+      args,
+      Keyword.put_new(opts, :into, %Rendro.Release.StreamingCommandCapture{})
+    )
   end
 
   defp current_version_tag(context) do

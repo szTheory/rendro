@@ -70,7 +70,7 @@ defmodule Mix.Tasks.Release.Preflight do
     project_config = Mix.Project.config()
 
     command_runner =
-      Application.get_env(:rendro, :release_preflight_command_runner, &System.cmd/3)
+      Application.get_env(:rendro, :release_preflight_command_runner, &streaming_system_cmd/3)
 
     %{
       project_config: project_config,
@@ -229,7 +229,16 @@ defmodule Mix.Tasks.Release.Preflight do
   end
 
   defp run_command(context, command, args) do
+    Mix.shell().info("$ #{Enum.join([command | args], " ")}")
     context.command_runner.(command, args, stderr_to_stdout: true)
+  end
+
+  defp streaming_system_cmd(command, args, opts) do
+    System.cmd(
+      command,
+      args,
+      Keyword.put_new(opts, :into, %Rendro.Release.StreamingCommandCapture{})
+    )
   end
 
   defp print_result(%{name: name, status: :pass}) do
