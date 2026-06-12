@@ -36,7 +36,10 @@ defmodule Rendro.DocsContract.GithubIntakeClaimsTest do
     blocked = File.read!(".github/ISSUE_TEMPLATE/02_blocked_document.yml")
 
     assert blocked =~ ~s|labels: ["state:triage", "adoption:signal"]|
-    assert blocked =~ "A maintainer applies `adoption:counted` only after checking ADOPTION.md rules"
+
+    assert blocked =~
+             "A maintainer applies `adoption:counted` only after checking ADOPTION.md rules"
+
     refute blocked =~ ~r/^labels:.*adoption:counted/m
   end
 

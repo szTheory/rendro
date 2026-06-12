@@ -13,8 +13,8 @@ defmodule Mix.Tasks.Rendro.ViewerEvidenceTest do
 
       assert result == :ok
       output = Enum.join(messages, "\n")
-      assert output =~ "Viewer evidence: 26 cells"
-      assert output =~ "supported=17, unverified=0, explicit_deferral=9"
+      assert output =~ "Viewer evidence: 30 cells"
+      assert output =~ "supported=17, unverified=0, explicit_deferral=13"
       refute output =~ "legacy: missing evidence pointer"
     end
 
@@ -25,11 +25,11 @@ defmodule Mix.Tasks.Rendro.ViewerEvidenceTest do
         end)
 
       assert {:ok, payload} = JSON.decode(json_output)
-      assert payload["summary"]["total"] == 26
+      assert payload["summary"]["total"] == 30
       assert payload["summary"]["supported"] == 17
       assert payload["summary"]["unverified"] == 0
-      assert payload["summary"]["explicit_deferral"] == 9
-      assert length(payload["cells"]) == 26
+      assert payload["summary"]["explicit_deferral"] == 13
+      assert length(payload["cells"]) == 30
 
       assert Enum.all?(payload["cells"], fn cell ->
                Map.has_key?(cell, "surface") and

@@ -57,7 +57,9 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
     end
 
     assert Enum.map(positions, fn {_section, {position, _length}} -> position end) ==
-             positions |> Enum.map(fn {_section, {position, _length}} -> position end) |> Enum.sort()
+             positions
+             |> Enum.map(fn {_section, {position, _length}} -> position end)
+             |> Enum.sort()
   end
 
   test "adoption gate threshold text and contributor exclusions are exact" do
@@ -107,7 +109,9 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
     assert adoption =~ "curl -fsSL https://hex.pm/api/packages/rendro | jq '.downloads'"
     assert adoption =~ ~s|gh issue list --state all --label "adoption:signal"|
     assert adoption =~ ~s|gh issue list --state all --label "area:text-shaping"|
-    assert adoption =~ ~s|gh pr list --state merged --search "merged:>=$LAUNCH_DATE -author:szTheory"|
+
+    assert adoption =~
+             ~s|gh pr list --state merged --search "merged:>=$LAUNCH_DATE -author:szTheory"|
   end
 
   test "README and comparison guide link to ADOPTION.md" do

@@ -89,7 +89,9 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     end
 
     assert Enum.map(positions, fn {_label, {position, _length}} -> position end) ==
-             positions |> Enum.map(fn {_label, {position, _length}} -> position end) |> Enum.sort()
+             positions
+             |> Enum.map(fn {_label, {position, _length}} -> position end)
+             |> Enum.sort()
   end
 
   test "launch copy contract contains required title, first mention, disclosure, and mobile beat" do

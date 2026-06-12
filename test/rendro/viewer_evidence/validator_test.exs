@@ -296,22 +296,22 @@ defmodule Rendro.ViewerEvidence.ValidatorTest do
 
   describe "matrix_walker" do
     @tag :matrix_walker
-    test "enumerate_viewer_cells returns 26 cells sorted by surface then viewer" do
+    test "enumerate_viewer_cells returns 30 cells sorted by surface then viewer" do
       matrix = Matrix.load!()
       cells = Matrix.enumerate_viewer_cells(matrix)
 
-      assert length(cells) == 26
+      assert length(cells) == 30
       assert cells == Enum.sort_by(cells, fn cell -> {cell.surface, cell.viewer} end)
     end
 
     @tag :matrix_walker
-    test "production matrix status split is 17 supported, 0 unverified, 9 explicit_deferral" do
+    test "production matrix status split is 17 supported, 0 unverified, 13 explicit_deferral" do
       matrix = Matrix.load!()
       cells = Matrix.enumerate_viewer_cells(matrix)
 
       assert Enum.count(cells, &(&1.status == "supported")) == 17
       refute Enum.any?(cells, &(&1.status == "unverified"))
-      assert Enum.count(cells, &(&1.status == "explicit_deferral")) == 9
+      assert Enum.count(cells, &(&1.status == "explicit_deferral")) == 13
     end
 
     @tag :matrix_walker
@@ -380,10 +380,10 @@ defmodule Rendro.ViewerEvidence.ValidatorTest do
       matrix = load_matrix()
       statuses = collect_viewer_statuses(matrix)
 
-      assert length(statuses) == 26
+      assert length(statuses) == 30
       assert Enum.count(statuses, &(&1 == "supported")) == 17
       refute Enum.any?(statuses, &(&1 == "unverified"))
-      assert Enum.count(statuses, &(&1 == "explicit_deferral")) == 9
+      assert Enum.count(statuses, &(&1 == "explicit_deferral")) == 13
     end
 
     @tag :schema_contract

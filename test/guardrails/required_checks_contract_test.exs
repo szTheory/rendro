@@ -145,7 +145,7 @@ defmodule Guardrails.RequiredChecksContractTest do
   end
 
   describe "docs-contract lane count" do
-    test "verify_docs.exs registers exactly seventeen lanes including the recipes, page-primitive, public-api contract, script-support, path, raster, launch-artifact, and comparison lanes" do
+    test "verify_docs.exs registers exactly twenty lanes including launch and GitHub intake lanes" do
       script = File.read!(@verify_docs_path)
 
       lane_entries =
@@ -154,7 +154,7 @@ defmodule Guardrails.RequiredChecksContractTest do
           script
         )
 
-      assert length(lane_entries) == 17
+      assert length(lane_entries) == 20
 
       assert script =~
                ~r/\{"Viewer evidence semantic-claims lane",\s*\["test",\s*"test\/docs_contract\/viewer_evidence_claims_test\.exs"\]\}/s
