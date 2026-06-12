@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.6
 milestone_name: Public Launch & Adoption Bootstrap
 status: executing
-last_updated: "2026-06-12T17:45:00Z"
-last_activity: 2026-06-12 -- Quick task completed: automated HexDocs publish on main
+last_updated: "2026-06-12T20:55:30Z"
+last_activity: 2026-06-12 -- Plan 05 Tasks 1-2 passed; CMP-03 reconciled and public proof URLs verified; awaiting maintainer publication URLs
 progress:
   total_phases: 6
   completed_phases: 5
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-10 — v2.6 milestone started)
 
 Phase: 88 (launch-execution-demand-instrumentation) — EXECUTING
 Plan: 5 of 5
-Status: Blocked before public posting
-Last activity: 2026-06-12 -- Plan 05 Task 1 local checks passed; public sync/publish blocked by dirty/ahead checkout and stale public proof URLs
+Status: Awaiting manual external publication checkpoint
+Last activity: 2026-06-12 -- Plan 05 Tasks 1-2 passed; CMP-03 reconciled and public proof URLs verified; awaiting maintainer publication URLs
 
 Progress: [██████████] 97%
 
@@ -72,7 +72,7 @@ None.
 
 ### Blockers/Concerns
 
-- [Phase 88]: Plan 05 cannot publish or reconcile CMP-03 until `main` can be cleanly synced/published. Current blocker: local `main` is ahead of `origin/main` by 199 commits and the checkout has unrelated pre-existing dirty state (`test/fixtures/forms_support_fixture.pdf`, `.planning/v2.6-MILESTONE-AUDIT.md`). Local checks passed at 2026-06-12T15:49Z: `mix docs.contract`, `mix rendro.livebook.check`, `mix hex.build`, targeted launch/adoption/intake docs-contract tests, and `mix rendro.viewer_evidence validate`. Public proof remains stale/missing: GitHub README raw lacks `Rendered Recipe Gallery`; comparison, Livebook, and ADOPTION raw URLs return 404; HexDocs comparison and Livebook return 404. GitHub intake is issue-only by the accepted 88-03 deviation; D-34 labels are present and Discussions remain disabled intentionally.
+- [Phase 88]: Plan 05 Tasks 1-2 are complete. CMP-03 is reconciled after `mix docs.contract`, `mix rendro.livebook.check`, `mix hex.build`, targeted launch/adoption/intake docs-contract tests, `mix rendro.viewer_evidence validate`, public raw GitHub checks, and HexDocs README/comparison/Livebook checks passed on 2026-06-12. Remaining blocker: maintainer must publish the ElixirForum hub, ElixirStatus post, awesome-elixir PR, two demand-thread replies, and mobile evidence follow-up in locked order, then return final URLs for Task 3. GitHub intake is issue-only by the accepted 88-03 deviation; D-34 labels are present and Discussions remain disabled intentionally.
 
 ## Deferred Items
 

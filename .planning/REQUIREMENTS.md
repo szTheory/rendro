@@ -40,7 +40,7 @@ Requirements for the v2.6 milestone. Each maps to exactly one roadmap phase.
 
 - [x] **CMP-01**: A reproducible benchmark harness (checked-in scripts + committed results) measures cold start, memory, container image size, and dependency count vs ChromicPDF, pdf_generator, and Typst-CLI.
 - [x] **CMP-02**: A "Generating PDFs in Elixir without Chrome" comparison guide ships in HexDocs with every claim bounded to checked-in benchmark results by a docs-contract test — honest about where HTML→PDF wins (arbitrary CSS, complex scripts).
-- [ ] **CMP-03**: A Livebook tutorial (`.livemd`: invoice data → render → inline Kino preview → download) ships with "Run in Livebook" badges and is executed in an advisory CI lane so it cannot rot.
+- [x] **CMP-03**: A Livebook tutorial (`.livemd`: invoice data → render → inline Kino preview → download) ships with "Run in Livebook" badges and is executed in an advisory CI lane so it cannot rot.
 
 ### Launch Execution & Demand Instrumentation (LNCH)
 
@@ -92,7 +92,7 @@ Deferred to future milestones. Tracked but not in the current roadmap.
 | GAL-03 | Phase 86 | Complete |
 | CMP-01 | Phase 87 | Complete |
 | CMP-02 | Phase 87 | Complete |
-| CMP-03 | Phase 87 | Pending |
+| CMP-03 | Phase 87 | Complete |
 | LNCH-01 | Phase 88 | Pending |
 | LNCH-02 | Phase 88 | Complete |
 | LNCH-03 | Phase 88 | Pending |

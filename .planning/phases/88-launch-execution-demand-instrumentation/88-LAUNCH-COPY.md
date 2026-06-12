@@ -73,8 +73,8 @@ Rendro: Elixir-native PDF layout without Chrome. The launch thread shows rendere
 Links:
 
 1. ElixirForum hub URL: TBD
-2. HexDocs URL: TBD
-3. First-invoice Livebook URL: TBD
+2. HexDocs URL: `https://hexdocs.pm/rendro/readme.html`
+3. First-invoice Livebook URL: `https://hexdocs.pm/rendro/first_invoice.html`
 
 ## awesome-elixir PR
 
@@ -106,11 +106,11 @@ ChromicPDF/Gotenberg are still the better fit when the document source is browse
 
 Links:
 
-1. Public repo or HexDocs: TBD
-2. Comparison guide: TBD
-3. First-invoice Livebook: TBD
+1. Public repo or HexDocs: `https://hexdocs.pm/rendro/readme.html`
+2. Comparison guide: `https://hexdocs.pm/rendro/comparison.html`
+3. First-invoice Livebook: `https://hexdocs.pm/rendro/first_invoice.html`
 
-Route concrete unsupported documents or shaping blockers to GitHub Discussions/issues and `ADOPTION.md`.
+Route concrete unsupported documents or shaping blockers to GitHub issues and `ADOPTION.md`.
 
 ## Prawn-like Demand-Thread Reply
 
@@ -128,11 +128,11 @@ If your team wants arbitrary browser markup, use ChromicPDF/Gotenberg. If your t
 
 Links:
 
-1. Public repo or HexDocs: TBD
-2. Comparison guide: TBD
-3. First-invoice Livebook: TBD
+1. Public repo or HexDocs: `https://hexdocs.pm/rendro/readme.html`
+2. Comparison guide: `https://hexdocs.pm/rendro/comparison.html`
+3. First-invoice Livebook: `https://hexdocs.pm/rendro/first_invoice.html`
 
-Route concrete unsupported documents or shaping blockers to GitHub Discussions/issues and `ADOPTION.md`.
+Route concrete unsupported documents or shaping blockers to GitHub issues and `ADOPTION.md`.
 
 ## Mobile Follow-Up
 
