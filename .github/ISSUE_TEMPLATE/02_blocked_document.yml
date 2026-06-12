@@ -1,0 +1,81 @@
+name: Describe blocked document
+description: Share a concrete document job that Rendro cannot handle yet.
+title: "[blocked document]: "
+labels: ["state:triage", "adoption:signal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for concrete unsupported document jobs. A maintainer applies `adoption:counted` only after checking ADOPTION.md rules; this template never adds that label by default.
+  - type: textarea
+    id: document-job
+    attributes:
+      label: Document job
+      description: What document are you trying to generate, and who uses it?
+      placeholder: "Example: Arabic invoice for a Phoenix billing workflow."
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: What should the PDF show or preserve?
+    validations:
+      required: true
+  - type: textarea
+    id: current-blocker
+    attributes:
+      label: Current Rendro blocker
+      description: What prevents you from using Rendro for this job today?
+    validations:
+      required: true
+  - type: input
+    id: script-language
+    attributes:
+      label: Script/language
+      description: If text shaping is involved, name the script or language.
+      placeholder: "Arabic, Hebrew/RTL, Devanagari, Thai, mixed bidi, etc."
+    validations:
+      required: false
+  - type: dropdown
+    id: production-evaluation
+    attributes:
+      label: Production/evaluation blocked?
+      description: Does this block production use or a serious evaluation?
+      options:
+        - "Production is blocked"
+        - "Evaluation is blocked"
+        - "Not blocked yet"
+    validations:
+      required: true
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Workaround or current alternative
+      description: What are you using instead, or how are you working around it?
+    validations:
+      required: true
+  - type: textarea
+    id: fixture-notes
+    attributes:
+      label: Minimal fixture or reproduction notes
+      description: Link a sanitized fixture or describe the smallest reproduction. Do not upload secrets, private customer PDFs, PEM blocks, or confidential screenshots.
+    validations:
+      required: true
+  - type: textarea
+    id: source-url
+    attributes:
+      label: Source URL or private-report note
+      description: Provide the public source URL for this request, or state that it is a private adopter report that may need anonymization.
+    validations:
+      required: true
+  - type: checkboxes
+    id: quote-permission
+    attributes:
+      label: Permission to quote/anonymize
+      description: Private reports can be anonymized and capped by ADOPTION.md counting rules.
+      options:
+        - label: You may quote this report publicly.
+          required: false
+        - label: You may anonymize this report in ADOPTION.md.
+          required: false

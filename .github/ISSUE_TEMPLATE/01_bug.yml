@@ -1,0 +1,44 @@
+name: Open bug report
+description: Report a reproducible Rendro defect.
+title: "[bug]: "
+labels: ["state:triage", "kind:bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a reproducible issue. Please keep the example minimal and remove private data before attaching snippets or fixtures.
+  - type: textarea
+    id: observed-behavior
+    attributes:
+      label: Observed behavior
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: What should have happened?
+    validations:
+      required: true
+  - type: input
+    id: rendro-version
+    attributes:
+      label: Rendro version
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: textarea
+    id: minimal-reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Include the smallest Elixir snippet, fixture path, or repository link that reproduces the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include Elixir/OTP versions, OS/container, and any optional adapters or external tools involved.
+    validations:
+      required: true

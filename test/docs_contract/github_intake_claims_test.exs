@@ -26,7 +26,6 @@ defmodule Rendro.DocsContract.GithubIntakeClaimsTest do
              ~r/\{"GitHub intake claims lane",\s*\["test",\s*"test\/docs_contract\/github_intake_claims_test\.exs"\]\}/s
   end
 
-  @tag skip: "unskip after GitHub issue templates are created"
   test "Phase 88 requires only the locked issue template set" do
     for path <- @required_issue_templates do
       assert File.exists?(path)
@@ -42,16 +41,14 @@ defmodule Rendro.DocsContract.GithubIntakeClaimsTest do
     assert actual == Enum.sort(@required_issue_templates)
   end
 
-  @tag skip: "unskip after GitHub issue templates are created"
   test "blocked-document intake defaults to signal triage without counted labels" do
     blocked = File.read!(".github/ISSUE_TEMPLATE/02_blocked_document.yml")
 
-    assert blocked =~ "state:triage"
-    assert blocked =~ "adoption:signal"
-    refute blocked =~ "adoption:counted"
+    assert blocked =~ ~s|labels: ["state:triage", "adoption:signal"]|
+    assert blocked =~ "A maintainer applies `adoption:counted` only after checking ADOPTION.md rules"
+    refute blocked =~ ~r/^labels:.*adoption:counted/m
   end
 
-  @tag skip: "unskip after GitHub issue templates are created"
   test "GitHub issue config disables blank issues and routes discovery outward" do
     config = File.read!(".github/ISSUE_TEMPLATE/config.yml")
 
@@ -60,7 +57,6 @@ defmodule Rendro.DocsContract.GithubIntakeClaimsTest do
     assert config =~ "ElixirForum"
   end
 
-  @tag skip: "unskip after GitHub issue templates are created"
   test "blocked-document form collects adoption-gate review fields" do
     blocked = File.read!(".github/ISSUE_TEMPLATE/02_blocked_document.yml")
 
