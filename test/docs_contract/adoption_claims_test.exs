@@ -28,9 +28,9 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
     "Notes"
   ]
   @threshold_sentences [
-    "Demand: 6 qualifying text-shaping signals in a rolling 90-day window, from at least 4 distinct non-maintainer requesters and at least 3 distinct orgs/apps. At least 3 must be blocking production/evaluation, not curiosity.",
-    "Downloads: since launch snapshot, Hex `downloads.all` increases by at least 1,500 and `downloads.week >= 150` on two snapshots at least 14 days apart after launch week.",
-    "Contributor: at least 1 merged, non-maintainer PR after launch that materially improves code, tests, docs, examples, fixtures, or a reproducible failing case. Typos, bots, Dependabot, and maintainer alternate accounts do not count."
+    "6 qualifying text-shaping signals in a rolling 90-day window, from at least 4 distinct non-maintainer requesters and at least 3 distinct orgs/apps. At least 3 must block production or evaluation.",
+    "Since launch snapshot, Hex downloads.all increases by at least 1,500 and downloads.week >= 150 on two snapshots at least 14 days apart after launch week.",
+    "At least 1 merged, non-maintainer PR after launch that materially improves code, tests, docs, examples, fixtures, or a reproducible failing case. Typos, bots, Dependabot, and maintainer alternate accounts do not count."
   ]
 
   test "docs verification script includes exactly one adoption claims lane" do
@@ -42,7 +42,6 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
              ~r/\{"Adoption claims lane",\s*\["test",\s*"test\/docs_contract\/adoption_claims_test\.exs"\]\}/s
   end
 
-  @tag skip: "unskip after ADOPTION.md is created"
   test "ADOPTION.md exists at the repository root with the required section order" do
     adoption = File.read!(@adoption_path)
 
@@ -61,7 +60,6 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
              positions |> Enum.map(fn {_section, {position, _length}} -> position end) |> Enum.sort()
   end
 
-  @tag skip: "unskip after ADOPTION.md is created"
   test "adoption gate threshold text and contributor exclusions are exact" do
     adoption = File.read!(@adoption_path)
 
@@ -70,17 +68,15 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
     end
   end
 
-  @tag skip: "unskip after ADOPTION.md is created"
   test "signal ledger columns and empty states are explicit" do
     adoption = File.read!(@adoption_path)
 
     assert adoption =~ Enum.join(@ledger_columns, " | ")
-    assert adoption =~ "No qualifying adoption signals have been counted yet."
-    assert adoption =~ "No post-launch download snapshots have been recorded yet."
-    assert adoption =~ "No qualifying external contributor signal has been recorded yet."
+    assert adoption =~ "No qualifying shaping signals have been counted yet."
+    assert adoption =~ "No post-launch Hex download snapshots recorded yet."
+    assert adoption =~ "No qualifying non-maintainer contributor signal has been counted yet."
   end
 
-  @tag skip: "unskip after ADOPTION.md is created"
   test "review cadence and counting exclusions stay measurable" do
     adoption = File.read!(@adoption_path)
 
@@ -94,14 +90,24 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
           "current blocker",
           "source URL",
           "Same requester/org/use case counts once per 90-day window",
-          "Private adopter reports may be anonymized but cap at 2 counted signals per window"
+          "Private adopter reports may be anonymized but cap at 2 counted signals per window",
+          "generic i18n wishes do not qualify"
         ] do
       assert adoption =~ phrase
     end
 
-    for forbidden <- ["stars count", "+1 counts", "generic i18n", "adoption:counted default"] do
+    for forbidden <- ["stars count", "+1 counts", "adoption:counted default"] do
       refute adoption =~ forbidden
     end
+  end
+
+  test "review workflow commands are documented without runtime telemetry" do
+    adoption = File.read!(@adoption_path)
+
+    assert adoption =~ "curl -fsSL https://hex.pm/api/packages/rendro | jq '.downloads'"
+    assert adoption =~ ~s|gh issue list --state all --label "adoption:signal"|
+    assert adoption =~ ~s|gh issue list --state all --label "area:text-shaping"|
+    assert adoption =~ ~s|gh pr list --state merged --search "merged:>=$LAUNCH_DATE -author:szTheory"|
   end
 
   @tag skip: "unskip after ADOPTION.md is linked from public docs"
