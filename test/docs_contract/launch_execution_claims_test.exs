@@ -4,6 +4,8 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
   @phase_dir ".planning/phases/88-launch-execution-demand-instrumentation"
   @checklist_path Path.join(@phase_dir, "88-LAUNCH-CHECKLIST.md")
   @copy_path Path.join(@phase_dir, "88-LAUNCH-COPY.md")
+  @hexdocs_workflow_path ".github/workflows/hexdocs.yml"
+  @public_url_script_path "scripts/verify_public_launch_urls.sh"
   @readiness_labels [
     "Claim-accuracy fixes are shipped",
     "Launch artifacts are published and byte-checked",
@@ -113,5 +115,48 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     for claim <- @forbidden_claims do
       refute copy =~ claim
     end
+  end
+
+  test "HexDocs workflow publishes docs-only from main with a repository secret" do
+    workflow = File.read!(@hexdocs_workflow_path)
+
+    assert {:ok, %{"jobs" => jobs}} = YamlElixir.read_from_string(workflow)
+    assert Map.has_key?(jobs, "verify-docs-ready")
+    assert Map.has_key?(jobs, "publish-hexdocs")
+
+    assert workflow =~ "name: HexDocs"
+    assert workflow =~ "workflow_dispatch:"
+    assert workflow =~ "permissions:\n  contents: read"
+    assert workflow =~ "concurrency:"
+    assert workflow =~ "branches:\n      - main"
+    assert workflow =~ "if: github.event_name == 'push' && github.ref == 'refs/heads/main'"
+    assert workflow =~ "HEX_API_KEY: ${{ secrets.HEX_API_KEY }}"
+    assert workflow =~ "mix hex.publish docs --yes"
+    assert workflow =~ "scripts/verify_public_launch_urls.sh"
+    assert workflow =~ "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683"
+    assert workflow =~ "erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7"
+
+    refute workflow =~ ~r/mix hex\.publish --yes/
+    refute workflow =~ ~r/^\s+environment:/m
+  end
+
+  test "public launch URL verifier covers GitHub raw and HexDocs proof routes" do
+    script = File.read!(@public_url_script_path)
+
+    assert script =~ "HEXDOCS_RETRIES"
+    assert script =~ "https://raw.githubusercontent.com/szTheory/rendro/main/README.md"
+    assert script =~ "Rendered Recipe Gallery"
+    assert script =~ "https://raw.githubusercontent.com/szTheory/rendro/main/guides/comparison.md"
+    assert script =~ "Generating PDFs in Elixir without Chrome"
+
+    assert script =~
+             "https://raw.githubusercontent.com/szTheory/rendro/main/guides/livebook/first_invoice.livemd"
+
+    assert script =~ "First Invoice"
+    assert script =~ "https://raw.githubusercontent.com/szTheory/rendro/main/ADOPTION.md"
+    assert script =~ "# Adoption Signals"
+    assert script =~ "https://hexdocs.pm/rendro/readme.html"
+    assert script =~ "https://hexdocs.pm/rendro/comparison.html"
+    assert script =~ "https://hexdocs.pm/rendro/first_invoice.html"
   end
 end
