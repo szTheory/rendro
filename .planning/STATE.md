@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.6
 milestone_name: Public Launch & Adoption Bootstrap
 status: executing
-last_updated: "2026-06-12T15:14:26.232Z"
-last_activity: 2026-06-12
+last_updated: "2026-06-12T15:49:00Z"
+last_activity: 2026-06-12 -- Phase 88 Plan 05 blocked at launch publication preflight
 progress:
   total_phases: 6
   completed_phases: 5
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-10 — v2.6 milestone started)
 
 Phase: 88 (launch-execution-demand-instrumentation) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
-Last activity: 2026-06-12
+Status: Blocked before public posting
+Last activity: 2026-06-12 -- Plan 05 Task 1 local checks passed; public sync/publish blocked by dirty/ahead checkout and stale public proof URLs
 
 Progress: [██████████] 97%
 
@@ -72,7 +72,7 @@ None.
 
 ### Blockers/Concerns
 
-None.
+- [Phase 88]: Plan 05 cannot publish or reconcile CMP-03 until `main` can be cleanly synced/published. Current blocker: local `main` is ahead of `origin/main` by 199 commits and the checkout has unrelated pre-existing dirty state (`test/fixtures/forms_support_fixture.pdf`, `.planning/v2.6-MILESTONE-AUDIT.md`). Local checks passed at 2026-06-12T15:49Z: `mix docs.contract`, `mix rendro.livebook.check`, `mix hex.build`, targeted launch/adoption/intake docs-contract tests, and `mix rendro.viewer_evidence validate`. Public proof remains stale/missing: GitHub README raw lacks `Rendered Recipe Gallery`; comparison, Livebook, and ADOPTION raw URLs return 404; HexDocs comparison and Livebook return 404. GitHub intake is issue-only by the accepted 88-03 deviation; D-34 labels are present and Discussions remain disabled intentionally.
 
 ## Deferred Items
 
@@ -92,8 +92,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-06-12T15:14:26.205Z
-Stopped at: Completed 88-04-PLAN.md
+Last session: 2026-06-12T15:44:08Z
+Stopped at: Blocked 88-05-PLAN.md Task 1 before public posting
 Resume file: None
 
 ## Performance Metrics
