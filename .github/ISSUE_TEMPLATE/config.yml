@@ -1,8 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: GitHub Discussions
-    url: https://github.com/szTheory/rendro/discussions
-    about: Start open-ended use-case discovery in Discussions.
   - name: Adoption Signals
     url: https://github.com/szTheory/rendro/blob/main/ADOPTION.md
     about: Read the public rules for counted adoption signals.

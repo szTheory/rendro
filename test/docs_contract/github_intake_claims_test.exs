@@ -2,19 +2,10 @@ defmodule Rendro.DocsContract.GithubIntakeClaimsTest do
   use ExUnit.Case, async: true
 
   @issue_dir ".github/ISSUE_TEMPLATE"
-  @discussion_path ".github/DISCUSSION_TEMPLATE/use-cases.yml"
   @required_issue_templates [
     ".github/ISSUE_TEMPLATE/01_bug.yml",
     ".github/ISSUE_TEMPLATE/02_blocked_document.yml",
     ".github/ISSUE_TEMPLATE/config.yml"
-  ]
-  @use_case_fields [
-    "document type",
-    "Phoenix/Elixir context",
-    "blocker",
-    "script/language",
-    "workaround",
-    "production/evaluation"
   ]
 
   test "docs verification script includes exactly one GitHub intake claims lane" do
@@ -49,12 +40,13 @@ defmodule Rendro.DocsContract.GithubIntakeClaimsTest do
     refute blocked =~ ~r/^labels:.*adoption:counted/m
   end
 
-  test "GitHub issue config disables blank issues and routes discovery outward" do
+  test "GitHub issue config disables blank issues and keeps intake issue-only" do
     config = File.read!(".github/ISSUE_TEMPLATE/config.yml")
 
     assert config =~ "blank_issues_enabled: false"
-    assert config =~ "Discussions"
+    refute config =~ "Discussions"
     assert config =~ "ElixirForum"
+    assert config =~ "ADOPTION.md"
   end
 
   test "blocked-document form collects adoption-gate review fields" do
@@ -76,12 +68,7 @@ defmodule Rendro.DocsContract.GithubIntakeClaimsTest do
     end
   end
 
-  @tag skip: "unskip after GitHub discussion template is created"
-  test "use-cases discussion template asks for the six required fields when present" do
-    discussion = File.read!(@discussion_path)
-
-    for field <- @use_case_fields do
-      assert String.downcase(discussion) =~ String.downcase(field)
-    end
+  test "Phase 88 does not create a discussion-template surface" do
+    refute File.exists?(".github/DISCUSSION_TEMPLATE/use-cases.yml")
   end
 end
