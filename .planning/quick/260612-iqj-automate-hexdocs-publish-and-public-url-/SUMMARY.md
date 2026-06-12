@@ -12,9 +12,10 @@ verification:
   - mix rendro.livebook.check
   - mix rendro.comparison.check
   - mix hex.build
-  - actionlint .github/workflows/ci.yml .github/workflows/hexdocs.yml .github/workflows/release.yml
+- actionlint .github/workflows/ci.yml .github/workflows/hexdocs.yml .github/workflows/release.yml
   - GitHub Actions HexDocs run 27432226735
   - GitHub Actions HexDocs run 27433121994
+  - GitHub Actions HexDocs run 27433698454
 ---
 
 # Quick Task Summary
@@ -27,6 +28,7 @@ Automated the main-branch HexDocs refresh path so launch proof docs no longer de
 - Added `scripts/verify_public_launch_urls.sh` for GitHub raw and HexDocs public proof checks, with HexDocs propagation retries.
 - Extended launch docs-contract coverage so the workflow stays docs-only, secret-backed, no-approval, and wired to public URL verification.
 - Pinned `actions/checkout` to the `v6.0.3` commit SHA across HexDocs, CI, and release workflows after GitHub Actions warned that the previous `v4.2.2` pin used the deprecated Node 20 runtime.
+- Pinned `actions/setup-python` to the `v6.2.0` commit SHA in CI live-proof jobs after GitHub Actions warned that `v5` is on the Node 20 deprecation path.
 - Removed a nested `mix run` subprocess from the release-preflight proof test after CI exposed it as timeout-prone inside the main `mix ci` test job.
 
 ## Commits
@@ -46,3 +48,4 @@ Automated the main-branch HexDocs refresh path so launch proof docs no longer de
 - `actionlint .github/workflows/ci.yml .github/workflows/hexdocs.yml .github/workflows/release.yml` passed.
 - GitHub Actions HexDocs run `27432226735` passed end to end: readiness checks, `mix hex.publish docs --yes`, and public launch URL verification.
 - GitHub Actions HexDocs run `27433121994` passed end to end after all workflow checkout pins moved to `v6.0.3`.
+- GitHub Actions HexDocs run `27433698454` passed end to end after the release-preflight CI test timeout fix.
