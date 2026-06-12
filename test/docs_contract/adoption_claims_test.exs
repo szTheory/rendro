@@ -110,9 +110,35 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
     assert adoption =~ ~s|gh pr list --state merged --search "merged:>=$LAUNCH_DATE -author:szTheory"|
   end
 
-  @tag skip: "unskip after ADOPTION.md is linked from public docs"
   test "README and comparison guide link to ADOPTION.md" do
-    assert File.read!("README.md") =~ "ADOPTION.md"
-    assert File.read!("guides/comparison.md") =~ "ADOPTION.md"
+    readme_guides = readme_guides_section()
+    comparison = File.read!("guides/comparison.md")
+
+    assert readme_guides =~ "ADOPTION.md"
+    assert readme_guides =~ "Adoption Signals"
+    assert comparison =~ "../ADOPTION.md"
+
+    public_docs = readme_guides <> "\n" <> comparison
+
+    for phrase <- [
+          "stars count",
+          "forks count",
+          "reactions count",
+          "+1 counts",
+          "generic i18n wishes count"
+        ] do
+      refute public_docs =~ phrase
+    end
+  end
+
+  defp readme_guides_section do
+    readme = File.read!("README.md")
+
+    pattern = ~r/## Guides\n(?<section>.*?)\n## Getting Started with the Builder API/s
+
+    case Regex.named_captures(pattern, readme) do
+      %{"section" => section} -> section
+      _ -> flunk("expected README Guides section before Builder API section")
+    end
   end
 end

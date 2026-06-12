@@ -44,6 +44,7 @@ SHA-256: `a9f1a241c3fb331ad5522d905af8acf26d9848b8862cb9a6f3e4033c3ee1dc94`
 - [Generating PDFs in Elixir without Chrome](guides/comparison.md) — an evidence-backed comparison guide for Rendro, ChromicPDF, pdf_generator, and Typst CLI.
 - [First Invoice Livebook](guides/livebook/first_invoice.livemd) — a zero-friction tutorial for rendering and downloading a deterministic invoice PDF.
 - [API Stability and Support Boundaries](guides/api_stability.md) — the canonical support language for trust-sensitive and proof-backed surfaces.
+- [Adoption Signals](ADOPTION.md) - public criteria for counting demand toward the conditional v2.7 text-shaping gate.
 
 ## Getting Started with the Builder API
 

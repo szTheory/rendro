@@ -60,6 +60,8 @@ Typst is a strong fit when the team wants Typst templates, Typst review workflow
 >
 > Unsupported shaping cases fail explicitly instead of producing silent broken output.
 
+Concrete unsupported document jobs or text-shaping blockers should be routed to the public [Adoption Signals](../ADOPTION.md) ledger so the conditional v2.7 gate stays measurable.
+
 Rendro's comparison posture is intentionally narrow: deterministic business documents authored from Elixir data, with explicit support boundaries. If a job depends on arbitrary browser layout, use a browser-backed renderer. If a job depends on Typst-native templates, use Typst.
 
 ## Reproduce These Numbers
