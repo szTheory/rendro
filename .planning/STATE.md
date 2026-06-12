@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.6
 milestone_name: Public Launch & Adoption Bootstrap
 status: executing
-last_updated: "2026-06-12T14:45:59.770Z"
+last_updated: "2026-06-12T15:14:26.232Z"
 last_activity: 2026-06-12
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 32
-  completed_plans: 30
-  percent: 94
+  completed_plans: 31
+  percent: 97
 ---
 
 # Project State
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-06-10 — v2.6 milestone started)
 ## Current Position
 
 Phase: 88 (launch-execution-demand-instrumentation) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-06-12
 
-Progress: [█████████░] 94%
+Progress: [██████████] 97%
 
 ## Milestone Snapshot
 
@@ -64,6 +64,7 @@ Full decision log in PROJECT.md Key Decisions table. v2.6 scoping decisions (loc
 - [Phase 85]: `pdfium-render` is reserved for top-level raster evidence; GUI-viewer promotion rows stay limited to manual, pdfium-cli, and pdfjs-dist.
 - [Phase 85]: `Pdfium.render/2` validates `pages:` as a strict numeric page range before executable lookup or command execution.
 - [Phase 88]: Prefer issue-only OSS intake over GitHub Discussions; Issues are the lightweight dumping ground that can be scanned and triaged efficiently with `gh` and LLM workflows.
+- [Phase 88]: Zero-human UAT governs mobile viewer evidence; iOS Files/Preview and Android Drive mobile GUI rows remain `explicit_deferral` until automated device-level CI evidence exists, and anecdotal local opening does not promote support rows.
 
 ### Pending Todos
 
@@ -91,8 +92,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-06-12T14:45:59.765Z
-Stopped at: Completed 88-03-PLAN.md
+Last session: 2026-06-12T15:14:26.205Z
+Stopped at: Completed 88-04-PLAN.md
 Resume file: None
 
 ## Performance Metrics
@@ -118,3 +119,4 @@ Resume file: None
 | Phase 88 P01 | 12 min | 2 tasks | 7 files |
 | Phase 88 P02 | 11 min | 2 tasks | 4 files |
 | Phase 88 P03 | 9 min | 2 tasks | 4 files |
+| Phase 88 P04 | 28 min | 2 tasks | 8 files |

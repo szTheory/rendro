@@ -45,7 +45,7 @@ Requirements for the v2.6 milestone. Each maps to exactly one roadmap phase.
 ### Launch Execution & Demand Instrumentation (LNCH)
 
 - [ ] **LNCH-01**: The coordinated launch is executed: ElixirForum #announcing thread, ElixirStatus post, awesome-elixir PR, and genuine, helpful replies in the two existing demand threads (optional Show HN) — only after HYG/GAL/CMP requirements are shipped.
-- [ ] **LNCH-02**: 2–4 mobile viewer-evidence rows (iOS Files/Mail preview, Android default viewer × forms/signed surfaces) are recorded via the existing evidence recipe and published as a launch-adjacent content beat.
+- [x] **LNCH-02**: 2–4 mobile viewer-evidence rows (iOS Files/Mail preview, Android default viewer × forms/signed surfaces) are recorded via the existing evidence recipe and published as a launch-adjacent content beat.
 - [ ] **LNCH-03**: The conditional-v2.7 text-shaping demand gate is concrete and measurable: defined signal thresholds (non-self issues/asks, download floor, first external contributor), an ADOPTION.md signal ledger, and GitHub Discussions/issue templates routing adopter needs.
 
 ## v2 Requirements
@@ -94,5 +94,5 @@ Deferred to future milestones. Tracked but not in the current roadmap.
 | CMP-02 | Phase 87 | Complete |
 | CMP-03 | Phase 87 | Pending |
 | LNCH-01 | Phase 88 | Pending |
-| LNCH-02 | Phase 88 | Pending |
+| LNCH-02 | Phase 88 | Complete |
 | LNCH-03 | Phase 88 | Pending |
