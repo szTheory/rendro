@@ -1,22 +1,21 @@
-# Phase 88 Launch Checklist
+# Phase 88 Quiet Public Checklist
 
-Operator ledger for launch readiness, publication order, and final public URLs.
+Operator ledger for quiet public discoverability, proof readiness, and low-maintenance intake.
 
-## [BLOCKING] Launch readiness
+## Quiet Public Posture
 
-Launch is blocked until CMP-03 is reconciled and all required proof links are public. Update the requirements traceability, verify the Livebook link, then re-run the launch checklist.
+Rendro is public and findable through GitHub, HexDocs, proof links, and issue templates. No proactive announcement campaign is required.
 
-CMP-03 was reconciled on 2026-06-12 after local Livebook checks and public GitHub/HexDocs URL checks passed. Remaining launch blockers are the manual external publication URLs below.
-
-Use only these statuses: `Ready`, `Blocked`, `Deferred with reason`.
+Use only these statuses: `Ready`, `Deferred with reason`.
 
 | Gate | Status | Evidence / URL | Notes |
 | --- | --- | --- | --- |
-| Claim-accuracy fixes are shipped | Ready | HYG-01..05 complete in `.planning/REQUIREMENTS.md` | Pure core and shaping boundaries must stay true before posting. |
-| Launch artifacts are published and byte-checked | Ready | GAL-01..03 complete; `mix docs.contract` passed 2026-06-12T20:55Z; public GitHub README raw URL passed 2026-06-12T20:55Z | Public gallery/manual proof is available before posting. |
-| Comparison guide and Livebook are live | Ready | `mix docs.contract`, `mix rendro.livebook.check`, `mix hex.build`, raw GitHub comparison/Livebook checks, and HexDocs comparison/Livebook checks passed 2026-06-12T20:55Z; CMP-03 checked in `.planning/REQUIREMENTS.md` | Hex downloads at launch-readiness check: `all=867`, `week=115`. |
+| Claim-accuracy fixes are shipped | Ready | HYG-01..05 complete in `.planning/REQUIREMENTS.md` | Pure core and shaping boundaries must stay true for public readers. |
+| Launch artifacts are published and byte-checked | Ready | GAL-01..03 complete; `mix docs.contract` passed 2026-06-12T20:55Z; public GitHub README raw URL passed 2026-06-12T20:55Z | Gallery/manual proof stays available for people who find the project. |
+| Comparison guide and Livebook are live | Ready | `mix docs.contract`, `mix rendro.livebook.check`, `mix hex.build`, raw GitHub comparison/Livebook checks, and HexDocs comparison/Livebook checks passed 2026-06-12T20:55Z; CMP-03 checked in `.planning/REQUIREMENTS.md` | Hex downloads at readiness check: `all=867`, `week=115`. |
 | Mobile evidence outcome is recorded | Ready | Four terminal `explicit_deferral` rows in `priv/support_matrix.json` | Zero-human UAT decision: no mobile GUI support claim is promoted until automated device-level CI evidence exists. |
 | Adoption signal ledger is ready | Ready | `ADOPTION.md` exists; targeted launch/adoption/intake tests and D-34 remote label check passed 2026-06-12T15:49Z | Issue-only intake is the locked Phase 88 path; Discussions remain disabled by the accepted 88-03 checkpoint deviation. |
+| Proactive outreach | Deferred with reason | No ElixirForum announcement, ElixirStatus post, awesome-elixir PR, demand-thread reply, mobile follow-up post, or Show HN is required | Maintainer posture: keep Rendro quietly public, but avoid creating a recurring community-response obligation unless explicitly opted in later. |
 
 ## Mobile Evidence Outcome
 
@@ -38,26 +37,23 @@ Use only these statuses: `Ready`, `Blocked`, `Deferred with reason`.
 | HexDocs README | Ready | `https://hexdocs.pm/rendro/readme.html` | 2026-06-12T15:49Z | HTTP 200. |
 | HexDocs comparison guide | Ready | `https://hexdocs.pm/rendro/comparison.html` | 2026-06-12T20:55Z | HTTP 200. |
 | HexDocs Livebook page | Ready | `https://hexdocs.pm/rendro/first_invoice.html` | 2026-06-12T20:55Z | HTTP 200. |
-| ElixirForum hub | Blocked | TBD | TBD | Publish first, after readiness gates pass. |
-| ElixirStatus post | Blocked | TBD | TBD | Publish after ElixirForum hub. |
-| awesome-elixir PR | Blocked | TBD | TBD | Open after public docs are live. |
-| Chromium demand-thread reply | Blocked | TBD | TBD | Reply after canonical announcement is live. |
-| Prawn-like demand-thread reply | Blocked | TBD | TBD | Reply after Chromium thread. |
-| mobile evidence follow-up | Blocked | TBD | TBD | Publish after mobile evidence outcome is recorded. |
 
-## Publication Order
+## Deferred Outreach
 
-1. ElixirForum announcement
-2. ElixirStatus
-3. awesome-elixir PR
-4. PDF generation without Chromium dependency
-5. Looking for a Prawn-Like PDF Generation Library in Elixir
-6. mobile evidence follow-up
+The following are intentionally not part of Phase 88 completion:
+
+| Surface | Status | Reason |
+| --- | --- | --- |
+| ElixirForum announcement | Deferred with reason | No proactive announcement campaign is planned. |
+| ElixirStatus post | Deferred with reason | No short-channel promotion is planned. |
+| awesome-elixir PR | Deferred with reason | No listing PR is required. |
+| Demand-thread replies | Deferred with reason | No external thread replies are required. |
+| Mobile evidence follow-up post | Deferred with reason | Mobile evidence remains documented in support boundaries, not promoted as a content beat. |
+| Show HN | Deferred with reason | No broad launch step is planned. |
 
 ## Operator Notes
 
-- Show blocked gates first in any launch handoff.
-- Do not publish celebratory copy while any required gate is `Blocked`.
+- Do not treat deferred outreach as blocked work.
+- Keep public docs, HexDocs, ADOPTION.md, and issue templates truthful and discoverable.
 - Do not route launch copy to GitHub Discussions; Phase 88 accepted the issue-only intake deviation in 88-03.
-- Show HN is deferred and non-blocking; it is not part of the required publication order.
-- Record final public URLs in this checklist as each channel is posted.
+- If the maintainer later opts into outreach, create a new explicit task instead of reactivating Phase 88 publication obligations.

@@ -2,9 +2,9 @@
 
 ## Purpose
 
-This ledger records public, reviewable signals for Rendro's conditional v2.7 global text shaping gate. It is the source of truth for deciding whether global text shaping work has enough concrete adopter demand to justify a dedicated milestone.
+This ledger records public, reviewable signals for Rendro's conditional v2.7 global text shaping gate. It is intentionally low-maintenance: Rendro is quietly public, and signals are reviewed when people find the project and open concrete issues.
 
-Rendro does not use private analytics, social counters, or GitHub Projects to trigger this gate. Every counted signal must be reviewable from a source URL or an explicitly anonymized private report.
+Rendro does not use private analytics, social counters, launch campaigns, or GitHub Projects to trigger this gate. Every counted signal must be reviewable from a source URL or an explicitly anonymized private report.
 
 ## Current Gate: v2.7 Global Text Shaping
 
@@ -17,8 +17,8 @@ Text-shaping signals count only when they require shaping, RTL, or cluster behav
 | Threshold | Status | Required |
 | --- | --- | --- |
 | Demand | Blocked | 6 qualifying text-shaping signals in a rolling 90-day window, from at least 4 distinct non-maintainer requesters and at least 3 distinct orgs/apps. At least 3 must block production or evaluation. |
-| Downloads | Blocked | Since launch snapshot, Hex downloads.all increases by at least 1,500 and downloads.week >= 150 on two snapshots at least 14 days apart after launch week. |
-| Contributor | Blocked | At least 1 merged, non-maintainer PR after launch that materially improves code, tests, docs, examples, fixtures, or a reproducible failing case. Typos, bots, Dependabot, and maintainer alternate accounts do not count. |
+| Downloads | Blocked | Since discovery baseline, Hex downloads.all increases by at least 1,500 and downloads.week >= 150 on two snapshots at least 14 days apart after the baseline. |
+| Contributor | Blocked | At least 1 merged, non-maintainer PR after discovery baseline that materially improves code, tests, docs, examples, fixtures, or a reproducible failing case. Typos, bots, Dependabot, and maintainer alternate accounts do not count. |
 
 Counting rules:
 
@@ -28,17 +28,17 @@ Counting rules:
 - Private adopter reports may be anonymized but cap at 2 counted signals per window.
 - A maintainer applies `adoption:counted` only after checking these rules.
 
-## Launch Snapshot
+## Discovery Baseline
 
-Record the launch-thread date as `L` before counting download growth.
+The discovery baseline is the first recorded public-readiness snapshot. It is not tied to an announcement campaign.
 
-| Date | Launch Thread | Hex downloads.all | Hex downloads.week | Notes |
+| Date | Source | Hex downloads.all | Hex downloads.week | Notes |
 | --- | --- | --- | --- | --- |
-| YYYY-MM-DD | TBD | TBD | TBD | Add before counting download growth. |
+| 2026-06-12 | Quiet public readiness check | 867 | 115 | Baseline recorded after README, comparison guide, Livebook, ADOPTION.md, and HexDocs proof URLs were public. |
 
 ## Signal Ledger
 
-No qualifying shaping signals have been counted yet. Open a blocked-document issue or use-case discussion with a concrete document job, script/language, current blocker, and source URL.
+No qualifying shaping signals have been counted yet. Open a blocked-document issue with a concrete document job, script/language, current blocker, and source URL.
 
 | ID | Date | Source URL | Channel | Requester | Org/App | Gate Area | Script/Language | Document Job | Blocking? | Qualifies? | Count Group | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -46,7 +46,7 @@ No qualifying shaping signals have been counted yet. Open a blocked-document iss
 
 ## Download Snapshots
 
-No post-launch Hex download snapshots recorded yet. Add the launch snapshot before counting download growth.
+No post-baseline Hex download snapshots recorded yet. Add future snapshots only when reviewing inbound signal volume or planning a future milestone.
 
 Use this command when recording a snapshot:
 
@@ -56,7 +56,7 @@ curl -fsSL https://hex.pm/api/packages/rendro | jq '.downloads'
 
 | Date | Hex downloads.all | Hex downloads.week | Source | Notes |
 | --- | --- | --- | --- | --- |
-| YYYY-MM-DD | TBD | TBD | Hex package API | Add the first row at launch, then compare later snapshots against it. |
+| YYYY-MM-DD | TBD | TBD | Hex package API | Add only when reviewing concrete inbound demand or planning future work. |
 
 ## External Contributors
 
@@ -65,7 +65,7 @@ No qualifying non-maintainer contributor signal has been counted yet.
 Contributor review command:
 
 ```sh
-gh pr list --state merged --search "merged:>=$LAUNCH_DATE -author:szTheory" \
+gh pr list --state merged --search "merged:>=2026-06-12 -author:szTheory" \
   --json number,title,author,mergedAt,url
 ```
 
@@ -85,13 +85,13 @@ Rejected contributor candidates:
 
 ## Review Log
 
-No gate reviews have run yet. First review is scheduled for L+30 and the gate cannot trigger before L+45.
+No gate reviews have run yet. Reviews are pull-based: run one when qualifying issues exist or during future milestone planning.
 
 Review cadence:
 
-- Triage inbound signals twice weekly for the first 30 days after `L`, then weekly.
-- Gate reviews happen at `L+30`, `L+60`, `L+90`, then monthly using the rolling 90-day window.
-- The gate cannot trigger before L+45.
+- Triage inbound adoption-signal issues when they are opened.
+- Run gate reviews only when concrete inbound signals exist or when planning a future milestone.
+- The gate cannot trigger until at least 45 days after the 2026-06-12 discovery baseline.
 
 Issue review commands:
 
@@ -103,8 +103,6 @@ gh issue list --state all --label "area:text-shaping" \
   --json number,title,author,createdAt,url,labels
 ```
 
-Use the GitHub UI for low-volume Discussions. Use GraphQL only if volume justifies it.
-
 | Date | Reviewer | Demand | Downloads | Contributor | Decision | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| TBD | TBD | Blocked | Blocked | Blocked | No review run yet | First scheduled review is L+30. |
+| TBD | TBD | Blocked | Blocked | Blocked | No review run yet | Reviews are pull-based, not scheduled from a launch date. |

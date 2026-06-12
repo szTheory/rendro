@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.6
 milestone_name: Public Launch & Adoption Bootstrap
-status: executing
-last_updated: "2026-06-12T20:55:30Z"
-last_activity: 2026-06-12 -- Plan 05 Tasks 1-2 passed; CMP-03 reconciled and public proof URLs verified; awaiting maintainer publication URLs
+status: ready_for_verification
+last_updated: "2026-06-12T21:09:53Z"
+last_activity: 2026-06-12 -- Phase 88 quiet public posture recorded; proactive announcement obligations removed
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 32
-  completed_plans: 31
-  percent: 97
+  completed_plans: 32
+  percent: 100
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-06-10 — v2.6 milestone started)
 
 ## Current Position
 
-Phase: 88 (launch-execution-demand-instrumentation) — EXECUTING
+Phase: 88 (launch-execution-demand-instrumentation) — COMPLETE
 Plan: 5 of 5
-Status: Awaiting manual external publication checkpoint
-Last activity: 2026-06-12 -- Plan 05 Tasks 1-2 passed; CMP-03 reconciled and public proof URLs verified; awaiting maintainer publication URLs
+Status: Ready for milestone verification
+Last activity: 2026-06-12 -- Phase 88 quiet public posture recorded; proactive announcement obligations removed
 
 Progress: [██████████] 97%
 
@@ -59,6 +59,7 @@ Full decision log in PROJECT.md Key Decisions table. v2.6 scoping decisions (loc
 - Raster lane is always advisory — `pdfium-render` evidence vocabulary stays distinct from GUI-viewer proof; a pdfium download failure must never block the four required engine lanes.
 - Benchmark guide is honest about ChromicPDF's strengths; unfair benchmarks poison the launch.
 - Demand gate thresholds (LNCH-03) must be concrete and numeric — "adopter demand" failed as a gate before.
+- Phase 88 quiet public posture: keep README, HexDocs, ADOPTION.md, and issue templates available for people who find Rendro, but do not require announcements, listings, demand-thread replies, or other proactive outreach. External promotion is deferred unless the maintainer explicitly opts in later.
 - [Phase ?]: Used @tag :skip for RED Wave 0 test stubs — :pending not in ExUnit exclude list; :skip ensures mix test exits 0 during Wave 0 scaffolding
 - [Phase ?]: render_args/3 separate private function
 - [Phase 85]: `pdfium-render` is reserved for top-level raster evidence; GUI-viewer promotion rows stay limited to manual, pdfium-cli, and pdfjs-dist.
@@ -72,7 +73,7 @@ None.
 
 ### Blockers/Concerns
 
-- [Phase 88]: Plan 05 Tasks 1-2 are complete. CMP-03 is reconciled after `mix docs.contract`, `mix rendro.livebook.check`, `mix hex.build`, targeted launch/adoption/intake docs-contract tests, `mix rendro.viewer_evidence validate`, public raw GitHub checks, and HexDocs README/comparison/Livebook checks passed on 2026-06-12. Remaining blocker: maintainer must publish the ElixirForum hub, ElixirStatus post, awesome-elixir PR, two demand-thread replies, and mobile evidence follow-up in locked order, then return final URLs for Task 3. GitHub intake is issue-only by the accepted 88-03 deviation; D-34 labels are present and Discussions remain disabled intentionally.
+None.
 
 ## Deferred Items
 
@@ -101,6 +102,7 @@ Resume file: None
 | Date | Task | Summary |
 |------|------|---------|
 | 2026-06-12 | Automate HexDocs publish and public URL verification on main | `.github/workflows/hexdocs.yml` publishes docs-only with `HEX_API_KEY` after main pushes and runs `scripts/verify_public_launch_urls.sh`. |
+| 2026-06-12 | Update Phase 88 to quiet public posture | Removed proactive announcement obligations; Rendro stays quietly public with low-maintenance issue-only intake. |
 
 ## Performance Metrics
 

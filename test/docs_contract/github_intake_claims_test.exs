@@ -48,7 +48,7 @@ defmodule Rendro.DocsContract.GithubIntakeClaimsTest do
 
     assert config =~ "blank_issues_enabled: false"
     refute config =~ "Discussions"
-    assert config =~ "ElixirForum"
+    refute config =~ "ElixirForum"
     assert config =~ "ADOPTION.md"
   end
 

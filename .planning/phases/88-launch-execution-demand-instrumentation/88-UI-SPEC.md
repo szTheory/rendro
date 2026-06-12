@@ -11,14 +11,20 @@ reviewed_at: 2026-06-12T01:29:17Z
 
 # Phase 88 - UI Design Contract
 
-Visual, copy, and interaction contract for launch execution surfaces,
-mobile-viewer evidence publication, root `ADOPTION.md`, GitHub issue/discussion
-intake, and community reply content.
+Visual, copy, and interaction contract for quiet public discovery surfaces,
+mobile-viewer evidence publication, root `ADOPTION.md`, and GitHub issue-only
+intake.
+
+Superseding posture, 2026-06-12: Phase 88 is quiet public discoverability, not
+a proactive launch campaign. Keep GitHub, HexDocs, proof links, ADOPTION.md,
+and issue templates available, but do not require ElixirForum, ElixirStatus,
+awesome-elixir, demand-thread, mobile follow-up, or Show HN publication unless
+the maintainer explicitly opts into a new task.
 
 This is not a web application UI phase. No client framework, shadcn,
 third-party component registry, custom JavaScript, or marketing landing page is
-in scope. The primary surfaces are Markdown, GitHub forms, HexDocs/GitHub
-rendered docs, `priv/support_matrix.json`, and Elixir community posts.
+in scope. The primary surfaces are Markdown, GitHub issue forms, HexDocs/GitHub
+rendered docs, and `priv/support_matrix.json`.
 
 ---
 
@@ -26,23 +32,20 @@ rendered docs, `priv/support_matrix.json`, and Elixir community posts.
 
 | Property | Value |
 |----------|-------|
-| Tool | Markdown / GitHub issue forms / GitHub Discussions / ExDoc / ElixirForum / ElixirStatus |
+| Tool | Markdown / GitHub issue forms / ExDoc |
 | Preset | not applicable |
 | Component library | none |
 | Icon library | none |
 | Font | Host defaults for rendered Markdown/forms; Inter and JetBrains Mono only if new custom docs CSS is introduced later |
-| Primary surfaces | ElixirForum announcement, ElixirStatus post, awesome-elixir PR copy, demand-thread replies, mobile evidence docs, `ADOPTION.md`, issue templates, discussion template |
+| Primary surfaces | README/HexDocs proof links, mobile evidence docs, `ADOPTION.md`, issue templates |
 | Source of truth for claims | `priv/support_matrix.json`, checked-in evidence files, docs-contract tests, benchmark results, Livebook and guide links |
-| Source of truth for gate rules | Root `ADOPTION.md` and Phase 88 context decisions D-24..D-35 |
+| Source of truth for gate rules | Root `ADOPTION.md` and Phase 88 context decisions D-24..D-38 |
 
 Contract:
 
-- Keep the launch ecosystem-idiomatic: plain useful maintainer writing, not a
-  marketing microsite.
-- Community surfaces should link back to the ElixirForum announcement as the
-  canonical hub.
-- GitHub issue/discussion forms are structured intake for adoption signals,
-  not an app-like workflow.
+- Keep the quiet public surfaces plain and useful, not a marketing microsite.
+- Public discovery should route to README, HexDocs, ADOPTION.md, and issue templates.
+- GitHub issue forms are structured intake for adoption signals, not an app-like workflow.
 - Public docs are the product UI for this phase. Every claim in public copy
   must have a checked-in proof or named boundary.
 - No custom browser widgets, remote images, CDN assets, social embeds, or
@@ -203,7 +206,7 @@ Required section order:
 2. `## Purpose`
 3. `## Current Gate: v2.7 Global Text Shaping`
 4. `## Gate Thresholds`
-5. `## Launch Snapshot`
+5. `## Discovery Baseline`
 6. `## Signal Ledger`
 7. `## Download Snapshots`
 8. `## External Contributors`
@@ -220,8 +223,8 @@ Threshold presentation:
 | Threshold | Required copy |
 |-----------|---------------|
 | Demand | `6 qualifying text-shaping signals in a rolling 90-day window, from at least 4 distinct non-maintainer requesters and at least 3 distinct orgs/apps. At least 3 must block production or evaluation.` |
-| Downloads | `Since launch snapshot, Hex downloads.all increases by at least 1,500 and downloads.week >= 150 on two snapshots at least 14 days apart after launch week.` |
-| Contributor | `At least 1 merged, non-maintainer PR after launch that materially improves code, tests, docs, examples, fixtures, or a reproducible failing case.` |
+| Downloads | `Since discovery baseline, Hex downloads.all increases by at least 1,500 and downloads.week >= 150 on two snapshots at least 14 days apart after the baseline.` |
+| Contributor | `At least 1 merged, non-maintainer PR after discovery baseline that materially improves code, tests, docs, examples, fixtures, or a reproducible failing case.` |
 
 Signal ledger columns:
 
@@ -231,10 +234,10 @@ Empty-state copy:
 
 | Location | Copy |
 |----------|------|
-| Signal Ledger | `No qualifying shaping signals have been counted yet. Open a blocked-document issue or use-case discussion with a concrete document job, script/language, current blocker, and source URL.` |
-| Download Snapshots | `No post-launch Hex download snapshots recorded yet. Add the launch snapshot before counting download growth.` |
+| Signal Ledger | `No qualifying shaping signals have been counted yet. Open a blocked-document issue with a concrete document job, script/language, current blocker, and source URL.` |
+| Download Snapshots | `No post-baseline Hex download snapshots recorded yet. Add future snapshots only when reviewing inbound signal volume or planning a future milestone.` |
 | External Contributors | `No qualifying non-maintainer contributor signal has been counted yet.` |
-| Review Log | `No gate reviews have run yet. First review is scheduled for L+30 and the gate cannot trigger before L+45.` |
+| Review Log | `No gate reviews have run yet. Reviews are pull-based: run one when qualifying issues exist or during future milestone planning.` |
 
 Do not count reactions, stars, forks, `+1`, generic i18n wishes, or social
 posts as shaping signals.

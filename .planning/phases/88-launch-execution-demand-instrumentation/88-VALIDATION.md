@@ -42,7 +42,7 @@ created: 2026-06-12
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
 | 88-W0-01 | TBD | 0 | LNCH-01 | T-88-01 | Launch copy cannot publish before CMP-03/public URL readiness gates pass | docs-contract/static | `mix test test/docs_contract/launch_execution_claims_test.exs` | W0 | pending |
 | 88-W0-02 | TBD | 0 | LNCH-03 | T-88-02 | Adoption gate thresholds, ledger columns, labels, and intake routing are source-checked before public use | docs-contract/static | `mix test test/docs_contract/adoption_claims_test.exs test/docs_contract/github_intake_claims_test.exs` | W0 | pending |
-| 88-LNCH-01 | TBD | TBD | LNCH-01 | T-88-01 | Public launch order, link budgets, banned claims, and manual publication checkpoints are verified | docs-contract/manual URL | `mix test test/docs_contract/launch_execution_claims_test.exs`; public `curl` URL checks | W0 | pending |
+| 88-LNCH-01 | TBD | TBD | LNCH-01 | T-88-01 | Quiet public posture, deferred outreach, banned claims, and public proof readiness are verified | docs-contract/manual URL | `mix test test/docs_contract/launch_execution_claims_test.exs`; public `curl` URL checks | W0 | pending |
 | 88-LNCH-02 | TBD | TBD | LNCH-02 | T-88-03 | Mobile rows are either evidence-backed supported rows or explicit deferrals with no broad mobile overclaim | docs-contract + validator | `mix rendro.viewer_evidence validate`; targeted viewer/form/signing/raster docs-contract tests | yes | pending |
 | 88-LNCH-03 | TBD | TBD | LNCH-03 | T-88-02 / T-88-04 | Public adoption ledger records only qualifying non-maintainer signals and preserves private-report boundaries | docs-contract + gh/manual | `mix test test/docs_contract/adoption_claims_test.exs test/docs_contract/github_intake_claims_test.exs`; `gh label list` | W0 | pending |
 
@@ -62,9 +62,9 @@ created: 2026-06-12
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
 | Public GitHub/HexDocs readiness | LNCH-01 | Public package/docs publication happens outside local test execution | Check exact public README, comparison guide, Livebook, gallery/manual, and HexDocs URLs before posting. |
-| GitHub Discussions enablement/category availability | LNCH-03 | Repository setting/category creation may require maintainer UI/API action | Confirm `has_discussions: true` and a `Use cases` category before relying on `.github/DISCUSSION_TEMPLATE/use-cases.yml`. |
+| GitHub Discussions disabled | LNCH-03 | The accepted issue-only posture should not create a second inbox | Confirm `has_discussions: false` and no `.github/DISCUSSION_TEMPLATE/use-cases.yml` is committed. |
 | Mobile iOS/Android viewer observations | LNCH-02 | Physical/device app behavior is operator-owned | Complete each proof ID on the representative forms fixture or use `explicit_deferral`; signed rows defer unless a real `/Sig` trust UI is observed. |
-| Community publication | LNCH-01 | ElixirForum, ElixirStatus, awesome-elixir, and demand-thread posts require maintainer accounts and judgment | Publish in locked order only after readiness gates pass; record final URLs in launch checklist or `ADOPTION.md` launch snapshot as applicable. |
+| Proactive outreach | LNCH-01 | Maintainer explicitly chose quiet public discoverability | Do not publish ElixirForum, ElixirStatus, awesome-elixir, demand-thread, mobile follow-up, or Show HN surfaces unless a future explicit opt-in task exists. |
 
 ---
 
@@ -72,7 +72,7 @@ created: 2026-06-12
 
 | ID | Threat | Severity | Mitigation |
 |----|--------|----------|------------|
-| T-88-01 | Launch copy links to local-only or unpublished artifacts | high | Block posts until public URL checks pass and CMP-03 traceability is reconciled. |
+| T-88-01 | Quiet public docs link to local-only or unpublished artifacts | high | Keep public URL checks passing before marking proof surfaces Ready. |
 | T-88-02 | Adoption gate is tampered with by vague, duplicate, or self-generated signals | medium | Require source URL, requester/org grouping, concrete document job, maintainer-applied `adoption:counted`, and ledger review cadence. |
 | T-88-03 | Mobile evidence turns into broad viewer/support claims | high | Keep rows per viewer/surface; use explicit deferrals for signed mobile rows unless trust UI is observed; ban "mobile PDF support" copy. |
 | T-88-04 | Private adopter reports leak confidential document details | high | Allow anonymized notes, cap counted private signals at two per window, and reject secrets/fixtures in public evidence bodies. |

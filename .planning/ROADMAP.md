@@ -33,14 +33,14 @@ Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-
 
 ### 🚧 v2.6 Public Launch & Adoption Bootstrap (Active)
 
-**Milestone Goal:** Convert Rendro's proof-backed depth into its first real adopters — fix claim accuracy, polish visible output, build the deterministic raster toolchain, ship self-proving launch artifacts, execute a coordinated ecosystem launch, and define a concrete demand gate for conditional v2.7 global text shaping.
+**Milestone Goal:** Make Rendro truthfully and quietly discoverable — fix claim accuracy, polish visible output, build the deterministic raster toolchain, ship self-proving launch artifacts, keep low-maintenance issue intake available, and define a concrete demand gate for conditional v2.7 global text shaping without requiring proactive announcements.
 
 - [x] **Phase 83: Claim-Accuracy & Shaping Hygiene** - Make `harfbuzz_ex` optional, fix shaping bug, migrate off dead `unicode_data`, declare complex-script deferrals — restoring the "pure Elixir core" claim before any launch content ships (completed 2026-06-10)
 - [x] **Phase 84: Drawn-Path Primitive & Visible Polish** - Declarative `%Rendro.Path{}` block element, opt-in table borders/rules/header-band, Certificate border frame, byte-determinism goldens (completed 2026-06-10)
 - [x] **Phase 85: Deterministic Raster Lane** - `Pdfium.render/2`, golden-PNG snapshot harness, advisory CI lane, honest `pdfium-render` evidence vocabulary (verified 9/9 must-haves) (completed 2026-06-11)
 - [x] **Phase 86: Self-Proving Launch Artifacts** - CI-hash-checked visual recipe gallery in README/HexDocs, self-rendered `manual.pdf` with published SHA-256, brand-book-conformant presentation (completed 2026-06-11)
 - [x] **Phase 87: Comparison Page & Livebook** - Reproducible benchmark harness vs ChromicPDF/pdf_generator/Typst-CLI, HexDocs comparison guide, CI-executed Livebook tutorial with badges (completed 2026-06-11)
-- [ ] **Phase 88: Launch Execution & Demand Instrumentation** - Coordinated ecosystem launch, mobile viewer evidence beat, concrete v2.7 shaping demand gate + ADOPTION.md ledger
+- [x] **Phase 88: Launch Execution & Demand Instrumentation** - Quiet public discoverability posture, mobile viewer evidence outcome, concrete v2.7 shaping demand gate + ADOPTION.md ledger (completed 2026-06-12)
 
 ## Phase Details
 
@@ -212,14 +212,14 @@ Plans:
 
 ### Phase 88: Launch Execution & Demand Instrumentation
 
-**Goal**: Rendro is visible to the Elixir community — the coordinated ecosystem launch is executed, existing demand threads are answered genuinely, mobile viewer evidence is published as a content beat, and the conditional v2.7 text-shaping demand gate is concrete, measurable, and recorded in an ADOPTION.md ledger.
-**Depends on**: Phase 83 (claim accuracy must be true before announcing), Phase 84 (output must be visually polished), Phase 85 (raster evidence vocabulary in place), Phase 86 (launch artifacts exist), Phase 87 (comparison guide + Livebook exist)
+**Goal**: Rendro is quietly public and discoverable — proof links and issue intake are available for people who find the project, mobile viewer evidence is recorded as a truthful outcome, and the conditional v2.7 text-shaping demand gate is concrete, measurable, and recorded in an ADOPTION.md ledger without creating a proactive outreach obligation.
+**Depends on**: Phase 83 (claim accuracy must be true before public claims), Phase 84 (output must be visually polished), Phase 85 (raster evidence vocabulary in place), Phase 86 (launch artifacts exist), Phase 87 (comparison guide + Livebook exist)
 **Requirements**: LNCH-01, LNCH-02, LNCH-03
 **Success Criteria** (what must be TRUE):
 
-  1. An ElixirForum #announcing thread, an ElixirStatus post, an awesome-elixir PR, and genuine replies in the two existing "PDF without Chromium" demand threads are published — only after all HYG/GAL/CMP requirements are shipped.
-  2. 2-4 mobile viewer-evidence rows (iOS Files/Mail preview, Android default viewer x forms/signed surfaces) are recorded via the existing evidence recipe, published in `priv/support_matrix.json`, and referenced in launch content.
-  3. An ADOPTION.md ledger exists with concrete, numeric signal thresholds for the v2.7 text-shaping demand gate (e.g., N non-self GitHub issues/asks, a downloads floor, first external contributor), and GitHub Discussions / issue templates route adopter needs to the ledger.
+  1. No proactive announcement, ElixirStatus post, awesome-elixir PR, demand-thread reply, mobile follow-up post, or Show HN task is required; these are deferred unless the maintainer explicitly opts in later.
+  2. 2-4 mobile viewer-evidence rows (iOS Files/Mail preview, Android default viewer x forms/signed surfaces) are recorded via the existing evidence recipe, published in `priv/support_matrix.json`, and kept truthful without broad mobile support claims.
+  3. An ADOPTION.md ledger exists with concrete, numeric signal thresholds for the v2.7 text-shaping demand gate (e.g., N non-self GitHub issues/asks, a downloads floor, first external contributor), and issue templates route adopter needs to the ledger.
 
 **Plans**: TBD
 
@@ -237,7 +237,7 @@ Plans:
 | 85. Deterministic Raster Lane | v2.6 | 6/6 | Complete    | 2026-06-11 |
 | 86. Self-Proving Launch Artifacts | v2.6 | 5/5 | Complete   | 2026-06-11 |
 | 87. Comparison Page & Livebook | v2.6 | 6/6 | Complete   | 2026-06-11 |
-| 88. Launch Execution & Demand Instrumentation | v2.6 | 4/5 | In Progress|  |
+| 88. Launch Execution & Demand Instrumentation | v2.6 | 5/5 | Complete| 2026-06-12 |
 
 ---
 *v2.5 archived 2026-06-05 on milestone completion (Phases 78-82, 13 plans, 16/16 requirements, audit `passed`). v2.6 roadmap created 2026-06-10 (Phases 83-88, 21 requirements).*

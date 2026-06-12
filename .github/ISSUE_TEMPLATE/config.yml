@@ -3,6 +3,3 @@ contact_links:
   - name: Adoption Signals
     url: https://github.com/szTheory/rendro/blob/main/ADOPTION.md
     about: Read the public rules for counted adoption signals.
-  - name: ElixirForum Announcing
-    url: https://elixirforum.com/c/news/announcing/159
-    about: ElixirForum category used until the final launch hub URL exists.

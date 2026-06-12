@@ -6,7 +6,7 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
     "Purpose",
     "Current Gate: v2.7 Global Text Shaping",
     "Gate Thresholds",
-    "Launch Snapshot",
+    "Discovery Baseline",
     "Signal Ledger",
     "Download Snapshots",
     "External Contributors",
@@ -29,8 +29,8 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
   ]
   @threshold_sentences [
     "6 qualifying text-shaping signals in a rolling 90-day window, from at least 4 distinct non-maintainer requesters and at least 3 distinct orgs/apps. At least 3 must block production or evaluation.",
-    "Since launch snapshot, Hex downloads.all increases by at least 1,500 and downloads.week >= 150 on two snapshots at least 14 days apart after launch week.",
-    "At least 1 merged, non-maintainer PR after launch that materially improves code, tests, docs, examples, fixtures, or a reproducible failing case. Typos, bots, Dependabot, and maintainer alternate accounts do not count."
+    "Since discovery baseline, Hex downloads.all increases by at least 1,500 and downloads.week >= 150 on two snapshots at least 14 days apart after the baseline.",
+    "At least 1 merged, non-maintainer PR after discovery baseline that materially improves code, tests, docs, examples, fixtures, or a reproducible failing case. Typos, bots, Dependabot, and maintainer alternate accounts do not count."
   ]
 
   test "docs verification script includes exactly one adoption claims lane" do
@@ -75,14 +75,19 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
 
     assert adoption =~ Enum.join(@ledger_columns, " | ")
     assert adoption =~ "No qualifying shaping signals have been counted yet."
-    assert adoption =~ "No post-launch Hex download snapshots recorded yet."
+    assert adoption =~ "No post-baseline Hex download snapshots recorded yet."
     assert adoption =~ "No qualifying non-maintainer contributor signal has been counted yet."
   end
 
   test "review cadence and counting exclusions stay measurable" do
     adoption = File.read!(@adoption_path)
 
-    for phrase <- ["L+30", "L+60", "L+90", "monthly", "cannot trigger before L+45"] do
+    for phrase <- [
+          "Reviews are pull-based",
+          "concrete inbound signals",
+          "future milestone planning",
+          "45 days after the 2026-06-12 discovery baseline"
+        ] do
       assert adoption =~ phrase
     end
 
@@ -101,6 +106,10 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
     for forbidden <- ["stars count", "+1 counts", "adoption:counted default"] do
       refute adoption =~ forbidden
     end
+
+    for forbidden <- ["L+30", "L+60", "L+90", "launch-thread date", "First review is scheduled"] do
+      refute adoption =~ forbidden
+    end
   end
 
   test "review workflow commands are documented without runtime telemetry" do
@@ -111,7 +120,7 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
     assert adoption =~ ~s|gh issue list --state all --label "area:text-shaping"|
 
     assert adoption =~
-             ~s|gh pr list --state merged --search "merged:>=$LAUNCH_DATE -author:szTheory"|
+             ~s|gh pr list --state merged --search "merged:>=2026-06-12 -author:szTheory"|
   end
 
   test "README and comparison guide link to ADOPTION.md" do

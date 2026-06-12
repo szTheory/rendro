@@ -15,6 +15,11 @@ This phase does not add rendering capability. It coordinates already-shipped v2.
 <decisions>
 ## Implementation Decisions
 
+### Superseding Quiet Public Posture
+- **D-36:** Phase 88 is no longer a proactive launch campaign. Rendro remains public and discoverable through GitHub, HexDocs, proof links, `ADOPTION.md`, and issue templates, but ElixirForum announcements, ElixirStatus posts, awesome-elixir PRs, demand-thread replies, mobile evidence follow-up posts, and Show HN are not required.
+- **D-37:** The maintainer preference is low-maintenance, pull-based discovery. Future agents must not resurrect outreach work unless the maintainer explicitly opts into a new task. Do not record personal context for this preference; record only the durable project posture.
+- **D-38:** GitHub intake remains issue-only. Discussions stay disabled, `ADOPTION.md` is the public counting surface, and review cadence is pull-based when concrete inbound issues exist or future planning needs it.
+
 ### Launch Choreography
 - **D-01:** Use an **Elixir-first proof hub** launch, not a same-day broad blitz. Publish the canonical ElixirForum announcement first, then post ElixirStatus, open the awesome-elixir PR, reply to the two demand threads, publish mobile evidence as a follow-up, and treat Show HN as optional/later.
 - **D-02:** The ElixirForum announcement is the canonical launch hub. Shorter channels link back to it rather than creating parallel long-form launch narratives.
@@ -49,13 +54,13 @@ This phase does not add rendering capability. It coordinates already-shipped v2.
   - `mix docs.contract`
 
 ### Adoption Gate and Routing
-- **D-24:** Put `ADOPTION.md` at the repository root. It is a public product/roadmap surface, not private planning. Link it from README, the comparison guide limitation block, issue/discussion templates, and launch replies.
+- **D-24:** Put `ADOPTION.md` at the repository root. It is a public product/roadmap surface, not private planning. Link it from README, the comparison guide limitation block, and issue templates.
 - **D-25:** `ADOPTION.md` shape:
   - `# Adoption Signals`
   - `## Purpose`
   - `## Current Gate: v2.7 Global Text Shaping`
   - `## Gate Thresholds`
-  - `## Launch Snapshot`
+  - `## Discovery Baseline`
   - `## Signal Ledger`
   - `## Download Snapshots`
   - `## External Contributors`
@@ -63,16 +68,16 @@ This phase does not add rendering capability. It coordinates already-shipped v2.
 - **D-26:** Signal ledger columns: `ID | Date | Source URL | Channel | Requester | Org/App | Gate Area | Script/Language | Document Job | Blocking? | Qualifies? | Count Group | Notes`.
 - **D-27:** v2.7 gate triggers only when all three thresholds are met:
   - Demand: 6 qualifying text-shaping signals in a rolling 90-day window, from at least 4 distinct non-maintainer requesters and at least 3 distinct orgs/apps. At least 3 must be blocking production/evaluation, not curiosity.
-  - Downloads: since launch snapshot, Hex `downloads.all` increases by at least 1,500 and `downloads.week >= 150` on two snapshots at least 14 days apart after launch week.
-  - Contributor: at least 1 merged, non-maintainer PR after launch that materially improves code, tests, docs, examples, fixtures, or a reproducible failing case. Typos, bots, Dependabot, and maintainer alternate accounts do not count.
+  - Downloads: since discovery baseline, Hex `downloads.all` increases by at least 1,500 and `downloads.week >= 150` on two snapshots at least 14 days apart after the baseline.
+  - Contributor: at least 1 merged, non-maintainer PR after discovery baseline that materially improves code, tests, docs, examples, fixtures, or a reproducible failing case. Typos, bots, Dependabot, and maintainer alternate accounts do not count.
 - **D-28:** Count one shaping signal only when it names a concrete document job, script/language, current blocker, and source URL. Same requester/org/use case counts once per 90-day window. Reactions, stars, forks, `+1`, "please support Arabic", social posts, and generic i18n wishes do not count. Private adopter reports may be anonymized but cap at 2 counted signals per window.
 - **D-29:** Text-shaping signals count for v2.7 only when they require shaping/RTL/cluster behavior beyond current support: Arabic, Hebrew/RTL, Devanagari, Thai, bidi ordering, cluster-aware line breaking, or copy/paste extraction issues. Font installation, arbitrary HTML/CSS rendering, viewer bugs, and PDF/A/PDF/UA asks route elsewhere.
-- **D-30:** Review cadence: define `L` as the launch-thread date. Triage inbound twice weekly for the first 30 days, then weekly. Gate reviews happen at `L+30`, `L+60`, `L+90`, then monthly using the rolling 90-day window. The gate cannot trigger before `L+45`.
-- **D-31:** Enable GitHub Discussions with `Announcements`, `Q&A`, and `Use cases` if available. Add `.github/DISCUSSION_TEMPLATE/use-cases.yml` for `Use cases`, asking for document type, Phoenix/Elixir context, blocker, script/language, workaround, and whether production/evaluation is blocked. Discussions are discovery; scoped work becomes an issue.
+- **D-30:** Review cadence is pull-based. Triage inbound adoption-signal issues when opened, and run gate reviews only when concrete inbound signals exist or when planning a future milestone. The gate cannot trigger until at least 45 days after the 2026-06-12 discovery baseline.
+- **D-31:** Keep GitHub Discussions disabled. Do not commit a discussion template; scoped work enters through issue templates.
 - **D-32:** Add only these issue templates for Phase 88:
   - `.github/ISSUE_TEMPLATE/01_bug.yml`
   - `.github/ISSUE_TEMPLATE/02_blocked_document.yml`
-  - `.github/ISSUE_TEMPLATE/config.yml` with `blank_issues_enabled: false` and contact links to Discussions and ElixirForum.
+  - `.github/ISSUE_TEMPLATE/config.yml` with `blank_issues_enabled: false` and a contact link to ADOPTION.md.
 - **D-33:** Default labels for the blocked-document form: `state:triage` and `adoption:signal`. The maintainer manually adds `adoption:counted` after reviewing against the gate.
 - **D-34:** Label set: `state:triage`, `kind:bug`, `kind:enhancement`, `kind:docs`, `area:text-shaping`, `area:viewer-evidence`, `area:phoenix`, `adoption:signal`, `adoption:counted`, `adoption:duplicate`, `adoption:private`, `help wanted`, `good first issue`.
 - **D-35:** Review workflow commands:

@@ -3,7 +3,7 @@
 **Defined:** 2026-06-10
 **Core Value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
 
-> Scope locked 2026-06-10 via deep parallel research (5 research agents: repo vision/state digest, text shaping, release/render automation, layout primitives, post-1.0 adoption strategy — full findings in `.planning/research/`). Decisions locked: **v2.6 is a launch/adoption milestone, not a feature milestone** (Rendro has 1.0-grade depth, ~856 self/CI downloads, 0 stars, never announced; two live ElixirForum threads ask for exactly this library); **fix the "pure Elixir core" claim before announcing** (`harfbuzz_ex` is currently a hard NIF dep); **ship the path primitive so the gallery shows bordered tables**; **the proof culture is the marketing asset** (byte-reproducible manual + published hash, checked-in benchmarks, honest viewer matrix). Deferred with named reasons: full text shaping (conditional v2.7 behind a now-measurable demand gate), release-please, multi-signature, charts, TOC, duplex headers, PDF.js lane. Build order: truth fix → visible polish → raster tooling → launch artifacts → launch + instrumentation.
+> Scope locked 2026-06-10 via deep parallel research (5 research agents: repo vision/state digest, text shaping, release/render automation, layout primitives, post-1.0 adoption strategy — full findings in `.planning/research/`). Decisions locked: **v2.6 is a quiet public discoverability milestone, not a marketing campaign**; the package, docs, proof links, and issue intake stay public for people who find them, but proactive announcement work is explicitly deferred to avoid creating a recurring maintainer-response obligation. Also locked: **fix the "pure Elixir core" claim before any public claims rely on it** (`harfbuzz_ex` was a hard NIF dep before Phase 83); **ship the path primitive so the gallery shows bordered tables**; **the proof culture is the adoption asset** (byte-reproducible manual + published hash, checked-in benchmarks, honest viewer matrix). Deferred with named reasons: proactive announcement campaign, full text shaping (conditional v2.7 behind a now-measurable demand gate), release-please, multi-signature, charts, TOC, duplex headers, PDF.js lane. Build order: truth fix → visible polish → raster tooling → launch artifacts → quiet discoverability + low-maintenance instrumentation.
 
 ## v1 Requirements
 
@@ -44,9 +44,9 @@ Requirements for the v2.6 milestone. Each maps to exactly one roadmap phase.
 
 ### Launch Execution & Demand Instrumentation (LNCH)
 
-- [ ] **LNCH-01**: The coordinated launch is executed: ElixirForum #announcing thread, ElixirStatus post, awesome-elixir PR, and genuine, helpful replies in the two existing demand threads (optional Show HN) — only after HYG/GAL/CMP requirements are shipped.
+- [x] **LNCH-01**: Rendro is quietly public and discoverable through the repository, HexDocs, proof links, and issue intake; proactive announcements, ElixirStatus, awesome-elixir PRs, demand-thread replies, mobile follow-up posts, and Show HN are explicitly deferred unless the maintainer later opts in.
 - [x] **LNCH-02**: 2–4 mobile viewer-evidence rows (iOS Files/Mail preview, Android default viewer × forms/signed surfaces) are recorded via the existing evidence recipe and published as a launch-adjacent content beat.
-- [ ] **LNCH-03**: The conditional-v2.7 text-shaping demand gate is concrete and measurable: defined signal thresholds (non-self issues/asks, download floor, first external contributor), an ADOPTION.md signal ledger, and GitHub Discussions/issue templates routing adopter needs.
+- [x] **LNCH-03**: The conditional-v2.7 text-shaping demand gate is concrete and measurable without proactive outreach: defined signal thresholds (non-self issues/asks, download floor, first external contributor), an ADOPTION.md signal ledger, and issue-only GitHub templates route adopter needs.
 
 ## v2 Requirements
 
@@ -70,6 +70,7 @@ Deferred to future milestones. Tracked but not in the current roadmap.
 | Path transforms, clipping, gradients | Each is a viewer-compat surface; v1 path surface stays minimal with explicit matrix deferrals |
 | Hosted playground | Livebook achieves ~80% of the value at ~10% of the cost; revisit post-launch |
 | Headless-browser viewer CI | Browser runtime in core CI remains forbidden by project constraints; the pdfium WASM-static-binary lane covers the raster need |
+| Proactive announcement campaign | Deferred by maintainer posture; Rendro remains quietly public and discoverable, but external promotion would create a response obligation the maintainer does not want to take on now |
 
 ## Traceability
 
@@ -93,6 +94,6 @@ Deferred to future milestones. Tracked but not in the current roadmap.
 | CMP-01 | Phase 87 | Complete |
 | CMP-02 | Phase 87 | Complete |
 | CMP-03 | Phase 87 | Complete |
-| LNCH-01 | Phase 88 | Pending |
+| LNCH-01 | Phase 88 | Complete |
 | LNCH-02 | Phase 88 | Complete |
-| LNCH-03 | Phase 88 | Pending |
+| LNCH-03 | Phase 88 | Complete |
