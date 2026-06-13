@@ -102,7 +102,9 @@ defmodule Rendro.ViewerEvidence.Validator do
            {:ok, date} <- Date.from_iso8601(recorded_at) do
         if Date.diff(today, date) > @staleness_days do
           [
-            "#{cell.matrix_path}: recorded_at #{recorded_at} is older than #{@staleness_days} days"
+            "#{cell.matrix_path}: recorded_at #{recorded_at} is older than #{@staleness_days} days" <>
+              " (advisory — non-fatal unless --strict; run mix rendro.viewer_evidence record to re-record;" <>
+              " see guides/viewer_evidence.md)"
           ]
         else
           []
