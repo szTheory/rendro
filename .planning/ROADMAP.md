@@ -119,7 +119,7 @@ Exit criteria:
 | 89. Page Context Primitive | v2.7 | 1/1 | Complete    | 2026-06-13 |
 | 90. Duplex Running Content | v2.7 | 1/1 | Complete    | 2026-06-13 |
 | 91. PDF.js Advisory Proof Lane | v2.7 | 1/1 | Complete    | 2026-06-13 |
-| 92. Docs, Claims, Release Hygiene | v2.7 | 0/? | Not started | — |
+| 92. Docs, Claims, Release Hygiene | v2.7 | 3/3 | Complete    | 2026-06-13 |
 
 ---
 *v2.7 started 2026-06-13 as Page Context & Browser Proof Hardening. Global text shaping remains demand-gated by ADOPTION.md.*
