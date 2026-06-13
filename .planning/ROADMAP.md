@@ -108,7 +108,12 @@ Plans:
   3. Edge cases are covered: first-page parity (page 1 = odd), single-page doc (only `:odd` appears), and header + footer `only_on` coexisting via independent `region_entries`.
   4. Stale v2.6/v2.7 phase validation-history / Nyquist metadata is reconciled so no false-incomplete or false-pending markers remain and recorded status matches each passed milestone audit.
 
-**Plans**: TBD
+**Plans**: 2 plans
+
+**Wave 1** *(both plans are independent — no shared files — and can run in parallel)*
+
+- [ ] 95-01-PLAN.md — PROOF-01: header only_on render-layer 4-page proof + edge cases + paginate-layer restart coexistence
+- [ ] 95-02-PLAN.md — META-01: reconcile v2.7 VALIDATION.md false-pending markers (90, 92, 91; 88 left untouched per research)
 
 #### Phase 96: Adoption Signal Review & Stewardship Posture
 
