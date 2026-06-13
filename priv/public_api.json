@@ -397,6 +397,7 @@
       "functions": [],
       "tier": "stable",
       "types": [
+        "page_numbering/0",
         "suppress_on/0",
         "t/0"
       ]

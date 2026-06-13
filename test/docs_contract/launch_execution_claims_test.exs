@@ -1,9 +1,12 @@
 defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
   use ExUnit.Case, async: true
 
-  @phase_dir ".planning/phases/88-launch-execution-demand-instrumentation"
-  @checklist_path Path.join(@phase_dir, "88-LAUNCH-CHECKLIST.md")
-  @copy_path Path.join(@phase_dir, "88-LAUNCH-COPY.md")
+  @phase_dirs [
+    ".planning/phases/88-launch-execution-demand-instrumentation",
+    ".planning/milestones/v2.6-phases/88-launch-execution-demand-instrumentation"
+  ]
+  @checklist_file "88-LAUNCH-CHECKLIST.md"
+  @copy_file "88-LAUNCH-COPY.md"
   @hexdocs_workflow_path ".github/workflows/hexdocs.yml"
   @public_url_script_path "scripts/verify_public_launch_urls.sh"
   @readiness_labels [
@@ -34,7 +37,7 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
   end
 
   test "quiet public checklist exposes proof readiness without publication obligations" do
-    checklist = File.read!(@checklist_path)
+    checklist = read_phase_artifact(@checklist_file)
 
     assert checklist =~ "# Phase 88 Quiet Public Checklist"
     assert checklist =~ "Quiet Public Posture"
@@ -66,7 +69,7 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
   end
 
   test "quiet public checklist defers proactive outreach instead of requiring publication order" do
-    checklist = File.read!(@checklist_path)
+    checklist = read_phase_artifact(@checklist_file)
 
     refute checklist =~ "## Publication Order"
 
@@ -86,7 +89,7 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
   end
 
   test "quiet public copy contract contains first mention, reactive disclosure, and mobile boundary language" do
-    copy = File.read!(@copy_path)
+    copy = read_phase_artifact(@copy_file)
 
     assert copy =~
              "Rendro is an open-source, Elixir-native PDF layout library for Phoenix teams that need reliable PDFs without Chrome."
@@ -110,7 +113,7 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
   end
 
   test "launch copy contract refutes unsupported launch claims" do
-    copy = File.read!(@copy_path)
+    copy = read_phase_artifact(@copy_file)
 
     for claim <- @forbidden_claims do
       refute copy =~ claim
@@ -158,5 +161,15 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     assert script =~ "https://hexdocs.pm/rendro/readme.html"
     assert script =~ "https://hexdocs.pm/rendro/comparison.html"
     assert script =~ "https://hexdocs.pm/rendro/first_invoice.html"
+  end
+
+  defp read_phase_artifact(filename) do
+    path =
+      @phase_dirs
+      |> Enum.map(&Path.join(&1, filename))
+      |> Enum.find(&File.exists?/1)
+
+    path || flunk("Could not find #{filename} in active phase dir or v2.6 milestone archive")
+    File.read!(path)
   end
 end
