@@ -64,6 +64,14 @@ defmodule Rendro.ViewerEvidence.ValidatorTest do
       assert length(warnings) == 1
       assert hd(warnings) =~ "forms.viewers.apple_preview"
       assert hd(warnings) =~ "is older than 180 days"
+
+      # HYG-02: the signal must be self-explaining — advisory severity, a directly
+      # runnable remediation command (with surface + viewer positionals), and a
+      # pointer to the guide.
+      assert hd(warnings) =~ "advisory"
+      assert hd(warnings) =~ "--strict"
+      assert hd(warnings) =~ "mix rendro.viewer_evidence record forms apple_preview"
+      assert hd(warnings) =~ "guides/viewer_evidence.md"
     end
 
     @tag :staleness

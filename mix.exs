@@ -179,7 +179,8 @@ defmodule Rendro.MixProject do
           Rendro.RunningContent,
           Rendro.Error,
           Rendro.Text.Shaper,
-          Rendro.Text.Shaper.Simple
+          Rendro.Text.Shaper.Simple,
+          Rendro.PDF.Font
         ],
         "Canonical Recipes": [
           Rendro.Recipes,
