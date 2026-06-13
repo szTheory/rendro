@@ -26,12 +26,16 @@ defmodule Rendro.DocsContract.ScriptSupportClaimsTest do
     assert matrix =~
              ~r/"arabic".*?"evidence_deferred"\s*:\s*".{40,}"/s
 
+    assert matrix =~ "global text-shaping demand gate"
+
     # latin_and_cjk must be "supported", not deferred
     assert matrix =~
              ~r/"latin_and_cjk"\s*:\s*\{.*?"status"\s*:\s*"supported"/s
 
     refute matrix =~ ~s|"arabic": "supported"|
     refute matrix =~ ~s|"complex scripts are supported"|
+    refute matrix =~ "deferred to v2.7"
+    refute matrix =~ "v2.7 Global Text Shaping"
   end
 
   test "docs verification script includes the script support claims lane" do

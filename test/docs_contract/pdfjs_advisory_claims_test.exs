@@ -155,6 +155,15 @@ defmodule Rendro.DocsContract.PdfjsAdvisoryClaimsTest do
     end
   end
 
+  test "public docs use narrow PDF.js advisory vocabulary" do
+    api_stability = File.read!("guides/api_stability.md")
+
+    assert api_stability =~ "Pinned PDF.js advisory observations"
+    assert api_stability =~ "priv/pdfjs_observations/"
+    assert api_stability =~ "not GUI-viewer proof"
+    assert api_stability =~ "do not promote any"
+  end
+
   test "PDF.js support-matrix rows remain explicit deferrals without promotion fields" do
     matrix = File.read!("priv/support_matrix.json") |> JSON.decode!()
 

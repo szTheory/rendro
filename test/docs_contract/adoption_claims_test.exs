@@ -2,9 +2,10 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
   use ExUnit.Case, async: true
 
   @adoption_path "ADOPTION.md"
+  @roadmap_path ".planning/ROADMAP.md"
   @required_sections [
     "Purpose",
-    "Current Gate: v2.7 Global Text Shaping",
+    "Current Gate: Conditional Global Text Shaping",
     "Gate Thresholds",
     "Discovery Baseline",
     "Signal Ledger",
@@ -129,7 +130,9 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
 
     assert readme_guides =~ "ADOPTION.md"
     assert readme_guides =~ "Adoption Signals"
+    assert readme_guides =~ "conditional global text-shaping gate"
     assert comparison =~ "../ADOPTION.md"
+    assert comparison =~ "conditional global text-shaping gate"
 
     public_docs = readme_guides <> "\n" <> comparison
 
@@ -141,6 +144,33 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
           "generic i18n wishes count"
         ] do
       refute public_docs =~ phrase
+    end
+  end
+
+  test "global text shaping is demand-gated, not v2.7 scope" do
+    adoption = File.read!(@adoption_path)
+    readme = File.read!("README.md")
+    comparison = File.read!("guides/comparison.md")
+    api_stability = File.read!("guides/api_stability.md")
+    support_matrix = File.read!("priv/support_matrix.json")
+    roadmap = File.read!(@roadmap_path)
+
+    public_text = Enum.join([adoption, readme, comparison, api_stability, support_matrix], "\n")
+
+    assert adoption =~ "conditional global text shaping gate"
+    assert adoption =~ "## Current Gate: Conditional Global Text Shaping"
+    assert roadmap =~ "v2.7 Page Context & Browser Proof Hardening"
+    assert roadmap =~ "Global Text Shaping & Script Support"
+    assert roadmap =~ "conditional; only if the v2.6 `ADOPTION.md` demand gate triggers"
+
+    for stale <- [
+          "v2.7 Global Text Shaping",
+          "conditional v2.7 global text shaping gate",
+          "conditional v2.7 text-shaping gate",
+          "deferred to v2.7 behind the LNCH-03 demand gate"
+        ] do
+      refute public_text =~ stale
+      refute roadmap =~ stale
     end
   end
 

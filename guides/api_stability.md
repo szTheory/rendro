@@ -90,6 +90,10 @@ Chrome PDFium is `supported` for `forms` based on the recorded viewer checklist 
 
 PDF.js is `explicit_deferral` for `forms` because the four-check save-and-reopen round-trip failed on the representative fixture during operator review — edit/toggle persistence is not reliable.
 
+Pinned PDF.js advisory observations are recorded under `priv/pdfjs_observations/`
+for maintainer visibility. They are not GUI-viewer proof and do not promote any
+PDF.js row in the support matrix.
+
 iOS Files/Preview and Google Drive PDF viewer on Android are `explicit_deferral` for `forms` in Phase 88. Rendro has checked-in fixture and structural validation, but no automated device-level CI lane for those mobile GUI viewers; without that lane, zero-human UAT means no supported mobile form row is promoted.
 
 Adobe Acrobat Reader is `supported` for unsigned `signature_widget` based on the recorded checklist (`priv/viewer_evidence/signature_widget/adobe_acrobat_reader.md`). Apple Preview is `supported` with evidence at `priv/viewer_evidence/signature_widget/apple_preview.md`. Chrome PDFium is `supported` with evidence at `priv/viewer_evidence/signature_widget/chrome_pdfium.md`. PDF.js is `explicit_deferral` for signature widgets per mozilla/pdf.js#4202.
@@ -199,9 +203,9 @@ Every `explicit_deferral` viewer row in `priv/support_matrix.json` carries a nam
 - long_lived_signed_artifact × PDF.js: PDF.js does not implement long-term-validation timestamp, revocation, or expiry indicators for augmented signatures; viewer promotion deferred until LTV UI exists upstream.
 - embedded_files × Apple Preview: Apple Preview Attachments UI still does not discover, open, or extract the representative embedded-artifact fixture on the version recorded; the deferral stands.
 - text_shaping × arabic: Arabic shaping requires contextual glyph substitution, joining forms, and right-to-left reordering that Shaper.Simple does not implement; full shaping is demand-gated at LNCH-03. Use harfbuzz_ex optional dep with config :rendro, shaper: Rendro.Adapters.HarfBuzz.
-- text_shaping × hebrew_rtl: Hebrew rendering requires UAX #9 bidi reordering which is not implemented in Rendro.Text.Bidi; visual reordering and RTL line presentation are deferred to v2.7 behind the LNCH-03 demand gate.
-- text_shaping × devanagari: Devanagari and other Indic scripts require complex glyph reordering, conjunct formation, and matra positioning that Shaper.Simple does not implement; deferred to v2.7 behind the LNCH-03 demand gate.
-- text_shaping × thai: Thai and other SEA scripts require cluster-aware line breaking, vowel positioning, and tone mark handling that Shaper.Simple does not implement; deferred to v2.7 behind the LNCH-03 demand gate.
+- text_shaping × hebrew_rtl: Hebrew rendering requires UAX #9 bidi reordering which is not implemented in Rendro.Text.Bidi; visual reordering and RTL line presentation are deferred until the ADOPTION.md global text-shaping demand gate triggers at LNCH-03.
+- text_shaping × devanagari: Devanagari and other Indic scripts require complex glyph reordering, conjunct formation, and matra positioning that Shaper.Simple does not implement; deferred until the ADOPTION.md global text-shaping demand gate triggers at LNCH-03.
+- text_shaping × thai: Thai and other SEA scripts require cluster-aware line breaking, vowel positioning, and tone mark handling that Shaper.Simple does not implement; deferred until the ADOPTION.md global text-shaping demand gate triggers at LNCH-03.
 - path_primitive × transforms_cm: Affine transforms (cm operator) deferred — adds viewer-compat surface; v1 path surface is move/line/curve/rect/rounded-rect + stroke/fill only. Tracked in support_matrix.json deferral rows per PATH-04.
 - path_primitive × clipping_W: Clipping paths (W/W* operators) deferred — adds viewer-compat surface requiring cross-viewer testing; v1 path surface deferred per PATH-04.
 - path_primitive × gradients: Gradients (PDF shading dictionaries) deferred — adds significant viewer-compat surface; v1 path surface is stroke/fill only per PATH-04.

@@ -2,11 +2,11 @@
 
 ## Purpose
 
-This ledger records public, reviewable signals for Rendro's conditional v2.7 global text shaping gate. It is intentionally low-maintenance: Rendro is quietly public, and signals are reviewed when people find the project and open concrete issues.
+This ledger records public, reviewable signals for Rendro's conditional global text shaping gate. It is intentionally low-maintenance: Rendro is quietly public, and signals are reviewed when people find the project and open concrete issues.
 
 Rendro does not use private analytics, social counters, launch campaigns, or GitHub Projects to trigger this gate. Every counted signal must be reviewable from a source URL or an explicitly anonymized private report.
 
-## Current Gate: v2.7 Global Text Shaping
+## Current Gate: Conditional Global Text Shaping
 
 The gate is currently **blocked** until all three threshold families are met in the same review window: demand, downloads, and contributor signal.
 

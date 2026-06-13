@@ -405,7 +405,36 @@
     "capabilities": {
       "single_pass_substitution": "supported",
       "deterministic_output": "supported",
-      "suppress_on_first_page": "supported"
+      "suppress_on_first_page": "supported",
+      "section_page_number_token": "supported",
+      "section_total_pages_token": "supported"
+    }
+  },
+  "section_page_numbering": {
+    "surface": "section_page_numbering",
+    "status": "supported",
+    "evidence": "test/rendro/pipeline/paginate_test.exs",
+    "recorded_at": "2026-06-13",
+    "capabilities": {
+      "body_section_restart": "supported",
+      "section_page_number_token": "supported",
+      "section_total_pages_token": "supported",
+      "implicit_whole_document_fallback": "supported",
+      "public_page_context_api": "unsupported"
+    }
+  },
+  "duplex_running_content": {
+    "surface": "duplex_running_content",
+    "status": "supported",
+    "evidence": "test/rendro/pipeline/paginate_test.exs",
+    "recorded_at": "2026-06-13",
+    "capabilities": {
+      "physical_odd_even_only_on": "supported",
+      "header_footer_running_regions": "supported",
+      "composes_with_suppress_on": "supported",
+      "composes_with_section_page_tokens": "supported",
+      "blank_recto_verso_insertion": "unsupported",
+      "recto_verso_aliases": "unsupported"
     }
   },
   "statement": {
@@ -454,15 +483,15 @@
     },
     "hebrew_rtl": {
       "status": "explicit_deferral",
-      "evidence_deferred": "Hebrew rendering requires UAX #9 bidi reordering which is not implemented in Rendro.Text.Bidi; visual reordering and RTL line presentation are deferred to v2.7 behind the LNCH-03 demand gate."
+      "evidence_deferred": "Hebrew rendering requires UAX #9 bidi reordering which is not implemented in Rendro.Text.Bidi; visual reordering and RTL line presentation are deferred until the ADOPTION.md global text-shaping demand gate triggers at LNCH-03."
     },
     "devanagari": {
       "status": "explicit_deferral",
-      "evidence_deferred": "Devanagari and other Indic scripts require complex glyph reordering, conjunct formation, and matra positioning that Shaper.Simple does not implement; deferred to v2.7 behind the LNCH-03 demand gate."
+      "evidence_deferred": "Devanagari and other Indic scripts require complex glyph reordering, conjunct formation, and matra positioning that Shaper.Simple does not implement; deferred until the ADOPTION.md global text-shaping demand gate triggers at LNCH-03."
     },
     "thai": {
       "status": "explicit_deferral",
-      "evidence_deferred": "Thai and other SEA scripts require cluster-aware line breaking, vowel positioning, and tone mark handling that Shaper.Simple does not implement; deferred to v2.7 behind the LNCH-03 demand gate."
+      "evidence_deferred": "Thai and other SEA scripts require cluster-aware line breaking, vowel positioning, and tone mark handling that Shaper.Simple does not implement; deferred until the ADOPTION.md global text-shaping demand gate triggers at LNCH-03."
     }
   },
   "path_primitive": {
