@@ -191,6 +191,37 @@ Apple Preview consolidated evidence (`priv/viewer_evidence/forms/apple_preview.m
 
 Copy source for new cells: `priv/viewer_evidence/_template.md`.
 
+---
+
+## Staleness Lifecycle
+
+The viewer-evidence validator emits a staleness warning when any `supported` row's `recorded_at` date is more than 180 days old. This is a **designed cadence signal**, not a defect or regression.
+
+### When it fires
+
+Based on the most recent recordings in this repository (mid-June 2026), the 180-day threshold will first be crossed in **approximately late November 2026**. If you see this warning around that time, that is the expected first firing — it does not indicate a broken workflow, a configuration error, or a problem with the evidence files themselves.
+
+### What to do
+
+Re-record evidence for the stale cells. The warning message names the affected `matrix_path` and `recorded_at` date. Use the same recording workflow described in this guide:
+
+```bash
+mix rendro.viewer_evidence record <surface> <viewer> \
+  --fixture test/fixtures/<surface>_support_fixture.pdf \
+  --recorded-by <your-identifier>
+```
+
+After re-recording, update `recorded_at` in `priv/support_matrix.json` to the new observation date and commit both the updated matrix row and the new evidence file.
+
+### Severity
+
+- **Advisory (non-fatal) by default:** `mix rendro.viewer_evidence validate` emits the warning but exits 0, so the normal CI lane is not blocked.
+- **Fatal with `--strict`:** `mix rendro.viewer_evidence validate --strict` exits 1 when any cell is stale. This is not a required merge-blocking check — it is available for stricter operator-driven workflows.
+
+### Do not suppress
+
+The threshold (180 days) is intentional. Do not raise it, disable the check, or pre-emptively re-record evidence just to push the next firing date out. Re-record when the signal fires because evidence is genuinely stale — that is the cadence the signal is designed to enforce.
+
 ## Appendix A — Per-surface manual checklists
 
 ### Forms (`forms`)
