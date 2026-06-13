@@ -1,0 +1,17 @@
+{
+  "name": "@rendro/pdfjs-observer",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Maintainer-only PDF.js advisory observation tooling for Rendro fixtures.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0 || >=24"
+  },
+  "scripts": {
+    "check": "node observe.mjs --check",
+    "write": "node observe.mjs --write"
+  },
+  "dependencies": {
+    "pdfjs-dist": "6.0.227"
+  }
+}

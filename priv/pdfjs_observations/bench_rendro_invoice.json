@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "observer": "rendro-pdfjs-advisory",
+  "advisory_boundary": "Pinned PDF.js advisory observation only; not GUI-viewer proof or Rendro runtime support.",
+  "pdfjs_dist_version": "6.0.227",
+  "node_version": "v22.14.0",
+  "recorded_at": "2026-06-13T03:15:27.884Z",
+  "platform": "darwin-arm64; Darwin 25.5.0",
+  "fixture": "bench/results/raw/rendro.pdf",
+  "page_count": 2,
+  "pages": [
+    {
+      "page_number": 1,
+      "width": 595.28,
+      "height": 841.89
+    },
+    {
+      "page_number": 2,
+      "width": 595.28,
+      "height": 841.89
+    }
+  ],
+  "warnings": [],
+  "errors": []
+}
