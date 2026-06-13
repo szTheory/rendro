@@ -2,16 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.8
 milestone_name: Done-Enough Stewardship & Adoption Signal Loop
-status: ready_to_plan
-last_updated: 2026-06-13T15:43:50.642Z
-last_activity: 2026-06-13 -- Phase 94 execution started
+status: planning
+last_updated: "2026-06-13T15:51:29.588Z"
+last_activity: 2026-06-13
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
   completed_plans: 5
-  percent: 25
-stopped_at: Phase 94 complete (2/2) — ready to discuss Phase 95
+  percent: 50
 ---
 
 # Project State
@@ -82,9 +81,9 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-06-13T14:54:00.772Z
-Stopped at: Phase 94 context gathered
-Resume file: .planning/phases/94-docs-warning-hygiene/94-CONTEXT.md
+Last session: 2026-06-13T15:51:29.583Z
+Stopped at: Phase 95 context gathered
+Resume file: .planning/phases/95-header-duplex-proof-metadata-reconcile/95-CONTEXT.md
 
 ## Operator Next Steps
 
