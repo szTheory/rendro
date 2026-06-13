@@ -221,6 +221,7 @@ defmodule Rendro.Pipeline.ComposeTest do
         %Section{
           name: :body_copy,
           region: :body,
+          page_numbering: [restart: true],
           content: [Rendro.block(Rendro.text("Body from section"))]
         }
 
@@ -246,6 +247,9 @@ defmodule Rendro.Pipeline.ComposeTest do
                :totals,
                :body_copy
              ]
+
+      body_entry = Enum.find(layout.entries, &(&1.name == :body_copy))
+      assert body_entry.page_numbering == [restart: true]
 
       assert Enum.map(result.content, & &1.content.content) == [
                "Lead paragraph",

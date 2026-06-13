@@ -213,10 +213,21 @@ defmodule RendroBuildersTest do
       block = Rendro.block(Rendro.text("Summary"))
 
       section =
-        Rendro.section(name: :summary, region: :body, content: [block], page_template: :invoice)
+        Rendro.section(
+          name: :summary,
+          region: :body,
+          content: [block],
+          page_numbering: [restart: true],
+          page_template: :invoice
+        )
 
-      assert %Section{name: :summary, region: :body, content: [^block], page_template: :invoice} =
-               section
+      assert %Section{
+               name: :summary,
+               region: :body,
+               content: [^block],
+               page_numbering: [restart: true],
+               page_template: :invoice
+             } = section
     end
 
     test "document/1 builds a Document struct" do

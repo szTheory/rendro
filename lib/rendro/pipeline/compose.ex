@@ -69,7 +69,13 @@ defmodule Rendro.Pipeline.Compose do
 
     entries =
       [
-        %{name: :content, region: :body, blocks: doc.content, page_template: doc.page_template},
+        %{
+          name: :content,
+          region: :body,
+          blocks: doc.content,
+          page_numbering: [],
+          page_template: doc.page_template
+        },
         Enum.with_index(doc.sections, 1)
         |> Enum.map(fn {section, index} -> normalize_section(section, index) end)
       ]
@@ -126,6 +132,7 @@ defmodule Rendro.Pipeline.Compose do
       name: section.name || :"section_#{index}",
       region: section.region || :body,
       blocks: Enum.map(section.content, &compose_block/1),
+      page_numbering: section.page_numbering,
       page_template: section.page_template
     }
   end
