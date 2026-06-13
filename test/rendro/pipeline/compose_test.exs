@@ -263,6 +263,13 @@ defmodule Rendro.Pipeline.ComposeTest do
 
       assert Enum.map(result.header, & &1.content.content) == ["Legacy header", "Header"]
       assert Enum.map(layout.region_blocks.sidebar, & &1.content.content) == ["Sidebar"]
+
+      assert layout.region_entries.header |> Enum.map(& &1.name) == [
+               :legacy_header,
+               :report_header
+             ]
+
+      assert layout.region_entries.header |> Enum.map(& &1.only_on) == [nil, :odd]
     end
 
     test "raises for invalid section only_on before rendering" do

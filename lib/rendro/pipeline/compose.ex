@@ -114,6 +114,15 @@ defmodule Rendro.Pipeline.Compose do
         end
       end)
 
+    region_entries =
+      [
+        legacy_region_entry(:header, doc.header),
+        legacy_region_entry(:footer, doc.footer),
+        Enum.reject(entries, &(&1.region == :body))
+      ]
+      |> List.flatten()
+      |> Enum.group_by(& &1.region)
+
     layout = %{
       template: template,
       region_map: region_map,
@@ -122,6 +131,7 @@ defmodule Rendro.Pipeline.Compose do
       footer_region: Map.get(region_map, :footer),
       region_blocks: region_blocks,
       region_suppress_on: region_suppress_on,
+      region_entries: region_entries,
       entries: entries
     }
 
@@ -141,6 +151,22 @@ defmodule Rendro.Pipeline.Compose do
       page_numbering: section.page_numbering,
       page_template: section.page_template
     }
+  end
+
+  defp legacy_region_entry(_region, []), do: []
+
+  defp legacy_region_entry(region, blocks) do
+    [
+      %{
+        name: :"legacy_#{region}",
+        region: region,
+        blocks: blocks,
+        suppress_on: nil,
+        only_on: nil,
+        page_numbering: [],
+        page_template: nil
+      }
+    ]
   end
 
   defp validate_sections!(sections) do

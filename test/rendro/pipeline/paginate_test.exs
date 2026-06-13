@@ -751,6 +751,132 @@ defmodule Rendro.Pipeline.PaginateTest do
              ]
     end
 
+    test "only_on odd and even footer sections render on physical page parity" do
+      template = section_context_template()
+
+      odd_footer =
+        Rendro.section(
+          region: :footer,
+          only_on: :odd,
+          content: [Rendro.page_number(format: "Odd {{page_number}}")]
+        )
+
+      even_footer =
+        Rendro.section(
+          region: :footer,
+          only_on: :even,
+          content: [Rendro.page_number(format: "Even {{page_number}}")]
+        )
+
+      doc =
+        Rendro.flow(
+          for(i <- 1..5, do: Rendro.block(Rendro.text("Line #{i}"))),
+          page_template: :section_context,
+          page_templates: [template],
+          sections: [odd_footer, even_footer]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+      assert length(paginated.pages) == 3
+
+      assert Enum.map(paginated.pages, fn page -> page_texts(page) |> hd() end) == [
+               "Odd 1",
+               "Even 2",
+               "Odd 3"
+             ]
+    end
+
+    test "only_on uses physical parity while section tokens use section-local context" do
+      template = section_context_template()
+
+      odd_footer =
+        Rendro.section(
+          region: :footer,
+          only_on: :odd,
+          content: [
+            Rendro.page_number(
+              format: "O P{{page_number}} S{{section_page_number}}/{{section_total_pages}}"
+            )
+          ]
+        )
+
+      even_footer =
+        Rendro.section(
+          region: :footer,
+          only_on: :even,
+          content: [
+            Rendro.page_number(
+              format: "E P{{page_number}} S{{section_page_number}}/{{section_total_pages}}"
+            )
+          ]
+        )
+
+      restarting_section =
+        Rendro.section(
+          name: :appendix,
+          region: :body,
+          page_numbering: [restart: true],
+          content: for(i <- 1..3, do: Rendro.block(Rendro.text("Appendix #{i}")))
+        )
+
+      doc =
+        Rendro.flow(
+          [Rendro.block(Rendro.text("Intro"))],
+          page_template: :section_context,
+          page_templates: [template],
+          sections: [restarting_section, odd_footer, even_footer]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+      assert length(paginated.pages) == 3
+
+      assert Enum.map(paginated.pages, fn page -> page_texts(page) |> hd() end) == [
+               "O P1 S1/1",
+               "E P2 S1/2",
+               "O P3 S2/2"
+             ]
+    end
+
+    test "suppression and only_on both run before RunningContent evaluation" do
+      template = section_context_template()
+      {:ok, agent} = Agent.start_link(fn -> [] end)
+
+      fn_block =
+        %Rendro.Block{
+          content: %Rendro.RunningContent{
+            fun: fn {pn, tp} ->
+              Agent.update(agent, fn calls -> [{pn, tp} | calls] end)
+              [Rendro.block(Rendro.text("Odd #{pn}"))]
+            end
+          },
+          height: 14.4
+        }
+
+      footer =
+        Rendro.section(
+          region: :footer,
+          only_on: :odd,
+          suppress_on: :first,
+          content: [fn_block]
+        )
+
+      doc =
+        Rendro.flow(
+          for(i <- 1..5, do: Rendro.block(Rendro.text("Line #{i}"))),
+          page_template: :section_context,
+          page_templates: [template],
+          sections: [footer]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+      calls = Agent.get(agent, & &1) |> Enum.reverse()
+      Agent.stop(agent)
+
+      assert length(paginated.pages) == 3
+      assert calls == [{3, 3}]
+      assert page_texts(Enum.at(paginated.pages, 2)) |> hd() == "Odd 3"
+    end
+
     test "evaluates fn {page_number, total_pages} block per page with correct arguments" do
       # Build a 2-page document using a template with a footer region that carries a
       # RunningContent fn. After paginate, each page's footer blocks should contain

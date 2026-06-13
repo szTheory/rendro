@@ -265,6 +265,68 @@ defmodule Rendro.FlowTest do
            "expected footer 'Page 2' on page 2 but not found"
   end
 
+  test "only_on odd and even footer sections render on physical page parity" do
+    template =
+      Rendro.page_template(
+        name: :duplex_footer_test,
+        width: 420,
+        height: 220,
+        margin_top: 20,
+        margin_right: 24,
+        margin_bottom: 20,
+        margin_left: 24,
+        regions: [
+          Rendro.region(
+            name: :body,
+            role: :body,
+            anchor: :flow,
+            x: 24,
+            y: 52,
+            width: 372,
+            height: 60
+          ),
+          Rendro.region(
+            name: :footer,
+            role: :footer,
+            anchor: :bottom,
+            x: 24,
+            y: 180,
+            width: 372,
+            height: 16
+          )
+        ]
+      )
+
+    odd_footer =
+      Rendro.section(
+        region: :footer,
+        only_on: :odd,
+        content: [Rendro.block(Rendro.text("Odd {{page_number}}"))]
+      )
+
+    even_footer =
+      Rendro.section(
+        region: :footer,
+        only_on: :even,
+        content: [Rendro.block(Rendro.text("Even {{page_number}}"))]
+      )
+
+    doc =
+      Rendro.flow(
+        for(i <- 1..8, do: Rendro.block(Rendro.text("Line #{i}"))),
+        page_template: :duplex_footer_test,
+        page_templates: [template],
+        sections: [odd_footer, even_footer]
+      )
+
+    {:ok, pdf} = Rendro.render(doc)
+
+    assert length(Regex.scan(~r"/Type\s*/Page\b", pdf)) == 2
+    assert pdf =~ "(Odd 1) Tj"
+    assert pdf =~ "(Even 2) Tj"
+    refute pdf =~ "{{page_number}}"
+  end
+
   test "body blocks do not overlap footer region (y + height <= footer.y)" do
     # Use an explicit template with a footer at a known y-position.
     # Assert that no body block's bottom edge (y + height) exceeds footer.y.

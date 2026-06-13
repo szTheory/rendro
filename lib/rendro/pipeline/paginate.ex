@@ -556,26 +556,79 @@ defmodule Rendro.Pipeline.Paginate do
   end
 
   defp apply_page_template(%Page{} = page, idx, layout, total, page_context) do
-    region_suppress_on = Map.get(layout, :region_suppress_on, %{})
-
     anchored_blocks =
       layout.template.regions
       |> Enum.reject(&(&1.name == :body))
       |> Enum.flat_map(fn region ->
-        suppress_on = Map.get(region_suppress_on, region.name)
-
         anchored_region_blocks =
-          layout.region_blocks
-          |> Map.get(region.name, [])
-          |> apply_suppression(suppress_on, idx)
-          |> evaluate_fn_blocks(idx, total)
-          |> replace_page_numbers(page_context)
+          layout
+          |> running_region_entries(region.name)
+          |> Enum.flat_map(&running_entry_blocks(&1, idx, total, page_context))
           |> anchor_region_blocks(region, page)
 
         maybe_validate_region_fit(anchored_region_blocks, region, page, idx, region.name)
       end)
 
     %{page | blocks: anchored_blocks ++ page.blocks}
+  end
+
+  defp running_region_entries(layout, region_name) do
+    measured_blocks = Map.get(layout.region_blocks, region_name, [])
+
+    entries =
+      case Map.get(layout, :region_entries) do
+        region_entries when is_map(region_entries) ->
+          Map.get(region_entries, region_name, [])
+
+        _ ->
+          fallback_running_region_entries(layout, region_name, measured_blocks)
+      end
+
+    measured_running_entries(entries, measured_blocks, region_name, layout)
+  end
+
+  defp fallback_running_region_entries(layout, region_name, measured_blocks) do
+    suppress_on = layout |> Map.get(:region_suppress_on, %{}) |> Map.get(region_name)
+
+    [
+      %{
+        name: region_name,
+        region: region_name,
+        blocks: measured_blocks,
+        suppress_on: suppress_on,
+        only_on: nil
+      }
+    ]
+  end
+
+  defp measured_running_entries([], _measured_blocks, _region_name, _layout), do: []
+
+  defp measured_running_entries(entries, measured_blocks, region_name, layout) do
+    {measured_entries, remaining_blocks} =
+      Enum.map_reduce(entries, measured_blocks, fn entry, remaining ->
+        {entry_blocks, rest} = Enum.split(remaining, length(Map.get(entry, :blocks, [])))
+        {%{entry | blocks: entry_blocks}, rest}
+      end)
+
+    case {measured_entries, remaining_blocks} do
+      {[], _} ->
+        fallback_running_region_entries(layout, region_name, measured_blocks)
+
+      {entries, []} ->
+        entries
+
+      {entries, rest} ->
+        List.update_at(entries, -1, fn entry -> %{entry | blocks: entry.blocks ++ rest} end)
+    end
+  end
+
+  defp running_entry_blocks(entry, page_idx, total, page_context) do
+    entry
+    |> Map.get(:blocks, [])
+    |> apply_suppression(Map.get(entry, :suppress_on), page_idx)
+    |> apply_only_on(Map.get(entry, :only_on), page_idx)
+    |> evaluate_fn_blocks(page_idx, total)
+    |> replace_page_numbers(page_context)
   end
 
   defp replace_page_numbers(blocks, page_context) do
@@ -672,6 +725,18 @@ defmodule Rendro.Pipeline.Paginate do
         blocks
     end
   end
+
+  defp apply_only_on(blocks, nil, _page_idx), do: blocks
+
+  defp apply_only_on(blocks, :odd, page_idx) do
+    if rem(page_idx, 2) == 1, do: blocks, else: []
+  end
+
+  defp apply_only_on(blocks, :even, page_idx) do
+    if rem(page_idx, 2) == 0, do: blocks, else: []
+  end
+
+  defp apply_only_on(_blocks, _unknown, _page_idx), do: []
 
   defp anchor_region_blocks(blocks, %Region{} = region, %Page{} = page) do
     start_x = relative_x(region, page)
