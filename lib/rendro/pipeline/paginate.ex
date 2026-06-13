@@ -16,14 +16,14 @@ defmodule Rendro.Pipeline.Paginate do
     layout = flow_layout(doc)
     template = layout.template
     page_template = page_from_template(template)
-    body_blocks = Map.get(layout.region_blocks, :body, doc.content)
+    body_entries = body_entries(layout, doc)
     max_h = layout.body_capacity
 
     try do
-      {pages, diagnostics} =
-        paginate_blocks(
-          body_blocks,
-          {[%{page_template | blocks: []}], []},
+      {pages, diagnostics, section_starts} =
+        paginate_body_entries(
+          body_entries,
+          {[%{page_template | blocks: []}], [], []},
           page_template,
           max_h,
           %{overflow_source: :bounded_region, region: :body}
@@ -31,6 +31,7 @@ defmodule Rendro.Pipeline.Paginate do
 
       pages = Enum.reverse(pages)
       total = length(pages)
+      page_contexts = page_contexts(total, section_starts)
 
       pages =
         pages
@@ -39,7 +40,7 @@ defmodule Rendro.Pipeline.Paginate do
           page
           |> stack_body_blocks(layout.body_region)
           |> validate_body_region_fit!(layout.body_region, idx)
-          |> apply_page_template(idx, layout, total)
+          |> apply_page_template(idx, layout, total, Map.fetch!(page_contexts, idx))
         end)
 
       {:ok,
@@ -62,6 +63,60 @@ defmodule Rendro.Pipeline.Paginate do
     end
   end
 
+  defp paginate_body_entries(
+         [],
+         {pages, diagnostics, section_starts},
+         _template,
+         _max_h,
+         _overflow_details
+       ),
+       do: {pages, diagnostics, section_starts}
+
+  defp paginate_body_entries(
+         [entry | rest],
+         {pages, diagnostics, section_starts},
+         template,
+         max_h,
+         overflow_details
+       ) do
+    {pages, diagnostics} =
+      if section_numbering_restart?(entry) do
+        maybe_section_page_break({pages, diagnostics}, template)
+      else
+        {pages, diagnostics}
+      end
+
+    section_starts =
+      if section_numbering_restart?(entry) do
+        section_starts ++
+          [
+            %{
+              name: Map.get(entry, :name),
+              start_page: current_page_index(pages)
+            }
+          ]
+      else
+        section_starts
+      end
+
+    {pages, diagnostics} =
+      paginate_blocks(
+        Map.get(entry, :blocks, []),
+        {pages, diagnostics},
+        template,
+        max_h,
+        overflow_details
+      )
+
+    paginate_body_entries(
+      rest,
+      {pages, diagnostics, section_starts},
+      template,
+      max_h,
+      overflow_details
+    )
+  end
+
   defp paginate_blocks([], {pages, diagnostics}, _template, _max_h, _overflow_details),
     do: {pages, diagnostics}
 
@@ -79,6 +134,107 @@ defmodule Rendro.Pipeline.Paginate do
 
   defp has_flow_layout?(%Document{options: %{layout: _layout}}), do: true
   defp has_flow_layout?(%Document{}), do: false
+
+  defp body_entries(layout, %Document{} = doc) do
+    measured_body_blocks = Map.get(layout.region_blocks, :body, doc.content)
+
+    case Map.get(layout, :entries) do
+      entries when is_list(entries) ->
+        entries
+        |> Enum.filter(&(Map.get(&1, :region) == :body))
+        |> case do
+          [] -> fallback_body_entries(measured_body_blocks)
+          body_entries -> measured_body_entries(body_entries, measured_body_blocks)
+        end
+
+      _ ->
+        fallback_body_entries(measured_body_blocks)
+    end
+  end
+
+  defp fallback_body_entries(measured_body_blocks) do
+    [%{name: :content, region: :body, blocks: measured_body_blocks, page_numbering: []}]
+  end
+
+  defp measured_body_entries(entries, measured_body_blocks) do
+    {measured_entries, remaining_blocks} =
+      Enum.map_reduce(entries, measured_body_blocks, fn entry, remaining ->
+        {entry_blocks, rest} = Enum.split(remaining, length(Map.get(entry, :blocks, [])))
+        {%{entry | blocks: entry_blocks}, rest}
+      end)
+
+    case {measured_entries, remaining_blocks} do
+      {[], _} ->
+        fallback_body_entries(measured_body_blocks)
+
+      {entries, []} ->
+        entries
+
+      {entries, rest} ->
+        List.update_at(entries, -1, fn entry -> %{entry | blocks: entry.blocks ++ rest} end)
+    end
+  end
+
+  defp section_numbering_restart?(%{page_numbering: [restart: true]}), do: true
+  defp section_numbering_restart?(_entry), do: false
+
+  defp maybe_section_page_break({[%Page{blocks: []} | _] = pages, diagnostics}, _template),
+    do: {pages, diagnostics}
+
+  defp maybe_section_page_break({pages, diagnostics}, template),
+    do: {[%{template | blocks: []} | pages], diagnostics}
+
+  defp current_page_index([_current_page | prior_pages]), do: length(prior_pages) + 1
+
+  defp page_contexts(total, section_starts) do
+    explicit_starts =
+      section_starts
+      |> Enum.filter(fn %{start_page: start_page} -> start_page >= 1 and start_page <= total end)
+      |> Enum.reduce(%{}, fn start, acc -> Map.put(acc, start.start_page, start) end)
+
+    starts_by_page =
+      if total > 0 and not Map.has_key?(explicit_starts, 1) do
+        Map.put(explicit_starts, 1, %{name: :document, start_page: 1})
+      else
+        explicit_starts
+      end
+
+    starts =
+      starts_by_page
+      |> Map.values()
+      |> Enum.sort_by(& &1.start_page)
+
+    ranges =
+      starts
+      |> Enum.with_index()
+      |> Enum.map(fn {start, index} ->
+        next_start = Enum.at(starts, index + 1)
+        end_page = if next_start, do: next_start.start_page - 1, else: total
+
+        %{
+          name: start.name,
+          start_page: start.start_page,
+          end_page: end_page,
+          total_pages: end_page - start.start_page + 1
+        }
+      end)
+
+    Map.new(1..total, fn page_number ->
+      section =
+        Enum.find(ranges, fn range ->
+          page_number >= range.start_page and page_number <= range.end_page
+        end)
+
+      {page_number,
+       %{
+         page_number: page_number,
+         total_pages: total,
+         section_name: section.name,
+         section_page_number: page_number - section.start_page + 1,
+         section_total_pages: section.total_pages
+       }}
+    end)
+  end
 
   # D-04: y-stacking stays page-local and now starts at the explicit body
   # region origin instead of relying on implicit page margins.
@@ -399,7 +555,7 @@ defmodule Rendro.Pipeline.Paginate do
     Enum.to_list(start_index..finish_index)
   end
 
-  defp apply_page_template(%Page{} = page, idx, layout, total) do
+  defp apply_page_template(%Page{} = page, idx, layout, total, page_context) do
     region_suppress_on = Map.get(layout, :region_suppress_on, %{})
 
     anchored_blocks =
@@ -413,7 +569,7 @@ defmodule Rendro.Pipeline.Paginate do
           |> Map.get(region.name, [])
           |> apply_suppression(suppress_on, idx)
           |> evaluate_fn_blocks(idx, total)
-          |> replace_page_numbers(idx, total)
+          |> replace_page_numbers(page_context)
           |> anchor_region_blocks(region, page)
 
         maybe_validate_region_fit(anchored_region_blocks, region, page, idx, region.name)
@@ -422,30 +578,21 @@ defmodule Rendro.Pipeline.Paginate do
     %{page | blocks: anchored_blocks ++ page.blocks}
   end
 
-  defp replace_page_numbers(blocks, page_num, total) do
+  defp replace_page_numbers(blocks, page_context) do
     Enum.map(blocks, fn block ->
       case block.content do
         %Rendro.Text{content: text} = t ->
-          new_text =
-            text
-            |> String.replace("{{page_number}}", Integer.to_string(page_num))
-            |> String.replace("{{total_pages}}", Integer.to_string(total))
+          new_text = replace_page_number_tokens(text, page_context)
 
           %{block | content: %{t | content: new_text}}
 
         %Rendro.Pipeline.MeasuredText{source: %Rendro.Text{content: text} = source} = measured ->
-          new_source_text =
-            text
-            |> String.replace("{{page_number}}", Integer.to_string(page_num))
-            |> String.replace("{{total_pages}}", Integer.to_string(total))
+          new_source_text = replace_page_number_tokens(text, page_context)
 
           new_lines =
             Enum.map(measured.lines, fn line ->
               Enum.map(line, fn run ->
-                new_run_text =
-                  run.text
-                  |> String.replace("{{page_number}}", Integer.to_string(page_num))
-                  |> String.replace("{{total_pages}}", Integer.to_string(total))
+                new_run_text = replace_page_number_tokens(run.text, page_context)
 
                 # NOTE: run.width intentionally NOT updated (D-10)
                 %{run | text: new_run_text}
@@ -465,6 +612,20 @@ defmodule Rendro.Pipeline.Paginate do
           block
       end
     end)
+  end
+
+  defp replace_page_number_tokens(text, page_context) do
+    text
+    |> String.replace("{{page_number}}", Integer.to_string(page_context.page_number))
+    |> String.replace("{{total_pages}}", Integer.to_string(page_context.total_pages))
+    |> String.replace(
+      "{{section_page_number}}",
+      Integer.to_string(page_context.section_page_number)
+    )
+    |> String.replace(
+      "{{section_total_pages}}",
+      Integer.to_string(page_context.section_total_pages)
+    )
   end
 
   defp evaluate_fn_blocks(blocks, page_num, total) do

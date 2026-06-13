@@ -682,6 +682,75 @@ defmodule Rendro.Pipeline.PaginateTest do
   end
 
   describe "running-region stubs (Wave 0)" do
+    test "page_numbering restart starts a body section on a new physical page and substitutes section tokens" do
+      template = section_context_template()
+
+      footer_section =
+        Rendro.section(
+          region: :footer,
+          content: [
+            Rendro.page_number(
+              format:
+                "P{{page_number}}/{{total_pages}} S{{section_page_number}}/{{section_total_pages}}"
+            )
+          ]
+        )
+
+      restarting_section =
+        Rendro.section(
+          name: :appendix,
+          region: :body,
+          page_numbering: [restart: true],
+          content: for(i <- 1..3, do: Rendro.block(Rendro.text("Appendix #{i}")))
+        )
+
+      doc =
+        Rendro.flow(
+          [Rendro.block(Rendro.text("Intro"))],
+          page_template: :section_context,
+          page_templates: [template],
+          sections: [restarting_section, footer_section]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+      assert length(paginated.pages) == 3
+
+      [page1, page2, page3] = paginated.pages
+
+      assert page_texts(page1) == ["P1/3 S1/1", "Intro"]
+      assert page_texts(page2) == ["P2/3 S1/2", "Appendix 1", "Appendix 2"]
+      assert page_texts(page3) == ["P3/3 S2/2", "Appendix 3"]
+    end
+
+    test "section tokens fall back to whole-document numbering when no restart exists" do
+      template = section_context_template()
+
+      footer_section =
+        Rendro.section(
+          region: :footer,
+          content: [
+            Rendro.page_number(format: "S{{section_page_number}}/{{section_total_pages}}")
+          ]
+        )
+
+      doc =
+        Rendro.flow(
+          for(i <- 1..5, do: Rendro.block(Rendro.text("Line #{i}"))),
+          page_template: :section_context,
+          page_templates: [template],
+          sections: [footer_section]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+      assert length(paginated.pages) == 3
+
+      assert Enum.map(paginated.pages, fn page -> page_texts(page) |> hd() end) == [
+               "S1/3",
+               "S2/3",
+               "S3/3"
+             ]
+    end
+
     test "evaluates fn {page_number, total_pages} block per page with correct arguments" do
       # Build a 2-page document using a template with a footer region that carries a
       # RunningContent fn. After paginate, each page's footer blocks should contain
@@ -1012,6 +1081,38 @@ defmodule Rendro.Pipeline.PaginateTest do
           y: 52,
           width: 372,
           height: 30
+        }
+      ]
+    }
+  end
+
+  defp section_context_template do
+    %PageTemplate{
+      name: :section_context,
+      width: 420,
+      height: 240,
+      margin_top: 20,
+      margin_right: 24,
+      margin_bottom: 28,
+      margin_left: 24,
+      regions: [
+        %Region{
+          name: :body,
+          role: :body,
+          anchor: :flow,
+          x: 24,
+          y: 52,
+          width: 372,
+          height: 30
+        },
+        %Region{
+          name: :footer,
+          role: :footer,
+          anchor: :bottom,
+          x: 24,
+          y: 200,
+          width: 600,
+          height: 20
         }
       ]
     }
