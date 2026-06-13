@@ -8,9 +8,9 @@
 
 ### Page Context Primitive
 
-- [ ] **CTX-01**: A document author can mark a body section as a section-local page-numbering boundary with `page_numbering: [restart: true]`, and rendering starts that section on a new physical page without changing existing non-numbered sections.
-- [ ] **CTX-02**: A document author can use `{{section_page_number}}` and `{{section_total_pages}}` in running header/footer text and get deterministic decimal section-local numbering.
-- [ ] **CTX-03**: Existing `{{page_number}}` / `{{total_pages}}`, `suppress_on`, and `RunningContent` `{page, total}` callback behavior remain backward-compatible.
+- [x] **CTX-01**: A document author can mark a body section as a section-local page-numbering boundary with `page_numbering: [restart: true]`, and rendering starts that section on a new physical page without changing existing non-numbered sections.
+- [x] **CTX-02**: A document author can use `{{section_page_number}}` and `{{section_total_pages}}` in running header/footer text and get deterministic decimal section-local numbering.
+- [x] **CTX-03**: Existing `{{page_number}}` / `{{total_pages}}`, `suppress_on`, and `RunningContent` `{page, total}` callback behavior remain backward-compatible.
 
 ### Duplex Running Content
 
