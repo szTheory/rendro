@@ -506,16 +506,16 @@ This phase adds thin delegation functions and a test. There is no authentication
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **BrandedInvoice struct byte-identity assertion in drift test**
    - What we know: `BrandedInvoice.document/2` calls `Rendro.Document.register_embedded_font/3` and `register_image/3` with `Rendro.Branded.font_path()` / `Rendro.Branded.logo_path()`. The struct equality assertion should still hold (the `%Rendro.Document{}` struct contains the font/image registrations).
    - What's unclear: Whether `register_embedded_font/3` involves any non-deterministic state (e.g., file handle timestamps).
-   - Recommendation: Include BrandedInvoice in the struct byte-identity assertion. If it fails due to non-determinism, fall back to asserting `%Rendro.Document{} = Rendro.Recipes.branded_invoice(data)` (type check only). The existing `branded_invoice_test.exs` already calls `BrandedInvoice.document/2` and asserts struct equality (`doc.page_template == :branded_invoice`) — suggesting struct equality is reliable.
+   - **RESOLVED (low-risk assumption A2, fallback documented):** Include BrandedInvoice in the struct byte-identity assertion. If it fails due to non-determinism, fall back to asserting `%Rendro.Document{} = Rendro.Recipes.branded_invoice(data)` (type check only). The existing `branded_invoice_test.exs` already calls `BrandedInvoice.document/2` and asserts struct equality (`doc.page_template == :branded_invoice`) — suggesting struct equality is reliable. Does not block execution.
 
 2. **File name for the new test: `recipes_facade_drift_test.exs` vs `recipes_test.exs`**
    - What we know: Existing `test/rendro/recipes/` contains per-recipe files. There is no `test/rendro/recipes_test.exs` (facade-level file). CONTEXT.md D-10 leaves this to executor discretion.
-   - Recommendation: Use `test/rendro/recipes_facade_drift_test.exs` — more explicit naming, avoids confusion with existing `test/rendro/recipes/` directory contents. Or place at `test/rendro/recipes/facade_drift_test.exs` to keep all recipe tests collocated.
+   - **RESOLVED (decided in Plan 93-01):** Use `test/rendro/recipes_facade_drift_test.exs` — explicit naming, avoids confusion with the existing `test/rendro/recipes/` directory contents.
 
 ---
 
