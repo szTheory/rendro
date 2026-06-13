@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.8
 milestone_name: Done-Enough Stewardship & Adoption Signal Loop
-status: executing
-last_updated: "2026-06-13T19:02:52.796Z"
+status: verifying
+last_updated: "2026-06-13T19:06:32.827Z"
 last_activity: 2026-06-13
 progress:
   total_phases: 4
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 7
-  completed_plans: 6
-  percent: 50
+  completed_plans: 7
+  percent: 75
 ---
 
 # Project State
@@ -26,10 +26,10 @@ See: .planning/PROJECT.md (updated 2026-06-13 — v2.8 Done-Enough Stewardship &
 
 Phase: 95 (header-duplex-proof-metadata-reconcile) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-06-13
 
-Progress: [█████████░] 86%
+Progress: [██████████] 100%
 
 ## v2.8 Phase Map
 
@@ -60,6 +60,7 @@ Full decision log in PROJECT.md Key Decisions table. Locked v2.8 research recomm
 - SIGNAL-01: append a dated HOLD review to `ADOPTION.md` `## Review Log` — no new mix task.
 - STEW-01: two locations (MILESTONE-ARC internal posture section + `guides/api_stability.md` public status section); signal "stable & cared-for," never "abandoned."
 - [Phase 95]: PROOF-01: header only_on proven at render + paginate layers via additive tests over the shipped region-agnostic engine; no lib/ or public-API change
+- [Phase 95]: META-01 v2.7 reconcile: flipped 90/92 false-pending task cells and 91 stale Planned header to passed; frontmatter status: untouched (D-07); 88 left as consistent draft (D-06)
 
 ### Pending Todos
 
@@ -82,7 +83,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-06-13T19:02:11.109Z
+Last session: 2026-06-13T19:05:54.014Z
 Stopped at: Phase 95 context gathered
 Resume file: None
 
@@ -95,3 +96,4 @@ Resume file: None
 | Phase | Plan | Duration | Notes |
 |-------|------|----------|-------|
 | Phase 95 P01 | 2min | 3 tasks | 2 files |
+| Phase 95 P02 | 2min | 3 tasks | 3 files |

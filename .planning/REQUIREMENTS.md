@@ -25,7 +25,7 @@ Requirements for this milestone. Each maps to exactly one roadmap phase.
 
 ### Validation Metadata Cleanup
 
-- [ ] **META-01**: Stale v2.6/v2.7 phase validation-history / Nyquist metadata is reconciled so recorded phase metadata matches the already-passed milestone audit status, with no false-incomplete or false-pending markers remaining.
+- [x] **META-01**: Stale v2.6/v2.7 phase validation-history / Nyquist metadata is reconciled so recorded phase metadata matches the already-passed milestone audit status, with no false-incomplete or false-pending markers remaining.
 
 ### Adoption Signal Review
 
@@ -70,7 +70,7 @@ Which phases cover which requirements.
 | HYG-01 | Phase 94 | Complete |
 | HYG-02 | Phase 94 | Complete |
 | PROOF-01 | Phase 95 | Complete |
-| META-01 | Phase 95 | Pending |
+| META-01 | Phase 95 | Complete |
 | SIGNAL-01 | Phase 96 | Pending |
 | STEW-01 | Phase 96 | Pending |
 

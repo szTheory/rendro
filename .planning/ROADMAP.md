@@ -113,7 +113,7 @@ Plans:
 **Wave 1** *(both plans are independent — no shared files — and can run in parallel)*
 
 - [x] 95-01-PLAN.md — PROOF-01: header only_on render-layer 4-page proof + edge cases + paginate-layer restart coexistence
-- [ ] 95-02-PLAN.md — META-01: reconcile v2.7 VALIDATION.md false-pending markers (90, 92, 91; 88 left untouched per research)
+- [x] 95-02-PLAN.md — META-01: reconcile v2.7 VALIDATION.md false-pending markers (90, 92, 91; 88 left untouched per research)
 
 #### Phase 96: Adoption Signal Review & Stewardship Posture
 
@@ -138,7 +138,7 @@ v2.8 phases execute in numeric order: 93 → 94 → 95 → 96
 |-------|-----------|----------------|--------|-----------|
 | 93. Recipes Facade DX Closure | v2.8 | 3/3 | Complete    | 2026-06-13 |
 | 94. Docs & Warning Hygiene | v2.8 | 2/2 | Complete    | 2026-06-13 |
-| 95. Header Duplex Proof & Metadata Reconcile | v2.8 | 1/2 | In Progress|  |
+| 95. Header Duplex Proof & Metadata Reconcile | v2.8 | 2/2 | Complete   | 2026-06-13 |
 | 96. Adoption Signal Review & Stewardship Posture | v2.8 | 0/TBD | Not started | - |
 
 ---
