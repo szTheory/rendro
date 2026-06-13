@@ -70,8 +70,8 @@ v2.7 archives:
 Plans:
 **Wave 1**
 
-- [ ] 93-01-PLAN.md — Author RED drift test (test/rendro/recipes_facade_drift_test.exs) + fix README opts-drop line
-- [ ] 93-02-PLAN.md — Expand lib/rendro/recipes.ex with 10 @spec'd facade functions (fixes opts-drop footgun)
+- [x] 93-01-PLAN.md — Author RED drift test (test/rendro/recipes_facade_drift_test.exs) + fix README opts-drop line
+- [x] 93-02-PLAN.md — Expand lib/rendro/recipes.ex with 10 @spec'd facade functions (fixes opts-drop footgun)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -126,7 +126,7 @@ v2.8 phases execute in numeric order: 93 → 94 → 95 → 96
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 93. Recipes Facade DX Closure | v2.8 | 0/3 | Not started | - |
+| 93. Recipes Facade DX Closure | v2.8 | 2/3 | In Progress|  |
 | 94. Docs & Warning Hygiene | v2.8 | 0/TBD | Not started | - |
 | 95. Header Duplex Proof & Metadata Reconcile | v2.8 | 0/TBD | Not started | - |
 | 96. Adoption Signal Review & Stewardship Posture | v2.8 | 0/TBD | Not started | - |
