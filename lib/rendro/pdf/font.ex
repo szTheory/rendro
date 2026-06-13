@@ -1,5 +1,11 @@
 defmodule Rendro.PDF.Font do
-  @moduledoc false
+  @moduledoc """
+  Internal implementation detail of Rendro's PDF rendering layer.
+
+  `Rendro.PDF.Font` is not a public, stable surface and is not covered by the
+  SemVer API guarantee. It may change or be removed in any release without notice.
+  Do not depend on this module in application code.
+  """
 
   @type t :: %__MODULE__{
           name: String.t(),
