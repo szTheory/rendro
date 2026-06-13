@@ -390,6 +390,14 @@ defmodule Rendro.FlowTest do
     assert pdf =~ "(Even 2) Tj"
     assert pdf =~ "(Odd 3) Tj"
     assert pdf =~ "(Even 4) Tj"
+    # Wrong-parity guards: prove the filter actually excludes. A broken only_on that
+    # rendered both sections on every page would still satisfy the positive asserts
+    # above (each section carries the live page number), so physical parity is only
+    # proven by refuting the off-parity combinations.
+    refute pdf =~ "(Even 1) Tj"
+    refute pdf =~ "(Odd 2) Tj"
+    refute pdf =~ "(Even 3) Tj"
+    refute pdf =~ "(Odd 4) Tj"
     refute pdf =~ "{{page_number}}"
   end
 
@@ -537,10 +545,19 @@ defmodule Rendro.FlowTest do
     # 8 body lines / 4-per-page = 2 physical pages. Page 1 odd, page 2 even.
     # Header parity and footer parity are driven by independent region_entries keys
     # and do not interfere.
+    assert length(Regex.scan(~r"/Type\s*/Page\b", pdf)) == 2
     assert pdf =~ "(HOdd 1) Tj"
     assert pdf =~ "(FOdd 1) Tj"
     assert pdf =~ "(HEven 2) Tj"
     assert pdf =~ "(FEven 2) Tj"
+    # Wrong-parity guards for BOTH regions: independent region_entries means header
+    # and footer must each exclude their off-parity page. A broken filter would leak
+    # these (each section carries the live page number), so coexistence is only proven
+    # by refuting every off-parity combination.
+    refute pdf =~ "(HEven 1) Tj"
+    refute pdf =~ "(HOdd 2) Tj"
+    refute pdf =~ "(FEven 1) Tj"
+    refute pdf =~ "(FOdd 2) Tj"
     refute pdf =~ "{{page_number}}"
   end
 
