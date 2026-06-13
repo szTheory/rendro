@@ -1,6 +1,6 @@
 # Roadmap: Rendro
 
-**Phase numbering:** sequential and continuous across milestones (never restarts at 01). v2.6 closed at phase 88; the next milestone starts at phase 89.
+**Phase numbering:** sequential and continuous across milestones (never restarts at 01). v2.6 closed at phase 88; v2.7 starts at phase 89.
 
 ## Milestones
 
@@ -20,43 +20,91 @@
 - ✅ **v2.4 Batteries-Included Workflow & Adoption Closure** — Phases 73-77 (shipped 2026-05-30)
 - ✅ **v2.5 1.0 Release Capstone** — Phases 78-82 (shipped 2026-06-05, hex tag 1.0.0)
 - ✅ **v2.6 Public Launch & Adoption Bootstrap** — Phases 83-88 (shipped 2026-06-13)
-- 💤 **v2.7 Global Text Shaping & Script Support** — conditional, only if the v2.6 demand gate triggers
+- 🔄 **v2.7 Page Context & Browser Proof Hardening** — Phases 89-92 (active)
+- 💤 **Global Text Shaping & Script Support** — conditional; only if the v2.6 `ADOPTION.md` demand gate triggers
 
 ## Phases
 
 <details>
-<summary>✅ v1.0 – v2.5 (Phases 1-82) — SHIPPED</summary>
+<summary>✅ v1.0 - v2.6 (Phases 1-88) — SHIPPED</summary>
 
 Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-ROADMAP.md` with matching `-REQUIREMENTS.md` and, where present, `-MILESTONE-AUDIT.md`. See `.planning/MILESTONES.md` for the per-milestone accomplishment ledger.
 
-</details>
-
-<details>
-<summary>✅ v2.6 Public Launch & Adoption Bootstrap (Phases 83-88) — SHIPPED 2026-06-13</summary>
-
-Archived:
+v2.6 archives:
 
 - `.planning/milestones/v2.6-ROADMAP.md`
 - `.planning/milestones/v2.6-REQUIREMENTS.md`
 - `.planning/milestones/v2.6-MILESTONE-AUDIT.md`
 - `.planning/milestones/v2.6-phases/`
 
-Completed phases:
-
-- [x] Phase 83: Claim-Accuracy & Shaping Hygiene (5/5 plans) — completed 2026-06-10
-- [x] Phase 84: Drawn-Path Primitive & Visible Polish (5/5 plans) — completed 2026-06-10
-- [x] Phase 85: Deterministic Raster Lane (6/6 plans) — completed 2026-06-11
-- [x] Phase 86: Self-Proving Launch Artifacts (5/5 plans) — completed 2026-06-11
-- [x] Phase 87: Comparison Page & Livebook (6/6 plans) — completed 2026-06-11
-- [x] Phase 88: Launch Execution & Demand Instrumentation (5/5 plans) — completed 2026-06-12
-
-Summary: v2.6 made Rendro truthfully and quietly discoverable. It restored the pure-Elixir core claim by making HarfBuzz optional, added deterministic path/table/certificate visible polish, shipped the advisory pdfium raster lane, published hash-checked gallery/manual/comparison/Livebook proof artifacts, and recorded low-maintenance adoption instrumentation plus a measurable conditional v2.7 shaping gate.
-
 </details>
 
-### 💤 v2.7 Global Text Shaping & Script Support (Conditional)
+### 🔄 v2.7 Page Context & Browser Proof Hardening
 
-No active phase is planned yet. Start the next milestone with `$gsd-new-milestone` when the ADOPTION.md demand gate triggers or when a different next milestone is selected.
+Milestone intent: make the existing PAGE/running-region primitive substantially better for long reports and duplex output while preserving deterministic rendering, then add a narrow browser-family advisory proof lane without upgrading public viewer claims.
+
+#### Phase 89: Page Context Primitive
+
+**Requirements:** CTX-01, CTX-02, CTX-03
+**Depends on:** v2.4 PAGE primitive, v2.6 claim discipline
+
+Deliverables:
+- Extend `Rendro.section/1` with `page_numbering: [restart: true]` for body sections.
+- Force a restarting section to begin on a new physical page.
+- Compute internal page context after pagination: physical page number, total pages, section-local page number, and section total pages.
+- Extend page-number token substitution with `{{section_page_number}}` and `{{section_total_pages}}`.
+- Preserve existing `{{page_number}}`, `{{total_pages}}`, `suppress_on`, and `RunningContent` callback behavior.
+
+Exit criteria:
+- Section-local numbering is decimal-only and deterministic.
+- Existing PAGE tests still pass unchanged.
+- Backward compatibility is covered by focused regression tests.
+
+#### Phase 90: Duplex Running Content
+
+**Requirements:** DUP-01, DUP-02, DUP-03
+**Depends on:** Phase 89
+
+Deliverables:
+- Extend `Rendro.section/1` with `only_on: :odd | :even` for header/footer/running-region sections.
+- Evaluate `only_on` against physical page parity.
+- Compose odd/even filtering with `suppress_on` and section-local page-number tokens.
+- Add instructive validation failures for malformed `only_on` and `page_numbering` options.
+
+Exit criteria:
+- Odd/even content works for headers and footers without changing fixed-position body rendering.
+- Duplex content uses physical parity even after section restarts.
+- Invalid options fail before rendering misleading output.
+
+#### Phase 91: PDF.js Advisory Proof Lane
+
+**Requirements:** PDFJS-01, PDFJS-02, PDFJS-03
+**Depends on:** v2.6 raster/evidence vocabulary
+
+Deliverables:
+- Add a pinned Node/pdfjs-dist advisory observer script or mix task that records PDF.js version, Node version, page count, page dimensions, warnings, and optional first-page PNG hash.
+- Add committed observation fixtures for a small, representative PDF set.
+- Wire CI as advisory and graph-disconnected from required engine lanes.
+- Add guardrails/docs-contract checks so wording remains "pinned PDF.js advisory observations" and cannot imply GUI-viewer support.
+
+Exit criteria:
+- No Node/npm package is a core runtime dependency, required CI dependency, or Hex dependency.
+- PDF.js observations are useful to maintainers and impossible to confuse with support-matrix promotion.
+
+#### Phase 92: Docs, Claims, Release Hygiene
+
+**Requirements:** DOC-01, DOC-02, DOC-03
+**Depends on:** Phases 89-91
+
+Deliverables:
+- Add/update guides for page context, section-local numbering, and duplex running content.
+- Update public support matrix and docs-contract tests for page context, duplex content, and PDF.js advisory wording.
+- Harden release/HexDocs workflow wording and CI permissions where practical.
+- Keep global text shaping explicitly demand-gated in `ADOPTION.md` and public roadmap language.
+
+Exit criteria:
+- Every v2.7 public claim is backed by tests, support rows, evidence fixtures, or explicit deferrals.
+- TOC/outlines/anchors/cross-references, charts, global text shaping, and full release automation are named deferrals, not implied near-term promises.
 
 ## Progress
 
@@ -68,6 +116,10 @@ No active phase is planned yet. Start the next milestone with `$gsd-new-mileston
 | 86. Self-Proving Launch Artifacts | v2.6 | 5/5 | Complete | 2026-06-11 |
 | 87. Comparison Page & Livebook | v2.6 | 6/6 | Complete | 2026-06-11 |
 | 88. Launch Execution & Demand Instrumentation | v2.6 | 5/5 | Complete | 2026-06-12 |
+| 89. Page Context Primitive | v2.7 | 0/? | Not started | — |
+| 90. Duplex Running Content | v2.7 | 0/? | Not started | — |
+| 91. PDF.js Advisory Proof Lane | v2.7 | 0/? | Not started | — |
+| 92. Docs, Claims, Release Hygiene | v2.7 | 0/? | Not started | — |
 
 ---
-*v2.6 archived 2026-06-13 on milestone completion (Phases 83-88, 32 plans, 21/21 requirements, audit `passed`). Fresh requirements for the next milestone should be created with `$gsd-new-milestone`.*
+*v2.7 started 2026-06-13 as Page Context & Browser Proof Hardening. Global text shaping remains demand-gated by ADOPTION.md.*
