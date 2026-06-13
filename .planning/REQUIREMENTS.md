@@ -14,9 +14,9 @@
 
 ### Duplex Running Content
 
-- [ ] **DUP-01**: A document author can attach running header/footer sections with `only_on: :odd` or `only_on: :even`, evaluated against physical page parity.
-- [ ] **DUP-02**: Duplex running content composes with section-local numbering so report/booklet-style documents can render different left/right page footers without a second render pass.
-- [ ] **DUP-03**: Invalid `only_on` / `page_numbering` options fail with instructive errors before rendering produces misleading output.
+- [x] **DUP-01**: A document author can attach running header/footer sections with `only_on: :odd` or `only_on: :even`, evaluated against physical page parity.
+- [x] **DUP-02**: Duplex running content composes with section-local numbering so report/booklet-style documents can render different left/right page footers without a second render pass.
+- [x] **DUP-03**: Invalid `only_on` / `page_numbering` options fail with instructive errors before rendering produces misleading output.
 
 ### Browser Advisory Proof
 
