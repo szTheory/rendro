@@ -273,6 +273,18 @@
         "t/0"
       ]
     },
+    "Elixir.Rendro.PDF.Font": {
+      "functions": [
+        "embedded/1",
+        "has_glyph?/2",
+        "helvetica/0",
+        "text_width/3"
+      ],
+      "tier": "stable",
+      "types": [
+        "t/0"
+      ]
+    },
     "Elixir.Rendro.Page": {
       "functions": [],
       "tier": "stable",

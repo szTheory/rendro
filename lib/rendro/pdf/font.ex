@@ -1,11 +1,18 @@
 defmodule Rendro.PDF.Font do
   @moduledoc """
-  Internal implementation detail of Rendro's PDF rendering layer.
+  Font representation passed to text shapers.
 
-  `Rendro.PDF.Font` is not a public, stable surface and is not covered by the
-  SemVer API guarantee. It may change or be removed in any release without notice.
-  Do not depend on this module in application code.
+  A `Rendro.PDF.Font` struct carries the metrics and embedding data a
+  `Rendro.Text.Shaper` needs to lay out a run of text — name, source kind,
+  units-per-em, ascent/descent, advance widths, and the cmap. It appears in the
+  public `c:Rendro.Text.Shaper.shape/3` contract, so any custom shaper receives
+  values of this type.
+
+  You normally obtain a `t/0` from the rendering pipeline rather than building one
+  by hand; the struct's internal field layout may evolve, but `t/0` remains the
+  stable type referenced by the shaping API.
   """
+  @moduledoc tags: [:stable]
 
   @type t :: %__MODULE__{
           name: String.t(),

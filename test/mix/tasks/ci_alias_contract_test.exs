@@ -11,7 +11,7 @@ defmodule Mix.Tasks.CiAliasContractTest do
              "hex.build",
              "compile --warnings-as-errors",
              "test",
-             "docs",
+             "docs --warnings-as-errors",
              "credo --strict",
              "dialyzer"
            ]

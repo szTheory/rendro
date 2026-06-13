@@ -62,6 +62,7 @@ defmodule Mix.Tasks.Rendro.Api.Gen do
     Rendro.Page,
     Rendro.PageTemplate,
     Rendro.Path,
+    Rendro.PDF.Font,
     Rendro.Protect,
     Rendro.Recipes,
     Rendro.Region,
