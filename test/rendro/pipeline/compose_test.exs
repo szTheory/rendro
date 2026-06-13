@@ -277,7 +277,11 @@ defmodule Rendro.Pipeline.ComposeTest do
         %Rendro.Document{
           content: [Rendro.block(Rendro.text("Body"))],
           sections: [
-            %Section{region: :footer, only_on: :left, content: [Rendro.block(Rendro.text("Footer"))]}
+            %Section{
+              region: :footer,
+              only_on: :left,
+              content: [Rendro.block(Rendro.text("Footer"))]
+            }
           ],
           metadata: %Rendro.Metadata{}
         }
