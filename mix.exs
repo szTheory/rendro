@@ -87,6 +87,7 @@ defmodule Rendro.MixProject do
         .formatter.exs
         mix.exs
         README.md
+        ADOPTION.md
         LICENSE
         NOTICE
         CHANGELOG.md
@@ -100,6 +101,7 @@ defmodule Rendro.MixProject do
       assets: %{"assets" => "assets"},
       before_closing_head_tag: &before_closing_head_tag/1,
       skip_undefined_reference_warnings_on: [
+        "CHANGELOG.md",
         "guides/branding.md",
         "guides/integrations.md",
         "guides/comparison.md",
@@ -115,6 +117,8 @@ defmodule Rendro.MixProject do
       source_url: @source_url,
       extras: [
         "README.md",
+        "ADOPTION.md",
+        "CHANGELOG.md",
         "guides/integrations.md",
         "guides/branding.md",
         "guides/api_stability.md",
@@ -137,6 +141,8 @@ defmodule Rendro.MixProject do
           "guides/livebook/first_invoice.livemd"
         ],
         Policies: [
+          "ADOPTION.md",
+          "CHANGELOG.md",
           "guides/api_stability.md",
           "guides/upgrading_to_1.0.md",
           "guides/viewer_evidence.md"

@@ -148,7 +148,9 @@ defmodule Rendro.DocsContract.LaunchArtifactsClaimsTest do
       "assets/rendro/gallery/branded_invoice.png",
       "assets/rendro/gallery/statement.png",
       "assets/rendro/gallery/receipt_report.png",
-      "assets/rendro/gallery/certificate.png"
+      "assets/rendro/gallery/certificate.png",
+      "ADOPTION.md",
+      "CHANGELOG.md"
     ]
 
     for asset <- expected_assets do

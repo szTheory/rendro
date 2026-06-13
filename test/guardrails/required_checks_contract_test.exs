@@ -3,6 +3,8 @@ defmodule Guardrails.RequiredChecksContractTest do
 
   @baseline_path "priv/guardrails/required_status_checks.json"
   @ci_path ".github/workflows/ci.yml"
+  @hexdocs_path ".github/workflows/hexdocs.yml"
+  @release_path ".github/workflows/release.yml"
   @verify_docs_path "scripts/verify_docs.exs"
 
   @required_contexts ~w(long-lived-live-proof release-proof signing-live-proof test)
@@ -85,6 +87,15 @@ defmodule Guardrails.RequiredChecksContractTest do
 
       assert {:ok, %{"jobs" => jobs}} = YamlElixir.read_from_string(ci)
       assert is_map(jobs)
+    end
+
+    test "CI, HexDocs, and release workflows use read-only contents permissions" do
+      for path <- [@ci_path, @hexdocs_path, @release_path] do
+        workflow = load_workflow!(path)
+
+        assert workflow["permissions"] == %{"contents" => "read"},
+               "#{path} must set top-level contents: read permissions"
+      end
     end
   end
 
@@ -285,6 +296,23 @@ defmodule Guardrails.RequiredChecksContractTest do
     end
   end
 
+  describe "release workflow boundary" do
+    test "release workflow stays tag-gated and publishes with Hex credentials only" do
+      release = File.read!(@release_path)
+      workflow = load_workflow!(@release_path)
+
+      assert release =~ "tags:"
+      assert release =~ "'v*.*.*'"
+      assert release =~ "mix release.preflight"
+      assert release =~ "mix hex.publish --yes"
+      assert release =~ "HEX_API_KEY"
+      refute release =~ "contents: write"
+      refute release =~ "gh release"
+      refute release =~ "release-please"
+      assert is_map(workflow["jobs"]["publish"])
+    end
+  end
+
   describe "fork-safe offline contract" do
     test "does not reference network APIs or tokens" do
       source = File.read!(__ENV__.file)
@@ -300,6 +328,13 @@ defmodule Guardrails.RequiredChecksContractTest do
     @baseline_path
     |> File.read!()
     |> Jason.decode!()
+  end
+
+  defp load_workflow!(path) do
+    case YamlElixir.read_from_string(File.read!(path)) do
+      {:ok, workflow} -> workflow
+      {:error, reason} -> flunk("expected #{path} to parse as YAML: #{inspect(reason)}")
+    end
   end
 
   defp advisory_context!(baseline, name) do

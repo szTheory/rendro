@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+#### v2.7 Docs, Claims, and Release Hygiene
+
+- Documented section-local page numbering, `{{section_page_number}}` / `{{section_total_pages}}`, and physical odd/even running content with support-matrix-backed claim guards.
+- Kept global text shaping demand-gated outside the v2.7 scope while preserving the public `ADOPTION.md` thresholds.
+- Added `ADOPTION.md` to the Hex package and HexDocs extras so public README links resolve in package/docs contexts.
+- Set read-only `contents: read` permissions on CI and tag-gated release workflows.
+
 #### LNCH-02: Zero-UAT mobile viewer evidence posture
 
 - Added terminal `explicit_deferral` rows for iOS Files/Preview and Google Drive PDF viewer on Android across `forms` and `signed_artifact`. These rows intentionally publish no mobile GUI support claim until automated device-level CI evidence exists.

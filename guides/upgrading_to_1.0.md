@@ -40,4 +40,4 @@ The machine-readable index is `priv/support_matrix.json`, with each `supported` 
 
 ---
 
-For full change history, see [CHANGELOG.md](../CHANGELOG.md).
+For full change history, see [CHANGELOG.md](CHANGELOG.md).
