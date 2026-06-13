@@ -18,6 +18,8 @@ The following modules and functions receive strict SemVer guarantees: breaking c
 
 **Diagnostics map contract:** The `:diagnostics` map common keys — `:level` and `:type` — are stable. Adopters consuming diagnostics maps should key only on documented common keys; additive keys may appear in any release. The implementation module (`Rendro.Inspector`) is adapter-tier and not part of the Tier-1 contract.
 
+**Recipes facade:** `Rendro.Recipes` is Tier-1 stable by module; it now exposes all five recipe families — `invoice`, `branded_invoice`, `statement`, `receipt`, and `certificate` — each in both arity-1 and arity-2 (opts-forwarding) forms.
+
 ## Tier-2 Evolving
 
 The following are additive-only within a major version but may break to follow upstream library majors:
