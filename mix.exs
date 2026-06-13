@@ -67,7 +67,7 @@ defmodule Rendro.MixProject do
         "hex.build",
         "compile --warnings-as-errors",
         "test",
-        "docs",
+        "docs --warnings-as-errors",
         "credo --strict",
         "dialyzer"
       ]
@@ -112,6 +112,11 @@ defmodule Rendro.MixProject do
         "lib/rendro/document.ex",
         "lib/rendro/font_registry.ex",
         "lib/rendro.ex"
+      ],
+      skip_code_autolink_to: [
+        "Rendro.PDF.CidFont",
+        "Rendro.PDF.FontSubsetter",
+        "Rendro.Format"
       ],
       source_ref: "v#{@version}",
       source_url: @source_url,
