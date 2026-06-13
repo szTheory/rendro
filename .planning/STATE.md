@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.7
 milestone_name: Page Context & Browser Proof Hardening
 status: Awaiting next milestone
-last_updated: "2026-06-13T05:27:48.817Z"
-last_activity: 2026-06-13 — Milestone v2.7 completed and archived
+last_updated: "2026-06-13T05:46:52Z"
+last_activity: 2026-06-13 - Milestone next-step assessment completed
 progress:
   total_phases: 4
   completed_phases: 4
@@ -20,14 +20,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-13 — v2.7 Page Context & Browser Proof Hardening completed)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Milestone complete
+**Current focus:** Awaiting next milestone; recommended next scope is a short stewardship/adoption-signal milestone, not a new capability family.
 
 ## Current Position
 
 Phase: Milestone v2.7 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-06-13 — Milestone v2.7 completed and archived
+Last activity: 2026-06-13 - Milestone next-step assessment completed
+
+## Milestone Boundary Assessment
+
+- Assessment date: 2026-06-13.
+- Done-enough estimate: 90-93% for Rendro's stated scope; remaining work is important-but-narrow rather than foundational.
+- Recommended next milestone: `v2.8 Done-Enough Stewardship & Adoption Signal Loop`.
+- Rationale: v2.7 shipped page-context/report ergonomics, while v2.6 already shipped quiet public discovery, proof artifacts, comparison/Livebook try paths, and the adoption-signal gate. Repo inspection shows larger feature families should stay demand-gated; the highest leverage is warning/debt cleanup, small adopter-DX polish, and a pull-based adoption-signal review.
+- Explicit non-goal for the next planning cycle: do not start global text shaping, mobile GUI proof, TOC/outlines/anchors, charts, release automation, or proactive outreach unless concrete adopter demand changes the tradeoff.
 
 ## Milestone Snapshot
 
@@ -57,6 +65,7 @@ Full decision log in PROJECT.md Key Decisions table. v2.7 decisions:
 - `only_on: :odd | :even` evaluates physical page parity, not section-local parity.
 - `RunningContent` callback shape remains `{page, total}` for backward compatibility.
 - PDF.js work is a pinned advisory observation lane, not PDF.js support, a runtime dependency, or a required CI lane.
+- 2026-06-13 milestone-boundary assessment recommends treating Rendro as near done for its current product identity and starting a short stewardship/adoption-signal milestone before any new feature family.
 
 ### Pending Todos
 
@@ -121,4 +130,4 @@ Resume file: None
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Start the next milestone with `/gsd-new-milestone`, using `v2.8 Done-Enough Stewardship & Adoption Signal Loop` from `.planning/MILESTONE-ARC.md` as the recommended scope.
