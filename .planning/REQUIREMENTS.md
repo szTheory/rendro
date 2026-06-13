@@ -16,7 +16,7 @@ Requirements for this milestone. Each maps to exactly one roadmap phase.
 
 ### Header Duplex Proof Depth
 
-- [ ] **PROOF-01**: A direct end-to-end test renders header-specific `only_on: :odd | :even` running content and asserts the header appears only on the correct physical pages, bringing header odd/even proof depth to parity with the footer coverage shipped in v2.7.
+- [x] **PROOF-01**: A direct end-to-end test renders header-specific `only_on: :odd | :even` running content and asserts the header appears only on the correct physical pages, bringing header odd/even proof depth to parity with the footer coverage shipped in v2.7.
 
 ### Recipes Facade DX
 
@@ -69,7 +69,7 @@ Which phases cover which requirements.
 | DX-02 | Phase 93 | Complete |
 | HYG-01 | Phase 94 | Complete |
 | HYG-02 | Phase 94 | Complete |
-| PROOF-01 | Phase 95 | Pending |
+| PROOF-01 | Phase 95 | Complete |
 | META-01 | Phase 95 | Pending |
 | SIGNAL-01 | Phase 96 | Pending |
 | STEW-01 | Phase 96 | Pending |

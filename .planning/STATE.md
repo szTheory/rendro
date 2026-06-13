@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.8
 milestone_name: Done-Enough Stewardship & Adoption Signal Loop
 status: executing
-last_updated: "2026-06-13T18:55:48.831Z"
-last_activity: 2026-06-13 -- Phase 95 planning complete
+last_updated: "2026-06-13T19:02:52.796Z"
+last_activity: 2026-06-13
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 6
   percent: 50
 ---
 
@@ -20,16 +20,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-13 — v2.8 Done-Enough Stewardship & Adoption Signal Loop started)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 95 — header duplex proof & metadata reconcile
+**Current focus:** Phase 95 — header-duplex-proof-metadata-reconcile
 
 ## Current Position
 
-Phase: 95
-Plan: Not started
+Phase: 95 (header-duplex-proof-metadata-reconcile) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-06-13 -- Phase 95 planning complete
+Last activity: 2026-06-13
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█████████░] 86%
 
 ## v2.8 Phase Map
 
@@ -59,6 +59,7 @@ Full decision log in PROJECT.md Key Decisions table. Locked v2.8 research recomm
 - PROOF-01: mirror footer proofs at render + paginate layers; reject Poppler-per-page and golden-bytes.
 - SIGNAL-01: append a dated HOLD review to `ADOPTION.md` `## Review Log` — no new mix task.
 - STEW-01: two locations (MILESTONE-ARC internal posture section + `guides/api_stability.md` public status section); signal "stable & cared-for," never "abandoned."
+- [Phase 95]: PROOF-01: header only_on proven at render + paginate layers via additive tests over the shipped region-agnostic engine; no lib/ or public-API change
 
 ### Pending Todos
 
@@ -81,10 +82,16 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-06-13T15:51:29.583Z
+Last session: 2026-06-13T19:02:11.109Z
 Stopped at: Phase 95 context gathered
-Resume file: .planning/phases/95-header-duplex-proof-metadata-reconcile/95-CONTEXT.md
+Resume file: None
 
 ## Operator Next Steps
 
 - Plan the first phase with `/gsd:plan-phase 93`.
+
+## Performance Metrics
+
+| Phase | Plan | Duration | Notes |
+|-------|------|----------|-------|
+| Phase 95 P01 | 2min | 3 tasks | 2 files |
