@@ -393,6 +393,157 @@ defmodule Rendro.FlowTest do
     refute pdf =~ "{{page_number}}"
   end
 
+  test "single-page header only_on renders odd header only" do
+    template =
+      Rendro.page_template(
+        name: :duplex_header_test,
+        width: 420,
+        height: 220,
+        margin_top: 20,
+        margin_right: 24,
+        margin_bottom: 20,
+        margin_left: 24,
+        regions: [
+          Rendro.region(
+            name: :header,
+            role: :header,
+            anchor: :top,
+            x: 24,
+            y: 24,
+            width: 372,
+            height: 16
+          ),
+          Rendro.region(
+            name: :body,
+            role: :body,
+            anchor: :flow,
+            x: 24,
+            y: 52,
+            width: 372,
+            height: 60
+          )
+        ]
+      )
+
+    odd_header =
+      Rendro.section(
+        region: :header,
+        only_on: :odd,
+        content: [Rendro.block(Rendro.text("Odd {{page_number}}"))]
+      )
+
+    even_header =
+      Rendro.section(
+        region: :header,
+        only_on: :even,
+        content: [Rendro.block(Rendro.text("Even {{page_number}}"))]
+      )
+
+    doc =
+      Rendro.flow(
+        [Rendro.block(Rendro.text("Solo"))],
+        page_template: :duplex_header_test,
+        page_templates: [template],
+        sections: [odd_header, even_header]
+      )
+
+    {:ok, pdf} = Rendro.render(doc)
+
+    # Single body block -> exactly one physical (odd) page: only the :odd header appears.
+    assert length(Regex.scan(~r"/Type\s*/Page\b", pdf)) == 1
+    assert pdf =~ "(Odd 1) Tj"
+    refute pdf =~ "(Even"
+  end
+
+  test "header and footer only_on coexist via independent region_entries" do
+    template =
+      Rendro.page_template(
+        name: :duplex_header_footer_test,
+        width: 420,
+        height: 220,
+        margin_top: 20,
+        margin_right: 24,
+        margin_bottom: 20,
+        margin_left: 24,
+        regions: [
+          Rendro.region(
+            name: :header,
+            role: :header,
+            anchor: :top,
+            x: 24,
+            y: 24,
+            width: 372,
+            height: 16
+          ),
+          Rendro.region(
+            name: :body,
+            role: :body,
+            anchor: :flow,
+            x: 24,
+            y: 52,
+            width: 372,
+            height: 60
+          ),
+          Rendro.region(
+            name: :footer,
+            role: :footer,
+            anchor: :bottom,
+            x: 24,
+            y: 190,
+            width: 372,
+            height: 16
+          )
+        ]
+      )
+
+    odd_header =
+      Rendro.section(
+        region: :header,
+        only_on: :odd,
+        content: [Rendro.block(Rendro.text("HOdd {{page_number}}"))]
+      )
+
+    even_header =
+      Rendro.section(
+        region: :header,
+        only_on: :even,
+        content: [Rendro.block(Rendro.text("HEven {{page_number}}"))]
+      )
+
+    odd_footer =
+      Rendro.section(
+        region: :footer,
+        only_on: :odd,
+        content: [Rendro.block(Rendro.text("FOdd {{page_number}}"))]
+      )
+
+    even_footer =
+      Rendro.section(
+        region: :footer,
+        only_on: :even,
+        content: [Rendro.block(Rendro.text("FEven {{page_number}}"))]
+      )
+
+    doc =
+      Rendro.flow(
+        for(i <- 1..8, do: Rendro.block(Rendro.text("Line #{i}"))),
+        page_template: :duplex_header_footer_test,
+        page_templates: [template],
+        sections: [odd_header, even_header, odd_footer, even_footer]
+      )
+
+    {:ok, pdf} = Rendro.render(doc)
+
+    # 8 body lines / 4-per-page = 2 physical pages. Page 1 odd, page 2 even.
+    # Header parity and footer parity are driven by independent region_entries keys
+    # and do not interfere.
+    assert pdf =~ "(HOdd 1) Tj"
+    assert pdf =~ "(FOdd 1) Tj"
+    assert pdf =~ "(HEven 2) Tj"
+    assert pdf =~ "(FEven 2) Tj"
+    refute pdf =~ "{{page_number}}"
+  end
+
   test "body blocks do not overlap footer region (y + height <= footer.y)" do
     # Use an explicit template with a footer at a known y-position.
     # Assert that no body block's bottom edge (y + height) exceeds footer.y.
