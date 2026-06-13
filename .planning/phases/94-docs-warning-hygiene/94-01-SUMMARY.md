@@ -122,3 +122,22 @@ No new security-relevant surface introduced. Changes are build-time documentatio
 ---
 *Phase: 94-docs-warning-hygiene*
 *Completed: 2026-06-13*
+
+---
+
+## Post-merge integration correction (orchestrator, commit 63e7cc4)
+
+The original plan made `Rendro.PDF.Font` visible with an *internal-marking* `@moduledoc`
+and asserted it stayed out of the public API surface. The post-merge full-suite gate
+disproved that: the full-surface sweep (`test/rendro/public_api_test.exs`) requires every
+visible `:rendro` module to be hidden or tagged `[:stable]`/`[:adapter]`, and a visible
+untagged `Font` failed it. `skip_code_autolink_to` was verified unable to suppress the
+hidden-type typespec warnings, so `Font` could not stay `@moduledoc false` and warning-free.
+
+**User-approved resolution:** `Rendro.PDF.Font` is now genuinely public — its `t/0` is
+already exposed in the public `Rendro.Text.Shaper.shape/3` callback contract. It carries a
+public `@moduledoc` tagged `[:stable]`, was added to the `mix rendro.api.gen` public-module
+registry, and `priv/public_api.json` was regenerated to include it. The two ci-alias contract
+tests were updated for the intended `docs --warnings-as-errors` step. `mix docs --warnings-as-errors`
+exits 0 and the public-API governance suite is green. This supersedes the "stays out of the
+public API surface" claim above.

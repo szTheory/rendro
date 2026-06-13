@@ -93,8 +93,8 @@ Plans:
 
 **Wave 1** *(both plans are independent and can run in parallel)*
 
-- [ ] 94-01-PLAN.md — Resolve all ExDoc warnings (skip_code_autolink_to: + Font @moduledoc + ci --warnings-as-errors)
-- [ ] 94-02-PLAN.md — Augment staleness message + add lifecycle section to guides/viewer_evidence.md
+- [x] 94-01-PLAN.md — Resolve all ExDoc warnings (skip_code_autolink_to: + Font @moduledoc + ci --warnings-as-errors)
+- [x] 94-02-PLAN.md — Augment staleness message + add lifecycle section to guides/viewer_evidence.md
 
 #### Phase 95: Header Duplex Proof & Metadata Reconcile
 
@@ -132,7 +132,7 @@ v2.8 phases execute in numeric order: 93 → 94 → 95 → 96
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 93. Recipes Facade DX Closure | v2.8 | 3/3 | Complete    | 2026-06-13 |
-| 94. Docs & Warning Hygiene | v2.8 | 0/2 | Not started | - |
+| 94. Docs & Warning Hygiene | v2.8 | 2/2 | Complete   | 2026-06-13 |
 | 95. Header Duplex Proof & Metadata Reconcile | v2.8 | 0/TBD | Not started | - |
 | 96. Adoption Signal Review & Stewardship Posture | v2.8 | 0/TBD | Not started | - |
 
