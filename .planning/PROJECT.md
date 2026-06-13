@@ -10,7 +10,7 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Active milestone:** v2.7 Page Context & Browser Proof Hardening — **STARTED 2026-06-13** (planned Phases 89-92). The milestone strengthens report/booklet layout ergonomics through internal page context, section-local page-numbering tokens, and physical odd/even running content, then adds a pinned PDF.js advisory observation lane and docs/release hygiene so public claims stay narrow.
+**Active milestone:** v2.7 Page Context & Browser Proof Hardening — **STARTED 2026-06-13** (planned Phases 89-92). Phase 89 is complete: section-local page numbering now uses internal page context, `page_numbering: [restart: true]`, and `{{section_page_number}}` / `{{section_total_pages}}` tokens while preserving existing PAGE behavior. Next is Phase 90 duplex running content.
 
 **Shipped milestone:** v2.6 Public Launch & Adoption Bootstrap — **SHIPPED 2026-06-13** (Phases 83-88, 21/21 requirements; milestone audit `passed`; phase history archived under `milestones/v2.6-phases/`). Rendro is now truthfully and quietly discoverable: the pure-Elixir core claim is restored, visible output polish and deterministic raster proof tooling are in place, public proof artifacts are self-rendered and hash-checked, the comparison guide and Livebook try path are live, issue-only intake is available, mobile GUI rows are explicitly deferred rather than overclaimed, and the conditional text-shaping gate is measurable in `ADOPTION.md`.
 
@@ -122,7 +122,7 @@ The milestone must deliver:
 
 ### Active
 
-- [ ] **CTX-01..03** — Page context primitive: section-local numbering restarts, section page-number tokens, and backward-compatible PAGE behavior.
+- [x] **CTX-01..03** — Page context primitive: section-local numbering restarts, section page-number tokens, and backward-compatible PAGE behavior. Validated in Phase 89.
 - [ ] **DUP-01..03** — Duplex running content: physical odd/even header/footer variants that compose with section-local numbering and fail clearly on invalid options.
 - [ ] **PDFJS-01..03** — Pinned PDF.js advisory observations: versioned Node/pdfjs-dist lane, recorded observations, advisory-only CI, and no GUI-support promotion.
 - [ ] **DOC-01..03** — Docs, claims, and release hygiene: guide examples, support-boundary enforcement, and keeping global text shaping demand-gated.
@@ -195,6 +195,7 @@ As of v2.6 (2026-06-13), public claims are bounded by checked proof artifacts: p
 | Implement page context internally instead of exposing a public `Rendro.PageContext` struct in v2.7 | Authors need stable tokens and section options first; a public context object would freeze abstractions before TOC/anchors/cross-refs prove their shape | Planned for v2.7 |
 | Evaluate odd/even running content against physical page parity, not section-local parity | Duplex print/booklet conventions are based on left/right physical pages; section-local parity would surprise authors and break print workflows | Planned for v2.7 |
 | Keep PDF.js evidence advisory and worded as "pinned PDF.js advisory observations" | PDF.js is a browser-family renderer, not a GUI support matrix substitute; Node/npm must never become a core runtime, required CI, or Hex dependency | Planned for v2.7 |
+| Re-pair compose section metadata with measured body blocks during pagination | Compose entries are created before measurement, but pagination must use measured heights; block counts let Rendro keep metadata without adding hidden fields to `%Rendro.Block{}` | ✓ Shipped in Phase 89 |
 
 ## Archived Milestone Context
 
@@ -259,4 +260,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-13 after starting v2.7 Page Context & Browser Proof Hardening.*
+*Last updated: 2026-06-13 after Phase 89 Page Context Primitive completion.*
