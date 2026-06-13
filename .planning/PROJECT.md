@@ -10,7 +10,7 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Active milestone:** None. v2.7 Page Context & Browser Proof Hardening shipped on 2026-06-13 and the project is awaiting the next `$gsd-new-milestone` cycle.
+**Active milestone:** v2.8 Done-Enough Stewardship & Adoption Signal Loop — started 2026-06-13. A short stewardship cycle that reduces maintainer/adopter friction and keeps the public posture truthful while demand accumulates, without widening product scope.
 
 **Shipped milestone:** v2.7 Page Context & Browser Proof Hardening — **SHIPPED 2026-06-13** (Phases 89-92, 12/12 requirements; milestone audit `passed`; phase history archived under `milestones/v2.7-phases/`). Rendro now has section-local page numbering through internal page context, physical odd/even running content, pinned PDF.js advisory observations, and docs/package/workflow guardrails that keep every new claim proof-backed and global text shaping demand-gated.
 
@@ -84,11 +84,22 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 **Foundation Already Shipped:** v1.3 release readiness, v1.2 typography/assets truth, v1.1 layout-authoring maturity, and v1.0 deterministic core rendering.
 
-## Next Milestone Goals
+## Current Milestone: v2.8 Done-Enough Stewardship & Adoption Signal Loop
 
-No next milestone is selected. The next planning cycle should start with `$gsd-new-milestone` and preserve the same proof-backed claim discipline that carried v2.6 and v2.7.
+**Goal:** Reduce maintainer/adopter friction and keep the public posture truthful while demand accumulates — without widening the product scope.
 
-Likely future candidates remain demand-gated:
+**Target features:**
+- Warning/debt hygiene — clean up or deliberately document the docs/CI warning posture (hidden-internal ExDoc warnings, stale viewer-evidence warning noise).
+- Header `only_on` E2E proof depth — direct header-specific odd/even rendering coverage matching the footer proof depth shipped in v2.7.
+- `Rendro.Recipes` facade gap — facade currently delegates only Invoice/BrandedInvoice while Statement/Receipt/Certificate exist as full recipe modules; close the DX gap.
+- Nyquist/validation metadata cleanup — reconcile stale v2.6/v2.7 phase validation-history metadata where the audit already passed.
+- Adoption-signal review — lightweight pull-based review confirming whether `ADOPTION.md` shows qualifying text-shaping demand, download movement, or contributor signal before any large capability is proposed.
+- Maintainer docs/state — record that Rendro is near-done for its current scope and should not deepen proof/viewer work by default.
+
+**Explicit non-goals:** global text shaping, mobile GUI viewer promotion, TOC/outlines/anchors/cross-references, charts, existing-PDF editing, release-please automation, and proactive outreach — unless concrete adopter demand changes the tradeoff.
+
+## Future Milestone Candidates (demand-gated)
+
 - Global Text Shaping & Script Support only after the `ADOPTION.md` gate triggers.
 - Larger report features such as TOC/outlines/anchors/cross-references and charts only after concrete user pressure proves the product value.
 
@@ -127,7 +138,7 @@ Likely future candidates remain demand-gated:
 
 ### Active
 
-- None. v2.7 requirements are archived; create the next active requirement set with `$gsd-new-milestone`.
+- v2.8 Done-Enough Stewardship & Adoption Signal Loop — requirements defined in `.planning/REQUIREMENTS.md` (warning/debt hygiene, header `only_on` E2E proof depth, `Rendro.Recipes` facade closure, Nyquist/validation metadata cleanup, adoption-signal review, maintainer docs/state). Scope is stewardship-only; no new feature family. — v2.8
 
 ### Out of Scope
 
@@ -263,4 +274,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-13 after v2.7 Page Context & Browser Proof Hardening completion.*
+*Last updated: 2026-06-13 — v2.8 Done-Enough Stewardship & Adoption Signal Loop started.*
