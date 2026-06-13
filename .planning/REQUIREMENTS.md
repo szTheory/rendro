@@ -26,9 +26,9 @@
 
 ### Documentation and Release Hygiene
 
-- [ ] **DOC-01**: Guides explain page context, section-local numbering, and duplex running content with code examples, rendered-proof references, and explicit unsupported TOC/outline/chart/text-shaping boundaries.
-- [ ] **DOC-02**: Release/HexDocs workflow hardening prevents unreleased public docs from silently overclaiming the current Hex package and pins/minimizes CI permissions where practical.
-- [ ] **DOC-03**: Public roadmap and `ADOPTION.md` language keeps global text shaping demand-gated rather than reusing the v2.7 label for a false shaping promise.
+- [x] **DOC-01**: Guides explain page context, section-local numbering, and duplex running content with code examples, rendered-proof references, and explicit unsupported TOC/outline/chart/text-shaping boundaries.
+- [x] **DOC-02**: Release/HexDocs workflow hardening prevents unreleased public docs from silently overclaiming the current Hex package and pins/minimizes CI permissions where practical.
+- [x] **DOC-03**: Public roadmap and `ADOPTION.md` language keeps global text shaping demand-gated rather than reusing the v2.7 label for a false shaping promise.
 
 ## Traceability
 
