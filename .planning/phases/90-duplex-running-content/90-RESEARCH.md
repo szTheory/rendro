@@ -323,17 +323,15 @@ end
 | A1 | A small helper such as `Rendro.SectionOptions` is an acceptable internal shape. | Recommended Project Structure / Code Examples | Planner may instead inline validation in Compose; behavior should remain the same. |
 | A2 | Warning-sign heuristics reflect likely test smells. | Common Pitfalls | Low; they guide review, not implementation. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should validation raise `ArgumentError` directly from Compose or return `{:error, %Rendro.Error{}}`?**
    - What we know: The locked context prefers clear `ArgumentError` unless a narrower error surface already exists, and Compose already raises `ArgumentError` for conflicting `suppress_on`. [VERIFIED: `.planning/phases/90-duplex-running-content/90-CONTEXT.md`, `lib/rendro/pipeline/compose.ex`]
-   - What's unclear: Whether maintainers want all malformed section options to be pipeline tuple errors long term. [ASSUMED]
-   - Recommendation: Use `ArgumentError` for Phase 90 to match existing Compose conflict behavior, but keep messages precise and test them. [VERIFIED: existing behavior]
+   - Resolution: Use `ArgumentError` for Phase 90 to match existing Compose conflict behavior, keep messages precise, and test them. A future phase can normalize malformed author input into structured `Rendro.Error` tuples if the pipeline error surface is redesigned more broadly.
 
 2. **Should direct `Paginate.run/1` with prebuilt `options.layout.entries` validate layout entries too?**
    - What we know: Tests call `Build -> Compose -> Measure -> Paginate`, but `Paginate.run/1` has fallback paths and is directly tested. [VERIFIED: `test/rendro/pipeline/paginate_test.exs`]
-   - What's unclear: Whether external users rely on direct internal pipeline stages. [ASSUMED]
-   - Recommendation: Validate in Compose and defensively normalize/filter unknown layout-entry values in Paginate where cheap. [ASSUMED]
+   - Resolution: Validate section-authored options in Compose, which is the source of normalized section metadata. In Paginate, treat unknown or absent `only_on` values as non-matching only when they appear in already-normalized layout entries; do not add a second public validation surface for internal direct-stage use in Phase 90.
 
 ## Environment Availability
 
