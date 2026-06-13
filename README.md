@@ -132,7 +132,7 @@ doc =
 {:ok, pdf} = Rendro.render(doc)
 ```
 
-The delegating alias `Rendro.Recipes.invoice/1` calls `Rendro.Recipes.Invoice.document/1` for convenience.
+`Rendro.Recipes.invoice/1` (and `/2`) delegates to `Rendro.Recipes.Invoice.document/2`, threading opts through.
 
 ### Branded Documents
 
