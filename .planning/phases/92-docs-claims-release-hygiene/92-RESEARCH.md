@@ -431,17 +431,15 @@ Recommended release hygiene tasks:
 | A1 | "Release hygiene" can be misread as full automation. | Common Pitfalls | Low; this is interpretive, not implementation-critical. |
 | A2 | Adding new top-level support rows may require schema or docs-contract updates if tests enumerate known keys. | Support Matrix Recommendation | Medium; planner must run full docs-contract and schema tests after editing matrix. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should `ADOPTION.md` become an ExDoc extra or only a packaged file?**  
    - What we know: README and comparison link to it, and `mix docs` warns because it is missing from ExDoc context. [VERIFIED: `mix docs`]  
-   - What's unclear: Whether maintainers want the adoption ledger visible in HexDocs sidebar. [ASSUMED]  
-   - Recommendation: Include it as a Policies extra because it is already public-facing and linked from public docs. [VERIFIED: current links]
+   - RESOLVED: Include it as a Policies extra because it is already public-facing and linked from public docs. [VERIFIED: current links]
 
 2. **Should `page_numbering` be expanded instead of adding `section_page_numbering`?**  
    - What we know: `page_numbering` exists and is supported for the older global PAGE primitive. [VERIFIED: `priv/support_matrix.json`]  
-   - What's unclear: Whether public consumers prefer one broad row or separate rows. [ASSUMED]  
-   - Recommendation: Add separate top-level rows for new v2.7 claims so docs-contract can bind exact capabilities without rewriting older semantics. [VERIFIED: CONTEXT.md]
+   - RESOLVED: Add separate top-level rows for new v2.7 claims so docs-contract can bind exact capabilities without rewriting older semantics. [VERIFIED: CONTEXT.md]
 
 ## Environment Availability
 
