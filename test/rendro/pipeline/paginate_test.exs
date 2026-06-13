@@ -837,6 +837,89 @@ defmodule Rendro.Pipeline.PaginateTest do
              ]
     end
 
+    test "header only_on physical parity coexists with restart section tokens" do
+      template = %PageTemplate{
+        name: :section_context_header,
+        width: 420,
+        height: 240,
+        margin_top: 20,
+        margin_right: 24,
+        margin_bottom: 28,
+        margin_left: 24,
+        regions: [
+          %Region{
+            name: :header,
+            role: :header,
+            anchor: :top,
+            x: 24,
+            y: 24,
+            width: 372,
+            height: 20
+          },
+          %Region{name: :body, role: :body, anchor: :flow, x: 24, y: 52, width: 372, height: 30},
+          %Region{
+            name: :footer,
+            role: :footer,
+            anchor: :bottom,
+            x: 24,
+            y: 200,
+            width: 600,
+            height: 20
+          }
+        ]
+      }
+
+      odd_header =
+        Rendro.section(
+          region: :header,
+          only_on: :odd,
+          content: [Rendro.page_number(format: "HOdd P{{page_number}}")]
+        )
+
+      even_header =
+        Rendro.section(
+          region: :header,
+          only_on: :even,
+          content: [Rendro.page_number(format: "HEven P{{page_number}}")]
+        )
+
+      footer =
+        Rendro.section(
+          region: :footer,
+          content: [
+            Rendro.page_number(format: "S{{section_page_number}}/{{section_total_pages}}")
+          ]
+        )
+
+      appendix =
+        Rendro.section(
+          name: :appendix,
+          region: :body,
+          page_numbering: [restart: true],
+          content: for(i <- 1..3, do: Rendro.block(Rendro.text("Appendix #{i}")))
+        )
+
+      doc =
+        Rendro.flow(
+          [Rendro.block(Rendro.text("Intro"))],
+          page_template: :section_context_header,
+          page_templates: [template],
+          sections: [appendix, odd_header, even_header, footer]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+      assert length(paginated.pages) == 3
+
+      [page1, page2, page3] = paginated.pages
+
+      # page_texts/1 returns header blocks first, then footer, then body (verified ordering).
+      # Header shows PHYSICAL page parity; footer S-token shows SECTION-LOCAL numbering under
+      # restart -- the two coexist without interference.
+      assert page_texts(page1) == ["HOdd P1", "S1/1", "Intro"]
+      assert page_texts(page2) == ["HEven P2", "S1/2", "Appendix 1", "Appendix 2"]
+      assert page_texts(page3) == ["HOdd P3", "S2/2", "Appendix 3"]
+    end
+
     test "suppression and only_on both run before RunningContent evaluation" do
       template = section_context_template()
       {:ok, agent} = Agent.start_link(fn -> [] end)
