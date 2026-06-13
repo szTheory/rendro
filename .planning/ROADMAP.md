@@ -62,7 +62,12 @@ v2.7 archives:
   2. The existing `invoice/1` opts-drop footgun is fixed — `:formatters` / `:labels` / `:border` / `:page_number_opts` thread through instead of being silently dropped — and the README line documenting the drop is corrected.
   3. A drift test asserts each recipe is reachable as `name/1` and `name/2`, that the facade exposes no extra functions (MapSet equality), and that `Rendro.Recipes.name(data, opts)` is byte-identical to `Module.document(data, opts)`.
   4. `mix rendro.api.gen` is re-run so `priv/public_api.json` reflects the 10-function facade surface, and `public_api_contract_test.exs` passes the byte-compare (additive arity pair, no Tier-1 symbol replaced).
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 93-01-PLAN.md — Author RED drift test (test/rendro/recipes_facade_drift_test.exs) + fix README opts-drop line
+- [ ] 93-02-PLAN.md — Expand lib/rendro/recipes.ex with 10 @spec'd facade functions (fixes opts-drop footgun)
+- [ ] 93-03-PLAN.md — Run mix rendro.api.gen, verify additive-only diff, confirm contract test passes
 
 #### Phase 94: Docs & Warning Hygiene
 **Goal**: A maintainer building the docs sees a clean, deliberate warning posture — `mix docs` emits zero unexplained ExDoc warnings, and the latent viewer-evidence staleness signal is self-explaining rather than mysterious.
@@ -104,7 +109,7 @@ v2.8 phases execute in numeric order: 93 → 94 → 95 → 96
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 93. Recipes Facade DX Closure | v2.8 | 0/TBD | Not started | - |
+| 93. Recipes Facade DX Closure | v2.8 | 0/3 | Not started | - |
 | 94. Docs & Warning Hygiene | v2.8 | 0/TBD | Not started | - |
 | 95. Header Duplex Proof & Metadata Reconcile | v2.8 | 0/TBD | Not started | - |
 | 96. Adoption Signal Review & Stewardship Posture | v2.8 | 0/TBD | Not started | - |
