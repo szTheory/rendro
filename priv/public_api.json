@@ -319,7 +319,15 @@
     "Elixir.Rendro.Recipes": {
       "functions": [
         "branded_invoice/1",
-        "invoice/1"
+        "branded_invoice/2",
+        "certificate/1",
+        "certificate/2",
+        "invoice/1",
+        "invoice/2",
+        "receipt/1",
+        "receipt/2",
+        "statement/1",
+        "statement/2"
       ],
       "tier": "stable",
       "types": []
