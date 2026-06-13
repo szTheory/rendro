@@ -10,7 +10,7 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Shipped milestone:** v2.5 1.0 Release Capstone — **SHIPPED 2026-06-05** (Phases 78–82, 16/16 requirements; milestone audit `passed`; **`rendro 1.0.0` live on hex.pm**). The formal two-tier SemVer commitment, enforced public API boundary, migration docs, hardened release gates, and the irreversible proof-gated publish are all done. The full phase-delivery narrative is archived in `milestones/v2.5-ROADMAP.md`. **Active milestone: v2.6 Public Launch & Adoption Bootstrap — convert Rendro's proof-backed depth into its first real adopters. Claim accuracy, drawn-path visible polish, and the deterministic raster lane are complete; next is self-proving launch artifacts (visual gallery, self-rendered manual, benchmark page, Livebook), then coordinated ecosystem launch and a concrete demand gate for conditional v2.7 global text shaping.**
+**Shipped milestone:** v2.6 Public Launch & Adoption Bootstrap — **SHIPPED 2026-06-13** (Phases 83-88, 21/21 requirements; milestone audit `passed`; phase history archived under `milestones/v2.6-phases/`). Rendro is now truthfully and quietly discoverable: the pure-Elixir core claim is restored, visible output polish and deterministic raster proof tooling are in place, public proof artifacts are self-rendered and hash-checked, the comparison guide and Livebook try path are live, issue-only intake is available, mobile GUI rows are explicitly deferred rather than overclaimed, and the conditional v2.7 text-shaping gate is measurable in `ADOPTION.md`. There is no active milestone; the next milestone starts with `$gsd-new-milestone`.
 
 <details>
 <summary>v2.5 phase delivery detail</summary>
@@ -26,7 +26,11 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 </details>
 
-**Shipped Version:** v2.5 1.0 Release Capstone (2026-06-05)
+**Shipped Version:** v2.6 Public Launch & Adoption Bootstrap (2026-06-13)
+
+Rendro is now quietly public and proof-backed for evaluators who find it: claim accuracy was repaired (`harfbuzz_ex` optional behind `Rendro.Text.Shaper`, complex scripts instructively deferred), visible output polish landed (`%Rendro.Path{}`, table borders/rules/header bands, Certificate frame), advisory raster proof is available through `Rendro.Adapters.Pdfium.render/2` and golden PNG refs, README/HexDocs carry hash-checked gallery/manual artifacts, the comparison guide and Livebook tutorial are mechanically bounded, issue-only intake is live, and `ADOPTION.md` defines the conditional v2.7 text-shaping demand gate. All 21 requirements satisfied; milestone audit `passed`. Archived in `milestones/v2.6-ROADMAP.md` / `milestones/v2.6-REQUIREMENTS.md` / `milestones/v2.6-MILESTONE-AUDIT.md` / `milestones/v2.6-phases/`.
+
+**Previous Shipped Version:** v2.5 1.0 Release Capstone (2026-06-05)
 
 Rendro `1.0.0` is published on hex.pm — a permanent, proof-backed first 1.x release consolidating all unreleased v2.3 + v2.4 work since `0.3.0`. The public API surface is intentional and machine-checkable (tiered `priv/public_api.json` manifest, 27 stable + 18 adapter modules, accidentally-public internals hidden, docs-contract enforcement lane failing CI on drift), the two-tier SemVer stability contract is formal (`guides/api_stability.md` rewritten, `guides/upgrading_to_1.0.md`, Tier-1-symbols-exist claims test), and release machinery is hardened (exact-allowlist tarball content audit, `hex.audit`/`deps.audit`, SHA-pinned release workflow). All 16 requirements satisfied; milestone audit `passed`. Archived in `milestones/v2.5-ROADMAP.md` / `milestones/v2.5-REQUIREMENTS.md` / `milestones/v2.5-MILESTONE-AUDIT.md`.
 
@@ -72,31 +76,23 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 **Foundation Already Shipped:** v1.3 release readiness, v1.2 typography/assets truth, v1.1 layout-authoring maturity, and v1.0 deterministic core rendering.
 
-## Current Milestone: v2.6 Public Launch & Adoption Bootstrap
+## Next Milestone Goals
 
-**Goal:** Convert Rendro's proof-backed depth into its first real adopters — fix claim accuracy, polish visible output, build the deterministic raster toolchain, ship self-proving launch artifacts, and execute a coordinated ecosystem launch that makes the conditional text-shaping demand gate actually reachable.
-
-**Target features:**
-- **Claim-accuracy & shaping hygiene** — make `harfbuzz_ex` an optional dependency behind a `Rendro.Text.Shaper` behaviour (core ships a pure-Elixir `Shaper.Simple`; HarfBuzz adapter activates when present, with an instructive error for unsupported scripts — never silent broken output), fix the per-grapheme shaping bug in the line-breaking path, migrate off the dead `unicode_data 0.8.0` to the maintained `ex_unicode` stack, and record `explicit_deferral` support-matrix rows for complex scripts. The "pure Elixir core" claim becomes true again before any launch content ships.
-- **Drawn-path primitive + visible polish** — declarative `%Rendro.Path{}` block element (move/line/curve/rect/rounded-rect, stroke/fill) on the existing writer seam; table rules/borders/header-band options; Certificate `border:` frame. Byte-determinism golden tests + support-matrix rows.
-- **Deterministic raster lane** — extend `Rendro.Adapters.Pdfium` with `render/2` (pinned pdfium-cli), a golden-PNG snapshot harness in `mix test` (hash-equality fast path, containerized bless), an advisory CI lane, and an honest `viewer_kind: "pdfium-render"` evidence vocabulary distinct from GUI observation.
-- **Self-proving launch artifacts** — visual recipe gallery (all five recipes rasterized into README + HexDocs, hash-checked in CI), a Prawn-style `manual.pdf` generated by Rendro itself with its SHA-256 published, a reproducible "PDFs in Elixir without Chrome" benchmark/comparison page vs ChromicPDF/pdf_generator/Typst-CLI, and a CI-executed Livebook tutorial with "Run in Livebook" badges.
-- **Launch execution + demand instrumentation** — ElixirForum #announcing thread, ElixirStatus post, awesome-elixir PR, genuine replies in the two existing demand threads, a mobile-viewer-evidence content beat (2–4 honest rows), and a concrete v2.7 text-shaping demand gate (signal thresholds + ADOPTION.md ledger + GitHub Discussions/issue templates).
-
-**Why now:** Rendro has 1.0-grade depth but is invisible — ~856 lifetime hex downloads (essentially all self/CI), 0 GitHub stars, never announced anywhere — while two live ElixirForum threads ask for exactly this library and conclude it doesn't exist. The roadmap's own rule ("v2.7 text shaping only if adopter demand justifies it") cannot trigger at zero visibility; the in-niche cautionary tale is `mudbrick` (12 releases, no launch work, stalled at 2.8k downloads). Every successful comparable (Oban, ChromicPDF, Typst, pdf-lib, Prawn) started with a visibility act, and Rendro's proof culture (byte-reproducible manual, checked-in benchmarks, honest viewer matrix) is launch marketing no competitor can copy. One blocking truth issue: `harfbuzz_ex` is currently a *hard* NIF dependency, so the "pure Elixir / no external dependencies" positioning must be fixed before announcing. Research detail in `.planning/research/`.
+No active milestone is selected. The default next candidate is **v2.7 Global Text Shaping & Script Support**, but it remains conditional: pursue it only if the `ADOPTION.md` demand gate triggers through qualifying non-maintainer asks, download thresholds, or external contribution signals. If the gate does not trigger, the next milestone should be chosen fresh with `$gsd-new-milestone` from the current project state rather than inheriting v2.6 launch assumptions.
 
 ## Strategic Arc
 
-**Active strategic arc:** public 1.0 commitment → public launch & adoption bootstrap → demand-gated capability growth
+**Active strategic arc:** public 1.0 commitment → quiet public discoverability → demand-gated capability growth
 
-**Planned sequence after v2.5:**
-- v2.6 Public Launch & Adoption Bootstrap — claim-accuracy hygiene, path primitive + borders, deterministic raster lane, self-proving launch artifacts, coordinated ecosystem launch, concrete demand instrumentation
-- v2.7 Global Text Shaping & Script Support (conditional — pursue only when the v2.6-defined demand gate triggers; the gate is now measurable instead of an open circuit)
+**Planned sequence after v2.6:**
+- v2.7 Global Text Shaping & Script Support (conditional — pursue only when the v2.6-defined demand gate triggers)
+- Otherwise, select the next milestone from observed adopter needs and maintainer capacity.
 
 ## Requirements
 
 ### Validated
 
+- ✓ Rendro v2.6 shipped public launch and adoption bootstrap without overclaiming: HarfBuzz is optional behind `Rendro.Text.Shaper`, complex scripts fail instructively, `%Rendro.Path{}`/table borders/Certificate frame polish are in the core render path, `Rendro.Adapters.Pdfium.render/2` and golden-PNG snapshots provide advisory raster proof, the README/HexDocs gallery and self-rendered `manual.pdf` are hash-checked, the comparison guide and Livebook tutorial are bounded by docs-contract checks, issue-only intake and `ADOPTION.md` establish a measurable demand gate, and mobile GUI rows are terminal `explicit_deferral` entries rather than support claims. All 21 requirements satisfied; milestone audit `passed`. Shipped 2026-06-13 and archived in `milestones/v2.6-ROADMAP.md` / `milestones/v2.6-REQUIREMENTS.md` / `milestones/v2.6-MILESTONE-AUDIT.md` / `milestones/v2.6-phases/`. — v2.6
 - ✓ Rendro v2.5 shipped the public 1.0 commitment: a formal two-tier SemVer/API-stability contract (Tier-1 Stable strict SemVer, Tier-2 Evolving adapters/diagnostics), a mechanically enforced public API boundary (`priv/public_api.json` manifest + `public_api_contract_test.exs` docs-contract lane, API-01..05), rewritten stability/migration docs (`api_stability.md`, `upgrading_to_1.0.md`, Tier-1 claims test, STAB-01..05), hardened release gates (exact-allowlist tarball audit, `hex.audit`/`deps.audit`, SHA-pinned workflow), and the irreversible consolidated `1.0.0` publish to hex.pm (REL-01..06). All 16 requirements satisfied; milestone audit `passed`. Shipped 2026-06-05 and archived in `milestones/v2.5-ROADMAP.md` / `milestones/v2.5-REQUIREMENTS.md` / `milestones/v2.5-MILESTONE-AUDIT.md`. — v2.5
 - ✓ Rendro v2.4 closed the adoption gap with batteries-included Phoenix document workflows — a deterministic page-numbering / running-region primitive (PAGE-01..04), three data-driven recipes on the three-rung escape hatch (Statement STMT-01..04, Receipt/Report RCPT-01..03, Certificate CERT-01..03), terminal support-matrix rows for every new surface (CONTRACT-01), an executable reference Phoenix app in an isolated non-required CI lane (REF-01..03), and HexDocs guides bounded by docs-contract tests (CONTRACT-02). All 19 v1 requirements satisfied; milestone audit `passed`. Shipped 2026-05-30 and archived in `milestones/v2.4-ROADMAP.md` / `milestones/v2.4-REQUIREMENTS.md` / `milestones/v2.4-MILESTONE-AUDIT.md`. — v2.4
 - [x] Rendro v2.3 closed the trust-sensitive viewer evidence gap surface-by-surface: all 26 (surface × viewer) cells are terminal — 17 `supported` with resolvable `evidence:` pointers into `priv/viewer_evidence/`, 9 `explicit_deferral` with named viewer-behavior reasons, 0 silently `unverified`. Added the `explicit_deferral` matrix vocabulary plus additive `evidence:`/`recorded_at:`/`viewer_kind:` fields enforced by an in-tree JSON-Schema validator, the `mix rendro.viewer_evidence` operator task, the 8th docs-contract lane (wired into the required `test` job), and the durable `guides/viewer_evidence.md` operator recipe. The engine-level required CI lanes were verified unchanged via a live branch-protection audit. Shipped 2026-05-29 at tag `v0.3.1` and archived in `milestones/v2.3-ROADMAP.md` / `milestones/v2.3-REQUIREMENTS.md` / `milestones/v2.3-MILESTONE-AUDIT.md`.
@@ -117,15 +113,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-_Milestone **v2.6 Public Launch & Adoption Bootstrap** is active (concrete REQ-IDs in `REQUIREMENTS.md`, phases 83–88 in `ROADMAP.md`). Headline requirements:_
-
-- [x] **Claim-accuracy & shaping hygiene** — `harfbuzz_ex` optional behind a `Rendro.Text.Shaper` behaviour with pure-Elixir `Shaper.Simple` in core, per-grapheme shaping bug fixed, `unicode_data` → `unicode` migration, `explicit_deferral` matrix rows for complex scripts (HYG-01..05). Validated in Phase 83: Claim-Accuracy & Shaping Hygiene (2026-06-10, 4/4 success criteria, 1022 tests green; 12 code-review findings fixed incl. per-render `shaper:` override and embedded-font default-install fix).
-- [x] **Drawn-path primitive + visible polish** — declarative `%Rendro.Path{}`, table rules/borders, Certificate border frame, determinism golden tests (PATH-01..04). Validated in Phase 84: Drawn-Path Primitive & Visible Polish (2026-06-10, 5/5 plans complete; phase verification passed).
-- [x] **Deterministic raster lane** — `Pdfium.render/2`, golden-PNG snapshot harness, advisory CI lane, honest `pdfium-render` evidence vocabulary (RAST-01..03). Validated in Phase 85: Deterministic Raster Lane (2026-06-11, 9/9 must-haves verified after gap closure; full suite and docs-contract lanes green).
-- [ ] **Self-proving launch artifacts** — CI-hash-checked visual recipe gallery, self-rendered `manual.pdf` with published SHA-256, reproducible benchmark/comparison page, CI-executed Livebook tutorial (GAL-xx, CMP-xx).
-- [ ] **Launch execution + demand instrumentation** — coordinated ecosystem launch, mobile-viewer-evidence content beat, concrete v2.7 shaping demand gate + ADOPTION.md ledger (LNCH-xx).
-- [ ] Hold **v2.7 Global Text Shaping & Script Support** as conditional — pursue only when the v2.6-defined demand gate triggers.
-- [ ] Keep viewer claims narrower than blanket "works in every viewer" marketing, blanket compliance narratives, and signer identity trust unless a separate milestone proves them; every new surface inherits the v2.3 viewer-evidence recording discipline. Raster-renderer evidence must never be presented as GUI-viewer proof.
+No active requirements file exists after v2.6 close. Fresh requirements should be defined with `$gsd-new-milestone`.
 
 ### Out of Scope
 
@@ -137,9 +125,9 @@ _Milestone **v2.6 Public Launch & Adoption Bootstrap** is active (concrete REQ-I
 
 ## Context
 
-Rendro has now shipped four authored PDF surfaces inside one deterministic pipeline (static content v1.0-v1.2, interactive forms v1.8, document-level embedded files v1.9, curated link annotations v1.9) and one full trust-sensitive stack as artifact-first or optional-adapter seams: protection through `Rendro.Protect` (v1.10), unsigned signature preparation through `Rendro.Sign.prepare/2` (v2.0), cryptographic signing through `Rendro.Sign.sign/2` plus first-party optional runtime adapters (v2.1), and long-lived signature augmentation through `Rendro.Sign.augment/2` plus a dedicated long-lived-live-proof CI lane (v2.2). All of this lands without widening the core rendering contract or the deterministic `build → compose → measure → paginate → render → validate` pipeline.
+Rendro has now shipped four authored PDF surfaces inside one deterministic pipeline (static content v1.0-v1.2, interactive forms v1.8, document-level embedded files v1.9, curated link annotations v1.9) and one full trust-sensitive stack as artifact-first or optional-adapter seams: protection through `Rendro.Protect` (v1.10), unsigned signature preparation through `Rendro.Sign.prepare/2` (v2.0), cryptographic signing through `Rendro.Sign.sign/2` plus first-party optional runtime adapters (v2.1), and long-lived signature augmentation through `Rendro.Sign.augment/2` plus a dedicated long-lived-live-proof CI lane (v2.2). It now also has batteries-included Phoenix document workflows (v2.4), a public 1.0 API/release contract (v2.5), and quiet public discovery proof surfaces (v2.6). All of this lands without widening the core rendering contract or the deterministic `build → compose → measure → paginate → render → validate` pipeline.
 
-As of v2.3 (2026-05-29), per-viewer behavior is no longer carried as blanket `unverified`: every (surface × viewer) cell across forms, protection, signature widgets, signing preparation, signed artifacts, and long-lived artifacts is terminal — recorded `supported` with checked-in evidence or `explicit_deferral` with a named viewer-behavior reason. Recorded engine truth and recorded operator-facing truth are now aligned end-to-end, enforced by the schema validator and the 8th docs-contract lane. The next trust-and-adoption gap is adoption itself: reducing time-to-production for common Phoenix workflows (v2.4), with global text shaping held as a conditional v2.5.
+As of v2.6 (2026-06-13), public claims are bounded by checked proof artifacts: per-viewer rows are terminal (`supported` or `explicit_deferral`), raster evidence remains distinct from GUI-viewer proof, visual launch assets and the manual are hash-checked, comparison claims are tied to committed benchmark results, and the Livebook tutorial is CI-executed in an advisory lane. The next major capability question is global text shaping, but it stays conditional until `ADOPTION.md` shows demand that justifies the core investment.
 
 ## Constraints
 
@@ -185,11 +173,12 @@ As of v2.3 (2026-05-29), per-viewer behavior is no longer carried as blanket `un
 | Certificate coordinates are derived from template geometry (page size is a parameter, default with a multi-size A4+Letter exit test), not hardcoded A4 numerics | Recipes must render correctly across page sizes; hardcoded geometry is a latent portability bug | ✓ Shipped in v2.4 |
 | The reference Phoenix app's CI job is isolated and graph-disconnected (`needs: []`, advisory, recorded in `advisory_contexts`), never a required branch-protection check | A Phoenix-dependency failure must never block the four engine-critical lanes (`signing-live-proof`, `long-lived-live-proof`, `release-proof`, `test`) | ✓ Shipped in v2.4 |
 | New recipe surfaces raise structured `ArgumentError` on malformed input rather than leaking `BadMapError`/`FunctionClauseError` (Phase 77 closure) | Errors-as-product: instructive failures at the recipe boundary are part of the adoption contract | ✓ Shipped in v2.4 |
-| `v2.6` is a public-launch/adoption milestone, not a feature milestone | Rendro has 1.0-grade depth and zero visibility (0 stars, no announcement ever); the conditional-shaping demand gate cannot trigger without adopters; every successful comparable started with a visibility act | Locked 2026-06-10 |
-| Fix the "pure Elixir core" claim before launch: `harfbuzz_ex` becomes optional behind a `Rendro.Text.Shaper` behaviour; unsupported scripts raise an instructive error, never silent broken output | A hard Rust-NIF dependency contradicts the flagship positioning; launching with an inaccurate claim would violate the proof-backed-claims culture at the worst moment (iText pdfCalligraph seam precedent) | v2.6 |
-| Path primitive is declarative (`%Rendro.Path{}` authored element, ReportLab-shapes-style), never an imperative Prawn-style canvas | Matches Rendro's declarative authored-element architecture; ~20 deterministic PDF operators on an existing internal writer pattern | v2.6 |
-| Raster evidence gets its own `viewer_kind` (`pdfium-render`) distinct from GUI observation; renderer version bumps are deliberate evidence re-recording events | A rasterizer is not Acrobat; automation must not silently upgrade structural-proxy claims into GUI-viewer proof | v2.6 |
-| Defer full text shaping to conditional v2.7, release-please, multi-signature, charts, TOC, and duplex headers — each with a named reason | Shaping is multi-quarter (fpdf2 ~6 expert-months; iText sells it as a paid add-on); release-please adds a PAT credential to an irreversible pipeline for minutes/year saved; multi-sig is DocuSign-shaped; charts are a DX scope sink; TOC demand is book-shaped not invoice-shaped | v2.6 scoping |
+| `v2.6` is a public-launch/adoption milestone, not a feature milestone | Rendro has 1.0-grade depth and zero visibility; the conditional-shaping demand gate cannot trigger without public proof surfaces and intake | ✓ Shipped in v2.6 |
+| Fix the "pure Elixir core" claim before launch: `harfbuzz_ex` becomes optional behind a `Rendro.Text.Shaper` behaviour; unsupported scripts raise an instructive error, never silent broken output | A hard Rust-NIF dependency contradicts the flagship positioning; launching with an inaccurate claim would violate the proof-backed-claims culture | ✓ Shipped in v2.6 |
+| Path primitive is declarative (`%Rendro.Path{}` authored element, ReportLab-shapes-style), never an imperative Prawn-style canvas | Matches Rendro's declarative authored-element architecture; ~20 deterministic PDF operators on an existing internal writer pattern | ✓ Shipped in v2.6 |
+| Raster evidence gets its own `viewer_kind` (`pdfium-render`) distinct from GUI observation; renderer version bumps are deliberate evidence re-recording events | A rasterizer is not Acrobat; automation must not silently upgrade structural-proxy claims into GUI-viewer proof | ✓ Shipped in v2.6 |
+| Quiet public posture over proactive announcements | Public README, HexDocs, proof links, issue templates, and ADOPTION.md stay available while avoiding a recurring maintainer response obligation | ✓ Shipped in v2.6 |
+| Defer full text shaping to conditional v2.7, release-please, multi-signature, charts, TOC, and duplex headers — each with a named reason | Shaping is multi-quarter; release automation adds credential risk for little gain; other surfaces remain demand-gated | ✓ Shipped in v2.6 |
 
 ## Archived Milestone Context
 
@@ -232,7 +221,7 @@ As of v2.3 (2026-05-29), per-viewer behavior is no longer carried as blanket `un
 - `v2.3` shipped per-viewer evidence closure across all shipped surfaces — every cell terminal (`supported` with recorded proof or `explicit_deferral` with a named reason), enforced by a schema validator and docs-contract lane, with a durable operator recipe for future surfaces.
 - `v2.4` shipped batteries-included adoption closure — the page-numbering primitive, three new data-driven recipes, the reference Phoenix app, and docs-contract-bounded guides.
 - `v2.5` shipped the public 1.0 commitment — the enforced public API boundary, the two-tier SemVer stability contract, hardened release gates, and the irreversible `1.0.0` publish to hex.pm.
-- `v2.6` is the active milestone: public launch & adoption bootstrap — truth-accurate claims, visible polish, deterministic raster proof tooling, self-proving launch artifacts, and a measurable demand gate for conditional v2.7 text shaping.
+- `v2.6` shipped quiet public launch and adoption bootstrap — truth-accurate claims, visible polish, deterministic raster proof tooling, self-proving launch artifacts, issue-only intake, and a measurable demand gate for conditional v2.7 text shaping.
 - The core deterministic pipeline and the optional-adapter boundary remain non-negotiable.
 
 ## Evolution
@@ -253,4 +242,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-11 — Phase 85 (Deterministic Raster Lane) complete: `Pdfium.render/2`, advisory raster CI, render-backed golden PNG snapshot evidence, and the `pdfium-render`/GUI-viewer boundary are verified. Next: Phase 86 (Self-Proving Launch Artifacts).*
+*Last updated: 2026-06-13 after v2.6 milestone completion.*

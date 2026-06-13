@@ -1,6 +1,6 @@
 # Roadmap: Rendro
 
-**Phase numbering:** sequential and continuous across milestones (never restarts at 01). v2.5 closed at phase 82; v2.6 starts at phase 83.
+**Phase numbering:** sequential and continuous across milestones (never restarts at 01). v2.6 closed at phase 88; the next milestone starts at phase 89.
 
 ## Milestones
 
@@ -19,225 +19,55 @@
 - ✅ **v2.3 Viewer Proof & Interop Closure** — Phases 68-72 (shipped 2026-05-29, tag v0.3.1)
 - ✅ **v2.4 Batteries-Included Workflow & Adoption Closure** — Phases 73-77 (shipped 2026-05-30)
 - ✅ **v2.5 1.0 Release Capstone** — Phases 78-82 (shipped 2026-06-05, hex tag 1.0.0)
-- 🚧 **v2.6 Public Launch & Adoption Bootstrap** — Phases 83-88 (active)
-- 💤 **v2.7 Global Text Shaping & Script Support** — conditional, only if v2.6 demand gate triggers
+- ✅ **v2.6 Public Launch & Adoption Bootstrap** — Phases 83-88 (shipped 2026-06-13)
+- 💤 **v2.7 Global Text Shaping & Script Support** — conditional, only if the v2.6 demand gate triggers
 
 ## Phases
 
 <details>
 <summary>✅ v1.0 – v2.5 (Phases 1-82) — SHIPPED</summary>
 
-Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-ROADMAP.md` with matching `-REQUIREMENTS.md` and (where present) `-MILESTONE-AUDIT.md`. See `.planning/MILESTONES.md` for the per-milestone accomplishment ledger. v2.5 (Phases 78-82) shipped 2026-06-05 — first public hex release (`1.0.0`), 16/16 requirements, archived in `milestones/v2.5-ROADMAP.md`.
+Earlier milestones are archived individually under `.planning/milestones/v[X.Y]-ROADMAP.md` with matching `-REQUIREMENTS.md` and, where present, `-MILESTONE-AUDIT.md`. See `.planning/MILESTONES.md` for the per-milestone accomplishment ledger.
 
 </details>
 
-### 🚧 v2.6 Public Launch & Adoption Bootstrap (Active)
+<details>
+<summary>✅ v2.6 Public Launch & Adoption Bootstrap (Phases 83-88) — SHIPPED 2026-06-13</summary>
 
-**Milestone Goal:** Make Rendro truthfully and quietly discoverable — fix claim accuracy, polish visible output, build the deterministic raster toolchain, ship self-proving launch artifacts, keep low-maintenance issue intake available, and define a concrete demand gate for conditional v2.7 global text shaping without requiring proactive announcements.
+Archived:
 
-- [x] **Phase 83: Claim-Accuracy & Shaping Hygiene** - Make `harfbuzz_ex` optional, fix shaping bug, migrate off dead `unicode_data`, declare complex-script deferrals — restoring the "pure Elixir core" claim before any launch content ships (completed 2026-06-10)
-- [x] **Phase 84: Drawn-Path Primitive & Visible Polish** - Declarative `%Rendro.Path{}` block element, opt-in table borders/rules/header-band, Certificate border frame, byte-determinism goldens (completed 2026-06-10)
-- [x] **Phase 85: Deterministic Raster Lane** - `Pdfium.render/2`, golden-PNG snapshot harness, advisory CI lane, honest `pdfium-render` evidence vocabulary (verified 9/9 must-haves) (completed 2026-06-11)
-- [x] **Phase 86: Self-Proving Launch Artifacts** - CI-hash-checked visual recipe gallery in README/HexDocs, self-rendered `manual.pdf` with published SHA-256, brand-book-conformant presentation (completed 2026-06-11)
-- [x] **Phase 87: Comparison Page & Livebook** - Reproducible benchmark harness vs ChromicPDF/pdf_generator/Typst-CLI, HexDocs comparison guide, CI-executed Livebook tutorial with badges (completed 2026-06-11)
-- [x] **Phase 88: Launch Execution & Demand Instrumentation** - Quiet public discoverability posture, mobile viewer evidence outcome, concrete v2.7 shaping demand gate + ADOPTION.md ledger (completed 2026-06-12)
+- `.planning/milestones/v2.6-ROADMAP.md`
+- `.planning/milestones/v2.6-REQUIREMENTS.md`
+- `.planning/milestones/v2.6-MILESTONE-AUDIT.md`
+- `.planning/milestones/v2.6-phases/`
 
-## Phase Details
+Completed phases:
 
-### Phase 83: Claim-Accuracy & Shaping Hygiene
+- [x] Phase 83: Claim-Accuracy & Shaping Hygiene (5/5 plans) — completed 2026-06-10
+- [x] Phase 84: Drawn-Path Primitive & Visible Polish (5/5 plans) — completed 2026-06-10
+- [x] Phase 85: Deterministic Raster Lane (6/6 plans) — completed 2026-06-11
+- [x] Phase 86: Self-Proving Launch Artifacts (5/5 plans) — completed 2026-06-11
+- [x] Phase 87: Comparison Page & Livebook (6/6 plans) — completed 2026-06-11
+- [x] Phase 88: Launch Execution & Demand Instrumentation (5/5 plans) — completed 2026-06-12
 
-**Goal**: The "pure Elixir core / no hard NIF dependencies" claim is restored to truth before any launch content ships — `harfbuzz_ex` is an optional dep behind a behaviour, complex scripts fail instructively, the shaping bug is fixed, and dead `unicode_data` is replaced.
-**Depends on**: Nothing (first phase; must merge before Phase 88 executes)
-**Requirements**: HYG-01, HYG-02, HYG-03, HYG-04, HYG-05
-**Success Criteria** (what must be TRUE):
+Summary: v2.6 made Rendro truthfully and quietly discoverable. It restored the pure-Elixir core claim by making HarfBuzz optional, added deterministic path/table/certificate visible polish, shipped the advisory pdfium raster lane, published hash-checked gallery/manual/comparison/Livebook proof artifacts, and recorded low-maintenance adoption instrumentation plus a measurable conditional v2.7 shaping gate.
 
-  1. A project that does not include `harfbuzz_ex` in its `mix.exs` can compile and render Latin-script PDFs without any NIF-compilation step — `mix.exs` lists `harfbuzz_ex` as `optional: true`.
-  2. Rendering text in Arabic, Hebrew, Devanagari, or Thai with no shaping adapter configured raises a deterministic, instructive error that names the script and the fix — never silent wrong/disconnected glyph output.
-  3. All existing Latin-script golden tests pass byte-identically (or are deliberately re-blessed with a changelog note) after the `split_graphemes` cluster-boundary fix and the `ex_unicode` migration.
-  4. `priv/support_matrix.json` contains `explicit_deferral` rows for Arabic, Hebrew/RTL, Devanagari, and Thai with named reasons, and README/guide script-support claims align with those rows — no overclaim.
+</details>
 
-**Plans**: 5 plans
+### 💤 v2.7 Global Text Shaping & Script Support (Conditional)
 
-Plans:
-**Wave 1**
-
-- [x] 83-01-PLAN.md — Behaviour split: shaper.ex → behaviour + Shaper.Simple + Adapters.HarfBuzz, mix.exs dep flip
-
-**Wave 2** *(blocked on Wave 1 completion)*
-
-- [x] 83-02-PLAN.md — Unicode migration: bidi.ex + ScriptTags helper (unicode_data → unicode)
-- [x] 83-03-PLAN.md — Complex-script gate + measure.ex hard-match softening + error.ex clauses
-
-**Wave 3** *(blocked on Wave 2 completion)*
-
-- [x] 83-04-PLAN.md — Cluster-boundary fix in split_graphemes + StreamData property test + re-bless event
-
-**Wave 4** *(blocked on Wave 3 completion)*
-
-- [x] 83-05-PLAN.md — Support matrix rows, script_support_claims_test, API manifest regen, api_stability.md
-
-### Phase 84: Drawn-Path Primitive & Visible Polish
-
-**Goal**: A Phoenix engineer can author deterministic vector graphics via a declarative `%Rendro.Path{}` element, tables can opt in to borders and rules, and the Certificate recipe gains a decorative border frame — so the gallery shows visually compelling output.
-**Depends on**: Nothing (parallel to 83; gallery depends on both 84 and 85)
-**Requirements**: PATH-01, PATH-02, PATH-03, PATH-04
-**Success Criteria** (what must be TRUE):
-
-  1. A caller can declare `%Rendro.Path{ops: [{:rect, x, y, w, h}], stroke: %{color: {0, 0, 0}, width: 1.0}}` in a document and the rendered PDF contains the corresponding visible rectangle — verified by the raster lane's golden-PNG harness.
-  2. Passing `borders: :all` (or equivalent) to a table renders visible cell rules in the PDF; omitting the option produces output byte-identical to today's borderless rendering.
-  3. The Certificate recipe accepts a `border: true` (or `border: frame_opts`) option and renders a decorative frame at both A4 and US Letter sizes, with all coordinates derived from page geometry — zero hardcoded A4 numerics.
-  4. The path surface has terminal `priv/support_matrix.json` rows and byte-determinism golden tests; transforms, clipping, and gradients are listed as explicit deferrals.
-
-**Plans**: 5 plans
-**UI hint**: yes
-
-Plans:
-**Wave 1**
-
-- [x] 84-01-PLAN.md — Rendro.Color helper + %Rendro.Path{} struct + Wave 0 test stubs (RED state)
-
-**Wave 2** *(blocked on Wave 1 completion)*
-
-- [x] 84-02-PLAN.md — Path pipeline dispatch: measure clause + writer render_block + Rendro.path/2 builder + D-03 Text color retrofit
-
-**Wave 3** *(blocked on Wave 2 completion)*
-
-- [x] 84-03-PLAN.md — Table borders: borders/border_style/header_fill fields + table_decoration draw-once collapse
-- [x] 84-04-PLAN.md — Certificate border frame: validate_border! + :frame anchored region + sections + document
-
-**Wave 4** *(blocked on Wave 3 completion)*
-
-- [x] 84-05-PLAN.md — Manifests: support_matrix path_primitive rows + public_api regen + ROADMAP D-05 correction
-
-### Phase 85: Deterministic Raster Lane
-
-**Goal**: `Rendro.Adapters.Pdfium` can rasterize PDFs to PNG and the project has a golden-PNG snapshot harness in CI that is advisory (never gates the four required engine lanes) and uses honest `pdfium-render` evidence vocabulary that cannot be conflated with GUI-viewer proof.
-**Depends on**: Nothing (parallel to 83 and 84; Phase 86 depends on this)
-**Requirements**: RAST-01, RAST-02, RAST-03
-**Success Criteria** (what must be TRUE):
-
-  1. `Rendro.Adapters.Pdfium.render/2` accepts a PDF binary and options (dpi, page range) and returns `{:ok, [png_binary]}` — with pdfium-cli pinned by version + sha256 in the project configuration.
-  2. `mix test` includes a golden-PNG snapshot harness that compares rendered PNGs against committed ref hashes; the harness uses a hash-equality fast path and a pinned-CI-only bless command — refs generated only in the containerized environment, never on dev laptops.
-  3. The raster advisory CI lane (`needs: []`, graph-disconnected) runs in CI but never gates the four required engine lanes (`signing-live-proof`, `long-lived-live-proof`, `release-proof`, `test`); a pdfium-cli download failure cannot block engine merges.
-  4. `priv/support_matrix.json` and evidence files use `viewer_kind: "pdfium-render"` for raster evidence; a docs-contract guard prevents raster evidence from upgrading GUI-viewer claims (Adobe/Preview rows remain structural proxies).
-
-**Plans**: 6 plans
-
-Plans:
-**Wave 1**
-
-- [x] 85-01-PLAN.md — Wave 0 test scaffolding: pdfium_raster_snapshot_test.exs stubs, raster_claims_test.exs stubs, pdfium_pin.json, raster_refs/.gitkeep
-
-**Wave 2** *(blocked on Wave 1 completion)*
-
-- [x] 85-02-PLAN.md — render/2 implementation in pdfium.ex + pdfium_test.exs render unit tests
-- [x] 85-03-PLAN.md — Atomic dual-schema sync (viewer_kind enum + @viewer_kinds) + support_matrix.json raster section
-
-**Wave 3** *(blocked on Wave 2 completion)*
-
-- [x] 85-04-PLAN.md — Advisory CI lane (raster-advisory) + guardrails registration + verify_docs.exs lane entry
-
-**Wave 4** *(gap closure; blocked on Wave 3 completion)*
-
-- [x] 85-05-PLAN.md — Render-backed golden PNG snapshot harness + pinned-container committed hash refs
-- [x] 85-06-PLAN.md — Structural pdfium-render GUI-row exclusion + raster adapter hardening
-
-### Phase 86: Self-Proving Launch Artifacts
-
-**Goal**: Any evaluating engineer visiting the repo or HexDocs sees all five recipes as rendered images in the README and docs — images that are CI-hash-checked so they cannot drift; plus a `manual.pdf` generated by Rendro itself with its SHA-256 machine-published and CI-verified; all presentation conforming to the Rendro brand book.
-**Depends on**: Phase 84 (path primitive needed for gallery polish), Phase 85 (raster lane needed to generate PNGs)
-**Requirements**: GAL-01, GAL-02, GAL-03
-**Success Criteria** (what must be TRUE):
-
-  1. An evaluating engineer sees rendered recipe images for all five recipes (Invoice, BrandedInvoice, Statement, Receipt/Report, Certificate) in the README and HexDocs — not placeholder text or ASCII art.
-  2. A docs-contract CI lane fails if the committed gallery images do not match hashes regenerated from the current engine — the gallery cannot silently drift.
-  3. A `manual.pdf` generated by Rendro itself (exercising recipes, the path primitive, and page numbering) is committed or CI-fetchable; its SHA-256 is machine-published in the README/guide and CI-verified on every engine change so the hash cannot go stale.
-  4. Gallery images and docs presentation conform to the Rendro brand book (`prompts/Rendro Brand Book.txt`) — typography, palette, and layout consistent with the brand before public launch.
-
-**Plans**: 5/5 plans complete
-**UI hint**: yes
-
-Plans:
-**Wave 1**
-
-- [x] 86-01-PLAN.md - Advisory guardrails: keep launch artifact checks in `raster-advisory`, not required CI
-
-**Wave 2** *(blocked on Wave 1 completion)*
-
-- [x] 86-02-PLAN.md - Static docs-contract proof: manifest, docs blocks, package assets, source/manual hashes
-- [x] 86-03-PLAN.md - Launch fixture polish: launch-only table styling and certificate frame source proof
-
-**Wave 3** *(blocked on Wave 2 completion)*
-
-- [x] 86-04-PLAN.md - Brand and manual presentation: README, HexDocs copy, compact manual source
-
-**Wave 4** *(blocked on Wave 3 completion)*
-
-- [x] 86-05-PLAN.md - Final generation, visual inspection, required/static and advisory/raster verification
-
-### Phase 87: Comparison Page & Livebook
-
-**Goal**: HexDocs contains a reproducible "PDFs in Elixir without Chrome" comparison guide whose every claim is bounded to checked-in benchmark results, and a Livebook tutorial that is executed in CI so it cannot rot — giving evaluating engineers honest signal and a zero-friction try path.
-**Depends on**: Phase 83 (comparison claims must be based on accurate dependency facts — "pure Elixir core" must be true before the guide ships)
-**Requirements**: CMP-01, CMP-02, CMP-03
-**Success Criteria** (what must be TRUE):
-
-  1. A checked-in benchmark harness (`bench/` scripts + committed results) measures cold start, memory, container image size, and dependency count vs ChromicPDF, pdf_generator, and Typst-CLI — with pinned versions, published hardware, and honest acknowledgment of where HTML→PDF wins.
-  2. The HexDocs comparison guide has every claim bounded to committed benchmark results by a docs-contract test — a false claim or an unbounded claim fails CI.
-  3. A `.livemd` Livebook tutorial (invoice data → render → inline Kino preview → download) runs in an advisory CI lane; the tutorial has "Run in Livebook" badges in HexDocs and the README; the advisory lane is graph-disconnected and never gates the four required engine lanes.
-
-**Plans**: 6/6 plans complete across 5 waves
-
-Plans:
-**Wave 1**
-
-- [x] 87-01-PLAN.md - Static comparison proof scaffold: claim registry, manifest fixture, docs contract baseline
-
-**Wave 2** *(blocked on Wave 1 completion)*
-
-- [x] 87-02-PLAN.md - Reproducible benchmark harness and committed results
-- [x] 87-04-PLAN.md - CI-executed first-invoice Livebook tutorial
-
-**Wave 3** *(blocked on Wave 2 benchmark completion)*
-
-- [x] 87-03-PLAN.md - Generated comparison guide and claim citation contract
-
-**Wave 4** *(blocked on Wave 3 + Livebook completion)*
-
-- [x] 87-05-PLAN.md - ExDoc, README, package, and advisory CI wiring
-
-**Wave 5** *(blocked on Wave 4 completion)*
-
-- [x] 87-06-PLAN.md - Final regeneration, fairness review, and verification closure
-
-### Phase 88: Launch Execution & Demand Instrumentation
-
-**Goal**: Rendro is quietly public and discoverable — proof links and issue intake are available for people who find the project, mobile viewer evidence is recorded as a truthful outcome, and the conditional v2.7 text-shaping demand gate is concrete, measurable, and recorded in an ADOPTION.md ledger without creating a proactive outreach obligation.
-**Depends on**: Phase 83 (claim accuracy must be true before public claims), Phase 84 (output must be visually polished), Phase 85 (raster evidence vocabulary in place), Phase 86 (launch artifacts exist), Phase 87 (comparison guide + Livebook exist)
-**Requirements**: LNCH-01, LNCH-02, LNCH-03
-**Success Criteria** (what must be TRUE):
-
-  1. No proactive announcement, ElixirStatus post, awesome-elixir PR, demand-thread reply, mobile follow-up post, or Show HN task is required; these are deferred unless the maintainer explicitly opts in later.
-  2. 2-4 mobile viewer-evidence rows (iOS Files/Mail preview, Android default viewer x forms/signed surfaces) are recorded via the existing evidence recipe, published in `priv/support_matrix.json`, and kept truthful without broad mobile support claims.
-  3. An ADOPTION.md ledger exists with concrete, numeric signal thresholds for the v2.7 text-shaping demand gate (e.g., N non-self GitHub issues/asks, a downloads floor, first external contributor), and issue templates route adopter needs to the ledger.
-
-**Plans**: TBD
+No active phase is planned yet. Start the next milestone with `$gsd-new-milestone` when the ADOPTION.md demand gate triggers or when a different next milestone is selected.
 
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 78. Public API Surface Definition & Cleanup | v2.5 | 5/5 | Complete | 2026-05-30 |
-| 79. Public API Contract Enforcement Lane | v2.5 | 3/3 | Complete | 2026-05-30 |
-| 80. Stability Contract & Migration Docs | v2.5 | 4/4 | Complete | 2026-05-30 |
-| 81. Release Hardening | v2.5 | 1/1 | Complete | 2026-06-05 |
-| 82. 1.0.0 Consolidation & Publish | v2.5 | 3/3 | Complete | 2026-06-05 |
-| 83. Claim-Accuracy & Shaping Hygiene | v2.6 | 5/5 | Complete    | 2026-06-10 |
-| 84. Drawn-Path Primitive & Visible Polish | v2.6 | 5/5 | Complete   | 2026-06-10 |
-| 85. Deterministic Raster Lane | v2.6 | 6/6 | Complete    | 2026-06-11 |
-| 86. Self-Proving Launch Artifacts | v2.6 | 5/5 | Complete   | 2026-06-11 |
-| 87. Comparison Page & Livebook | v2.6 | 6/6 | Complete   | 2026-06-11 |
-| 88. Launch Execution & Demand Instrumentation | v2.6 | 5/5 | Complete| 2026-06-12 |
+| 83. Claim-Accuracy & Shaping Hygiene | v2.6 | 5/5 | Complete | 2026-06-10 |
+| 84. Drawn-Path Primitive & Visible Polish | v2.6 | 5/5 | Complete | 2026-06-10 |
+| 85. Deterministic Raster Lane | v2.6 | 6/6 | Complete | 2026-06-11 |
+| 86. Self-Proving Launch Artifacts | v2.6 | 5/5 | Complete | 2026-06-11 |
+| 87. Comparison Page & Livebook | v2.6 | 6/6 | Complete | 2026-06-11 |
+| 88. Launch Execution & Demand Instrumentation | v2.6 | 5/5 | Complete | 2026-06-12 |
 
 ---
-*v2.5 archived 2026-06-05 on milestone completion (Phases 78-82, 13 plans, 16/16 requirements, audit `passed`). v2.6 roadmap created 2026-06-10 (Phases 83-88, 21 requirements).*
+*v2.6 archived 2026-06-13 on milestone completion (Phases 83-88, 32 plans, 21/21 requirements, audit `passed`). Fresh requirements for the next milestone should be created with `$gsd-new-milestone`.*

@@ -39,6 +39,8 @@ decisions:
   - "P01d kappa test fixed: original assertion checked for '0.5523' (standalone kappa constant) which never appears with r=10; corrected to check '90.5228' and '60.5228' which ARE the kappa-derived control point coordinates"
   - "Rendro.Path alias dropped from rendro.ex alias block to avoid shadowing Elixir.Path module used in write_output/2"
   - "Rendro.Path added to @public_modules in api.gen.ex, priv/public_api.json regenerated"
+requirements-completed:
+  - PATH-01
 metrics:
   duration: "27m (approx)"
   completed: "2026-06-10"

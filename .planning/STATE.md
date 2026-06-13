@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v2.6
 milestone_name: Public Launch & Adoption Bootstrap
-status: ready_for_verification
-last_updated: "2026-06-12T21:09:53Z"
-last_activity: 2026-06-12 -- Phase 88 quiet public posture recorded; proactive announcement obligations removed
+status: Awaiting next milestone
+last_updated: "2026-06-13T01:07:12.533Z"
+last_activity: 2026-06-13 — Milestone v2.6 completed and archived
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 32
   completed_plans: 32
   percent: 100
@@ -17,26 +17,25 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-10 — v2.6 milestone started)
+See: .planning/PROJECT.md (updated 2026-06-13 — v2.6 milestone completed)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 88 — launch-execution-demand-instrumentation
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 88 (launch-execution-demand-instrumentation) — COMPLETE
-Plan: 5 of 5
-Status: Ready for milestone verification
-Last activity: 2026-06-12 -- Phase 88 quiet public posture recorded; proactive announcement obligations removed
-
-Progress: [██████████] 97%
+Phase: Milestone v2.6 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-06-13 — Milestone v2.6 completed and archived
 
 ## Milestone Snapshot
 
-- Shipped milestone: `v2.5 1.0 Release Capstone` — phases 78-82, 16 requirements, audit `passed`. Archived in `milestones/v2.5-ROADMAP.md`.
-- Active milestone: `v2.6 Public Launch & Adoption Bootstrap` — phases 83-88, 21 requirements (HYG-01..05, PATH-01..04, RAST-01..03, GAL-01..03, CMP-01..03, LNCH-01..03).
+- Shipped milestone: `v2.6 Public Launch & Adoption Bootstrap` — phases 83-88, 21 requirements, audit `passed`. Archived in `milestones/v2.6-ROADMAP.md`, `milestones/v2.6-REQUIREMENTS.md`, `milestones/v2.6-MILESTONE-AUDIT.md`, and `milestones/v2.6-phases/`.
+- Previous shipped milestone: `v2.5 1.0 Release Capstone` — phases 78-82, 16 requirements, audit `passed`. Archived in `milestones/v2.5-ROADMAP.md`.
+- Next milestone: not selected. Start with `/gsd-new-milestone`.
 
-## v2.6 Phase Map
+## v2.6 Phase Map (Archived)
 
 | Phase | Name | Requirements | Depends on |
 |-------|------|--------------|-----------|
@@ -51,10 +50,10 @@ Progress: [██████████] 97%
 
 ### Decisions
 
-Full decision log in PROJECT.md Key Decisions table. v2.6 scoping decisions (locked 2026-06-10):
+Full decision log in PROJECT.md Key Decisions table. v2.6 decisions shipped and archived:
 
-- v2.6 is a launch/adoption milestone, not a feature milestone — Rendro has 1.0-grade depth at ~856 self/CI downloads, 0 stars, never announced.
-- Fix "pure Elixir core" claim before launch — `harfbuzz_ex` is currently a hard NIF dep; Phase 83 must merge before Phase 88 executes.
+- v2.6 was a launch/adoption milestone, not a feature milestone — Rendro had 1.0-grade depth but needed truthful public proof surfaces and intake.
+- Fix "pure Elixir core" claim before launch — `harfbuzz_ex` is optional behind a behaviour; `Shaper.Simple` is the default pure-Elixir path.
 - Path primitive is declarative (`%Rendro.Path{}`), not imperative canvas; all coordinates route through `format_num` for byte-determinism.
 - Raster lane is always advisory — `pdfium-render` evidence vocabulary stays distinct from GUI-viewer proof; a pdfium download failure must never block the four required engine lanes.
 - Benchmark guide is honest about ChromicPDF's strengths; unfair benchmarks poison the launch.
@@ -93,8 +92,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-06-12T15:44:08Z
-Stopped at: Blocked 88-05-PLAN.md Task 1 before public posting
+Last session: 2026-06-13T01:07:12Z
+Stopped at: v2.6 milestone archived; awaiting next milestone selection
 Resume file: None
 
 ## Quick Tasks Completed
@@ -128,3 +127,7 @@ Resume file: None
 | Phase 88 P02 | 11 min | 2 tasks | 4 files |
 | Phase 88 P03 | 9 min | 2 tasks | 4 files |
 | Phase 88 P04 | 28 min | 2 tasks | 8 files |
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone

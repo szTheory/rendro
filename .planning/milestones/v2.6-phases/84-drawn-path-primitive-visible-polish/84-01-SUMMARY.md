@@ -37,6 +37,8 @@ decisions:
   - "format_num/1 copied verbatim from writer.ex (not imported) — Rendro.Color is standalone with zero coupling"
   - "Rendro.Path is a pure struct module (no functions) matching image.ex — all behavior lives in pipeline stages"
   - "Wave 0 test stubs use struct! with fields not yet in Table — this produces correct RED failures until plan 84-02 adds the fields"
+requirements-completed:
+  - PATH-01
 metrics:
   duration: "465s (7m)"
   completed: "2026-06-10"

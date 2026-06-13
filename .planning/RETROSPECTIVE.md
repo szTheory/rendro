@@ -138,6 +138,49 @@
 
 ---
 
+## Milestone: v2.6 — Public Launch & Adoption Bootstrap
+
+**Shipped:** 2026-06-13
+**Phases:** 6 (83-88) | **Plans:** 32 | **Tasks:** 68
+
+### What Was Built
+- Claim accuracy and shaping hygiene: `harfbuzz_ex` is optional behind `Rendro.Text.Shaper`, `Shaper.Simple` is the pure-Elixir default, complex scripts fail with instructive errors, `unicode_data` is removed, and Latin determinism is preserved.
+- Visible output proof: declarative `%Rendro.Path{}`, table borders/rules/header bands, Certificate frame support, public API manifest rows, and path support-matrix deferrals.
+- Deterministic raster tooling: `Rendro.Adapters.Pdfium.render/2`, pinned pdfium metadata, render-backed PNG snapshot refs, and an advisory `raster-advisory` CI lane that cannot gate engine merges.
+- Self-proving launch artifacts: five rendered recipe gallery PNGs, self-rendered `manual.pdf`, `assets/rendro/artifacts.json`, README/HexDocs hash publication, and package inclusion checks.
+- Reproducible adoption proof paths: benchmark-backed comparison guide vs ChromicPDF/pdf_generator/Typst-CLI and a first-invoice Livebook tutorial executed by `mix rendro.livebook.check`.
+- Quiet public instrumentation: issue-only GitHub intake, `ADOPTION.md` signal ledger with numeric v2.7 text-shaping thresholds, public URL checks, and terminal mobile GUI `explicit_deferral` rows.
+
+### What Worked
+- **Truth before visibility.** Phase 83 fixed the hard-NIF claim contradiction before any public proof copy depended on it, preserving the documentation-as-contract rule.
+- **Advisory lanes stayed advisory.** Raster snapshots, comparison checks, Livebook execution, and HexDocs publishing gained automation without joining the four required engine contexts.
+- **Generated proof artifacts reduced copy drift.** Gallery/manual/comparison blocks are tied to manifests, hashes, and docs-contract checks instead of hand-maintained marketing text.
+- **Quiet launch posture matched maintainer capacity.** The milestone ended with public proof links and issue intake available, while proactive announcements were explicitly deferred rather than left as ambiguous unfinished work.
+
+### What Was Inefficient
+- **Audit was run before closeout artifacts were current.** The first v2.6 audit returned `gaps_found` because Phase 87/88 verification files and 83/84 summary frontmatter were not yet present. The refreshed audit passed after those artifacts were added.
+- **Auto-generated MILESTONES.md accomplishments were noisy.** The milestone handler extracted per-plan one-liners and literal `One-liner:` headings, requiring manual curation at close.
+- **Nyquist validation metadata lagged real verification.** Phase verification and requirements evidence passed, but several `VALIDATION.md` files remain draft or missing. The audit records this as non-blocking historical debt.
+
+### Patterns Established
+- **Truth-correction phase before public claims.** Any public adoption milestone should first repair claim drift, dependency truth, and support-matrix language before publishing proof surfaces.
+- **Proof assets as product surface.** README/HexDocs gallery images, manual SHA, comparison results, and Livebook execution are maintained as checked artifacts with tests, not as one-off launch collateral.
+- **Zero-human mobile posture.** Mobile GUI rows stay `explicit_deferral` unless automated device-level evidence exists; anecdotal manual opening does not promote support.
+- **Demand gate as a public ledger.** Conditional roadmap work should name measurable thresholds and route adopter signals into an auditable file.
+
+### Key Lessons
+1. **Make visibility truthful before making it broad.** Claim hygiene and support boundaries are launch prerequisites, not cleanup tasks after publication.
+2. **Advisory proof can be rich without becoming branch protection.** Public proof artifacts can have CI checks while still keeping engine-required lanes stable and deterministic.
+3. **Manual UAT debt should become explicit deferral, not implied support.** If a surface needs physical-device proof and no automated lane exists, the honest state is terminal deferral.
+4. **Closeout tooling still needs curation.** Auto-extracted accomplishments are useful raw material, but milestone summaries should be rewritten at the milestone level.
+
+### Cost Observations
+- 6 phases / 32 plans / 68 tasks across four calendar days (2026-06-10 -> 2026-06-13).
+- Large artifact footprint by design: gallery PNGs, `manual.pdf`, benchmark PDFs/results, and public proof manifests are part of the shipped surface.
+- Rework: one stale `gaps_found` audit, summary-frontmatter backfills for phases 83/84, and manual MILESTONES.md cleanup.
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -149,6 +192,8 @@
 | v2.2 | 4 (64-67) | 8 | Extended live-proof gate pattern to long-lived (`long-lived-live-proof` required on `main`); established augmentation-as-separate-seam pattern and posture-vs-tool metadata split. |
 | v2.3 | 5 (68-72) | 15 | Recording-discipline (not engineering) milestone: added the `explicit_deferral` three-state support vocabulary, schema-enforced additive matrix evolution, the `mix rendro.viewer_evidence` operator task + 8th docs-contract lane, and the durable `guides/viewer_evidence.md` recipe. |
 | v2.4 | 5 (73-77) | 21 | Adoption-ergonomics milestone: foundational-primitive-before-recipes sequencing (page primitive in its own Phase 73), stateless-engine/stateful-data pagination, an audit-sourced closure phase (Phase 77 took the audit from `tech_debt` → `passed`), and an advisory-isolated reference-app CI lane. |
+| v2.5 | 5 (78-82) | 16 | Public 1.0 commitment: enforced API manifest, two-tier SemVer contract, hardened release gates, and proof-gated hex publish. |
+| v2.6 | 6 (83-88) | 32 | Quiet public discoverability: claim correction, visible proof artifacts, advisory raster/comparison/Livebook lanes, issue-only intake, and measurable demand-gated v2.7 criteria. |
 
 ### Cumulative Quality
 
@@ -159,6 +204,8 @@
 | v2.2 | 2 (`signing-live-proof`, `long-lived-live-proof`) | 2 (pyHanko long-lived augmentation reuses signing adapter; pyHanko-backed validation) |
 | v2.3 | 2 (engine lanes unchanged; viewer-evidence lane folded into required `test`, not a new context) | 0 new (manual-only recording; observer adapters deferred to a later milestone) |
 | v2.4 | 2 (engine lanes unchanged; reference-app `example-phoenix` lane is advisory/isolated, never required) | 0 new (recipes are pure-core; no new runtime adapter or Hex dependency) |
+| v2.5 | 2 (engine lanes unchanged; release-proof hardened) | 0 new |
+| v2.6 | 2 (engine lanes unchanged; raster/comparison/Livebook/HexDocs remain advisory or separate) | 1 new optional adapter surface (`Rendro.Adapters.Pdfium.render/2`) |
 
 ### Top Lessons (Verified Across Milestones)
 
@@ -166,3 +213,4 @@
 2. **Operationally enforce live proof.** A required CI status check (`signing-live-proof`, `long-lived-live-proof`) turns "we tested it once" into "the supported path cannot regress unobserved." This pattern now governs every trust-sensitive seam.
 3. **Publish trust-sensitive support as posture, not as one binary "supported" row.** v2.1 split signing integrity from certificate trust; v2.2 added timestamp / revocation / narrow compliance as distinct signals. Operators read truth at the granularity their workflow needs, and over-claiming becomes structurally hard.
 4. **Reuse one taxonomy for adjacent trust capabilities.** Embedded files and links shared the artifact-surface taxonomy in v1.9; long-lived shares the signing taxonomy in v2.2. Adjacent capabilities should nest under existing families instead of creating new top-level rows.
+5. **Keep optional proof lanes out of required engine gates.** v2.4 reference-app CI, v2.6 raster snapshots, comparison checks, Livebook execution, and HexDocs publishing all add signal without making engine merges depend on optional ecosystems.

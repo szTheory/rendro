@@ -29,6 +29,8 @@ decisions:
   - "152 clauses cover full Unicode 12.0 script inventory — well above minimum 25 required"
   - "Doc-only reference to UnicodeData.Script.script_to_tag/1 in @doc string is attribution, not a functional call"
   - "No reclassifications found — unicode package v1.22.0 tables match bidi test fixtures exactly"
+requirements-completed:
+  - HYG-04
 metrics:
   duration: "~25m"
   completed: "2026-06-10"

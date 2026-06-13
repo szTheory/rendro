@@ -37,6 +37,8 @@ decisions:
   - "stroke setup (RG + w) emitted once before outer+rules — not repeated per segment"
   - "Interior rules use _grid_layout span suppression; nil guard falls back to unconditional draw"
   - "Test fixtures rewritten from struct!-based (broke pipeline font validation) to Rendro.table/2 + Rendro.flow"
+requirements-completed:
+  - PATH-02
 metrics:
   duration: "approx 45m"
   completed: "2026-06-10"

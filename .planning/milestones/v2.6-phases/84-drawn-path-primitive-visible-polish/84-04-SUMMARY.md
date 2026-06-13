@@ -27,6 +27,8 @@ decisions:
   - "document/2 uses _pw/_ph prefixes to suppress unused-variable warning when only margins are needed for min_margin computation"
   - "Frame section uses region: :frame (not target:) — matches Rendro.Section struct field name"
   - "validate_border! runs before page_template construction (fail-early); margin computation duplicated in document/2 to avoid calling page_template twice"
+requirements-completed:
+  - PATH-03
 metrics:
   duration: "25m (approx)"
   completed: "2026-06-10"

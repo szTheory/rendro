@@ -20,6 +20,8 @@ decisions:
   - "path_primitive deferral entries (transforms_cm, clipping_W, gradients) follow viewer_evidence_claims_test contract requiring api_stability.md mirrors — Rule 2 auto-fix applied"
   - "Rendro.Path was already in @public_modules in api.gen.ex from Plan 01; only manifest regen needed"
   - "ROADMAP.md D-05 correction and plan list update were already applied by prior waves — confirmed present in worktree, no changes needed (worktree-mode artifact, deferred section below)"
+requirements-completed:
+  - PATH-04
 metrics:
   duration: "~10 minutes"
   completed: "2026-06-10"

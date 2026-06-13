@@ -41,7 +41,7 @@ key_decisions:
 patterns_established:
   - "Per-grapheme shaping in line-break fallback (split_graphemes) is the authoritative fix site for HYG-03; measure_text_into_runs was already run-based"
   - "Cluster-boundary run structs have the same shape as measure_text_into_runs output — line-break accumulator cond logic is unchanged"
-requirements_completed: [HYG-03]
+requirements-completed: [HYG-03]
 duration: ~30min
 completed: "2026-06-10"
 ---

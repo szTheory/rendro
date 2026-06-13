@@ -40,6 +40,9 @@ decisions:
   - "Lockstep triple updated: verify_docs.exs lane count, guardrails contract test count, and the new script_support_claims_test.exs are all in sync at 13 lanes"
   - "manifest_test.exs (separate from public_api_contract_test.exs) also had Rendro.Text.Shaper in hidden list — removed as Rule 2 auto-fix"
   - "Rendro.Adapters.HarfBuzz required explicit addition to @public_modules in api.gen.ex — the @adapter_files list in public_api.ex drives recompile_conditional_adapters, but @public_modules drives which modules appear in the manifest"
+requirements-completed:
+  - HYG-01
+  - HYG-05
 metrics:
   duration: "~35m"
   completed: "2026-06-10"

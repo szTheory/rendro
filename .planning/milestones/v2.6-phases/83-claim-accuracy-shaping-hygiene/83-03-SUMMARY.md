@@ -37,7 +37,7 @@ key_decisions:
 patterns_established:
   - "Shaper-level complex-script gate is the authoritative fence; I18n pre-flight checks are redundant when the shaper already handles the same error class with better messages"
   - "from_stage wrapping can be added selectively at the measure_block level for specific error reasons without breaking tests that rely on raw tuples from other error paths"
-requirements_completed: [HYG-02]
+requirements-completed: [HYG-02]
 duration: 45min
 completed: "2026-06-10"
 ---

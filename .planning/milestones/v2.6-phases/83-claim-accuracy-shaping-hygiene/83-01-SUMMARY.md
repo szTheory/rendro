@@ -40,6 +40,9 @@ decisions:
   - "HarfBuzz adapter adds built-in font delegation clause to Shaper.Simple to support apps using both font types with a single configured shaper"
   - "Test isolation: shaper_test.exs is async: false to safely clear global HarfBuzz test config; all other tests benefit from globally configured HarfBuzz"
   - "cluster: 0 placeholder in Shaper.Simple is intentional — cluster-aware splitting is Plan 04's concern (D-11)"
+requirements-completed:
+  - HYG-01
+  - HYG-04
 metrics:
   duration: "34m 28s"
   completed: "2026-06-10"
