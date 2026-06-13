@@ -18,6 +18,8 @@ defmodule Rendro.Pipeline.Compose do
         footer: composed_footer
     }
 
+    validate_sections!(doc.sections)
+
     {:ok, normalize_flow_layout(doc)}
   end
 
@@ -73,6 +75,8 @@ defmodule Rendro.Pipeline.Compose do
           name: :content,
           region: :body,
           blocks: doc.content,
+          suppress_on: nil,
+          only_on: nil,
           page_numbering: [],
           page_template: doc.page_template
         },
@@ -132,9 +136,36 @@ defmodule Rendro.Pipeline.Compose do
       name: section.name || :"section_#{index}",
       region: section.region || :body,
       blocks: Enum.map(section.content, &compose_block/1),
+      suppress_on: section.suppress_on,
+      only_on: section.only_on,
       page_numbering: section.page_numbering,
       page_template: section.page_template
     }
+  end
+
+  defp validate_sections!(sections) do
+    Enum.each(sections, fn %Section{} = section ->
+      validate_only_on!(section)
+      validate_page_numbering!(section)
+    end)
+  end
+
+  defp validate_only_on!(%Section{only_on: only_on})
+       when only_on in [nil, :odd, :even],
+       do: :ok
+
+  defp validate_only_on!(%Section{only_on: only_on}) do
+    raise ArgumentError,
+          "Invalid only_on #{inspect(only_on)}; expected nil, :odd, or :even"
+  end
+
+  defp validate_page_numbering!(%Section{page_numbering: page_numbering})
+       when page_numbering in [[], [restart: true]],
+       do: :ok
+
+  defp validate_page_numbering!(%Section{page_numbering: page_numbering}) do
+    raise ArgumentError,
+          "Invalid page_numbering #{inspect(page_numbering)}; expected [] or [restart: true]"
   end
 
   defp resolve_template(%Document{page_templates: [], page_template: nil}), do: %PageTemplate{}

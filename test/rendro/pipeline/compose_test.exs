@@ -211,7 +211,8 @@ defmodule Rendro.Pipeline.ComposeTest do
         %Section{
           name: :report_header,
           region: :header,
-          content: [Rendro.block(Rendro.text("Header"))]
+          content: [Rendro.block(Rendro.text("Header"))],
+          only_on: :odd
         }
 
       sidebar_section =
@@ -249,6 +250,10 @@ defmodule Rendro.Pipeline.ComposeTest do
              ]
 
       body_entry = Enum.find(layout.entries, &(&1.name == :body_copy))
+      header_entry = Enum.find(layout.entries, &(&1.name == :report_header))
+
+      assert header_entry.only_on == :odd
+      assert header_entry.suppress_on == nil
       assert body_entry.page_numbering == [restart: true]
 
       assert Enum.map(result.content, & &1.content.content) == [
@@ -258,6 +263,40 @@ defmodule Rendro.Pipeline.ComposeTest do
 
       assert Enum.map(result.header, & &1.content.content) == ["Legacy header", "Header"]
       assert Enum.map(layout.region_blocks.sidebar, & &1.content.content) == ["Sidebar"]
+    end
+
+    test "raises for invalid section only_on before rendering" do
+      doc =
+        %Rendro.Document{
+          content: [Rendro.block(Rendro.text("Body"))],
+          sections: [
+            %Section{region: :footer, only_on: :left, content: [Rendro.block(Rendro.text("Footer"))]}
+          ],
+          metadata: %Rendro.Metadata{}
+        }
+
+      assert_raise ArgumentError, ~r/Invalid only_on :left/, fn ->
+        Compose.run(doc)
+      end
+    end
+
+    test "raises for invalid section page_numbering before rendering" do
+      doc =
+        %Rendro.Document{
+          content: [Rendro.block(Rendro.text("Body"))],
+          sections: [
+            %Section{
+              region: :body,
+              page_numbering: [restart: false],
+              content: [Rendro.block(Rendro.text("Section"))]
+            }
+          ],
+          metadata: %Rendro.Metadata{}
+        }
+
+      assert_raise ArgumentError, ~r/Invalid page_numbering \[restart: false\]/, fn ->
+        Compose.run(doc)
+      end
     end
   end
 end

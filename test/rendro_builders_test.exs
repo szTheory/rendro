@@ -217,6 +217,7 @@ defmodule RendroBuildersTest do
           name: :summary,
           region: :body,
           content: [block],
+          only_on: :odd,
           page_numbering: [restart: true],
           page_template: :invoice
         )
@@ -225,6 +226,7 @@ defmodule RendroBuildersTest do
                name: :summary,
                region: :body,
                content: [^block],
+               only_on: :odd,
                page_numbering: [restart: true],
                page_template: :invoice
              } = section
