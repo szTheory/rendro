@@ -8,6 +8,22 @@ defmodule Rendro.DocsContract.PdfjsAdvisoryClaimsTest do
     "priv/pdfjs_observations/embedded_artifact_support_fixture.json",
     "priv/pdfjs_observations/bench_rendro_invoice.json"
   ]
+  @required_observation_keys ~w(
+    advisory_boundary
+    errors
+    fixture
+    node_version
+    observer
+    page_count
+    pages
+    pdfjs_dist_version
+    platform
+    recorded_at
+    schema_version
+    warnings
+  )
+  @optional_observation_keys ~w(first_page_png_sha256)
+  @page_keys ~w(height page_number width)
   @public_docs [
     "README.md",
     "guides/api_stability.md",
@@ -55,6 +71,12 @@ defmodule Rendro.DocsContract.PdfjsAdvisoryClaimsTest do
     for path <- @observation_paths do
       observation = path |> File.read!() |> JSON.decode!()
 
+      assert Enum.sort(Map.keys(observation) -- @optional_observation_keys) ==
+               Enum.sort(@required_observation_keys)
+
+      assert Map.keys(observation) -- (@required_observation_keys ++ @optional_observation_keys) ==
+               []
+
       assert observation["schema_version"] == 1
       assert observation["observer"] == "rendro-pdfjs-advisory"
       assert observation["advisory_boundary"] =~ "Pinned PDF.js advisory observation only"
@@ -72,6 +94,7 @@ defmodule Rendro.DocsContract.PdfjsAdvisoryClaimsTest do
       assert length(observation["pages"]) == observation["page_count"]
 
       for page <- observation["pages"] do
+        assert Enum.sort(Map.keys(page)) == @page_keys
         assert is_integer(page["page_number"])
         assert page["page_number"] > 0
         assert is_number(page["width"])

@@ -9,6 +9,22 @@ import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 
 const OBSERVER = "rendro-pdfjs-advisory";
 const SCHEMA_VERSION = 1;
+const OBSERVATION_KEYS = new Set([
+  "schema_version",
+  "observer",
+  "advisory_boundary",
+  "pdfjs_dist_version",
+  "node_version",
+  "recorded_at",
+  "platform",
+  "fixture",
+  "page_count",
+  "pages",
+  "warnings",
+  "errors",
+  "first_page_png_sha256"
+]);
+const PAGE_KEYS = new Set(["page_number", "width", "height"]);
 
 const FIXTURES = [
   {
@@ -70,7 +86,8 @@ function stableObservation(observation) {
     page_count: observation.page_count,
     pages: observation.pages,
     warnings: observation.warnings,
-    errors: observation.errors
+    errors: observation.errors,
+    first_page_png_sha256: observation.first_page_png_sha256
   };
 }
 
@@ -84,6 +101,8 @@ function assertObservationShape(observation, output) {
     "platform",
     "fixture"
   ];
+
+  assertAllowedKeys(observation, OBSERVATION_KEYS, output);
 
   if (observation.schema_version !== SCHEMA_VERSION) {
     throw new Error(`${output}: expected schema_version ${SCHEMA_VERSION}`);
@@ -107,7 +126,16 @@ function assertObservationShape(observation, output) {
     throw new Error(`${output}: expected warnings and errors arrays`);
   }
 
+  if (
+    Object.hasOwn(observation, "first_page_png_sha256") &&
+    !/^[0-9a-f]{64}$/.test(observation.first_page_png_sha256)
+  ) {
+    throw new Error(`${output}: expected lowercase SHA-256 first_page_png_sha256`);
+  }
+
   for (const page of observation.pages) {
+    assertAllowedKeys(page, PAGE_KEYS, `${output} page ${page.page_number || "?"}`);
+
     if (!Number.isInteger(page.page_number) || page.page_number < 1) {
       throw new Error(`${output}: expected positive integer page_number`);
     }
@@ -118,6 +146,14 @@ function assertObservationShape(observation, output) {
 
     if (typeof page.height !== "number" || page.height <= 0) {
       throw new Error(`${output}: expected positive page height`);
+    }
+  }
+}
+
+function assertAllowedKeys(object, allowedKeys, output) {
+  for (const key of Object.keys(object)) {
+    if (!allowedKeys.has(key)) {
+      throw new Error(`${output}: unexpected key ${key}`);
     }
   }
 }
