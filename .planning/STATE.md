@@ -2,15 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.8
 milestone_name: Done-Enough Stewardship & Adoption Signal Loop
-status: executing
-last_updated: "2026-06-13T07:13:31.672Z"
+status: ready_to_plan
+last_updated: 2026-06-13T14:45:21.299Z
 last_activity: 2026-06-13 -- Phase 93 execution started
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 3
-  completed_plans: 0
+  completed_plans: 3
   percent: 0
+stopped_at: Phase 93 complete (3/3) — ready to discuss Phase 94
 ---
 
 # Project State
@@ -20,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-13 — v2.8 Done-Enough Stewardship & Adoption Signal Loop started)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 93 — recipes-facade-dx-closure
+**Current focus:** Phase 94 — docs & warning hygiene
 
 ## Current Position
 
-Phase: 93 (recipes-facade-dx-closure) — EXECUTING
-Plan: 1 of 3
-Status: Executing Phase 93
-Last activity: 2026-06-13 -- Phase 93 execution started
+Phase: 94
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-06-13
 
 Progress: [░░░░░░░░░░] 0%
 

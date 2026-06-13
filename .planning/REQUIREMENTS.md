@@ -20,8 +20,8 @@ Requirements for this milestone. Each maps to exactly one roadmap phase.
 
 ### Recipes Facade DX
 
-- [ ] **DX-01**: `Rendro.Recipes` exposes Statement, Receipt/Report, and Certificate through the same facade that already delegates Invoice and BrandedInvoice, so callers can reach every shipped recipe from one module.
-- [ ] **DX-02**: A test asserts each shipped recipe (Invoice, BrandedInvoice, Statement, Receipt/Report, Certificate) is reachable and renders through the `Rendro.Recipes` facade, preventing future facade/recipe drift.
+- [x] **DX-01**: `Rendro.Recipes` exposes Statement, Receipt/Report, and Certificate through the same facade that already delegates Invoice and BrandedInvoice, so callers can reach every shipped recipe from one module.
+- [x] **DX-02**: A test asserts each shipped recipe (Invoice, BrandedInvoice, Statement, Receipt/Report, Certificate) is reachable and renders through the `Rendro.Recipes` facade, preventing future facade/recipe drift.
 
 ### Validation Metadata Cleanup
 
@@ -65,8 +65,8 @@ Which phases cover which requirements.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DX-01 | Phase 93 | Pending |
-| DX-02 | Phase 93 | Pending |
+| DX-01 | Phase 93 | Complete |
+| DX-02 | Phase 93 | Complete |
 | HYG-01 | Phase 94 | Pending |
 | HYG-02 | Phase 94 | Pending |
 | PROOF-01 | Phase 95 | Pending |
