@@ -118,7 +118,7 @@ Exit criteria:
 | 88. Launch Execution & Demand Instrumentation | v2.6 | 5/5 | Complete | 2026-06-12 |
 | 89. Page Context Primitive | v2.7 | 1/1 | Complete    | 2026-06-13 |
 | 90. Duplex Running Content | v2.7 | 1/1 | Complete    | 2026-06-13 |
-| 91. PDF.js Advisory Proof Lane | v2.7 | 0/? | Not started | — |
+| 91. PDF.js Advisory Proof Lane | v2.7 | 1/1 | Complete   | 2026-06-13 |
 | 92. Docs, Claims, Release Hygiene | v2.7 | 0/? | Not started | — |
 
 ---

@@ -20,9 +20,9 @@
 
 ### Browser Advisory Proof
 
-- [ ] **PDFJS-01**: Maintainers can run a pinned PDF.js advisory observer that records renderer version, Node version, page count, page dimensions, warnings, and optional first-page PNG hash for committed fixtures.
-- [ ] **PDFJS-02**: The PDF.js observer runs only in graph-disconnected advisory CI and cannot block required engine lanes or promote GUI-viewer claims.
-- [ ] **PDFJS-03**: Support matrix and docs-contract checks keep PDF.js wording narrow and preserve existing PDF.js deferrals for forms, signatures, and long-lived signatures unless exact proof rows pass.
+- [x] **PDFJS-01**: Maintainers can run a pinned PDF.js advisory observer that records renderer version, Node version, page count, page dimensions, warnings, and optional first-page PNG hash for committed fixtures.
+- [x] **PDFJS-02**: The PDF.js observer runs only in graph-disconnected advisory CI and cannot block required engine lanes or promote GUI-viewer claims.
+- [x] **PDFJS-03**: Support matrix and docs-contract checks keep PDF.js wording narrow and preserve existing PDF.js deferrals for forms, signatures, and long-lived signatures unless exact proof rows pass.
 
 ### Documentation and Release Hygiene
 

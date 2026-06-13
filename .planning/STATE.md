@@ -2,16 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.7
 milestone_name: Page Context & Browser Proof Hardening
-status: ready_to_plan
-last_updated: 2026-06-13T02:53:39.555Z
-last_activity: 2026-06-13 -- Phase 90 execution started
+status: executing
+last_updated: "2026-06-13T03:13:58.481Z"
+last_activity: 2026-06-13 -- Phase 91 execution started
 progress:
   total_phases: 4
-  completed_phases: 1
-  total_plans: 2
+  completed_phases: 2
+  total_plans: 3
   completed_plans: 2
-  percent: 25
-stopped_at: Phase 90 complete (1/1) — ready to discuss Phase 91
+  percent: 50
 ---
 
 # Project State
@@ -21,14 +20,14 @@ stopped_at: Phase 90 complete (1/1) — ready to discuss Phase 91
 See: .planning/PROJECT.md (updated 2026-06-13 — v2.7 Page Context & Browser Proof Hardening started)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 91 — pdf.js advisory proof lane
+**Current focus:** Phase 91 — PDF.js Advisory Proof Lane
 
 ## Current Position
 
-Phase: 91
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-06-13
+Phase: 91 (PDF.js Advisory Proof Lane) — EXECUTING
+Plan: 1 of 1
+Status: Executing Phase 91
+Last activity: 2026-06-13 -- Phase 91 execution started
 
 ## Milestone Snapshot
 
