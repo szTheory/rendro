@@ -63,7 +63,9 @@ defmodule Guardrails.RequiredChecksContractTest do
 
       expected_advisory_contexts = [
         {"comparison-advisory", "comparison_static_advisory", "mix rendro.comparison.check"},
-        {"livebook-advisory", "livebook_execution", "mix rendro.livebook.check"}
+        {"livebook-advisory", "livebook_execution", "mix rendro.livebook.check"},
+        {"pdfjs-advisory", "pdfjs_advisory_observation",
+         "npm ci --prefix scripts/pdfjs_observer && node scripts/pdfjs_observer/observe.mjs --check"}
       ]
 
       for {name, semantic_class, command} <- expected_advisory_contexts do
@@ -72,7 +74,7 @@ defmodule Guardrails.RequiredChecksContractTest do
         assert context["semantic_class"] == semantic_class
         assert context["ci_job"] == name
         assert context["command"] == command
-        assert context["notes"] =~ "Phase 87"
+        assert context["notes"] =~ "Phase 87" or context["notes"] =~ "Phase 91"
         assert context["notes"] =~ "not required"
         refute name in baseline["required_contexts"]
       end
@@ -97,7 +99,8 @@ defmodule Guardrails.RequiredChecksContractTest do
                 "example-phoenix",
                 "raster-advisory",
                 "comparison-advisory",
-                "livebook-advisory"
+                "livebook-advisory",
+                "pdfjs-advisory"
               ] do
         assert ci =~ "  #{job}:"
       end
@@ -145,7 +148,7 @@ defmodule Guardrails.RequiredChecksContractTest do
   end
 
   describe "docs-contract lane count" do
-    test "verify_docs.exs registers exactly twenty lanes including launch and GitHub intake lanes" do
+    test "verify_docs.exs registers exactly twenty-one lanes including PDF.js advisory and GitHub intake lanes" do
       script = File.read!(@verify_docs_path)
 
       lane_entries =
@@ -154,13 +157,16 @@ defmodule Guardrails.RequiredChecksContractTest do
           script
         )
 
-      assert length(lane_entries) == 20
+      assert length(lane_entries) == 21
 
       assert script =~
                ~r/\{"Viewer evidence semantic-claims lane",\s*\["test",\s*"test\/docs_contract\/viewer_evidence_claims_test\.exs"\]\}/s
 
       assert script =~
                ~r/\{"Comparison claims lane",\s*\["test",\s*"test\/docs_contract\/comparison_claims_test\.exs"\]\}/s
+
+      assert script =~
+               ~r/\{"PDF\.js advisory claims lane",\s*\["test",\s*"test\/docs_contract\/pdfjs_advisory_claims_test\.exs"\]\}/s
     end
   end
 
@@ -196,6 +202,11 @@ defmodule Guardrails.RequiredChecksContractTest do
         "Rendro.Adapters.Pdfium.render",
         "rendro.comparison.check",
         "rendro.livebook.check",
+        "setup-node",
+        "npm",
+        "pdfjs",
+        "pdfjs-dist",
+        "pdfjs_observer",
         "chrome",
         "wkhtmltopdf",
         "typst",
@@ -222,22 +233,34 @@ defmodule Guardrails.RequiredChecksContractTest do
       refute raster_block =~ ~r/^\s+needs:/m
     end
 
-    test "comparison and livebook advisory jobs are graph-disconnected and non-blocking" do
+    test "comparison, livebook, and PDF.js advisory jobs are graph-disconnected and non-blocking" do
       ci = File.read!(@ci_path)
 
       expected_advisory_jobs = [
         {"comparison-advisory", "mix rendro.comparison.check"},
-        {"livebook-advisory", "mix rendro.livebook.check"}
+        {"livebook-advisory", "mix rendro.livebook.check"},
+        {"pdfjs-advisory", "node scripts/pdfjs_observer/observe.mjs --check"}
       ]
 
       for {job, command} <- expected_advisory_jobs do
         block = ci_job_block!(ci, job)
 
         assert block =~ "continue-on-error: true"
-        assert block =~ "run: mix deps.get"
         assert block =~ "run: #{command}"
         refute block =~ ~r/^\s+needs:/m
       end
+    end
+
+    test "pdfjs-advisory installs Node in the advisory job only" do
+      ci = File.read!(@ci_path)
+      block = ci_job_block!(ci, "pdfjs-advisory")
+
+      assert block =~ "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6"
+      assert block =~ "node-version: '22.14.0'"
+      assert block =~ "cache-dependency-path: scripts/pdfjs_observer/package-lock.json"
+      assert block =~ "working-directory: scripts/pdfjs_observer"
+      assert block =~ "run: npm ci"
+      assert block =~ "run: node scripts/pdfjs_observer/observe.mjs --check"
     end
 
     test "release-proof is bounded and runs the isolated proof wrapper" do

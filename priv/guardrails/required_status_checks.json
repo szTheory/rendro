@@ -72,6 +72,13 @@
       "ci_job": "livebook-advisory",
       "command": "mix rendro.livebook.check",
       "notes": "Phase 87 Livebook tutorial static execution check; not required on main and must not start a Livebook server."
+    },
+    {
+      "name": "pdfjs-advisory",
+      "semantic_class": "pdfjs_advisory_observation",
+      "ci_job": "pdfjs-advisory",
+      "command": "npm ci --prefix scripts/pdfjs_observer && node scripts/pdfjs_observer/observe.mjs --check",
+      "notes": "Phase 91 pinned PDF.js advisory observations; not required on main. npm, Node, or PDF.js observer failures must never block required engine merges or promote GUI-viewer support claims."
     }
   ],
   "supersedes_planning_refs": {
