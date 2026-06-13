@@ -10,9 +10,11 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Active milestone:** v2.7 Page Context & Browser Proof Hardening — **STARTED 2026-06-13** (planned Phases 89-92). Phases 89-90 are complete: section-local page numbering now uses internal page context and `page_numbering: [restart: true]`, while running header/footer sections support physical odd/even filtering through `only_on: :odd | :even` that composes with section-local PAGE tokens. Next is Phase 91 PDF.js advisory proof lane.
+**Active milestone:** None. v2.7 Page Context & Browser Proof Hardening shipped on 2026-06-13 and the project is awaiting the next `$gsd-new-milestone` cycle.
 
-**Shipped milestone:** v2.6 Public Launch & Adoption Bootstrap — **SHIPPED 2026-06-13** (Phases 83-88, 21/21 requirements; milestone audit `passed`; phase history archived under `milestones/v2.6-phases/`). Rendro is now truthfully and quietly discoverable: the pure-Elixir core claim is restored, visible output polish and deterministic raster proof tooling are in place, public proof artifacts are self-rendered and hash-checked, the comparison guide and Livebook try path are live, issue-only intake is available, mobile GUI rows are explicitly deferred rather than overclaimed, and the conditional text-shaping gate is measurable in `ADOPTION.md`.
+**Shipped milestone:** v2.7 Page Context & Browser Proof Hardening — **SHIPPED 2026-06-13** (Phases 89-92, 12/12 requirements; milestone audit `passed`; phase history archived under `milestones/v2.7-phases/`). Rendro now has section-local page numbering through internal page context, physical odd/even running content, pinned PDF.js advisory observations, and docs/package/workflow guardrails that keep every new claim proof-backed and global text shaping demand-gated.
+
+**Previous shipped milestone:** v2.6 Public Launch & Adoption Bootstrap — **SHIPPED 2026-06-13** (Phases 83-88, 21/21 requirements; milestone audit `passed`; phase history archived under `milestones/v2.6-phases/`). Rendro is truthfully and quietly discoverable: the pure-Elixir core claim is restored, visible output polish and deterministic raster proof tooling are in place, public proof artifacts are self-rendered and hash-checked, the comparison guide and Livebook try path are live, issue-only intake is available, mobile GUI rows are explicitly deferred rather than overclaimed, and the conditional text-shaping gate is measurable in `ADOPTION.md`.
 
 <details>
 <summary>v2.5 phase delivery detail</summary>
@@ -28,9 +30,13 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 </details>
 
-**Shipped Version:** v2.6 Public Launch & Adoption Bootstrap (2026-06-13)
+**Shipped Version:** v2.7 Page Context & Browser Proof Hardening (2026-06-13)
 
-Rendro is now quietly public and proof-backed for evaluators who find it: claim accuracy was repaired (`harfbuzz_ex` optional behind `Rendro.Text.Shaper`, complex scripts instructively deferred), visible output polish landed (`%Rendro.Path{}`, table borders/rules/header bands, Certificate frame), advisory raster proof is available through `Rendro.Adapters.Pdfium.render/2` and golden PNG refs, README/HexDocs carry hash-checked gallery/manual artifacts, the comparison guide and Livebook tutorial are mechanically bounded, issue-only intake is live, and `ADOPTION.md` defines the conditional v2.7 text-shaping demand gate. All 21 requirements satisfied; milestone audit `passed`. Archived in `milestones/v2.6-ROADMAP.md` / `milestones/v2.6-REQUIREMENTS.md` / `milestones/v2.6-MILESTONE-AUDIT.md` / `milestones/v2.6-phases/`.
+Rendro now improves long-report and duplex ergonomics without widening the deterministic core: `Rendro.section/1` supports `page_numbering: [restart: true]`, running text can use `{{section_page_number}}` / `{{section_total_pages}}`, header/footer/running-region sections can filter on physical page parity through `only_on: :odd | :even`, and the PDF.js lane records pinned advisory observations without creating a GUI-viewer support claim. Public docs, support rows, HexDocs/package inclusion, and CI/release permissions were reconciled so every v2.7 claim is backed by tests, fixtures, evidence, or named deferrals. All 12 requirements satisfied; milestone audit `passed`. Archived in `milestones/v2.7-ROADMAP.md` / `milestones/v2.7-REQUIREMENTS.md` / `milestones/v2.7-MILESTONE-AUDIT.md` / `milestones/v2.7-phases/`.
+
+**Previous Shipped Version:** v2.6 Public Launch & Adoption Bootstrap (2026-06-13)
+
+Rendro is quietly public and proof-backed for evaluators who find it: claim accuracy was repaired (`harfbuzz_ex` optional behind `Rendro.Text.Shaper`, complex scripts instructively deferred), visible output polish landed (`%Rendro.Path{}`, table borders/rules/header bands, Certificate frame), advisory raster proof is available through `Rendro.Adapters.Pdfium.render/2` and golden PNG refs, README/HexDocs carry hash-checked gallery/manual artifacts, the comparison guide and Livebook tutorial are mechanically bounded, issue-only intake is live, and `ADOPTION.md` defines the conditional global text-shaping demand gate. All 21 requirements satisfied; milestone audit `passed`. Archived in `milestones/v2.6-ROADMAP.md` / `milestones/v2.6-REQUIREMENTS.md` / `milestones/v2.6-MILESTONE-AUDIT.md` / `milestones/v2.6-phases/`.
 
 **Previous Shipped Version:** v2.5 1.0 Release Capstone (2026-06-05)
 
@@ -80,20 +86,18 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ## Next Milestone Goals
 
-**v2.7 Page Context & Browser Proof Hardening** is active. It deliberately chooses the highest-leverage, low-scope layout/reporting work that emerged from v2.6 research while keeping global text shaping demand-gated.
+No next milestone is selected. The next planning cycle should start with `$gsd-new-milestone` and preserve the same proof-backed claim discipline that carried v2.6 and v2.7.
 
-The milestone must deliver:
-- Section-local page numbering on the existing PAGE primitive through `Rendro.section/1` `page_numbering: [restart: true]` and `Rendro.page_number/1` tokens `{{section_page_number}}` / `{{section_total_pages}}`.
-- Physical odd/even running header/footer variants through `only_on: :odd | :even`, preserving existing `suppress_on` behavior and the `RunningContent` callback shape `{page, total}`.
-- A graph-disconnected, pinned PDF.js advisory observer that records renderer facts without creating a runtime, required-CI, or public-support dependency.
-- Documentation, support-matrix, and release-workflow hygiene that names TOC/outlines/anchors/cross-refs, charts, global text shaping, and broader release automation as explicit deferrals.
+Likely future candidates remain demand-gated:
+- Global Text Shaping & Script Support only after the `ADOPTION.md` gate triggers.
+- Larger report features such as TOC/outlines/anchors/cross-references and charts only after concrete user pressure proves the product value.
 
 ## Strategic Arc
 
 **Active strategic arc:** public 1.0 commitment → quiet public discoverability → report ergonomics with proof-backed claim discipline → demand-gated capability growth
 
-**Planned sequence after v2.6:**
-- v2.7 Page Context & Browser Proof Hardening — active; improve recurring report/booklet layout primitives and add a narrow browser-family advisory proof lane.
+**Planned sequence after v2.7:**
+- Next milestone TBD through `$gsd-new-milestone`.
 - Global Text Shaping & Script Support remains conditional — pursue only when the v2.6-defined `ADOPTION.md` demand gate triggers.
 - Larger report features such as TOC/outlines/anchors/cross-references and charts stay deferred until page context proves useful and demand is concrete.
 
@@ -101,6 +105,7 @@ The milestone must deliver:
 
 ### Validated
 
+- ✓ Rendro v2.7 shipped page context and browser proof hardening: section-local page numbering with `page_numbering: [restart: true]`, internal physical/section page context, `{{section_page_number}}` / `{{section_total_pages}}` tokens, physical odd/even running content through `only_on: :odd | :even`, pinned PDF.js advisory observations isolated from core/runtime/required CI, and docs/package/workflow hygiene that keeps TOC/outlines/anchors/cross-refs, charts, global text shaping, PDF.js GUI support, and release automation as explicit deferrals. All 12 requirements satisfied; milestone audit `passed`. Shipped 2026-06-13 and archived in `milestones/v2.7-ROADMAP.md` / `milestones/v2.7-REQUIREMENTS.md` / `milestones/v2.7-MILESTONE-AUDIT.md` / `milestones/v2.7-phases/`. — v2.7
 - ✓ Rendro v2.6 shipped public launch and adoption bootstrap without overclaiming: HarfBuzz is optional behind `Rendro.Text.Shaper`, complex scripts fail instructively, `%Rendro.Path{}`/table borders/Certificate frame polish are in the core render path, `Rendro.Adapters.Pdfium.render/2` and golden-PNG snapshots provide advisory raster proof, the README/HexDocs gallery and self-rendered `manual.pdf` are hash-checked, the comparison guide and Livebook tutorial are bounded by docs-contract checks, issue-only intake and `ADOPTION.md` establish a measurable demand gate, and mobile GUI rows are terminal `explicit_deferral` entries rather than support claims. All 21 requirements satisfied; milestone audit `passed`. Shipped 2026-06-13 and archived in `milestones/v2.6-ROADMAP.md` / `milestones/v2.6-REQUIREMENTS.md` / `milestones/v2.6-MILESTONE-AUDIT.md` / `milestones/v2.6-phases/`. — v2.6
 - ✓ Rendro v2.5 shipped the public 1.0 commitment: a formal two-tier SemVer/API-stability contract (Tier-1 Stable strict SemVer, Tier-2 Evolving adapters/diagnostics), a mechanically enforced public API boundary (`priv/public_api.json` manifest + `public_api_contract_test.exs` docs-contract lane, API-01..05), rewritten stability/migration docs (`api_stability.md`, `upgrading_to_1.0.md`, Tier-1 claims test, STAB-01..05), hardened release gates (exact-allowlist tarball audit, `hex.audit`/`deps.audit`, SHA-pinned workflow), and the irreversible consolidated `1.0.0` publish to hex.pm (REL-01..06). All 16 requirements satisfied; milestone audit `passed`. Shipped 2026-06-05 and archived in `milestones/v2.5-ROADMAP.md` / `milestones/v2.5-REQUIREMENTS.md` / `milestones/v2.5-MILESTONE-AUDIT.md`. — v2.5
 - ✓ Rendro v2.4 closed the adoption gap with batteries-included Phoenix document workflows — a deterministic page-numbering / running-region primitive (PAGE-01..04), three data-driven recipes on the three-rung escape hatch (Statement STMT-01..04, Receipt/Report RCPT-01..03, Certificate CERT-01..03), terminal support-matrix rows for every new surface (CONTRACT-01), an executable reference Phoenix app in an isolated non-required CI lane (REF-01..03), and HexDocs guides bounded by docs-contract tests (CONTRACT-02). All 19 v1 requirements satisfied; milestone audit `passed`. Shipped 2026-05-30 and archived in `milestones/v2.4-ROADMAP.md` / `milestones/v2.4-REQUIREMENTS.md` / `milestones/v2.4-MILESTONE-AUDIT.md`. — v2.4
@@ -122,10 +127,7 @@ The milestone must deliver:
 
 ### Active
 
-- [x] **CTX-01..03** — Page context primitive: section-local numbering restarts, section page-number tokens, and backward-compatible PAGE behavior. Validated in Phase 89.
-- [x] **DUP-01..03** — Duplex running content: physical odd/even header/footer variants that compose with section-local numbering and fail clearly on invalid options. Validated in Phase 90.
-- [ ] **PDFJS-01..03** — Pinned PDF.js advisory observations: versioned Node/pdfjs-dist lane, recorded observations, advisory-only CI, and no GUI-support promotion.
-- [ ] **DOC-01..03** — Docs, claims, and release hygiene: guide examples, support-boundary enforcement, and keeping global text shaping demand-gated.
+- None. v2.7 requirements are archived; create the next active requirement set with `$gsd-new-milestone`.
 
 ### Out of Scope
 
@@ -137,9 +139,9 @@ The milestone must deliver:
 
 ## Context
 
-Rendro has now shipped four authored PDF surfaces inside one deterministic pipeline (static content v1.0-v1.2, interactive forms v1.8, document-level embedded files v1.9, curated link annotations v1.9) and one full trust-sensitive stack as artifact-first or optional-adapter seams: protection through `Rendro.Protect` (v1.10), unsigned signature preparation through `Rendro.Sign.prepare/2` (v2.0), cryptographic signing through `Rendro.Sign.sign/2` plus first-party optional runtime adapters (v2.1), and long-lived signature augmentation through `Rendro.Sign.augment/2` plus a dedicated long-lived-live-proof CI lane (v2.2). It now also has batteries-included Phoenix document workflows (v2.4), a public 1.0 API/release contract (v2.5), and quiet public discovery proof surfaces (v2.6). All of this lands without widening the core rendering contract or the deterministic `build → compose → measure → paginate → render → validate` pipeline.
+Rendro has now shipped four authored PDF surfaces inside one deterministic pipeline (static content v1.0-v1.2, interactive forms v1.8, document-level embedded files v1.9, curated link annotations v1.9) and one full trust-sensitive stack as artifact-first or optional-adapter seams: protection through `Rendro.Protect` (v1.10), unsigned signature preparation through `Rendro.Sign.prepare/2` (v2.0), cryptographic signing through `Rendro.Sign.sign/2` plus first-party optional runtime adapters (v2.1), and long-lived signature augmentation through `Rendro.Sign.augment/2` plus a dedicated long-lived-live-proof CI lane (v2.2). It now also has batteries-included Phoenix document workflows (v2.4), a public 1.0 API/release contract (v2.5), quiet public discovery proof surfaces (v2.6), and section-aware report/duplex ergonomics with pinned browser-family advisory observations (v2.7). All of this lands without widening the core rendering contract or the deterministic `build → compose → measure → paginate → render → validate` pipeline.
 
-As of v2.6 (2026-06-13), public claims are bounded by checked proof artifacts: per-viewer rows are terminal (`supported` or `explicit_deferral`), raster evidence remains distinct from GUI-viewer proof, visual launch assets and the manual are hash-checked, comparison claims are tied to committed benchmark results, and the Livebook tutorial is CI-executed in an advisory lane. v2.7 applies that same discipline to report ergonomics: add the page-context pieces users expect in statements, booklets, and long reports, then observe PDF.js in an advisory lane without turning a browser renderer into a support promise. Global text shaping remains conditional until `ADOPTION.md` shows demand that justifies the core investment.
+As of v2.7 (2026-06-13), public claims are bounded by checked proof artifacts: per-viewer rows are terminal (`supported` or `explicit_deferral`), raster evidence remains distinct from GUI-viewer proof, visual launch assets and the manual are hash-checked, comparison claims are tied to committed benchmark results, the Livebook tutorial is CI-executed in an advisory lane, and PDF.js observations are explicitly pinned/advisory rather than support-matrix promotion. Global text shaping remains conditional until `ADOPTION.md` shows demand that justifies the core investment.
 
 ## Constraints
 
@@ -190,11 +192,11 @@ As of v2.6 (2026-06-13), public claims are bounded by checked proof artifacts: p
 | Path primitive is declarative (`%Rendro.Path{}` authored element, ReportLab-shapes-style), never an imperative Prawn-style canvas | Matches Rendro's declarative authored-element architecture; ~20 deterministic PDF operators on an existing internal writer pattern | ✓ Shipped in v2.6 |
 | Raster evidence gets its own `viewer_kind` (`pdfium-render`) distinct from GUI observation; renderer version bumps are deliberate evidence re-recording events | A rasterizer is not Acrobat; automation must not silently upgrade structural-proxy claims into GUI-viewer proof | ✓ Shipped in v2.6 |
 | Quiet public posture over proactive announcements | Public README, HexDocs, proof links, issue templates, and ADOPTION.md stay available while avoiding a recurring maintainer response obligation | ✓ Shipped in v2.6 |
-| Defer full text shaping to conditional v2.7, release-please, multi-signature, charts, TOC, and duplex headers — each with a named reason | Shaping is multi-quarter; release automation adds credential risk for little gain; other surfaces remain demand-gated | ✓ Shipped in v2.6 |
-| Keep v2.7 focused on page-context/report ergonomics rather than global text shaping | The ADOPTION demand gate has not triggered; section-local numbering and duplex running content are smaller, coherent extensions of the shipped PAGE primitive | Planned for v2.7 |
-| Implement page context internally instead of exposing a public `Rendro.PageContext` struct in v2.7 | Authors need stable tokens and section options first; a public context object would freeze abstractions before TOC/anchors/cross-refs prove their shape | Planned for v2.7 |
-| Evaluate odd/even running content against physical page parity, not section-local parity | Duplex print/booklet conventions are based on left/right physical pages; section-local parity would surprise authors and break print workflows | Planned for v2.7 |
-| Keep PDF.js evidence advisory and worded as "pinned PDF.js advisory observations" | PDF.js is a browser-family renderer, not a GUI support matrix substitute; Node/npm must never become a core runtime, required CI, or Hex dependency | Planned for v2.7 |
+| Defer full text shaping to the conditional demand gate, release-please, multi-signature, charts, TOC, and broader report/navigation features — each with a named reason | Shaping is multi-quarter; release automation adds credential risk for little gain; other surfaces remain demand-gated | ✓ Shipped in v2.6 |
+| Keep v2.7 focused on page-context/report ergonomics rather than global text shaping | The ADOPTION demand gate has not triggered; section-local numbering and duplex running content are smaller, coherent extensions of the shipped PAGE primitive | ✓ Shipped in v2.7 |
+| Implement page context internally instead of exposing a public `Rendro.PageContext` struct in v2.7 | Authors need stable tokens and section options first; a public context object would freeze abstractions before TOC/anchors/cross-refs prove their shape | ✓ Shipped in v2.7 |
+| Evaluate odd/even running content against physical page parity, not section-local parity | Duplex print/booklet conventions are based on left/right physical pages; section-local parity would surprise authors and break print workflows | ✓ Shipped in v2.7 |
+| Keep PDF.js evidence advisory and worded as "pinned PDF.js advisory observations" | PDF.js is a browser-family renderer, not a GUI support matrix substitute; Node/npm must never become a core runtime, required CI, or Hex dependency | ✓ Shipped in v2.7 |
 | Re-pair compose section metadata with measured body blocks during pagination | Compose entries are created before measurement, but pagination must use measured heights; block counts let Rendro keep metadata without adding hidden fields to `%Rendro.Block{}` | ✓ Shipped in Phase 89 |
 | Preserve per-section running-region metadata for duplex filters | Region-wide maps cannot represent odd and even header/footer variants targeting the same region; `region_entries` keeps filters per authored section while measured blocks stay deterministic | ✓ Shipped in Phase 90 |
 
@@ -239,8 +241,8 @@ As of v2.6 (2026-06-13), public claims are bounded by checked proof artifacts: p
 - `v2.3` shipped per-viewer evidence closure across all shipped surfaces — every cell terminal (`supported` with recorded proof or `explicit_deferral` with a named reason), enforced by a schema validator and docs-contract lane, with a durable operator recipe for future surfaces.
 - `v2.4` shipped batteries-included adoption closure — the page-numbering primitive, three new data-driven recipes, the reference Phoenix app, and docs-contract-bounded guides.
 - `v2.5` shipped the public 1.0 commitment — the enforced public API boundary, the two-tier SemVer stability contract, hardened release gates, and the irreversible `1.0.0` publish to hex.pm.
-- `v2.6` shipped quiet public launch and adoption bootstrap — truth-accurate claims, visible polish, deterministic raster proof tooling, self-proving launch artifacts, issue-only intake, and a measurable demand gate for conditional v2.7 text shaping.
-- `v2.7` is active: page context, section-local numbering, physical odd/even running content, pinned PDF.js advisory observations, and docs/release hygiene without widening global text-shaping scope.
+- `v2.6` shipped quiet public launch and adoption bootstrap — truth-accurate claims, visible polish, deterministic raster proof tooling, self-proving launch artifacts, issue-only intake, and a measurable demand gate for conditional global text shaping.
+- `v2.7` shipped page context, section-local numbering, physical odd/even running content, pinned PDF.js advisory observations, and docs/release hygiene without widening global text-shaping scope.
 - The core deterministic pipeline and the optional-adapter boundary remain non-negotiable.
 
 ## Evolution
@@ -261,4 +263,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-13 after Phase 90 Duplex Running Content completion.*
+*Last updated: 2026-06-13 after v2.7 Page Context & Browser Proof Hardening completion.*

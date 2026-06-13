@@ -1,5 +1,24 @@
 # Milestones
 
+## v2.7 Page Context & Browser Proof Hardening (Shipped: 2026-06-13)
+
+**Phases completed:** 4 phases, 6 plans, 15 tasks
+
+**Key accomplishments:**
+
+- Section-local page numbering for flow documents using internal page context and PAGE token substitution
+- Physical odd/even running content with section-local PAGE tokens and compose-time option validation
+- Pinned PDF.js advisory observations for representative Rendro PDFs, isolated from core runtime and required CI.
+- v2.7 public claims now match shipped page-context, duplex, and PDF.js advisory behavior, with HexDocs/package and workflow guardrails backing the release posture.
+- Public linked docs are now included in package/docs contexts, and CI/release workflows use read-only repository token permissions.
+- Phase 92 final verification passed across focused docs-contracts, all docs-contract lanes, package/docs checks, and full `mix ci`.
+
+**Audit status:** `passed` — all 12 requirements satisfied. Integration audit passed with one non-blocking tech-debt item for a future header-specific `only_on` E2E test.
+
+**Archived:** `milestones/v2.7-ROADMAP.md`, `milestones/v2.7-REQUIREMENTS.md`, `milestones/v2.7-MILESTONE-AUDIT.md`, and `milestones/v2.7-phases/`.
+
+---
+
 ## v2.6 Public Launch & Adoption Bootstrap (Shipped: 2026-06-13)
 
 **Delivered:** Quiet public discoverability backed by truth-correct claims, deterministic visual proof, comparison/Livebook try paths, issue-only intake, and a measurable demand gate for conditional text shaping.
