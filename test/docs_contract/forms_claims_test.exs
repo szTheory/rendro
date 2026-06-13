@@ -100,6 +100,22 @@ defmodule Rendro.DocsContract.FormsClaimsTest do
     end
   end
 
+  test "PDF.js form and signature-widget rows remain explicit deferrals" do
+    matrix = File.read!("priv/support_matrix.json") |> JSON.decode!()
+
+    for row <- [
+          matrix["forms"]["viewers"]["pdfjs"],
+          matrix["forms"]["signature_widget_viewers"]["pdfjs"]
+        ] do
+      assert row["status"] == "explicit_deferral"
+      assert is_binary(row["evidence_deferred"])
+      refute Map.has_key?(row, "evidence")
+      refute Map.has_key?(row, "recorded_at")
+      refute Map.has_key?(row, "viewer_kind")
+      refute Map.has_key?(row, "proof")
+    end
+  end
+
   test "the canonical docs verification script includes the forms claims lane" do
     script = File.read!("scripts/verify_docs.exs")
 

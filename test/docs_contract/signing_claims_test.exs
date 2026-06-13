@@ -123,6 +123,23 @@ defmodule Rendro.DocsContract.SigningClaimsTest do
     end
   end
 
+  test "PDF.js signing and long-lived rows remain explicit deferrals" do
+    matrix = File.read!("priv/support_matrix.json") |> JSON.decode!()
+
+    for row <- [
+          matrix["signing_preparation"]["viewers"]["pdfjs"],
+          matrix["signing"]["viewers"]["pdfjs"],
+          matrix["signing"]["long_lived"]["viewers"]["pdfjs"]
+        ] do
+      assert row["status"] == "explicit_deferral"
+      assert is_binary(row["evidence_deferred"])
+      refute Map.has_key?(row, "evidence")
+      refute Map.has_key?(row, "recorded_at")
+      refute Map.has_key?(row, "viewer_kind")
+      refute Map.has_key?(row, "proof")
+    end
+  end
+
   test "docs verification script includes the signing claims lane" do
     script = File.read!("scripts/verify_docs.exs")
 

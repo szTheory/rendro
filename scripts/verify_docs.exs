@@ -25,10 +25,12 @@ lanes = [
   {"Script support claims lane", ["test", "test/docs_contract/script_support_claims_test.exs"]},
   {"Path claims lane", ["test", "test/docs_contract/path_claims_test.exs"]},
   {"Raster claims lane", ["test", "test/docs_contract/raster_claims_test.exs"]},
+  {"PDF.js advisory claims lane", ["test", "test/docs_contract/pdfjs_advisory_claims_test.exs"]},
   {"Launch artifacts claims lane",
    ["test", "test/docs_contract/launch_artifacts_claims_test.exs"]},
   {"Comparison claims lane", ["test", "test/docs_contract/comparison_claims_test.exs"]},
-  {"Launch execution claims lane", ["test", "test/docs_contract/launch_execution_claims_test.exs"]},
+  {"Launch execution claims lane",
+   ["test", "test/docs_contract/launch_execution_claims_test.exs"]},
   {"Adoption claims lane", ["test", "test/docs_contract/adoption_claims_test.exs"]},
   {"GitHub intake claims lane", ["test", "test/docs_contract/github_intake_claims_test.exs"]}
 ]
