@@ -70,8 +70,13 @@ defmodule Rendro.RecipesFacadeDriftTest do
         mod_str = Atom.to_string(mod)
 
         String.starts_with?(mod_str, "Elixir.Rendro.Recipes.") and
-          function_exported?(mod, :document, 2) and
-          mod != Rendro.Recipes.Pagination
+          mod != Rendro.Recipes.Pagination and
+          # :application.get_key returns module atoms from the .app manifest, but
+          # function_exported?/3 reports false for modules not yet loaded into the
+          # VM. Ensure the candidate is loaded before probing for document/2 so the
+          # sweep does not depend on async test load order.
+          match?({:module, ^mod}, Code.ensure_loaded(mod)) and
+          function_exported?(mod, :document, 2)
       end)
       |> MapSet.new()
 
@@ -92,13 +97,13 @@ defmodule Rendro.RecipesFacadeDriftTest do
   describe "facade opts-threading regression" do
     test "statement/2 with sentinel opts produces struct-identical result to Statement.document/2" do
       data = fixture_for(:statement)
-      opts = [labels: %{balance: "Saldo"}]
+      opts = [labels: %{opening_balance: "Saldo"}]
       assert Rendro.Recipes.statement(data, opts) == Rendro.Recipes.Statement.document(data, opts)
     end
 
     test "statement/2 with sentinel opts changes result vs no-opts" do
       data = fixture_for(:statement)
-      opts = [labels: %{balance: "Saldo"}]
+      opts = [labels: %{opening_balance: "Saldo"}]
       assert Rendro.Recipes.statement(data, opts) != Rendro.Recipes.statement(data)
     end
 

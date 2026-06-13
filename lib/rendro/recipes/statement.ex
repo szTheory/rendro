@@ -177,7 +177,23 @@ defmodule Rendro.Recipes.Statement do
       ]
     ]
 
-    Rendro.page_template(Keyword.merge(defaults, opts))
+    # page_template/1 only understands PageTemplate struct keys. Recipe-level opts
+    # (:labels, :formatters, ...) are consumed by the section builders via opts,
+    # not here — filter them out so they thread through to sections/2 instead of
+    # reaching struct!/2 and raising KeyError.
+    template_opts =
+      Keyword.take(opts, [
+        :name,
+        :width,
+        :height,
+        :margin_top,
+        :margin_right,
+        :margin_bottom,
+        :margin_left,
+        :regions
+      ])
+
+    Rendro.page_template(Keyword.merge(defaults, template_opts))
   end
 
   @doc """
