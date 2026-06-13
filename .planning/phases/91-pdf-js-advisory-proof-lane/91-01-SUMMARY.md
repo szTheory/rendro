@@ -69,6 +69,7 @@ completed: 2026-06-13
 - Committed compact observations for `test/fixtures/embedded_artifact_support_fixture.pdf` and `bench/results/raw/rendro.pdf`, including PDF.js version, Node version, page counts, page dimensions, warnings, and errors.
 - Added docs-contract tests that validate the observer package boundary, observation JSON shape, absence of unqualified PDF.js support wording, and preservation of existing PDF.js `explicit_deferral` rows.
 - Added `pdfjs-advisory` to CI as a graph-disconnected `continue-on-error` job and registered it only under `advisory_contexts`.
+- Tightened `--check` and the Mix docs-contract lane so observation JSON rejects unexpected top-level or page-level keys.
 
 ## Task Commits
 
@@ -76,6 +77,9 @@ completed: 2026-06-13
 2. **Task 1:** `9b63f1a` feat(91-01): add pinned pdfjs observer
 3. **Task 2:** `996f502` test(91-01): add pdfjs advisory claim guards
 4. **Task 3:** `999a0e2` ci(91-01): add pdfjs advisory lane
+5. **Review fix:** `4bf139f` fix(91-01): enforce pdfjs observation keys
+6. **Review:** `92a82b9` docs(91): refresh pdfjs advisory review
+7. **Verification:** `8618db1` docs(91): verify pdfjs advisory proof lane
 
 ## Files Created/Modified
 
@@ -98,7 +102,7 @@ completed: 2026-06-13
 
 ## Deviations from Plan
 
-None. The planned optional PNG hash remained deferred by design.
+None. The planned optional PNG hash remained deferred by design. The review follow-up strengthened the planned observation-schema guardrail by rejecting unexpected JSON keys in both Node and Mix checks.
 
 ## Issues Encountered
 
@@ -113,6 +117,7 @@ None. The planned optional PNG hash remained deferred by design.
 - `mix test test/docs_contract/forms_claims_test.exs test/docs_contract/signing_claims_test.exs test/docs_contract/viewer_evidence_claims_test.exs` — 34 tests, 0 failures.
 - `mix run scripts/verify_docs.exs` — all 21 docs-contract lanes passed.
 - `mix ci` — passed; 12 doctests, 4 properties, 1180 tests, 0 failures, 11 excluded; credo found no issues; dialyzer total errors 0.
+- Follow-up review after `4bf139f` — clean; previous observation-schema warning resolved.
 
 Known existing verification noise: adapter redefinition warnings, telemetry local handler notices, docs-reference warnings, and the stale Apple Preview viewer-evidence warning still appear but do not fail the gate.
 
@@ -132,4 +137,3 @@ Phase 92 can safely document the page-context and PDF.js advisory posture using 
 ---
 *Phase: 91-pdf-js-advisory-proof-lane*
 *Completed: 2026-06-13*
-
