@@ -61,24 +61,24 @@ Explicitly excluded for v2.8. Documented to prevent scope creep during a steward
 
 ## Traceability
 
-Which phases cover which requirements. Populated during roadmap creation.
+Which phases cover which requirements.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HYG-01 | TBD | Pending |
-| HYG-02 | TBD | Pending |
-| PROOF-01 | TBD | Pending |
-| DX-01 | TBD | Pending |
-| DX-02 | TBD | Pending |
-| META-01 | TBD | Pending |
-| SIGNAL-01 | TBD | Pending |
-| STEW-01 | TBD | Pending |
+| DX-01 | Phase 93 | Pending |
+| DX-02 | Phase 93 | Pending |
+| HYG-01 | Phase 94 | Pending |
+| HYG-02 | Phase 94 | Pending |
+| PROOF-01 | Phase 95 | Pending |
+| META-01 | Phase 95 | Pending |
+| SIGNAL-01 | Phase 96 | Pending |
+| STEW-01 | Phase 96 | Pending |
 
 **Coverage:**
 - v1 requirements: 8 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 8 ⚠️ (resolved during roadmap creation)
+- Mapped to phases: 8 ✓
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-06-13*
-*Last updated: 2026-06-13 after v2.8 milestone definition*
+*Last updated: 2026-06-13 after v2.8 roadmap creation (Phases 93-96)*
