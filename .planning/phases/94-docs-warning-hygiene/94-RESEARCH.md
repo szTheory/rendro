@@ -437,12 +437,10 @@ All other claims in this research were verified by running tools against the act
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Does `mix rendro.api.gen` pick up `Rendro.PDF.Font` after the `@moduledoc` change?**
-   - What we know: The generator uses `public_modules/0` to filter. The exact filter logic was not read.
-   - What's unclear: Whether "public" is defined as "not `@moduledoc false`" or by some other criterion (e.g., explicit allowlist).
-   - Recommendation: After making the `@moduledoc` change, run `mix rendro.api.gen --dry-run` (or equivalent) to confirm no manifest drift. If Font appears in the generated manifest, a small fix is needed — either keep Font as `@moduledoc false` (and use `skip_code_autolink_to:` for its type refs instead) or adjust the generator filter. Read the `Mix.Tasks.Rendro.Api.Gen.public_modules/0` function before implementing D-02.
+1. **RESOLVED: Does `mix rendro.api.gen` pick up `Rendro.PDF.Font` after the `@moduledoc` change?** — **No.** During planning (94-01), `Mix.Tasks.Rendro.Api.Gen` was read: it uses a hardcoded `@public_modules` explicit allowlist (`lib/mix/tasks/rendro/api.gen.ex`), not a "not `@moduledoc false`" heuristic. `Rendro.PDF.Font` is absent from that allowlist, so giving it a real `@moduledoc` carries **zero** manifest-drift risk. The plan still runs the contract test (`mix test test/docs_contract/public_api_contract_test.exs`) after the change as a guardrail.
+   - Original investigation: The generator uses `public_modules/0` to filter; the exact filter logic was not read at research time. Recommendation was to read `Mix.Tasks.Rendro.Api.Gen.public_modules/0` before implementing D-02 — done during planning, answer above.
 
 ---
 
