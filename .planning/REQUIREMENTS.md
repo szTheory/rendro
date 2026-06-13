@@ -11,8 +11,8 @@ Requirements for this milestone. Each maps to exactly one roadmap phase.
 
 ### Warning & Debt Hygiene
 
-- [ ] **HYG-01**: A maintainer building the docs sees a clean ExDoc warning posture — known hidden-internal (`@moduledoc false` / `@doc false`) reference warnings are eliminated, or each remaining warning is deliberately documented with a reason in a maintainer-visible note.
-- [ ] **HYG-02**: Stale viewer-evidence warning noise is resolved or explicitly documented so routine `mix` / verification output no longer emits unexplained viewer-evidence warnings.
+- [x] **HYG-01**: A maintainer building the docs sees a clean ExDoc warning posture — known hidden-internal (`@moduledoc false` / `@doc false`) reference warnings are eliminated, or each remaining warning is deliberately documented with a reason in a maintainer-visible note.
+- [x] **HYG-02**: Stale viewer-evidence warning noise is resolved or explicitly documented so routine `mix` / verification output no longer emits unexplained viewer-evidence warnings.
 
 ### Header Duplex Proof Depth
 
@@ -67,8 +67,8 @@ Which phases cover which requirements.
 |-------------|-------|--------|
 | DX-01 | Phase 93 | Complete |
 | DX-02 | Phase 93 | Complete |
-| HYG-01 | Phase 94 | Pending |
-| HYG-02 | Phase 94 | Pending |
+| HYG-01 | Phase 94 | Complete |
+| HYG-02 | Phase 94 | Complete |
 | PROOF-01 | Phase 95 | Pending |
 | META-01 | Phase 95 | Pending |
 | SIGNAL-01 | Phase 96 | Pending |

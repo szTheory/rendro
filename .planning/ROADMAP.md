@@ -132,7 +132,7 @@ v2.8 phases execute in numeric order: 93 → 94 → 95 → 96
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 93. Recipes Facade DX Closure | v2.8 | 3/3 | Complete    | 2026-06-13 |
-| 94. Docs & Warning Hygiene | v2.8 | 2/2 | Complete   | 2026-06-13 |
+| 94. Docs & Warning Hygiene | v2.8 | 2/2 | Complete    | 2026-06-13 |
 | 95. Header Duplex Proof & Metadata Reconcile | v2.8 | 0/TBD | Not started | - |
 | 96. Adoption Signal Review & Stewardship Posture | v2.8 | 0/TBD | Not started | - |
 
