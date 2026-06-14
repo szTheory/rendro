@@ -10,7 +10,9 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Active milestone:** v2.8 Done-Enough Stewardship & Adoption Signal Loop — started 2026-06-13. A short stewardship cycle that reduces maintainer/adopter friction and keeps the public posture truthful while demand accumulates, without widening product scope. **Phase 95 complete (2026-06-13):** header `only_on: :odd | :even` now has direct render- + paginate-layer E2E proof at footer parity (PROOF-01), and stale false-pending markers in the archived v2.7 validation metadata were reconciled to match the passed milestone audit (META-01). Phase 96 (adoption-signal review & stewardship posture) remains.
+**Active milestone:** None. See Next Milestone Goals.
+
+**Shipped milestone:** v2.8 Done-Enough Stewardship & Adoption Signal Loop — **SHIPPED 2026-06-13** (Phases 93-96, 8/8 requirements; milestone audit `passed`). Rendro reduced maintainer/adopter friction and kept its public posture truthful by closing the `Rendro.Recipes` facade DX gap, cleaning up docs/warning hygiene, bringing header odd/even proof depth to footer parity, reconciling stale phase-validation metadata, and establishing an explicit done-enough stewardship posture tied to a dated adoption-signal review.
 
 **Shipped milestone:** v2.7 Page Context & Browser Proof Hardening — **SHIPPED 2026-06-13** (Phases 89-92, 12/12 requirements; milestone audit `passed`; phase history archived under `milestones/v2.7-phases/`). Rendro now has section-local page numbering through internal page context, physical odd/even running content, pinned PDF.js advisory observations, and docs/package/workflow guardrails that keep every new claim proof-backed and global text shaping demand-gated.
 

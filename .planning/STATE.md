@@ -1,67 +1,44 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.8
-milestone_name: Done-Enough Stewardship & Adoption Signal Loop
-status: milestone_complete
-last_updated: 2026-06-14T00:46:12.626Z
-last_activity: 2026-06-14 -- Phase 96 planning complete
+milestone: None
+milestone_name: None
+status: milestone_archived
+last_updated: 2026-06-13T00:00:00Z
+last_activity: 2026-06-13 -- Milestone v2.8 archived
 progress:
-  total_phases: 4
-  completed_phases: 3
-  total_plans: 8
-  completed_plans: 8
-  percent: 75
-stopped_at: Milestone complete (Phase 96 was final phase)
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 100
+stopped_at: Milestone v2.8 archived
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-13 — v2.8 Done-Enough Stewardship & Adoption Signal Loop started)
+See: .planning/PROJECT.md
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Milestone complete
+**Current focus:** Between milestones
 
 ## Current Position
 
-Phase: 96
-Plan: Not started
-Status: Milestone complete
-Last activity: 2026-06-14
+Phase: None
+Plan: None
+Status: Milestone archived
+Last activity: 2026-06-13
 
 Progress: [██████████] 100%
 
-## v2.8 Phase Map
-
-| Phase | Name | Requirements | Depends on |
-|-------|------|--------------|-----------|
-| 93 | Recipes Facade DX Closure | DX-01, DX-02 | v2.4 recipes, v2.5 API contract |
-| 94 | Docs & Warning Hygiene | HYG-01, HYG-02 | 93 |
-| 95 | Header Duplex Proof & Metadata Reconcile | PROOF-01, META-01 | 94 |
-| 96 | Adoption Signal Review & Stewardship Posture | SIGNAL-01, STEW-01 | 95 |
-
 ## Milestone Snapshot
 
-- Active milestone: `v2.8 Done-Enough Stewardship & Adoption Signal Loop` — Phases 93-96, 8 requirements, stewardship-only scope.
-- Completed milestone: `v2.7 Page Context & Browser Proof Hardening` — Phases 89-92, audit `passed`. Archived under `milestones/v2.7-*`.
-- Done-enough estimate: 90-93% for Rendro's stated scope; remaining work is important-but-narrow.
-- Global text shaping: still demand-gated by `ADOPTION.md`; not v2.8 scope.
+- Active milestone: None
+- Completed milestone: `v2.8 Done-Enough Stewardship & Adoption Signal Loop` — Phases 93-96, 8 requirements. Archived under `milestones/v2.8-*`.
+- Global text shaping: still demand-gated by `ADOPTION.md`.
 
 ## Accumulated Context
-
-### Decisions
-
-Full decision log in PROJECT.md Key Decisions table. Locked v2.8 research recommendations:
-
-- DX facade: hand-written `@spec`'d arity-1 + arity-2 wrapper pairs (Ecto-thin-index model), fix the `invoice/1` opts-drop, regenerate `priv/public_api.json` via `mix rendro.api.gen`. No validation in the facade.
-- HYG-01: `skip_code_autolink_to:` for prose refs + real `@moduledoc` on `Rendro.PDF.Font`; enforce `docs --warnings-as-errors` in the `ci` alias.
-- HYG-02: viewer-evidence staleness is latent (fires ~late Nov 2026) — make it self-explaining, do NOT silence/raise/pre-record.
-- PROOF-01: mirror footer proofs at render + paginate layers; reject Poppler-per-page and golden-bytes.
-- SIGNAL-01: append a dated HOLD review to `ADOPTION.md` `## Review Log` — no new mix task.
-- STEW-01: two locations (MILESTONE-ARC internal posture section + `guides/api_stability.md` public status section); signal "stable & cared-for," never "abandoned."
-- [Phase 95]: PROOF-01: header only_on proven at render + paginate layers via additive tests over the shipped region-agnostic engine; no lib/ or public-API change
-- [Phase 95]: META-01 v2.7 reconcile: flipped 90/92 false-pending task cells and 91 stale Planned header to passed; frontmatter status: untouched (D-07); 88 left as consistent draft (D-06)
 
 ### Pending Todos
 
@@ -82,19 +59,6 @@ None.
 | automation | release-please / publish automation | deferred — BEAM norm is manual/semi-manual |
 | outreach | Proactive launch/outreach obligations | deferred — quiet pull-based posture unless maintainer opts in |
 
-## Session Continuity
-
-Last session: 2026-06-13T19:27:35.626Z
-Stopped at: Phase 96 context gathered
-Resume file: .planning/phases/96-adoption-signal-review-stewardship-posture/96-CONTEXT.md
-
 ## Operator Next Steps
 
-- Plan the first phase with `/gsd:plan-phase 93`.
-
-## Performance Metrics
-
-| Phase | Plan | Duration | Notes |
-|-------|------|----------|-------|
-| Phase 95 P01 | 2min | 3 tasks | 2 files |
-| Phase 95 P02 | 2min | 3 tasks | 3 files |
+- Run `/gsd:new-milestone` to start the next milestone.

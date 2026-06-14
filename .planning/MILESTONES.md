@@ -1,5 +1,25 @@
 # Milestones
 
+
+## v2.8 Done-Enough Stewardship & Adoption Signal Loop (Shipped: 2026-06-13)
+
+**Delivered:** Reduced maintainer/adopter friction and kept Rendro's public posture truthful while demand accumulates — without widening product scope.
+
+**Phases completed:** 93-96 (8 plans)
+
+**Key accomplishments:**
+
+- Closed the `Rendro.Recipes` facade DX gap with a 10-function facade and drift test preventing facade/recipe drift.
+- Cleaned up docs/warning hygiene, resolving zero unexplained ExDoc warnings and augmenting the viewer-evidence staleness signal to be self-explaining.
+- Brought header `only_on: :odd | :even` proof depth to footer parity with direct render-layer and paginate-layer E2E tests.
+- Reconciled stale v2.7 validation history metadata, clearing false-pending markers to match the passed milestone audit.
+- Established an explicit "done-enough" stewardship posture tied to a dated adoption-signal review in `ADOPTION.md` (HOLD verdict).
+
+**Audit status:** `passed` — all 8 requirements satisfied.
+
+**Archived:** `milestones/v2.8-ROADMAP.md`, `milestones/v2.8-REQUIREMENTS.md`, and `milestones/v2.8-MILESTONE-AUDIT.md`.
+
+---
 ## v2.7 Page Context & Browser Proof Hardening (Shipped: 2026-06-13)
 
 **Phases completed:** 4 phases, 6 plans, 15 tasks
