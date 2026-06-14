@@ -21,7 +21,7 @@
 ### Visual Table of Contents
 - [ ] **TOC-01**: The engine provides a `{{anchor_page:id}}` string substitution token evaluated strictly post-layout.
 - [ ] **TOC-02**: The `measure` phase assigns a fixed-width bounding box (e.g., sizing for a 4-digit number) to the TOC token, preventing layout oscillation.
-- [ ] **TOC-03**: The `paginate` phase substitutes the exact page numbers from `doc.metadata.anchors` into the fixed tokens after all pagination is complete, aligning the string correctly without re-measuring text bounds.
+- [x] **TOC-03**: The `paginate` phase substitutes the exact page numbers from `doc.metadata.anchors` into the fixed tokens after all pagination is complete, aligning the string correctly without re-measuring text bounds.
 
 ## Future Requirements
 - Deferred
@@ -47,4 +47,4 @@
 | XREF-03 | Phase 99 | Complete |
 | TOC-01 | Phase 100 | Pending |
 | TOC-02 | Phase 100 | Pending |
-| TOC-03 | Phase 100 | Pending |
+| TOC-03 | Phase 100 | Complete |
