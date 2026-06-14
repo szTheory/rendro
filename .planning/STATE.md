@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: None
-milestone_name: None
-status: milestone_archived
-last_updated: 2026-06-13T00:00:00Z
-last_activity: 2026-06-13 -- Milestone v2.8 archived
+milestone: v2.9
+milestone_name: TOC & Document Navigation
+status: planning
+last_updated: "2026-06-14T04:21:04.124Z"
+last_activity: 2026-06-14
 progress:
   total_phases: 0
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
-  percent: 100
-stopped_at: Milestone v2.8 archived
+  percent: 0
 ---
 
 # Project State
@@ -25,12 +24,10 @@ See: .planning/PROJECT.md
 
 ## Current Position
 
-Phase: None
-Plan: None
-Status: Milestone archived
-Last activity: 2026-06-13
-
-Progress: [██████████] 100%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-06-14 — Milestone v2.9 started
 
 ## Milestone Snapshot
 

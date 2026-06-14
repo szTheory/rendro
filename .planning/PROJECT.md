@@ -86,24 +86,19 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 **Foundation Already Shipped:** v1.3 release readiness, v1.2 typography/assets truth, v1.1 layout-authoring maturity, and v1.0 deterministic core rendering.
 
-## Current Milestone: v2.8 Done-Enough Stewardship & Adoption Signal Loop
+## Current Milestone: v2.9 TOC & Document Navigation
 
-**Goal:** Reduce maintainer/adopter friction and keep the public posture truthful while demand accumulates — without widening the product scope.
+**Goal:** Deliver Table of Contents, document outlines (bookmarks), anchors, and cross-references for long reports, proactively bypassing the previous adoption gate.
 
 **Target features:**
-- Warning/debt hygiene — clean up or deliberately document the docs/CI warning posture (hidden-internal ExDoc warnings, stale viewer-evidence warning noise).
-- Header `only_on` E2E proof depth — direct header-specific odd/even rendering coverage matching the footer proof depth shipped in v2.7.
-- `Rendro.Recipes` facade gap — facade currently delegates only Invoice/BrandedInvoice while Statement/Receipt/Certificate exist as full recipe modules; close the DX gap.
-- Nyquist/validation metadata cleanup — reconcile stale v2.6/v2.7 phase validation-history metadata where the audit already passed.
-- Adoption-signal review — lightweight pull-based review confirming whether `ADOPTION.md` shows qualifying text-shaping demand, download movement, or contributor signal before any large capability is proposed.
-- Maintainer docs/state — record that Rendro is near-done for its current scope and should not deepen proof/viewer work by default.
-
-**Explicit non-goals:** global text shaping, mobile GUI viewer promotion, TOC/outlines/anchors/cross-references, charts, existing-PDF editing, release-please automation, and proactive outreach — unless concrete adopter demand changes the tradeoff.
+- Document outlines (PDF Bookmarks/Outlines)
+- Internal page anchors and cross-references (linking to pages/sections)
+- Table of Contents primitives and generation
 
 ## Future Milestone Candidates (demand-gated)
 
 - Global Text Shaping & Script Support only after the `ADOPTION.md` gate triggers.
-- Larger report features such as TOC/outlines/anchors/cross-references and charts only after concrete user pressure proves the product value.
+- Charts (`%Rendro.Chart{}`) only after concrete user pressure proves the product value.
 
 ## Strategic Arc
 
@@ -278,10 +273,10 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-13 — v2.8 Phase 95 (Header Duplex Proof & Metadata Reconcile) complete.*
+*Last updated: 2026-06-14 — v2.9 TOC & Document Navigation started.*
 y?
 3. Audit Out of Scope -> reasons still valid?
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-14 — v2.8 Phase 96 (adoption-signal-review-stewardship-posture) complete.*
+*Last updated: 2026-06-14 — v2.9 TOC & Document Navigation started.*
