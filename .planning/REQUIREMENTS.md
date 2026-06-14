@@ -45,6 +45,6 @@
 | XREF-01 | Phase 99 | Complete |
 | XREF-02 | Phase 99 | Complete |
 | XREF-03 | Phase 99 | Complete |
-| TOC-01 | Phase 100 | Pending |
-| TOC-02 | Phase 100 | Pending |
+| TOC-01 | Phase 100 | Complete |
+| TOC-02 | Phase 100 | Complete |
 | TOC-03 | Phase 100 | Complete |

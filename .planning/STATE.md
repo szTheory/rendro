@@ -58,7 +58,7 @@ Phase 100: 2/2 plans (Completed)
 
 ## Next Steps
 
-1. Run `/gsd:plan-phase` to plan the next phase.
+1. Run `$gsd-verify` for Phase 100.
 
 ## Last Session
 
