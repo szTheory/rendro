@@ -265,6 +265,33 @@ defmodule Rendro.PDF.WriterTest do
       assert pdf =~ "/Info"
     end
 
+    test "does not inject /Outlines into the catalog when doc.metadata.outlines is empty" do
+      {:ok, pdf} = Writer.render(sample_document())
+      refute pdf =~ "/Outlines"
+    end
+
+    test "injects /Outlines into the catalog and serializes the outline tree when outlines exist" do
+      doc = sample_document()
+      doc = %{doc | pages: doc.pages ++ doc.pages} # 2 pages
+      doc = %{doc | metadata: %{doc.metadata | outlines: [
+        %{title: "First Page ページ", page_idx: 1, children: [
+          %{title: "Child 1", page_idx: 1, children: []}
+        ]},
+        %{title: "Second Page", page_idx: 2, children: []}
+      ]}}
+
+      {:ok, pdf} = Writer.render(doc, deterministic: true)
+      
+      assert pdf =~ "/Outlines "
+      assert pdf =~ "/Type /Outlines"
+      assert pdf =~ "/First"
+      assert pdf =~ "/Last"
+      assert pdf =~ "/Parent"
+      assert pdf =~ "/Title <FEFF" # BOM for UTF-16BE
+      assert pdf =~ "/Dest ["
+      assert pdf =~ "/XYZ"
+    end
+
     test "contains Catalog object" do
       {:ok, pdf} = Writer.render(sample_document())
       assert pdf =~ "/Type /Catalog"
