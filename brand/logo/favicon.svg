@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 8 64 64" role="img" aria-labelledby="t d" width="64" height="64">
+  <title id="t">Rendro favicon</title>
+  <desc id="d">Rendro favicon — the page-frame R mark, framed square. Transparent background, self-theming.</desc>
+  <style>
+    svg { color: #101827; } .accent { fill: #2C6BED; }
+    @media (prefers-color-scheme: dark) { svg { color: #F2ECE0; } .accent { fill: #7FA9FF; } }
+  </style>
+  <g fill="currentColor" transform="translate(6,12)">
+    <rect x="0" y="0" width="11" height="33.5"/>
+    <rect x="0" y="36" width="11" height="20"/>
+    <path d="M13.5 0 H35 L46 11 H13.5 Z"/>
+    <rect x="35" y="13.5" width="11" height="14.5"/>
+    <rect x="13.5" y="28" width="32.5" height="11"/>
+    <path d="M13.5 41.5 H24.5 L46 56 H35 Z"/>
+  </g>
+  <path class="accent" transform="translate(6,12)" d="M35 0 L46 11 H35 Z"/>
+</svg>

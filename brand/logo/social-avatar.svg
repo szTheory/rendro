@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" role="img" aria-labelledby="t d" width="80" height="80">
+  <title id="t">Rendro avatar</title>
+  <desc id="d">Rendro social / org avatar — the page-frame R in paper on ink, framed for square or circular crops. Fixed colors (an avatar legitimately needs a fill; the logo itself never boxes the mark).</desc>
+  <rect x="0" y="0" width="80" height="80" rx="16" fill="#101827"/>
+  <g transform="translate(16.22,7.2) scale(0.82)">
+    <g fill="#F2ECE0" transform="translate(6,12)">
+      <rect x="0" y="0" width="11" height="33.5"/>
+      <rect x="0" y="36" width="11" height="20"/>
+      <path d="M13.5 0 H35 L46 11 H13.5 Z"/>
+      <rect x="35" y="13.5" width="11" height="14.5"/>
+      <rect x="13.5" y="28" width="32.5" height="11"/>
+      <path d="M13.5 41.5 H24.5 L46 56 H35 Z"/>
+    </g>
+    <path fill="#7FA9FF" transform="translate(6,12)" d="M35 0 L46 11 H35 Z"/>
+  </g>
+</svg>

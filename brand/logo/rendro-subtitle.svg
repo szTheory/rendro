@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 104" role="img" aria-labelledby="t d" width="250" height="104">
+  <title id="t">Rendro — Native PDF layout for Elixir</title>
+  <desc id="d">Rendro logo with tagline lockup. The tagline is set apart from the primary mark; use the primary (no subtitle) wherever a single logo is expected.</desc>
+  <style>
+    svg { color: #101827; } .accent { fill: #2C6BED; } .sub { fill: #5B6573; }
+    @media (prefers-color-scheme: dark) { svg { color: #F2ECE0; } .accent { fill: #7FA9FF; } .sub { fill: #968F7E; } }
+  </style>
+  <g fill="currentColor">
+    <g transform="translate(6,12)">
+      <rect x="0" y="0" width="11" height="33.5"/>
+      <rect x="0" y="36" width="11" height="20"/>
+      <path d="M13.5 0 H35 L46 11 H13.5 Z"/>
+      <rect x="35" y="13.5" width="11" height="14.5"/>
+      <rect x="13.5" y="28" width="32.5" height="11"/>
+      <path d="M13.5 41.5 H24.5 L46 56 H35 Z"/>
+    </g>
+    <rect x="60" y="30" width="10" height="38"/>
+    <rect x="73" y="30" width="21" height="10"/>
+    <rect x="84" y="30" width="10" height="19"/>
+    <rect x="73" y="46" width="21" height="9"/>
+    <rect x="73" y="58" width="15" height="10"/>
+    <rect x="100" y="30" width="10" height="38"/>
+    <rect x="124" y="30" width="10" height="38"/>
+    <rect x="113" y="30" width="12" height="10"/>
+    <rect x="166" y="12" width="10" height="56"/>
+    <rect x="140" y="30" width="10" height="38"/>
+    <rect x="153" y="30" width="14" height="10"/>
+    <rect x="153" y="58" width="14" height="10"/>
+    <rect x="182" y="30" width="10" height="38"/>
+    <rect x="195" y="30" width="10" height="10"/>
+  </g>
+  <circle cx="229" cy="49" r="14" fill="none" stroke="currentColor" stroke-width="10"/>
+  <path class="accent" transform="translate(6,12)" d="M35 0 L46 11 H35 Z"/>
+  <text class="sub" x="7" y="96" font-family="Inter, system-ui, sans-serif" font-weight="500" font-size="12.5" letter-spacing="0.2">Native PDF layout for Elixir</text>
+</svg>

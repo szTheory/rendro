@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 80" role="img" aria-labelledby="t d" width="250" height="80">
+  <title id="t">Rendro</title>
+  <desc id="d">Rendro primary logo — a page-frame R with a folded corner and structural seam, set with a geometric stencil "endro". Self-theming for light and dark.</desc>
+  <style>
+    svg { color: #101827; } .accent { fill: #2C6BED; }
+    @media (prefers-color-scheme: dark) { svg { color: #F2ECE0; } .accent { fill: #7FA9FF; } }
+  </style>
+  <g fill="currentColor">
+    <!-- Hero R -->
+    <g transform="translate(6,12)">
+      <rect x="0" y="0" width="11" height="33.5"/>
+      <rect x="0" y="36" width="11" height="20"/>
+      <path d="M13.5 0 H35 L46 11 H13.5 Z"/>
+      <rect x="35" y="13.5" width="11" height="14.5"/>
+      <rect x="13.5" y="28" width="32.5" height="11"/>
+      <path d="M13.5 41.5 H24.5 L46 56 H35 Z"/>
+    </g>
+    <!-- e (top counter closes on the right, like the d; mouth open at lower right) -->
+    <rect x="60" y="30" width="10" height="38"/>
+    <rect x="73" y="30" width="21" height="10"/>
+    <rect x="84" y="30" width="10" height="19"/>
+    <rect x="73" y="46" width="21" height="9"/>
+    <rect x="73" y="58" width="15" height="10"/>
+    <!-- n (top bar joins right stem solidly; opening gap stays on the left) -->
+    <rect x="100" y="30" width="10" height="38"/>
+    <rect x="124" y="30" width="10" height="38"/>
+    <rect x="113" y="30" width="12" height="10"/>
+    <!-- d (bars close on the stem solidly; opening gap stays on the left) -->
+    <rect x="166" y="12" width="10" height="56"/>
+    <rect x="140" y="30" width="10" height="38"/>
+    <rect x="153" y="30" width="14" height="10"/>
+    <rect x="153" y="58" width="14" height="10"/>
+    <!-- r -->
+    <rect x="182" y="30" width="10" height="38"/>
+    <rect x="195" y="30" width="10" height="10"/>
+  </g>
+  <!-- o -->
+  <circle cx="229" cy="49" r="14" fill="none" stroke="currentColor" stroke-width="10"/>
+  <!-- folded page corner (signature accent) -->
+  <path class="accent" transform="translate(6,12)" d="M35 0 L46 11 H35 Z"/>
+</svg>
