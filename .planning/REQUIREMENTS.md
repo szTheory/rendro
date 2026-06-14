@@ -8,14 +8,14 @@
 - [ ] **ANC-03**: The engine emits deterministic error payloads if a developer assigns duplicate `id` values.
 
 ### Document Outlines (Bookmarks)
-- [ ] **OUT-01**: Developers can declaratively harvest outlines by assigning `outline: true` or `outline_level: N` to blocks.
-- [ ] **OUT-02**: The engine functionally aggregates outline items during the `paginate` phase, keeping them decoupled from visual layout loops.
-- [ ] **OUT-03**: The engine natively serializes the doubly-linked `/Outlines` dictionary tree entirely within the `render` phase.
-- [ ] **OUT-04**: Outline `/Title` strings are explicitly encoded as UTF-16BE with a Byte Order Mark (`\xFE\xFF`) to guarantee cross-viewer rendering of non-Latin characters.
+- [x] **OUT-01**: Developers can declaratively harvest outlines by assigning `outline: true` or `outline_level: N` to blocks.
+- [x] **OUT-02**: The engine functionally aggregates outline items during the `paginate` phase, keeping them decoupled from visual layout loops.
+- [x] **OUT-03**: The engine natively serializes the doubly-linked `/Outlines` dictionary tree entirely within the `render` phase.
+- [x] **OUT-04**: Outline `/Title` strings are explicitly encoded as UTF-16BE with a Byte Order Mark (`\xFE\xFF`) to guarantee cross-viewer rendering of non-Latin characters.
 
 ### Cross-References
-- [ ] **XREF-01**: Developers can define explicit cross-reference inline links (e.g., `%Rendro.Link{to: {:anchor, "exec-summary"}}`).
-- [ ] **XREF-02**: The `validate` phase strictly checks all cross-references against `doc.metadata.anchors`, crashing deterministically with an instructive error (Errors as Product) if a target is missing.
+- [x] **XREF-01**: Developers can define explicit cross-reference inline links (e.g., `%Rendro.Link{to: {:anchor, "exec-summary"}}`).
+- [x] **XREF-02**: The `validate` phase strictly checks all cross-references against `doc.metadata.anchors`, crashing deterministically with an instructive error (Errors as Product) if a target is missing.
 - [ ] **XREF-03**: Validated cross-references serialize as native PDF `/Link` annotations pointing to explicit `/Dest` arrays during the `render` phase.
 
 ### Visual Table of Contents
@@ -38,12 +38,12 @@
 | ANC-01 | Phase 97 | Pending |
 | ANC-02 | Phase 97 | Pending |
 | ANC-03 | Phase 97 | Pending |
-| OUT-01 | Phase 98 | Pending |
-| OUT-02 | Phase 98 | Pending |
-| OUT-03 | Phase 98 | Pending |
-| OUT-04 | Phase 98 | Pending |
-| XREF-01 | Phase 99 | Pending |
-| XREF-02 | Phase 99 | Pending |
+| OUT-01 | Phase 98 | Complete |
+| OUT-02 | Phase 98 | Complete |
+| OUT-03 | Phase 98 | Complete |
+| OUT-04 | Phase 98 | Complete |
+| XREF-01 | Phase 99 | Complete |
+| XREF-02 | Phase 99 | Complete |
 | XREF-03 | Phase 99 | Pending |
 | TOC-01 | Phase 100 | Pending |
 | TOC-02 | Phase 100 | Pending |

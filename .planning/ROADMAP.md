@@ -40,7 +40,7 @@
   1. User can click a rendered link in the PDF and jump to the exact top-left position of the targeted section without zooming out.
   2. Developer receives a fail-fast structured error during generation if they link to an `id` that does not exist in the document.
 **Plans**: 2 plans
-- [ ] 99-01-PLAN.md — Primitives & Validation
+- [x] 99-01-PLAN.md — Primitives & Validation
 - [ ] 99-02-PLAN.md — Serialization
 
 ### Phase 100: Printable Table of Contents Primitive
@@ -61,5 +61,5 @@
 |-------|----------------|--------|-----------|
 | 97. Location Tracking & Primitives | 0/2 | Not started | - |
 | 98. Document Outlines (Bookmarks) | 0/0 | Not started | - |
-| 99. Cross-References & Validation | 0/2 | Planned | - |
+| 99. Cross-References & Validation | 1/2 | In Progress|  |
 | 100. Printable Table of Contents Primitive | 0/0 | Not started | - |
