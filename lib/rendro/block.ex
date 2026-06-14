@@ -15,7 +15,9 @@ defmodule Rendro.Block do
     keep_together: false,
     keep_with_next: false,
     break_before: false,
-    break_after: false
+    break_after: false,
+    outline: false,
+    outline_level: 1
   ]
 
   @type t :: %__MODULE__{
@@ -29,6 +31,8 @@ defmodule Rendro.Block do
           keep_together: boolean(),
           keep_with_next: boolean(),
           break_before: boolean(),
-          break_after: boolean()
+          break_after: boolean(),
+          outline: boolean() | String.t(),
+          outline_level: non_neg_integer()
         }
 end
