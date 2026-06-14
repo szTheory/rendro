@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Rendro social card">
+  <style>
+    .sans{font-family:Inter,system-ui,-apple-system,sans-serif;}
+    .mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;}
+  </style>
+  <rect width="1200" height="630" fill="#101827"/>
+
+  <!-- ===== subtle structural grid motif (low-contrast) ===== -->
+  <g stroke="#1F2937" stroke-width="1">
+    <line x1="0" y1="105" x2="1200" y2="105"/>
+    <line x1="0" y1="210" x2="1200" y2="210"/>
+    <line x1="0" y1="315" x2="1200" y2="315"/>
+    <line x1="0" y1="420" x2="1200" y2="420"/>
+    <line x1="0" y1="525" x2="1200" y2="525"/>
+    <line x1="150" y1="0" x2="150" y2="630"/>
+    <line x1="300" y1="0" x2="300" y2="630"/>
+    <line x1="450" y1="0" x2="450" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="750" y1="0" x2="750" y2="630"/>
+    <line x1="900" y1="0" x2="900" y2="630"/>
+    <line x1="1050" y1="0" x2="1050" y2="630"/>
+  </g>
+  <!-- faint page-frame on the right -->
+  <rect x="860" y="150" width="260" height="330" rx="6" fill="none" stroke="#1F2937" stroke-width="2"/>
+  <path d="M1080 150 H1120 V190 Z" fill="#1F2937"/>
+
+  <!-- ===== Rendro logo (paper ink, blue fold), scaled 2.4x ===== -->
+  <g transform="translate(96,170) scale(2.4)">
+    <g fill="#F2ECE0">
+      <g transform="translate(6,12)">
+        <rect x="0" y="0" width="11" height="33.5"/>
+        <rect x="0" y="36" width="11" height="20"/>
+        <path d="M13.5 0 H35 L46 11 H13.5 Z"/>
+        <rect x="35" y="13.5" width="11" height="14.5"/>
+        <rect x="13.5" y="28" width="32.5" height="11"/>
+        <path d="M13.5 41.5 H24.5 L46 56 H35 Z"/>
+      </g>
+      <rect x="60" y="30" width="10" height="38"/>
+      <rect x="73" y="30" width="21" height="10"/>
+      <rect x="84" y="30" width="10" height="19"/>
+      <rect x="73" y="46" width="21" height="9"/>
+      <rect x="73" y="58" width="15" height="10"/>
+      <rect x="100" y="30" width="10" height="38"/>
+      <rect x="124" y="30" width="10" height="38"/>
+      <rect x="113" y="30" width="12" height="10"/>
+      <rect x="166" y="12" width="10" height="56"/>
+      <rect x="140" y="30" width="10" height="38"/>
+      <rect x="153" y="30" width="14" height="10"/>
+      <rect x="153" y="58" width="14" height="10"/>
+      <rect x="182" y="30" width="10" height="38"/>
+      <rect x="195" y="30" width="10" height="10"/>
+    </g>
+    <circle cx="229" cy="49" r="14" fill="none" stroke="#F2ECE0" stroke-width="10"/>
+    <path transform="translate(6,12)" d="M35 0 L46 11 H35 Z" fill="#7FA9FF"/>
+  </g>
+
+  <!-- tagline -->
+  <text class="sans" x="96" y="420" font-size="46" font-weight="700" fill="#F2ECE0">Native PDF layout for Elixir.</text>
+
+  <!-- supporting line, muted -->
+  <text class="sans" x="96" y="468" font-size="24" font-weight="400" fill="#968F7E">Build PDFs as Elixir data — deterministic, paginated, no Chrome.</text>
+</svg>

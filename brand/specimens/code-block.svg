@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="300" viewBox="0 0 760 300" role="img" aria-label="Rendro code block specimen">
+  <style>
+    .mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:14px;}
+    .kw{fill:#7FA9FF;}      /* keywords */
+    .str{fill:#3FB37F;}     /* strings */
+    .atom{fill:#C9AEF2;}    /* atoms (plum tint) */
+    .com{fill:#968F7E;}     /* comments */
+    .def{fill:#F2ECE0;}     /* default text */
+    .lbl{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:12px;fill:#968F7E;}
+  </style>
+  <!-- transparent margin so panel reads as a card -->
+  <rect width="760" height="300" fill="#1B1713"/>
+  <!-- panel -->
+  <rect x="20" y="20" width="720" height="260" rx="10" fill="#14110D"/>
+  <!-- top strip -->
+  <circle cx="46" cy="48" r="5" fill="#3A352B"/>
+  <circle cx="64" cy="48" r="5" fill="#3A352B"/>
+  <circle cx="82" cy="48" r="5" fill="#3A352B"/>
+  <text class="lbl" x="710" y="52" text-anchor="end">elixir</text>
+  <line x1="20" y1="72" x2="740" y2="72" stroke="#3A352B"/>
+
+  <!-- code lines: x=44, line-height 30, first baseline ~104 -->
+  <text class="mono" x="44" y="104"><tspan class="def">invoice</tspan></text>
+
+  <text class="mono" x="44" y="134"><tspan class="def">|&gt; </tspan><tspan class="def">Rendro.Document.</tspan><tspan class="def">new</tspan><tspan class="def">(</tspan><tspan class="def">page_size: </tspan><tspan class="atom">:a4</tspan><tspan class="def">)</tspan></text>
+
+  <text class="mono" x="44" y="164"><tspan class="def">|&gt; </tspan><tspan class="def">Rendro.</tspan><tspan class="def">heading</tspan><tspan class="def">(</tspan><tspan class="str">"Invoice #{invoice.number}"</tspan><tspan class="def">)</tspan></text>
+
+  <text class="mono" x="44" y="194"><tspan class="def">|&gt; </tspan><tspan class="def">Rendro.</tspan><tspan class="def">table</tspan><tspan class="def">(invoice.line_items, </tspan><tspan class="def">repeat_header: </tspan><tspan class="kw">true</tspan><tspan class="def">)</tspan></text>
+
+  <text class="mono" x="44" y="224"><tspan class="def">|&gt; </tspan><tspan class="def">Rendro.</tspan><tspan class="def">render</tspan><tspan class="def">()</tspan></text>
+
+  <text class="mono" x="44" y="254"><tspan class="com"># =&gt; {:ok, &lt;&lt;PDF binary&gt;&gt;}</tspan></text>
+</svg>

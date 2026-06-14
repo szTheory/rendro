@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="700" viewBox="0 0 920 700" role="img" aria-label="Rendro color palette specimen">
+  <style>
+    .title{font-family:Inter,system-ui,-apple-system,sans-serif;font-weight:700;}
+    .sub{font-family:Inter,system-ui,-apple-system,sans-serif;font-size:13px;fill:#5B6573;}
+    .sect{font-family:Inter,system-ui,-apple-system,sans-serif;font-weight:600;font-size:13px;letter-spacing:.04em;text-transform:uppercase;fill:#5B6573;}
+    .name{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:12px;fill:#101827;}
+    .hex{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:11px;fill:#5B6573;}
+    .note{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:11px;fill:#1F2937;}
+    .role{font-family:Inter,system-ui,-apple-system,sans-serif;font-size:12px;font-weight:500;fill:#1F2937;}
+  </style>
+  <rect width="920" height="700" fill="#F7F3EA"/>
+  <text class="title" x="40" y="48" font-size="26" fill="#101827">Rendro — Color</text>
+  <text class="sub" x="40" y="70">Raw palette tokens and semantic roles.</text>
+
+  <!-- swatch: 96x72 r6, name at y=90, hex at y=106 within local group -->
+
+  <!-- Band A: Ink / Paper / Line -->
+  <text class="sect" x="40" y="104">Ink · Paper · Line</text>
+  <g transform="translate(40,116)"><rect width="96" height="72" rx="6" fill="#101827" stroke="#D8D2C3"/><text class="name" x="0" y="90">ink-900</text><text class="hex" x="0" y="106">#101827</text></g>
+  <g transform="translate(152,116)"><rect width="96" height="72" rx="6" fill="#1F2937" stroke="#D8D2C3"/><text class="name" x="0" y="90">ink-700</text><text class="hex" x="0" y="106">#1F2937</text></g>
+  <g transform="translate(264,116)"><rect width="96" height="72" rx="6" fill="#5B6573" stroke="#D8D2C3"/><text class="name" x="0" y="90">ink-500</text><text class="hex" x="0" y="106">#5B6573</text></g>
+  <g transform="translate(376,116)"><rect width="96" height="72" rx="6" fill="#F7F3EA" stroke="#D8D2C3"/><text class="name" x="0" y="90">paper-100</text><text class="hex" x="0" y="106">#F7F3EA</text></g>
+  <g transform="translate(488,116)"><rect width="96" height="72" rx="6" fill="#EFE8DA" stroke="#D8D2C3"/><text class="name" x="0" y="90">paper-200</text><text class="hex" x="0" y="106">#EFE8DA</text></g>
+  <g transform="translate(600,116)"><rect width="96" height="72" rx="6" fill="#FFFFFF" stroke="#D8D2C3"/><text class="name" x="0" y="90">sheet-000</text><text class="hex" x="0" y="106">#FFFFFF</text></g>
+  <g transform="translate(712,116)"><rect width="96" height="72" rx="6" fill="#D8D2C3" stroke="#C4BCA9"/><text class="name" x="0" y="90">line-300</text><text class="hex" x="0" y="106">#D8D2C3</text></g>
+  <g transform="translate(824,116)"><rect width="56" height="72" rx="6" fill="#C4BCA9" stroke="#C4BCA9"/><text class="name" x="0" y="90">line-400</text><text class="hex" x="0" y="106">#C4BCA9</text></g>
+
+  <!-- Band B: Blue -->
+  <text class="sect" x="40" y="268">Blue</text>
+  <g transform="translate(40,280)"><rect width="96" height="72" rx="6" fill="#1F4FB8" stroke="#D8D2C3"/><text class="name" x="0" y="90">blue-700</text><text class="hex" x="0" y="106">#1F4FB8</text></g>
+  <g transform="translate(152,280)"><rect width="96" height="72" rx="6" fill="#2C6BED" stroke="#D8D2C3"/><text class="name" x="0" y="90">blue-600</text><text class="hex" x="0" y="106">#2C6BED</text></g>
+  <g transform="translate(264,280)"><rect width="96" height="72" rx="6" fill="#7FA9FF" stroke="#D8D2C3"/><text class="name" x="0" y="90">blue-300</text><text class="hex" x="0" y="106">#7FA9FF</text></g>
+  <g transform="translate(376,280)"><rect width="96" height="72" rx="6" fill="#D9E8FF" stroke="#D8D2C3"/><text class="name" x="0" y="90">blue-100</text><text class="hex" x="0" y="106">#D9E8FF</text></g>
+
+  <!-- Band B (right): Semantic -->
+  <text class="sect" x="500" y="268">Semantic</text>
+  <g transform="translate(500,280)"><rect width="90" height="72" rx="6" fill="#0E7C76" stroke="#D8D2C3"/><text class="name" x="0" y="90">teal-700</text><text class="hex" x="0" y="106">#0E7C76</text></g>
+  <g transform="translate(596,280)"><rect width="90" height="72" rx="6" fill="#6E3CB8" stroke="#D8D2C3"/><text class="name" x="0" y="90">plum-700</text><text class="hex" x="0" y="106">#6E3CB8</text></g>
+  <g transform="translate(692,280)"><rect width="90" height="72" rx="6" fill="#C78600" stroke="#D8D2C3"/><text class="name" x="0" y="90">amber-600</text><text class="hex" x="0" y="106">#C78600</text></g>
+  <g transform="translate(40,400)"></g>
+
+  <!-- Band C: continue semantic (red/green) + tints on left -->
+  <!-- left: Tints -->
+  <text class="sect" x="40" y="424">Tints</text>
+  <g transform="translate(40,436)"><rect width="96" height="72" rx="6" fill="#DDF4EE" stroke="#D8D2C3"/><text class="name" x="0" y="90">mint-100</text><text class="hex" x="0" y="106">#DDF4EE</text></g>
+  <g transform="translate(152,436)"><rect width="96" height="72" rx="6" fill="#EDE4D3" stroke="#D8D2C3"/><text class="name" x="0" y="90">sand-200</text><text class="hex" x="0" y="106">#EDE4D3</text></g>
+  <g transform="translate(264,436)"><rect width="96" height="72" rx="6" fill="#E9DDFB" stroke="#D8D2C3"/><text class="name" x="0" y="90">plum-100</text><text class="hex" x="0" y="106">#E9DDFB</text></g>
+  <!-- right of tints: red/green -->
+  <text class="sect" x="500" y="424">Semantic ·</text>
+  <g transform="translate(500,436)"><rect width="90" height="72" rx="6" fill="#C24132" stroke="#D8D2C3"/><text class="name" x="0" y="90">red-700</text><text class="hex" x="0" y="106">#C24132</text></g>
+  <g transform="translate(596,436)"><rect width="90" height="72" rx="6" fill="#147A4B" stroke="#D8D2C3"/><text class="name" x="0" y="90">green-700</text><text class="hex" x="0" y="106">#147A4B</text></g>
+
+  <!-- Band D: Dark -->
+  <text class="sect" x="40" y="580">Dark</text>
+  <g transform="translate(40,592)"><rect width="96" height="52" rx="6" fill="#1B1713" stroke="#D8D2C3"/><text class="name" x="0" y="70">night-800</text><text class="hex" x="0" y="86">#1B1713</text></g>
+  <g transform="translate(152,592)"><rect width="96" height="52" rx="6" fill="#232019" stroke="#D8D2C3"/><text class="name" x="0" y="70">night-700</text><text class="hex" x="0" y="86">#232019</text></g>
+  <g transform="translate(264,592)"><rect width="96" height="52" rx="6" fill="#F2ECE0" stroke="#D8D2C3"/><text class="name" x="0" y="70">paper-d-50</text><text class="hex" x="0" y="86">#F2ECE0</text></g>
+
+  <!-- Semantic roles card (right, clear of all swatches) -->
+  <g transform="translate(500,560)">
+    <text class="sect" x="0" y="-4">Semantic roles</text>
+    <rect x="0" y="8" width="380" height="120" rx="12" fill="#FFFFFF" stroke="#D8D2C3"/>
+    <g transform="translate(20,28)"><rect width="18" height="18" rx="4" fill="#101827"/><text class="role" x="28" y="14">text → ink-900</text></g>
+    <g transform="translate(20,56)"><rect width="18" height="18" rx="4" fill="#FFFFFF" stroke="#C4BCA9"/><text class="role" x="28" y="14">surface → sheet-000</text></g>
+    <g transform="translate(20,84)"><rect width="18" height="18" rx="4" fill="#1F4FB8"/><text class="role" x="28" y="14">link → blue-700</text></g>
+    <g transform="translate(210,28)"><rect width="18" height="18" rx="4" fill="#147A4B"/><text class="role" x="28" y="14">success → green-700</text></g>
+    <g transform="translate(210,56)"><rect width="18" height="18" rx="4" fill="#C78600"/><text class="role" x="28" y="14">warning → amber-600</text></g>
+    <g transform="translate(210,84)"><rect width="18" height="18" rx="4" fill="#C24132"/><text class="role" x="28" y="14">error → red-700</text></g>
+  </g>
+
+  <!-- contrast notes footer -->
+  <text class="note" x="40" y="688">Contrast — ink-900 on paper = 15.8 (AAA) · blue-700 on paper = 7.1 (AA) · blue-600 on paper = 4.28 (large text only) · amber-600 on paper = 3.0 (UI/large only)</text>
+</svg>

@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="320" viewBox="0 0 1280 320" role="img" aria-label="Rendro README header">
+  <style>
+    .sans{font-family:Inter,system-ui,-apple-system,sans-serif;}
+    .mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;}
+  </style>
+  <rect width="1280" height="320" fill="#F7F3EA"/>
+
+  <!-- ===== Rendro primary logo (exact geometry, scaled 1.6x, ink) ===== -->
+  <g transform="translate(80,64) scale(1.6)">
+    <g fill="#101827">
+      <!-- Hero R -->
+      <g transform="translate(6,12)">
+        <rect x="0" y="0" width="11" height="33.5"/>
+        <rect x="0" y="36" width="11" height="20"/>
+        <path d="M13.5 0 H35 L46 11 H13.5 Z"/>
+        <rect x="35" y="13.5" width="11" height="14.5"/>
+        <rect x="13.5" y="28" width="32.5" height="11"/>
+        <path d="M13.5 41.5 H24.5 L46 56 H35 Z"/>
+      </g>
+      <!-- e -->
+      <rect x="60" y="30" width="10" height="38"/>
+      <rect x="73" y="30" width="21" height="10"/>
+      <rect x="84" y="30" width="10" height="19"/>
+      <rect x="73" y="46" width="21" height="9"/>
+      <rect x="73" y="58" width="15" height="10"/>
+      <!-- n -->
+      <rect x="100" y="30" width="10" height="38"/>
+      <rect x="124" y="30" width="10" height="38"/>
+      <rect x="113" y="30" width="12" height="10"/>
+      <!-- d -->
+      <rect x="166" y="12" width="10" height="56"/>
+      <rect x="140" y="30" width="10" height="38"/>
+      <rect x="153" y="30" width="14" height="10"/>
+      <rect x="153" y="58" width="14" height="10"/>
+      <!-- r -->
+      <rect x="182" y="30" width="10" height="38"/>
+      <rect x="195" y="30" width="10" height="10"/>
+    </g>
+    <!-- o -->
+    <circle cx="229" cy="49" r="14" fill="none" stroke="#101827" stroke-width="10"/>
+    <!-- folded page corner accent -->
+    <path transform="translate(6,12)" d="M35 0 L46 11 H35 Z" fill="#2C6BED"/>
+  </g>
+
+  <!-- tagline -->
+  <text class="sans" x="84" y="232" font-size="28" font-weight="600" fill="#101827">Native PDF layout for Elixir.</text>
+
+  <!-- faux badges (ink/paper) -->
+  <g transform="translate(84,258)">
+    <rect x="0" y="0" width="118" height="30" rx="6" fill="#FFFFFF" stroke="#C4BCA9"/>
+    <text class="mono" x="59" y="20" font-size="12" fill="#1F2937" text-anchor="middle">hex v1.0</text>
+    <rect x="130" y="0" width="78" height="30" rx="6" fill="#FFFFFF" stroke="#C4BCA9"/>
+    <text class="mono" x="169" y="20" font-size="12" fill="#1F2937" text-anchor="middle">docs</text>
+    <rect x="220" y="0" width="68" height="30" rx="6" fill="#FFFFFF" stroke="#C4BCA9"/>
+    <text class="mono" x="254" y="20" font-size="12" fill="#1F2937" text-anchor="middle">MIT</text>
+  </g>
+
+  <!-- ===== page-frame motif on the right ===== -->
+  <g transform="translate(950,56)">
+    <!-- document sheet -->
+    <rect x="0" y="0" width="240" height="208" rx="4" fill="#FFFFFF" stroke="#D8D2C3"/>
+    <!-- folded corner -->
+    <path d="M210 0 H240 V30 Z" fill="#EFE8DA"/>
+    <path d="M210 0 V30 H240 Z" fill="none" stroke="#D8D2C3"/>
+    <!-- margin guides -->
+    <rect x="24" y="24" width="192" height="160" fill="none" stroke="#D9E8FF" stroke-dasharray="4 4"/>
+    <!-- faint content lines -->
+    <rect x="40" y="48" width="120" height="12" rx="2" fill="#EFE8DA"/>
+    <rect x="40" y="76" width="160" height="6" rx="2" fill="#EFE8DA"/>
+    <rect x="40" y="90" width="160" height="6" rx="2" fill="#EFE8DA"/>
+    <rect x="40" y="104" width="140" height="6" rx="2" fill="#EFE8DA"/>
+    <rect x="40" y="132" width="160" height="6" rx="2" fill="#EFE8DA"/>
+    <rect x="40" y="146" width="100" height="6" rx="2" fill="#EFE8DA"/>
+    <!-- accent fold tick -->
+    <rect x="40" y="166" width="44" height="8" rx="2" fill="#D9E8FF"/>
+  </g>
+</svg>

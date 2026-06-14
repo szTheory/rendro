@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="520" viewBox="0 0 920 520" role="img" aria-label="Rendro UI components specimen">
+  <style>
+    .sans{font-family:Inter,system-ui,-apple-system,sans-serif;}
+    .sect{font-family:Inter,system-ui,-apple-system,sans-serif;font-weight:600;font-size:13px;letter-spacing:.04em;text-transform:uppercase;fill:#5B6573;}
+  </style>
+  <rect width="920" height="520" fill="#F7F3EA"/>
+  <text class="sans" x="40" y="48" font-size="26" font-weight="700" fill="#101827">Rendro — Components</text>
+
+  <!-- ===== Buttons ===== -->
+  <text class="sect" x="40" y="92">Buttons</text>
+  <!-- primary -->
+  <rect x="40" y="106" width="150" height="44" rx="6" fill="#2C6BED"/>
+  <text class="sans" x="115" y="133" font-size="15" font-weight="600" fill="#FFFFFF" text-anchor="middle">Render PDF</text>
+  <!-- secondary -->
+  <rect x="206" y="106" width="150" height="44" rx="6" fill="#FFFFFF" stroke="#D8D2C3"/>
+  <text class="sans" x="281" y="133" font-size="15" font-weight="600" fill="#101827" text-anchor="middle">Preview</text>
+  <!-- quiet -->
+  <rect x="372" y="106" width="120" height="44" rx="6" fill="none"/>
+  <text class="sans" x="432" y="133" font-size="15" font-weight="600" fill="#2C6BED" text-anchor="middle">Learn more</text>
+
+  <!-- ===== Badges ===== -->
+  <text class="sect" x="560" y="92">Badges</text>
+  <rect x="560" y="108" width="86" height="26" rx="999" fill="#D9E8FF"/>
+  <text class="sans" x="603" y="125" font-size="12" font-weight="600" fill="#1F4FB8" text-anchor="middle">stable</text>
+  <rect x="656" y="108" width="86" height="26" rx="999" fill="#DDF4EE"/>
+  <text class="sans" x="699" y="125" font-size="12" font-weight="600" fill="#147A4B" text-anchor="middle">passing</text>
+  <rect x="752" y="108" width="96" height="26" rx="999" fill="#EDE4D3"/>
+  <text class="sans" x="800" y="125" font-size="12" font-weight="600" fill="#C78600" text-anchor="middle">beta</text>
+
+  <!-- ===== Card ===== -->
+  <text class="sect" x="40" y="196">Card</text>
+  <rect x="40" y="210" width="380" height="150" rx="12" fill="#FFFFFF" stroke="#D8D2C3"/>
+  <text class="sans" x="64" y="246" font-size="18" font-weight="700" fill="#101827">Invoice #1042</text>
+  <text class="sans" x="64" y="272" font-size="14" font-weight="400" fill="#5B6573">Generated from Elixir data — paginated</text>
+  <text class="sans" x="64" y="292" font-size="14" font-weight="400" fill="#5B6573">and deterministic. No headless browser.</text>
+  <line x1="64" y1="312" x2="396" y2="312" stroke="#D8D2C3"/>
+  <rect x="64" y="324" width="110" height="32" rx="6" fill="#2C6BED"/>
+  <text class="sans" x="119" y="345" font-size="13" font-weight="600" fill="#FFFFFF" text-anchor="middle">Download</text>
+  <text class="sans" x="190" y="345" font-size="13" font-weight="500" fill="#2C6BED">View source</text>
+
+  <!-- ===== Callouts ===== -->
+  <text class="sect" x="460" y="196">Callouts</text>
+  <!-- info -->
+  <g transform="translate(460,210)">
+    <rect width="420" height="58" rx="8" fill="#D9E8FF"/>
+    <rect width="5" height="58" rx="2.5" fill="#2C6BED"/>
+    <text class="sans" x="20" y="26" font-size="14" font-weight="700" fill="#1F4FB8">Info</text>
+    <text class="sans" x="20" y="46" font-size="13" font-weight="400" fill="#1F2937">Page size defaults to A4. Override with page_size: :letter.</text>
+  </g>
+  <!-- success -->
+  <g transform="translate(460,278)">
+    <rect width="420" height="58" rx="8" fill="#DDF4EE"/>
+    <rect width="5" height="58" rx="2.5" fill="#147A4B"/>
+    <text class="sans" x="20" y="26" font-size="14" font-weight="700" fill="#147A4B">Success</text>
+    <text class="sans" x="20" y="46" font-size="13" font-weight="400" fill="#1F2937">Document rendered in 18ms — 3 pages, fonts embedded.</text>
+  </g>
+  <!-- warning -->
+  <g transform="translate(460,346)">
+    <rect width="420" height="58" rx="8" fill="#EDE4D3"/>
+    <rect width="5" height="58" rx="2.5" fill="#C78600"/>
+    <text class="sans" x="20" y="26" font-size="14" font-weight="700" fill="#C78600">Warning</text>
+    <text class="sans" x="20" y="46" font-size="13" font-weight="400" fill="#1F2937">Table overflows the page — enable repeat_header: true.</text>
+  </g>
+  <!-- error -->
+  <g transform="translate(460,414)">
+    <rect width="420" height="58" rx="8" fill="#FFFFFF" stroke="#D8D2C3"/>
+    <rect width="5" height="58" rx="2.5" fill="#C24132"/>
+    <text class="sans" x="20" y="26" font-size="14" font-weight="700" fill="#C24132">Error</text>
+    <text class="sans" x="20" y="46" font-size="13" font-weight="400" fill="#1F2937">Unknown font family ":comic" — not registered.</text>
+  </g>
+
+  <!-- left column filler: quiet/secondary note under buttons region kept clean -->
+  <text class="sans" x="40" y="430" font-size="13" font-weight="500" fill="#5B6573">Controls: radius 6 · Cards: radius 12 · Badges: pill</text>
+</svg>
