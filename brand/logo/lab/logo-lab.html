@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rendro · Logo Lab (Phase 103 — pick a direction)</title>
+<!-- Brand fonts for accurate preview. This is a review tool; the network link is fine here.
+     The committed logo files self-theme and the final chosen mark (Phase 104) will be outlined to paths. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --ink:#101827; --paper:#F7F3EA; --sheet:#FFF; --line:#D8D2C3; --blue:#2C6BED; --muted:#5B6573; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--paper);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+  header.top{max-width:1120px;margin:0 auto;padding:48px 24px 8px}
+  header.top h1{font-size:34px;letter-spacing:-1px;margin:0 0 6px}
+  header.top p{color:var(--muted);max-width:62ch;margin:6px 0}
+  .wrap{max-width:1120px;margin:0 auto;padding:24px}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 8px}
+  .chip{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:4px 12px;background:var(--sheet);color:var(--muted)}
+  .option{background:var(--sheet);border:1px solid var(--line);border-radius:16px;padding:24px;margin:22px 0;box-shadow:0 1px 2px rgba(16,24,39,.05)}
+  .option h2{font-size:20px;margin:0 0 2px;letter-spacing:-.3px}
+  .option .key{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--blue)}
+  .option p.desc{color:var(--muted);margin:8px 0 18px;max-width:74ch}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}}
+  .surface{border-radius:12px;padding:28px;display:flex;align-items:center;justify-content:center;min-height:120px;border:1px solid transparent}
+  .surface.light{background:var(--paper);color:var(--ink);border-color:var(--line)}
+  .surface.dark{background:#1B1713;color:#F2ECE0}
+  .accent{fill:var(--blue)} .accent-s{stroke:var(--blue)}
+  .surface.dark .accent,.av.dark .accent,.gh.dark .accent{fill:#7FA9FF}
+  .surface.dark .accent-s{stroke:#7FA9FF}
+  .lockup{height:56px;width:auto}
+  .subrow{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end;margin-top:16px;padding-top:16px;border-top:1px dashed var(--line)}
+  .favs{display:flex;align-items:flex-end;gap:14px}
+  .favs .cap,.cap{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+  .favblk{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .mark48{height:48px;width:48px} .mark32{height:32px;width:32px} .mark24{height:24px;width:24px} .mark16{height:16px;width:16px}
+  .av{width:84px;height:84px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+  .av.dark{background:#1B1713;color:#F2ECE0} .av .m{height:46px;width:46px}
+  .gh{display:flex;align-items:center;gap:8px;font-size:15px;border:1px solid var(--line);border-radius:8px;padding:8px 14px;background:var(--sheet)}
+  .gh .m{height:22px;width:22px} .gh .path{color:var(--muted)} .gh .repo{font-weight:600;color:var(--ink)}
+  .blockcap{font-size:12px;color:var(--muted);margin:0 0 8px;text-transform:uppercase;letter-spacing:.06em}
+  .verdict{font-size:13px;color:var(--muted);margin-top:14px;padding:12px 14px;background:var(--paper);border-radius:10px;border:1px solid var(--line)}
+  .verdict b{color:var(--ink)}
+  footer{max-width:1120px;margin:0 auto;padding:24px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+
+<!-- ============ SPRITE: every mark/lockup defined once, reused via <use> ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <!-- A: Frame-R lockup -->
+  <symbol id="lk-a" viewBox="0 0 250 80">
+    <g fill="currentColor"><rect x="10" y="12" width="11" height="56" rx="1"/>
+      <path fill-rule="evenodd" d="M21 12 H50 L58 20 V44 H21 Z M29 20 H49 V36 H29 Z"/>
+      <path d="M14 44 H26 L60 68 H48 Z"/></g>
+    <path class="accent" d="M50 12 L58 20 H50 Z"/>
+    <text x="74" y="60" font-family="Inter,sans-serif" font-weight="700" font-size="48" letter-spacing="-1.5" fill="currentColor">endro</text>
+  </symbol>
+  <symbol id="mk-a" viewBox="0 0 68 80">
+    <g fill="currentColor"><rect x="10" y="12" width="11" height="56" rx="1"/>
+      <path fill-rule="evenodd" d="M21 12 H50 L58 20 V44 H21 Z M29 20 H49 V36 H29 Z"/>
+      <path d="M14 44 H26 L60 68 H48 Z"/></g>
+    <path class="accent" d="M50 12 L58 20 H50 Z"/>
+  </symbol>
+
+  <!-- B: Page-o lockup -->
+  <symbol id="lk-b" viewBox="0 0 196 80">
+    <text x="8" y="58" font-family="'JetBrains Mono',monospace" font-weight="700" font-size="42" fill="currentColor">rendr</text>
+    <path fill="currentColor" fill-rule="evenodd" d="M134 24 H159 L168 33 V58 H134 Z M143 33 H159 V49 H143 Z"/>
+    <path class="accent" d="M159 24 L168 33 H159 Z"/>
+  </symbol>
+  <symbol id="mk-b" viewBox="0 0 40 42">
+    <path fill="currentColor" fill-rule="evenodd" d="M2 4 H27 L36 13 V38 H2 Z M11 14 H27 V30 H11 Z"/>
+    <path class="accent" d="M27 4 L36 13 H27 Z"/>
+  </symbol>
+
+  <!-- C: Flow-line lockup -->
+  <symbol id="lk-c" viewBox="0 0 230 80">
+    <g fill="currentColor"><rect x="10" y="16" width="30" height="5" rx="2.5"/><rect x="10" y="26" width="20" height="5" rx="2.5"/></g>
+    <text x="10" y="60" font-family="Inter,sans-serif" font-weight="700" font-size="46" letter-spacing="-1.5" fill="currentColor">rendro</text>
+    <path class="accent-s" fill="none" stroke-width="6" stroke-linecap="round" d="M12 70 H180 q16 0 16 -16 V44"/>
+    <rect class="accent" x="186" y="22" width="18" height="18" rx="2"/>
+  </symbol>
+  <symbol id="mk-c" viewBox="0 0 56 56">
+    <g fill="currentColor"><rect x="4" y="8" width="28" height="5" rx="2.5"/><rect x="4" y="18" width="18" height="5" rx="2.5"/></g>
+    <path class="accent-s" fill="none" stroke-width="5" stroke-linecap="round" d="M6 48 H34 q12 0 12 -12 V30"/>
+    <rect class="accent" x="36" y="8" width="15" height="15" rx="2"/>
+  </symbol>
+
+  <!-- D: Object-tree R lockup -->
+  <symbol id="lk-d" viewBox="0 0 250 80">
+    <g fill="currentColor"><rect x="10" y="12" width="11" height="56" rx="1"/>
+      <path fill-rule="evenodd" d="M21 12 H58 V44 H21 Z M28 19 H51 V37 H28 Z"/>
+      <path fill-rule="evenodd" d="M31 22 H48 V34 H31 Z M36 27 H43 V31 H36 Z"/>
+      <path d="M14 44 H26 L60 68 H48 Z"/></g>
+    <rect class="accent" x="37" y="27.5" width="5" height="3"/>
+    <text x="74" y="60" font-family="Inter,sans-serif" font-weight="700" font-size="48" letter-spacing="-1.5" fill="currentColor">endro</text>
+  </symbol>
+  <symbol id="mk-d" viewBox="0 0 68 80">
+    <g fill="currentColor"><rect x="10" y="12" width="11" height="56" rx="1"/>
+      <path fill-rule="evenodd" d="M21 12 H58 V44 H21 Z M28 19 H51 V37 H28 Z"/>
+      <path fill-rule="evenodd" d="M31 22 H48 V34 H31 Z M36 27 H43 V31 H36 Z"/>
+      <path d="M14 44 H26 L60 68 H48 Z"/></g>
+    <rect class="accent" x="37" y="27.5" width="5" height="3"/>
+  </symbol>
+
+  <!-- E: Measured baseline lockup -->
+  <symbol id="lk-e" viewBox="0 0 232 80">
+    <text x="12" y="50" font-family="Inter,sans-serif" font-weight="700" font-size="46" letter-spacing="-1.5" fill="currentColor">Rendro</text>
+    <g fill="currentColor"><rect x="12" y="63" width="184" height="2.5" rx="1.25"/>
+      <rect x="12" y="60" width="2" height="9"/><rect x="58" y="62" width="1.5" height="5"/>
+      <rect x="104" y="62" width="1.5" height="5"/><rect x="150" y="62" width="1.5" height="5"/>
+      <rect x="194" y="60" width="2" height="9"/></g>
+    <path class="accent" d="M200 58 L210 64 L200 70 Z"/>
+  </symbol>
+  <symbol id="mk-e" viewBox="0 0 56 56">
+    <text x="6" y="34" font-family="Inter,sans-serif" font-weight="700" font-size="30" letter-spacing="-1" fill="currentColor">R</text>
+    <g fill="currentColor"><rect x="6" y="44" width="36" height="2.5" rx="1.25"/>
+      <rect x="6" y="41" width="2" height="8"/><rect x="40" y="41" width="2" height="8"/></g>
+    <path class="accent" d="M44 40 L52 46 L44 52 Z"/>
+  </symbol>
+</svg>
+
+<header class="top">
+  <h1>Rendro · Logo Lab</h1>
+  <p>Phase 103 of milestone B1. Five integrated typemark directions, each judged against the same constraints. Pick one (or ask to iterate) — the chosen direction becomes the full lockup system in Phase 104.</p>
+  <div class="legend">
+    <span class="chip">No background box</span>
+    <span class="chip">Motif worked into the letterforms</span>
+    <span class="chip">Logotype tight to the mark</span>
+    <span class="chip">No subtitle in the main combo</span>
+    <span class="chip">Metaphor: structured flow → reliable document</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ===== OPTION A ===== -->
+  <section class="option">
+    <h2>A · Frame-R <span class="key">option-a-frame-r</span></h2>
+    <p class="desc">The capital <b>R</b> is the mark: its bowl is a page frame with a folded corner (pagination), and its leg kicks past the baseline — content leaving the page as finished output. The mark <em>is</em> the first letter, so the wordmark is inherently unified, no separate icon.</p>
+    <div class="grid">
+      <div class="surface light"><svg class="lockup" viewBox="0 0 250 80"><use href="#lk-a"/></svg></div>
+      <div class="surface dark"><svg class="lockup" viewBox="0 0 250 80"><use href="#lk-a"/></svg></div>
+    </div>
+    <div class="subrow">
+      <div class="favs">
+        <div class="favblk"><svg class="mark48" viewBox="0 0 68 80"><use href="#mk-a"/></svg><span class="cap">48</span></div>
+        <div class="favblk"><svg class="mark32" viewBox="0 0 68 80"><use href="#mk-a"/></svg><span class="cap">32</span></div>
+        <div class="favblk"><svg class="mark24" viewBox="0 0 68 80"><use href="#mk-a"/></svg><span class="cap">24</span></div>
+        <div class="favblk"><svg class="mark16" viewBox="0 0 68 80"><use href="#mk-a"/></svg><span class="cap">16</span></div>
+      </div>
+      <div class="favblk"><div class="av dark"><svg class="m" viewBox="0 0 68 80"><use href="#mk-a"/></svg></div><span class="cap">avatar</span></div>
+      <div class="favblk"><div class="gh"><svg class="m" viewBox="0 0 68 80"><use href="#mk-a"/></svg><span><span class="path">szTheory /</span> <span class="repo">rendro</span></span></div><span class="cap">repo header</span></div>
+    </div>
+    <p class="verdict"><b>Strength:</b> strongest letter/mark fusion; favicon = the R, instantly legible. <b>Watch:</b> R-as-page is a touch expected for a document tool.</p>
+  </section>
+
+  <!-- ===== OPTION B ===== -->
+  <section class="option">
+    <h2>B · Page-o <span class="key">option-b-page-o</span></h2>
+    <p class="desc">Lowercase, monospaced — the <b>package</b> register (<code>rendro</code> as you type it in <code>mix.exs</code>). The final <b>o</b> becomes two overlapping pages: the pagination motif, worked into the counter rather than bolted on.</p>
+    <div class="grid">
+      <div class="surface light"><svg class="lockup" viewBox="0 0 196 80"><use href="#lk-b"/></svg></div>
+      <div class="surface dark"><svg class="lockup" viewBox="0 0 196 80"><use href="#lk-b"/></svg></div>
+    </div>
+    <div class="subrow">
+      <div class="favs">
+        <div class="favblk"><svg class="mark48" viewBox="0 0 40 42"><use href="#mk-b"/></svg><span class="cap">48</span></div>
+        <div class="favblk"><svg class="mark32" viewBox="0 0 40 42"><use href="#mk-b"/></svg><span class="cap">32</span></div>
+        <div class="favblk"><svg class="mark24" viewBox="0 0 40 42"><use href="#mk-b"/></svg><span class="cap">24</span></div>
+        <div class="favblk"><svg class="mark16" viewBox="0 0 40 42"><use href="#mk-b"/></svg><span class="cap">16</span></div>
+      </div>
+      <div class="favblk"><div class="av dark"><svg class="m" viewBox="0 0 40 42"><use href="#mk-b"/></svg></div><span class="cap">avatar</span></div>
+      <div class="favblk"><div class="gh"><svg class="m" viewBox="0 0 40 42"><use href="#mk-b"/></svg><span><span class="path">szTheory /</span> <span class="repo">rendro</span></span></div><span class="cap">repo header</span></div>
+    </div>
+    <p class="verdict"><b>Strength:</b> reads as a developer artifact; pagination motif is the most literal-yet-tasteful. <b>Watch:</b> all-lowercase mono is a touch quieter for a hero/marketing lockup.</p>
+  </section>
+
+  <!-- ===== OPTION C ===== -->
+  <section class="option">
+    <h2>C · Flow-line <span class="key">option-c-flowline</span></h2>
+    <p class="desc">Content lines flow into the wordmark; a single rule threads beneath it and lifts off to the right into a page — <code>data → document</code> rendered literally in the lockup. The flow line breaks the boundary upward (no box, deliberately open).</p>
+    <div class="grid">
+      <div class="surface light"><svg class="lockup" viewBox="0 0 230 80"><use href="#lk-c"/></svg></div>
+      <div class="surface dark"><svg class="lockup" viewBox="0 0 230 80"><use href="#lk-c"/></svg></div>
+    </div>
+    <div class="subrow">
+      <div class="favs">
+        <div class="favblk"><svg class="mark48" viewBox="0 0 56 56"><use href="#mk-c"/></svg><span class="cap">48</span></div>
+        <div class="favblk"><svg class="mark32" viewBox="0 0 56 56"><use href="#mk-c"/></svg><span class="cap">32</span></div>
+        <div class="favblk"><svg class="mark24" viewBox="0 0 56 56"><use href="#mk-c"/></svg><span class="cap">24</span></div>
+        <div class="favblk"><svg class="mark16" viewBox="0 0 56 56"><use href="#mk-c"/></svg><span class="cap">16</span></div>
+      </div>
+      <div class="favblk"><div class="av dark"><svg class="m" viewBox="0 0 56 56"><use href="#mk-c"/></svg></div><span class="cap">avatar</span></div>
+      <div class="favblk"><div class="gh"><svg class="m" viewBox="0 0 56 56"><use href="#mk-c"/></svg><span><span class="path">szTheory /</span> <span class="repo">rendro</span></span></div><span class="cap">repo header</span></div>
+    </div>
+    <p class="verdict"><b>Strength:</b> tells the whole product story in one glance; most narrative. <b>Watch:</b> the mark alone is busier — favicon legibility at 16px is the thing to scrutinize below.</p>
+  </section>
+
+  <!-- ===== OPTION D ===== -->
+  <section class="option">
+    <h2>D · Object-tree R <span class="key">option-d-object-tree</span></h2>
+    <p class="desc">Same R-as-first-letter integration as A, but the counter is built from <b>nested page frames</b> — the PDF object/page hierarchy the engine actually constructs. Quietly technical; rewards a second look.</p>
+    <div class="grid">
+      <div class="surface light"><svg class="lockup" viewBox="0 0 250 80"><use href="#lk-d"/></svg></div>
+      <div class="surface dark"><svg class="lockup" viewBox="0 0 250 80"><use href="#lk-d"/></svg></div>
+    </div>
+    <div class="subrow">
+      <div class="favs">
+        <div class="favblk"><svg class="mark48" viewBox="0 0 68 80"><use href="#mk-d"/></svg><span class="cap">48</span></div>
+        <div class="favblk"><svg class="mark32" viewBox="0 0 68 80"><use href="#mk-d"/></svg><span class="cap">32</span></div>
+        <div class="favblk"><svg class="mark24" viewBox="0 0 68 80"><use href="#mk-d"/></svg><span class="cap">24</span></div>
+        <div class="favblk"><svg class="mark16" viewBox="0 0 68 80"><use href="#mk-d"/></svg><span class="cap">16</span></div>
+      </div>
+      <div class="favblk"><div class="av dark"><svg class="m" viewBox="0 0 68 80"><use href="#mk-d"/></svg></div><span class="cap">avatar</span></div>
+      <div class="favblk"><div class="gh"><svg class="m" viewBox="0 0 68 80"><use href="#mk-d"/></svg><span><span class="path">szTheory /</span> <span class="repo">rendro</span></span></div><span class="cap">repo header</span></div>
+    </div>
+    <p class="verdict"><b>Strength:</b> conceptually richest; the nested frames are unique. <b>Watch:</b> nested detail can fill in and muddy at 16px — check the favicon row.</p>
+  </section>
+
+  <!-- ===== OPTION E ===== -->
+  <section class="option">
+    <h2>E · Measured baseline <span class="key">option-e-measure</span> <span class="cap">(wildcard)</span></h2>
+    <p class="desc">A pure type treatment: the wordmark sits on an engineering measure rule with tick marks and a forward render caret — "layout you can reason about." The flourish lives in the baseline, not in a glyph.</p>
+    <div class="grid">
+      <div class="surface light"><svg class="lockup" viewBox="0 0 232 80"><use href="#lk-e"/></svg></div>
+      <div class="surface dark"><svg class="lockup" viewBox="0 0 232 80"><use href="#lk-e"/></svg></div>
+    </div>
+    <div class="subrow">
+      <div class="favs">
+        <div class="favblk"><svg class="mark48" viewBox="0 0 56 56"><use href="#mk-e"/></svg><span class="cap">48</span></div>
+        <div class="favblk"><svg class="mark32" viewBox="0 0 56 56"><use href="#mk-e"/></svg><span class="cap">32</span></div>
+        <div class="favblk"><svg class="mark24" viewBox="0 0 56 56"><use href="#mk-e"/></svg><span class="cap">24</span></div>
+        <div class="favblk"><svg class="mark16" viewBox="0 0 56 56"><use href="#mk-e"/></svg><span class="cap">16</span></div>
+      </div>
+      <div class="favblk"><div class="av dark"><svg class="m" viewBox="0 0 56 56"><use href="#mk-e"/></svg></div><span class="cap">avatar</span></div>
+      <div class="favblk"><div class="gh"><svg class="m" viewBox="0 0 56 56"><use href="#mk-e"/></svg><span><span class="path">szTheory /</span> <span class="repo">rendro</span></span></div><span class="cap">repo header</span></div>
+    </div>
+    <p class="verdict"><b>Strength:</b> most distinctive personality; very "engineering artifact." <b>Watch:</b> weakest standalone mark — it leans on a borrowed "R" for the favicon, so it's the least self-contained at small sizes.</p>
+  </section>
+
+</div>
+
+<footer>
+  Tip: open this file directly in a browser. Judge each row top-to-bottom — lockup (light + dark), then the favicon scale-down, then avatar and repo-header context. The 16px favicon and the dark lockup are the two hardest tests.
+</footer>
+
+</body>
+</html>

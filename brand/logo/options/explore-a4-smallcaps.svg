@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 278 80" role="img" aria-labelledby="t d" width="278" height="80">
+  <title id="t">Rendro</title>
+  <desc id="d">Frame-R exploration A4 — title-case feel via small caps: a full-height R plus "endro" set as smaller caps in the exact same page-frame construction, baseline-aligned.</desc>
+  <style>
+    svg { color: #101827; } .accent { fill: #2C6BED; }
+    @media (prefers-color-scheme: dark) { svg { color: #F2ECE0; } .accent { fill: #7FA9FF; } }
+  </style>
+  <g fill="currentColor">
+    <!-- Full-height R -->
+    <g transform="translate(10,12)">
+      <rect x="0" y="0" width="11" height="56"/>
+      <path d="M13.5 0 H35 L46 11 H13.5 Z"/>
+      <rect x="35" y="13.5" width="11" height="14.5"/>
+      <rect x="13.5" y="28" width="32.5" height="11"/>
+      <path d="M13.5 41.5 H24.5 L46 56 H35 Z"/>
+      <path class="accent" d="M35 0 L46 11 H35 Z"/>
+    </g>
+    <!-- "endro" as baseline-aligned small caps (same construction, scaled) -->
+    <g transform="translate(70,28) scale(0.714)">
+      <!-- E -->
+      <g transform="translate(0,0)">
+        <rect x="0" y="0" width="11" height="56"/>
+        <rect x="13.5" y="0" width="28.5" height="11"/>
+        <rect x="13.5" y="22.5" width="22" height="11"/>
+        <rect x="13.5" y="45" width="28.5" height="11"/>
+      </g>
+      <!-- N -->
+      <g transform="translate(54,0)">
+        <rect x="0" y="0" width="11" height="56"/>
+        <rect x="33" y="0" width="11" height="56"/>
+        <path d="M13.5 0 H22 L44 56 H35.5 Z"/>
+      </g>
+      <!-- D -->
+      <g transform="translate(110,0)">
+        <rect x="0" y="0" width="11" height="56"/>
+        <rect x="13.5" y="0" width="32.5" height="11"/>
+        <rect x="35" y="13.5" width="11" height="29"/>
+        <rect x="13.5" y="45" width="32.5" height="11"/>
+      </g>
+      <!-- R -->
+      <g transform="translate(168,0)">
+        <rect x="0" y="0" width="11" height="56"/>
+        <path d="M13.5 0 H35 L46 11 H13.5 Z"/>
+        <rect x="35" y="13.5" width="11" height="14.5"/>
+        <rect x="13.5" y="28" width="32.5" height="11"/>
+        <path d="M13.5 41.5 H24.5 L46 56 H35 Z"/>
+      </g>
+      <!-- O -->
+      <g transform="translate(226,0)">
+        <path fill-rule="evenodd" d="M14 0 H34 A14 14 0 0 1 48 14 V42 A14 14 0 0 1 34 56 H14 A14 14 0 0 1 0 42 V14 A14 14 0 0 1 14 0 Z M19.5 13.5 H28.5 A6 6 0 0 1 34.5 19.5 V36.5 A6 6 0 0 1 28.5 42.5 H19.5 A6 6 0 0 1 13.5 36.5 V19.5 A6 6 0 0 1 19.5 13.5 Z"/>
+      </g>
+    </g>
+  </g>
+</svg>

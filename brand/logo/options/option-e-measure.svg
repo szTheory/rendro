@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 232 80" role="img" aria-labelledby="te de" width="232" height="80">
+  <title id="te">Rendro</title>
+  <desc id="de">Direction E — Measured baseline: the wordmark sits on an engineering measure rule with tick marks and a render caret (layout you can reason about).</desc>
+  <style>
+    svg { color: #101827; }
+    .accent { fill: #2C6BED; }
+    @media (prefers-color-scheme: dark) { svg { color: #F2ECE0; } .accent { fill: #7FA9FF; } }
+  </style>
+  <text x="12" y="50" font-family="Inter, system-ui, -apple-system, sans-serif" font-weight="700" font-size="46" letter-spacing="-1.5" fill="currentColor">Rendro</text>
+  <!-- measure rule -->
+  <g fill="currentColor">
+    <rect x="12" y="63" width="184" height="2.5" rx="1.25"/>
+    <rect x="12" y="60" width="2" height="9"/>
+    <rect x="58" y="62" width="1.5" height="5"/>
+    <rect x="104" y="62" width="1.5" height="5"/>
+    <rect x="150" y="62" width="1.5" height="5"/>
+    <rect x="194" y="60" width="2" height="9"/>
+  </g>
+  <!-- render caret: the rule flows forward into output -->
+  <path class="accent" d="M200 58 L210 64 L200 70 Z"/>
+</svg>

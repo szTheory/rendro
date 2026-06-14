@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 196 80" role="img" aria-labelledby="tb db" width="196" height="80">
+  <title id="tb">rendro</title>
+  <desc id="db">Direction B — Page-o: lowercase technical wordmark (package register) whose final "o" is a page — a clean ring with a folded corner.</desc>
+  <style>
+    svg { color: #101827; }
+    .accent { fill: #2C6BED; }
+    @media (prefers-color-scheme: dark) { svg { color: #F2ECE0; } .accent { fill: #7FA9FF; } }
+  </style>
+  <text x="8" y="58" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace" font-weight="700" font-size="42" letter-spacing="0" fill="currentColor">rendr</text>
+  <!-- the "o" is a page: squared ring with a folded top-right corner -->
+  <path fill="currentColor" fill-rule="evenodd" d="M134 24 H159 L168 33 V58 H134 Z M143 33 H159 V49 H143 Z"/>
+  <!-- folded page corner -->
+  <path class="accent" d="M159 24 L168 33 H159 Z"/>
+</svg>

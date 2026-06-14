@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 80" role="img" aria-labelledby="ta da" width="250" height="80">
+  <title id="ta">Rendro</title>
+  <desc id="da">Direction A — Frame-R: the capital R is a page frame with a folded corner and a leg that kicks past the baseline (content becoming a document).</desc>
+  <style>
+    svg { color: #101827; }
+    .accent { fill: #2C6BED; }
+    @media (prefers-color-scheme: dark) { svg { color: #F2ECE0; } .accent { fill: #7FA9FF; } }
+  </style>
+  <g fill="currentColor">
+    <!-- stem -->
+    <rect x="10" y="12" width="11" height="56" rx="1"/>
+    <!-- bowl as page frame with folded corner (even-odd hole) -->
+    <path fill-rule="evenodd" d="M21 12 H50 L58 20 V44 H21 Z M29 20 H49 V36 H29 Z"/>
+    <!-- leg kicking out toward the wordmark -->
+    <path d="M14 44 H26 L60 68 H48 Z"/>
+  </g>
+  <!-- folded page corner -->
+  <path class="accent" d="M50 12 L58 20 H50 Z"/>
+  <text x="74" y="60" font-family="Inter, system-ui, -apple-system, sans-serif" font-weight="700" font-size="48" letter-spacing="-1.5" fill="currentColor">endro</text>
+</svg>

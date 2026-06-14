@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rendro · final logo system</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --ink:#101827; --paper:#F7F3EA; --sheet:#FFF; --line:#D8D2C3; --blue:#2C6BED; --muted:#5B6573; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.5}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 24px}
+  h1{font-size:30px;letter-spacing:-1px;margin:0 0 4px}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:34px 0 12px;font-weight:600}
+  .lede{color:var(--muted);max-width:72ch}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}}
+  .surface{border-radius:14px;padding:34px;display:flex;align-items:center;justify-content:center;min-height:120px}
+  .light{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+  .dark{background:#1B1713;color:#F2ECE0}
+  .accent{fill:var(--blue)} .dark .accent{fill:#7FA9FF}
+  .sub{fill:var(--muted)} .dark .sub{fill:#968F7E}
+  .lg{height:58px;width:auto} .md{height:46px;width:auto} .tall{height:74px;width:auto}
+  .row{display:flex;gap:26px;align-items:flex-end;flex-wrap:wrap;background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:24px}
+  .fav{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .cap{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+  .m48{height:48px}.m32{height:32px}.m24{height:24px}.m16{height:16px}
+  .gh{display:flex;align-items:center;gap:9px;font-size:16px}
+  .gh svg{height:24px} .gh .path{color:var(--muted)} .gh .repo{font-weight:600}
+  .hero{background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:40px}
+  .hero .tag{color:var(--muted);margin:14px 0 20px;font-size:18px}
+  .btn{display:inline-block;background:var(--blue);color:#fff;font-weight:600;padding:10px 18px;border-radius:6px;font-size:14px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="primary" viewBox="0 0 250 80">
+    <g fill="currentColor">
+      <g transform="translate(6,12)"><rect x="0" y="0" width="11" height="33.5"/><rect x="0" y="36" width="11" height="20"/><path d="M13.5 0 H35 L46 11 H13.5 Z"/><rect x="35" y="13.5" width="11" height="14.5"/><rect x="13.5" y="28" width="32.5" height="11"/><path d="M13.5 41.5 H24.5 L46 56 H35 Z"/></g>
+      <rect x="60" y="30" width="10" height="38"/><rect x="73" y="30" width="21" height="10"/><rect x="84" y="30" width="10" height="19"/><rect x="73" y="46" width="21" height="9"/><rect x="73" y="58" width="15" height="10"/>
+      <rect x="100" y="30" width="10" height="38"/><rect x="124" y="30" width="10" height="38"/><rect x="113" y="30" width="12" height="10"/>
+      <rect x="166" y="12" width="10" height="56"/><rect x="140" y="30" width="10" height="38"/><rect x="153" y="30" width="14" height="10"/><rect x="153" y="58" width="14" height="10"/>
+      <rect x="182" y="30" width="10" height="38"/><rect x="195" y="30" width="10" height="10"/>
+    </g>
+    <circle cx="229" cy="49" r="14" fill="none" stroke="currentColor" stroke-width="10"/>
+    <path class="accent" transform="translate(6,12)" d="M35 0 L46 11 H35 Z"/>
+  </symbol>
+  <symbol id="mark" viewBox="0 0 58 80">
+    <g fill="currentColor" transform="translate(6,12)"><rect x="0" y="0" width="11" height="33.5"/><rect x="0" y="36" width="11" height="20"/><path d="M13.5 0 H35 L46 11 H13.5 Z"/><rect x="35" y="13.5" width="11" height="14.5"/><rect x="13.5" y="28" width="32.5" height="11"/><path d="M13.5 41.5 H24.5 L46 56 H35 Z"/></g>
+    <path class="accent" transform="translate(6,12)" d="M35 0 L46 11 H35 Z"/>
+  </symbol>
+  <symbol id="sub" viewBox="0 0 250 104">
+    <use href="#primary"/>
+    <text class="sub" x="7" y="96" font-family="Inter,sans-serif" font-weight="500" font-size="12.5" letter-spacing="0.2">Native PDF layout for Elixir</text>
+  </symbol>
+</svg>
+
+<div class="wrap">
+  <h1>Rendro · final logo system</h1>
+  <p class="lede">The locked Frame-R identity. Page-frame R (folded corner + structural seam) reading into a geometric stencil “endro”. Everything below is the committed SVG in <code>brand/logo/</code>, shown light and dark.</p>
+
+  <h2>Primary lockup</h2>
+  <div class="grid">
+    <div class="surface light"><svg class="lg" viewBox="0 0 250 80"><use href="#primary"/></svg></div>
+    <div class="surface dark"><svg class="lg" viewBox="0 0 250 80"><use href="#primary"/></svg></div>
+  </div>
+
+  <h2>With tagline · monochrome</h2>
+  <div class="grid">
+    <div class="surface light"><svg class="tall" viewBox="0 0 250 104"><use href="#sub"/></svg></div>
+    <div class="surface dark"><svg class="md" viewBox="0 0 250 80" style="filter:grayscale(1)"><use href="#primary"/></svg></div>
+  </div>
+
+  <h2>Mark · favicon scale · avatar</h2>
+  <div class="row">
+    <div class="fav"><svg class="m48" viewBox="0 0 58 80"><use href="#mark"/></svg><span class="cap">48</span></div>
+    <div class="fav"><svg class="m32" viewBox="0 0 58 80"><use href="#mark"/></svg><span class="cap">32</span></div>
+    <div class="fav"><svg class="m24" viewBox="0 0 58 80"><use href="#mark"/></svg><span class="cap">24</span></div>
+    <div class="fav"><svg class="m16" viewBox="0 0 58 80"><use href="#mark"/></svg><span class="cap">16</span></div>
+    <div class="fav"><img src="../social-avatar.svg" width="72" height="72" alt="avatar"><span class="cap">avatar (square)</span></div>
+    <div class="fav"><img src="../social-avatar.svg" width="72" height="72" style="border-radius:50%" alt="avatar circle"><span class="cap">avatar (circle)</span></div>
+  </div>
+
+  <h2>In context</h2>
+  <div class="row" style="gap:14px;align-items:center">
+    <span class="gh"><svg viewBox="0 0 58 80"><use href="#mark"/></svg><span class="path">szTheory /</span><span class="repo">rendro</span></span>
+  </div>
+  <div class="hero" style="margin-top:16px">
+    <svg style="height:54px" viewBox="0 0 250 80"><use href="#primary"/></svg>
+    <div class="tag">Build PDF documents as Elixir data, then render them with predictable layout and production telemetry — no Chrome.</div>
+    <span class="btn">Generate your first PDF</span>
+  </div>
+</div>
+</body>
+</html>

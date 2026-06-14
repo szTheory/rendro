@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 230 80" role="img" aria-labelledby="tc dc" width="230" height="80">
+  <title id="tc">rendro</title>
+  <desc id="dc">Direction C — Flow-line: content lines flow into the wordmark; a baseline rule threads beneath it and lifts off to the right into a page (data becoming a document).</desc>
+  <style>
+    svg { color: #101827; }
+    .accent { fill: #2C6BED; }
+    .accent-s { stroke: #2C6BED; }
+    @media (prefers-color-scheme: dark) { svg { color: #F2ECE0; } .accent { fill: #7FA9FF; } .accent-s { stroke: #7FA9FF; } }
+  </style>
+  <!-- glyph-run: content lines flowing in -->
+  <g fill="currentColor">
+    <rect x="10" y="16" width="30" height="5" rx="2.5"/>
+    <rect x="10" y="26" width="20" height="5" rx="2.5"/>
+  </g>
+  <text x="10" y="60" font-family="Inter, system-ui, -apple-system, sans-serif" font-weight="700" font-size="46" letter-spacing="-1.5" fill="currentColor">rendro</text>
+  <!-- flow line threading the baseline, lifting into a page on the right -->
+  <path class="accent-s" fill="none" stroke-width="6" stroke-linecap="round" d="M12 70 H180 q16 0 16 -16 V44"/>
+  <!-- destination page -->
+  <rect class="accent" x="186" y="22" width="18" height="18" rx="2"/>
+</svg>

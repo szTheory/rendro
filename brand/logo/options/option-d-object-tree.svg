@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 80" role="img" aria-labelledby="td2 dd" width="250" height="80">
+  <title id="td2">Rendro</title>
+  <desc id="dd">Direction D — Object-tree R: the R's counter is built from nested page frames, echoing the PDF object/page hierarchy.</desc>
+  <style>
+    svg { color: #101827; }
+    .accent { fill: #2C6BED; }
+    @media (prefers-color-scheme: dark) { svg { color: #F2ECE0; } .accent { fill: #7FA9FF; } }
+  </style>
+  <g fill="currentColor">
+    <!-- stem -->
+    <rect x="10" y="12" width="11" height="56" rx="1"/>
+    <!-- outer page frame -->
+    <path fill-rule="evenodd" d="M21 12 H58 V44 H21 Z M28 19 H51 V37 H28 Z"/>
+    <!-- middle nested frame -->
+    <path fill-rule="evenodd" d="M31 22 H48 V34 H31 Z M36 27 H43 V31 H36 Z"/>
+    <!-- leg -->
+    <path d="M14 44 H26 L60 68 H48 Z"/>
+  </g>
+  <!-- innermost node -->
+  <rect class="accent" x="37" y="27.5" width="5" height="3"/>
+  <text x="74" y="60" font-family="Inter, system-ui, -apple-system, sans-serif" font-weight="700" font-size="48" letter-spacing="-1.5" fill="currentColor">endro</text>
+</svg>

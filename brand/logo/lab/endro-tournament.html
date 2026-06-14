@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rendro · "endro" wordmark tournament</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --ink:#101827; --paper:#F7F3EA; --sheet:#FFF; --line:#D8D2C3; --blue:#2C6BED; --muted:#5B6573; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.5}
+  .wrap{max-width:1040px;margin:0 auto;padding:40px 24px}
+  h1{font-size:30px;letter-spacing:-1px;margin:0 0 6px}
+  .lede{color:var(--muted);max-width:72ch}
+  .take{background:var(--sheet);border:1px solid var(--line);border-radius:16px;padding:22px;margin:18px 0}
+  .take h2{font-size:18px;margin:0 0 2px}
+  .take .key{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--blue)}
+  .take p{color:var(--muted);margin:6px 0 14px;max-width:80ch;font-size:14px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}}
+  .surface{border-radius:12px;padding:22px;display:flex;align-items:center;justify-content:center;min-height:96px}
+  .light{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+  .dark{background:#1B1713;color:#F2ECE0}
+  .accent{fill:var(--blue)} .dark .accent{fill:#7FA9FF}
+  .lk{height:46px;width:auto}
+  .rec{font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <!-- hero R (constant) -->
+  <symbol id="R" viewBox="0 0 256 80">
+    <g fill="currentColor"><g transform="translate(6,12)"><rect x="0" y="0" width="11" height="33.5"/><rect x="0" y="36" width="11" height="20"/><path d="M13.5 0 H35 L46 11 H13.5 Z"/><rect x="35" y="13.5" width="11" height="14.5"/><rect x="13.5" y="28" width="32.5" height="11"/><path d="M13.5 41.5 H24.5 L46 56 H35 Z"/></g></g>
+    <path class="accent" transform="translate(6,12)" d="M35 0 L46 11 H35 Z"/>
+  </symbol>
+  <!-- ndro (constant) -->
+  <symbol id="ndro" viewBox="0 0 256 80">
+    <g fill="currentColor">
+      <rect x="100" y="30" width="10" height="38"/><rect x="124" y="30" width="10" height="38"/><rect x="100" y="30" width="34" height="10"/>
+      <rect x="166" y="12" width="10" height="56"/><rect x="140" y="30" width="10" height="38"/><rect x="150" y="30" width="16" height="10"/><rect x="150" y="58" width="16" height="10"/>
+      <rect x="182" y="30" width="10" height="38"/><rect x="192" y="30" width="13" height="10"/>
+    </g>
+    <circle cx="229" cy="49" r="14" fill="none" stroke="currentColor" stroke-width="10"/>
+  </symbol>
+  <!-- e variants -->
+  <symbol id="e1" viewBox="0 0 256 80"><g fill="currentColor"><rect x="60" y="30" width="10" height="38"/><rect x="70" y="30" width="24" height="10"/><rect x="84" y="30" width="10" height="10"/><rect x="60" y="44" width="34" height="9"/><rect x="70" y="58" width="18" height="10"/></g></symbol>
+  <symbol id="e2" viewBox="0 0 256 80"><g fill="currentColor"><rect x="60" y="30" width="10" height="38"/><path d="M70 30 H88 L94 36 H70 Z"/><rect x="84" y="36" width="10" height="8"/><rect x="60" y="44" width="34" height="9"/><rect x="70" y="58" width="18" height="10"/></g></symbol>
+  <symbol id="e3" viewBox="0 0 256 80"><g fill="currentColor"><path fill="none" stroke="currentColor" stroke-width="10" d="M93 58 A17 19 0 1 1 94 41"/><rect x="62" y="44" width="31" height="9"/></g></symbol>
+</svg>
+
+<div class="wrap">
+  <h1>“endro” wordmark · tournament</h1>
+  <p class="lede">Title case “Rendro”, R is the first letter, seam/pixel detail stays in the R only. The hero R and “ndro” are constant; only the <strong>e</strong> changes (plus two clean-type entries). Open in a browser to see Inter render and to judge light/dark. Pick an e direction — I’ll then harmonize the rest and build the full lockup system.</p>
+
+  <section class="take">
+    <h2>1 · Geometric, squared e <span class="key">e1</span></h2>
+    <p>Most cohesive with the modular/digital language of the R. Blocky, confident, “systems” feel.</p>
+    <div class="grid">
+      <div class="surface light"><svg class="lk" viewBox="0 0 256 80"><use href="#R"/><use href="#e1"/><use href="#ndro"/></svg></div>
+      <div class="surface dark"><svg class="lk" viewBox="0 0 256 80"><use href="#R"/><use href="#e1"/><use href="#ndro"/></svg></div>
+    </div>
+  </section>
+
+  <section class="take">
+    <h2>2 · Geometric, round e <span class="key">e3</span> &nbsp;<span class="rec">recommended</span></h2>
+    <p>Round e pairs with the round o for a refined sharp-R / soft-lowercase contrast — most typographic. (If chosen, I’d round the d-bowl slightly to match.)</p>
+    <div class="grid">
+      <div class="surface light"><svg class="lk" viewBox="0 0 256 80"><use href="#R"/><use href="#e3"/><use href="#ndro"/></svg></div>
+      <div class="surface dark"><svg class="lk" viewBox="0 0 256 80"><use href="#R"/><use href="#e3"/><use href="#ndro"/></svg></div>
+    </div>
+  </section>
+
+  <section class="take">
+    <h2>3 · Geometric, folded-cut e <span class="key">e2</span></h2>
+    <p>The e’s top-right corner folds like the R — one quiet callback tying wordmark to mark.</p>
+    <div class="grid">
+      <div class="surface light"><svg class="lk" viewBox="0 0 256 80"><use href="#R"/><use href="#e2"/><use href="#ndro"/></svg></div>
+      <div class="surface dark"><svg class="lk" viewBox="0 0 256 80"><use href="#R"/><use href="#e2"/><use href="#ndro"/></svg></div>
+    </div>
+  </section>
+
+  <section class="take">
+    <h2>4 · Clean type — Inter Bold <span class="key">option 1</span></h2>
+    <p>Abandon custom lowercase; set “endro” in refined Inter so the R is the only bespoke element. Quiet and safe.</p>
+    <div class="grid">
+      <div class="surface light"><svg class="lk" viewBox="0 0 256 80"><use href="#R"/><text x="60" y="68" font-family="Inter,sans-serif" font-weight="700" font-size="54" letter-spacing="-2" fill="currentColor">endro</text></svg></div>
+      <div class="surface dark"><svg class="lk" viewBox="0 0 256 80"><use href="#R"/><text x="60" y="68" font-family="Inter,sans-serif" font-weight="700" font-size="54" letter-spacing="-2" fill="currentColor">endro</text></svg></div>
+    </div>
+  </section>
+
+  <section class="take">
+    <h2>5 · Clean type — Inter SemiBold (lighter) <span class="key">option 1</span></h2>
+    <p>Same as 4 but lighter weight, so the bold custom R dominates even more.</p>
+    <div class="grid">
+      <div class="surface light"><svg class="lk" viewBox="0 0 256 80"><use href="#R"/><text x="60" y="68" font-family="Inter,sans-serif" font-weight="600" font-size="54" letter-spacing="-2" fill="currentColor">endro</text></svg></div>
+      <div class="surface dark"><svg class="lk" viewBox="0 0 256 80"><use href="#R"/><text x="60" y="68" font-family="Inter,sans-serif" font-weight="600" font-size="54" letter-spacing="-2" fill="currentColor">endro</text></svg></div>
+    </div>
+  </section>
+</div>
+</body>
+</html>
