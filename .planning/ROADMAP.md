@@ -31,7 +31,7 @@
 Plans:
 **Wave 1**
 
-- [ ] 108-01-PLAN.md — BASE-05: Add gate-neutral job-summary instrumentation to the `test` job in ci.yml
+- [x] 108-01-PLAN.md — BASE-05: Add gate-neutral job-summary instrumentation to the `test` job in ci.yml
 - [ ] 108-02-PLAN.md — Evidence gathering: real-runner timing, local profiling, flake sweep, async:false residue read
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -127,7 +127,7 @@ Plans:
 
 | Phase | Requirements Complete | Status | Completed |
 |-------|-----------------------|--------|-----------|
-| 108. Baseline & Audit Report | 0/5 | Planning | - |
+| 108. Baseline & Audit Report | 1/3 | In Progress|  |
 | 109. Caching & setup-beam Foundation | 0/5 | Not started | - |
 | 110. Test Concurrency, Determinism & Cleanup | 0/5 | Not started | - |
 | 111. Workflow Topology, Triggers & Matrix | 0/5 | Not started | - |
