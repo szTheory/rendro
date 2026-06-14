@@ -461,6 +461,7 @@ defmodule Rendro.PDF.Writer do
           page_obj_nums,
           link_annotation_allocations,
           page_index,
+          doc,
           opts
         )
 
@@ -948,6 +949,7 @@ defmodule Rendro.PDF.Writer do
          page_obj_nums,
          link_annotation_allocations,
          page_index,
+         doc,
          opts
        ) do
     page_allocations = page_link_annotation_allocations(link_annotation_allocations, page_index)
@@ -966,6 +968,7 @@ defmodule Rendro.PDF.Writer do
               rect,
               allocation.target,
               page_obj_nums,
+              doc,
               opts
             )
 
@@ -980,7 +983,7 @@ defmodule Rendro.PDF.Writer do
     Enum.filter(link_annotation_allocations, &(&1.page_index == page_index))
   end
 
-  defp build_link_annotation_object(obj_num, rect, {:uri, uri}, _page_obj_nums, opts) do
+  defp build_link_annotation_object(obj_num, rect, {:uri, uri}, _page_obj_nums, _doc, opts) do
     dict =
       {:dict,
        [
@@ -994,7 +997,7 @@ defmodule Rendro.PDF.Writer do
     Object.indirect_object(obj_num, 0, Object.serialize(dict, opts))
   end
 
-  defp build_link_annotation_object(obj_num, rect, {:page, page_number}, page_obj_nums, opts) do
+  defp build_link_annotation_object(obj_num, rect, {:page, page_number}, page_obj_nums, _doc, opts) do
     {target_page_obj_num, _content_obj_num} = Enum.at(page_obj_nums, page_number - 1)
 
     dict =
@@ -1005,6 +1008,24 @@ defmodule Rendro.PDF.Writer do
          {"Rect", {:array, rect}},
          {"Border", {:array, [0, 0, 0]}},
          {"Dest", {:array, [{:ref, target_page_obj_num, 0}, {:name, "Fit"}]}}
+       ]}
+
+    Object.indirect_object(obj_num, 0, Object.serialize(dict, opts))
+  end
+
+  defp build_link_annotation_object(obj_num, rect, {:anchor, id}, page_obj_nums, doc, opts) do
+    [page_idx, :XYZ, x, y, _nil] = Map.fetch!(doc.metadata.anchors, id)
+
+    {target_page_obj_num, _content_obj_num} = Enum.at(page_obj_nums, page_idx)
+
+    dict =
+      {:dict,
+       [
+         {"Type", {:name, "Annot"}},
+         {"Subtype", {:name, "Link"}},
+         {"Rect", {:array, rect}},
+         {"Border", {:array, [0, 0, 0]}},
+         {"Dest", {:array, [{:ref, target_page_obj_num, 0}, {:name, "XYZ"}, x, y, nil]}}
        ]}
 
     Object.indirect_object(obj_num, 0, Object.serialize(dict, opts))

@@ -518,6 +518,16 @@ defmodule Rendro.PDF.WriterTest do
       refute pdf =~ "/D ["
     end
 
+    test "serializes internal anchor links as exact physical /Dest coordinates" do
+      doc = linked_text_document(anchor: "my-target")
+      doc = %{doc | metadata: Map.put(doc.metadata, :anchors, %{"my-target" => [0, :XYZ, 100.0, 200.0, nil]})}
+
+      {:ok, pdf} = Writer.render(doc, deterministic: true)
+
+      assert pdf =~ "/Subtype /Link"
+      assert pdf =~ ~r|/Dest \[\d+ 0 R /XYZ 100\.0000 200\.0000 null\]|
+    end
+
     test "emits one link annotation per paginated fragment" do
       {:ok, pdf} =
         Writer.render(linked_fragment_document(uri: "https://example.com/docs"),
