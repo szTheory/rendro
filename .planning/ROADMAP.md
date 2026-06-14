@@ -13,7 +13,7 @@
 
 ## Phases
 
-- [ ] **Phase 108: Baseline & Audit Report** — Measure the current pipeline (per-job duration/critical-path table), classify every test/check A–E with evidence, emit a prioritized P0–P3 recommendation report, and add CI observability job summaries. Analysis + instrumentation only; no gate-logic or test changes.
+- [x] **Phase 108: Baseline & Audit Report** — Measure the current pipeline (per-job duration/critical-path table), classify every test/check A–E with evidence, emit a prioritized P0–P3 recommendation report, and add CI observability job summaries. Analysis + instrumentation only; no gate-logic or test changes. (completed 2026-06-14)
 - [ ] **Phase 109: Caching & setup-beam Foundation** — Add keyed `deps`/`_build`/PLT caching (the pipeline currently has ZERO caching), SHA-pin and unify `setup-beam`, and document cache-busting. Biggest expected runtime win.
 - [ ] **Phase 110: Test Concurrency, Determinism & Cleanup** — Convert safely-isolatable modules to `async: true`, make an evidence-based partitioning decision, fix/quarantine flaky tests (no blind retries), remove low-signal tests with evidence, and layer slow suites PR-vs-scheduled correctly.
 - [ ] **Phase 111: Workflow Topology, Triggers & Matrix** — Cut the critical path and duplicated work, rationalize advisory + live-proof jobs, add per-PR concurrency cancellation, define the PR/main/nightly/release trigger model + version-matrix policy, and gate merge on one stable required-check summary.
@@ -27,7 +27,7 @@
 **Goal**: Establish the measured source-of-truth that drives every downstream phase — what the pipeline does today, how long it takes, where the bottlenecks are, which checks are worth keeping, and what to change in priority order — without touching gate logic or removing any test.
 **Depends on**: Nothing (source of truth for phases 109–113)
 **Requirements**: BASE-01, BASE-02, BASE-03, BASE-04, BASE-05
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 Plans:
 **Wave 1**
 
@@ -127,7 +127,7 @@ Plans:
 
 | Phase | Requirements Complete | Status | Completed |
 |-------|-----------------------|--------|-----------|
-| 108. Baseline & Audit Report | 3/3 | Complete   | 2026-06-14 |
+| 108. Baseline & Audit Report | 3/3 | Complete    | 2026-06-14 |
 | 109. Caching & setup-beam Foundation | 0/5 | Not started | - |
 | 110. Test Concurrency, Determinism & Cleanup | 0/5 | Not started | - |
 | 111. Workflow Topology, Triggers & Matrix | 0/5 | Not started | - |
