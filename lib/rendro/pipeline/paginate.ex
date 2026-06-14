@@ -15,14 +15,95 @@ defmodule Rendro.Pipeline.Paginate do
     case result do
       {:ok, paginated_doc} ->
         with {:ok, doc1} <- collect_anchors(paginated_doc),
-             {:ok, doc2} <- collect_outlines(doc1) do
-          {:ok, doc2}
+             {:ok, doc2} <- collect_outlines(doc1),
+             {:ok, doc3} <- resolve_toc_tokens(doc2) do
+          {:ok, doc3}
         end
 
       error ->
         error
     end
   end
+
+  defp resolve_toc_tokens(%Document{} = doc) do
+    anchors = Map.get(doc.metadata || %Rendro.Metadata{}, :anchors, %{})
+
+    pages =
+      Enum.map(doc.pages, fn page ->
+        %{page | blocks: replace_toc_tokens_in_blocks(page.blocks, anchors)}
+      end)
+
+    {:ok, %{doc | pages: pages}}
+  end
+
+  defp replace_toc_tokens_in_blocks(blocks, anchors) when is_list(blocks) do
+    Enum.map(blocks, &replace_toc_tokens(&1, anchors))
+  end
+
+  defp replace_toc_tokens(%Rendro.Block{} = block, anchors) do
+    new_content =
+      case block.content do
+        %Rendro.Text{content: text} = t ->
+          %{t | content: substitute_anchor_tokens(text, anchors)}
+
+        %Rendro.Pipeline.MeasuredText{source: %Rendro.Text{content: text} = source} = measured ->
+          new_source_text = substitute_anchor_tokens(text, anchors)
+
+          new_lines =
+            Enum.map(measured.lines, fn line ->
+              Enum.map(line, fn run ->
+                %{run | text: substitute_anchor_tokens(run.text, anchors)}
+              end)
+            end)
+
+          %{measured | source: %{source | content: new_source_text}, lines: new_lines}
+
+        %Rendro.Table{} = table ->
+          new_header =
+            if table.header,
+              do: %{
+                table.header
+                | cells: replace_toc_tokens_in_cells(table.header.cells, anchors)
+              },
+              else: nil
+
+          new_rows =
+            Enum.map(table.rows || [], fn row ->
+              %{row | cells: replace_toc_tokens_in_cells(row.cells, anchors)}
+            end)
+
+          %{table | header: new_header, rows: new_rows}
+
+        other ->
+          other
+      end
+
+    %{block | content: new_content}
+  end
+
+  defp replace_toc_tokens_in_cells(cells, anchors) do
+    Enum.map(cells, fn cell ->
+      case cell.content do
+        %Rendro.Block{} = nested_block ->
+          %{cell | content: replace_toc_tokens(nested_block, anchors)}
+
+        _ ->
+          cell
+      end
+    end)
+  end
+
+  defp substitute_anchor_tokens(text, anchors) when is_binary(text) do
+    Regex.replace(~r/\{\{anchor_page:([^}]+)\}\}/, text, fn match, id ->
+      case Map.get(anchors, id) do
+        [page_idx | _] -> Integer.to_string(page_idx)
+        # Fallback: keep original token if not found
+        _ -> match
+      end
+    end)
+  end
+
+  defp substitute_anchor_tokens(other, _anchors), do: other
 
   defp collect_anchors(%Document{} = doc) do
     try do
@@ -92,8 +173,11 @@ defmodule Rendro.Pipeline.Paginate do
 
       Enum.reduce(cells, row_acc, fn cell_content, cell_acc ->
         case cell_content do
-          %Rendro.Block{} = nested_block -> collect_single_anchor(nested_block, page_idx, cell_acc)
-          _ -> cell_acc
+          %Rendro.Block{} = nested_block ->
+            collect_single_anchor(nested_block, page_idx, cell_acc)
+
+          _ ->
+            cell_acc
         end
       end)
     end)
