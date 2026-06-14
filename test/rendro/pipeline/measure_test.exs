@@ -35,6 +35,44 @@ defmodule Rendro.Pipeline.MeasureTest do
   end
 
   describe "run/1" do
+    test "anchor_page token measures exactly the same width as '8888'" do
+      doc_token =
+        %Rendro.Document{
+          pages: [
+            %Rendro.Page{
+              blocks: [
+                Rendro.block(Rendro.text("Page {{anchor_page:intro}}", size: 12), width: nil)
+              ]
+            }
+          ],
+          metadata: %Rendro.Metadata{}
+        }
+
+      doc_fixed =
+        %Rendro.Document{
+          pages: [
+            %Rendro.Page{
+              blocks: [
+                Rendro.block(Rendro.text("Page 8888", size: 12), width: nil)
+              ]
+            }
+          ],
+          metadata: %Rendro.Metadata{}
+        }
+
+      assert {:ok, result_token} = Measure.run(doc_token)
+      assert {:ok, result_fixed} = Measure.run(doc_fixed)
+
+      [block_token] = hd(result_token.pages).blocks
+      [block_fixed] = hd(result_fixed.pages).blocks
+
+      assert block_token.width == block_fixed.width
+      
+      # Ensure the original text is preserved in the MeasuredText run so it can be substituted later
+      lines = lines_text(block_token.content)
+      assert Enum.join(lines, "") == "Page {{anchor_page:intro}}"
+    end
+
     test "computes width and height for blocks with nil dimensions" do
       text = %Rendro.Text{content: "Hello", font: "Helvetica", size: 12, color: {0, 0, 0}}
       block = %Rendro.Block{content: text, x: 0, y: 0, width: nil, height: nil}
