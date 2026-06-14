@@ -56,7 +56,7 @@ curl -fsSL https://hex.pm/api/packages/rendro | jq '.downloads'
 
 | Date | Hex downloads.all | Hex downloads.week | Source | Notes |
 | --- | --- | --- | --- | --- |
-| YYYY-MM-DD | TBD | TBD | Hex package API | Add only when reviewing concrete inbound demand or planning future work. |
+| 2026-06-13 | 877 | 117 | Hex package API | Captured during v2.8 stewardship planning review (not scheduled telemetry). +10 all / +2 week since 2026-06-12 baseline; negligible movement, Downloads threshold still blocked. First post-baseline data point; next snapshot only when planning future work or reviewing concrete demand. |
 
 ## External Contributors
 
