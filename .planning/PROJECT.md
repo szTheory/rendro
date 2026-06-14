@@ -136,9 +136,11 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 - [x] Rendro v1.1 proved layout-authoring maturity with explicit templates/regions, deterministic wrapped text, keep/break pagination semantics, truthful fit validation, stronger table continuation, diagnostics proof, and canonical recipes. Validated at milestone close in `v1.1-REQUIREMENTS.md`.
 - [x] Rendro v2.1 delivered one proof-backed cryptographic-signing path, first-party optional pyHanko/pdfsig adapters, enforced live proof, and a truthful signed-artifact support contract. Shipped on 2026-05-07 and archived in `milestones/v2.1-ROADMAP.md` / `milestones/v2.1-REQUIREMENTS.md`.
 
+- ✓ Rendro v2.8 completed the done-enough stewardship & adoption signal loop. Validated in Phase 96: adoption-signal-review-stewardship-posture.
+
 ### Active
 
-- v2.8 Done-Enough Stewardship & Adoption Signal Loop — requirements defined in `.planning/REQUIREMENTS.md` (warning/debt hygiene, header `only_on` E2E proof depth, `Rendro.Recipes` facade closure, Nyquist/validation metadata cleanup, adoption-signal review, maintainer docs/state). Scope is stewardship-only; no new feature family. — v2.8
+- None
 
 ### Out of Scope
 
@@ -275,3 +277,9 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 *Last updated: 2026-06-13 — v2.8 Phase 95 (Header Duplex Proof & Metadata Reconcile) complete.*
+y?
+3. Audit Out of Scope -> reasons still valid?
+4. Update Context with current state
+
+---
+*Last updated: 2026-06-14 — v2.8 Phase 96 (adoption-signal-review-stewardship-posture) complete.*
