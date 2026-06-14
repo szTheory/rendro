@@ -60,7 +60,7 @@ Phase 100: 2/2 plans (Completed)
 
 ## Next Steps
 
-1. Run `/gsd:wrap-up-milestone` to finalize the release.
+1. Run `/gsd:new-milestone` to start the next iteration.
 
 ## Last Session
 
