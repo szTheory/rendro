@@ -282,12 +282,12 @@ defmodule Rendro.PDF.WriterTest do
             | outlines: [
                 %{
                   title: "First Page ページ",
-                  page_idx: 1,
+                  dest: [1, :XYZ, 0, 0, nil],
                   children: [
-                    %{title: "Child 1", page_idx: 1, children: []}
+                    %{title: "Child 1", dest: [1, :XYZ, 0, 0, nil], children: []}
                   ]
                 },
-                %{title: "Second Page", page_idx: 2, children: []}
+                %{title: "Second Page", dest: [2, :XYZ, 0, 0, nil], children: []}
               ]
           }
       }

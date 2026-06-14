@@ -2499,7 +2499,8 @@ defmodule Rendro.PDF.Writer do
               |> Map.get(:obj_num),
             else: nil
 
-        page_idx = max(0, min(item.page_idx - 1, length(page_obj_nums) - 1))
+        [logical_page_idx, :XYZ, x, y, _] = item.dest
+        page_idx = max(0, min(logical_page_idx - 1, length(page_obj_nums) - 1))
         page_num = elem(Enum.at(page_obj_nums, page_idx), 0)
 
         node = %{
@@ -2510,7 +2511,7 @@ defmodule Rendro.PDF.Writer do
           next_num: next_node_num,
           first_num: first_num,
           last_num: last_num,
-          dest: {:array, [{:ref, page_num, 0}, {:name, "XYZ"}, nil, nil, nil]}
+          dest: {:array, [{:ref, page_num, 0}, {:name, "XYZ"}, x, y, nil]}
         }
 
         {[node] ++ child_items, end_num}
