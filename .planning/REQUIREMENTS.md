@@ -16,7 +16,7 @@
 ### Cross-References
 - [x] **XREF-01**: Developers can define explicit cross-reference inline links (e.g., `%Rendro.Link{to: {:anchor, "exec-summary"}}`).
 - [x] **XREF-02**: The `validate` phase strictly checks all cross-references against `doc.metadata.anchors`, crashing deterministically with an instructive error (Errors as Product) if a target is missing.
-- [ ] **XREF-03**: Validated cross-references serialize as native PDF `/Link` annotations pointing to explicit `/Dest` arrays during the `render` phase.
+- [x] **XREF-03**: Validated cross-references serialize as native PDF `/Link` annotations pointing to explicit `/Dest` arrays during the `render` phase.
 
 ### Visual Table of Contents
 - [ ] **TOC-01**: The engine provides a `{{anchor_page:id}}` string substitution token evaluated strictly post-layout.
@@ -44,7 +44,7 @@
 | OUT-04 | Phase 98 | Complete |
 | XREF-01 | Phase 99 | Complete |
 | XREF-02 | Phase 99 | Complete |
-| XREF-03 | Phase 99 | Pending |
+| XREF-03 | Phase 99 | Complete |
 | TOC-01 | Phase 100 | Pending |
 | TOC-02 | Phase 100 | Pending |
 | TOC-03 | Phase 100 | Pending |

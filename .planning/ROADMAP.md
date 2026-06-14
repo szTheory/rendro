@@ -4,7 +4,7 @@
 
 - [ ] **Phase 97: Location Tracking & Primitives** - Establish exact X/Y physical locations and bounds as a foundational engine primitive.
 - [x] **Phase 98: Document Outlines (Bookmarks)** - Introduce native, declarative doubly-linked PDF outline serialization.
-- [ ] **Phase 99: Cross-References & Validation** - Add validated internal document links that point to explicit physical destinations.
+- [x] **Phase 99: Cross-References & Validation** - Add validated internal document links that point to explicit physical destinations. (completed 2026-06-14)
 - [ ] **Phase 100: Printable Table of Contents Primitive** - Provide safe post-layout substitution tokens for visual Tables of Contents.
 
 ## Phase Details
@@ -41,7 +41,7 @@
   2. Developer receives a fail-fast structured error during generation if they link to an `id` that does not exist in the document.
 **Plans**: 2 plans
 - [x] 99-01-PLAN.md — Primitives & Validation
-- [ ] 99-02-PLAN.md — Serialization
+- [x] 99-02-PLAN.md — Serialization
 
 ### Phase 100: Printable Table of Contents Primitive
 **Goal**: Developers can render accurate visual Tables of Contents without risking infinite layout-measurement loops.
@@ -61,5 +61,5 @@
 |-------|----------------|--------|-----------|
 | 97. Location Tracking & Primitives | 0/2 | Not started | - |
 | 98. Document Outlines (Bookmarks) | 0/0 | Not started | - |
-| 99. Cross-References & Validation | 1/2 | In Progress|  |
+| 99. Cross-References & Validation | 2/2 | Complete   | 2026-06-14 |
 | 100. Printable Table of Contents Primitive | 0/0 | Not started | - |
