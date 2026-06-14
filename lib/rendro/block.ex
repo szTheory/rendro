@@ -6,6 +6,7 @@ defmodule Rendro.Block do
 
   @enforce_keys [:content]
   defstruct [
+    :id,
     :content,
     x: 0,
     y: 0,
@@ -18,6 +19,7 @@ defmodule Rendro.Block do
   ]
 
   @type t :: %__MODULE__{
+          id: String.t() | nil,
           content:
             Rendro.Text.t() | Rendro.Table.t() | Rendro.FormField.t() | Rendro.Link.t() | term(),
           x: number(),

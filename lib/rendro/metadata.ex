@@ -17,6 +17,7 @@ defmodule Rendro.Metadata do
     :creator,
     :creation_date,
     :modification_date,
+    anchors: %{},
     custom: %{}
   ]
 
@@ -26,6 +27,7 @@ defmodule Rendro.Metadata do
           creator: String.t() | nil,
           creation_date: DateTime.t() | nil,
           modification_date: DateTime.t() | nil,
+          anchors: map(),
           custom: %{optional(atom()) => term()}
         }
 end
