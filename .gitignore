@@ -51,3 +51,16 @@ examples/phoenix_example/deps/
 erl_crash.dump
 
 .env
+
+# ── Brand assets: keep brand/ text-only (SVG/JSON/CSS/MD/HTML). No binaries. ──
+brand/**/*.png
+brand/**/*.jpg
+brand/**/*.jpeg
+brand/**/*.gif
+brand/**/*.webp
+brand/**/*.pdf
+brand/**/*.woff
+brand/**/*.woff2
+brand/**/*.ttf
+brand/**/*.otf
+brand/**/*.eot

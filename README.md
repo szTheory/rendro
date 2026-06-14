@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/szTheory/rendro/actions/workflows/ci.yml/badge.svg)](https://github.com/szTheory/rendro/actions/workflows/ci.yml)
 [![Hex.pm](https://img.shields.io/hexpm/v/rendro.svg)](https://hex.pm/packages/rendro)
-[![HexDocs](https://img.shields.io/badge/hex--docs-purple.svg)](https://hexdocs.pm/rendro)
+[![HexDocs](https://img.shields.io/badge/hex--docs-2C6BED.svg)](https://hexdocs.pm/rendro)
 
 Native PDF layout for Elixir.
 
@@ -371,3 +371,7 @@ Rendro.flow(
 ```
 
 This style is still supported for existing code but mixes `doc.header` block stacking with the region normalization path, which can produce confusing overlap. For all new documents, use explicit `%Rendro.Section{}` structs mapped to named `%Rendro.PageTemplate{}` regions as shown in the builder and recipe examples above.
+
+## Brand
+
+Rendro's brand system — logo, design tokens, typography, voice, and copy — lives in [`brand/`](https://github.com/szTheory/rendro/tree/main/brand). Open [`brand/index.html`](https://github.com/szTheory/rendro/blob/main/brand/index.html) locally for the full brand book, or start with the [kit index](https://github.com/szTheory/rendro/blob/main/brand/README.md) and the [logo files](https://github.com/szTheory/rendro/tree/main/brand/logo). Brand assets are source-controlled but excluded from the published Hex package.
