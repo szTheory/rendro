@@ -515,16 +515,16 @@ defmodule Rendro do
   end
 
   defp normalize_link_target(opts) do
-    target_opts = Keyword.take(opts, [:uri, :page])
-    unsupported_keys = opts |> Keyword.keys() |> Kernel.--([:uri, :page])
+    target_opts = Keyword.take(opts, [:uri, :page, :anchor])
+    unsupported_keys = opts |> Keyword.keys() |> Kernel.--([:uri, :page, :anchor])
 
     cond do
       unsupported_keys != [] ->
         raise ArgumentError,
               "Rendro.link/2 received unsupported link options: #{inspect(unsupported_keys)}"
 
-      Keyword.has_key?(target_opts, :uri) and Keyword.has_key?(target_opts, :page) ->
-        raise ArgumentError, "Rendro.link/2 requires exactly one of :uri or :page"
+      length(Keyword.keys(target_opts)) != 1 ->
+        raise ArgumentError, "Rendro.link/2 requires exactly one of :uri, :page, or :anchor"
 
       Keyword.has_key?(target_opts, :uri) ->
         {:uri, Keyword.fetch!(target_opts, :uri)}
@@ -532,8 +532,8 @@ defmodule Rendro do
       Keyword.has_key?(target_opts, :page) ->
         {:page, Keyword.fetch!(target_opts, :page)}
 
-      true ->
-        raise ArgumentError, "Rendro.link/2 requires exactly one of :uri or :page"
+      Keyword.has_key?(target_opts, :anchor) ->
+        {:anchor, Keyword.fetch!(target_opts, :anchor)}
     end
   end
 end

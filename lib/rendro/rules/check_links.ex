@@ -26,6 +26,14 @@ defmodule Rendro.Rules.CheckLinks do
   def check(%Link{target: {:page, page_number}}, _doc),
     do: {:error, {:invalid_link_page, page_number}}
 
+  def check(%Link{target: {:anchor, id}}, %Document{} = doc) do
+    if Map.has_key?(doc.metadata.anchors, id) do
+      :ok
+    else
+      {:error, {:missing_anchor, id}}
+    end
+  end
+
   def check(%Link{target: target}, _doc), do: {:error, {:invalid_link_target, target}}
   def check(_, _doc), do: :ok
 

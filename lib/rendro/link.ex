@@ -5,7 +5,7 @@ defmodule Rendro.Link do
   @moduledoc tags: [:stable]
 
   @typedoc "Curated link target variants supported in Phase 49."
-  @type target :: {:uri, String.t()} | {:page, pos_integer()}
+  @type target :: {:uri, String.t()} | {:page, pos_integer()} | {:anchor, String.t()}
 
   @enforce_keys [:content, :target]
   defstruct [:content, :target]
