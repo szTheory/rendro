@@ -272,22 +272,35 @@ defmodule Rendro.PDF.WriterTest do
 
     test "injects /Outlines into the catalog and serializes the outline tree when outlines exist" do
       doc = sample_document()
-      doc = %{doc | pages: doc.pages ++ doc.pages} # 2 pages
-      doc = %{doc | metadata: %{doc.metadata | outlines: [
-        %{title: "First Page ページ", page_idx: 1, children: [
-          %{title: "Child 1", page_idx: 1, children: []}
-        ]},
-        %{title: "Second Page", page_idx: 2, children: []}
-      ]}}
+      # 2 pages
+      doc = %{doc | pages: doc.pages ++ doc.pages}
+
+      doc = %{
+        doc
+        | metadata: %{
+            doc.metadata
+            | outlines: [
+                %{
+                  title: "First Page ページ",
+                  page_idx: 1,
+                  children: [
+                    %{title: "Child 1", page_idx: 1, children: []}
+                  ]
+                },
+                %{title: "Second Page", page_idx: 2, children: []}
+              ]
+          }
+      }
 
       {:ok, pdf} = Writer.render(doc, deterministic: true)
-      
+
       assert pdf =~ "/Outlines "
       assert pdf =~ "/Type /Outlines"
       assert pdf =~ "/First"
       assert pdf =~ "/Last"
       assert pdf =~ "/Parent"
-      assert pdf =~ "/Title <FEFF" # BOM for UTF-16BE
+      # BOM for UTF-16BE
+      assert pdf =~ "/Title <FEFF"
       assert pdf =~ "/Dest ["
       assert pdf =~ "/XYZ"
     end

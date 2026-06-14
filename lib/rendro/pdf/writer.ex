@@ -44,6 +44,9 @@ defmodule Rendro.PDF.Writer do
     {link_annotation_objects, next_num} =
       allocate_link_annotation_nums(link_annotations, next_num)
 
+    {outline_objects, next_num, outlines_root_num} =
+      allocate_outlines(metadata.outlines, next_num, page_obj_nums)
+
     pages_num = next_num
     next_num = next_num + 1
 
@@ -72,7 +75,8 @@ defmodule Rendro.PDF.Writer do
       {:dict,
        pages_num
        |> maybe_add_acro_form_entry(form_field_objects)
-       |> maybe_add_embedded_files_entries(embedded_file_objects)}
+       |> maybe_add_embedded_files_entries(embedded_file_objects)
+       |> maybe_add_outlines_entry(outlines_root_num)}
 
     catalog_obj = Object.indirect_object(catalog_num, 0, Object.serialize(catalog_dict, opts))
 
@@ -104,6 +108,7 @@ defmodule Rendro.PDF.Writer do
          image_pdf_objects ++
          form_field_pdf_objects ++
          embedded_file_pdf_objects ++
+         outline_objects ++
          [{pages_num, pages_obj}] ++
          page_objects ++
          [{info_num, info_obj}])
@@ -2427,5 +2432,115 @@ defmodule Rendro.PDF.Writer do
         []
       end
     end)
+  end
+
+  defp maybe_add_outlines_entry(entries, nil), do: entries
+
+  defp maybe_add_outlines_entry(entries, outlines_root_num) do
+    entries ++ [{"Outlines", {:ref, outlines_root_num, 0}}]
+  end
+
+  defp allocate_outlines([], next_num, _page_obj_nums), do: {[], next_num, nil}
+  defp allocate_outlines(nil, next_num, _page_obj_nums), do: {[], next_num, nil}
+
+  defp allocate_outlines(outlines, next_num, page_obj_nums) do
+    root_num = next_num
+    next_num = next_num + 1
+
+    {items, final_num} = allocate_outline_items(outlines, root_num, next_num, page_obj_nums)
+
+    first_item = List.first(items)
+    last_item = items |> Enum.filter(&(&1.parent_num == root_num)) |> List.last()
+
+    root_dict =
+      {:dict,
+       [
+         {"Type", {:name, "Outlines"}},
+         {"First", {:ref, first_item.obj_num, 0}},
+         {"Last", {:ref, last_item.obj_num, 0}}
+       ]}
+
+    root_obj =
+      Rendro.PDF.Object.indirect_object(root_num, 0, Rendro.PDF.Object.serialize(root_dict, []))
+
+    pdf_objects =
+      [{root_num, root_obj}] ++
+        Enum.map(items, fn item -> {item.obj_num, build_outline_item_object(item)} end)
+
+    {pdf_objects, final_num, root_num}
+  end
+
+  defp allocate_outline_items(outlines, parent_num, next_num, page_obj_nums) do
+    {siblings, next_num} =
+      Enum.map_reduce(outlines, next_num, fn item, num ->
+        {Map.put(item, :obj_num, num), num + 1}
+      end)
+
+    {nested_lists, final_num} =
+      Enum.map_reduce(Enum.with_index(siblings), next_num, fn {item, idx}, current_num ->
+        prev_num = if idx > 0, do: Enum.at(siblings, idx - 1).obj_num, else: nil
+
+        next_node_num =
+          if idx < length(siblings) - 1, do: Enum.at(siblings, idx + 1).obj_num, else: nil
+
+        children = Map.get(item, :children, []) || []
+
+        {child_items, end_num} =
+          allocate_outline_items(children, item.obj_num, current_num, page_obj_nums)
+
+        first_num = if length(child_items) > 0, do: List.first(child_items).obj_num, else: nil
+
+        last_num =
+          if length(child_items) > 0,
+            do:
+              child_items
+              |> Enum.filter(&(&1.parent_num == item.obj_num))
+              |> List.last()
+              |> Map.get(:obj_num),
+            else: nil
+
+        page_idx = max(0, min(item.page_idx - 1, length(page_obj_nums) - 1))
+        page_num = elem(Enum.at(page_obj_nums, page_idx), 0)
+
+        node = %{
+          obj_num: item.obj_num,
+          title: item.title,
+          parent_num: parent_num,
+          prev_num: prev_num,
+          next_num: next_node_num,
+          first_num: first_num,
+          last_num: last_num,
+          dest: {:array, [{:ref, page_num, 0}, {:name, "XYZ"}, nil, nil, nil]}
+        }
+
+        {[node] ++ child_items, end_num}
+      end)
+
+    {List.flatten(nested_lists), final_num}
+  end
+
+  defp build_outline_item_object(item) do
+    entries =
+      [
+        {"Title", utf16be_hex(item.title)},
+        {"Parent", {:ref, item.parent_num, 0}},
+        {"Dest", item.dest}
+      ]
+      |> maybe_add_pdf_entry("Prev", if(item.prev_num, do: {:ref, item.prev_num, 0}, else: nil))
+      |> maybe_add_pdf_entry("Next", if(item.next_num, do: {:ref, item.next_num, 0}, else: nil))
+      |> maybe_add_pdf_entry(
+        "First",
+        if(item.first_num, do: {:ref, item.first_num, 0}, else: nil)
+      )
+      |> maybe_add_pdf_entry("Last", if(item.last_num, do: {:ref, item.last_num, 0}, else: nil))
+
+    dict = {:dict, entries}
+    Rendro.PDF.Object.indirect_object(item.obj_num, 0, Rendro.PDF.Object.serialize(dict, []))
+  end
+
+  defp utf16be_hex(string) do
+    bom = <<0xFE, 0xFF>>
+    utf16_binary = :unicode.characters_to_binary(string, :utf8, {:utf16, :big})
+    {:hex_string, bom <> utf16_binary}
   end
 end
