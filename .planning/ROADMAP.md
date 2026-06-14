@@ -130,7 +130,7 @@ Plans:
 **Plans**: 1 plans
 
 Plans:
-- [ ] 96-01-PLAN.md — Apply a dated adoption-signal review with a HOLD verdict and establish the explicit "done-enough" stewardship posture
+- [x] 96-01-PLAN.md — Apply a dated adoption-signal review with a HOLD verdict and establish the explicit "done-enough" stewardship posture
 
 ## Progress
 
@@ -142,7 +142,7 @@ v2.8 phases execute in numeric order: 93 → 94 → 95 → 96
 | 93. Recipes Facade DX Closure | v2.8 | 3/3 | Complete    | 2026-06-13 |
 | 94. Docs & Warning Hygiene | v2.8 | 2/2 | Complete    | 2026-06-13 |
 | 95. Header Duplex Proof & Metadata Reconcile | v2.8 | 2/2 | Complete    | 2026-06-13 |
-| 96. Adoption Signal Review & Stewardship Posture | v2.8 | 0/TBD | Not started | - |
+| 96. Adoption Signal Review & Stewardship Posture | v2.8 | 1/1 | Complete    | 2026-06-14 |
 
 ---
 *v2.8 Done-Enough Stewardship & Adoption Signal Loop started 2026-06-13 (Phases 93-96, 8 requirements). Global text shaping remains demand-gated by ADOPTION.md.*

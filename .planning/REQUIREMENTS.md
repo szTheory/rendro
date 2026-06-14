@@ -29,11 +29,11 @@ Requirements for this milestone. Each maps to exactly one roadmap phase.
 
 ### Adoption Signal Review
 
-- [ ] **SIGNAL-01**: A lightweight, dated adoption-signal review records whether `ADOPTION.md` shows qualifying text-shaping demand, download/version movement, or contributor signal, and produces an explicit recommendation on whether any large demand-gated capability is now justified.
+- [x] **SIGNAL-01**: A lightweight, dated adoption-signal review records whether `ADOPTION.md` shows qualifying text-shaping demand, download/version movement, or contributor signal, and produces an explicit recommendation on whether any large demand-gated capability is now justified.
 
 ### Maintainer Posture & Docs
 
-- [ ] **STEW-01**: Maintainer-facing docs/state record that Rendro is near-done for its current product scope and that proof/viewer work should not deepen by default, so future planning cycles inherit the done-enough posture and its named non-goals.
+- [x] **STEW-01**: Maintainer-facing docs/state record that Rendro is near-done for its current product scope and that proof/viewer work should not deepen by default, so future planning cycles inherit the done-enough posture and its named non-goals.
 
 ## v2 Requirements
 
@@ -71,8 +71,8 @@ Which phases cover which requirements.
 | HYG-02 | Phase 94 | Complete |
 | PROOF-01 | Phase 95 | Complete |
 | META-01 | Phase 95 | Complete |
-| SIGNAL-01 | Phase 96 | Pending |
-| STEW-01 | Phase 96 | Pending |
+| SIGNAL-01 | Phase 96 | Complete |
+| STEW-01 | Phase 96 | Complete |
 
 **Coverage:**
 - v1 requirements: 8 total
