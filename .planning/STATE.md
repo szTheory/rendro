@@ -8,29 +8,30 @@
 
 ## Current Position
 
-**Phase**: Phase 97: Location Tracking & Primitives
+**Phase**: Phase 98: Document Outlines (Bookmarks)
 **Plan**: Not started
-**Status**: `Not started`
+**Status**: `Ready to plan`
 
 ## Progress
 
 ```text
-[                                        ] 0%
-Phase 97: 0/0 plans
+[===========                             ] 25%
+Phase 97: 2/2 plans (Completed)
+Phase 98: 0/0 plans
 ```
 
 ## Performance Metrics
 
-- **E2E flows fully working**: 0
-- **Total requirements met**: 0/13
+- **E2E flows fully working**: 1
+- **Total requirements met**: 3/13
 
 ## Accumulated Context
 
 ### Decisions
-*(To be filled during execution)*
+- IDs are mapped explicitly to anchors within the doc metadata as a new engine primitive safely during pagination.
 
 ### Blockers / Open Questions
 - None currently.
 
 ## Next Steps
-1. Run `$gsd-plan` for Phase 97 to decompose requirements into plans.
+1. Run `$gsd-plan` for Phase 98 to decompose outline requirements into plans.
