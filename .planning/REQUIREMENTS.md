@@ -35,9 +35,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ANC-01 | Phase 97 | Pending |
-| ANC-02 | Phase 97 | Pending |
-| ANC-03 | Phase 97 | Pending |
+| ANC-01 | Phase 97 | Complete |
+| ANC-02 | Phase 97 | Complete |
+| ANC-03 | Phase 97 | Complete |
 | OUT-01 | Phase 98 | Complete |
 | OUT-02 | Phase 98 | Complete |
 | OUT-03 | Phase 98 | Complete |
