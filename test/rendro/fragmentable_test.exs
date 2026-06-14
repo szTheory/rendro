@@ -34,6 +34,26 @@ defmodule Rendro.FragmentableTest do
     assert rb.height == 50
   end
 
+  test "splitting an anchored block returns a remaining fragment with id: nil" do
+    text = %MeasuredText{
+      height: 100,
+      width: 100,
+      line_height: 25,
+      resolved_font: %Rendro.PDF.Font{},
+      lines: [[:run1], [:run2], [:run3], [:run4]],
+      widows: 1,
+      orphans: 1,
+      source: %Rendro.Text{content: "..."}
+    }
+
+    block = %Block{id: "my_anchor", height: 100, content: text}
+    
+    {this_block, rem_block} = Rendro.Fragmentable.split(block, 60)
+    
+    assert this_block.id == "my_anchor"
+    assert rem_block.id == nil
+  end
+
   test "splitting a table at row boundary" do
     table = %Table{
       header_height: 20,

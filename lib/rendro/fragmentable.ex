@@ -31,7 +31,7 @@ defimpl Rendro.Fragmentable, for: Rendro.Block do
 
             rem_block =
               if rem_content,
-                do: %{block | content: rem_content, height: height_for(rem_content)},
+                do: %{block | content: rem_content, height: height_for(rem_content), id: nil},
                 else: nil
 
             {this_block, rem_block}
