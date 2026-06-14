@@ -1014,8 +1014,9 @@ defmodule Rendro.PDF.Writer do
   end
 
   defp build_link_annotation_object(obj_num, rect, {:anchor, id}, page_obj_nums, doc, opts) do
-    [page_idx, :XYZ, x, y, _nil] = Map.fetch!(doc.metadata.anchors, id)
+    [logical_page_idx, :XYZ, x, y, _nil] = Map.fetch!(doc.metadata.anchors, id)
 
+    page_idx = max(0, min(logical_page_idx - 1, length(page_obj_nums) - 1))
     {target_page_obj_num, _content_obj_num} = Enum.at(page_obj_nums, page_idx)
 
     dict =
