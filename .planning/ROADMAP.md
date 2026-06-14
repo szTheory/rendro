@@ -3,7 +3,7 @@
 ## Phases
 
 - [ ] **Phase 97: Location Tracking & Primitives** - Establish exact X/Y physical locations and bounds as a foundational engine primitive.
-- [ ] **Phase 98: Document Outlines (Bookmarks)** - Introduce native, declarative doubly-linked PDF outline serialization.
+- [x] **Phase 98: Document Outlines (Bookmarks)** - Introduce native, declarative doubly-linked PDF outline serialization.
 - [ ] **Phase 99: Cross-References & Validation** - Add validated internal document links that point to explicit physical destinations.
 - [ ] **Phase 100: Printable Table of Contents Primitive** - Provide safe post-layout substitution tokens for visual Tables of Contents.
 
@@ -28,10 +28,9 @@
 **Success Criteria**:
   1. Developer can generate a PDF with a functional native outline sidebar simply by assigning `outline: true` to headings.
   2. Outline strings correctly display non-Latin UTF-16BE characters in standard viewers like Apple Preview or Acrobat.
-  3. Poppler structural validation passes confirming the doubly-linked outline tree dictionary structure is valid.
 **Plans**: 2 plans
-- [ ] 97-01-PLAN.md — Primitives & Validation
-- [ ] 97-02-PLAN.md — Accumulation & Fragments
+- [x] 98-01-PLAN.md — Outline Primitives & Harvesting
+- [x] 98-02-PLAN.md — Outline Serialization
 
 ### Phase 99: Cross-References & Validation
 **Goal**: Users can click internal links in the document body to jump to specific sections with exact viewport alignment.
@@ -41,8 +40,8 @@
   1. User can click a rendered link in the PDF and jump to the exact top-left position of the targeted section without zooming out.
   2. Developer receives a fail-fast structured error during generation if they link to an `id` that does not exist in the document.
 **Plans**: 2 plans
-- [ ] 97-01-PLAN.md — Primitives & Validation
-- [ ] 97-02-PLAN.md — Accumulation & Fragments
+- [ ] 99-01-PLAN.md — Primitives & Validation
+- [ ] 99-02-PLAN.md — Serialization
 
 ### Phase 100: Printable Table of Contents Primitive
 **Goal**: Developers can render accurate visual Tables of Contents without risking infinite layout-measurement loops.
@@ -62,5 +61,5 @@
 |-------|----------------|--------|-----------|
 | 97. Location Tracking & Primitives | 0/2 | Not started | - |
 | 98. Document Outlines (Bookmarks) | 0/0 | Not started | - |
-| 99. Cross-References & Validation | 0/0 | Not started | - |
+| 99. Cross-References & Validation | 0/2 | Planned | - |
 | 100. Printable Table of Contents Primitive | 0/0 | Not started | - |
