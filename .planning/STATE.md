@@ -1,64 +1,66 @@
 ---
 gsd_state_version: 1.0
-milestone: B1
-milestone_name: Brand System & Identity Lab
-status: Complete — awaiting commit
-last_updated: "2026-06-14T23:30:00.000Z"
-last_activity: 2026-06-14 — B1 complete (all 7 phases); brand/ kit built, QA gate passed
+milestone: C1
+milestone_name: CI/CD Performance & Reliability
+status: planning
+last_updated: "2026-06-14T21:30:05.374Z"
+last_activity: 2026-06-14
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 7
-  completed_plans: 7
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Reference
 
-**Project**: Rendro — milestone **B1 Brand System & Identity Lab** (brand collateral; no library/Hex changes)
-**Core Value**: Pressure-test the existing brand book and productionize it into committed, source-controllable artifacts (audit, tokens, chosen logo system, specimens, voice, HTML brand book) in a self-contained `brand/` folder with strict anti-bloat discipline.
-**Current Focus**: Logo selection gate — present 5 integrated-typemark directions for the user to choose before finalizing the logo system and assembling the HTML brand book.
+**Project**: Rendro — milestone **C1 CI/CD Performance & Reliability** (non-version infra milestone; pipeline/tooling work, no library/Hex changes)
+**Core Value**: A fast, deterministic, trustworthy, resource-efficient CI/CD pipeline with great contributor DX — keep the high-value quality signal, drop low-signal/flaky checks, fix caching and parallelism, all measured before/after.
+**Current Focus**: Defining requirements & roadmap from the audit brief (`milestones/C1-AUDIT-BRIEF.md`); then Phase 108 baseline + audit report.
 
 ## Current Position
 
-Phase: B1 complete — all 7 phases done
+Phase: Not started (defining requirements)
 Plan: —
-Status: Brand kit built in brand/ (audit, tokens, logo, specimens, copy, index.html); QA gate passed. Awaiting commit.
-Last activity: 2026-06-14 — Phases 105 (specimens) + 107 (HTML book, QA, repo integration) complete
+Status: Defining requirements
+Last activity: 2026-06-14 — Milestone C1 started
 
 ## Progress
 
 ```text
-[=================.......................] 43%
-Phase 101 Brand Audit ............ Complete
-Phase 102 Design Tokens .......... Complete
-Phase 103 Logo Lab ............... Options ready — AWAITING SELECTION
-Phase 104 Logo System ............ Blocked on 103 selection
-Phase 105 Visual Specimens ....... Pending (needs 104)
-Phase 106 Voice & Copy ........... Complete (parallel lane)
-Phase 107 HTML Book + QA ......... Pending (assembles all)
+[........................................] 0% — roadmap pending
+Phase 108 Baseline & Audit Report ........ Pending
+Phase 109 Caching & setup-beam ........... Pending
+Phase 110 Test Concurrency & Determinism . Pending
+Phase 111 Workflow Topology & Matrix ..... Pending
+Phase 112 Security & Release Hardening .... Pending
+Phase 113 DX & Validation ................. Pending
 ```
 
 ## Accumulated Context
 
 ### Decisions
-- Framed as non-semver `B1` brand milestone (phases 101–107); no Hex release; `brand/` excluded from `mix.exs` package files.
-- Logo: 4–5 options for user choice; system-font stack + optional CDN fonts (no committed binaries); logo letterforms outlined in Phase 104.
-- Tokens: `tokens.json` is single source of truth; `mix brand.gen` regenerates CSS + Tailwind (zero-dep, Elixir 1.19 `JSON`).
-- Dark mode: warm-neutral (`night-*`) scale, not pure black, to preserve brand warmth.
+
+- Framed as non-version `C1` infra milestone (phases 108–113); no Hex release; touches `.github/`, `mix.exs` aliases, tests, CONTRIBUTING only.
+- Full arc: measure baseline first (Phase 108, analysis only) → implement (109–112) → validate vs baseline (113). "Boil the ocean systematically; keep high-value tests, drop lowest-signal."
+- North Star priority order: trustworthy gates > deterministic feedback > fast PR feedback > runner efficiency > YAML simplicity > contributor DX > security > reporting.
+- Source brief preserved verbatim at `milestones/C1-AUDIT-BRIEF.md` — canonical scope/checklist cited by every phase.
 
 ### Blockers / Open Questions
-- **Logo direction selection (A–E)** — required before Phase 104.
-- **FLAG (human/legal):** CHILI `rendro` + existing GitHub/NPM `rendro` name collision — trademark clearance is out of scope for these phases.
+
+- None yet — baseline metrics (CI run history, cache state) to be gathered in Phase 108.
 
 ## Next Steps
-1. User selects a logo direction (or requests iteration).
-2. Phase 104 — finalize chosen direction into full lockup system (outlined paths).
-3. Phase 105 — visual specimens; Phase 107 — assemble `brand/index.html`, QA gate, repo integration (`.gitignore`, README links).
+
+1. Finalize `REQUIREMENTS.md` + `ROADMAP.md` for C1 (phases 108–113).
+2. `/gsd:discuss-phase 108` (or `/gsd:plan-phase 108`) — baseline measurement + prioritized audit report.
+3. Implement caching (109), test concurrency/determinism (110), topology/matrix (111), security/release (112), DX + validation (113).
 
 ## Last Session
+
 **Last updated**: 2026-06-14
-**Stopped at**: Phase 103 logo selection gate
-**Blockers**: Awaiting logo choice
+**Stopped at**: C1 milestone scaffolding (requirements + roadmap)
+**Blockers**: None

@@ -86,14 +86,19 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 **Foundation Already Shipped:** v1.3 release readiness, v1.2 typography/assets truth, v1.1 layout-authoring maturity, and v1.0 deterministic core rendering.
 
-## Current Milestone: v2.9 TOC & Document Navigation
+## Current Milestone: C1 CI/CD Performance & Reliability
 
-**Goal:** Deliver Table of Contents, document outlines (bookmarks), anchors, and cross-references for long reports, proactively bypassing the previous adoption gate.
+> Non-version infra milestone (like B1) — pipeline/tooling work, **no library/`lib/` changes, no Hex release.** Phases continue global numbering (108–113). Source brief: `milestones/C1-AUDIT-BRIEF.md`.
+
+**Goal:** Make the CI/CD pipeline fast, deterministic, trustworthy, and resource-efficient with great contributor DX — measure a baseline, then implement caching, test concurrency/determinism, workflow-topology, security/release, and DX improvements, validating before/after — without weakening the quality signal.
 
 **Target features:**
-- Document outlines (PDF Bookmarks/Outlines)
-- Internal page anchors and cross-references (linking to pages/sections)
-- Table of Contents primitives and generation
+- Baseline & audit report (measure before optimizing) + prioritized P0–P3 recommendations
+- Correct, keyed caching (deps/`_build`/PLT) — currently zero caching anywhere
+- Test concurrency, determinism, and low-signal cleanup (async, partitioning decision, flaky fixes)
+- Workflow topology / triggers / matrix rationalization (PR-fast vs main vs nightly; required-check summary)
+- Security/supply-chain & release hardening (action SHA pinning, least-privilege, dry-run)
+- DX & local reproducibility (`mix ci` parity, CONTRIBUTING, job summaries) + final validation vs baseline
 
 ## Future Milestone Candidates (demand-gated)
 
@@ -274,13 +279,13 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-14 after v2.9 milestone*
+*Last updated: 2026-06-14 after C1 milestone start*
 y?
 3. Audit Out of Scope -> reasons still valid?
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-14 after v2.9 milestone*
+*Last updated: 2026-06-14 after C1 milestone start*
 idated? -> Move to Out of Scope with reason
 2. Requirements validated? -> Move to Validated with phase reference
 3. New requirements emerged? -> Add to Active
@@ -294,10 +299,10 @@ idated? -> Move to Out of Scope with reason
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-14 after v2.9 milestone*
+*Last updated: 2026-06-14 after C1 milestone start*
 y?
 3. Audit Out of Scope -> reasons still valid?
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-14 after v2.9 milestone*
+*Last updated: 2026-06-14 after C1 milestone start*
