@@ -127,7 +127,10 @@ Plans:
   3. `.planning/MILESTONE-ARC.md` gains a dated `## Stewardship Posture (Done-Enough)` section recording the ~90-93% done-enough estimate, the standing rule to prefer stewardship over deepening proof/viewer machinery, and the named non-goals as demand-gated deferrals tied to `ADOPTION.md` — not abandonment.
   4. `guides/api_stability.md` gains a top `## Project Status & Stewardship` section signalling "stable and actively stewarded · feature-complete for its stated scope" with a *Last reviewed* date, explicit bug/security commitments, and "new capabilities are demand-gated, not abandoned" pointing to `ADOPTION.md`.
 
-**Plans**: TBD
+**Plans**: 1 plans
+
+Plans:
+- [ ] 96-01-PLAN.md — Apply a dated adoption-signal review with a HOLD verdict and establish the explicit "done-enough" stewardship posture
 
 ## Progress
 
