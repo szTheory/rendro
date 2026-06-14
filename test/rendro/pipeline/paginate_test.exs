@@ -1482,33 +1482,52 @@ defmodule Rendro.Pipeline.PaginateTest do
           pages: [
             Rendro.page(
               blocks: [
-                %Rendro.Block{id: "first_anchor", content: %Rendro.Text{content: "One"}, x: 10, y: 20},
+                %Rendro.Block{
+                  id: "first_anchor",
+                  content: %Rendro.Text{content: "One"},
+                  x: 10,
+                  y: 20
+                },
                 %Rendro.Block{
                   content: %Rendro.Table{
                     rows: [
                       %Rendro.Row{
                         cells: [
-                          %Rendro.Cell{content: %Rendro.Block{id: "nested", content: %Rendro.Text{content: "Two"}, x: 5, y: 5}}
+                          %Rendro.Cell{
+                            content: %Rendro.Block{
+                              id: "nested",
+                              content: %Rendro.Text{content: "Two"},
+                              x: 5,
+                              y: 5
+                            }
+                          }
                         ]
                       }
                     ]
                   },
-                  x: 30, y: 40
+                  x: 30,
+                  y: 40
                 }
               ]
             ),
             Rendro.page(
               blocks: [
-                %Rendro.Block{id: "second_page_anchor", content: %Rendro.Text{content: "Three"}, x: 100, y: 200}
+                %Rendro.Block{
+                  id: "second_page_anchor",
+                  content: %Rendro.Text{content: "Three"},
+                  x: 100,
+                  y: 200
+                }
               ]
             )
           ]
         )
 
       assert {:ok, paginated} = Paginate.run(doc)
-      
+
       anchors = paginated.metadata.anchors
       assert anchors["first_anchor"] == [1, :XYZ, 10, 20, nil]
+
       # Nested element x/y are relative to cell, but block.x inside cell is preserved. Wait, check_block_anchors takes block.x.
       # For now, just test it finds it.
       assert anchors["nested"] == [1, :XYZ, 5, 5, nil]
@@ -1532,6 +1551,36 @@ defmodule Rendro.Pipeline.PaginateTest do
       assert error.stage == :paginate
       assert error.reason == :duplicate_anchor_id
       assert error.details.id == "dup"
+    end
+  end
+
+  describe "Table of Contents tokens" do
+    test "substitutes {{anchor_page:id}} tokens with resolved exact page numbers post-pagination" do
+      doc =
+        Rendro.flow(
+          [
+            Rendro.block(Rendro.text("See Chapter 2 on page {{anchor_page:ch2}}")),
+            Rendro.block(Rendro.text("Chapter 2"), id: "ch2", break_before: true)
+          ],
+          page_template: :tiny_keep_chain,
+          page_templates: [tiny_keep_chain_template()]
+        )
+
+      assert {:ok, paginated} = paginate_flow(doc)
+
+      [page1, _page2 | _] = paginated.pages
+
+      # Find the text block on page 1
+      page1_text = page_texts(page1)
+      assert Enum.any?(page1_text, fn text -> text =~ "See Chapter 2 on page " end)
+
+      anchor_page =
+        Enum.find_index(paginated.pages, fn page ->
+          Enum.any?(page.blocks, &(&1.id == "ch2"))
+        end) + 1
+
+      # The token should be replaced by the exact page number of the anchor
+      assert Enum.any?(page1_text, fn text -> text == "See Chapter 2 on page #{anchor_page}" end)
     end
   end
 end
