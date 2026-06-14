@@ -145,10 +145,25 @@ defmodule RendroBuildersTest do
              } = linked
     end
 
+    test "link/2 wraps a block with an explicit anchor target" do
+      text = Rendro.text("Read the section")
+      block = Rendro.block(text, x: 10, y: 20, width: 180, height: 24)
+
+      linked = Rendro.link(block, anchor: "my-section")
+
+      assert %Block{
+               x: 10,
+               y: 20,
+               width: 180,
+               height: 24,
+               content: %Link{content: ^text, target: {:anchor, "my-section"}}
+             } = linked
+    end
+
     test "link/2 rejects missing target options" do
       block = Rendro.block(Rendro.text("Missing target"))
 
-      assert_raise ArgumentError, ~r/exactly one of :uri or :page/, fn ->
+      assert_raise ArgumentError, ~r/exactly one of :uri, :page, or :anchor/, fn ->
         Rendro.link(block, [])
       end
     end
@@ -156,7 +171,7 @@ defmodule RendroBuildersTest do
     test "link/2 rejects multiple target options" do
       block = Rendro.block(Rendro.text("Too many targets"))
 
-      assert_raise ArgumentError, ~r/exactly one of :uri or :page/, fn ->
+      assert_raise ArgumentError, ~r/exactly one of :uri, :page, or :anchor/, fn ->
         Rendro.link(block, uri: "https://example.com", page: 2)
       end
     end

@@ -77,6 +77,20 @@ defmodule Rendro.Rules.CheckLinksTest do
                )
     end
 
+    test "accepts anchor link target when anchor exists in document metadata" do
+      doc = %Document{metadata: %Rendro.Metadata{anchors: %{"my-section" => %{}}}}
+      link = %Link{content: %Text{content: "Jump"}, target: {:anchor, "my-section"}}
+
+      assert :ok = CheckLinks.check(link, doc)
+    end
+
+    test "rejects anchor link target when anchor does not exist in document metadata" do
+      doc = %Document{metadata: %Rendro.Metadata{anchors: %{"other-section" => %{}}}}
+      link = %Link{content: %Text{content: "Jump"}, target: {:anchor, "missing"}}
+
+      assert {:error, {:missing_anchor, "missing"}} = CheckLinks.check(link, doc)
+    end
+
     test "rejects links wrapping form fields" do
       link = %Link{content: %FormField{name: "email"}, target: {:uri, "https://example.com"}}
 
