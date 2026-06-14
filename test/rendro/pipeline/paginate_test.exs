@@ -1327,6 +1327,79 @@ defmodule Rendro.Pipeline.PaginateTest do
     }
   end
 
+  describe "Outline harvesting" do
+    test "collects outline directives into a hierarchical tree in metadata" do
+      doc =
+        Rendro.document(
+          pages: [
+            Rendro.page(
+              blocks: [
+                %Rendro.Block{
+                  content: %Rendro.Text{content: "Level 1"},
+                  x: 10,
+                  y: 20,
+                  outline: true,
+                  outline_level: 1
+                },
+                %Rendro.Block{
+                  content: %Rendro.Text{content: "Level 2"},
+                  x: 15,
+                  y: 40,
+                  outline: "Custom Title",
+                  outline_level: 2
+                },
+                %Rendro.Block{
+                  content: %Rendro.Text{content: "Level 1 Again"},
+                  x: 10,
+                  y: 60,
+                  outline: true,
+                  outline_level: 1
+                }
+              ]
+            ),
+            Rendro.page(
+              blocks: [
+                %Rendro.Block{
+                  content: %Rendro.Text{content: "Skipped Level 3"},
+                  x: 20,
+                  y: 20,
+                  outline: true,
+                  outline_level: 3
+                }
+              ]
+            )
+          ]
+        )
+
+      assert {:ok, paginated} = Paginate.run(doc)
+
+      assert [
+               %{
+                 title: "Level 1",
+                 dest: [1, :XYZ, 10, 20, nil],
+                 children: [
+                   %{
+                     title: "Custom Title",
+                     dest: [1, :XYZ, 15, 40, nil],
+                     children: []
+                   }
+                 ]
+               },
+               %{
+                 title: "Level 1 Again",
+                 dest: [1, :XYZ, 10, 60, nil],
+                 children: [
+                   %{
+                     title: "Skipped Level 3",
+                     dest: [2, :XYZ, 20, 20, nil],
+                     children: []
+                   }
+                 ]
+               }
+             ] = paginated.metadata.outlines
+    end
+  end
+
   describe "Table Fragmentation (:fragment policy)" do
     test "slices the 2D grid horizontally at available_h" do
       table = %Rendro.Table{

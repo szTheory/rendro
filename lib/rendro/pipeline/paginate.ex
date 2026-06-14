@@ -13,8 +13,14 @@ defmodule Rendro.Pipeline.Paginate do
       end
 
     case result do
-      {:ok, paginated_doc} -> collect_anchors(paginated_doc)
-      error -> error
+      {:ok, paginated_doc} ->
+        with {:ok, doc1} <- collect_anchors(paginated_doc),
+             {:ok, doc2} <- collect_outlines(doc1) do
+          {:ok, doc2}
+        end
+
+      error ->
+        error
     end
   end
 
@@ -91,6 +97,112 @@ defmodule Rendro.Pipeline.Paginate do
         end
       end)
     end)
+  end
+
+  defp collect_outlines(%Document{} = doc) do
+    flat_outlines = collect_page_outlines(doc.pages)
+    tree = build_outline_tree(flat_outlines)
+    metadata = Map.put(doc.metadata || %Rendro.Metadata{}, :outlines, tree)
+    {:ok, %{doc | metadata: metadata}}
+  end
+
+  defp collect_page_outlines(pages) do
+    pages
+    |> Enum.with_index(1)
+    |> Enum.flat_map(fn {page, page_idx} ->
+      collect_block_outlines(page.blocks, page_idx)
+    end)
+  end
+
+  defp collect_block_outlines(blocks, page_idx) when is_list(blocks) do
+    Enum.flat_map(blocks, fn block ->
+      collect_single_outline(block, page_idx)
+    end)
+  end
+
+  defp collect_single_outline(%Rendro.Block{} = block, page_idx) do
+    extracted =
+      if block.outline do
+        title = extract_outline_title(block)
+
+        if title do
+          [
+            %{
+              title: title,
+              level: block.outline_level || 1,
+              dest: [page_idx, :XYZ, block.x || 0, block.y || 0, nil]
+            }
+          ]
+        else
+          []
+        end
+      else
+        []
+      end
+
+    nested =
+      case block.content do
+        %Rendro.Table{} = table ->
+          header_outlines =
+            if table.header, do: collect_row_outlines([table.header], page_idx), else: []
+
+          row_outlines = collect_row_outlines(table.rows || [], page_idx)
+          header_outlines ++ row_outlines
+
+        _ ->
+          []
+      end
+
+    extracted ++ nested
+  end
+
+  defp collect_single_outline(_other, _page_idx), do: []
+
+  defp collect_row_outlines(rows, page_idx) do
+    Enum.flat_map(rows, fn row ->
+      cells =
+        case row do
+          %Rendro.Row{cells: c} -> Enum.map(c, & &1.content)
+          list when is_list(list) -> list
+          _ -> []
+        end
+
+      Enum.flat_map(cells, fn cell_content ->
+        case cell_content do
+          %Rendro.Block{} = nested_block -> collect_single_outline(nested_block, page_idx)
+          _ -> []
+        end
+      end)
+    end)
+  end
+
+  defp extract_outline_title(%Rendro.Block{outline: title}) when is_binary(title), do: title
+  defp extract_outline_title(%Rendro.Block{content: %Rendro.Text{content: content}}), do: content
+
+  defp extract_outline_title(%Rendro.Block{
+         content: %Rendro.Pipeline.MeasuredText{source: %Rendro.Text{content: content}}
+       }),
+       do: content
+
+  defp extract_outline_title(_), do: "Section"
+
+  defp build_outline_tree(flat_outlines) do
+    {forest, _} = do_build_outline_tree(flat_outlines, 0)
+    forest
+  end
+
+  defp do_build_outline_tree([], _parent_level), do: {[], []}
+
+  defp do_build_outline_tree([%{level: level} | _] = outlines, parent_level)
+       when level <= parent_level,
+       do: {[], outlines}
+
+  defp do_build_outline_tree([first | rest], parent_level) do
+    node = %{title: first.title, dest: first.dest, children: []}
+    {children, remaining} = do_build_outline_tree(rest, first.level)
+    node = %{node | children: children}
+    {siblings, remaining_after_siblings} = do_build_outline_tree(remaining, parent_level)
+    {[node | siblings], remaining_after_siblings}
   end
 
   defp paginate_flow(%Document{} = doc) do
