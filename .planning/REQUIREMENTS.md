@@ -32,4 +32,19 @@
 - **External Metadata Tooling**: Utilizing `Ghostscript` or `qpdf` to assemble bookmarks violates the pure Elixir Core constraints.
 
 ## Traceability
-*(To be filled by roadmap)*
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| ANC-01 | Phase 97 | Pending |
+| ANC-02 | Phase 97 | Pending |
+| ANC-03 | Phase 97 | Pending |
+| OUT-01 | Phase 98 | Pending |
+| OUT-02 | Phase 98 | Pending |
+| OUT-03 | Phase 98 | Pending |
+| OUT-04 | Phase 98 | Pending |
+| XREF-01 | Phase 99 | Pending |
+| XREF-02 | Phase 99 | Pending |
+| XREF-03 | Phase 99 | Pending |
+| TOC-01 | Phase 100 | Pending |
+| TOC-02 | Phase 100 | Pending |
+| TOC-03 | Phase 100 | Pending |
