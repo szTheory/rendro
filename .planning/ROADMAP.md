@@ -36,7 +36,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 108-03-PLAN.md — Audit authoring: write C1-AUDIT.md (BASE-01 through BASE-04)
+- [x] 108-03-PLAN.md — Audit authoring: write C1-AUDIT.md (BASE-01 through BASE-04)
 
 **Success Criteria** (what must be TRUE):
 
@@ -127,7 +127,7 @@ Plans:
 
 | Phase | Requirements Complete | Status | Completed |
 |-------|-----------------------|--------|-----------|
-| 108. Baseline & Audit Report | 2/3 | In Progress|  |
+| 108. Baseline & Audit Report | 3/3 | Complete   | 2026-06-14 |
 | 109. Caching & setup-beam Foundation | 0/5 | Not started | - |
 | 110. Test Concurrency, Determinism & Cleanup | 0/5 | Not started | - |
 | 111. Workflow Topology, Triggers & Matrix | 0/5 | Not started | - |
