@@ -7,6 +7,7 @@ defmodule Rendro.Pipeline.Validate do
     CheckBounds,
     CheckEmbeddedFiles,
     CheckFormFields,
+    CheckIds,
     CheckLinks,
     CheckReferences,
     CheckRequiredKeys
@@ -18,7 +19,8 @@ defmodule Rendro.Pipeline.Validate do
     CheckRequiredKeys,
     CheckFormFields,
     CheckLinks,
-    CheckEmbeddedFiles
+    CheckEmbeddedFiles,
+    CheckIds
   ]
 
   @spec run(Rendro.Document.t()) :: {:ok, Rendro.Document.t()} | {:error, Rendro.Error.t()}
