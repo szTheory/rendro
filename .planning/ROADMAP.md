@@ -17,7 +17,9 @@
   1. Developer can successfully build a document containing blocks with explicit `id` attributes.
   2. Developer receives a clear crash with descriptive error when providing duplicate block `id`s.
   3. The engine's post-pagination metadata correctly exposes an exact mapping of `id`s to physical page, X, and Y coordinates that are zoom-agnostic (`[page /XYZ left top null]`).
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 97-01-PLAN.md — Primitives & Validation
+- [ ] 97-02-PLAN.md — Accumulation & Fragments
 
 ### Phase 98: Document Outlines (Bookmarks)
 **Goal**: Viewers can navigate hierarchical document outlines using standard PDF sidebars with support for non-Latin characters.
@@ -27,7 +29,9 @@
   1. Developer can generate a PDF with a functional native outline sidebar simply by assigning `outline: true` to headings.
   2. Outline strings correctly display non-Latin UTF-16BE characters in standard viewers like Apple Preview or Acrobat.
   3. Poppler structural validation passes confirming the doubly-linked outline tree dictionary structure is valid.
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 97-01-PLAN.md — Primitives & Validation
+- [ ] 97-02-PLAN.md — Accumulation & Fragments
 
 ### Phase 99: Cross-References & Validation
 **Goal**: Users can click internal links in the document body to jump to specific sections with exact viewport alignment.
@@ -36,7 +40,9 @@
 **Success Criteria**:
   1. User can click a rendered link in the PDF and jump to the exact top-left position of the targeted section without zooming out.
   2. Developer receives a fail-fast structured error during generation if they link to an `id` that does not exist in the document.
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 97-01-PLAN.md — Primitives & Validation
+- [ ] 97-02-PLAN.md — Accumulation & Fragments
 
 ### Phase 100: Printable Table of Contents Primitive
 **Goal**: Developers can render accurate visual Tables of Contents without risking infinite layout-measurement loops.
@@ -46,13 +52,15 @@
   1. Developer can use `{{anchor_page:id}}` tokens inside standard text blocks to print the exact page number of any section.
   2. Generated page numbers maintain correct alignment without causing text to re-wrap or shift lines.
   3. Multi-page document generation remains strictly single-pass and deterministic with zero performance degradation from layout loops.
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 97-01-PLAN.md — Primitives & Validation
+- [ ] 97-02-PLAN.md — Accumulation & Fragments
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 97. Location Tracking & Primitives | 0/0 | Not started | - |
+| 97. Location Tracking & Primitives | 0/2 | Not started | - |
 | 98. Document Outlines (Bookmarks) | 0/0 | Not started | - |
 | 99. Cross-References & Validation | 0/0 | Not started | - |
 | 100. Printable Table of Contents Primitive | 0/0 | Not started | - |
