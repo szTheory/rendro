@@ -41,14 +41,19 @@ jobs:
         if: always()
         continue-on-error: true
         shell: bash
+        # Pass setup-beam outputs via env (values, not inlined script text) to avoid
+        # ${{ }} template-expression injection into the shell (WR-01 / GitHub hardening guide).
+        env:
+          OTP_VERSION: ${{ steps.setup-beam.outputs.otp-version }}
+          ELIXIR_VERSION: ${{ steps.setup-beam.outputs.elixir-version }}
         run: |
           {
             echo "## CI Baseline"
             echo ""
             echo "| Property | Value |"
             echo "|----------|-------|"
-            echo "| OTP | ${{ steps.setup-beam.outputs.otp-version }} |"
-            echo "| Elixir | ${{ steps.setup-beam.outputs.elixir-version }} |"
+            echo "| OTP | ${OTP_VERSION:-n/a} |"
+            echo "| Elixir | ${ELIXIR_VERSION:-n/a} |"
             echo "| Schedulers | $(elixir -e 'IO.puts(System.schedulers_online())' 2>/dev/null || echo 'n/a') |"
             # TODO(109): replace 'cold / none' with cache-hit output once actions/cache + id: cache lands
             echo "| Cache (deps) | cold / none |"
