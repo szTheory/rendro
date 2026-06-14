@@ -620,13 +620,24 @@ defmodule Rendro.Pipeline.Measure do
     end)
   end
 
+  defp extract_graphemes_and_tokens(text) do
+    Regex.split(~r/(\{\{anchor_page:[^}]+\}\})/, text, include_captures: true)
+    |> Enum.flat_map(fn part ->
+      if String.starts_with?(part, "{{anchor_page:") do
+        [part]
+      else
+        String.graphemes(part)
+      end
+    end)
+  end
+
   # Rewritten per D-11: shapes runs (not individual graphemes) and breaks at cluster
   # boundaries. Under Shaper.Simple (cluster=0 for all glyphs), each glyph maps 1:1
   # to a grapheme and behaviour is identical to the old per-grapheme loop. Under
   # Rendro.Adapters.HarfBuzz (cluster=byte offset), ligature clusters are treated as
   # atomic units for line-breaking. The per-grapheme shaping call is gone.
   defp split_graphemes(text, max_width, font_chain, font_size, shape_opts) do
-    graphemes = String.graphemes(text)
+    graphemes = extract_graphemes_and_tokens(text)
 
     # Step 1: Resolve font for each grapheme, accumulating into font-homogeneous runs.
     # Each run is {font, accumulated_text}.
@@ -657,9 +668,11 @@ defmodule Rendro.Pipeline.Measure do
                 _ -> :latn
               end
 
+            shape_text = substitute_measure_tokens(run_text)
+
             case Rendro.Text.Shaper.shape(
                    font,
-                   run_text,
+                   shape_text,
                    Keyword.put(shape_opts, :script, script)
                  ) do
               {:ok, glyphs} ->
@@ -801,9 +814,11 @@ defmodule Rendro.Pipeline.Measure do
           {:ok, font_runs} ->
             measured_result =
               Enum.reduce_while(font_runs, {:ok, []}, fn {font, sub_text}, {:ok, run_acc} ->
+                shape_text = substitute_measure_tokens(sub_text)
+
                 case Rendro.Text.Shaper.shape(
                        font,
-                       sub_text,
+                       shape_text,
                        Keyword.put(shape_opts, :script, bidi_run.script)
                      ) do
                   {:ok, glyphs} ->
@@ -835,6 +850,10 @@ defmodule Rendro.Pipeline.Measure do
     end
   end
 
+  defp substitute_measure_tokens(text) do
+    Regex.replace(~r/\{\{anchor_page:[^}]+\}\}/u, text, "8888")
+  end
+
   defp merge_contiguous_runs(runs) do
     Enum.reduce(runs, [], fn run, acc ->
       merge_runs(acc, [run])
@@ -844,7 +863,7 @@ defmodule Rendro.Pipeline.Measure do
   defp resolve_fonts_for_run(text, font_chain) do
     result =
       text
-      |> String.graphemes()
+      |> extract_graphemes_and_tokens()
       |> Enum.reduce_while({:ok, []}, fn grapheme, {:ok, acc} ->
         case find_font_for_grapheme(grapheme, font_chain) do
           {:ok, font} ->
@@ -864,6 +883,10 @@ defmodule Rendro.Pipeline.Measure do
   defp append_font_run([], font, text), do: [{font, text}]
   defp append_font_run([{f, t} | rest], font, text) when f == font, do: [{f, t <> text} | rest]
   defp append_font_run(runs, font, text), do: [{font, text} | runs]
+
+  defp find_font_for_grapheme(<<"{{anchor_page:", _rest::binary>>, font_chain) do
+    find_font_for_grapheme("8", font_chain)
+  end
 
   defp find_font_for_grapheme(grapheme, font_chain) do
     Enum.find_value(font_chain, :error, fn font ->
