@@ -22,9 +22,9 @@ progress:
 
 ## Current Position
 
-**Phase**: Phase 100: Printable Table of Contents Primitive
-**Plan**: 100-02-PLAN.md
-**Status**: `Execution Complete`
+**Phase**: Milestone Complete
+**Plan**: All Complete
+**Status**: `Ready to wrap up`
 
 ## Progress
 
@@ -58,7 +58,7 @@ Phase 100: 2/2 plans (Completed)
 
 ## Next Steps
 
-1. Run `$gsd-verify` for Phase 100.
+1. Run `/gsd:wrap-up-milestone` to finalize the release.
 
 ## Last Session
 

@@ -2,7 +2,7 @@
 
 ## Phases
 
-- [ ] **Phase 97: Location Tracking & Primitives** - Establish exact X/Y physical locations and bounds as a foundational engine primitive.
+- [x] **Phase 97: Location Tracking & Primitives** - Establish exact X/Y physical locations and bounds as a foundational engine primitive.
 - [x] **Phase 98: Document Outlines (Bookmarks)** - Introduce native, declarative doubly-linked PDF outline serialization.
 - [x] **Phase 99: Cross-References & Validation** - Add validated internal document links that point to explicit physical destinations. (completed 2026-06-14)
 - [x] **Phase 100: Printable Table of Contents Primitive** - Provide safe post-layout substitution tokens for visual Tables of Contents. (completed 2026-06-14)
