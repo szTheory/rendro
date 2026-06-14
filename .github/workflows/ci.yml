@@ -20,6 +20,7 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Setup Beam
+        id: setup-beam
         uses: erlef/setup-beam@v1
         with:
           otp-version: '28'
@@ -29,7 +30,32 @@ jobs:
         run: mix deps.get
 
       - name: Run CI
-        run: mix ci
+        shell: bash
+        run: |
+          set -o pipefail
+          mix ci 2>&1 | tee /tmp/mix-ci-output.log
+
+      - name: CI Baseline Summary
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          {
+            echo "## CI Baseline"
+            echo ""
+            echo "| Property | Value |"
+            echo "|----------|-------|"
+            echo "| OTP | ${{ steps.setup-beam.outputs.otp-version }} |"
+            echo "| Elixir | ${{ steps.setup-beam.outputs.elixir-version }} |"
+            echo "| Schedulers | $(elixir -e 'IO.puts(System.schedulers_online())' 2>/dev/null || echo 'n/a') |"
+            # TODO(109): replace 'cold / none' with cache-hit output once actions/cache + id: cache lands
+            echo "| Cache (deps) | cold / none |"
+            echo "| Cache (_build) | cold / none |"
+            echo ""
+            echo "### Slowest Tests"
+            echo ""
+            grep -A 25 'Top [0-9]* slowest' /tmp/mix-ci-output.log || echo "_(slowest data unavailable)_"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   example-phoenix:
     runs-on: ubuntu-latest
