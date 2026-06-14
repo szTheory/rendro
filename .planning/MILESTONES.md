@@ -1,5 +1,18 @@
 # Milestones
 
+## v2.9 TOC & Document Navigation (Shipped: 2026-06-14)
+
+**Phases completed:** 4 phases, 9 plans, 7 tasks
+
+**Key accomplishments:**
+
+- Introduce the `{{anchor_page:id}}` substitution token and ensure the Measure pipeline reserves a fixed-width bounding box for it to prevent infinite layout oscillations when real page numbers are later injected.
+- Implement pre-layout duplicate ID validation and block location primitives.
+- Declarative Document Outlines added to blocks and harvested into a hierarchical tree in Document Metadata during pagination
+- Serialize the extracted metadata outline tree into a doubly-linked PDF dictionary structure with UTF-16BE support
+- Automate the visual/human verification of PDF outlines by introducing an end-to-end integration test that programmatically asserts the correctness of the generated PDF binary.
+
+---
 
 ## v2.8 Done-Enough Stewardship & Adoption Signal Loop (Shipped: 2026-06-13)
 
