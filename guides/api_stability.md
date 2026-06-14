@@ -1,5 +1,15 @@
 # API Stability and Support Boundaries
 
+## Project Status & Stewardship
+
+**Stable and actively stewarded · feature-complete for its stated scope.**
+
+*Last reviewed: 2026-06-13*
+
+1. **Security:** Fixes are prioritized. Please report via [GitHub's built-in private vulnerability reporting](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing/privately-reporting-a-security-vulnerability) on this repository.
+2. **Bug fixes:** Best-effort, no guaranteed timeline/SLA. Providing a minimal, reproducible failing test case is the fastest path to a fix.
+3. **New capabilities:** Demand-gated, not abandoned. Major new feature families wait for explicit public demand before implementation. See [ADOPTION.md](../ADOPTION.md) for current gate status.
+
 ## Tier-1 Stable
 
 The following modules and functions receive strict SemVer guarantees: breaking changes only in major versions (`1.x.x` → `2.0.0`), additive changes allowed in any minor.

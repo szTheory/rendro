@@ -105,4 +105,4 @@ gh issue list --state all --label "area:text-shaping" \
 
 | Date | Reviewer | Demand | Downloads | Contributor | Decision | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| TBD | TBD | Blocked | Blocked | Blocked | No review run yet | Reviews are pull-based, not scheduled from a launch date. |
+| 2026-06-13 | Maintainer (v2.8 planning) | 0 | 877 all / 117 wk | 0 | HOLD | HOLD (all three families). Decision rule applied: TRIGGER / ACCUMULATING / HOLD / HOLD-noise. Downloads 867→877 all, 115→117 week since baseline: noise, not the +1,500 / >=150 thresholds. Zero qualifying shaping signals; zero non-maintainer PRs. Re-check is pull-based, not scheduled: next review triggered by the first qualifying text-shaping issue, a counted contributor PR, or the next milestone-planning pass — whichever comes first. Gate cannot trigger before 2026-07-27 (earliest-possible floor, not a reminder). |

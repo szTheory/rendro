@@ -3,6 +3,21 @@
 **Last updated:** 2026-06-13
 **Purpose:** Preserve the recommended multi-milestone sequence so milestone-definition work does not reopen settled architectural tradeoffs unless the project direction materially changes.
 
+## Stewardship Posture (Done-Enough)
+
+*Date recorded: 2026-06-13*
+
+Rendro is ~90-93% feature-complete for its stated product identity. The standing rule is to prefer short stewardship, claim hygiene, and adoption-feedback work over new feature families. Do not deepen proof/viewer machinery by default.
+
+**Demand-Gated Deferrals** (see [ADOPTION.md](../ADOPTION.md) for gate status; these are not abandoned, just waiting for qualifying demand):
+- Global text shaping
+- Mobile GUI viewer promotion
+- TOC/outlines/anchors/cross-references
+- Charts
+- Existing-PDF editing
+- Release-please automation
+- Proactive outreach
+
 ## Active Strategic Arc
 
 ### Done-Enough Stewardship and Demand-Gated Growth
