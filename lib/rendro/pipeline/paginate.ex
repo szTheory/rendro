@@ -5,11 +5,92 @@ defmodule Rendro.Pipeline.Paginate do
 
   @spec run(Rendro.Document.t()) :: {:ok, Rendro.Document.t()} | {:error, term()}
   def run(%Document{pages: pages, content: content} = doc) do
-    cond do
-      pages != [] -> validate_fixed_pages(doc)
-      content != [] or has_flow_layout?(doc) -> paginate_flow(doc)
-      true -> {:error, :no_content}
+    result =
+      cond do
+        pages != [] -> validate_fixed_pages(doc)
+        content != [] or has_flow_layout?(doc) -> paginate_flow(doc)
+        true -> {:error, :no_content}
+      end
+
+    case result do
+      {:ok, paginated_doc} -> collect_anchors(paginated_doc)
+      error -> error
     end
+  end
+
+  defp collect_anchors(%Document{} = doc) do
+    try do
+      anchors = collect_page_anchors(doc.pages)
+      metadata = Map.put(doc.metadata || %Rendro.Metadata{}, :anchors, anchors)
+      {:ok, %{doc | metadata: metadata}}
+    catch
+      {:error, :duplicate_anchor_id, id} ->
+        {:error, Rendro.Error.from_stage(:paginate, :duplicate_anchor_id, %{details: %{id: id}})}
+    end
+  end
+
+  defp collect_page_anchors(pages) do
+    pages
+    |> Enum.with_index(1)
+    |> Enum.reduce(%{}, fn {page, page_idx}, acc ->
+      collect_block_anchors(page.blocks, page_idx, acc)
+    end)
+  end
+
+  defp collect_block_anchors(blocks, page_idx, acc) when is_list(blocks) do
+    Enum.reduce(blocks, acc, fn block, current_acc ->
+      collect_single_anchor(block, page_idx, current_acc)
+    end)
+  end
+
+  defp collect_single_anchor(%Rendro.Block{} = block, page_idx, acc) do
+    acc1 =
+      case block.id do
+        nil ->
+          acc
+
+        id ->
+          if Map.has_key?(acc, id) do
+            throw({:error, :duplicate_anchor_id, id})
+          else
+            Map.put(acc, id, [page_idx, :XYZ, block.x || 0, block.y || 0, nil])
+          end
+      end
+
+    case block.content do
+      %Rendro.Table{} = table ->
+        acc2 =
+          if table.header do
+            collect_row_anchors([table.header], page_idx, acc1)
+          else
+            acc1
+          end
+
+        collect_row_anchors(table.rows || [], page_idx, acc2)
+
+      _ ->
+        acc1
+    end
+  end
+
+  defp collect_single_anchor(_other, _page_idx, acc), do: acc
+
+  defp collect_row_anchors(rows, page_idx, acc) do
+    Enum.reduce(rows, acc, fn row, row_acc ->
+      cells =
+        case row do
+          %Rendro.Row{cells: c} -> Enum.map(c, & &1.content)
+          list when is_list(list) -> list
+          _ -> []
+        end
+
+      Enum.reduce(cells, row_acc, fn cell_content, cell_acc ->
+        case cell_content do
+          %Rendro.Block{} = nested_block -> collect_single_anchor(nested_block, page_idx, cell_acc)
+          _ -> cell_acc
+        end
+      end)
+    end)
   end
 
   defp paginate_flow(%Document{} = doc) do
@@ -875,9 +956,29 @@ defmodule Rendro.Pipeline.Paginate do
   end
 
   defp invalid_table_directive(%Rendro.Table{header: header, rows: rows}) do
-    Enum.find_value(List.wrap(header), &invalid_fixed_page_directive/1) ||
-      Enum.find_value(rows, fn row -> Enum.find_value(row, &invalid_fixed_page_directive/1) end)
+    Enum.find_value(List.wrap(header), &invalid_table_row_directive/1) ||
+      Enum.find_value(rows, &invalid_table_row_directive/1)
   end
+
+  defp invalid_table_row_directive(%Rendro.Row{cells: cells}) do
+    Enum.find_value(cells, fn %Rendro.Cell{content: content} ->
+      case content do
+        %Rendro.Block{} = block -> invalid_fixed_page_directive(block)
+        _ -> nil
+      end
+    end)
+  end
+
+  defp invalid_table_row_directive(cells) when is_list(cells) do
+    Enum.find_value(cells, fn content ->
+      case content do
+        %Rendro.Block{} = block -> invalid_fixed_page_directive(block)
+        _ -> nil
+      end
+    end)
+  end
+
+  defp invalid_table_row_directive(_), do: nil
 
   defp validate_page_fit!(%Page{blocks: blocks} = page, page_index) do
     bounds = %{

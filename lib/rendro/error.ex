@@ -266,6 +266,10 @@ defmodule Rendro.Error do
     end
   end
 
+  defp next_step(:paginate, :duplicate_anchor_id) do
+    "Ensure all id attributes assigned to blocks are unique across the entire document."
+  end
+
   defp next_step(:paginate, :content_overflow) do
     "Reduce content size or expand the declared page/region bounds; Rendro does not auto-fit overflowing content."
   end

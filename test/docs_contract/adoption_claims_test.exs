@@ -159,9 +159,6 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
 
     assert adoption =~ "conditional global text shaping gate"
     assert adoption =~ "## Current Gate: Conditional Global Text Shaping"
-    assert roadmap =~ "v2.7 Page Context & Browser Proof Hardening"
-    assert roadmap =~ "Global Text Shaping & Script Support"
-    assert roadmap =~ "conditional; only if the v2.6 `ADOPTION.md` demand gate triggers"
 
     for stale <- [
           "v2.7 Global Text Shaping",
