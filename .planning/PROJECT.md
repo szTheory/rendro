@@ -113,7 +113,8 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Validated
 
-- ✓ Rendro v2.7 shipped page context and browser proof hardening: section-local page numbering with `page_numbering: [restart: true]`, internal physical/section page context, `{{section_page_number}}` / `{{section_total_pages}}` tokens, physical odd/even running content through `only_on: :odd | :even`, pinned PDF.js advisory observations isolated from core/runtime/required CI, and docs/package/workflow hygiene that keeps TOC/outlines/anchors/cross-refs, charts, global text shaping, PDF.js GUI support, and release automation as explicit deferrals. All 12 requirements satisfied; milestone audit `passed`. Shipped 2026-06-13 and archived in `milestones/v2.7-ROADMAP.md` / `milestones/v2.7-REQUIREMENTS.md` / `milestones/v2.7-MILESTONE-AUDIT.md` / `milestones/v2.7-phases/`. — v2.7
+- ✓ Rendro v2.9 shipped TOC & Document Navigation: explicit page anchors, hierarchical document outlines with UTF-16BE support, fail-fast validated internal cross-reference links, and layout-preserving `{{anchor_page:id}}` Table of Contents substitution tokens. All 13 requirements satisfied; milestone audit `passed`. Shipped 2026-06-14 and archived in `milestones/v2.9-ROADMAP.md` / `milestones/v2.9-REQUIREMENTS.md` / `milestones/v2.9-phases/`. — v2.9
+- ✓ Rendro v2.8 completed the done-enough stewardship & adoption signal loop. Validated in Phase 96: adoption-signal-review-stewardship-posture.
 - ✓ Rendro v2.6 shipped public launch and adoption bootstrap without overclaiming: HarfBuzz is optional behind `Rendro.Text.Shaper`, complex scripts fail instructively, `%Rendro.Path{}`/table borders/Certificate frame polish are in the core render path, `Rendro.Adapters.Pdfium.render/2` and golden-PNG snapshots provide advisory raster proof, the README/HexDocs gallery and self-rendered `manual.pdf` are hash-checked, the comparison guide and Livebook tutorial are bounded by docs-contract checks, issue-only intake and `ADOPTION.md` establish a measurable demand gate, and mobile GUI rows are terminal `explicit_deferral` entries rather than support claims. All 21 requirements satisfied; milestone audit `passed`. Shipped 2026-06-13 and archived in `milestones/v2.6-ROADMAP.md` / `milestones/v2.6-REQUIREMENTS.md` / `milestones/v2.6-MILESTONE-AUDIT.md` / `milestones/v2.6-phases/`. — v2.6
 - ✓ Rendro v2.5 shipped the public 1.0 commitment: a formal two-tier SemVer/API-stability contract (Tier-1 Stable strict SemVer, Tier-2 Evolving adapters/diagnostics), a mechanically enforced public API boundary (`priv/public_api.json` manifest + `public_api_contract_test.exs` docs-contract lane, API-01..05), rewritten stability/migration docs (`api_stability.md`, `upgrading_to_1.0.md`, Tier-1 claims test, STAB-01..05), hardened release gates (exact-allowlist tarball audit, `hex.audit`/`deps.audit`, SHA-pinned workflow), and the irreversible consolidated `1.0.0` publish to hex.pm (REL-01..06). All 16 requirements satisfied; milestone audit `passed`. Shipped 2026-06-05 and archived in `milestones/v2.5-ROADMAP.md` / `milestones/v2.5-REQUIREMENTS.md` / `milestones/v2.5-MILESTONE-AUDIT.md`. — v2.5
 - ✓ Rendro v2.4 closed the adoption gap with batteries-included Phoenix document workflows — a deterministic page-numbering / running-region primitive (PAGE-01..04), three data-driven recipes on the three-rung escape hatch (Statement STMT-01..04, Receipt/Report RCPT-01..03, Certificate CERT-01..03), terminal support-matrix rows for every new surface (CONTRACT-01), an executable reference Phoenix app in an isolated non-required CI lane (REF-01..03), and HexDocs guides bounded by docs-contract tests (CONTRACT-02). All 19 v1 requirements satisfied; milestone audit `passed`. Shipped 2026-05-30 and archived in `milestones/v2.4-ROADMAP.md` / `milestones/v2.4-REQUIREMENTS.md` / `milestones/v2.4-MILESTONE-AUDIT.md`. — v2.4
@@ -273,10 +274,30 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-14 — v2.9 TOC & Document Navigation started.*
+*Last updated: 2026-06-14 after v2.9 milestone*
 y?
 3. Audit Out of Scope -> reasons still valid?
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-14 — v2.9 TOC & Document Navigation started.*
+*Last updated: 2026-06-14 after v2.9 milestone*
+idated? -> Move to Out of Scope with reason
+2. Requirements validated? -> Move to Validated with phase reference
+3. New requirements emerged? -> Add to Active
+4. Decisions to log? -> Add to Key Decisions
+5. "What This Is" still accurate? -> Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check -> still the right priority?
+3. Audit Out of Scope -> reasons still valid?
+4. Update Context with current state
+
+---
+*Last updated: 2026-06-14 after v2.9 milestone*
+y?
+3. Audit Out of Scope -> reasons still valid?
+4. Update Context with current state
+
+---
+*Last updated: 2026-06-14 after v2.9 milestone*

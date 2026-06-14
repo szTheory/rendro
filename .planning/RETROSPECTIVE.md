@@ -2,6 +2,30 @@
 
 *A living document updated after each milestone. Lessons feed forward into future planning.*
 
+## Milestone: v2.9 — TOC & Document Navigation
+
+**Shipped:** 2026-06-14
+**Phases:** 4 (97-100) | **Plans:** 9 | **Files changed:** 20+
+
+### What Was Built
+- **Phase 97:** Location Tracking & Primitives (added explicit block `id` attributes and validated duplicate IDs; captured physical destinations in `doc.metadata.anchors` during pagination).
+- **Phase 98:** Document Outlines/Bookmarks (harvested outlines via `outline: true`, functionally aggregated into a doubly-linked tree, and natively serialized with UTF-16BE encoding into the `/Outlines` catalog).
+- **Phase 99:** Cross-References & Validation (added `%Rendro.Link{}` pointing to explicit `{:anchor, id}` targets, strictly checked against anchors, and serialized to native `/Link` annotations).
+- **Phase 100:** Printable Table of Contents Primitive (added `{{anchor_page:id}}` string substitution tokens measured safely as fixed-width boxes and exactly substituted post-layout).
+
+### What Worked
+- **Shifting Human Verification Left to CI:** In Phase 98 and Phase 99, we successfully converted visually-required validation (checking the PDF outlines and PDF link targets) into programmatic end-to-end binary parsing tests. This caught two real serialization/formatting bugs and achieved 0-human-intervention testing.
+- **Goal-Backward Structural Validation:** The `gsd-verifier` clearly highlighted where human testing was required, providing the impetus to shift it left into integration testing.
+- **Wave-based Autonomous Execution:** The `gsd-executor` cleanly moved through waves, correctly managing tests and committing atomic iterations.
+
+### What Was Inefficient
+- **Roadmap Artifact Overlapping:** A minor anomaly with the `ROADMAP.md` format vs the `gsd-sdk` parser temporarily produced inconsistent tracking numbers, requiring a manual restructure. 
+- **Context Bleeding in Metadata Updates:** State updates sometimes failed due to missing explicit line matching or formatting nuances. 
+
+### Patterns Established
+- **Binary Integration Assertions:** Validating generated PDF capabilities using strict `/Object` and byte-level regex assertions directly over the rendered binary, circumventing the need to spin up external structural tools.
+- **Placeholder Measurement:** Subbing functional template strings with temporary dummy text ("8888") during `measure` purely to reserve bounding boxes without causing oscillation.
+
 ## Milestone: v2.2 — Long-Lived Signatures & Compliance Evidence
 
 **Shipped:** 2026-05-08
