@@ -9,9 +9,9 @@
 
 ### Baseline & Observability (BASE) — brief §1, §3, §4, §9, §10, §11
 
-- [ ] **BASE-01**: Maintainer can read a current-state baseline table covering every workflow/job (trigger, runner, command, avg/p95 duration, required-for-merge, cache usage, likely bottleneck).
-- [ ] **BASE-02**: The critical path is documented for PR / push-to-main / release paths (which jobs gate merge, which run in parallel, which determines wall-clock, what work is duplicated across jobs).
-- [ ] **BASE-03**: Every test/check category is classified A–E (keep-in-PR / keep-but-optimize / move-to-scheduled / quarantine-fix / delete-rewrite) with evidence per category.
+- [x] **BASE-01**: Maintainer can read a current-state baseline table covering every workflow/job (trigger, runner, command, avg/p95 duration, required-for-merge, cache usage, likely bottleneck).
+- [x] **BASE-02**: The critical path is documented for PR / push-to-main / release paths (which jobs gate merge, which run in parallel, which determines wall-clock, what work is duplicated across jobs).
+- [x] **BASE-03**: Every test/check category is classified A–E (keep-in-PR / keep-but-optimize / move-to-scheduled / quarantine-fix / delete-rewrite) with evidence per category.
 - [ ] **BASE-04**: A prioritized P0–P3 recommendation report exists — each item with issue, proposed change, expected impact, risk, and rollback — informed by comparable Elixir OSS pipelines, and drives phases 109–113.
 - [x] **BASE-05**: CI job summaries surface resolved OTP/Elixir versions, `System.schedulers_online()`, cache hit/miss state, and slowest tests (observability instrumentation, no behavior change).
 
@@ -78,9 +78,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BASE-01 | Phase 108 | Pending |
-| BASE-02 | Phase 108 | Pending |
-| BASE-03 | Phase 108 | Pending |
+| BASE-01 | Phase 108 | Complete |
+| BASE-02 | Phase 108 | Complete |
+| BASE-03 | Phase 108 | Complete |
 | BASE-04 | Phase 108 | Pending |
 | BASE-05 | Phase 108 | Complete |
 | CACHE-01 | Phase 109 | Pending |

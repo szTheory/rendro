@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: C1
 milestone_name: CI/CD Performance & Reliability
 status: executing
-last_updated: "2026-06-14T22:34:32.474Z"
+last_updated: "2026-06-14T22:46:02.939Z"
 last_activity: 2026-06-14
 progress:
   total_phases: 10
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -24,7 +24,7 @@ progress:
 ## Current Position
 
 Phase: 108 (baseline-audit-report) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-06-14
 
@@ -49,10 +49,14 @@ Phase 113 DX & Validation ................. Pending
 - North Star priority order: trustworthy gates > deterministic feedback > fast PR feedback > runner efficiency > YAML simplicity > contributor DX > security > reporting.
 - Source brief preserved verbatim at `milestones/C1-AUDIT-BRIEF.md` — canonical scope/checklist cited by every phase.
 - 108-01: Used `set -o pipefail` (bash-idiomatic) for tee exit-code preservation; single brace-group `{ … } >> "$GITHUB_STEP_SUMMARY"` per house style; `# TODO(109)` seam retained for cache rows.
+- 108-02: RecipesFacadeDriftTest is a seed-dependent ordering artifact (async:true test calls function_exported? before Rendro.Recipes is VM-loaded with --seed 0) — Phase 110 finding, not a flake.
+- 108-02: ManifestTest async:false confirmed required — PublicApi.recompile_conditional_adapters() triggers global BEAM module recompilation (cannot run concurrently).
+- 108-02: BrandingContractTest and RecipesContractTest are Phase 110 async:true candidates (no global state found; DocsContract.evaluate!/2 needs Phase 110 safety verification).
+- 108-02: Two pre-existing deterministic failures noted but NOT fixed (MEASURE-ONLY): RequiredChecksContractTest (guardrail expects bare mix ci, but 108-01 used tee) and PublicApiTest (Mix.Tasks.Brand.Gen missing @moduledoc).
 
 ### Blockers / Open Questions
 
-- None yet — baseline metrics (CI run history, cache state) to be gathered in Phase 108.
+- None — 108-EVIDENCE.md complete; Plan 03 can proceed to author C1-AUDIT.md.
 
 ## Next Steps
 
@@ -62,7 +66,7 @@ Phase 113 DX & Validation ................. Pending
 ## Last Session
 
 **Last updated**: 2026-06-14
-**Stopped at**: Completed 108-01-PLAN.md — BASE-05 gate-neutral job-summary instrumentation in test job
+**Stopped at**: Completed 108-02-PLAN.md — all baseline evidence gathered in 108-EVIDENCE.md
 **Blockers**: None
 
 ## Performance Metrics
@@ -70,3 +74,4 @@ Phase 113 DX & Validation ................. Pending
 | Phase | Plan | Duration | Notes |
 |-------|------|----------|-------|
 | Phase 108 P01 | 5 | 1 tasks | 1 files |
+| Phase 108 P02 | 45min | 2 tasks | 1 files |
