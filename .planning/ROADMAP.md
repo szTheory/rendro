@@ -26,6 +26,11 @@
 **Goal**: Establish the measured source-of-truth that drives every downstream phase — what the pipeline does today, how long it takes, where the bottlenecks are, which checks are worth keeping, and what to change in priority order — without touching gate logic or removing any test.
 **Depends on**: Nothing (source of truth for phases 109–113)
 **Requirements**: BASE-01, BASE-02, BASE-03, BASE-04, BASE-05
+**Plans:** 3 plans
+Plans:
+- [ ] 108-01-PLAN.md — BASE-05: Add gate-neutral job-summary instrumentation to the `test` job in ci.yml
+- [ ] 108-02-PLAN.md — Evidence gathering: real-runner timing, local profiling, flake sweep, async:false residue read
+- [ ] 108-03-PLAN.md — Audit authoring: write C1-AUDIT.md (BASE-01 through BASE-04)
 **Success Criteria** (what must be TRUE):
   1. A current-state baseline table covers every workflow/job across `ci.yml` / `hexdocs.yml` / `release.yml` (trigger, runner, command, avg + p95 duration, required-for-merge, cache usage, likely bottleneck) — BASE-01.
   2. The critical path is documented for PR / push-to-main / release paths, naming which jobs gate merge, which run in parallel, which sets wall-clock, and what work (e.g. repeated `mix deps.get` / compile) is duplicated across the 10 jobs — BASE-02.
@@ -98,7 +103,7 @@
 
 | Phase | Requirements Complete | Status | Completed |
 |-------|-----------------------|--------|-----------|
-| 108. Baseline & Audit Report | 0/5 | Not started | - |
+| 108. Baseline & Audit Report | 0/5 | Planning | - |
 | 109. Caching & setup-beam Foundation | 0/5 | Not started | - |
 | 110. Test Concurrency, Determinism & Cleanup | 0/5 | Not started | - |
 | 111. Workflow Topology, Triggers & Matrix | 0/5 | Not started | - |
