@@ -21,7 +21,7 @@ jobs:
 
       - name: Setup Beam
         id: setup-beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
@@ -72,7 +72,7 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
@@ -92,7 +92,7 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
@@ -126,7 +126,7 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
@@ -146,7 +146,7 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
@@ -188,7 +188,7 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
@@ -242,7 +242,7 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
@@ -276,7 +276,7 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
@@ -312,7 +312,7 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
