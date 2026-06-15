@@ -38,6 +38,12 @@ Plans:
 
 - [x] 108-03-PLAN.md — Audit authoring: write C1-AUDIT.md (BASE-01 through BASE-04)
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 110-01-PLAN.md — Docs contract structural security & concurrency maximization
+- [ ] 110-02-PLAN.md — Flake quarantine lane & test strategy documentation
+
 **Success Criteria** (what must be TRUE):
 
   1. A current-state baseline table covers every workflow/job across `ci.yml` / `hexdocs.yml` / `release.yml` (trigger, runner, command, avg + p95 duration, required-for-merge, cache usage, likely bottleneck) — BASE-01.
