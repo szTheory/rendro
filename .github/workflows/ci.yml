@@ -14,6 +14,10 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      # Bumping CACHE_BUSTER bursts the cache across all jobs
+      CACHE_BUSTER: v1
+      MIX_ENV: test
 
     steps:
       - name: Checkout
@@ -25,6 +29,24 @@ jobs:
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
+
+      - name: Cache dependencies
+        id: deps-cache
+        uses: actions/cache@v4
+        with:
+          path: deps
+          key: ${{ runner.os }}-deps-${{ env.CACHE_BUSTER }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ env.MIX_ENV }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-${{ env.CACHE_BUSTER }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ env.MIX_ENV }}-
+
+      - name: Cache build artifacts
+        id: build-cache
+        uses: actions/cache@v4
+        with:
+          path: _build
+          key: ${{ runner.os }}-build-${{ env.CACHE_BUSTER }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ env.MIX_ENV }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.CACHE_BUSTER }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ env.MIX_ENV }}-
 
       - name: Install Dependencies
         run: mix deps.get
@@ -46,7 +68,13 @@ jobs:
         env:
           OTP_VERSION: ${{ steps.setup-beam.outputs.otp-version }}
           ELIXIR_VERSION: ${{ steps.setup-beam.outputs.elixir-version }}
+          DEPS_CACHE_HIT: ${{ steps.deps-cache.outputs.cache-hit }}
+          BUILD_CACHE_HIT: ${{ steps.build-cache.outputs.cache-hit }}
+          PLT_CACHE_HIT: ${{ steps.plt-cache.outputs.cache-hit }}
         run: |
+          [ "$DEPS_CACHE_HIT" = "true" ] && D_STATUS="hit" || D_STATUS="miss"
+          [ "$BUILD_CACHE_HIT" = "true" ] && B_STATUS="hit" || B_STATUS="miss"
+          [ "$PLT_CACHE_HIT" = "true" ] && P_STATUS="hit" || P_STATUS="miss"
           {
             echo "## CI Baseline"
             echo ""
@@ -55,9 +83,9 @@ jobs:
             echo "| OTP | ${OTP_VERSION:-n/a} |"
             echo "| Elixir | ${ELIXIR_VERSION:-n/a} |"
             echo "| Schedulers | $(elixir -e 'IO.puts(System.schedulers_online())' 2>/dev/null || echo 'n/a') |"
-            # TODO(109): replace 'cold / none' with cache-hit output once actions/cache + id: cache lands
-            echo "| Cache (deps) | cold / none |"
-            echo "| Cache (_build) | cold / none |"
+            echo "| Cache (deps) | ${D_STATUS} |"
+            echo "| Cache (_build) | ${B_STATUS} |"
+            echo "| Cache (PLT) | ${P_STATUS} |"
             echo ""
             echo "### Slowest Tests"
             echo ""
@@ -321,4 +349,6 @@ jobs:
         run: mix deps.get
 
       - name: Verify Release Proof
+        run: mix run scripts/release_preflight_proof.exs --current-version-tag --worktree "$RUNNER_TEMP/rendro-release-proof"
+: Verify Release Proof
         run: mix run scripts/release_preflight_proof.exs --current-version-tag --worktree "$RUNNER_TEMP/rendro-release-proof"
