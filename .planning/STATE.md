@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: C1
 milestone_name: CI/CD Performance & Reliability
 status: executing
-last_updated: "2026-06-15T20:49:34.445Z"
+last_updated: "2026-06-15T21:11:45.088Z"
 last_activity: 2026-06-15 -- Phase 109 planning complete
 progress:
   total_phases: 10
   completed_phases: 1
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
   percent: 10
 ---
 
@@ -24,9 +24,9 @@ progress:
 ## Current Position
 
 Phase: 109
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-06-15 -- Phase 109 planning complete
+Plan: 01 (completed)
+Status: In Progress
+Last activity: 2026-06-16 -- Completed 109-01-PLAN.md
 
 ## Progress
 
@@ -57,6 +57,8 @@ Phase 113 DX & Validation ................. Pending
 - 109-DISCUSS: `CACHE_BUSTER` will use an `env:` var in CI YAMLs for PR visibility and ease of bursting.
 - 109-DISCUSS: Dialyzer PLT will be isolated to `priv/plts` using `plt_core_path` in `mix.exs`, enabling a separate `restore/save` cache split so the PLT is saved unconditionally even if Dialyzer fails, without polluting `_build`.
 - 109-DISCUSS: `mix ci` decomposition is deferred to Phase 111 to avoid tangling cache implementation with `test/guardrails/required_checks_contract_test.exs` rewrites. `erlef/setup-beam` will be uniformly SHA-pinned.
+- 109-01: Unify erlef/setup-beam pinning to SHA 8251c48667b97e88a0a24ec512f5b72a039fcea7 across all workflow configurations.
+- 109-01: Set plt_core_path and plt_local_path to priv/plts in mix.exs to store Dialyzer PLT files outside the default _build directory, preparing for caching.
 
 ### Blockers / Open Questions
 
@@ -69,8 +71,8 @@ Phase 113 DX & Validation ................. Pending
 
 ## Last Session
 
-**Last updated**: 2026-06-15
-**Stopped at**: Completed 109-DISCUSS — generated 109-DECISIONS.md
+**Last updated**: 2026-06-16
+**Stopped at**: Completed 109-01-PLAN.md
 **Blockers**: None
 
 ## Performance Metrics
@@ -80,3 +82,4 @@ Phase 113 DX & Validation ................. Pending
 | Phase 108 P01 | 5 | 1 tasks | 1 files |
 | Phase 108 P02 | 45min | 2 tasks | 1 files |
 | Phase 108 P03 | 35min | 2 tasks | 1 files |
+| Phase 109 P01 | 15m | 2 tasks | 4 files |

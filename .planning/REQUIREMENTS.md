@@ -19,8 +19,8 @@
 
 - [ ] **CACHE-01**: Hex deps are cached on a precise key (OS + OTP + Elixir + MIX_ENV + `mix.lock` hash + cache-buster); `mix deps.get` still runs on cache miss.
 - [ ] **CACHE-02**: `_build` is cached with the same precise key and is never restored across incompatible OTP / Elixir / MIX_ENV combinations.
-- [ ] **CACHE-03**: Dialyzer PLTs are cached with OTP/Elixir/lockfile-scoped keys using a restore/save split, so a failing Dialyzer run still persists the PLT.
-- [ ] **CACHE-04**: `erlef/setup-beam` is SHA-pinned and consistent across all jobs; the cache-bust procedure is documented.
+- [x] **CACHE-03**: Dialyzer PLTs are cached with OTP/Elixir/lockfile-scoped keys using a restore/save split, so a failing Dialyzer run still persists the PLT.
+- [x] **CACHE-04**: `erlef/setup-beam` is SHA-pinned and consistent across all jobs; the cache-bust procedure is documented.
 - [ ] **CACHE-05**: Cache hit/miss is observable in CI and verified not to mask compiler warnings or stale compilation.
 
 ### Test Concurrency, Determinism & Cleanup (TEST) — brief §4, §5, §12
@@ -85,8 +85,8 @@
 | BASE-05 | Phase 108 | Complete |
 | CACHE-01 | Phase 109 | Pending |
 | CACHE-02 | Phase 109 | Pending |
-| CACHE-03 | Phase 109 | Pending |
-| CACHE-04 | Phase 109 | Pending |
+| CACHE-03 | Phase 109 | Complete |
+| CACHE-04 | Phase 109 | Complete |
 | CACHE-05 | Phase 109 | Pending |
 | TEST-01 | Phase 110 | Pending |
 | TEST-02 | Phase 110 | Pending |
