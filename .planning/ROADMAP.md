@@ -54,6 +54,15 @@ Plans:
 **Goal**: Eliminate the pipeline's biggest avoidable cost — zero caching anywhere — by adding correct, precisely-keyed `deps`/`_build`/PLT caching and a SHA-pinned, consistent `setup-beam`, so warm runs skip redundant dependency fetch and compile without ever masking warnings or restoring across incompatible toolchains.
 **Depends on**: Phase 108 (baseline quantifies the cold-cache cost and confirms zero existing caching)
 **Requirements**: CACHE-01, CACHE-02, CACHE-03, CACHE-04, CACHE-05
+**Plans:** 2 plans
+
+Plans:
+**Wave 1**
+- [ ] 109-01-PLAN.md — Unify setup-beam SHA pinning and isolate Dialyzer PLT in Mix config
+
+**Wave 2**
+- [ ] 109-02-PLAN.md — Introduce robust cache keys and PLT split-cache into CI workflows
+
 **Success Criteria** (what must be TRUE):
 
   1. Hex deps are cached on a precise key (OS + OTP + Elixir + MIX_ENV + `mix.lock` hash + cache-buster) and `mix deps.get` still runs on a cache miss — CACHE-01.
