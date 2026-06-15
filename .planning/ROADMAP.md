@@ -61,7 +61,7 @@ Plans:
 - [x] 109-01-PLAN.md — Unify setup-beam SHA pinning and isolate Dialyzer PLT in Mix config
 
 **Wave 2**
-- [ ] 109-02-PLAN.md — Introduce robust cache keys and PLT split-cache into CI workflows
+- [x] 109-02-PLAN.md — Introduce robust cache keys and PLT split-cache into CI workflows
 
 **Success Criteria** (what must be TRUE):
 
@@ -137,7 +137,7 @@ Plans:
 | Phase | Requirements Complete | Status | Completed |
 |-------|-----------------------|--------|-----------|
 | 108. Baseline & Audit Report | 3/3 | Complete    | 2026-06-14 |
-| 109. Caching & setup-beam Foundation | 1/2 | In Progress|  |
+| 109. Caching & setup-beam Foundation | 2/2 | Complete   | 2026-06-15 |
 | 110. Test Concurrency, Determinism & Cleanup | 0/5 | Not started | - |
 | 111. Workflow Topology, Triggers & Matrix | 0/5 | Not started | - |
 | 112. Security, Supply-chain & Release Hardening | 0/4 | Not started | - |

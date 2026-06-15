@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: C1
 milestone_name: CI/CD Performance & Reliability
 status: executing
-last_updated: "2026-06-15T21:11:45.088Z"
-last_activity: 2026-06-15 -- Phase 109 planning complete
+last_updated: "2026-06-15T21:15:15.043Z"
+last_activity: 2026-06-16 -- Completed 109-01-PLAN.md
 progress:
   total_phases: 10
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 4
-  percent: 10
+  completed_plans: 5
+  percent: 20
 ---
 
 # Project State
@@ -24,9 +24,9 @@ progress:
 ## Current Position
 
 Phase: 109
-Plan: 01 (completed)
+Plan: 02 (completed)
 Status: In Progress
-Last activity: 2026-06-16 -- Completed 109-01-PLAN.md
+Last activity: 2026-06-16 -- Completed 109-02-PLAN.md
 
 ## Progress
 
@@ -59,6 +59,8 @@ Phase 113 DX & Validation ................. Pending
 - 109-DISCUSS: `mix ci` decomposition is deferred to Phase 111 to avoid tangling cache implementation with `test/guardrails/required_checks_contract_test.exs` rewrites. `erlef/setup-beam` will be uniformly SHA-pinned.
 - 109-01: Unify erlef/setup-beam pinning to SHA 8251c48667b97e88a0a24ec512f5b72a039fcea7 across all workflow configurations.
 - 109-01: Set plt_core_path and plt_local_path to priv/plts in mix.exs to store Dialyzer PLT files outside the default _build directory, preparing for caching.
+- 109-02: Split PLT cache into restore and save actions to ensure generation is saved even on job failure or subsequent step failures, maintaining pipeline isolation.
+- 109-02: Expose cache hits to the job summary through strictly mapped env variables to prevent expression injection.
 
 ### Blockers / Open Questions
 
