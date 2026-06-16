@@ -1,0 +1,46 @@
+name: Nightly Security Audit
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Setup Beam
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
+        with:
+          otp-version: '28'
+          elixir-version: '1.19.5'
+
+      - name: Install Dependencies
+        run: mix deps.get
+
+      - name: Mix Deps Audit
+        run: mix deps.audit
+
+      - name: Mix Hex Audit
+        run: mix hex.audit
+
+      - name: Prepare Issue Content
+        if: failure()
+        run: |
+          echo "The nightly security audit failed." > /tmp/audit-failure.md
+          echo "Please review the workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> /tmp/audit-failure.md
+
+      - name: Create issue on failure
+        if: failure()
+        uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710
+        with:
+          title: Security Audit Failure
+          content-filepath: /tmp/audit-failure.md
+          labels: security, bug
