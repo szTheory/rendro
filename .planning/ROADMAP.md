@@ -38,7 +38,7 @@ Plans:
 
 - [x] 108-03-PLAN.md — Audit authoring: write C1-AUDIT.md (BASE-01 through BASE-04)
 
-**Plans:** 2 plans
+**Plans:** 3 plans
 
 Plans:
 - [x] 110-01-PLAN.md — Docs contract structural security & concurrency maximization
@@ -99,9 +99,10 @@ Plans:
 **Goal**: Reshape the workflow graph into a coherent fast-PR / main / nightly / release model — minimizing the critical path and duplicated setup, rationalizing the advisory and live-proof jobs, cancelling superseded PR runs, defining a version-matrix policy, and exposing one stable required-check name to branch protection — without weakening any gate.
 **Depends on**: Phase 108 (critical-path + topology evidence), Phase 109 (caching makes split/merge job decisions safe)
 **Requirements**: FLOW-01, FLOW-02, FLOW-03, FLOW-04, FLOW-05
-**Plans:** 2 plans
+**Plans:** 3 plans
 
 Plans:
+- [x] 111-00-PLAN.md — Guardrail Test Topology Alignment
 - [ ] 111-01-PLAN.md — Triggers, Concurrency, and Job Merging
 - [ ] 111-02-PLAN.md — Version Matrix Policy and Summary Gate Job
 
@@ -151,7 +152,7 @@ Plans:
 | 108. Baseline & Audit Report | 3/3 | Complete    | 2026-06-14 |
 | 109. Caching & setup-beam Foundation | 2/2 | Complete    | 2026-06-15 |
 | 110. Test Concurrency, Determinism & Cleanup | 3/3 | Complete    | 2026-06-16 |
-| 111. Workflow Topology, Triggers & Matrix | 0/5 | Not started | - |
+| 111. Workflow Topology, Triggers & Matrix | 1/3 | In Progress|  |
 | 112. Security, Supply-chain & Release Hardening | 0/4 | Not started | - |
 | 113. DX, Local Reproducibility & Validation | 0/6 | Not started | - |
 

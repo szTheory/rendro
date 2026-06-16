@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: C1
 milestone_name: CI/CD Performance & Reliability
 status: planning
-last_updated: "2026-06-16T15:45:14.760Z"
+last_updated: "2026-06-16T18:56:21.439Z"
 last_activity: 2026-06-16
 progress:
   total_phases: 10
   completed_phases: 3
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 11
+  completed_plans: 9
   percent: 30
 ---
 
@@ -24,8 +24,8 @@ progress:
 ## Current Position
 
 Phase: 111
-Plan: Not started
-Status: Ready to plan
+Plan: 01
+Status: Executing
 Last activity: 2026-06-16
 
 ## Progress
@@ -65,6 +65,9 @@ Phase 113 DX & Validation ................. Pending
 - [Phase ?]: ExUnit exclusions configured to automatically ignore quarantine, live_pdf_tools, live_signing, and raster_snapshot by default.
 - [Phase ?]: Explicitly rejected mix test --partitions N in favor of maximizing async: true due to BEAM initialization overhead.
 - [Phase ?]: Implemented flake quarantine lane via verify.flake and test.all aliases with --slowest 10 reporting.
+- 111-00: Allowed the contract tests to intentionally fail against the current `ci.yml` (TDD RED state) to fulfill the plan's explicit objective of preparing tests before pipeline modification.
+- 111-00: Grouped advisory contexts into a single `advisory-checks` pipeline context, and live-proofs into a single `integration-proofs` context.
+- 111-00: Set `ci-success` as the sole required context for main branch protection.
 
 ### Blockers / Open Questions
 
@@ -78,7 +81,7 @@ Phase 113 DX & Validation ................. Pending
 ## Last Session
 
 **Last updated**: 2026-06-16
-**Stopped at**: Completed 110-01-PLAN.md
+**Stopped at**: Completed 111-00-PLAN.md
 **Blockers**: None
 
 ## Performance Metrics
@@ -90,9 +93,5 @@ Phase 113 DX & Validation ................. Pending
 | Phase 108 P03 | 35min | 2 tasks | 1 files |
 | Phase 109 P01 | 15m | 2 tasks | 4 files |
 | Phase 110 P01 | 5m | 2 tasks | 5 files |
-------|----------|-------|
-| Phase 108 P01 | 5 | 1 tasks | 1 files |
-| Phase 108 P02 | 45min | 2 tasks | 1 files |
-| Phase 108 P03 | 35min | 2 tasks | 1 files |
-| Phase 109 P01 | 15m | 2 tasks | 4 files |
 | Phase 110-test-concurrency-determinism-cleanup P02 | 2 | 3 tasks | 3 files |
+| Phase 111 P00 | 5m | 2 tasks | 2 files |
