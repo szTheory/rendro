@@ -134,10 +134,10 @@ jobs:
           mix deps.get
           mix test
 
-  raster-advisory:
+  advisory-checks:
     runs-on: ubuntu-latest
     continue-on-error: true
-    # no 'needs:' -> graph-disconnected; continue-on-error: true -> download failure cannot block engine merges (RAST-02)
+    # no 'needs:' -> graph-disconnected; failures cannot block engine merges
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -147,6 +147,13 @@ jobs:
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
+
+      - name: Setup Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: '22.14.0'
+          cache: 'npm'
+          cache-dependency-path: scripts/pdfjs_observer/package-lock.json
 
       - name: Install pdfium-cli (pinned)
         run: |
@@ -168,60 +175,11 @@ jobs:
       - name: Check Launch Artifacts
         run: mix rendro.launch_artifacts.check
 
-  comparison-advisory:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    # no 'needs:' -> graph-disconnected; committed benchmark truth only, no external benchmark rerun
-    steps:
-      - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-
-      - name: Setup Beam
-        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
-        with:
-          otp-version: '28'
-          elixir-version: '1.19.5'
-
-      - name: Install Elixir Dependencies
-        run: mix deps.get
-
       - name: Check Comparison Evidence
         run: mix rendro.comparison.check
 
-  livebook-advisory:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    # no 'needs:' -> graph-disconnected; notebook check does not start a Livebook server
-    steps:
-      - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-
-      - name: Setup Beam
-        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
-        with:
-          otp-version: '28'
-          elixir-version: '1.19.5'
-
-      - name: Install Elixir Dependencies
-        run: mix deps.get
-
       - name: Check Livebook Tutorial
         run: mix rendro.livebook.check
-
-  pdfjs-advisory:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    # no 'needs:' -> graph-disconnected; npm/PDF.js failures cannot block engine merges
-    steps:
-      - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-
-      - name: Setup Node
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
-        with:
-          node-version: '22.14.0'
-          cache: 'npm'
-          cache-dependency-path: scripts/pdfjs_observer/package-lock.json
 
       - name: Install PDF.js observer dependencies
         working-directory: scripts/pdfjs_observer
