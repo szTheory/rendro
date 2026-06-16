@@ -7,6 +7,8 @@ on:
   pull_request:
     branches:
       - main
+  schedule:
+    - cron: '0 2 * * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -18,6 +20,17 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || matrix.primary == true
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - otp: '28'
+            elixir: '1.19.5'
+            primary: true
+          - otp: '25'
+            elixir: '1.19.0'
+            primary: false
     env:
       # Bumping CACHE_BUSTER bursts the cache across all jobs
       CACHE_BUSTER: v1
@@ -31,8 +44,8 @@ jobs:
         id: setup-beam
         uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
-          otp-version: '28'
-          elixir-version: '1.19.5'
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
 
       - name: Cache dependencies
         id: deps-cache
@@ -68,12 +81,18 @@ jobs:
             ${{ runner.os }}-plt-${{ env.CACHE_BUSTER }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ env.MIX_ENV }}-
 
       - name: Run CI
+        if: matrix.primary == true
         shell: bash
         # `shell: bash` runs `bash --noprofile --norc -eo pipefail {0}`, so pipefail
         # is on by default — `mix ci`'s exit code propagates through `tee` (gate-neutral).
         # Single-line `run:` keeps the literal `run: mix ci` lane that the
         # required-checks guardrail (test/guardrails/required_checks_contract_test.exs) asserts.
         run: mix ci 2>&1 | tee /tmp/mix-ci-output.log
+
+      - name: Run Tests (Secondary Version)
+        if: matrix.primary == false
+        shell: bash
+        run: mix test --exclude quarantine --slowest 10 2>&1 | tee /tmp/mix-ci-output.log
 
       - name: Save PLT Cache
         uses: actions/cache/save@v4
@@ -252,3 +271,15 @@ jobs:
 
       - name: Verify Release Proof
         run: mix run scripts/release_preflight_proof.exs --current-version-tag --worktree "$RUNNER_TEMP/rendro-release-proof"
+
+  ci-success:
+    if: always()
+    needs: [test, example-phoenix, integration-proofs, advisory-checks]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce strict checks
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
+      - name: Pass
+        if: ${{ !(contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')) }}
+        run: exit 0
