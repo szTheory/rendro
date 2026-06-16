@@ -25,7 +25,7 @@
 
 ### Test Concurrency, Determinism & Cleanup (TEST) — brief §4, §5, §12
 
-- [ ] **TEST-01**: Every safely-isolatable test module runs `async: true`; each module kept non-async carries a documented reason (global app env, named ETS, registered process, ports, time, randomness, etc.).
+- [x] **TEST-01**: Every safely-isolatable test module runs `async: true`; each module kept non-async carries a documented reason (global app env, named ETS, registered process, ports, time, randomness, etc.).
 - [ ] **TEST-02**: A measured decision on `mix test --partitions N` is made and applied only where evidence shows net benefit (no oversubscription, isolation preserved).
 - [ ] **TEST-03**: Flaky / nondeterministic tests (Process.sleep readiness, unseeded randomness, order dependence, real network) are fixed or explicitly quarantined with tracked remediation — not papered over with blind retries.
 - [ ] **TEST-04**: Low-signal tests (implementation-trivia, duplicated paths, assertion-free coverage filler) are removed or rewritten *with evidence*; high-value tests are retained.
@@ -88,7 +88,7 @@
 | CACHE-03 | Phase 109 | Complete |
 | CACHE-04 | Phase 109 | Complete |
 | CACHE-05 | Phase 109 | Complete |
-| TEST-01 | Phase 110 | Pending |
+| TEST-01 | Phase 110 | Complete |
 | TEST-02 | Phase 110 | Pending |
 | TEST-03 | Phase 110 | Pending |
 | TEST-04 | Phase 110 | Pending |
