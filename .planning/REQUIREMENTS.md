@@ -41,10 +41,10 @@
 
 ### Security, Supply-chain & Release (SEC) — brief §7, §12
 
-- [ ] **SEC-01**: All third-party actions are pinned to immutable SHAs, with Dependabot configured to update actions and deps.
-- [ ] **SEC-02**: `permissions` is least-privilege (read by default, write only where needed); no secrets are exposed to untrusted fork contexts.
-- [ ] **SEC-03**: The release/tag workflow depends on full verification and publishes to Hex only from trusted tags, with `mix hex.publish --dry-run` + metadata/docs checks (building on the existing `mix release.preflight`).
-- [ ] **SEC-04**: A dependency/security audit (`mix hex.audit` / `mix deps.audit`) runs in an appropriate lane without coupling the PR fast path to flaky network calls.
+- [x] **SEC-01**: All third-party actions are pinned to immutable SHAs, with Dependabot configured to update actions and deps.
+- [x] **SEC-02**: `permissions` is least-privilege (read by default, write only where needed); no secrets are exposed to untrusted fork contexts.
+- [x] **SEC-03**: The release/tag workflow depends on full verification and publishes to Hex only from trusted tags, with `mix hex.publish --dry-run` + metadata/docs checks (building on the existing `mix release.preflight`).
+- [x] **SEC-04**: A dependency/security audit (`mix hex.audit` / `mix deps.audit`) runs in an appropriate lane without coupling the PR fast path to flaky network calls.
 
 ### DX & Local Reproducibility (DX) — brief §8, §6.7
 
@@ -98,10 +98,10 @@
 | FLOW-03 | Phase 111 | Complete |
 | FLOW-04 | Phase 111 | Complete |
 | FLOW-05 | Phase 111 | Complete |
-| SEC-01 | Phase 112 | Pending |
-| SEC-02 | Phase 112 | Pending |
-| SEC-03 | Phase 112 | Pending |
-| SEC-04 | Phase 112 | Pending |
+| SEC-01 | Phase 112 | Complete |
+| SEC-02 | Phase 112 | Complete |
+| SEC-03 | Phase 112 | Complete |
+| SEC-04 | Phase 112 | Complete |
 | DX-01 | Phase 113 | Pending |
 | DX-02 | Phase 113 | Pending |
 | DX-03 | Phase 113 | Pending |

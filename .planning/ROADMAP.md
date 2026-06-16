@@ -17,7 +17,7 @@
 - [x] **Phase 109: Caching & setup-beam Foundation** — Add keyed `deps`/`_build`/PLT caching (the pipeline currently has ZERO caching), SHA-pin and unify `setup-beam`, and document cache-busting. Biggest expected runtime win. (completed 2026-06-15)
 - [x] **Phase 110: Test Concurrency, Determinism & Cleanup** — Convert safely-isolatable modules to `async: true`, make an evidence-based partitioning decision, fix/quarantine flaky tests (no blind retries), remove low-signal tests with evidence, and layer slow suites PR-vs-scheduled correctly. (completed 2026-06-16)
 - [x] **Phase 111: Workflow Topology, Triggers & Matrix** — Cut the critical path and duplicated work, rationalize advisory + live-proof jobs, add per-PR concurrency cancellation, define the PR/main/nightly/release trigger model + version-matrix policy, and gate merge on one stable required-check summary. (completed 2026-06-16)
-- [ ] **Phase 112: Security, Supply-chain & Release Hardening** — Pin all actions to SHAs + add Dependabot, apply least-privilege per-job permissions, and gate Hex publish on full verification from trusted tags with `hex.publish --dry-run` (building on `mix release.preflight`).
+- [x] **Phase 112: Security, Supply-chain & Release Hardening** — Pin all actions to SHAs + add Dependabot, apply least-privilege per-job permissions, and gate Hex publish on full verification from trusted tags with `hex.publish --dry-run` (building on `mix release.preflight`). (completed 2026-06-16)
 - [ ] **Phase 113: DX, Local Reproducibility & Validation** — Achieve `mix ci` local/CI parity, add CONTRIBUTING + actionable-failure ergonomics + README badge, and record final before/after metrics vs the Phase 108 baseline plus an integrated target-pipeline description. Closes the milestone.
 
 ## Phase Details
@@ -131,12 +131,12 @@ Plans:
 **Artifacts**: `.github/dependabot.yml`; `.github/workflows/*.yml` (SHA pins, per-job `permissions`, hardened `release.yml`, audit lane placement)
 
 
-**Plans:** 4 plans
+**Plans:** 4/4 plans complete
 
-- [ ] 112-01-PLAN.md — Configure Dependabot to manage dependencies for Hex and GitHub Actions on a grouped, weekly schedule to minimize PR fatigue.
-- [ ] 112-02-PLAN.md — Introduce separated security audit lanes to give immediate, non-blocking feedback on PRs while maintaining a strict, actionable nightly audit for maintainers.
-- [ ] 112-03-PLAN.md — Harden the release pipeline by adding deterministic version matching and a strict environment-based human approval gate before Hex publication.
-- [ ] 112-04-PLAN.md — Fix the gap where actions/cache in ci.yml is not pinned to a SHA, satisfying SEC-01 and claiming the orphaned requirements.
+- [x] 112-01-PLAN.md — Configure Dependabot to manage dependencies for Hex and GitHub Actions on a grouped, weekly schedule to minimize PR fatigue.
+- [x] 112-02-PLAN.md — Introduce separated security audit lanes to give immediate, non-blocking feedback on PRs while maintaining a strict, actionable nightly audit for maintainers.
+- [x] 112-03-PLAN.md — Harden the release pipeline by adding deterministic version matching and a strict environment-based human approval gate before Hex publication.
+- [x] 112-04-PLAN.md — Fix the gap where actions/cache in ci.yml is not pinned to a SHA, satisfying SEC-01 and claiming the orphaned requirements.
 
 ### Phase 113: DX, Local Reproducibility & Validation
 
@@ -161,7 +161,7 @@ Plans:
 | 109. Caching & setup-beam Foundation | 2/2 | Complete    | 2026-06-15 |
 | 110. Test Concurrency, Determinism & Cleanup | 3/3 | Complete    | 2026-06-16 |
 | 111. Workflow Topology, Triggers & Matrix | 3/3 | Complete    | 2026-06-16 |
-| 112. Security, Supply-chain & Release Hardening | 0/4 | Not started | - |
+| 112. Security, Supply-chain & Release Hardening | 4/4 | Complete    | 2026-06-16 |
 | 113. DX, Local Reproducibility & Validation | 0/6 | Not started | - |
 
 **Coverage:** 30/30 C1 requirements mapped across phases 108–113 — no orphans, no duplicates.
