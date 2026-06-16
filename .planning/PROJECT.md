@@ -10,7 +10,7 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Active milestone:** C1 CI/CD Performance & Reliability. Phase 110 complete — Test Concurrency, Determinism & Cleanup. Phase 111 (Workflow Topology, Triggers & Matrix) is next.
+**Active milestone:** C1 CI/CD Performance & Reliability. Phase 111 complete — Workflow Topology, Triggers & Matrix. Phase 112 (Security, Supply Chain & Release Hardening) is next.
 
 **Shipped milestone:** v2.8 Done-Enough Stewardship & Adoption Signal Loop — **SHIPPED 2026-06-13** (Phases 93-96, 8/8 requirements; milestone audit `passed`). Rendro reduced maintainer/adopter friction and kept its public posture truthful by closing the `Rendro.Recipes` facade DX gap, cleaning up docs/warning hygiene, bringing header odd/even proof depth to footer parity, reconciling stale phase-validation metadata, and establishing an explicit done-enough stewardship posture tied to a dated adoption-signal review.
 
@@ -279,13 +279,13 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-14 after C1 milestone start*
+*Last updated: 2026-06-16
 y?
 3. Audit Out of Scope -> reasons still valid?
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-14 after C1 milestone start*
+*Last updated: 2026-06-16
 idated? -> Move to Out of Scope with reason
 2. Requirements validated? -> Move to Validated with phase reference
 3. New requirements emerged? -> Add to Active
@@ -299,10 +299,10 @@ idated? -> Move to Out of Scope with reason
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-14 after C1 milestone start*
+*Last updated: 2026-06-16
 y?
 3. Audit Out of Scope -> reasons still valid?
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-14 after C1 milestone start*
+*Last updated: 2026-06-16
