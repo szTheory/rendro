@@ -188,9 +188,10 @@ jobs:
       - name: Check PDF.js advisory observations
         run: node scripts/pdfjs_observer/observe.mjs --check
 
-  viewer-evidence-live-proof:
+  integration-proofs:
     runs-on: ubuntu-latest
     needs: test
+    timeout-minutes: 45
 
     steps:
       - name: Checkout
@@ -202,14 +203,12 @@ jobs:
           otp-version: '28'
           elixir-version: '1.19.5'
 
-      - name: Install pdfium-cli
-        run: |
-          curl -fsSL -o pdfium-cli "https://github.com/klippa-app/pdfium-cli/releases/download/v0.10.3/pdfium-webassembly-linux-amd64"
-          chmod +x pdfium-cli
-          sudo mv pdfium-cli /usr/local/bin/pdfium-cli
-          pdfium-cli --version
+      - name: Setup Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
 
-      - name: Install pdfinfo, qpdf, and pdfsig
+      - name: Install System Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y poppler-utils qpdf
@@ -217,15 +216,18 @@ jobs:
           qpdf --version
           pdfsig -v
 
-      - name: Setup Python for pyhanko
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
-        with:
-          python-version: '3.12'
+      - name: Install pdfium-cli
+        run: |
+          curl -fsSL -o pdfium-cli "https://github.com/klippa-app/pdfium-cli/releases/download/v0.10.3/pdfium-webassembly-linux-amd64"
+          chmod +x pdfium-cli
+          sudo mv pdfium-cli /usr/local/bin/pdfium-cli
+          pdfium-cli --version
 
-      - name: Install pyhanko-cli
+      - name: Install Python Dependencies
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install pyHanko pyHanko-cli
+          python3 -m pip install 'certomancer[web-api]' pyHanko pyHanko-cli
+          certomancer --version
           pyhanko --version
 
       - name: Install Elixir Dependencies
@@ -242,92 +244,11 @@ jobs:
             test/rendro/adapters/signed_artifact_viewer_evidence_live_test.exs \
             test/rendro/adapters/trust_sensitive_viewer_evidence_live_test.exs
 
-  signing-live-proof:
-    runs-on: ubuntu-latest
-    needs: test
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-
-      - name: Setup Beam
-        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
-        with:
-          otp-version: '28'
-          elixir-version: '1.19.5'
-
-      - name: Setup Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
-        with:
-          python-version: '3.12'
-
-      - name: Install Signing Proof Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y poppler-utils
-          pdfsig -v
-          python3 -m pip install --upgrade pip
-          python3 -m pip install pyHanko pyHanko-cli
-          pyhanko --version
-
-      - name: Install Elixir Dependencies
-        run: mix deps.get
-
       - name: Run Signing Live Proof
         run: mix test --include live_signing test/rendro/adapters/signing_live_test.exs
 
-  long-lived-live-proof:
-    runs-on: ubuntu-latest
-    needs: test
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-
-      - name: Setup Beam
-        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
-        with:
-          otp-version: '28'
-          elixir-version: '1.19.5'
-
-      - name: Setup Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
-        with:
-          python-version: '3.12'
-
-      - name: Install Signing Proof Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y poppler-utils
-          pdfsig -v
-          python3 -m pip install --upgrade pip
-          python3 -m pip install 'certomancer[web-api]' pyHanko pyHanko-cli
-          certomancer --version
-          pyhanko --version
-
-      - name: Install Elixir Dependencies
-        run: mix deps.get
-
       - name: Run Long-Lived Live Proof
         run: mix test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs
-
-  release-proof:
-    runs-on: ubuntu-latest
-    needs: test
-    timeout-minutes: 45
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-
-      - name: Setup Beam
-        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
-        with:
-          otp-version: '28'
-          elixir-version: '1.19.5'
-
-      - name: Install Dependencies
-        run: mix deps.get
 
       - name: Verify Release Proof
         run: mix run scripts/release_preflight_proof.exs --current-version-tag --worktree "$RUNNER_TEMP/rendro-release-proof"
