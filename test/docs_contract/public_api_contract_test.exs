@@ -1,5 +1,5 @@
 defmodule Rendro.DocsContract.PublicApiContractTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   alias Rendro.PublicApi
   alias Rendro.PublicApi.Loader

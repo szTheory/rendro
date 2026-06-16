@@ -1,5 +1,5 @@
 defmodule Rendro.DocsContract.RecipesContractTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   alias Rendro.Test.DocsContract
 
