@@ -5,12 +5,16 @@
   "policy": "additive_only",
   "since_milestone": "v2.3",
   "required_contexts": [
-    "long-lived-live-proof",
-    "release-proof",
-    "signing-live-proof",
-    "test"
+    "ci-success"
   ],
   "contexts": [
+    {
+      "name": "ci-success",
+      "semantic_class": "pipeline_gate",
+      "ci_job": "ci-success",
+      "command": "true",
+      "notes": "The single mandatory gate job that depends on test and integration-proofs."
+    },
     {
       "name": "test",
       "semantic_class": "deterministic",
@@ -19,31 +23,19 @@
       "notes": "Includes mix test (11 docs-contract lanes), format, hex.build, compile --warnings-as-errors, docs, credo, dialyzer. Viewer-evidence schema/lint folded here per Phase 68 D-18 — not a separate required context. Public-api contract lane added Phase 79 D-07."
     },
     {
-      "name": "signing-live-proof",
+      "name": "integration-proofs",
       "semantic_class": "behavioral_live_proof",
-      "ci_job": "signing-live-proof",
-      "command": "mix test --include live_signing test/rendro/adapters/signing_live_test.exs"
-    },
-    {
-      "name": "long-lived-live-proof",
-      "semantic_class": "behavioral_live_proof",
-      "ci_job": "long-lived-live-proof",
-      "command": "mix test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs"
-    },
-    {
-      "name": "release-proof",
-      "semantic_class": "release",
-      "ci_job": "release-proof",
-      "command": "mix run scripts/release_preflight_proof.exs --current-version-tag --worktree <isolated>"
+      "ci_job": "integration-proofs",
+      "command": "mix test --include live_signing test/rendro/adapters/signing_live_test.exs && mix test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs && mix run scripts/release_preflight_proof.exs --current-version-tag --worktree <isolated>"
     }
   ],
   "advisory_contexts": [
     {
-      "name": "viewer-evidence-live-proof",
-      "semantic_class": "behavioral_live_proof",
-      "ci_job": "viewer-evidence-live-proof",
-      "command": "mix test --include live_pdf_tools test/rendro/adapters/forms_viewer_evidence_live_test.exs test/rendro/adapters/embedded_files_viewer_evidence_live_test.exs test/rendro/adapters/links_viewer_evidence_live_test.exs test/rendro/adapters/protection_viewer_evidence_live_test.exs test/rendro/adapters/signature_widget_viewer_evidence_live_test.exs test/rendro/adapters/signed_artifact_viewer_evidence_live_test.exs test/rendro/adapters/trust_sensitive_viewer_evidence_live_test.exs",
-      "notes": "Phase 71 structural-proxy evidence regen; not required on main per D-18/D-32."
+      "name": "advisory-checks",
+      "semantic_class": "advisory_aggregation",
+      "ci_job": "advisory-checks",
+      "command": "mix test --include live_pdf_tools test/rendro/adapters/forms_viewer_evidence_live_test.exs test/rendro/adapters/embedded_files_viewer_evidence_live_test.exs test/rendro/adapters/links_viewer_evidence_live_test.exs test/rendro/adapters/protection_viewer_evidence_live_test.exs test/rendro/adapters/signature_widget_viewer_evidence_live_test.exs test/rendro/adapters/signed_artifact_viewer_evidence_live_test.exs test/rendro/adapters/trust_sensitive_viewer_evidence_live_test.exs && mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs && mix rendro.launch_artifacts.check && mix rendro.comparison.check && mix rendro.livebook.check && npm ci --prefix scripts/pdfjs_observer && node scripts/pdfjs_observer/observe.mjs --check",
+      "notes": "Combined advisory checks including viewer-evidence-live-proof, raster-advisory, comparison-advisory, livebook-advisory, and pdfjs-advisory. Not required on main. D-32 and REF-03 apply."
     },
     {
       "name": "example-phoenix",
@@ -51,34 +43,6 @@
       "ci_job": "example-phoenix",
       "command": "mix deps.get && mix test",
       "notes": "Phase 76 reference Phoenix app smoke; not required on main per REF-03/D-09."
-    },
-    {
-      "name": "raster-advisory",
-      "semantic_class": "raster_snapshot",
-      "ci_job": "raster-advisory",
-      "command": "mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs && mix rendro.launch_artifacts.check",
-      "notes": "Phase 85 deterministic raster snapshots and Phase 86 launch artifact PNG/hash checks; not required on main. Pdfium download or check failures must never block engine merges."
-    },
-    {
-      "name": "comparison-advisory",
-      "semantic_class": "comparison_static_advisory",
-      "ci_job": "comparison-advisory",
-      "command": "mix rendro.comparison.check",
-      "notes": "Phase 87 comparison evidence static check; not required on main and must not rerun external benchmarks."
-    },
-    {
-      "name": "livebook-advisory",
-      "semantic_class": "livebook_execution",
-      "ci_job": "livebook-advisory",
-      "command": "mix rendro.livebook.check",
-      "notes": "Phase 87 Livebook tutorial static execution check; not required on main and must not start a Livebook server."
-    },
-    {
-      "name": "pdfjs-advisory",
-      "semantic_class": "pdfjs_advisory_observation",
-      "ci_job": "pdfjs-advisory",
-      "command": "npm ci --prefix scripts/pdfjs_observer && node scripts/pdfjs_observer/observe.mjs --check",
-      "notes": "Phase 91 pinned PDF.js advisory observations; not required on main. npm, Node, or PDF.js observer failures must never block required engine merges or promote GUI-viewer support claims."
     }
   ],
   "supersedes_planning_refs": {
