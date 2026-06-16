@@ -1,0 +1,29 @@
+version: 2
+updates:
+  - package-ecosystem: "mix"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      elixir-dev-tools:
+        patterns:
+          - "ex_doc"
+          - "credo"
+          - "dialyxir"
+          - "mix_audit"
+          - "bypass"
+      runtime-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
