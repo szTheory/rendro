@@ -70,11 +70,13 @@ defmodule Rendro.MixProject do
         "format --check-formatted",
         "hex.build",
         "compile --warnings-as-errors",
-        "test",
+        "test --exclude quarantine --slowest 10",
         "docs --warnings-as-errors",
         "credo --strict",
         "dialyzer"
-      ]
+      ],
+      "verify.flake": ["test --include quarantine --only quarantine --slowest 10"],
+      "test.all": ["test --include quarantine --include live_pdf_tools --include live_signing --include raster_snapshot --slowest 10"]
     ]
   end
 
