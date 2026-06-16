@@ -130,6 +130,14 @@ Plans:
 
 **Artifacts**: `.github/dependabot.yml`; `.github/workflows/*.yml` (SHA pins, per-job `permissions`, hardened `release.yml`, audit lane placement)
 
+
+**Plans:** 4 plans
+
+- [ ] 112-01-PLAN.md — Configure Dependabot to manage dependencies for Hex and GitHub Actions on a grouped, weekly schedule to minimize PR fatigue.
+- [ ] 112-02-PLAN.md — Introduce separated security audit lanes to give immediate, non-blocking feedback on PRs while maintaining a strict, actionable nightly audit for maintainers.
+- [ ] 112-03-PLAN.md — Harden the release pipeline by adding deterministic version matching and a strict environment-based human approval gate before Hex publication.
+- [ ] 112-04-PLAN.md — Fix the gap where actions/cache in ci.yml is not pinned to a SHA, satisfying SEC-01 and claiming the orphaned requirements.
+
 ### Phase 113: DX, Local Reproducibility & Validation
 
 **Goal**: Close the milestone by making the pipeline pleasant and reproducible for contributors — `mix ci` matches the merge gate 1:1, failures are actionable, CONTRIBUTING + the README badge are accurate — and by proving the whole effort worked: record before/after metrics vs the Phase 108 baseline and document the steady-state target pipeline as one coherent system.
