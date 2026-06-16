@@ -1,5 +1,5 @@
 defmodule Rendro.DocsContract.ComparisonClaimsTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   @guide_path "guides/comparison.md"
   @livebook_path "guides/livebook/first_invoice.livemd"
@@ -168,10 +168,8 @@ defmodule Rendro.DocsContract.ComparisonClaimsTest do
 
   test "hex package includes comparison guide, notebook, manifest, and raw artifacts" do
     tarball = "rendro-#{Mix.Project.config()[:version]}.tar"
-    File.rm(tarball)
-    on_exit(fn -> File.rm(tarball) end)
 
-    {output, 0} = System.cmd("mix", ["hex.build"], stderr_to_stdout: true)
+    {output, 0} = Rendro.Test.HexBuildCache.get_build_output()
     assert output =~ tarball
     assert File.exists?(tarball)
 

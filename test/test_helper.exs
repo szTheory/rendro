@@ -1,5 +1,8 @@
 ExUnit.start()
 
+# Start the HexBuildCache agent to avoid redundant mix hex.build calls in tests (TEST-05)
+Rendro.Test.HexBuildCache.start_link()
+
 # D-01: ExUnit.configure test layering and exclusion strategy.
 # - :quarantine tests are known flakes, isolated to a nightly verify.flake lane.
 # - :live_pdf_tools, :live_signing, and :raster_snapshot are specialized tests excluded by default.

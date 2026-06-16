@@ -4,13 +4,12 @@ defmodule Rendro.Test.HexBuildCacheTest do
   alias Rendro.Test.HexBuildCache
 
   setup do
-    # Ensure the Agent is started, or restart it to have a clean state for testing
-    if pid = Process.whereis(HexBuildCache) do
-      Process.exit(pid, :kill)
-      # Wait for it to die
-      Process.sleep(10)
+    # Reset the cache state for testing without killing the global process
+    if Process.whereis(HexBuildCache) do
+      Agent.update(HexBuildCache, fn _ -> nil end)
+    else
+      start_supervised(HexBuildCache)
     end
-    start_supervised(HexBuildCache)
     :ok
   end
 

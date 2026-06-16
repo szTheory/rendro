@@ -10,7 +10,7 @@ defmodule Mix.Tasks.CiAliasContractTest do
              "format --check-formatted",
              "hex.build",
              "compile --warnings-as-errors",
-             "test",
+             "test --exclude quarantine --slowest 10",
              "docs --warnings-as-errors",
              "credo --strict",
              "dialyzer"

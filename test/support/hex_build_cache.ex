@@ -1,11 +1,5 @@
 defmodule Rendro.Test.HexBuildCache do
-  @moduledoc """
-  An Agent to cache the result of `mix hex.build` during test runs.
-
-  This avoids redundant IO operations, reducing test execution time and
-  preventing concurrency issues caused by mutating the shared `_build`
-  directory.
-  """
+  @moduledoc false
   use Agent
 
   @doc """
@@ -37,10 +31,10 @@ defmodule Rendro.Test.HexBuildCache do
 
       cached_result ->
         {cached_result, cached_result}
-    end)
+    end, :infinity)
   end
 
   defp default_runner do
-    System.cmd("mix", ["hex.build"], stderr_to_stdout: true)
+    System.cmd("mix", ["hex.build"], env: [{"MIX_ENV", "dev"}], stderr_to_stdout: true)
   end
 end
