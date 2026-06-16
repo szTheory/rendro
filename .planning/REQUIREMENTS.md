@@ -26,10 +26,10 @@
 ### Test Concurrency, Determinism & Cleanup (TEST) — brief §4, §5, §12
 
 - [x] **TEST-01**: Every safely-isolatable test module runs `async: true`; each module kept non-async carries a documented reason (global app env, named ETS, registered process, ports, time, randomness, etc.).
-- [ ] **TEST-02**: A measured decision on `mix test --partitions N` is made and applied only where evidence shows net benefit (no oversubscription, isolation preserved).
-- [ ] **TEST-03**: Flaky / nondeterministic tests (Process.sleep readiness, unseeded randomness, order dependence, real network) are fixed or explicitly quarantined with tracked remediation — not papered over with blind retries.
-- [ ] **TEST-04**: Low-signal tests (implementation-trivia, duplicated paths, assertion-free coverage filler) are removed or rewritten *with evidence*; high-value tests are retained.
-- [ ] **TEST-05**: Slowest tests are reported, and the live-proof / advisory suites are correctly layered (PR fast path vs scheduled) without losing real coverage.
+- [x] **TEST-02**: A measured decision on `mix test --partitions N` is made and applied only where evidence shows net benefit (no oversubscription, isolation preserved).
+- [x] **TEST-03**: Flaky / nondeterministic tests (Process.sleep readiness, unseeded randomness, order dependence, real network) are fixed or explicitly quarantined with tracked remediation — not papered over with blind retries.
+- [x] **TEST-04**: Low-signal tests (implementation-trivia, duplicated paths, assertion-free coverage filler) are removed or rewritten *with evidence*; high-value tests are retained.
+- [x] **TEST-05**: Slowest tests are reported, and the live-proof / advisory suites are correctly layered (PR fast path vs scheduled) without losing real coverage.
 
 ### Workflow Topology, Triggers & Matrix (FLOW) — brief §1, §6.1–§6.4, §6.7, §6.8
 
@@ -89,10 +89,10 @@
 | CACHE-04 | Phase 109 | Complete |
 | CACHE-05 | Phase 109 | Complete |
 | TEST-01 | Phase 110 | Complete |
-| TEST-02 | Phase 110 | Pending |
-| TEST-03 | Phase 110 | Pending |
-| TEST-04 | Phase 110 | Pending |
-| TEST-05 | Phase 110 | Pending |
+| TEST-02 | Phase 110 | Complete |
+| TEST-03 | Phase 110 | Complete |
+| TEST-04 | Phase 110 | Complete |
+| TEST-05 | Phase 110 | Complete |
 | FLOW-01 | Phase 111 | Pending |
 | FLOW-02 | Phase 111 | Pending |
 | FLOW-03 | Phase 111 | Pending |

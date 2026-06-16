@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: C1
 milestone_name: CI/CD Performance & Reliability
 status: executing
-last_updated: "2026-06-16T01:58:05.893Z"
+last_updated: "2026-06-16T02:01:10.501Z"
 last_activity: 2026-06-16
 progress:
   total_phases: 10
   completed_phases: 2
   total_plans: 8
-  completed_plans: 6
+  completed_plans: 7
   percent: 20
 ---
 
@@ -24,7 +24,7 @@ progress:
 ## Current Position
 
 Phase: 110 (test-concurrency-determinism-cleanup) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-06-16
 
@@ -61,6 +61,10 @@ Phase 113 DX & Validation ................. Pending
 - 109-01: Set plt_core_path and plt_local_path to priv/plts in mix.exs to store Dialyzer PLT files outside the default _build directory, preparing for caching.
 - 109-02: Split PLT cache into restore and save actions to ensure generation is saved even on job failure or subsequent step failures, maintaining pipeline isolation.
 - 109-02: Expose cache hits to the job summary through strictly mapped env variables to prevent expression injection.
+- [Phase ?]: Quarantined RecipesFacadeDriftTest to a nightly verify.flake lane due to its non-deterministic seed-dependency.
+- [Phase ?]: ExUnit exclusions configured to automatically ignore quarantine, live_pdf_tools, live_signing, and raster_snapshot by default.
+- [Phase ?]: Explicitly rejected mix test --partitions N in favor of maximizing async: true due to BEAM initialization overhead.
+- [Phase ?]: Implemented flake quarantine lane via verify.flake and test.all aliases with --slowest 10 reporting.
 
 ### Blockers / Open Questions
 
@@ -91,3 +95,4 @@ Phase 113 DX & Validation ................. Pending
 | Phase 108 P02 | 45min | 2 tasks | 1 files |
 | Phase 108 P03 | 35min | 2 tasks | 1 files |
 | Phase 109 P01 | 15m | 2 tasks | 4 files |
+| Phase 110-test-concurrency-determinism-cleanup P02 | 2 | 3 tasks | 3 files |
