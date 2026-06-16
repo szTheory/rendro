@@ -99,6 +99,12 @@ Plans:
 **Goal**: Reshape the workflow graph into a coherent fast-PR / main / nightly / release model — minimizing the critical path and duplicated setup, rationalizing the advisory and live-proof jobs, cancelling superseded PR runs, defining a version-matrix policy, and exposing one stable required-check name to branch protection — without weakening any gate.
 **Depends on**: Phase 108 (critical-path + topology evidence), Phase 109 (caching makes split/merge job decisions safe)
 **Requirements**: FLOW-01, FLOW-02, FLOW-03, FLOW-04, FLOW-05
+**Plans:** 2 plans
+
+Plans:
+- [ ] 111-01-PLAN.md — Triggers, Concurrency, and Job Merging
+- [ ] 111-02-PLAN.md — Version Matrix Policy and Summary Gate Job
+
 **Success Criteria** (what must be TRUE):
 
   1. The critical path is minimized — duplicated `deps.get`/compile across jobs is reduced and the 4 advisory soft-fail jobs (raster/comparison/livebook/pdfjs) + 4 live-proof gates (viewer-evidence/signing/long-lived/release-proof) are rationalized (kept / merged / re-tiered) without weakening any gate — FLOW-01.
