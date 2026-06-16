@@ -16,7 +16,7 @@
 - [x] **Phase 108: Baseline & Audit Report** — Measure the current pipeline (per-job duration/critical-path table), classify every test/check A–E with evidence, emit a prioritized P0–P3 recommendation report, and add CI observability job summaries. Analysis + instrumentation only; no gate-logic or test changes. (completed 2026-06-14)
 - [x] **Phase 109: Caching & setup-beam Foundation** — Add keyed `deps`/`_build`/PLT caching (the pipeline currently has ZERO caching), SHA-pin and unify `setup-beam`, and document cache-busting. Biggest expected runtime win. (completed 2026-06-15)
 - [x] **Phase 110: Test Concurrency, Determinism & Cleanup** — Convert safely-isolatable modules to `async: true`, make an evidence-based partitioning decision, fix/quarantine flaky tests (no blind retries), remove low-signal tests with evidence, and layer slow suites PR-vs-scheduled correctly. (completed 2026-06-16)
-- [ ] **Phase 111: Workflow Topology, Triggers & Matrix** — Cut the critical path and duplicated work, rationalize advisory + live-proof jobs, add per-PR concurrency cancellation, define the PR/main/nightly/release trigger model + version-matrix policy, and gate merge on one stable required-check summary.
+- [x] **Phase 111: Workflow Topology, Triggers & Matrix** — Cut the critical path and duplicated work, rationalize advisory + live-proof jobs, add per-PR concurrency cancellation, define the PR/main/nightly/release trigger model + version-matrix policy, and gate merge on one stable required-check summary. (completed 2026-06-16)
 - [ ] **Phase 112: Security, Supply-chain & Release Hardening** — Pin all actions to SHAs + add Dependabot, apply least-privilege per-job permissions, and gate Hex publish on full verification from trusted tags with `hex.publish --dry-run` (building on `mix release.preflight`).
 - [ ] **Phase 113: DX, Local Reproducibility & Validation** — Achieve `mix ci` local/CI parity, add CONTRIBUTING + actionable-failure ergonomics + README badge, and record final before/after metrics vs the Phase 108 baseline plus an integrated target-pipeline description. Closes the milestone.
 
@@ -99,12 +99,12 @@ Plans:
 **Goal**: Reshape the workflow graph into a coherent fast-PR / main / nightly / release model — minimizing the critical path and duplicated setup, rationalizing the advisory and live-proof jobs, cancelling superseded PR runs, defining a version-matrix policy, and exposing one stable required-check name to branch protection — without weakening any gate.
 **Depends on**: Phase 108 (critical-path + topology evidence), Phase 109 (caching makes split/merge job decisions safe)
 **Requirements**: FLOW-01, FLOW-02, FLOW-03, FLOW-04, FLOW-05
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 
 Plans:
 - [x] 111-00-PLAN.md — Guardrail Test Topology Alignment
 - [x] 111-01-PLAN.md — Triggers, Concurrency, and Job Merging
-- [ ] 111-02-PLAN.md — Version Matrix Policy and Summary Gate Job
+- [x] 111-02-PLAN.md — Version Matrix Policy and Summary Gate Job
 
 **Success Criteria** (what must be TRUE):
 
@@ -152,7 +152,7 @@ Plans:
 | 108. Baseline & Audit Report | 3/3 | Complete    | 2026-06-14 |
 | 109. Caching & setup-beam Foundation | 2/2 | Complete    | 2026-06-15 |
 | 110. Test Concurrency, Determinism & Cleanup | 3/3 | Complete    | 2026-06-16 |
-| 111. Workflow Topology, Triggers & Matrix | 2/3 | In Progress|  |
+| 111. Workflow Topology, Triggers & Matrix | 3/3 | Complete    | 2026-06-16 |
 | 112. Security, Supply-chain & Release Hardening | 0/4 | Not started | - |
 | 113. DX, Local Reproducibility & Validation | 0/6 | Not started | - |
 
