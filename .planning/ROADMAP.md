@@ -103,7 +103,7 @@ Plans:
 
 Plans:
 - [x] 111-00-PLAN.md — Guardrail Test Topology Alignment
-- [ ] 111-01-PLAN.md — Triggers, Concurrency, and Job Merging
+- [x] 111-01-PLAN.md — Triggers, Concurrency, and Job Merging
 - [ ] 111-02-PLAN.md — Version Matrix Policy and Summary Gate Job
 
 **Success Criteria** (what must be TRUE):
@@ -152,7 +152,7 @@ Plans:
 | 108. Baseline & Audit Report | 3/3 | Complete    | 2026-06-14 |
 | 109. Caching & setup-beam Foundation | 2/2 | Complete    | 2026-06-15 |
 | 110. Test Concurrency, Determinism & Cleanup | 3/3 | Complete    | 2026-06-16 |
-| 111. Workflow Topology, Triggers & Matrix | 1/3 | In Progress|  |
+| 111. Workflow Topology, Triggers & Matrix | 2/3 | In Progress|  |
 | 112. Security, Supply-chain & Release Hardening | 0/4 | Not started | - |
 | 113. DX, Local Reproducibility & Validation | 0/6 | Not started | - |
 

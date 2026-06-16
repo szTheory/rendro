@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: C1
 milestone_name: CI/CD Performance & Reliability
-status: planning
-last_updated: "2026-06-16T18:56:21.439Z"
+status: executing
+last_updated: "2026-06-16T19:02:14.458Z"
 last_activity: 2026-06-16
 progress:
   total_phases: 10
   completed_phases: 3
   total_plans: 11
-  completed_plans: 9
+  completed_plans: 10
   percent: 30
 ---
 
@@ -24,8 +24,8 @@ progress:
 ## Current Position
 
 Phase: 111
-Plan: 01
-Status: Executing
+Plan: 02
+Status: Pending
 Last activity: 2026-06-16
 
 ## Progress
@@ -66,6 +66,8 @@ Phase 113 DX & Validation ................. Pending
 - [Phase ?]: Explicitly rejected mix test --partitions N in favor of maximizing async: true due to BEAM initialization overhead.
 - [Phase ?]: Implemented flake quarantine lane via verify.flake and test.all aliases with --slowest 10 reporting.
 - 111-00: Allowed the contract tests to intentionally fail against the current `ci.yml` (TDD RED state) to fulfill the plan's explicit objective of preparing tests before pipeline modification.
+- 111-01: Merged 8 disjointed/dependent CI jobs into 2 serialized jobs to minimize checkout and VM setup overhead.
+- 111-01: Used GitHub Actions concurrency API to cancel superseded in-progress non-main branch builds.
 - 111-00: Grouped advisory contexts into a single `advisory-checks` pipeline context, and live-proofs into a single `integration-proofs` context.
 - 111-00: Set `ci-success` as the sole required context for main branch protection.
 
@@ -81,7 +83,7 @@ Phase 113 DX & Validation ................. Pending
 ## Last Session
 
 **Last updated**: 2026-06-16
-**Stopped at**: Completed 111-00-PLAN.md
+**Stopped at**: Completed 111-01-PLAN.md
 **Blockers**: None
 
 ## Performance Metrics
@@ -95,3 +97,4 @@ Phase 113 DX & Validation ................. Pending
 | Phase 110 P01 | 5m | 2 tasks | 5 files |
 | Phase 110-test-concurrency-determinism-cleanup P02 | 2 | 3 tasks | 3 files |
 | Phase 111 P00 | 5m | 2 tasks | 2 files |
+| Phase 111 P01 | 10m | 3 tasks | 1 files |

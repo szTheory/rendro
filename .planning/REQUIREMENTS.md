@@ -34,7 +34,7 @@
 ### Workflow Topology, Triggers & Matrix (FLOW) — brief §1, §6.1–§6.4, §6.7, §6.8
 
 - [x] **FLOW-01**: The critical path is minimized — duplicated `deps.get`/compile across jobs reduced and the advisory + live-proof jobs rationalized (kept / merged / re-tiered) without weakening any gate.
-- [ ] **FLOW-02**: Concurrency cancels superseded PR runs (per-PR group) while never canceling in-flight main or release runs.
+- [x] **FLOW-02**: Concurrency cancels superseded PR runs (per-PR group) while never canceling in-flight main or release runs.
 - [ ] **FLOW-03**: Triggers follow a clear model: PR fast gate, push-to-main, scheduled/nightly (broad matrix + slow integration), release/tag full verification.
 - [ ] **FLOW-04**: A version matrix policy (latest + minimum-supported Elixir/OTP) protects compatibility, with the broad matrix on scheduled not every PR, and lint/static checks running once rather than per matrix entry.
 - [x] **FLOW-05**: A stable required-check summary job gates merge so branch protection references one stable name; no path/branch/skip-directive pending-check traps.
@@ -94,7 +94,7 @@
 | TEST-04 | Phase 110 | Complete |
 | TEST-05 | Phase 110 | Complete |
 | FLOW-01 | Phase 111 | Complete |
-| FLOW-02 | Phase 111 | Pending |
+| FLOW-02 | Phase 111 | Complete |
 | FLOW-03 | Phase 111 | Pending |
 | FLOW-04 | Phase 111 | Pending |
 | FLOW-05 | Phase 111 | Complete |
