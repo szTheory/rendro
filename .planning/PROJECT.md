@@ -10,7 +10,7 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Active milestone:** C1 CI/CD Performance & Reliability. Phase 109 complete — CI caching setup beam.
+**Active milestone:** C1 CI/CD Performance & Reliability. Phase 110 complete — Test Concurrency, Determinism & Cleanup. Phase 111 (Workflow Topology, Triggers & Matrix) is next.
 
 **Shipped milestone:** v2.8 Done-Enough Stewardship & Adoption Signal Loop — **SHIPPED 2026-06-13** (Phases 93-96, 8/8 requirements; milestone audit `passed`). Rendro reduced maintainer/adopter friction and kept its public posture truthful by closing the `Rendro.Recipes` facade DX gap, cleaning up docs/warning hygiene, bringing header odd/even proof depth to footer parity, reconciling stale phase-validation metadata, and establishing an explicit done-enough stewardship posture tied to a dated adoption-signal review.
 
