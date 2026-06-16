@@ -18,6 +18,25 @@ defmodule Rendro.Test.DocsContract do
   end
 
   def evaluate!(code, file) do
-    Code.eval_string("import ExUnit.Assertions\n#{code}", [], file: file)
+    ast = Code.string_to_quoted!("import ExUnit.Assertions\n#{code}")
+
+    Macro.prewalk(ast, fn
+      {{:., _, [{:__aliases__, _, [:File]}, func]}, _, _}
+          when func in [:write, :write!, :rm, :rm!, :rm_rf, :mkdir, :mkdir!, :cp, :cp!] ->
+        raise "Docs contract evaluator cannot perform File.#{func} writes"
+
+      {{:., _, [{:__aliases__, _, [:System]}, cmd]}, _, _}
+          when cmd in [:cmd] ->
+        raise "Docs contract evaluator cannot run System.#{cmd}"
+
+      {{:., _, [{:__aliases__, _, [:Mix, :Task]}, run]}, _, _}
+          when run in [:run, :clear] ->
+        raise "Docs contract evaluator cannot invoke Mix.Task.#{run}"
+
+      node ->
+        node
+    end)
+
+    Code.eval_quoted(ast, [], file: file)
   end
 end
