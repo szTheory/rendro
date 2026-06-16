@@ -15,7 +15,7 @@
 
 - [x] **Phase 108: Baseline & Audit Report** — Measure the current pipeline (per-job duration/critical-path table), classify every test/check A–E with evidence, emit a prioritized P0–P3 recommendation report, and add CI observability job summaries. Analysis + instrumentation only; no gate-logic or test changes. (completed 2026-06-14)
 - [x] **Phase 109: Caching & setup-beam Foundation** — Add keyed `deps`/`_build`/PLT caching (the pipeline currently has ZERO caching), SHA-pin and unify `setup-beam`, and document cache-busting. Biggest expected runtime win. (completed 2026-06-15)
-- [ ] **Phase 110: Test Concurrency, Determinism & Cleanup** — Convert safely-isolatable modules to `async: true`, make an evidence-based partitioning decision, fix/quarantine flaky tests (no blind retries), remove low-signal tests with evidence, and layer slow suites PR-vs-scheduled correctly.
+- [x] **Phase 110: Test Concurrency, Determinism & Cleanup** — Convert safely-isolatable modules to `async: true`, make an evidence-based partitioning decision, fix/quarantine flaky tests (no blind retries), remove low-signal tests with evidence, and layer slow suites PR-vs-scheduled correctly. (completed 2026-06-16)
 - [ ] **Phase 111: Workflow Topology, Triggers & Matrix** — Cut the critical path and duplicated work, rationalize advisory + live-proof jobs, add per-PR concurrency cancellation, define the PR/main/nightly/release trigger model + version-matrix policy, and gate merge on one stable required-check summary.
 - [ ] **Phase 112: Security, Supply-chain & Release Hardening** — Pin all actions to SHAs + add Dependabot, apply least-privilege per-job permissions, and gate Hex publish on full verification from trusted tags with `hex.publish --dry-run` (building on `mix release.preflight`).
 - [ ] **Phase 113: DX, Local Reproducibility & Validation** — Achieve `mix ci` local/CI parity, add CONTRIBUTING + actionable-failure ergonomics + README badge, and record final before/after metrics vs the Phase 108 baseline plus an integrated target-pipeline description. Closes the milestone.
@@ -144,7 +144,7 @@ Plans:
 |-------|-----------------------|--------|-----------|
 | 108. Baseline & Audit Report | 3/3 | Complete    | 2026-06-14 |
 | 109. Caching & setup-beam Foundation | 2/2 | Complete    | 2026-06-15 |
-| 110. Test Concurrency, Determinism & Cleanup | 2/3 | In Progress|  |
+| 110. Test Concurrency, Determinism & Cleanup | 3/3 | Complete    | 2026-06-16 |
 | 111. Workflow Topology, Triggers & Matrix | 0/5 | Not started | - |
 | 112. Security, Supply-chain & Release Hardening | 0/4 | Not started | - |
 | 113. DX, Local Reproducibility & Validation | 0/6 | Not started | - |
