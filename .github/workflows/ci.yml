@@ -272,9 +272,31 @@ jobs:
       - name: Verify Release Proof
         run: mix run scripts/release_preflight_proof.exs --current-version-tag --worktree "$RUNNER_TEMP/rendro-release-proof"
 
+  security-audit:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Setup Beam
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
+        with:
+          otp-version: '28'
+          elixir-version: '1.19.5'
+
+      - name: Install Dependencies
+        run: mix deps.get
+
+      - name: Mix Deps Audit
+        run: mix deps.audit
+
+      - name: Mix Hex Audit
+        run: mix hex.audit
+
   ci-success:
     if: always()
-    needs: [test, example-phoenix, integration-proofs, advisory-checks]
+    needs: [test, example-phoenix, integration-proofs, advisory-checks, security-audit]
     runs-on: ubuntu-latest
     steps:
       - name: Enforce strict checks
