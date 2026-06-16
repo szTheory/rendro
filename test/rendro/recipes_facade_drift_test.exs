@@ -1,6 +1,10 @@
 defmodule Rendro.RecipesFacadeDriftTest do
   use ExUnit.Case, async: true
 
+  # Seed-dependent and order-sensitive known flaky test.
+  # Quarantined here per D-03 to prevent PR gate failures until it is fixed within the nightly lane.
+  @moduletag :quarantine
+
   # Single source of truth for recipe facade entries (D-07).
   # Adding a recipe requires a deliberate edit here and in lib/rendro/recipes.ex.
   @recipes [
