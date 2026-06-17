@@ -66,7 +66,8 @@ defmodule Rendro.MixProject do
 
   defp aliases do
     [
-      ci: [
+      ci: ["ci.fast", "ci.proofs"],
+      "ci.fast": [
         "format --check-formatted",
         "hex.build",
         "compile --warnings-as-errors",
@@ -74,6 +75,22 @@ defmodule Rendro.MixProject do
         "docs --warnings-as-errors",
         "credo --strict",
         "dialyzer"
+      ],
+      "ci.proofs": [
+        "test --include live_pdf_tools test/rendro/adapters/forms_viewer_evidence_live_test.exs test/rendro/adapters/embedded_files_viewer_evidence_live_test.exs test/rendro/adapters/links_viewer_evidence_live_test.exs test/rendro/adapters/protection_viewer_evidence_live_test.exs test/rendro/adapters/signature_widget_viewer_evidence_live_test.exs test/rendro/adapters/signed_artifact_viewer_evidence_live_test.exs test/rendro/adapters/trust_sensitive_viewer_evidence_live_test.exs",
+        "test --include live_signing test/rendro/adapters/signing_live_test.exs",
+        "test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs",
+        "run scripts/release_preflight_proof.exs --current-version-tag --worktree /tmp/rendro-release-proof"
+      ],
+      "ci.advisory": [
+        "test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs",
+        "rendro.launch_artifacts.check",
+        "rendro.comparison.check",
+        "rendro.livebook.check",
+        "cmd npm ci --prefix scripts/pdfjs_observer",
+        "cmd node scripts/pdfjs_observer/observe.mjs --check",
+        "deps.audit",
+        "hex.audit"
       ],
       "verify.flake": ["test --include quarantine --only quarantine --slowest 10"],
       "test.all": ["test --include quarantine --include live_pdf_tools --include live_signing --include raster_snapshot --slowest 10"]
