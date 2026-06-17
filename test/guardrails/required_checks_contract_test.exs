@@ -140,9 +140,12 @@ defmodule Guardrails.RequiredChecksContractTest do
     test "ci alias includes structural validation steps folded into test context" do
       project = Rendro.MixProject.project()
       aliases = Keyword.fetch!(project, :aliases)
+      ci_fast_steps = Keyword.fetch!(aliases, :"ci.fast")
       ci_steps = Keyword.fetch!(aliases, :ci)
 
-      assert ci_steps == [
+      assert ci_steps == ["ci.fast", "ci.proofs"]
+
+      assert ci_fast_steps == [
                "format --check-formatted",
                "hex.build",
                "compile --warnings-as-errors",
@@ -159,7 +162,11 @@ defmodule Guardrails.RequiredChecksContractTest do
       ci = File.read!(@ci_path)
       test_block = ci_job_block!(ci, "test")
 
-      assert test_block =~ "run: mix ci"
+      assert test_block =~ "run: mix format"
+      assert test_block =~ "run: mix compile"
+      assert test_block =~ "run: mix test"
+      assert test_block =~ "run: mix credo"
+      assert test_block =~ "run: mix dialyzer"
 
       forbidden_required_fragments = [
         "pdfium-cli",
@@ -199,7 +206,7 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert advisory_block =~ "mix rendro.comparison.check"
       assert advisory_block =~ "mix rendro.livebook.check"
       assert advisory_block =~ "node scripts/pdfjs_observer/observe.mjs --check"
-      
+
       refute advisory_block =~ ~r/^\s+needs:/m
     end
 
