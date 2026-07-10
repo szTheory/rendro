@@ -41,6 +41,7 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
+
 - [x] 110-01-PLAN.md — Docs contract structural security & concurrency maximization
 - [x] 110-02-PLAN.md — Flake quarantine lane & test strategy documentation
 
@@ -64,9 +65,11 @@ Plans:
 
 Plans:
 **Wave 1**
+
 - [x] 109-01-PLAN.md — Unify setup-beam SHA pinning and isolate Dialyzer PLT in Mix config
 
 **Wave 2**
+
 - [x] 109-02-PLAN.md — Introduce robust cache keys and PLT split-cache into CI workflows
 
 **Success Criteria** (what must be TRUE):
@@ -102,6 +105,7 @@ Plans:
 **Plans:** 3/3 plans complete
 
 Plans:
+
 - [x] 111-00-PLAN.md — Guardrail Test Topology Alignment
 - [x] 111-01-PLAN.md — Triggers, Concurrency, and Job Merging
 - [x] 111-02-PLAN.md — Version Matrix Policy and Summary Gate Job
@@ -129,7 +133,6 @@ Plans:
   4. A dependency/security audit (`mix hex.audit` / `mix deps.audit`) runs in an appropriate lane without coupling the PR fast path to flaky network calls — SEC-04.
 
 **Artifacts**: `.github/dependabot.yml`; `.github/workflows/*.yml` (SHA pins, per-job `permissions`, hardened `release.yml`, audit lane placement)
-
 
 **Plans:** 4/4 plans complete
 
@@ -162,7 +165,7 @@ Plans:
 | 110. Test Concurrency, Determinism & Cleanup | 3/3 | Complete    | 2026-06-16 |
 | 111. Workflow Topology, Triggers & Matrix | 3/3 | Complete    | 2026-06-16 |
 | 112. Security, Supply-chain & Release Hardening | 4/4 | Complete    | 2026-06-16 |
-| 113. DX, Local Reproducibility & Validation | 3/3 | Complete   | 2026-07-10 |
+| 113. DX, Local Reproducibility & Validation | 3/3 | Complete    | 2026-07-10 |
 
 **Coverage:** 30/30 C1 requirements mapped across phases 108–113 — no orphans, no duplicates.
 
