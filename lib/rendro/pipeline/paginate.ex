@@ -106,14 +106,12 @@ defmodule Rendro.Pipeline.Paginate do
   defp substitute_anchor_tokens(other, _anchors), do: other
 
   defp collect_anchors(%Document{} = doc) do
-    try do
-      anchors = collect_page_anchors(doc.pages)
-      metadata = Map.put(doc.metadata || %Rendro.Metadata{}, :anchors, anchors)
-      {:ok, %{doc | metadata: metadata}}
-    catch
-      {:error, :duplicate_anchor_id, id} ->
-        {:error, Rendro.Error.from_stage(:paginate, :duplicate_anchor_id, %{details: %{id: id}})}
-    end
+    anchors = collect_page_anchors(doc.pages)
+    metadata = Map.put(doc.metadata || %Rendro.Metadata{}, :anchors, anchors)
+    {:ok, %{doc | metadata: metadata}}
+  catch
+    {:error, :duplicate_anchor_id, id} ->
+      {:error, Rendro.Error.from_stage(:paginate, :duplicate_anchor_id, %{details: %{id: id}})}
   end
 
   defp collect_page_anchors(pages) do

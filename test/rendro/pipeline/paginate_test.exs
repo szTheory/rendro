@@ -1528,7 +1528,8 @@ defmodule Rendro.Pipeline.PaginateTest do
       anchors = paginated.metadata.anchors
       assert anchors["first_anchor"] == [1, :XYZ, 10, 20, nil]
 
-      # Nested element x/y are relative to cell, but block.x inside cell is preserved. Wait, check_block_anchors takes block.x.
+      # Nested element x/y are relative to cell, but block.x inside cell is preserved.
+      # check_block_anchors takes block.x.
       # For now, just test it finds it.
       assert anchors["nested"] == [1, :XYZ, 5, 5, nil]
       assert anchors["second_page_anchor"] == [2, :XYZ, 100, 200, nil]

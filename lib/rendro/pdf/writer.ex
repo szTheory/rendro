@@ -2517,16 +2517,23 @@ defmodule Rendro.PDF.Writer do
         {child_items, end_num} =
           allocate_outline_items(children, item.obj_num, current_num, page_obj_nums)
 
-        first_num = if length(child_items) > 0, do: List.first(child_items).obj_num, else: nil
+        first_num =
+          case child_items do
+            [] -> nil
+            [first_child | _] -> first_child.obj_num
+          end
 
         last_num =
-          if length(child_items) > 0,
-            do:
+          case child_items do
+            [] ->
+              nil
+
+            _ ->
               child_items
               |> Enum.filter(&(&1.parent_num == item.obj_num))
               |> List.last()
-              |> Map.get(:obj_num),
-            else: nil
+              |> Map.get(:obj_num)
+          end
 
         [logical_page_idx, :XYZ, x, y, _] = item.dest
         page_idx = max(0, min(logical_page_idx - 1, length(page_obj_nums) - 1))
