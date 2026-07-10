@@ -18,7 +18,7 @@
 - [x] **Phase 110: Test Concurrency, Determinism & Cleanup** — Convert safely-isolatable modules to `async: true`, make an evidence-based partitioning decision, fix/quarantine flaky tests (no blind retries), remove low-signal tests with evidence, and layer slow suites PR-vs-scheduled correctly. (completed 2026-06-16)
 - [x] **Phase 111: Workflow Topology, Triggers & Matrix** — Cut the critical path and duplicated work, rationalize advisory + live-proof jobs, add per-PR concurrency cancellation, define the PR/main/nightly/release trigger model + version-matrix policy, and gate merge on one stable required-check summary. (completed 2026-06-16)
 - [x] **Phase 112: Security, Supply-chain & Release Hardening** — Pin all actions to SHAs + add Dependabot, apply least-privilege per-job permissions, and gate Hex publish on full verification from trusted tags with `hex.publish --dry-run` (building on `mix release.preflight`). (completed 2026-06-16)
-- [ ] **Phase 113: DX, Local Reproducibility & Validation** — Achieve `mix ci` local/CI parity, add CONTRIBUTING + actionable-failure ergonomics + README badge, and record final before/after metrics vs the Phase 108 baseline plus an integrated target-pipeline description. Closes the milestone.
+- [x] **Phase 113: DX, Local Reproducibility & Validation** — Achieve `mix ci` local/CI parity, add CONTRIBUTING + actionable-failure ergonomics + README badge, and record final before/after metrics vs the Phase 108 baseline plus an integrated target-pipeline description. Closes the milestone. (completed 2026-07-10)
 
 ## Phase Details
 
@@ -162,7 +162,7 @@ Plans:
 | 110. Test Concurrency, Determinism & Cleanup | 3/3 | Complete    | 2026-06-16 |
 | 111. Workflow Topology, Triggers & Matrix | 3/3 | Complete    | 2026-06-16 |
 | 112. Security, Supply-chain & Release Hardening | 4/4 | Complete    | 2026-06-16 |
-| 113. DX, Local Reproducibility & Validation | 2/3 | In Progress|  |
+| 113. DX, Local Reproducibility & Validation | 3/3 | Complete   | 2026-07-10 |
 
 **Coverage:** 30/30 C1 requirements mapped across phases 108–113 — no orphans, no duplicates.
 

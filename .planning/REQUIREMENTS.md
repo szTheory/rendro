@@ -55,8 +55,8 @@
 
 ### Validation (VAL) — brief §9 (validation), §10
 
-- [ ] **VAL-01**: Before/after metrics are recorded — PR wall-clock (p50/p95), cache hit rate, failure/rerun rate, compile time, slowest tests — demonstrating improvement vs the Phase 108 baseline with no quality-signal regression.
-- [ ] **VAL-02**: A final integrated target-pipeline description (PR / main / nightly / release / docs) documents the steady-state design as one coherent system.
+- [x] **VAL-01**: Before/after metrics are recorded — PR wall-clock (p50/p95), cache hit rate, failure/rerun rate, compile time, slowest tests — demonstrating improvement vs the Phase 108 baseline with no quality-signal regression.
+- [x] **VAL-02**: A final integrated target-pipeline description (PR / main / nightly / release / docs) documents the steady-state design as one coherent system.
 
 ## v2 Requirements (deferred)
 
@@ -106,8 +106,8 @@
 | DX-02 | Phase 113 | Complete |
 | DX-03 | Phase 113 | Complete |
 | DX-04 | Phase 113 | Complete |
-| VAL-01 | Phase 113 | Pending |
-| VAL-02 | Phase 113 | Pending |
+| VAL-01 | Phase 113 | Complete |
+| VAL-02 | Phase 113 | Complete |
 
 **Coverage:**
 - v1 requirements: 30 total
