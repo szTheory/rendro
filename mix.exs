@@ -30,7 +30,15 @@ defmodule Rendro.MixProject do
 
   def cli do
     [
-      preferred_envs: [ci: :test, verify: :test]
+      preferred_envs: [
+        ci: :test,
+        "ci.fast": :test,
+        "ci.proofs": :test,
+        "ci.advisory": :test,
+        "verify.flake": :test,
+        "test.all": :test,
+        verify: :test
+      ]
     ]
   end
 
