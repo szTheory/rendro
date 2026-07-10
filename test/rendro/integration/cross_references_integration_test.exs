@@ -2,26 +2,30 @@ defmodule Rendro.CrossReferencesIntegrationTest do
   use ExUnit.Case, async: true
 
   test "0-human verification: PDF anchor link annotations point to valid XYZ destinations" do
-    doc = Rendro.document(
-      pages: [
-        Rendro.page(
-          blocks: [
-            Rendro.block(
-              %Rendro.Link{
-                target: {:anchor, "target_id"},
-                content: Rendro.text("Click to jump")
-              },
-              x: 72, y: 72, width: 100, height: 20
-            )
-          ]
-        ),
-        Rendro.page(
-          blocks: [
-            Rendro.block(Rendro.text("Target Section"), x: 144, y: 288, id: "target_id")
-          ]
-        )
-      ]
-    )
+    doc =
+      Rendro.document(
+        pages: [
+          Rendro.page(
+            blocks: [
+              Rendro.block(
+                %Rendro.Link{
+                  target: {:anchor, "target_id"},
+                  content: Rendro.text("Click to jump")
+                },
+                x: 72,
+                y: 72,
+                width: 100,
+                height: 20
+              )
+            ]
+          ),
+          Rendro.page(
+            blocks: [
+              Rendro.block(Rendro.text("Target Section"), x: 144, y: 288, id: "target_id")
+            ]
+          )
+        ]
+      )
 
     assert {:ok, pdf} = Rendro.render(doc)
 

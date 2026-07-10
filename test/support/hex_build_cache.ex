@@ -24,14 +24,18 @@ defmodule Rendro.Test.HexBuildCache do
     # better if we want to avoid blocking other callers entirely while computing?
     # Actually, evaluating inside the Agent blocks others, which is exactly
     # what we want to prevent concurrent builds.
-    Agent.get_and_update(__MODULE__, fn
-      nil ->
-        result = runner.()
-        {result, result}
+    Agent.get_and_update(
+      __MODULE__,
+      fn
+        nil ->
+          result = runner.()
+          {result, result}
 
-      cached_result ->
-        {cached_result, cached_result}
-    end, :infinity)
+        cached_result ->
+          {cached_result, cached_result}
+      end,
+      :infinity
+    )
   end
 
   defp default_runner do

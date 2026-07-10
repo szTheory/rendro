@@ -7,6 +7,7 @@ defmodule Rendro.Test.DocsContractTest do
       code = """
       assert 1 + 1 == 2
       """
+
       # Shouldn't raise
       assert {_, _} = DocsContract.evaluate!(code, "test.md")
     end
@@ -15,13 +16,17 @@ defmodule Rendro.Test.DocsContractTest do
       code = """
       File.write!("foo.txt", "bar")
       """
-      assert_raise RuntimeError, ~r/Docs contract evaluator cannot perform File\.write! writes/, fn ->
-        DocsContract.evaluate!(code, "test.md")
-      end
+
+      assert_raise RuntimeError,
+                   ~r/Docs contract evaluator cannot perform File\.write! writes/,
+                   fn ->
+                     DocsContract.evaluate!(code, "test.md")
+                   end
 
       code2 = """
       File.rm("foo.txt")
       """
+
       assert_raise RuntimeError, ~r/Docs contract evaluator cannot perform File\.rm writes/, fn ->
         DocsContract.evaluate!(code2, "test.md")
       end
@@ -31,6 +36,7 @@ defmodule Rendro.Test.DocsContractTest do
       code = """
       System.cmd("echo", ["hello"])
       """
+
       assert_raise RuntimeError, ~r/Docs contract evaluator cannot run System\.cmd/, fn ->
         DocsContract.evaluate!(code, "test.md")
       end
@@ -40,6 +46,7 @@ defmodule Rendro.Test.DocsContractTest do
       code = """
       Mix.Task.run("test")
       """
+
       assert_raise RuntimeError, ~r/Docs contract evaluator cannot invoke Mix\.Task\.run/, fn ->
         DocsContract.evaluate!(code, "test.md")
       end

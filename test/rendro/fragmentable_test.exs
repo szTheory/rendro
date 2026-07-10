@@ -47,9 +47,9 @@ defmodule Rendro.FragmentableTest do
     }
 
     block = %Block{id: "my_anchor", height: 100, content: text}
-    
+
     {this_block, rem_block} = Rendro.Fragmentable.split(block, 60)
-    
+
     assert this_block.id == "my_anchor"
     assert rem_block.id == nil
   end

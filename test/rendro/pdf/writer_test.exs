@@ -520,7 +520,12 @@ defmodule Rendro.PDF.WriterTest do
 
     test "serializes internal anchor links as exact physical /Dest coordinates" do
       doc = linked_text_document(anchor: "my-target")
-      doc = %{doc | metadata: Map.put(doc.metadata, :anchors, %{"my-target" => [0, :XYZ, 100.0, 200.0, nil]})}
+
+      doc = %{
+        doc
+        | metadata:
+            Map.put(doc.metadata, :anchors, %{"my-target" => [0, :XYZ, 100.0, 200.0, nil]})
+      }
 
       {:ok, pdf} = Writer.render(doc, deterministic: true)
 

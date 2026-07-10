@@ -997,7 +997,14 @@ defmodule Rendro.PDF.Writer do
     Object.indirect_object(obj_num, 0, Object.serialize(dict, opts))
   end
 
-  defp build_link_annotation_object(obj_num, rect, {:page, page_number}, page_obj_nums, _doc, opts) do
+  defp build_link_annotation_object(
+         obj_num,
+         rect,
+         {:page, page_number},
+         page_obj_nums,
+         _doc,
+         opts
+       ) do
     {target_page_obj_num, _content_obj_num} = Enum.at(page_obj_nums, page_number - 1)
 
     dict =
