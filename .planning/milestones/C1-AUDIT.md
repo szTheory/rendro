@@ -486,3 +486,13 @@ Ensure push-to-main and release/tag runs are excluded from cancellation by scopi
 **Rollback:** Remove the audit step from the scheduled workflow.
 
 **Target phase:** 112. Maps to: SEC-04.
+
+---
+
+## Phase 113 Validation Summary
+
+Phase 113 closes C1 with the pipeline in a locally reproducible and structurally improved state. The required local command has been decomposed into scoped Mix aliases: `mix ci.fast` for the deterministic fast lane, `mix ci.proofs` for required integration proofing, and `mix ci.advisory` for optional advisory checks. The root `mix ci` alias now maps to the required merge gate (`ci.fast` followed by `ci.proofs`), while GitHub Actions exposes the fast lane as named Format, Hex Build, Compile, Test, Docs, Credo, and Dialyzer steps for actionable logs and step timings. The README badge now targets the stable `ci-success` check-run, and `CONTRIBUTING.md` documents local reproduction commands and seed-based flake reproduction.
+
+The final local validation gate is green in this checkout: `mix ci.fast` completed successfully on 2026-07-10 with `ci.fast_seconds=12` using warm local PLTs. That run covered formatting, Hex package build, compile warnings, the default ExUnit lane (1211 tests, 12 doctests, 4 properties, 0 failures, 20 excluded), docs warnings, Credo strict, and Dialyzer with 0 errors. During validation, Phase 113 also fixed committed drift that blocked the fast gate: stale formatting, missing preferred environments for scoped CI aliases, an outdated PDF.js advisory contract test, Credo strict findings, and Dialyzer metadata warnings.
+
+Remote GitHub timing improvement remains intentionally unclaimed until these local commits run on Actions. The latest queried `ci.yml` runs (`27512247437`, `27443757934`, `27441368861`) predate the local C1 closure work and therefore only serve as baseline-era evidence. The current workflow now has cache restore/save points for deps, `_build`, and PLTs, consolidated advisory and proof lanes, CI summaries for cache hit/miss and slowest tests, and one stable required `ci-success` gate. After push, at least three green `ci.yml` runs should be used to record post-C1 p50/p95 wall-clock and cache-hit rates in follow-up release notes or a milestone audit addendum.
