@@ -162,7 +162,7 @@ Plans:
 | 110. Test Concurrency, Determinism & Cleanup | 3/3 | Complete    | 2026-06-16 |
 | 111. Workflow Topology, Triggers & Matrix | 3/3 | Complete    | 2026-06-16 |
 | 112. Security, Supply-chain & Release Hardening | 4/4 | Complete    | 2026-06-16 |
-| 113. DX, Local Reproducibility & Validation | 1/3 | In Progress|  |
+| 113. DX, Local Reproducibility & Validation | 2/3 | In Progress|  |
 
 **Coverage:** 30/30 C1 requirements mapped across phases 108–113 — no orphans, no duplicates.
 
