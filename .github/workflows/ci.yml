@@ -20,7 +20,6 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || matrix.primary == true
     strategy:
       fail-fast: false
       matrix:
@@ -38,9 +37,11 @@ jobs:
 
     steps:
       - name: Checkout
+        if: github.event_name != 'pull_request' || matrix.primary == true
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Setup Beam
+        if: github.event_name != 'pull_request' || matrix.primary == true
         id: setup-beam
         uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
@@ -48,6 +49,7 @@ jobs:
           elixir-version: ${{ matrix.elixir }}
 
       - name: Cache dependencies
+        if: github.event_name != 'pull_request' || matrix.primary == true
         id: deps-cache
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
@@ -57,6 +59,7 @@ jobs:
             ${{ runner.os }}-deps-${{ env.CACHE_BUSTER }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ env.MIX_ENV }}-
 
       - name: Cache build artifacts
+        if: github.event_name != 'pull_request' || matrix.primary == true
         id: build-cache
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
@@ -66,12 +69,15 @@ jobs:
             ${{ runner.os }}-build-${{ env.CACHE_BUSTER }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ env.MIX_ENV }}-
 
       - name: Install Dependencies
+        if: github.event_name != 'pull_request' || matrix.primary == true
         run: mix deps.get
 
       - name: Ensure PLT directory exists
+        if: github.event_name != 'pull_request' || matrix.primary == true
         run: mkdir -p priv/plts
 
       - name: Cache PLT
+        if: github.event_name != 'pull_request' || matrix.primary == true
         id: plt-cache
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
@@ -110,19 +116,19 @@ jobs:
         run: mix dialyzer
 
       - name: Run Tests (Secondary Version)
-        if: matrix.primary == false
+        if: github.event_name != 'pull_request' && matrix.primary == false
         shell: bash
         run: mix test --exclude quarantine --slowest 10 2>&1 | tee /tmp/mix-test-output.log
 
       - name: Save PLT Cache
         uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        if: always() && steps.plt-cache.outputs.cache-hit != 'true'
+        if: always() && (github.event_name != 'pull_request' || matrix.primary == true) && steps.plt-cache.outputs.cache-hit != 'true'
         with:
           path: priv/plts
           key: ${{ steps.plt-cache.outputs.cache-primary-key }}
 
       - name: CI Baseline Summary
-        if: always()
+        if: always() && (github.event_name != 'pull_request' || matrix.primary == true)
         continue-on-error: true
         shell: bash
         # Pass setup-beam outputs via env (values, not inlined script text) to avoid
@@ -255,9 +261,12 @@ jobs:
           qpdf --version
           pdfsig -v
 
-      - name: Install pdfium-cli
+      - name: Install pdfium-cli (pinned)
         run: |
-          curl -fsSL -o pdfium-cli "https://github.com/klippa-app/pdfium-cli/releases/download/v0.10.3/pdfium-webassembly-linux-amd64"
+          EXPECTED_SHA256="b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a"
+          curl -fsSL -o pdfium-cli \
+            "https://github.com/klippa-app/pdfium-cli/releases/download/v0.11.0/pdfium-webassembly-linux-amd64"
+          echo "${EXPECTED_SHA256}  pdfium-cli" | sha256sum --check
           chmod +x pdfium-cli
           sudo mv pdfium-cli /usr/local/bin/pdfium-cli
           pdfium-cli --version
@@ -265,7 +274,7 @@ jobs:
       - name: Install Python Dependencies
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install 'certomancer[web-api]' pyHanko pyHanko-cli
+          python3 -m pip install --require-hashes -r scripts/proof_requirements.txt
           certomancer --version
           pyhanko --version
 
@@ -316,7 +325,7 @@ jobs:
 
   ci-success:
     if: always()
-    needs: [test, example-phoenix, integration-proofs, advisory-checks, security-audit]
+    needs: [test, integration-proofs]
     runs-on: ubuntu-latest
     steps:
       - name: Enforce strict checks

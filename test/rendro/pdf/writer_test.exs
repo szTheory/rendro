@@ -302,7 +302,7 @@ defmodule Rendro.PDF.WriterTest do
       # BOM for UTF-16BE
       assert pdf =~ "/Title <FEFF"
       assert pdf =~ "/Dest ["
-      assert pdf =~ "/XYZ"
+      assert pdf =~ ~r|/Dest \[\d+ 0 R /XYZ 72 769\.8900 null\]|
     end
 
     test "contains Catalog object" do
@@ -518,19 +518,19 @@ defmodule Rendro.PDF.WriterTest do
       refute pdf =~ "/D ["
     end
 
-    test "serializes internal anchor links as exact physical /Dest coordinates" do
+    test "serializes internal anchor links as PDF-space /Dest coordinates" do
       doc = linked_text_document(anchor: "my-target")
 
       doc = %{
         doc
         | metadata:
-            Map.put(doc.metadata, :anchors, %{"my-target" => [0, :XYZ, 100.0, 200.0, nil]})
+            Map.put(doc.metadata, :anchors, %{"my-target" => [1, :XYZ, 100.0, 200.0, nil]})
       }
 
       {:ok, pdf} = Writer.render(doc, deterministic: true)
 
       assert pdf =~ "/Subtype /Link"
-      assert pdf =~ ~r|/Dest \[\d+ 0 R /XYZ 100\.0000 200\.0000 null\]|
+      assert pdf =~ ~r|/Dest \[\d+ 0 R /XYZ 172\.0000 520\.0000 null\]|
     end
 
     test "emits one link annotation per paginated fragment" do

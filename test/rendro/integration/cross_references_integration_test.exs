@@ -37,8 +37,8 @@ defmodule Rendro.CrossReferencesIntegrationTest do
     assert pdf =~ "/Border [0 0 0]"
 
     # 3. Destination mapping Verification
-    # Assert destination structures are mapped (e.g. /Dest [ 4 0 R /XYZ 144 288 null ])
+    # Author-space target coordinates are converted into PDF-space destinations.
     assert pdf =~ "/Dest ["
-    assert pdf =~ "/XYZ 144 288 null"
+    assert pdf =~ "/XYZ 216 481.8900 null"
   end
 end
