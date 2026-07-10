@@ -93,7 +93,9 @@ defmodule Rendro.MixProject do
         "hex.audit"
       ],
       "verify.flake": ["test --include quarantine --only quarantine --slowest 10"],
-      "test.all": ["test --include quarantine --include live_pdf_tools --include live_signing --include raster_snapshot --slowest 10"]
+      "test.all": [
+        "test --include quarantine --include live_pdf_tools --include live_signing --include raster_snapshot --slowest 10"
+      ]
     ]
   end
 

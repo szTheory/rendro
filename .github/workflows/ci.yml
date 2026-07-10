@@ -80,19 +80,39 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-plt-${{ env.CACHE_BUSTER }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ env.MIX_ENV }}-
 
-      - name: Run CI
+      - name: Format
+        if: matrix.primary == true
+        run: mix format --check-formatted
+
+      - name: Hex Build
+        if: matrix.primary == true
+        run: mix hex.build
+
+      - name: Compile
+        if: matrix.primary == true
+        run: mix compile --warnings-as-errors
+
+      - name: Test
         if: matrix.primary == true
         shell: bash
-        # `shell: bash` runs `bash --noprofile --norc -eo pipefail {0}`, so pipefail
-        # is on by default — `mix ci`'s exit code propagates through `tee` (gate-neutral).
-        # Single-line `run:` keeps the literal `run: mix ci` lane that the
-        # required-checks guardrail (test/guardrails/required_checks_contract_test.exs) asserts.
-        run: mix ci 2>&1 | tee /tmp/mix-ci-output.log
+        run: mix test --exclude quarantine --slowest 10 2>&1 | tee /tmp/mix-test-output.log
+
+      - name: Docs
+        if: matrix.primary == true
+        run: mix docs --warnings-as-errors
+
+      - name: Credo
+        if: matrix.primary == true
+        run: mix credo --strict
+
+      - name: Dialyzer
+        if: matrix.primary == true
+        run: mix dialyzer
 
       - name: Run Tests (Secondary Version)
         if: matrix.primary == false
         shell: bash
-        run: mix test --exclude quarantine --slowest 10 2>&1 | tee /tmp/mix-ci-output.log
+        run: mix test --exclude quarantine --slowest 10 2>&1 | tee /tmp/mix-test-output.log
 
       - name: Save PLT Cache
         uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
@@ -131,7 +151,7 @@ jobs:
             echo ""
             echo "### Slowest Tests"
             echo ""
-            grep -A 25 'Top [0-9]* slowest' /tmp/mix-ci-output.log || echo "_(slowest data unavailable)_"
+            grep -A 25 'Top [0-9]* slowest' /tmp/mix-test-output.log || echo "_(slowest data unavailable)_"
           } >> "$GITHUB_STEP_SUMMARY"
 
   example-phoenix:
@@ -304,6 +324,4 @@ jobs:
         run: exit 1
       - name: Pass
         if: ${{ !(contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')) }}
-        run: exit 0
-*.result, 'cancelled')) }}
         run: exit 0
