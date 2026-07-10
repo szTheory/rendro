@@ -26,7 +26,7 @@ defmodule Rendro.Pipeline.Paginate do
   end
 
   defp resolve_toc_tokens(%Document{} = doc) do
-    anchors = Map.get(doc.metadata || %Rendro.Metadata{}, :anchors, %{})
+    anchors = Map.get(doc.metadata, :anchors, %{})
 
     pages =
       Enum.map(doc.pages, fn page ->
@@ -107,7 +107,7 @@ defmodule Rendro.Pipeline.Paginate do
 
   defp collect_anchors(%Document{} = doc) do
     anchors = collect_page_anchors(doc.pages)
-    metadata = Map.put(doc.metadata || %Rendro.Metadata{}, :anchors, anchors)
+    metadata = Map.put(doc.metadata, :anchors, anchors)
     {:ok, %{doc | metadata: metadata}}
   catch
     {:error, :duplicate_anchor_id, id} ->
@@ -184,7 +184,7 @@ defmodule Rendro.Pipeline.Paginate do
   defp collect_outlines(%Document{} = doc) do
     flat_outlines = collect_page_outlines(doc.pages)
     tree = build_outline_tree(flat_outlines)
-    metadata = Map.put(doc.metadata || %Rendro.Metadata{}, :outlines, tree)
+    metadata = Map.put(doc.metadata, :outlines, tree)
     {:ok, %{doc | metadata: metadata}}
   end
 
