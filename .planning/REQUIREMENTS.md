@@ -48,7 +48,7 @@
 
 ### DX & Local Reproducibility (DX) — brief §8, §6.7
 
-- [ ] **DX-01**: `mix ci` reproduces the CI merge gate locally with 1:1 parity; any divergence is eliminated or explicitly documented.
+- [x] **DX-01**: `mix ci` reproduces the CI merge gate locally with 1:1 parity; any divergence is eliminated or explicitly documented.
 - [ ] **DX-02**: CONTRIBUTING documents the required checks, how to run them locally, and how to reproduce a flaky failure (seed).
 - [ ] **DX-03**: CI failures are actionable — grouped logs, GitHub annotations for warnings, clear job names, and service/container failures distinguishable from test failures (test reports/artifacts where they add value).
 - [ ] **DX-04**: README status badge reflects the meaningful required check(s).
@@ -102,7 +102,7 @@
 | SEC-02 | Phase 112 | Complete |
 | SEC-03 | Phase 112 | Complete |
 | SEC-04 | Phase 112 | Complete |
-| DX-01 | Phase 113 | Pending |
+| DX-01 | Phase 113 | Complete |
 | DX-02 | Phase 113 | Pending |
 | DX-03 | Phase 113 | Pending |
 | DX-04 | Phase 113 | Pending |
