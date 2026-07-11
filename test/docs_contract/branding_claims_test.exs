@@ -66,6 +66,9 @@ defmodule Rendro.DocsContract.BrandingClaimsTest do
 
       refute contents =~ "priv/viewer_evidence/"
       refute contents =~ "priv/support_matrix.json"
+      refute contents =~ "priv/schemas/examples.schema.json"
+      refute contents =~ "priv/schemas/rubric_scores.schema.json"
+      refute contents =~ "priv/quality/"
     end
   end
 
