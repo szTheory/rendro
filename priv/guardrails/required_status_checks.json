@@ -26,7 +26,7 @@
       "name": "integration-proofs",
       "semantic_class": "behavioral_live_proof",
       "ci_job": "integration-proofs",
-      "command": "mix test --include live_signing test/rendro/adapters/signing_live_test.exs && mix test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs && mix run scripts/release_preflight_proof.exs --current-version-tag --skip-security-audits --worktree <isolated>"
+      "command": "mix test --include live_signing test/rendro/adapters/signing_live_test.exs && mix test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs && mix run scripts/release_preflight_proof.exs --current-version-tag --skip-ci --skip-security-audits --worktree <isolated>"
     }
   ],
   "advisory_contexts": [

@@ -26,11 +26,12 @@ defmodule Rendro.ReleasePreflightProofTest do
              )
   end
 
-  test "skip security audit flag is forwarded to release preflight" do
-    assert {:ok, %{skip_security_audits: true}} =
+  test "proof skip flags are forwarded to release preflight" do
+    assert {:ok, %{skip_ci: true, skip_security_audits: true}} =
              ReleasePreflightProof.parse_args(
                [
                  "--current-version-tag",
+                 "--skip-ci",
                  "--skip-security-audits",
                  "--worktree",
                  "/tmp/release-proof"
@@ -45,7 +46,8 @@ defmodule Rendro.ReleasePreflightProofTest do
         {"git", ["rev-parse", "--verify", "v0.2.0^{commit}"]} => {"abc123\n", 0},
         {"git", ["worktree", "add", "--detach", "/tmp/release-proof", "v0.2.0"]} => {"", 0},
         {"mix", ["deps.get"]} => {"deps ok\n", 0},
-        {"mix", ["release.preflight", "--skip-security-audits"]} => {"preflight ok\n", 0},
+        {"mix", ["release.preflight", "--skip-ci", "--skip-security-audits"]} =>
+          {"preflight ok\n", 0},
         {"git", ["worktree", "remove", "--force", "/tmp/release-proof"]} => {"", 0},
         {"git", ["tag", "-d", "v0.2.0"]} => {"Deleted tag\n", 0}
       })
@@ -58,12 +60,15 @@ defmodule Rendro.ReleasePreflightProofTest do
                  dry_run: false,
                  keep: false,
                  synthetic_tag: true,
+                 skip_ci: true,
                  skip_security_audits: true
                },
                %{runner: runner, project_config: [version: "0.2.0"]}
              )
 
-    assert_received {:proof_command, "mix", ["release.preflight", "--skip-security-audits"], opts}
+    assert_received {:proof_command, "mix",
+                     ["release.preflight", "--skip-ci", "--skip-security-audits"], opts}
+
     assert opts[:cd] == "/tmp/release-proof"
   end
 
@@ -116,7 +121,9 @@ defmodule Rendro.ReleasePreflightProofTest do
                  worktree: "/tmp/release-proof",
                  dry_run: false,
                  keep: false,
-                 synthetic_tag: true
+                 synthetic_tag: true,
+                 skip_ci: false,
+                 skip_security_audits: false
                },
                %{runner: runner, project_config: [version: "0.2.0"]}
              )
@@ -159,7 +166,9 @@ defmodule Rendro.ReleasePreflightProofTest do
                  worktree: "/tmp/release-proof",
                  dry_run: false,
                  keep: false,
-                 synthetic_tag: true
+                 synthetic_tag: true,
+                 skip_ci: false,
+                 skip_security_audits: false
                },
                %{runner: runner, project_config: [version: "0.2.0"]}
              )

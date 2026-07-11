@@ -166,6 +166,48 @@ defmodule Mix.Tasks.Release.PreflightTest do
                      ["deps.audit", "--ignore-file", ".mix_audit.ignore"]}
   end
 
+  test "skip ci keeps remote release proof from duplicating required merge gate" do
+    runner =
+      command_runner_for(%{
+        {"git", ["status", "--short"]} => {"", 0},
+        {"git", ["describe", "--tags", "--exact-match"]} => {"v1.0.0\n", 0},
+        {"mix", ["docs.contract"]} => {"docs ok", 0},
+        {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0},
+        {"sh", ["-c", "printf 'n\\n' | mix hex.publish --dry-run --yes"]} =>
+          {"Building rendro 1.0.0\nPublishing package to public repository hexpm.\nNo authenticated user found. Run `mix hex.user auth`\n",
+           1},
+        {"mix", ["hex.audit"]} => {"hex audit ok", 0},
+        {"mix", ["deps.audit", "--ignore-file", ".mix_audit.ignore"]} => {"deps audit ok", 0}
+      })
+
+    {messages, result} =
+      capture_shell_messages(fn ->
+        Preflight.run_with_context(
+          %{
+            project_config: [
+              version: "1.0.0",
+              docs: [source_ref: "v1.0.0"],
+              package: [licenses: ["MIT"], links: %{"GitHub" => "https://example.test"}]
+            ],
+            command_runner: runner,
+            env: %{}
+          },
+          skip_ci: true
+        )
+      end)
+
+    output = Enum.join(messages, "\n")
+
+    assert match?({:ok, _}, result)
+    assert output =~ "CI: SKIP"
+    assert output =~ "required CI gate already ran in this workflow"
+    assert output =~ "Docs Contract: PASS"
+    assert output =~ "Overall: PASS"
+
+    refute_received {:preflight_command, "mix", ["ci.fast"]}
+    assert_received {:preflight_command, "mix", ["docs.contract"]}
+  end
+
   test "fails before phase 2 when the changelog release-tail pointer is missing" do
     changelog_path =
       Path.join(

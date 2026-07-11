@@ -24,7 +24,7 @@ defmodule Mix.Tasks.CiAliasContractTest do
              "test --include live_pdf_tools test/rendro/adapters/forms_viewer_evidence_live_test.exs test/rendro/adapters/embedded_files_viewer_evidence_live_test.exs test/rendro/adapters/links_viewer_evidence_live_test.exs test/rendro/adapters/protection_viewer_evidence_live_test.exs test/rendro/adapters/signature_widget_viewer_evidence_live_test.exs test/rendro/adapters/signed_artifact_viewer_evidence_live_test.exs test/rendro/adapters/trust_sensitive_viewer_evidence_live_test.exs",
              "test --include live_signing test/rendro/adapters/signing_live_test.exs",
              "test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs",
-             "run scripts/release_preflight_proof.exs --current-version-tag --skip-security-audits --worktree /tmp/rendro-release-proof"
+             "run scripts/release_preflight_proof.exs --current-version-tag --skip-ci --skip-security-audits --worktree /tmp/rendro-release-proof"
            ]
   end
 

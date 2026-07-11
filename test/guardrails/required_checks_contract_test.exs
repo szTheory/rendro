@@ -98,7 +98,7 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert ci =~ "mix test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs"
 
       assert ci =~
-               "mix run scripts/release_preflight_proof.exs --current-version-tag --skip-security-audits --worktree"
+               "mix run scripts/release_preflight_proof.exs --current-version-tag --skip-ci --skip-security-audits --worktree"
     end
 
     test "baseline JSON commands match behavioral wiring substrings" do
@@ -112,6 +112,7 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert integration["command"] =~ "signing_live_test.exs"
       assert integration["command"] =~ "live_pdf_tools"
       assert integration["command"] =~ "release_preflight_proof.exs"
+      assert integration["command"] =~ "--skip-ci"
       assert integration["command"] =~ "--skip-security-audits"
     end
   end
@@ -223,8 +224,9 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert integration_block =~ "timeout-minutes:"
 
       assert integration_block =~
-               ~s(mix run scripts/release_preflight_proof.exs --current-version-tag --skip-security-audits --worktree)
+               ~s(mix run scripts/release_preflight_proof.exs --current-version-tag --skip-ci --skip-security-audits --worktree)
 
+      assert integration_block =~ "--skip-ci"
       assert integration_block =~ "--skip-security-audits"
     end
   end

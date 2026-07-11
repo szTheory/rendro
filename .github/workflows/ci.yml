@@ -299,7 +299,7 @@ jobs:
         run: mix test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs
 
       - name: Verify Release Proof
-        run: mix run scripts/release_preflight_proof.exs --current-version-tag --skip-security-audits --worktree "$RUNNER_TEMP/rendro-release-proof"
+        run: mix run scripts/release_preflight_proof.exs --current-version-tag --skip-ci --skip-security-audits --worktree "$RUNNER_TEMP/rendro-release-proof"
 
   security-audit:
     runs-on: ubuntu-latest

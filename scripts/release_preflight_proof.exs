@@ -36,6 +36,7 @@ defmodule Rendro.ReleasePreflightProof do
           dry_run: :boolean,
           keep: :boolean,
           current_version_tag: :boolean,
+          skip_ci: :boolean,
           skip_security_audits: :boolean
         ],
         aliases: [r: :ref, w: :worktree]
@@ -63,6 +64,7 @@ defmodule Rendro.ReleasePreflightProof do
            dry_run: Keyword.get(opts, :dry_run, false),
            keep: Keyword.get(opts, :keep, false),
            synthetic_tag: true,
+           skip_ci: Keyword.get(opts, :skip_ci, false),
            skip_security_audits: Keyword.get(opts, :skip_security_audits, false)
          }}
 
@@ -74,6 +76,7 @@ defmodule Rendro.ReleasePreflightProof do
            dry_run: Keyword.get(opts, :dry_run, false),
            keep: Keyword.get(opts, :keep, false),
            synthetic_tag: false,
+           skip_ci: Keyword.get(opts, :skip_ci, false),
            skip_security_audits: Keyword.get(opts, :skip_security_audits, false)
          }}
     end
@@ -182,21 +185,30 @@ defmodule Rendro.ReleasePreflightProof do
     "v#{version}"
   end
 
-  defp release_preflight_args(%{skip_security_audits: true}),
-    do: ["release.preflight", "--skip-security-audits"]
-
-  defp release_preflight_args(_options), do: ["release.preflight"]
+  defp release_preflight_args(options) do
+    ["release.preflight"]
+    |> maybe_add_flag(options, :skip_ci, "--skip-ci")
+    |> maybe_add_flag(options, :skip_security_audits, "--skip-security-audits")
+  end
 
   defp dry_run_message(%{synthetic_tag: true, ref: ref, worktree: worktree} = options) do
-    "Dry run: would create disposable exact tag #{ref} at HEAD, create isolated worktree #{worktree}, run mix deps.get and mix release.preflight#{skip_security_suffix(options)}, then clean up"
+    "Dry run: would create disposable exact tag #{ref} at HEAD, create isolated worktree #{worktree}, run mix deps.get and mix release.preflight#{proof_flag_suffix(options)}, then clean up"
   end
 
   defp dry_run_message(%{ref: ref, worktree: worktree} = options) do
-    "Dry run: would create isolated worktree #{worktree} at #{ref}, run mix deps.get and mix release.preflight#{skip_security_suffix(options)}, then clean up"
+    "Dry run: would create isolated worktree #{worktree} at #{ref}, run mix deps.get and mix release.preflight#{proof_flag_suffix(options)}, then clean up"
   end
 
-  defp skip_security_suffix(%{skip_security_audits: true}), do: " --skip-security-audits"
-  defp skip_security_suffix(_options), do: ""
+  defp maybe_add_flag(args, options, key, flag) do
+    if Map.get(options, key, false), do: args ++ [flag], else: args
+  end
+
+  defp proof_flag_suffix(options) do
+    options
+    |> release_preflight_args()
+    |> tl()
+    |> Enum.map_join("", &" #{&1}")
+  end
 
   defp cleanup(options, cleanup_state, context) do
     maybe_cleanup_worktree(options, context)

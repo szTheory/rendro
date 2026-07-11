@@ -17,7 +17,7 @@ defmodule Mix.Tasks.Release.Preflight do
     {"Hex Audit", ["hex.audit"]},
     {"Deps Audit", ["deps.audit", "--ignore-file", ".mix_audit.ignore"]}
   ]
-  @switches [skip_security_audits: :boolean]
+  @switches [skip_ci: :boolean, skip_security_audits: :boolean]
 
   def run(args) do
     case parse_args(args) do
@@ -40,7 +40,11 @@ defmodule Mix.Tasks.Release.Preflight do
     {opts, _argv, invalid} = OptionParser.parse(args, strict: @switches)
 
     if invalid == [] do
-      {:ok, %{skip_security_audits: Keyword.get(opts, :skip_security_audits, false)}}
+      {:ok,
+       %{
+         skip_ci: Keyword.get(opts, :skip_ci, false),
+         skip_security_audits: Keyword.get(opts, :skip_security_audits, false)
+       }}
     else
       invalid_options = Enum.map_join(invalid, ", ", fn {key, _} -> "--#{key}" end)
       {:error, "invalid options: #{invalid_options}"}
@@ -72,9 +76,20 @@ defmodule Mix.Tasks.Release.Preflight do
       Mix.shell().info("Phase 2: release parity checks")
 
       phase_2_results =
-        @release_parity_checks
+        release_parity_checks(options)
         |> Enum.map(fn {name, args} ->
-          result = run_mix_check(context, name, args)
+          result =
+            case args do
+              :skip ->
+                skip(
+                  name,
+                  "skipped for deterministic release proof; required CI gate already ran in this workflow"
+                )
+
+              args ->
+                run_mix_check(context, name, args)
+            end
+
           print_result(result)
           result
         end)
@@ -91,11 +106,17 @@ defmodule Mix.Tasks.Release.Preflight do
   end
 
   defp normalize_options(options) when is_map(options) do
-    %{skip_security_audits: Map.get(options, :skip_security_audits, false)}
+    %{
+      skip_ci: Map.get(options, :skip_ci, false),
+      skip_security_audits: Map.get(options, :skip_security_audits, false)
+    }
   end
 
   defp normalize_options(options) when is_list(options) do
-    %{skip_security_audits: Keyword.get(options, :skip_security_audits, false)}
+    %{
+      skip_ci: Keyword.get(options, :skip_ci, false),
+      skip_security_audits: Keyword.get(options, :skip_security_audits, false)
+    }
   end
 
   defp default_context do
@@ -131,6 +152,12 @@ defmodule Mix.Tasks.Release.Preflight do
       result
     end)
   end
+
+  defp release_parity_checks(%{skip_ci: true}) do
+    [{"CI", :skip} | Enum.reject(@release_parity_checks, fn {name, _args} -> name == "CI" end)]
+  end
+
+  defp release_parity_checks(%{skip_ci: false}), do: @release_parity_checks
 
   defp check_clean_worktree(context) do
     case run_command(context, "git", ["status", "--short"]) do
