@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "examples.schema.json",
+  "title": "Rendro Example Fixtures",
+  "description": "Structural contract for priv/examples/{domain}/{business}/{family}.json realistic business-document fixtures. Money fields are decimal strings, never JSON floats.",
+  "type": "object",
+  "required": ["fixture_id", "issuer", "customer", "invoice", "items"],
+  "properties": {
+    "fixture_id": { "type": "string", "minLength": 1 },
+    "issuer": { "$ref": "#/$defs/party" },
+    "customer": { "$ref": "#/$defs/party" },
+    "invoice": {
+      "type": "object",
+      "required": ["id", "date", "due_date", "terms"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "date": { "type": "string", "format": "date" },
+        "due_date": { "type": "string", "format": "date" },
+        "terms": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "qty", "price"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "description": { "type": "string" },
+          "qty": { "type": "integer", "minimum": 0 },
+          "price": { "$ref": "#/$defs/money_string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "totals": {
+      "type": "object",
+      "properties": {
+        "subtotal": { "$ref": "#/$defs/money_string" },
+        "tax": { "$ref": "#/$defs/money_string" },
+        "total": { "$ref": "#/$defs/money_string" }
+      },
+      "additionalProperties": true
+    },
+    "brand": {
+      "type": "object",
+      "properties": {
+        "logo": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "money_string": {
+      "type": "string",
+      "pattern": "^-?[0-9]+\\.[0-9]{2}$"
+    },
+    "party": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "street": { "type": "string" },
+        "city": { "type": "string" },
+        "region": { "type": "string" },
+        "postal_code": { "type": "string" },
+        "country": { "type": "string" }
+      },
+      "additionalProperties": true
+    }
+  }
+}
