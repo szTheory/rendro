@@ -2,16 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.10
 milestone_name: Realistic Business-Document Examples & Anatomy
-current_phase: 114
-current_phase_name: Domain research, reader-quality rubric & realistic example-data library
 status: executing
-last_updated: "2026-07-11T05:18:42.566Z"
+last_updated: "2026-07-11T05:26:04.168Z"
 last_activity: 2026-07-11
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 7
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -26,11 +24,11 @@ progress:
 ## Current Position
 
 Phase: 114 (Domain research, reader-quality rubric & realistic example-data library) — EXECUTING
-Plan: 4 of 7
+Plan: 5 of 7
 Status: Ready to execute
 Last activity: 2026-07-11
 
-Progress: [███░░░░░░░] 29%
+Progress: [██████░░░░] 57%
 
 ## Roadmap Snapshot (v2.10, Phases 114–118)
 
@@ -58,6 +56,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 - [Phase ?]: Plan 114-01: invoice fixture de-quarantined into priv/examples/invoice/acme-phoenix-saas/invoice.json as a provable byte-identical no-op; move kept verbatim (money/brand normalization deferred to 114-03 per Pitfall 6), consumers repointed, fresh render sha256-identical to recorded benchmark evidence.
 - [Phase ?]: 114-05: Authored Invoice DOMAIN.md as locked research-first recommendation (synthesized domain-research prose), light human sanity-check reserved for phase verification.
 - [Phase ?]: 114-05: DOMAIN.md structural contract test iterates priv/examples/*/DOMAIN.md so future domain families inherit the four-heading contract automatically.
+- [Phase 114]: 114-03: Normalized invoice fixture money from integer cents to Decimal-safe 2-decimal strings + added S4 empty brand/logo slot in a commit separate from 114-01's verbatim move (Pitfall 6); Rendro render byte-identical. Added first schema-validation lane (examples_schema_contract_test.exs) validating every priv/examples/ fixture. EXL-01/03/06 satisfied.
 
 ### Blockers / Open Questions
 
@@ -70,7 +69,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 ## Last Session
 
 **Last updated**: 2026-07-11
-**Stopped at**: Completed 114-02-PLAN.md — both repo-only JSON Schemas authored (examples.schema.json, rubric_scores.schema.json); EXL-03/RUB-03 satisfied.
+**Stopped at**: Completed 114-03-PLAN.md — invoice fixture money normalized to Decimal-safe strings + S4 brand/logo slot (byte-identical render); examples_schema_contract_test.exs validates every priv/examples/ fixture; EXL-01/03/06 satisfied.
 **Blockers**: None
 
 ## Performance Metrics
@@ -81,6 +80,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 | Phase 114 P01 | 1min | 2 tasks | 5 files |
 | Phase 114 P02 | 3min | 2 tasks | 2 files |
 | Phase 114 P05 | 1min | 2 tasks | 2 files |
+| Phase 114 P03 | 2min | 2 tasks | 6 files |
 
 ## Operator Next Steps
 
