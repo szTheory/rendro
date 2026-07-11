@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  publish:
+  validate-and-dry-run:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
@@ -28,13 +28,41 @@ jobs:
       - name: Install Dependencies
         run: mix deps.get
 
+      - name: Verify Version Match
+        run: |
+          MIX_VERSION=$(grep '@version' mix.exs | sed -E 's/.*"([^"]+)".*/\1/')
+          TAG_VERSION=${GITHUB_REF_NAME#v}
+          if [ "$MIX_VERSION" != "$TAG_VERSION" ]; then
+            echo "Version mismatch: mix.exs has $MIX_VERSION but tag is $TAG_VERSION"
+            exit 1
+          fi
+
       - name: Run CI Checks
         run: mix ci
 
       - name: Run Release Preflight
-        env:
-          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
         run: mix release.preflight
+
+      - name: Publish to Hex (Dry Run)
+        run: mix hex.publish --dry-run
+
+  publish:
+    needs: validate-and-dry-run
+    runs-on: ubuntu-latest
+    environment: 'Hex Publish'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Setup Beam
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
+        with:
+          otp-version: '28'
+          elixir-version: '1.19.5'
+
+      - name: Install Dependencies
+        run: mix deps.get
 
       - name: Publish to Hex
         env:

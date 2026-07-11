@@ -7,6 +7,12 @@ on:
   pull_request:
     branches:
       - main
+  schedule:
+    - cron: '0 2 * * *'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: read
@@ -14,22 +20,145 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - otp: '28'
+            elixir: '1.19.5'
+            primary: true
+          - otp: '25'
+            elixir: '1.19.0'
+            primary: false
+    env:
+      # Bumping CACHE_BUSTER bursts the cache across all jobs
+      CACHE_BUSTER: v1
+      MIX_ENV: test
 
     steps:
       - name: Checkout
+        if: github.event_name != 'pull_request' || matrix.primary == true
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        if: github.event_name != 'pull_request' || matrix.primary == true
+        id: setup-beam
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
-          otp-version: '28'
-          elixir-version: '1.19.5'
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
+
+      - name: Cache dependencies
+        if: github.event_name != 'pull_request' || matrix.primary == true
+        id: deps-cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: deps
+          key: ${{ runner.os }}-deps-${{ env.CACHE_BUSTER }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ env.MIX_ENV }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-${{ env.CACHE_BUSTER }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ env.MIX_ENV }}-
+
+      - name: Cache build artifacts
+        if: github.event_name != 'pull_request' || matrix.primary == true
+        id: build-cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: _build
+          key: ${{ runner.os }}-build-${{ env.CACHE_BUSTER }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ env.MIX_ENV }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.CACHE_BUSTER }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ env.MIX_ENV }}-
 
       - name: Install Dependencies
+        if: github.event_name != 'pull_request' || matrix.primary == true
         run: mix deps.get
 
-      - name: Run CI
-        run: mix ci
+      - name: Ensure PLT directory exists
+        if: github.event_name != 'pull_request' || matrix.primary == true
+        run: mkdir -p priv/plts
+
+      - name: Cache PLT
+        if: github.event_name != 'pull_request' || matrix.primary == true
+        id: plt-cache
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: priv/plts
+          key: ${{ runner.os }}-plt-${{ env.CACHE_BUSTER }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ env.MIX_ENV }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-plt-${{ env.CACHE_BUSTER }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ env.MIX_ENV }}-
+
+      - name: Format
+        if: matrix.primary == true
+        run: mix format --check-formatted
+
+      - name: Hex Build
+        if: matrix.primary == true
+        run: mix hex.build
+
+      - name: Compile
+        if: matrix.primary == true
+        run: mix compile --warnings-as-errors
+
+      - name: Test
+        if: matrix.primary == true
+        shell: bash
+        run: mix test --exclude quarantine --slowest 10 2>&1 | tee /tmp/mix-test-output.log
+
+      - name: Docs
+        if: matrix.primary == true
+        run: mix docs --warnings-as-errors
+
+      - name: Credo
+        if: matrix.primary == true
+        run: mix credo --strict
+
+      - name: Dialyzer
+        if: matrix.primary == true
+        run: mix dialyzer
+
+      - name: Run Tests (Secondary Version)
+        if: github.event_name != 'pull_request' && matrix.primary == false
+        shell: bash
+        run: mix test --exclude quarantine --slowest 10 2>&1 | tee /tmp/mix-test-output.log
+
+      - name: Save PLT Cache
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        if: always() && (github.event_name != 'pull_request' || matrix.primary == true) && steps.plt-cache.outputs.cache-hit != 'true'
+        with:
+          path: priv/plts
+          key: ${{ steps.plt-cache.outputs.cache-primary-key }}
+
+      - name: CI Baseline Summary
+        if: always() && (github.event_name != 'pull_request' || matrix.primary == true)
+        continue-on-error: true
+        shell: bash
+        # Pass setup-beam outputs via env (values, not inlined script text) to avoid
+        # ${{ }} template-expression injection into the shell (WR-01 / GitHub hardening guide).
+        env:
+          OTP_VERSION: ${{ steps.setup-beam.outputs.otp-version }}
+          ELIXIR_VERSION: ${{ steps.setup-beam.outputs.elixir-version }}
+          DEPS_CACHE_HIT: ${{ steps.deps-cache.outputs.cache-hit }}
+          BUILD_CACHE_HIT: ${{ steps.build-cache.outputs.cache-hit }}
+          PLT_CACHE_HIT: ${{ steps.plt-cache.outputs.cache-hit }}
+        run: |
+          [ "$DEPS_CACHE_HIT" = "true" ] && D_STATUS="hit" || D_STATUS="miss"
+          [ "$BUILD_CACHE_HIT" = "true" ] && B_STATUS="hit" || B_STATUS="miss"
+          [ "$PLT_CACHE_HIT" = "true" ] && P_STATUS="hit" || P_STATUS="miss"
+          {
+            echo "## CI Baseline"
+            echo ""
+            echo "| Property | Value |"
+            echo "|----------|-------|"
+            echo "| OTP | ${OTP_VERSION:-n/a} |"
+            echo "| Elixir | ${ELIXIR_VERSION:-n/a} |"
+            echo "| Schedulers | $(elixir -e 'IO.puts(System.schedulers_online())' 2>/dev/null || echo 'n/a') |"
+            echo "| Cache (deps) | ${D_STATUS} |"
+            echo "| Cache (_build) | ${B_STATUS} |"
+            echo "| Cache (PLT) | ${P_STATUS} |"
+            echo ""
+            echo "### Slowest Tests"
+            echo ""
+            grep -A 25 'Top [0-9]* slowest' /tmp/mix-test-output.log || echo "_(slowest data unavailable)_"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   example-phoenix:
     runs-on: ubuntu-latest
@@ -39,7 +168,7 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
@@ -50,19 +179,26 @@ jobs:
           mix deps.get
           mix test
 
-  raster-advisory:
+  advisory-checks:
     runs-on: ubuntu-latest
     continue-on-error: true
-    # no 'needs:' -> graph-disconnected; continue-on-error: true -> download failure cannot block engine merges (RAST-02)
+    # no 'needs:' -> graph-disconnected; failures cannot block engine merges
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
+
+      - name: Setup Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: '22.14.0'
+          cache: 'npm'
+          cache-dependency-path: scripts/pdfjs_observer/package-lock.json
 
       - name: Install pdfium-cli (pinned)
         run: |
@@ -84,60 +220,11 @@ jobs:
       - name: Check Launch Artifacts
         run: mix rendro.launch_artifacts.check
 
-  comparison-advisory:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    # no 'needs:' -> graph-disconnected; committed benchmark truth only, no external benchmark rerun
-    steps:
-      - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-
-      - name: Setup Beam
-        uses: erlef/setup-beam@v1
-        with:
-          otp-version: '28'
-          elixir-version: '1.19.5'
-
-      - name: Install Elixir Dependencies
-        run: mix deps.get
-
       - name: Check Comparison Evidence
         run: mix rendro.comparison.check
 
-  livebook-advisory:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    # no 'needs:' -> graph-disconnected; notebook check does not start a Livebook server
-    steps:
-      - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-
-      - name: Setup Beam
-        uses: erlef/setup-beam@v1
-        with:
-          otp-version: '28'
-          elixir-version: '1.19.5'
-
-      - name: Install Elixir Dependencies
-        run: mix deps.get
-
       - name: Check Livebook Tutorial
         run: mix rendro.livebook.check
-
-  pdfjs-advisory:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    # no 'needs:' -> graph-disconnected; npm/PDF.js failures cannot block engine merges
-    steps:
-      - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-
-      - name: Setup Node
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
-        with:
-          node-version: '22.14.0'
-          cache: 'npm'
-          cache-dependency-path: scripts/pdfjs_observer/package-lock.json
 
       - name: Install PDF.js observer dependencies
         working-directory: scripts/pdfjs_observer
@@ -146,28 +233,27 @@ jobs:
       - name: Check PDF.js advisory observations
         run: node scripts/pdfjs_observer/observe.mjs --check
 
-  viewer-evidence-live-proof:
+  integration-proofs:
     runs-on: ubuntu-latest
     needs: test
+    timeout-minutes: 45
 
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
 
-      - name: Install pdfium-cli
-        run: |
-          curl -fsSL -o pdfium-cli "https://github.com/klippa-app/pdfium-cli/releases/download/v0.10.3/pdfium-webassembly-linux-amd64"
-          chmod +x pdfium-cli
-          sudo mv pdfium-cli /usr/local/bin/pdfium-cli
-          pdfium-cli --version
+      - name: Setup Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
 
-      - name: Install pdfinfo, qpdf, and pdfsig
+      - name: Install System Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y poppler-utils qpdf
@@ -175,15 +261,21 @@ jobs:
           qpdf --version
           pdfsig -v
 
-      - name: Setup Python for pyhanko
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
-        with:
-          python-version: '3.12'
+      - name: Install pdfium-cli (pinned)
+        run: |
+          EXPECTED_SHA256="b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a"
+          curl -fsSL -o pdfium-cli \
+            "https://github.com/klippa-app/pdfium-cli/releases/download/v0.11.0/pdfium-webassembly-linux-amd64"
+          echo "${EXPECTED_SHA256}  pdfium-cli" | sha256sum --check
+          chmod +x pdfium-cli
+          sudo mv pdfium-cli /usr/local/bin/pdfium-cli
+          pdfium-cli --version
 
-      - name: Install pyhanko-cli
+      - name: Install Python Dependencies
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install pyHanko pyHanko-cli
+          python3 -m pip install --require-hashes -r scripts/proof_requirements.txt
+          certomancer --version
           pyhanko --version
 
       - name: Install Elixir Dependencies
@@ -200,86 +292,24 @@ jobs:
             test/rendro/adapters/signed_artifact_viewer_evidence_live_test.exs \
             test/rendro/adapters/trust_sensitive_viewer_evidence_live_test.exs
 
-  signing-live-proof:
-    runs-on: ubuntu-latest
-    needs: test
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-
-      - name: Setup Beam
-        uses: erlef/setup-beam@v1
-        with:
-          otp-version: '28'
-          elixir-version: '1.19.5'
-
-      - name: Setup Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
-        with:
-          python-version: '3.12'
-
-      - name: Install Signing Proof Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y poppler-utils
-          pdfsig -v
-          python3 -m pip install --upgrade pip
-          python3 -m pip install pyHanko pyHanko-cli
-          pyhanko --version
-
-      - name: Install Elixir Dependencies
-        run: mix deps.get
-
       - name: Run Signing Live Proof
         run: mix test --include live_signing test/rendro/adapters/signing_live_test.exs
-
-  long-lived-live-proof:
-    runs-on: ubuntu-latest
-    needs: test
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-
-      - name: Setup Beam
-        uses: erlef/setup-beam@v1
-        with:
-          otp-version: '28'
-          elixir-version: '1.19.5'
-
-      - name: Setup Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
-        with:
-          python-version: '3.12'
-
-      - name: Install Signing Proof Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y poppler-utils
-          pdfsig -v
-          python3 -m pip install --upgrade pip
-          python3 -m pip install 'certomancer[web-api]' pyHanko pyHanko-cli
-          certomancer --version
-          pyhanko --version
-
-      - name: Install Elixir Dependencies
-        run: mix deps.get
 
       - name: Run Long-Lived Live Proof
         run: mix test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs
 
-  release-proof:
-    runs-on: ubuntu-latest
-    needs: test
-    timeout-minutes: 45
+      - name: Verify Release Proof
+        run: mix run scripts/release_preflight_proof.exs --current-version-tag --skip-ci --skip-security-audits --worktree "$RUNNER_TEMP/rendro-release-proof"
 
+  security-audit:
+    runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Setup Beam
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
           otp-version: '28'
           elixir-version: '1.19.5'
@@ -287,5 +317,20 @@ jobs:
       - name: Install Dependencies
         run: mix deps.get
 
-      - name: Verify Release Proof
-        run: mix run scripts/release_preflight_proof.exs --current-version-tag --worktree "$RUNNER_TEMP/rendro-release-proof"
+      - name: Mix Deps Audit
+        run: mix deps.audit
+
+      - name: Mix Hex Audit
+        run: mix hex.audit
+
+  ci-success:
+    if: always()
+    needs: [test, integration-proofs]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce strict checks
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
+      - name: Pass
+        if: ${{ !(contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')) }}
+        run: exit 0

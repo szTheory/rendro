@@ -30,8 +30,9 @@ defmodule Rendro.Rules.CheckIds do
   end
 
   defp collect_block_ids(%Block{id: id, content: %Table{} = table}) do
-    table_ids = collect_row_ids(table.header) ++
-      Enum.flat_map(table.rows, &collect_row_ids/1)
+    table_ids =
+      collect_row_ids(table.header) ++
+        Enum.flat_map(table.rows, &collect_row_ids/1)
 
     if valid_identity?(id) do
       [id | table_ids]

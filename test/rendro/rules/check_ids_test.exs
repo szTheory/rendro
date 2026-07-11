@@ -45,7 +45,8 @@ defmodule Rendro.Rules.CheckIdsTest do
         ]
       }
 
-      assert CheckIds.check(doc, doc) == {:errors, [{:duplicate_id, "dup1"}, {:duplicate_id, "dup2"}]}
+      assert CheckIds.check(doc, doc) ==
+               {:errors, [{:duplicate_id, "dup1"}, {:duplicate_id, "dup2"}]}
     end
   end
 end

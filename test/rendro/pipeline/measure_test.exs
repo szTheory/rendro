@@ -67,7 +67,7 @@ defmodule Rendro.Pipeline.MeasureTest do
       [block_fixed] = hd(result_fixed.pages).blocks
 
       assert block_token.width == block_fixed.width
-      
+
       # Ensure the original text is preserved in the MeasuredText run so it can be substituted later
       lines = lines_text(block_token.content)
       assert Enum.join(lines, "") == "Page {{anchor_page:intro}}"

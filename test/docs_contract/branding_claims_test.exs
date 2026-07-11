@@ -1,5 +1,5 @@
 defmodule Rendro.DocsContract.BrandingClaimsTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   describe "NOTICE file (D-13)" do
     test "exists at top level" do
@@ -41,9 +41,8 @@ defmodule Rendro.DocsContract.BrandingClaimsTest do
   describe "hex tarball contents" do
     test "built tarball includes branded assets and NOTICE" do
       tarball = "rendro-#{Mix.Project.config()[:version]}.tar"
-      File.rm(tarball)
 
-      {output, 0} = System.cmd("mix", ["hex.build"], stderr_to_stdout: true)
+      {output, 0} = Rendro.Test.HexBuildCache.get_build_output()
       assert output =~ tarball
       assert File.exists?(tarball)
 
@@ -57,9 +56,8 @@ defmodule Rendro.DocsContract.BrandingClaimsTest do
 
     test "built tarball excludes operator-only priv paths" do
       tarball = "rendro-#{Mix.Project.config()[:version]}.tar"
-      File.rm(tarball)
 
-      {output, 0} = System.cmd("mix", ["hex.build"], stderr_to_stdout: true)
+      {output, 0} = Rendro.Test.HexBuildCache.get_build_output()
       assert output =~ tarball
       assert File.exists?(tarball)
 

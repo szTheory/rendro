@@ -1,20 +1,42 @@
 defmodule Mix.Tasks.CiAliasContractTest do
   use ExUnit.Case, async: true
 
-  test "ci alias matches the documented QUAL-01 contract" do
+  test "ci aliases match the required split-gate contract" do
     project = Rendro.MixProject.project()
     aliases = Keyword.fetch!(project, :aliases)
     ci_steps = Keyword.fetch!(aliases, :ci)
+    ci_fast_steps = Keyword.fetch!(aliases, :"ci.fast")
+    ci_proofs_steps = Keyword.fetch!(aliases, :"ci.proofs")
 
-    assert ci_steps == [
+    assert ci_steps == ["ci.fast", "ci.proofs"]
+
+    assert ci_fast_steps == [
              "format --check-formatted",
              "hex.build",
              "compile --warnings-as-errors",
-             "test",
+             "test --exclude quarantine --slowest 10",
              "docs --warnings-as-errors",
              "credo --strict",
              "dialyzer"
            ]
+
+    assert ci_proofs_steps == [
+             "test --include live_pdf_tools test/rendro/adapters/forms_viewer_evidence_live_test.exs test/rendro/adapters/embedded_files_viewer_evidence_live_test.exs test/rendro/adapters/links_viewer_evidence_live_test.exs test/rendro/adapters/protection_viewer_evidence_live_test.exs test/rendro/adapters/signature_widget_viewer_evidence_live_test.exs test/rendro/adapters/signed_artifact_viewer_evidence_live_test.exs test/rendro/adapters/trust_sensitive_viewer_evidence_live_test.exs",
+             "test --include live_signing test/rendro/adapters/signing_live_test.exs",
+             "test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs",
+             "run scripts/release_preflight_proof.exs --current-version-tag --skip-ci --skip-security-audits --worktree /tmp/rendro-release-proof"
+           ]
+  end
+
+  test "scoped ci aliases run in MIX_ENV=test for local parity" do
+    preferred_envs = Keyword.fetch!(Rendro.MixProject.cli(), :preferred_envs)
+
+    assert Keyword.fetch!(preferred_envs, :ci) == :test
+    assert Keyword.fetch!(preferred_envs, :"ci.fast") == :test
+    assert Keyword.fetch!(preferred_envs, :"ci.proofs") == :test
+    assert Keyword.fetch!(preferred_envs, :"ci.advisory") == :test
+    assert Keyword.fetch!(preferred_envs, :"verify.flake") == :test
+    assert Keyword.fetch!(preferred_envs, :"test.all") == :test
   end
 
   test "ex_doc is available in test so mix ci can run docs in MIX_ENV=test" do

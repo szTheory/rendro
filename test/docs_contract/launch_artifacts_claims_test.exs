@@ -1,5 +1,5 @@
 defmodule Rendro.DocsContract.LaunchArtifactsClaimsTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   @manifest_path "assets/rendro/artifacts.json"
   @readme_path "README.md"
@@ -131,10 +131,8 @@ defmodule Rendro.DocsContract.LaunchArtifactsClaimsTest do
 
   test "hex package includes public launch assets" do
     tarball = "rendro-#{Mix.Project.config()[:version]}.tar"
-    File.rm(tarball)
-    on_exit(fn -> File.rm(tarball) end)
 
-    {output, 0} = System.cmd("mix", ["hex.build"], stderr_to_stdout: true)
+    {output, 0} = Rendro.Test.HexBuildCache.get_build_output()
     assert output =~ tarball
     assert File.exists?(tarball)
 

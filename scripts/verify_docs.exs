@@ -32,7 +32,9 @@ lanes = [
   {"Launch execution claims lane",
    ["test", "test/docs_contract/launch_execution_claims_test.exs"]},
   {"Adoption claims lane", ["test", "test/docs_contract/adoption_claims_test.exs"]},
-  {"GitHub intake claims lane", ["test", "test/docs_contract/github_intake_claims_test.exs"]}
+  {"GitHub intake claims lane", ["test", "test/docs_contract/github_intake_claims_test.exs"]},
+  {"DX local reproducibility claims lane",
+   ["test", "test/docs_contract/dx_local_reproducibility_claims_test.exs"]}
 ]
 
 # formatter: on

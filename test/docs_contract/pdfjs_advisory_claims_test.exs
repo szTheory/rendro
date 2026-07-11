@@ -42,7 +42,8 @@ defmodule Rendro.DocsContract.PdfjsAdvisoryClaimsTest do
   test "observer package is private, exact-pinned, and outside mix dependencies" do
     package = @package_path |> File.read!() |> JSON.decode!()
     lockfile = @lockfile_path |> File.read!() |> JSON.decode!()
-    mix = File.read!("mix.exs")
+    aliases = Keyword.fetch!(Rendro.MixProject.project(), :aliases)
+    deps = Keyword.fetch!(Rendro.MixProject.project(), :deps)
 
     assert package["private"] == true
     assert package["type"] == "module"
@@ -56,9 +57,25 @@ defmodule Rendro.DocsContract.PdfjsAdvisoryClaimsTest do
     assert lockfile["packages"]["node_modules/pdfjs-dist"]["engines"]["node"] ==
              ">=22.13.0 || >=24"
 
-    refute mix =~ "pdfjs-dist"
-    refute mix =~ "pdfjs_observer"
-    refute mix =~ "setup-node"
+    refute Enum.any?(deps, fn dep ->
+             dep_name =
+               dep
+               |> elem(0)
+               |> Atom.to_string()
+
+             dep_name in ["pdfjs-dist", "pdfjs_observer", "setup-node"]
+           end)
+
+    assert Keyword.fetch!(aliases, :"ci.advisory") == [
+             "test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs",
+             "rendro.launch_artifacts.check",
+             "rendro.comparison.check",
+             "rendro.livebook.check",
+             "cmd npm ci --prefix scripts/pdfjs_observer",
+             "cmd node scripts/pdfjs_observer/observe.mjs --check",
+             "deps.audit",
+             "hex.audit"
+           ]
   end
 
   test "observation schema and committed observations use the advisory contract" do

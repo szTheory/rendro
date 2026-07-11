@@ -45,7 +45,7 @@ defmodule Rendro.PDF.Writer do
       allocate_link_annotation_nums(link_annotations, next_num)
 
     {outline_objects, next_num, outlines_root_num} =
-      allocate_outlines(metadata.outlines, next_num, page_obj_nums)
+      allocate_outlines(metadata.outlines, next_num, page_obj_nums, pages)
 
     pages_num = next_num
     next_num = next_num + 1
@@ -997,7 +997,14 @@ defmodule Rendro.PDF.Writer do
     Object.indirect_object(obj_num, 0, Object.serialize(dict, opts))
   end
 
-  defp build_link_annotation_object(obj_num, rect, {:page, page_number}, page_obj_nums, _doc, opts) do
+  defp build_link_annotation_object(
+         obj_num,
+         rect,
+         {:page, page_number},
+         page_obj_nums,
+         _doc,
+         opts
+       ) do
     {target_page_obj_num, _content_obj_num} = Enum.at(page_obj_nums, page_number - 1)
 
     dict =
@@ -1018,6 +1025,7 @@ defmodule Rendro.PDF.Writer do
 
     page_idx = max(0, min(logical_page_idx - 1, length(page_obj_nums) - 1))
     {target_page_obj_num, _content_obj_num} = Enum.at(page_obj_nums, page_idx)
+    {pdf_x, pdf_y} = pdf_destination_coordinates(Enum.at(doc.pages, page_idx), x, y)
 
     dict =
       {:dict,
@@ -1026,7 +1034,7 @@ defmodule Rendro.PDF.Writer do
          {"Subtype", {:name, "Link"}},
          {"Rect", {:array, rect}},
          {"Border", {:array, [0, 0, 0]}},
-         {"Dest", {:array, [{:ref, target_page_obj_num, 0}, {:name, "XYZ"}, x, y, nil]}}
+         {"Dest", {:array, [{:ref, target_page_obj_num, 0}, {:name, "XYZ"}, pdf_x, pdf_y, nil]}}
        ]}
 
     Object.indirect_object(obj_num, 0, Object.serialize(dict, opts))
@@ -1573,6 +1581,10 @@ defmodule Rendro.PDF.Writer do
     x = block.x + page.margin_left
     y = page.height - (block.y + block.height) - page.margin_top
     [x, y, x + block.width, y + block.height]
+  end
+
+  defp pdf_destination_coordinates(%Rendro.Page{} = page, x, y) do
+    {x + page.margin_left, page.height - page.margin_top - y}
   end
 
   defp rect_width([left, _bottom, right, _top]), do: right - left
@@ -2462,14 +2474,15 @@ defmodule Rendro.PDF.Writer do
     entries ++ [{"Outlines", {:ref, outlines_root_num, 0}}]
   end
 
-  defp allocate_outlines([], next_num, _page_obj_nums), do: {[], next_num, nil}
-  defp allocate_outlines(nil, next_num, _page_obj_nums), do: {[], next_num, nil}
+  defp allocate_outlines([], next_num, _page_obj_nums, _pages), do: {[], next_num, nil}
+  defp allocate_outlines(nil, next_num, _page_obj_nums, _pages), do: {[], next_num, nil}
 
-  defp allocate_outlines(outlines, next_num, page_obj_nums) do
+  defp allocate_outlines(outlines, next_num, page_obj_nums, pages) do
     root_num = next_num
     next_num = next_num + 1
 
-    {items, final_num} = allocate_outline_items(outlines, root_num, next_num, page_obj_nums)
+    {items, final_num} =
+      allocate_outline_items(outlines, root_num, next_num, page_obj_nums, pages)
 
     first_item = List.first(items)
     last_item = items |> Enum.filter(&(&1.parent_num == root_num)) |> List.last()
@@ -2492,7 +2505,7 @@ defmodule Rendro.PDF.Writer do
     {pdf_objects, final_num, root_num}
   end
 
-  defp allocate_outline_items(outlines, parent_num, next_num, page_obj_nums) do
+  defp allocate_outline_items(outlines, parent_num, next_num, page_obj_nums, pages) do
     {siblings, next_num} =
       Enum.map_reduce(outlines, next_num, fn item, num ->
         {Map.put(item, :obj_num, num), num + 1}
@@ -2508,22 +2521,30 @@ defmodule Rendro.PDF.Writer do
         children = Map.get(item, :children, []) || []
 
         {child_items, end_num} =
-          allocate_outline_items(children, item.obj_num, current_num, page_obj_nums)
+          allocate_outline_items(children, item.obj_num, current_num, page_obj_nums, pages)
 
-        first_num = if length(child_items) > 0, do: List.first(child_items).obj_num, else: nil
+        first_num =
+          case child_items do
+            [] -> nil
+            [first_child | _] -> first_child.obj_num
+          end
 
         last_num =
-          if length(child_items) > 0,
-            do:
+          case child_items do
+            [] ->
+              nil
+
+            _ ->
               child_items
               |> Enum.filter(&(&1.parent_num == item.obj_num))
               |> List.last()
-              |> Map.get(:obj_num),
-            else: nil
+              |> Map.get(:obj_num)
+          end
 
         [logical_page_idx, :XYZ, x, y, _] = item.dest
         page_idx = max(0, min(logical_page_idx - 1, length(page_obj_nums) - 1))
         page_num = elem(Enum.at(page_obj_nums, page_idx), 0)
+        {pdf_x, pdf_y} = pdf_destination_coordinates(Enum.at(pages, page_idx), x, y)
 
         node = %{
           obj_num: item.obj_num,
@@ -2533,7 +2554,7 @@ defmodule Rendro.PDF.Writer do
           next_num: next_node_num,
           first_num: first_num,
           last_num: last_num,
-          dest: {:array, [{:ref, page_num, 0}, {:name, "XYZ"}, x, y, nil]}
+          dest: {:array, [{:ref, page_num, 0}, {:name, "XYZ"}, pdf_x, pdf_y, nil]}
         }
 
         {[node] ++ child_items, end_num}

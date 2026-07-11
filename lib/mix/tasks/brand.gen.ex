@@ -16,6 +16,7 @@ defmodule Mix.Tasks.Brand.Gen do
 
   Not added to `mix.exs` :package files — brand assets live in git, never in the Hex tarball.
   """
+  @moduledoc tags: [:adapter]
   @shortdoc "Regenerate brand tokens.css + tailwind excerpt from tokens.json"
 
   use Mix.Task

@@ -10,7 +10,9 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Active milestone:** None. See Next Milestone Goals.
+**Active milestone:** None. C1 CI/CD Performance & Reliability shipped on 2026-07-11 as a non-version infrastructure milestone; next milestone planning has not started.
+
+**Shipped milestone:** C1 CI/CD Performance & Reliability — **SHIPPED 2026-07-11** (Phases 108-113, 30/30 requirements; milestone audit `passed`; no Hex release or library version tag). Rendro's CI/CD pipeline is now split into actionable fast/proof/advisory lanes, backed by precise BEAM caches, a stable `ci-success` required gate, local `mix ci.fast` / `mix ci.proofs` reproduction commands, and remote validation evidence from three green `ci.yml` runs.
 
 **Shipped milestone:** v2.8 Done-Enough Stewardship & Adoption Signal Loop — **SHIPPED 2026-06-13** (Phases 93-96, 8/8 requirements; milestone audit `passed`). Rendro reduced maintainer/adopter friction and kept its public posture truthful by closing the `Rendro.Recipes` facade DX gap, cleaning up docs/warning hygiene, bringing header odd/even proof depth to footer parity, reconciling stale phase-validation metadata, and establishing an explicit done-enough stewardship posture tied to a dated adoption-signal review.
 
@@ -86,14 +88,21 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 **Foundation Already Shipped:** v1.3 release readiness, v1.2 typography/assets truth, v1.1 layout-authoring maturity, and v1.0 deterministic core rendering.
 
-## Current Milestone: v2.9 TOC & Document Navigation
+## Latest Milestone: C1 CI/CD Performance & Reliability
 
-**Goal:** Deliver Table of Contents, document outlines (bookmarks), anchors, and cross-references for long reports, proactively bypassing the previous adoption gate.
+> Non-version infra milestone (like B1) — pipeline/tooling work, **no library/`lib/` changes, no Hex release.** Phases continue global numbering (108–113). Source brief: `milestones/C1-AUDIT-BRIEF.md`.
 
-**Target features:**
-- Document outlines (PDF Bookmarks/Outlines)
-- Internal page anchors and cross-references (linking to pages/sections)
-- Table of Contents primitives and generation
+**Shipped:** 2026-07-11. C1 made the CI/CD pipeline faster, more deterministic, more trustworthy, and more resource-efficient with better contributor DX — measured first, then improved caching, test concurrency/determinism, workflow topology, security/release posture, and validation reporting without weakening the quality signal.
+
+**Delivered:**
+- Measure-first baseline and P0-P3 recommendations for the old CI topology.
+- Precise deps, `_build`, and PLT caching plus unified SHA-pinned setup-beam.
+- Evidence-based test concurrency, quarantine, and slow/live proof layering.
+- Named fast-lane CI steps, advisory/proof lane boundaries, PR cancellation, and one stable `ci-success` required check.
+- Supply-chain hardening with pinned actions, Dependabot, least-privilege permissions, advisory audits, and deterministic release proof behavior.
+- Scoped local reproduction commands, README/CONTRIBUTING updates, and final metrics with three green remote `ci.yml` runs.
+
+**Archive:** `milestones/C1-ROADMAP.md`, `milestones/C1-REQUIREMENTS.md`, and `milestones/C1-MILESTONE-AUDIT.md`.
 
 ## Future Milestone Candidates (demand-gated)
 
@@ -113,6 +122,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Validated
 
+- ✓ Rendro C1 shipped CI/CD Performance & Reliability: split fast/proof/advisory lanes, precise BEAM caches, stable `ci-success` required gate, scoped local reproduction commands, supply-chain/release hardening, and before/after validation evidence from three green remote `ci.yml` runs. All 30 requirements satisfied; milestone audit `passed`. Shipped 2026-07-11 and archived in `milestones/C1-ROADMAP.md` / `milestones/C1-REQUIREMENTS.md` / `milestones/C1-MILESTONE-AUDIT.md`. — C1
 - ✓ Rendro v2.9 shipped TOC & Document Navigation: explicit page anchors, hierarchical document outlines with UTF-16BE support, fail-fast validated internal cross-reference links, and layout-preserving `{{anchor_page:id}}` Table of Contents substitution tokens. All 13 requirements satisfied; milestone audit `passed`. Shipped 2026-06-14 and archived in `milestones/v2.9-ROADMAP.md` / `milestones/v2.9-REQUIREMENTS.md` / `milestones/v2.9-phases/`. — v2.9
 - ✓ Rendro v2.8 completed the done-enough stewardship & adoption signal loop. Validated in Phase 96: adoption-signal-review-stewardship-posture.
 - ✓ Rendro v2.6 shipped public launch and adoption bootstrap without overclaiming: HarfBuzz is optional behind `Rendro.Text.Shaper`, complex scripts fail instructively, `%Rendro.Path{}`/table borders/Certificate frame polish are in the core render path, `Rendro.Adapters.Pdfium.render/2` and golden-PNG snapshots provide advisory raster proof, the README/HexDocs gallery and self-rendered `manual.pdf` are hash-checked, the comparison guide and Livebook tutorial are bounded by docs-contract checks, issue-only intake and `ADOPTION.md` establish a measurable demand gate, and mobile GUI rows are terminal `explicit_deferral` entries rather than support claims. All 21 requirements satisfied; milestone audit `passed`. Shipped 2026-06-13 and archived in `milestones/v2.6-ROADMAP.md` / `milestones/v2.6-REQUIREMENTS.md` / `milestones/v2.6-MILESTONE-AUDIT.md` / `milestones/v2.6-phases/`. — v2.6
@@ -210,6 +220,10 @@ As of v2.7 (2026-06-13), public claims are bounded by checked proof artifacts: p
 | Keep PDF.js evidence advisory and worded as "pinned PDF.js advisory observations" | PDF.js is a browser-family renderer, not a GUI support matrix substitute; Node/npm must never become a core runtime, required CI, or Hex dependency | ✓ Shipped in v2.7 |
 | Re-pair compose section metadata with measured body blocks during pagination | Compose entries are created before measurement, but pagination must use measured heights; block counts let Rendro keep metadata without adding hidden fields to `%Rendro.Block{}` | ✓ Shipped in Phase 89 |
 | Preserve per-section running-region metadata for duplex filters | Region-wide maps cannot represent odd and even header/footer variants targeting the same region; `region_entries` keeps filters per authored section while measured blocks stay deterministic | ✓ Shipped in Phase 90 |
+| Treat C1 as a non-version infrastructure milestone, not a product/library release | CI/CD behavior changed, but `lib/` product behavior and Hex package semantics did not; cutting a release tag would overstate scope | ✓ Shipped in C1 |
+| Use `ci-success` as the sole required merge check while keeping advisory lanes visible | Branch protection needs one stable context; advisory failures should surface maintenance signal without blocking deterministic fast/proof gates | ✓ Shipped in C1 |
+| Keep release preflight strict by default, but let CI's deterministic release proof skip duplicate CI/security audits | Real release/tag preflight must remain comprehensive; PR proof should avoid recursive CI duplication and avoid coupling deterministic proof to flaky advisory network audits | ✓ Shipped in C1 |
+| Keep security dependency audits advisory in PR CI and strict in maintenance/release posture | Dependency advisory checks are valuable but network/advisory-state sensitive; they should not make the required deterministic merge gate red | ✓ Shipped in C1 |
 
 ## Archived Milestone Context
 
@@ -274,30 +288,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-14 after v2.9 milestone*
-y?
-3. Audit Out of Scope -> reasons still valid?
-4. Update Context with current state
-
----
-*Last updated: 2026-06-14 after v2.9 milestone*
-idated? -> Move to Out of Scope with reason
-2. Requirements validated? -> Move to Validated with phase reference
-3. New requirements emerged? -> Add to Active
-4. Decisions to log? -> Add to Key Decisions
-5. "What This Is" still accurate? -> Update if drifted
-
-**After each milestone** (via `/gsd-complete-milestone`):
-1. Full review of all sections
-2. Core Value check -> still the right priority?
-3. Audit Out of Scope -> reasons still valid?
-4. Update Context with current state
-
----
-*Last updated: 2026-06-14 after v2.9 milestone*
-y?
-3. Audit Out of Scope -> reasons still valid?
-4. Update Context with current state
-
----
-*Last updated: 2026-06-14 after v2.9 milestone*
+*Last updated: 2026-07-11 after C1 milestone*

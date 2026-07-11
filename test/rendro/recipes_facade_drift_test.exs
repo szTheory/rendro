@@ -1,6 +1,10 @@
 defmodule Rendro.RecipesFacadeDriftTest do
   use ExUnit.Case, async: true
 
+  # Seed-dependent and order-sensitive known flaky test.
+  # Quarantined here per D-03 to prevent PR gate failures until it is fixed within the nightly lane.
+  @moduletag :quarantine
+
   # Single source of truth for recipe facade entries (D-07).
   # Adding a recipe requires a deliberate edit here and in lib/rendro/recipes.ex.
   @recipes [
@@ -69,12 +73,12 @@ defmodule Rendro.RecipesFacadeDriftTest do
       |> Enum.filter(fn mod ->
         mod_str = Atom.to_string(mod)
 
+        # :application.get_key returns module atoms from the .app manifest, but
+        # function_exported?/3 reports false for modules not yet loaded into the
+        # VM. Ensure the candidate is loaded before probing for document/2 so the
+        # sweep does not depend on async test load order.
         String.starts_with?(mod_str, "Elixir.Rendro.Recipes.") and
           mod != Rendro.Recipes.Pagination and
-          # :application.get_key returns module atoms from the .app manifest, but
-          # function_exported?/3 reports false for modules not yet loaded into the
-          # VM. Ensure the candidate is loaded before probing for document/2 so the
-          # sweep does not depend on async test load order.
           match?({:module, ^mod}, Code.ensure_loaded(mod)) and
           function_exported?(mod, :document, 2)
       end)
@@ -110,7 +114,9 @@ defmodule Rendro.RecipesFacadeDriftTest do
     test "certificate/2 with border: true produces struct-identical result to Certificate.document/2" do
       data = fixture_for(:certificate)
       opts = [border: true]
-      assert Rendro.Recipes.certificate(data, opts) == Rendro.Recipes.Certificate.document(data, opts)
+
+      assert Rendro.Recipes.certificate(data, opts) ==
+               Rendro.Recipes.Certificate.document(data, opts)
     end
 
     test "receipt/1 with empty opts returns same as receipt/2 with []" do

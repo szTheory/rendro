@@ -1,6 +1,7 @@
 # ── Elixir/Mix ──
 /_build/
 /deps/
+/priv/plts/
 /doc/
 *.ez
 rendro-*.tar

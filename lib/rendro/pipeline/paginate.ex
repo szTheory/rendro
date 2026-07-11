@@ -26,7 +26,7 @@ defmodule Rendro.Pipeline.Paginate do
   end
 
   defp resolve_toc_tokens(%Document{} = doc) do
-    anchors = Map.get(doc.metadata || %Rendro.Metadata{}, :anchors, %{})
+    anchors = Map.get(doc.metadata, :anchors, %{})
 
     pages =
       Enum.map(doc.pages, fn page ->
@@ -106,14 +106,12 @@ defmodule Rendro.Pipeline.Paginate do
   defp substitute_anchor_tokens(other, _anchors), do: other
 
   defp collect_anchors(%Document{} = doc) do
-    try do
-      anchors = collect_page_anchors(doc.pages)
-      metadata = Map.put(doc.metadata || %Rendro.Metadata{}, :anchors, anchors)
-      {:ok, %{doc | metadata: metadata}}
-    catch
-      {:error, :duplicate_anchor_id, id} ->
-        {:error, Rendro.Error.from_stage(:paginate, :duplicate_anchor_id, %{details: %{id: id}})}
-    end
+    anchors = collect_page_anchors(doc.pages)
+    metadata = Map.put(doc.metadata, :anchors, anchors)
+    {:ok, %{doc | metadata: metadata}}
+  catch
+    {:error, :duplicate_anchor_id, id} ->
+      {:error, Rendro.Error.from_stage(:paginate, :duplicate_anchor_id, %{details: %{id: id}})}
   end
 
   defp collect_page_anchors(pages) do
@@ -126,11 +124,14 @@ defmodule Rendro.Pipeline.Paginate do
 
   defp collect_block_anchors(blocks, page_idx, acc) when is_list(blocks) do
     Enum.reduce(blocks, acc, fn block, current_acc ->
-      collect_single_anchor(block, page_idx, current_acc)
+      collect_single_anchor(block, page_idx, current_acc, 0, 0)
     end)
   end
 
-  defp collect_single_anchor(%Rendro.Block{} = block, page_idx, acc) do
+  defp collect_single_anchor(%Rendro.Block{} = block, page_idx, acc, offset_x, offset_y) do
+    x = offset_x + (block.x || 0)
+    y = offset_y + (block.y || 0)
+
     acc1 =
       case block.id do
         nil ->
@@ -140,7 +141,7 @@ defmodule Rendro.Pipeline.Paginate do
           if Map.has_key?(acc, id) do
             throw({:error, :duplicate_anchor_id, id})
           else
-            Map.put(acc, id, [page_idx, :XYZ, block.x || 0, block.y || 0, nil])
+            Map.put(acc, id, [page_idx, :XYZ, x, y, nil])
           end
       end
 
@@ -148,37 +149,47 @@ defmodule Rendro.Pipeline.Paginate do
       %Rendro.Table{} = table ->
         acc2 =
           if table.header do
-            collect_row_anchors([table.header], page_idx, acc1)
+            collect_row_anchors([table.header], page_idx, acc1, offset_x, offset_y)
           else
             acc1
           end
 
-        collect_row_anchors(table.rows || [], page_idx, acc2)
+        collect_row_anchors(table.rows || [], page_idx, acc2, offset_x, offset_y)
 
       _ ->
         acc1
     end
   end
 
-  defp collect_single_anchor(_other, _page_idx, acc), do: acc
+  defp collect_single_anchor(_other, _page_idx, acc, _offset_x, _offset_y), do: acc
 
-  defp collect_row_anchors(rows, page_idx, acc) do
+  defp collect_row_anchors(rows, page_idx, acc, offset_x, offset_y) do
     Enum.reduce(rows, acc, fn row, row_acc ->
       cells =
         case row do
-          %Rendro.Row{cells: c} -> Enum.map(c, & &1.content)
+          %Rendro.Row{cells: c} -> c
           list when is_list(list) -> list
           _ -> []
         end
 
-      Enum.reduce(cells, row_acc, fn cell_content, cell_acc ->
-        case cell_content do
-          %Rendro.Block{} = nested_block ->
-            collect_single_anchor(nested_block, page_idx, cell_acc)
+      Enum.reduce(cells, row_acc, fn
+        %Rendro.Cell{content: %Rendro.Block{} = nested_block, x: cell_x, y: cell_y}, cell_acc ->
+          collect_single_anchor(
+            nested_block,
+            page_idx,
+            cell_acc,
+            offset_x + (cell_x || 0),
+            offset_y + (cell_y || 0)
+          )
 
-          _ ->
-            cell_acc
-        end
+        cell_content, cell_acc ->
+          case cell_content do
+            %Rendro.Block{} = nested_block ->
+              collect_single_anchor(nested_block, page_idx, cell_acc, offset_x, offset_y)
+
+            _ ->
+              cell_acc
+          end
       end)
     end)
   end
@@ -186,7 +197,7 @@ defmodule Rendro.Pipeline.Paginate do
   defp collect_outlines(%Document{} = doc) do
     flat_outlines = collect_page_outlines(doc.pages)
     tree = build_outline_tree(flat_outlines)
-    metadata = Map.put(doc.metadata || %Rendro.Metadata{}, :outlines, tree)
+    metadata = Map.put(doc.metadata, :outlines, tree)
     {:ok, %{doc | metadata: metadata}}
   end
 
@@ -200,11 +211,14 @@ defmodule Rendro.Pipeline.Paginate do
 
   defp collect_block_outlines(blocks, page_idx) when is_list(blocks) do
     Enum.flat_map(blocks, fn block ->
-      collect_single_outline(block, page_idx)
+      collect_single_outline(block, page_idx, 0, 0)
     end)
   end
 
-  defp collect_single_outline(%Rendro.Block{} = block, page_idx) do
+  defp collect_single_outline(%Rendro.Block{} = block, page_idx, offset_x, offset_y) do
+    x = offset_x + (block.x || 0)
+    y = offset_y + (block.y || 0)
+
     extracted =
       if block.outline do
         title = extract_outline_title(block)
@@ -214,7 +228,7 @@ defmodule Rendro.Pipeline.Paginate do
             %{
               title: title,
               level: block.outline_level || 1,
-              dest: [page_idx, :XYZ, block.x || 0, block.y || 0, nil]
+              dest: [page_idx, :XYZ, x, y, nil]
             }
           ]
         else
@@ -228,9 +242,11 @@ defmodule Rendro.Pipeline.Paginate do
       case block.content do
         %Rendro.Table{} = table ->
           header_outlines =
-            if table.header, do: collect_row_outlines([table.header], page_idx), else: []
+            if table.header,
+              do: collect_row_outlines([table.header], page_idx, offset_x, offset_y),
+              else: []
 
-          row_outlines = collect_row_outlines(table.rows || [], page_idx)
+          row_outlines = collect_row_outlines(table.rows || [], page_idx, offset_x, offset_y)
           header_outlines ++ row_outlines
 
         _ ->
@@ -240,22 +256,34 @@ defmodule Rendro.Pipeline.Paginate do
     extracted ++ nested
   end
 
-  defp collect_single_outline(_other, _page_idx), do: []
+  defp collect_single_outline(_other, _page_idx, _offset_x, _offset_y), do: []
 
-  defp collect_row_outlines(rows, page_idx) do
+  defp collect_row_outlines(rows, page_idx, offset_x, offset_y) do
     Enum.flat_map(rows, fn row ->
       cells =
         case row do
-          %Rendro.Row{cells: c} -> Enum.map(c, & &1.content)
+          %Rendro.Row{cells: c} -> c
           list when is_list(list) -> list
           _ -> []
         end
 
-      Enum.flat_map(cells, fn cell_content ->
-        case cell_content do
-          %Rendro.Block{} = nested_block -> collect_single_outline(nested_block, page_idx)
-          _ -> []
-        end
+      Enum.flat_map(cells, fn
+        %Rendro.Cell{content: %Rendro.Block{} = nested_block, x: cell_x, y: cell_y} ->
+          collect_single_outline(
+            nested_block,
+            page_idx,
+            offset_x + (cell_x || 0),
+            offset_y + (cell_y || 0)
+          )
+
+        cell_content ->
+          case cell_content do
+            %Rendro.Block{} = nested_block ->
+              collect_single_outline(nested_block, page_idx, offset_x, offset_y)
+
+            _ ->
+              []
+          end
       end)
     end)
   end

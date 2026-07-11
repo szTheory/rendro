@@ -205,6 +205,47 @@
 
 ---
 
+## Milestone: C1 — CI/CD Performance & Reliability
+
+**Shipped:** 2026-07-11
+**Phases:** 6 (108-113) | **Plans:** 18 | **Tasks:** 13
+
+### What Was Built
+- Measure-first CI baseline across `ci.yml`, `hexdocs.yml`, and `release.yml`, with critical-path analysis, cache absence proof, A-E test/check classification, and P0-P3 recommendations.
+- Precise BEAM caching for deps, `_build`, and PLTs, with unified SHA-pinned `erlef/setup-beam` and cache-hit observability in CI summaries.
+- Test reliability cleanup: safer async posture, documented non-async reasons, quarantine lane for nondeterministic behavior, and slow/live proof layering.
+- Workflow topology cleanup: named fast-lane steps, consolidated advisory/proof jobs, PR cancellation, minimum-version policy, and one stable `ci-success` required check.
+- Supply-chain and release hardening: pinned actions, Dependabot, least-privilege permissions, advisory security-audit lanes, and deterministic release preflight proof behavior.
+- Contributor DX and validation closure: scoped `mix ci.fast`, `mix ci.proofs`, and `mix ci.advisory` aliases, README/CONTRIBUTING updates, final metrics, and three green remote `ci.yml` validation runs.
+
+### What Worked
+- **Measure before optimization.** Phase 108 prevented speculative YAML churn by making cache absence, release-proof cost, and the monolithic `mix ci` step visible before changes landed.
+- **One required check name.** `ci-success` made branch-protection and badge behavior stable even as internal jobs changed.
+- **Deterministic vs advisory separation.** Keeping `security-audit` and other external-tool advisory checks visible but non-required let CI report maintenance risk without redlining the deterministic merge gate.
+- **Local/remote truth boundary.** Phase 113 first refused to claim unavailable GitHub timing data, then closed the claim only after three named remote runs existed.
+
+### What Was Inefficient
+- **Closeout required manual curation.** `milestone.complete` generated useful archive files but noisy milestone accomplishments, so MILESTONES.md still needed a human rewrite.
+- **Remote proof required corrective runs.** The first post-push release proof exposed that deterministic CI proofing should skip duplicate CI/security-audit work; the fix was valuable, but it added extra validation cycles.
+- **Existing scratch artifacts made phase-directory archival unsafe.** Several untracked phase research/review files were present before closeout, so phase directories stayed in place rather than being moved into the milestone archive.
+
+### Patterns Established
+- **CI as product surface.** CI timings, cache behavior, check names, and contributor commands are now treated as contract artifacts with docs-contract and guardrail tests.
+- **Strict release, bounded proof.** Release preflight remains comprehensive by default, while PR release proof can skip duplicate CI and advisory network audits for deterministic validation.
+- **Advisory lanes stay visible.** Advisory failures are not hidden; they are intentionally separated from the required deterministic gate and documented as maintenance signal.
+
+### Key Lessons
+1. **Do not infer remote performance from local proof.** Cache hit rate, p50/p95, and critical-path timing need real GitHub run IDs before they become claims.
+2. **Stable required check names matter more than internal job shape.** The workflow can evolve internally as long as branch protection and README badges target one stable summary gate.
+3. **Proof commands need a deterministic mode.** A release-proof command used inside CI should avoid recursively running CI or advisory network audits while preserving the stricter default path for real releases.
+
+### Cost Observations
+- 6 phases / 18 plans / 13 tracked tasks across 2026-06-14 to 2026-07-11.
+- Remote validation sample: three green `ci.yml` runs; required gate p50 783s, nearest-rank p95 1013s; optimized steady-state observed 774s-783s.
+- Local final gate: `mix ci.fast` passed with 1219 tests, 12 doctests, 4 properties, 0 failures.
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -218,6 +259,7 @@
 | v2.4 | 5 (73-77) | 21 | Adoption-ergonomics milestone: foundational-primitive-before-recipes sequencing (page primitive in its own Phase 73), stateless-engine/stateful-data pagination, an audit-sourced closure phase (Phase 77 took the audit from `tech_debt` → `passed`), and an advisory-isolated reference-app CI lane. |
 | v2.5 | 5 (78-82) | 16 | Public 1.0 commitment: enforced API manifest, two-tier SemVer contract, hardened release gates, and proof-gated hex publish. |
 | v2.6 | 6 (83-88) | 32 | Quiet public discoverability: claim correction, visible proof artifacts, advisory raster/comparison/Livebook lanes, issue-only intake, and measurable demand-gated v2.7 criteria. |
+| C1 | 6 (108-113) | 18 | CI/CD reliability milestone: measure-first baseline, precise BEAM caching, stable `ci-success` required gate, deterministic/advisory lane separation, release-proof hardening, and remote p50/p95/cache validation. |
 
 ### Cumulative Quality
 

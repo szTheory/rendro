@@ -26,6 +26,52 @@ defmodule Rendro.ReleasePreflightProofTest do
              )
   end
 
+  test "proof skip flags are forwarded to release preflight" do
+    assert {:ok, %{skip_ci: true, skip_security_audits: true}} =
+             ReleasePreflightProof.parse_args(
+               [
+                 "--current-version-tag",
+                 "--skip-ci",
+                 "--skip-security-audits",
+                 "--worktree",
+                 "/tmp/release-proof"
+               ],
+               %{project_config: [version: "9.9.9"]}
+             )
+
+    runner =
+      command_runner_for(%{
+        {"git", ["rev-parse", "--verify", "refs/tags/v0.2.0^{commit}"]} => {"", 1},
+        {"git", ["tag", "-f", "v0.2.0", "HEAD"]} => {"Updated tag\n", 0},
+        {"git", ["rev-parse", "--verify", "v0.2.0^{commit}"]} => {"abc123\n", 0},
+        {"git", ["worktree", "add", "--detach", "/tmp/release-proof", "v0.2.0"]} => {"", 0},
+        {"mix", ["deps.get"]} => {"deps ok\n", 0},
+        {"mix", ["release.preflight", "--skip-ci", "--skip-security-audits"]} =>
+          {"preflight ok\n", 0},
+        {"git", ["worktree", "remove", "--force", "/tmp/release-proof"]} => {"", 0},
+        {"git", ["tag", "-d", "v0.2.0"]} => {"Deleted tag\n", 0}
+      })
+
+    assert {:ok, _output} =
+             ReleasePreflightProof.execute_proof(
+               %{
+                 ref: "v0.2.0",
+                 worktree: "/tmp/release-proof",
+                 dry_run: false,
+                 keep: false,
+                 synthetic_tag: true,
+                 skip_ci: true,
+                 skip_security_audits: true
+               },
+               %{runner: runner, project_config: [version: "0.2.0"]}
+             )
+
+    assert_received {:proof_command, "mix",
+                     ["release.preflight", "--skip-ci", "--skip-security-audits"], opts}
+
+    assert opts[:cd] == "/tmp/release-proof"
+  end
+
   test "rejects ambiguous or non-release refs" do
     assert {:error, "ref must be an exact release tag like vX.Y.Z; got not-a-real-tag"} =
              ReleasePreflightProof.validate_ref("not-a-real-tag")
@@ -75,7 +121,9 @@ defmodule Rendro.ReleasePreflightProofTest do
                  worktree: "/tmp/release-proof",
                  dry_run: false,
                  keep: false,
-                 synthetic_tag: true
+                 synthetic_tag: true,
+                 skip_ci: false,
+                 skip_security_audits: false
                },
                %{runner: runner, project_config: [version: "0.2.0"]}
              )
@@ -118,7 +166,9 @@ defmodule Rendro.ReleasePreflightProofTest do
                  worktree: "/tmp/release-proof",
                  dry_run: false,
                  keep: false,
-                 synthetic_tag: true
+                 synthetic_tag: true,
+                 skip_ci: false,
+                 skip_security_audits: false
                },
                %{runner: runner, project_config: [version: "0.2.0"]}
              )
