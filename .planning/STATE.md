@@ -5,14 +5,14 @@ milestone_name: Realistic Business-Document Examples & Anatomy
 current_phase: 114
 current_phase_name: Domain research, reader-quality rubric & realistic example-data library
 status: executing
-last_updated: "2026-07-11T04:31:03.147Z"
-last_activity: 2026-07-10
-last_activity_desc: ROADMAP.md created; 26/26 requirements mapped across phases 114–118
+last_updated: "2026-07-11T04:36:27.877Z"
+last_activity: 2026-07-11
+last_activity_desc: Phase 114 execution started
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 7
+  completed_plans: 1
   percent: 0
 ---
 
@@ -26,10 +26,10 @@ progress:
 
 ## Current Position
 
-Phase: 114 of 118 (Domain research, reader-quality rubric & realistic example-data library)
-Plan: — (not yet planned)
+Phase: 114 (Domain research, reader-quality rubric & realistic example-data library) — EXECUTING
+Plan: 2 of 7
 Status: Ready to execute
-Last activity: 2026-07-10 — ROADMAP.md created; 26/26 requirements mapped across phases 114–118
+Last activity: 2026-07-11 — Phase 114 execution started
 
 Progress: [░░░░░░░░░░] 0% — 0/5 phases complete
 
@@ -56,6 +56,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 - Loader placement is load-bearing: `lib/rendro/examples.ex`, `@moduledoc false` — the only placement serving tests + bench(`:dev`) + Livebook + shipped consumers while staying out of `public_api.json`.
 - Money in fixtures as decimal **strings** (`"79.00"`), never JSON floats. De-quarantine `invoice_data.json` verbatim first (provable no-op vs advisory bench), normalize money to strings in a separate commit.
 - No text/cell right-align primitive exists today; additive `cell_align: :right` (Phase 115) is the single highest-leverage typographic upgrade — but the rubric must NOT assume it. No barcode/QR primitive; Ticket "reads as a ticket" via boxed code-area + human-readable reference + perforation + optional caller-supplied PNG.
+- [Phase ?]: Plan 114-01: invoice fixture de-quarantined into priv/examples/invoice/acme-phoenix-saas/invoice.json as a provable byte-identical no-op; move kept verbatim (money/brand normalization deferred to 114-03 per Pitfall 6), consumers repointed, fresh render sha256-identical to recorded benchmark evidence.
 
 ### Blockers / Open Questions
 
@@ -76,6 +77,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 | Phase | Plan | Duration | Notes |
 |-------|------|----------|-------|
 | — | — | — | v2.10 not yet executed |
+| Phase 114 P01 | 1min | 2 tasks | 5 files |
 
 ## Operator Next Steps
 
