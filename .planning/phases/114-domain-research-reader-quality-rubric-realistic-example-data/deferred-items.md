@@ -15,7 +15,9 @@ markdown block. Not caused by Plan 114-07 (which only touches `mix.exs`, `.gitig
 `examples_schema_contract_test.exs`, `branding_claims_test.exs`, `verify_docs.exs`,
 `required_checks_contract_test.exs`).
 
-**Status:** Out of scope for Plan 114-07 per the executor scope boundary. Plan 114-07's own
-three new lanes (Examples schema, Rubric manifest, Domain content) all PASS. Needs the
-comparison guide regenerated (whatever generator backs `Rendro.Comparison.evidence_block/1`)
-before the phase-gate `mix ci.fast` / `verify_docs.exs` goes fully green.
+**Status:** RESOLVED (post-merge fix, commit `c4e122e`). The stale `Scenario` line in
+`guides/comparison.md` was resynced to `priv/examples/invoice/acme-phoenix-saas/invoice.json`
+to match `Rendro.Comparison.evidence_block/1` (the sole one-line diff, 45/45 block lines
+otherwise identical). `mix test test/docs_contract/comparison_claims_test.exs` → 10 tests,
+0 failures; `mix run scripts/verify_docs.exs` → "Docs contract VERIFIED!"; full suite
+`mix test --exclude quarantine` → 1232 tests, 0 failures.
