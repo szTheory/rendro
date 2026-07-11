@@ -5,10 +5,10 @@ planted: 2026-07-10
 planted_during: C1 (post-archive, awaiting next milestone)
 trigger_when: after Milestone B (SEED-003) — once the Rendro.Theme token contract + light/dark exist
 scope: Large (full milestone)
-part_of: "Happy-Path Home Runs program (Milestone C of 3 — see SEED-002, SEED-003)"
+part_of: "Happy-Path Home Runs program (Milestone C of 4 — see SEED-002, SEED-003, SEED-005)"
 ---
 
-# SEED-004: Style-Genre Presets & Public Example Catalog (Milestone C)
+# SEED-004: Style-Genre Presets, Public Catalog & Static Configurator (Milestone C)
 
 Make GREAT-looking branded documents **turnkey** — pick a design *style* + plug in your palette/logo —
 and show the whole thing off as a **public by-domain example catalog** that doubles as a standing
@@ -66,6 +66,15 @@ once B is in place.
   organized **by domain, brand-tagged**. Doubles as the **standing quality-bar ratchet**: track the
   Milestone-A rubric scores across the whole grid over time so every layout "oozes quality," including the
   unbranded default on its own.
+- **Static client-side configurator + code export** *(the "browse → pick → copy code" 90% path)* — over
+  the pre-rendered static catalog, a **client-side** configurator: pick a preset + a sample accent from a
+  small palette, see the nearest pre-rendered preview, and **one-click copy** the terminal action — a
+  `Rendro.Theme.preset(:editorial, accent: {…}, mode: :dark)` snippet + recipe usage. Config state in the
+  **URL query string** (shareable); **no server compute, no DB**. Plus a `mix rendro.gen.theme <preset>
+  --accent "#…"` codegen task (models the existing `mix brand.gen`: opts → writes `lib/my_app/…_theme.ex`
+  + a `--check` drift gate) for users who want a materialized module. Extend the existing Livebook as a
+  third tinkerer surface. *(The heavier live, in-app, server-rendered theme playground is [[SEED-005]]
+  Milestone D — this static path covers the common case at zero compute.)*
 - **Boundary preserved:** design systems = code (`lib/rendro/theme*`), example brands = data
   (`priv/examples/`) — a brand is never a module.
 
@@ -77,8 +86,10 @@ once B is in place.
 - `priv/examples/<domain>/` — fixtures + `DOMAIN.md` (from [[SEED-002]]) + example-brand palettes/logos as
   data.
 - `priv/public_api.json`, `priv/support_matrix.json` — manifests the preset API updates.
-- New files: `lib/rendro/theme/presets.ex`, `priv/fonts/` (curated preset fonts). Related: [[SEED-002]],
-  [[SEED-003]].
+- `lib/mix/tasks/brand.gen.ex` — codegen template (opts → generated files + `--check` drift gate) for
+  `mix rendro.gen.theme`.
+- New files: `lib/rendro/theme/presets.ex`, `priv/fonts/` (curated preset fonts),
+  `lib/mix/tasks/rendro/gen/theme.ex` (codegen). Related: [[SEED-002]], [[SEED-003]], [[SEED-005]].
 
 ## Notes
 

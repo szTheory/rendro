@@ -5,7 +5,7 @@ planted: 2026-07-10
 planted_during: C1 (post-archive, awaiting next milestone)
 trigger_when: after Milestone A (SEED-002) — when adding visual/branding/theming capability to documents
 scope: Large (full milestone)
-part_of: "Happy-Path Home Runs program (Milestone B of 3 — see SEED-002, SEED-004)"
+part_of: "Happy-Path Home Runs program (Milestone B of 4 — see SEED-002, SEED-004, SEED-005)"
 ---
 
 # SEED-003: Document Theming & Design-Token System (Milestone B)

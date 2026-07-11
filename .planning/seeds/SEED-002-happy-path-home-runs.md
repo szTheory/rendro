@@ -5,7 +5,7 @@ planted: 2026-07-10
 planted_during: C1 (post-archive, awaiting next milestone)
 trigger_when: next product/feature milestone — the "toy → production" home run for business documents
 scope: Large (full milestone)
-part_of: "Happy-Path Home Runs program (Milestone A of 3 — see SEED-003, SEED-004)"
+part_of: "Happy-Path Home Runs program (Milestone A of 4 — see SEED-003, SEED-004, SEED-005)"
 ---
 
 # SEED-002: Realistic Business-Document Examples & Anatomy (Milestone A)
@@ -14,8 +14,9 @@ Turn rendro's toy examples into **production-grade, domain-true** documents usin
 one small additive Invoice upgrade + two new families (Payslip, Ticket). Goal: a serious user can jump
 in and adapt an award-quality, domain-correct document immediately.
 
-**Milestone A of a 3-milestone program.** Sequenced: A (this) → **[[SEED-003]]** Document Theming &
-Design-Token System → **[[SEED-004]]** Style-Genre Presets & Public Example Catalog. Full program plan:
+**Milestone A of a 4-milestone program.** Sequenced: A (this) → **[[SEED-003]]** Document Theming &
+Design-Token System → **[[SEED-004]]** Style-Genre Presets, Public Catalog & Static Configurator →
+**[[SEED-005]]** Rendro Studio (optional live theme playground). Full program plan:
 `~/.claude/plans/btw-what-is-rendro-spicy-giraffe.md`.
 
 ## Why This Matters
