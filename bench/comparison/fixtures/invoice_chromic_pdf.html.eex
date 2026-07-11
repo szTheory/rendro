@@ -33,12 +33,12 @@
           <td><%= item["name"] %></td>
           <td><%= item["description"] %></td>
           <td><%= item["qty"] %></td>
-          <td>$<%= :erlang.float_to_binary(item["price_cents"] / 100, decimals: 2) %></td>
+          <td>$<%= item["price"] %></td>
         </tr>
       <% end %>
     </tbody>
     <tfoot>
-      <tr><td colspan="3">Total</td><td>$<%= :erlang.float_to_binary(totals["total_cents"] / 100, decimals: 2) %></td></tr>
+      <tr><td colspan="3">Total</td><td>$<%= totals["total"] %></td></tr>
     </tfoot>
   </table>
 </body>

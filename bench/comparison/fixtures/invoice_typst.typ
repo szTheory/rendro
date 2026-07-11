@@ -18,8 +18,8 @@
     [#item.name],
     [#item.description],
     [#item.qty],
-    [#str(item.price_cents / 100)],
+    [#item.price],
   )).flatten()
 )
 
-Total: #str(data.totals.total_cents / 100)
+Total: #data.totals.total

@@ -10,7 +10,7 @@ items =
     %{
       name: "#{item["name"]} - #{item["description"]}",
       qty: item["qty"],
-      price: div(item["price_cents"], 100)
+      price: Decimal.new(item["price"]) |> Decimal.to_integer()
     }
   end)
 
