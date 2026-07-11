@@ -81,7 +81,7 @@ The runner builds the pinned Docker image for ChromicPDF and pdf_generator rows,
 | Run id | `phase-87-normalized-2026-06-11` |
 | Recorded at | `2026-06-11T21:23:51.834141Z` |
 | Git SHA | `ab6bf9c` |
-| Scenario | `invoice_v1` from `bench/comparison/fixtures/invoice_data.json` |
+| Scenario | `invoice_v1` from `priv/examples/invoice/acme-phoenix-saas/invoice.json` |
 | Host | Darwin, arm64, Apple M5 Pro, 65536 MB |
 | Container | rendro-comparison-bookworm:local sha256:066f1956bd58ce148a99019fea2f83b645aa013f396fa67baa8ba2dffa8dbae6 917.8 MB |
 | Comparator versions | `rendro` 1.0.0 (none); `chromic_pdf` 1.17.1 (Chromium 149.0.7827.102 built on Debian GNU/Linux 12 (bookworm)); `chromic_pdf_warm_pool` 1.17.1 (Chromium 149.0.7827.102 built on Debian GNU/Linux 12 (bookworm)); `pdf_generator` 0.6.2 (wkhtmltopdf 0.12.6); `typst_cli` typst 0.14.2 (unknown hash) (typst) |
