@@ -106,6 +106,45 @@ content · RTL raises instructively · single row taller than body → typed err
 6. **Gallery & docs closure** — expand `assets/rendro/gallery/` + `artifacts.json` via
    `mix rendro.launch_artifacts.gen` to realistic renders; reconcile `support_matrix.json`; update
    `README.md` (family-primary, industry-tagged gallery).
+7. **Document theming / palette system** *(NEW — added ad hoc; enables Phase 8; a real `lib/`
+   capability, not demo)* — a first-class PDF **theme/palette** primitive (colors as `{r,g,b}`,
+   likely mined from `brand/tokens/tokens.json`) with recipe plumbing to accept a `theme:` (colors)
+   alongside today's `brand:` (font+logo). Ships: (a) a named **unbranded/default** theme (restrained
+   grayscale/ink that still looks strong — NOT everything-is-blue); (b) a **light** + **dark** variant
+   convention (full-page background fill via `Rendro.Path {:rect}` + inverted text colors); (c) 2–3
+   example brand presets with strong typography+color. Register in `public_api.json` + `support_matrix.json`.
+8. **Public example catalog (marketing-site) + quality ratchet** *(NEW — added ad hoc)* — generate the
+   catalog (see below): every family × domain × {2–3 brands} × {light, dark} + unbranded default, as
+   deterministic hash-checked artifacts; doubles as a standing visual quality-bar baseline.
+
+### Public example catalog + light/dark + unbranded default (added ad hoc, session 2026-07-10)
+
+**The idea (user):** a curated catalog of all example documents on the public/"marketing" website,
+organized **by domain**, where each document type is shown across **2–3 example brands** and in **both
+light and dark mode**, plus a strong **unbranded default** (grayscale/ink, not blue/purple). Purpose:
+demonstrate out-of-the-box quality + brandability + light/dark robustness ("you get all this out of the
+box"), AND act as a **standing quality-bar stress test** — the user reviews the whole grid to hold a high
+bar, uses it as a baseline, and *ratchets* it so every layout eventually "oozes quality" (given strong
+example-brand typography/colors), including the unbranded default, which must look great on its own.
+
+**⚠️ Surfaced dependency — bigger than a website page.** Rendro has **no document color-theming system
+today.** The B1 "Brand System" milestone built the *project's own website brand* (top-level `brand/` dir
+with `tokens.json` + light/dark CSS/Tailwind tokens) that is **excluded from the Hex package** — not
+runtime PDF code. In the library, recipe brand injection is **font + logo only, no colors**
+(`Rendro.Recipes.BrandedInvoice` takes `brand: %{font_name, logo_name}` atoms wired to hardcoded demo
+assets; plain `Invoice` has no color/theme knob). "Unbranded" is only an ad-hoc "omit `data.brand`"
+convention (`Certificate`). So **light/dark PDFs + multi-brand palettes are new `lib/` capability**
+(Phase 7), not just catalog wiring. Primitives to build on exist — `Rendro.Path {:rect}` + fill renders a
+full-page dark background (`lib/rendro/pdf/writer.ex` ~1936), `Rendro.Text.color`/`Rendro.Path` carry
+per-element `{r,g,b}`, and `brand/tokens/tokens.json` has light+dark semantic role maps + `night-*` dark
+scale to mine — but nothing *composes* them into a theme.
+
+**Open decision for milestone-planning time (captured, not blocking):** Phases 7–8 roughly double the
+`lib/` surface and are arguably their own concern. At planning time decide: (A) fold Phases 7–8 into this
+milestone, or (B) keep this milestone to realistic-examples/anatomy/new-families (Phases 1–6) and spin
+theming + public catalog into a dedicated follow-on milestone (recommended if the theming design needs its
+own discovery). The catalog's ratchet value only materializes once unbranded-default + light/dark + a
+couple brand presets exist.
 
 ### Locked decisions (session 2026-07-10)
 
@@ -122,8 +161,14 @@ content · RTL raises instructively · single row taller than body → typed err
   follow (Decimal money, `totals`, `customer`).
 - `bench/comparison/fixtures/invoice_data.json` — the quarantined realistic fixture to promote
   into `priv/examples/` (Phase 1).
-- `lib/mix/tasks/rendro/launch_artifacts/gen.ex` — gallery + hash-check generator (Phases 5–6).
+- `lib/mix/tasks/rendro/launch_artifacts/gen.ex` — gallery + hash-check generator (Phases 5–6, 8).
 - `priv/public_api.json`, `priv/support_matrix.json` — machine-checked manifests to update.
+- `lib/rendro/recipes/branded_invoice.ex`, `lib/rendro/recipes/certificate.ex` — current brand injection
+  (font+logo only) + the "optional/unbranded" convention; the seam Phase 7 theming extends.
+- `lib/rendro/color.ex`, `lib/rendro/path.ex`, `lib/rendro/text.ex`, `lib/rendro/pdf/writer.ex` (~1936) —
+  `{r,g,b}` color + `{:rect}` full-page background-fill primitives a theme/dark-mode layer composes (Phase 7).
+- `brand/tokens/tokens.json` — web-only light/dark token source to mine for `{r,g,b}` theme values
+  (currently excluded from the Hex package; Phase 7).
 - `guides/recipes.md`, `guides/livebook/first_invoice.livemd`,
   `examples/phoenix_example/lib/phoenix_example_web/controllers/pdf_controller.ex` — demo surfaces.
 - Related: `.planning/research/JTBD-USER-FLOWS.md` (recommends clustering docs by user job);
