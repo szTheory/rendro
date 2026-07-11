@@ -2,14 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.10
 milestone_name: Realistic Business-Document Examples & Anatomy
+current_phase: 114
+current_phase_name: Domain research, reader-quality rubric & realistic example-data library
 status: executing
-last_updated: "2026-07-11T05:13:09.016Z"
+last_updated: "2026-07-11T05:18:42.566Z"
 last_activity: 2026-07-11
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 7
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -24,7 +26,7 @@ progress:
 ## Current Position
 
 Phase: 114 (Domain research, reader-quality rubric & realistic example-data library) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Ready to execute
 Last activity: 2026-07-11
 
@@ -54,6 +56,8 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 - Money in fixtures as decimal **strings** (`"79.00"`), never JSON floats. De-quarantine `invoice_data.json` verbatim first (provable no-op vs advisory bench), normalize money to strings in a separate commit.
 - No text/cell right-align primitive exists today; additive `cell_align: :right` (Phase 115) is the single highest-leverage typographic upgrade — but the rubric must NOT assume it. No barcode/QR primitive; Ticket "reads as a ticket" via boxed code-area + human-readable reference + perforation + optional caller-supplied PNG.
 - [Phase ?]: Plan 114-01: invoice fixture de-quarantined into priv/examples/invoice/acme-phoenix-saas/invoice.json as a provable byte-identical no-op; move kept verbatim (money/brand normalization deferred to 114-03 per Pitfall 6), consumers repointed, fresh render sha256-identical to recorded benchmark evidence.
+- [Phase ?]: 114-05: Authored Invoice DOMAIN.md as locked research-first recommendation (synthesized domain-research prose), light human sanity-check reserved for phase verification.
+- [Phase ?]: 114-05: DOMAIN.md structural contract test iterates priv/examples/*/DOMAIN.md so future domain families inherit the four-heading contract automatically.
 
 ### Blockers / Open Questions
 
@@ -76,6 +80,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 | — | — | — | v2.10 not yet executed |
 | Phase 114 P01 | 1min | 2 tasks | 5 files |
 | Phase 114 P02 | 3min | 2 tasks | 2 files |
+| Phase 114 P05 | 1min | 2 tasks | 2 files |
 
 ## Operator Next Steps
 

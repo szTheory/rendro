@@ -20,7 +20,7 @@ Legend: `[ ]` in scope for this milestone.
 
 ## Domain Research & Reader-Quality Rubric (RUB)
 
-- [ ] **RUB-01**: Each document domain has a co-located `DOMAIN.md` capturing its domain language (nouns/verbs/events), personas + JTBD (who reads it, in what context, and the ONE fact they need first), reading context, and layout/typographic conventions.
+- [x] **RUB-01**: Each document domain has a co-located `DOMAIN.md` capturing its domain language (nouns/verbs/events), personas + JTBD (who reads it, in what context, and the ONE fact they need first), reading context, and layout/typographic conventions.
 - [ ] **RUB-02**: A reader-quality rubric is defined with 6 core 1–5 dimensions (information architecture; content hierarchy; domain-fit/least-surprise; reader affordances; typographic craft; restraint/cohesion) plus 2 pass/fail gates (reading-order, print-safety), each with concrete 1/3/4/5 anchors a non-designer can apply.
 - [x] **RUB-03** *(seam S5)*: Rubric scores are recorded in a schema-backed, **appendable** manifest (`priv/quality/rubric_scores.json` + schema) with a docs-contract lane that enforces structure and the threshold arithmetic (hierarchy = 5, core ≥ 4, gates pass) — not the subjective score — so Milestone C's quality-ratchet only appends.
 
@@ -84,7 +84,7 @@ Every REQ-ID maps to exactly one phase. Coverage: **26/26 mapped**, no orphans, 
 | EXL-04 | Phase 114 | Complete |
 | EXL-05 | Phase 114 | Pending |
 | EXL-06 | Phase 114 | Pending |
-| RUB-01 | Phase 114 | Pending |
+| RUB-01 | Phase 114 | Complete |
 | RUB-02 | Phase 114 | Pending |
 | RUB-03 | Phase 114 | Complete |
 | INV-01 | Phase 115 | Pending |
