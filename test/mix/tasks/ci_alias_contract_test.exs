@@ -6,6 +6,7 @@ defmodule Mix.Tasks.CiAliasContractTest do
     aliases = Keyword.fetch!(project, :aliases)
     ci_steps = Keyword.fetch!(aliases, :ci)
     ci_fast_steps = Keyword.fetch!(aliases, :"ci.fast")
+    ci_proofs_steps = Keyword.fetch!(aliases, :"ci.proofs")
 
     assert ci_steps == ["ci.fast", "ci.proofs"]
 
@@ -17,6 +18,13 @@ defmodule Mix.Tasks.CiAliasContractTest do
              "docs --warnings-as-errors",
              "credo --strict",
              "dialyzer"
+           ]
+
+    assert ci_proofs_steps == [
+             "test --include live_pdf_tools test/rendro/adapters/forms_viewer_evidence_live_test.exs test/rendro/adapters/embedded_files_viewer_evidence_live_test.exs test/rendro/adapters/links_viewer_evidence_live_test.exs test/rendro/adapters/protection_viewer_evidence_live_test.exs test/rendro/adapters/signature_widget_viewer_evidence_live_test.exs test/rendro/adapters/signed_artifact_viewer_evidence_live_test.exs test/rendro/adapters/trust_sensitive_viewer_evidence_live_test.exs",
+             "test --include live_signing test/rendro/adapters/signing_live_test.exs",
+             "test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs",
+             "run scripts/release_preflight_proof.exs --current-version-tag --skip-security-audits --worktree /tmp/rendro-release-proof"
            ]
   end
 

@@ -35,7 +35,8 @@ defmodule Rendro.ReleasePreflightProof do
           worktree: :string,
           dry_run: :boolean,
           keep: :boolean,
-          current_version_tag: :boolean
+          current_version_tag: :boolean,
+          skip_security_audits: :boolean
         ],
         aliases: [r: :ref, w: :worktree]
       )
@@ -61,7 +62,8 @@ defmodule Rendro.ReleasePreflightProof do
            worktree: opts[:worktree],
            dry_run: Keyword.get(opts, :dry_run, false),
            keep: Keyword.get(opts, :keep, false),
-           synthetic_tag: true
+           synthetic_tag: true,
+           skip_security_audits: Keyword.get(opts, :skip_security_audits, false)
          }}
 
       true ->
@@ -71,7 +73,8 @@ defmodule Rendro.ReleasePreflightProof do
            worktree: opts[:worktree],
            dry_run: Keyword.get(opts, :dry_run, false),
            keep: Keyword.get(opts, :keep, false),
-           synthetic_tag: false
+           synthetic_tag: false,
+           skip_security_audits: Keyword.get(opts, :skip_security_audits, false)
          }}
     end
   end
@@ -110,7 +113,7 @@ defmodule Rendro.ReleasePreflightProof do
              {deps_output, 0} <-
                run_command(context, "mix", ["deps.get"], cd: options.worktree),
              {preflight_output, status} <-
-               run_command(context, "mix", ["release.preflight"], cd: options.worktree),
+               run_command(context, "mix", release_preflight_args(options), cd: options.worktree),
              :ok <- cleanup(options, cleanup_state, context) do
           output = deps_output <> preflight_output
 
@@ -179,13 +182,21 @@ defmodule Rendro.ReleasePreflightProof do
     "v#{version}"
   end
 
-  defp dry_run_message(%{synthetic_tag: true, ref: ref, worktree: worktree}) do
-    "Dry run: would create disposable exact tag #{ref} at HEAD, create isolated worktree #{worktree}, run mix deps.get and mix release.preflight, then clean up"
+  defp release_preflight_args(%{skip_security_audits: true}),
+    do: ["release.preflight", "--skip-security-audits"]
+
+  defp release_preflight_args(_options), do: ["release.preflight"]
+
+  defp dry_run_message(%{synthetic_tag: true, ref: ref, worktree: worktree} = options) do
+    "Dry run: would create disposable exact tag #{ref} at HEAD, create isolated worktree #{worktree}, run mix deps.get and mix release.preflight#{skip_security_suffix(options)}, then clean up"
   end
 
-  defp dry_run_message(%{ref: ref, worktree: worktree}) do
-    "Dry run: would create isolated worktree #{worktree} at #{ref}, run mix deps.get and mix release.preflight, then clean up"
+  defp dry_run_message(%{ref: ref, worktree: worktree} = options) do
+    "Dry run: would create isolated worktree #{worktree} at #{ref}, run mix deps.get and mix release.preflight#{skip_security_suffix(options)}, then clean up"
   end
+
+  defp skip_security_suffix(%{skip_security_audits: true}), do: " --skip-security-audits"
+  defp skip_security_suffix(_options), do: ""
 
   defp cleanup(options, cleanup_state, context) do
     maybe_cleanup_worktree(options, context)

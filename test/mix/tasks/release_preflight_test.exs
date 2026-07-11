@@ -34,7 +34,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
 
     assert_received {:preflight_command, "git", ["status", "--short"]}
     assert_received {:preflight_command, "git", ["describe", "--tags", "--exact-match"]}
-    refute_received {:preflight_command, "mix", ["ci"]}
+    refute_received {:preflight_command, "mix", ["ci.fast"]}
   end
 
   test "runs every phase 2 check and exits only after the final summary" do
@@ -45,7 +45,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
       command_runner_for(%{
         {"git", ["status", "--short"]} => {"", 0},
         {"git", ["describe", "--tags", "--exact-match"]} => {"v1.0.0\n", 0},
-        {"mix", ["ci"]} => {"ci ok", 0},
+        {"mix", ["ci.fast"]} => {"ci ok", 0},
         {"mix", ["docs.contract"]} => {"docs drifted", 1},
         {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0},
         {"mix", ["hex.publish", "--dry-run", "--yes"]} => {"dry run ok", 0},
@@ -78,7 +78,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
     assert message_index(output, "RELEASE PREFLIGHT COMPLETE") <
              message_index(output, "Overall: FAIL")
 
-    assert_received {:preflight_command, "mix", ["ci"]}
+    assert_received {:preflight_command, "mix", ["ci.fast"]}
     assert_received {:preflight_command, "mix", ["docs.contract"]}
     assert_received {:preflight_command, "mix", ["hex.build", "--unpack"]}
     assert_received {:preflight_command, "mix", ["hex.publish", "--dry-run", "--yes"]}
@@ -89,7 +89,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
       command_runner_for(%{
         {"git", ["status", "--short"]} => {"", 0},
         {"git", ["describe", "--tags", "--exact-match"]} => {"v1.0.0\n", 0},
-        {"mix", ["ci"]} => {"ci ok", 0},
+        {"mix", ["ci.fast"]} => {"ci ok", 0},
         {"mix", ["docs.contract"]} => {"docs ok", 0},
         {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0},
         {"sh", ["-c", "printf 'n\\n' | mix hex.publish --dry-run --yes"]} =>
@@ -121,6 +121,49 @@ defmodule Mix.Tasks.Release.PreflightTest do
                      ["-c", "printf 'n\\n' | mix hex.publish --dry-run --yes"]}
 
     refute_received {:preflight_command, "mix", ["hex.publish", "--dry-run", "--yes"]}
+  end
+
+  test "skip security audits keeps deterministic release proof separate from advisory checks" do
+    runner =
+      command_runner_for(%{
+        {"git", ["status", "--short"]} => {"", 0},
+        {"git", ["describe", "--tags", "--exact-match"]} => {"v1.0.0\n", 0},
+        {"mix", ["ci.fast"]} => {"ci ok", 0},
+        {"mix", ["docs.contract"]} => {"docs ok", 0},
+        {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0},
+        {"sh", ["-c", "printf 'n\\n' | mix hex.publish --dry-run --yes"]} =>
+          {"Building rendro 1.0.0\nPublishing package to public repository hexpm.\nNo authenticated user found. Run `mix hex.user auth`\n",
+           1}
+      })
+
+    {messages, result} =
+      capture_shell_messages(fn ->
+        Preflight.run_with_context(
+          %{
+            project_config: [
+              version: "1.0.0",
+              docs: [source_ref: "v1.0.0"],
+              package: [licenses: ["MIT"], links: %{"GitHub" => "https://example.test"}]
+            ],
+            command_runner: runner,
+            env: %{}
+          },
+          skip_security_audits: true
+        )
+      end)
+
+    output = Enum.join(messages, "\n")
+
+    assert match?({:ok, _}, result)
+    assert output =~ "Hex Audit: SKIP"
+    assert output =~ "Deps Audit: SKIP"
+    assert output =~ "run mix ci.advisory or mix release.preflight without --skip-security-audits"
+    assert output =~ "Overall: PASS"
+
+    refute_received {:preflight_command, "mix", ["hex.audit"]}
+
+    refute_received {:preflight_command, "mix",
+                     ["deps.audit", "--ignore-file", ".mix_audit.ignore"]}
   end
 
   test "fails before phase 2 when the changelog release-tail pointer is missing" do
@@ -170,7 +213,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
     assert output =~ "Changelog release tail: FAIL"
     assert output =~ "CHANGELOG.md is missing the current release-tail pointer or date"
     refute output =~ "Phase 2: release parity checks"
-    refute_received {:preflight_command, "mix", ["ci"]}
+    refute_received {:preflight_command, "mix", ["ci.fast"]}
   end
 
   defp command_runner_for(responses) do
