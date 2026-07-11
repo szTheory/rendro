@@ -25,4 +25,30 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
       assert {:ok, _} = JSV.validate(fixture, schema), "#{path} failed schema validation"
     end
   end
+
+  describe "hex tarball contents" do
+    test "priv/examples/ ships in the built tarball and every entry is text-only" do
+      tarball = "rendro-#{Mix.Project.config()[:version]}.tar"
+
+      {output, 0} = Rendro.Test.HexBuildCache.get_build_output()
+      assert output =~ tarball
+      assert File.exists?(tarball)
+
+      list_cmd = "tar -xOf #{tarball} contents.tar.gz | tar -tzf -"
+      {contents, 0} = System.cmd("sh", ["-c", list_cmd], stderr_to_stdout: true)
+
+      shipped =
+        contents
+        |> String.split("\n", trim: true)
+        |> Enum.filter(&String.starts_with?(&1, "priv/examples/"))
+
+      assert shipped != [],
+             "expected priv/examples/ entries in the shipped tarball; found none"
+
+      for path <- shipped do
+        assert Path.extname(path) in [".json", ".md", ".svg"],
+               "#{path} shipped in the Hex tarball but is not text-only (.json/.md/.svg)"
+      end
+    end
+  end
 end
