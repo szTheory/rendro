@@ -8,9 +8,24 @@ Rendro is a pure-Elixir, Phoenix-first PDF and document generation library for t
 
 Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
 
+## Current Milestone: v2.10 Realistic Business-Document Examples & Anatomy
+
+> Additive minor release (hex `1.1.0`). Milestone A of the 4-milestone "Happy-Path Home Runs" program (A realistic examples → B theming → C presets+catalog → D optional Studio). Retargets `SEED-002`. Phases continue global numbering (114–118). Research synthesis: `.planning/research/milestone-a/SUMMARY.md`.
+
+**Goal:** Close the toy→production gap so a serious user can adopt an award-quality, domain-correct business document immediately — realistic example corpus, an additive Invoice anatomy upgrade, two new document families (Payslip, Ticket), and a durable reader-quality rubric — without widening the deterministic core or the family-not-industry boundary.
+
+**Target features:**
+- A realistic example-data library (`priv/examples/<domain>/<business>/<family>.json` + `@moduledoc false` loader), de-quarantining the one realistic invoice fixture and repointing the bench harness.
+- Per-domain `DOMAIN.md` (domain language, personas + JTBD, conventions) + a schema-backed, appendable reader-quality rubric (hierarchy = 5, core dims ≥ 4, reading-order/print-safety gates).
+- An additive `Rendro.Recipes.Invoice` anatomy upgrade (optional issuer/customer/due_date/terms/totals + Decimal money + totals-kept-with-last-rows), the toy call preserved byte-identical; promote `Rendro.Format` to the public **adapter** tier; add an additive `cell_align: :right` primitive for tabular money.
+- Two new families on the 3-rung pattern: `Rendro.Recipes.Payslip` (anchor = net pay) and `Rendro.Recipes.Ticket` (fixed-box; anchor = seat/gate).
+- An edge-case stress matrix (deterministic hash-checked goldens + raster refs + errors-as-product), a rubric-gated demonstration set, and gallery/docs/README closure.
+
+**Key context:** Confirmed GREEN by a 5-lens research fan-out (domain/rubric, API/DX, example-data arch, prior-art/pitfalls, coherence/pillars). The only irreversible act is the `Format` public promotion — held to the *adapter/Evolving* tier with a documented "output may evolve" note. Four forward-compat "shape-now" seams are baked into acceptance criteria so Milestones B/C/D need no breaking rework: **S1** private `palette(opts)` keyed on B's locked color roles (sections never inline `{0,0,0}`) · **S4** fixtures reserve an optional brand/logo slot for C · **S5** rubric recorded as an appendable manifest for C's quality-ratchet · **S6** `artifacts.json` gains optional theme/mode/preset tags. Guards: no tagged-PDF/PDF-UA accessibility claims; engine stays locale-free (differences are data); no real PII (fictional businesses only; Payslip is the acute risk); ship `priv/examples/` text-only.
+
 ## Current State
 
-**Active milestone:** None. C1 CI/CD Performance & Reliability shipped on 2026-07-11 as a non-version infrastructure milestone; next milestone planning has not started.
+**Active milestone:** v2.10 Realistic Business-Document Examples & Anatomy — **planning** (defining requirements → roadmap). Retargets `SEED-002`; Milestone A of the Happy-Path program. C1 CI/CD Performance & Reliability shipped 2026-07-11 as a non-version infrastructure milestone.
 
 **Shipped milestone:** C1 CI/CD Performance & Reliability — **SHIPPED 2026-07-11** (Phases 108-113, 30/30 requirements; milestone audit `passed`; no Hex release or library version tag). Rendro's CI/CD pipeline is now split into actionable fast/proof/advisory lanes, backed by precise BEAM caches, a stable `ci-success` required gate, local `mix ci.fast` / `mix ci.proofs` reproduction commands, and remote validation evidence from three green `ci.yml` runs.
 
@@ -148,7 +163,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-- None
+- v2.10 Realistic Business-Document Examples & Anatomy (Milestone A / `SEED-002`) — realistic example-data library + per-domain `DOMAIN.md` + reader-quality rubric; additive Invoice anatomy upgrade + `Format` public (adapter tier) + `cell_align: :right`; new Payslip + Ticket families; edge-case stress matrix + rubric-gated demos + gallery/docs closure. Requirements defined in `REQUIREMENTS.md`; phases 114–118.
 
 ### Out of Scope
 
@@ -288,4 +303,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-11 after C1 milestone*
+*Last updated: 2026-07-10 — started milestone v2.10 (Realistic Business-Document Examples & Anatomy)*
