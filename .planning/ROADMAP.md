@@ -31,7 +31,16 @@
   3. The single realistic invoice fixture is de-quarantined from `bench/comparison/fixtures/invoice_data.json` into the example library and the bench harness is repointed, with `mix rendro.comparison.check` staying green — the move is a provable no-op (money-string normalization committed separately).
   4. `priv/examples/` ships in the Hex tarball as **text-only** (`.json`/`.md`/`.svg`), added to the `mix.exs` package allowlist + exact-allowlist tarball audit, with a raster-ban test mirroring `brand/`.
   5. Each domain has a co-located `DOMAIN.md` (domain language, personas + JTBD, reading context, layout/typographic conventions), and the reader-quality rubric (6 core 1–5 dims + 2 pass/fail gates with non-designer anchors) is recorded as a schema-backed **appendable** manifest (`priv/quality/rubric_scores.json` + schema) whose docs-contract lane enforces structure and threshold arithmetic (hierarchy = 5, core ≥ 4, gates pass) — not the subjective score (seam S5).
-**Plans**: TBD
+**Plans**: 7 plans
+
+Plans:
+- [ ] 114-01-PLAN.md — De-quarantine invoice fixture (verbatim move + repoint, provable no-op) — EXL-04
+- [ ] 114-02-PLAN.md — Author examples.schema.json + rubric_scores.schema.json — EXL-03, RUB-03
+- [ ] 114-03-PLAN.md — Normalize money to Decimal-safe strings + S4 brand slot + fixture schema-contract test — EXL-01, EXL-03, EXL-06
+- [ ] 114-04-PLAN.md — Rendro.Examples loader (load!/1, list/1) + loader test + public_api hidden-list extension — EXL-02, EXL-05
+- [ ] 114-05-PLAN.md — Author Invoice DOMAIN.md + domain_md_contract_test.exs — RUB-01
+- [ ] 114-06-PLAN.md — Reader-quality rubric content + rubric_scores.json manifest + contract test — RUB-02, RUB-03
+- [ ] 114-07-PLAN.md — Hex packaging: mix.exs allowlist, .gitignore raster-ban, tarball inclusion/exclusion tests — EXL-05
 
 ### Phase 115: Invoice anatomy upgrade + Format public promotion + palette/align seams
 **Goal**: Deliver the milestone's one real product `lib/` change — an additive, byte-compatible Invoice anatomy upgrade, the public promotion of `Rendro.Format`, the additive `cell_align: :right` primitive, and the S1 palette seam — without breaking the toy call or widening the Stable tier.
@@ -109,7 +118,7 @@
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 114. Domain research, rubric & example-data library | v2.10 | 0/TBD | Not started | - |
+| 114. Domain research, rubric & example-data library | v2.10 | 0/7 | Planned | - |
 | 115. Invoice anatomy + Format promotion + seams | v2.10 | 0/TBD | Not started | - |
 | 116. New families — Payslip & Ticket | v2.10 | 0/TBD | Not started | - |
 | 117. Edge-case stress matrix | v2.10 | 0/TBD | Not started | - |
