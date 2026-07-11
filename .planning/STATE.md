@@ -2,14 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.10
 milestone_name: Realistic Business-Document Examples & Anatomy
+current_phase: 114
+current_phase_name: Domain research, reader-quality rubric & realistic example-data library
 status: executing
-last_updated: "2026-07-11T05:31:30.481Z"
+last_updated: "2026-07-11T05:37:20.163Z"
 last_activity: 2026-07-11
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 6
   percent: 0
 ---
 
@@ -24,7 +26,7 @@ progress:
 ## Current Position
 
 Phase: 114 (Domain research, reader-quality rubric & realistic example-data library) — EXECUTING
-Plan: 6 of 7
+Plan: 7 of 7
 Status: Ready to execute
 Last activity: 2026-07-11
 
@@ -59,6 +61,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 - [Phase 114]: 114-03: Normalized invoice fixture money from integer cents to Decimal-safe 2-decimal strings + added S4 empty brand/logo slot in a commit separate from 114-01's verbatim move (Pitfall 6); Rendro render byte-identical. Added first schema-validation lane (examples_schema_contract_test.exs) validating every priv/examples/ fixture. EXL-01/03/06 satisfied.
 - [Phase ?]: Rendro.Examples loader kept String.t() path signature with Path.safe_relative/1 defense-in-depth guard; all current callers are internal/hardcoded
 - [Phase ?]: Loader uses built-in JSON.decode!/1 (never Jason) — Jason is a dev/test-only transitive dep that would crash prod Hex consumers
+- [Phase ?]: Rubric threshold arithmetic (hierarchy=5, core>=4, gates pass) lives only as a test helper — no lib/ product change except the loader.
 
 ### Blockers / Open Questions
 
@@ -84,6 +87,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 | Phase 114 P05 | 1min | 2 tasks | 2 files |
 | Phase 114 P03 | 2min | 2 tasks | 6 files |
 | Phase 114 P04 | ~2 min | 2 tasks | 3 files |
+| Phase 114 P06 | 4 min | 2 tasks | 2 files |
 
 ## Operator Next Steps
 

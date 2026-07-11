@@ -47,7 +47,7 @@ Plans:
 
 - [x] 114-03-PLAN.md — Normalize money to Decimal-safe strings + S4 brand slot + fixture schema-contract test — EXL-01, EXL-03, EXL-06
 - [x] 114-04-PLAN.md — Rendro.Examples loader (load!/1, list/1) + loader test + public_api hidden-list extension — EXL-02, EXL-05
-- [ ] 114-06-PLAN.md — Reader-quality rubric content + rubric_scores.json manifest + contract test — RUB-02, RUB-03
+- [x] 114-06-PLAN.md — Reader-quality rubric content + rubric_scores.json manifest + contract test — RUB-02, RUB-03
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -141,7 +141,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 114. Domain research, rubric & example-data library | v2.10 | 5/7 | In Progress|  |
+| 114. Domain research, rubric & example-data library | v2.10 | 6/7 | In Progress|  |
 | 115. Invoice anatomy + Format promotion + seams | v2.10 | 0/TBD | Not started | - |
 | 116. New families — Payslip & Ticket | v2.10 | 0/TBD | Not started | - |
 | 117. Edge-case stress matrix | v2.10 | 0/TBD | Not started | - |
