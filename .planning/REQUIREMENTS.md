@@ -12,10 +12,10 @@ Legend: `[ ]` in scope for this milestone.
 ## Example-Data Library (EXL)
 
 - [x] **EXL-01**: A shared realistic example-data library exists under `priv/examples/<domain>/<business>/<family>.json`, encoding the A0 domain language with real-shaped (fictional) businesses, addresses, terms, tax, and Decimal-safe money as strings (never JSON floats).
-- [ ] **EXL-02**: A `Rendro.Examples` loader (`lib/rendro/examples.ex`, `@moduledoc false`) reads fixtures for tests, the bench harness, guides, and Livebook, works for shipped consumers via `app_dir`, and is asserted **absent** from `priv/public_api.json` (stays out of the public tier).
+- [x] **EXL-02**: A `Rendro.Examples` loader (`lib/rendro/examples.ex`, `@moduledoc false`) reads fixtures for tests, the bench harness, guides, and Livebook, works for shipped consumers via `app_dir`, and is asserted **absent** from `priv/public_api.json` (stays out of the public tier).
 - [x] **EXL-03**: A repo-only `priv/schemas/examples.schema.json` validates every fixture, enforced by a docs-contract lane folded into the required `test` job.
 - [x] **EXL-04**: The single realistic invoice fixture is de-quarantined from `bench/comparison/fixtures/invoice_data.json` into the example library and the bench harness is repointed to it, with `mix rendro.comparison.check` staying green (the move is a provable no-op, money-string normalization committed separately).
-- [ ] **EXL-05**: `priv/examples/` ships in the Hex tarball as **text-only** (`.json`/`.md`/`.svg`), added to the `mix.exs` package allowlist + exact-allowlist tarball audit, with a raster-ban test mirroring `brand/`.
+- [x] **EXL-05**: `priv/examples/` ships in the Hex tarball as **text-only** (`.json`/`.md`/`.svg`), added to the `mix.exs` package allowlist + exact-allowlist tarball audit, with a raster-ban test mirroring `brand/`.
 - [x] **EXL-06** *(seam S4)*: Each fixture's business is modeled with an **optional** `brand`/`logo` sub-object (empty/absent in this milestone) so Milestone C can add brand data without re-keying `priv/examples/`.
 
 ## Domain Research & Reader-Quality Rubric (RUB)
@@ -79,10 +79,10 @@ Every REQ-ID maps to exactly one phase. Coverage: **26/26 mapped**, no orphans, 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | EXL-01 | Phase 114 | Complete |
-| EXL-02 | Phase 114 | Pending |
+| EXL-02 | Phase 114 | Complete |
 | EXL-03 | Phase 114 | Complete |
 | EXL-04 | Phase 114 | Complete |
-| EXL-05 | Phase 114 | Pending |
+| EXL-05 | Phase 114 | Complete |
 | EXL-06 | Phase 114 | Complete |
 | RUB-01 | Phase 114 | Complete |
 | RUB-02 | Phase 114 | Pending |

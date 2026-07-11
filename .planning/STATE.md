@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.10
 milestone_name: Realistic Business-Document Examples & Anatomy
 status: executing
-last_updated: "2026-07-11T05:26:04.168Z"
+last_updated: "2026-07-11T05:31:30.481Z"
 last_activity: 2026-07-11
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 7
-  completed_plans: 4
+  completed_plans: 5
   percent: 0
 ---
 
@@ -24,11 +24,11 @@ progress:
 ## Current Position
 
 Phase: 114 (Domain research, reader-quality rubric & realistic example-data library) — EXECUTING
-Plan: 5 of 7
+Plan: 6 of 7
 Status: Ready to execute
 Last activity: 2026-07-11
 
-Progress: [██████░░░░] 57%
+Progress: [███████░░░] 71%
 
 ## Roadmap Snapshot (v2.10, Phases 114–118)
 
@@ -57,6 +57,8 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 - [Phase ?]: 114-05: Authored Invoice DOMAIN.md as locked research-first recommendation (synthesized domain-research prose), light human sanity-check reserved for phase verification.
 - [Phase ?]: 114-05: DOMAIN.md structural contract test iterates priv/examples/*/DOMAIN.md so future domain families inherit the four-heading contract automatically.
 - [Phase 114]: 114-03: Normalized invoice fixture money from integer cents to Decimal-safe 2-decimal strings + added S4 empty brand/logo slot in a commit separate from 114-01's verbatim move (Pitfall 6); Rendro render byte-identical. Added first schema-validation lane (examples_schema_contract_test.exs) validating every priv/examples/ fixture. EXL-01/03/06 satisfied.
+- [Phase ?]: Rendro.Examples loader kept String.t() path signature with Path.safe_relative/1 defense-in-depth guard; all current callers are internal/hardcoded
+- [Phase ?]: Loader uses built-in JSON.decode!/1 (never Jason) — Jason is a dev/test-only transitive dep that would crash prod Hex consumers
 
 ### Blockers / Open Questions
 
@@ -81,6 +83,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 | Phase 114 P02 | 3min | 2 tasks | 2 files |
 | Phase 114 P05 | 1min | 2 tasks | 2 files |
 | Phase 114 P03 | 2min | 2 tasks | 6 files |
+| Phase 114 P04 | ~2 min | 2 tasks | 3 files |
 
 ## Operator Next Steps
 
