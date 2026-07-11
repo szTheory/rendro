@@ -13,7 +13,7 @@ Legend: `[ ]` in scope for this milestone.
 
 - [ ] **EXL-01**: A shared realistic example-data library exists under `priv/examples/<domain>/<business>/<family>.json`, encoding the A0 domain language with real-shaped (fictional) businesses, addresses, terms, tax, and Decimal-safe money as strings (never JSON floats).
 - [ ] **EXL-02**: A `Rendro.Examples` loader (`lib/rendro/examples.ex`, `@moduledoc false`) reads fixtures for tests, the bench harness, guides, and Livebook, works for shipped consumers via `app_dir`, and is asserted **absent** from `priv/public_api.json` (stays out of the public tier).
-- [ ] **EXL-03**: A repo-only `priv/schemas/examples.schema.json` validates every fixture, enforced by a docs-contract lane folded into the required `test` job.
+- [x] **EXL-03**: A repo-only `priv/schemas/examples.schema.json` validates every fixture, enforced by a docs-contract lane folded into the required `test` job.
 - [x] **EXL-04**: The single realistic invoice fixture is de-quarantined from `bench/comparison/fixtures/invoice_data.json` into the example library and the bench harness is repointed to it, with `mix rendro.comparison.check` staying green (the move is a provable no-op, money-string normalization committed separately).
 - [ ] **EXL-05**: `priv/examples/` ships in the Hex tarball as **text-only** (`.json`/`.md`/`.svg`), added to the `mix.exs` package allowlist + exact-allowlist tarball audit, with a raster-ban test mirroring `brand/`.
 - [ ] **EXL-06** *(seam S4)*: Each fixture's business is modeled with an **optional** `brand`/`logo` sub-object (empty/absent in this milestone) so Milestone C can add brand data without re-keying `priv/examples/`.
@@ -22,7 +22,7 @@ Legend: `[ ]` in scope for this milestone.
 
 - [ ] **RUB-01**: Each document domain has a co-located `DOMAIN.md` capturing its domain language (nouns/verbs/events), personas + JTBD (who reads it, in what context, and the ONE fact they need first), reading context, and layout/typographic conventions.
 - [ ] **RUB-02**: A reader-quality rubric is defined with 6 core 1–5 dimensions (information architecture; content hierarchy; domain-fit/least-surprise; reader affordances; typographic craft; restraint/cohesion) plus 2 pass/fail gates (reading-order, print-safety), each with concrete 1/3/4/5 anchors a non-designer can apply.
-- [ ] **RUB-03** *(seam S5)*: Rubric scores are recorded in a schema-backed, **appendable** manifest (`priv/quality/rubric_scores.json` + schema) with a docs-contract lane that enforces structure and the threshold arithmetic (hierarchy = 5, core ≥ 4, gates pass) — not the subjective score — so Milestone C's quality-ratchet only appends.
+- [x] **RUB-03** *(seam S5)*: Rubric scores are recorded in a schema-backed, **appendable** manifest (`priv/quality/rubric_scores.json` + schema) with a docs-contract lane that enforces structure and the threshold arithmetic (hierarchy = 5, core ≥ 4, gates pass) — not the subjective score — so Milestone C's quality-ratchet only appends.
 
 ## Invoice Anatomy & Format (INV)
 
@@ -80,13 +80,13 @@ Every REQ-ID maps to exactly one phase. Coverage: **26/26 mapped**, no orphans, 
 |-------------|-------|--------|
 | EXL-01 | Phase 114 | Pending |
 | EXL-02 | Phase 114 | Pending |
-| EXL-03 | Phase 114 | Pending |
+| EXL-03 | Phase 114 | Complete |
 | EXL-04 | Phase 114 | Complete |
 | EXL-05 | Phase 114 | Pending |
 | EXL-06 | Phase 114 | Pending |
 | RUB-01 | Phase 114 | Pending |
 | RUB-02 | Phase 114 | Pending |
-| RUB-03 | Phase 114 | Pending |
+| RUB-03 | Phase 114 | Complete |
 | INV-01 | Phase 115 | Pending |
 | INV-02 | Phase 115 | Pending |
 | INV-03 | Phase 115 | Pending |

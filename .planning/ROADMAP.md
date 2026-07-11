@@ -40,7 +40,7 @@ Plans:
 **Wave 1**
 
 - [x] 114-01-PLAN.md — De-quarantine invoice fixture (verbatim move + repoint, provable no-op) — EXL-04
-- [ ] 114-02-PLAN.md — Author examples.schema.json + rubric_scores.schema.json — EXL-03, RUB-03
+- [x] 114-02-PLAN.md — Author examples.schema.json + rubric_scores.schema.json — EXL-03, RUB-03
 - [ ] 114-05-PLAN.md — Author Invoice DOMAIN.md + domain_md_contract_test.exs — RUB-01
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -141,7 +141,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 114. Domain research, rubric & example-data library | v2.10 | 1/7 | In Progress|  |
+| 114. Domain research, rubric & example-data library | v2.10 | 2/7 | In Progress|  |
 | 115. Invoice anatomy + Format promotion + seams | v2.10 | 0/TBD | Not started | - |
 | 116. New families — Payslip & Ticket | v2.10 | 0/TBD | Not started | - |
 | 117. Edge-case stress matrix | v2.10 | 0/TBD | Not started | - |
