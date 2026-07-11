@@ -64,6 +64,12 @@ defmodule Rendro.DocsContract.DxLocalReproducibilityClaimsTest do
     end
 
     assert contributing =~ "Full required merge gate"
+    assert contributing =~ "deterministic local command for the required fast merge gate"
+    assert contributing =~ "only when the local machine has the same proof tools"
+
+    assert contributing =~
+             "GitHub Actions is the authoritative environment for `integration-proofs`"
+
     assert contributing =~ "Optional advisory lane"
     assert contributing =~ "Quarantined flaky-test lane"
   end
@@ -74,7 +80,7 @@ defmodule Rendro.DocsContract.DxLocalReproducibilityClaimsTest do
 
     assert metrics =~ "mix ci.fast"
     assert metrics =~ "ci.fast_exit=0"
-    assert metrics =~ "1211 tests, 12 doctests, 4 properties, 0 failures"
+    assert metrics =~ "1216 tests, 12 doctests, 4 properties, 0 failures"
     assert metrics =~ "Pending post-push GitHub run for this branch"
     assert metrics =~ "Pending post-push GitHub summaries"
     assert metrics =~ "post-merge GitHub timing proof"

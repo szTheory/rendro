@@ -43,7 +43,7 @@ overrides_applied: 0
 
 | From | To  | Via | Status | Details |
 | ---- | --- | --- | ------ | ------- |
-| `.github/workflows/ci.yml` | `ci-success` | needs array | ✓ VERIFIED | `security-audit` appended to `needs:` array in `ci-success` job |
+| `.github/workflows/ci.yml` | `security-audit` | advisory job | ✓ VERIFIED | `security-audit` is intentionally soft-fail and not included in `ci-success.needs`; the strict maintenance posture remains scheduled/release-oriented per SEC-04. |
 | `.github/workflows/release.yml` | `mix.exs` | version extraction and assertion | ✓ VERIFIED | `MIX_VERSION=$(grep '@version' mix.exs | sed -E 's/.*"([^"]+)".*/\1/')` compared against tag |
 
 ### Requirements Coverage

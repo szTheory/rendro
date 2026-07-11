@@ -23,7 +23,7 @@ The most recent remote `ci.yml` runs predate the local C1 phase-113 commits and 
 | Required local command | `mix ci` monolith | `mix ci` = `ci.fast` + `ci.proofs`; scoped `ci.fast`, `ci.proofs`, `ci.advisory` aliases available | `mix.exs`, `mix help ci.fast` |
 | Fast local required lane | `mix ci` inner step avg 327s, local proxy from 3 green runs | `mix ci.fast` green locally in 12s with warm PLTs on 2026-07-10 | `mix ci.fast` exit 0, `ci.fast_seconds=12` |
 | Default test lane | Included inside opaque `Run CI` step | Split CI `Test` step and local `mix test --exclude quarantine --slowest 10` | `.github/workflows/ci.yml`, `mix ci.fast` output |
-| Default test result | Baseline had pre-existing failures documented in Phase 108 | 1211 tests, 12 doctests, 4 properties, 0 failures, 20 excluded | `mix ci.fast` output, seed 869542 |
+| Default test result | Baseline had pre-existing failures documented in Phase 108 | 1216 tests, 12 doctests, 4 properties, 0 failures, 20 excluded | `mix ci.fast` output, seed 51835 |
 | Strict static checks | Opaque inside `Run CI` | `mix credo --strict` found no issues; `mix dialyzer` found 0 errors | `mix ci.fast` output |
 | Full CI wall-clock | 966s and 1039s for the last two green baseline runs; p95 insufficient (n=3) | Pending post-push GitHub run for this branch | `gh run view 27441368861`, `gh run view 27443757934` |
 | Cache coverage | No deps, `_build`, or PLT cache in `ci.yml` | `test` job restores deps, `_build`, and PLT caches; PLT save runs even after failures | `.github/workflows/ci.yml` |
@@ -56,7 +56,7 @@ Observed gate details from the successful local run:
 | `mix format --check-formatted` | Passed |
 | `mix hex.build` | Passed |
 | `mix compile --warnings-as-errors` | Passed |
-| `mix test --exclude quarantine --slowest 10` | Passed: 1211 tests, 12 doctests, 4 properties, 0 failures, 20 excluded |
+| `mix test --exclude quarantine --slowest 10` | Passed: 1216 tests, 12 doctests, 4 properties, 0 failures, 20 excluded |
 | `mix docs --warnings-as-errors` | Passed |
 | `mix credo --strict` | Passed: no issues |
 | `mix dialyzer` | Passed: 0 errors |

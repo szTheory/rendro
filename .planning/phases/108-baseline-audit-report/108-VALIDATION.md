@@ -1,10 +1,11 @@
 ---
 phase: 108
 slug: baseline-audit-report
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: complete
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-06-14
+updated: 2026-07-10
 ---
 
 # Phase 108 — Validation Strategy
@@ -42,13 +43,13 @@ created: 2026-06-14
 
 | Req ID | Behavior | Test Type | Automated Command | File Exists |
 |--------|----------|-----------|-------------------|-------------|
-| BASE-05 | `test` job summary step present, correctly guarded, gate-neutral | smoke | `grep -nE "CI Baseline\|if: always\(\)\|continue-on-error" .github/workflows/ci.yml` | ❌ W1 |
-| BASE-05 | `tee` capture preserves `mix ci` exit code | smoke | `grep -nE "PIPESTATUS\|pipefail" .github/workflows/ci.yml` | ❌ W1 |
-| BASE-05 | setup-beam step exposes version outputs via `id:` | smoke | `grep -n "id: setup-beam" .github/workflows/ci.yml` | ❌ W1 |
-| BASE-01 | Baseline table covers 3 workflows × all jobs w/ required columns | manual | inspect `#base-01--baseline-table` anchor in `C1-AUDIT.md` | ❌ W2 |
-| BASE-02 | Critical path + duplicated-work map documented | manual | inspect `#base-02--critical-path` anchor | ❌ W2 |
-| BASE-03 | All 34 `async: false` modules + lanes classified A–E w/ cited evidence | manual | inspect `#base-03--ae-classification` anchor | ❌ W2 |
-| BASE-04 | P0–P3 recs (issue/change/impact/risk/rollback) mapped to 109–113 | manual | inspect `#base-04--p0p3-recommendation-report` anchor | ❌ W2 |
+| BASE-05 | `test` job summary step present, correctly guarded, gate-neutral | smoke | `grep -nE "CI Baseline\|if: always\(\)\|continue-on-error" .github/workflows/ci.yml` | ✅ W1 |
+| BASE-05 | `tee` capture preserves `mix ci` exit code | smoke | `grep -nE "PIPESTATUS\|pipefail" .github/workflows/ci.yml` | ✅ W1 |
+| BASE-05 | setup-beam step exposes version outputs via `id:` | smoke | `grep -n "id: setup-beam" .github/workflows/ci.yml` | ✅ W1 |
+| BASE-01 | Baseline table covers 3 workflows × all jobs w/ required columns | manual | inspect `#base-01--baseline-table` anchor in `C1-AUDIT.md` | ✅ W2 |
+| BASE-02 | Critical path + duplicated-work map documented | manual | inspect `#base-02--critical-path` anchor | ✅ W2 |
+| BASE-03 | All 34 `async: false` modules + lanes classified A–E w/ cited evidence | manual | inspect `#base-03--ae-classification` anchor | ✅ W2 |
+| BASE-04 | P0–P3 recs (issue/change/impact/risk/rollback) mapped to 109–113 | manual | inspect `#base-04--p0p3-recommendation-report` anchor | ✅ W2 |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -56,9 +57,9 @@ created: 2026-06-14
 
 ## Wave 0 Requirements
 
-- [ ] `mix test --repeat-until-failure 25` × seeds {0,1,2} — bounded flake sweep producing BASE-03 flaky-**candidacy** evidence (not proof of absence; deep proof deferred to Phase 110).
-- [ ] Characterize the local `RecipesFacadeDriftTest` failure in isolation BEFORE the flake sweep so it is not conflated with flake data.
-- [ ] Human-read the 4 residue `async: false` modules (BrandingContractTest, IntegrationsContractTest, RecipesContractTest, ManifestTest) — grep showed no global state; record concrete reason or flag as Phase 110 `async: true` candidates.
+- [x] `mix test --repeat-until-failure 25` × seeds {0,1,2} — bounded flake sweep producing BASE-03 flaky-**candidacy** evidence (not proof of absence; deep proof deferred to Phase 110).
+- [x] Characterize the local `RecipesFacadeDriftTest` failure in isolation BEFORE the flake sweep so it is not conflated with flake data.
+- [x] Human-read the 4 residue `async: false` modules (BrandingContractTest, IntegrationsContractTest, RecipesContractTest, ManifestTest) — grep showed no global state; record concrete reason or flag as Phase 110 `async: true` candidates.
 
 *No test-framework gaps — ExUnit exists. Validation here is document authoring + YAML inspection, not a new suite.*
 
@@ -77,11 +78,21 @@ created: 2026-06-14
 
 ## Validation Sign-Off
 
-- [ ] All tasks have a `grep`/inspection verify or a Wave 0 dependency
-- [ ] Sampling continuity: no 3 consecutive tasks without an automated verify
-- [ ] Wave 0 covers flake sweep + residue read + local-failure characterization
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 5s
-- [ ] `nyquist_compliant: true` set in frontmatter once planner maps every task
+- [x] All tasks have a `grep`/inspection verify or a Wave 0 dependency
+- [x] Sampling continuity: no 3 consecutive tasks without an automated verify
+- [x] Wave 0 covers flake sweep + residue read + local-failure characterization
+- [x] No watch-mode flags
+- [x] Feedback latency < 5s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** approved 2026-07-10 from `108-VERIFICATION.md`.
+
+## Validation Audit 2026-07-10
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 1 |
+| Resolved | 1 |
+| Escalated/manual-only | 0 |
+
+The validation file was still marked draft even though `108-VERIFICATION.md` passed. This audit reconciles the frontmatter and sign-off with the existing verification evidence.
