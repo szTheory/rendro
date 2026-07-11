@@ -1,3 +1,12 @@
+# Requirements Archive: C1 CI/CD Performance & Reliability
+
+**Archived:** 2026-07-11
+**Status:** SHIPPED
+
+Fresh active requirements are created by the next milestone workflow.
+
+---
+
 # Requirements: Rendro — Milestone C1 (CI/CD Performance & Reliability)
 
 **Defined:** 2026-06-14
@@ -110,6 +119,7 @@
 | VAL-02 | Phase 113 | Complete |
 
 **Coverage:**
+
 - v1 requirements: 30 total
 - Mapped to phases: 30
 - Unmapped: 0 ✓

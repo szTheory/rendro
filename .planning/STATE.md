@@ -2,33 +2,33 @@
 gsd_state_version: 1.0
 milestone: C1
 milestone_name: CI/CD Performance & Reliability
-current_phase: 113
-status: verifying
-last_updated: "2026-07-10T23:48:29.488Z"
-last_activity: 2026-07-10
-last_activity_desc: Phase 113 complete
+status: Awaiting next milestone
+last_updated: "2026-07-11T01:36:49.721Z"
+last_activity: 2026-07-11
+last_activity_desc: Milestone C1 completed and archived
 progress:
   total_phases: 6
   completed_phases: 6
   total_plans: 18
   completed_plans: 18
   percent: 100
+current_phase: null
 ---
 
 # Project State
 
 ## Reference
 
-**Project**: Rendro — milestone **C1 CI/CD Performance & Reliability** (non-version infra milestone; pipeline/tooling work, no library/Hex changes)
-**Core Value**: A fast, deterministic, trustworthy, resource-efficient CI/CD pipeline with great contributor DX — keep the high-value quality signal, drop low-signal/flaky checks, fix caching and parallelism, all measured before/after.
-**Current Focus**: Phase 113 UAT and security verification complete. Next: complete C1 milestone.
+**Project**: Rendro
+**Core Value**: Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
+**Current Focus**: C1 CI/CD Performance & Reliability is complete and archived. Next: plan the next milestone.
 
 ## Current Position
 
-Phase: 113
-Plan: Not started
-Status: Phase complete — UAT and security verification passed with recurring docs-contract coverage
-Last activity: 2026-07-10 — Phase 113 complete
+Phase: Milestone C1 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-07-11 — Milestone C1 completed and archived
 
 ## Progress
 
@@ -55,7 +55,7 @@ Phase 113 DX & Validation ................. Complete
 - 108-02: ManifestTest async:false confirmed required — PublicApi.recompile_conditional_adapters() triggers global BEAM module recompilation (cannot run concurrently).
 - 108-02: BrandingContractTest and RecipesContractTest are Phase 110 async:true candidates (no global state found; DocsContract.evaluate!/2 needs Phase 110 safety verification).
 - 108-02: Two pre-existing deterministic failures noted but NOT fixed (MEASURE-ONLY): RequiredChecksContractTest (guardrail expects bare mix ci, but 108-01 used tee) and PublicApiTest (Mix.Tasks.Brand.Gen missing @moduledoc).
-- 108-03: C1-AUDIT.md authored as consolidated measure-only baseline; BASE-01/02/03/04 populated from 108-EVIDENCE.md; P0: decompose mix ci monolith (Phase 109+111); p95=insufficient green-run data (n=3); 0 flaky candidates; 2 pre-existing baseline failures noted
+- 108-03: C1-AUDIT.md authored as consolidated measure-only baseline; BASE-01/02/03/04 populated from 108-EVIDENCE.md; P0: decompose mix ci monolith (Phase 109+111); p95=insufficient green-run data (n=3); 0 flaky candidates; 2 pre-existing baseline failures noted.
 - 109-DISCUSS: `CACHE_BUSTER` will use an `env:` var in CI YAMLs for PR visibility and ease of bursting.
 - 109-DISCUSS: Dialyzer PLT will be isolated to `priv/plts` using `plt_core_path` in `mix.exs`, enabling a separate `restore/save` cache split so the PLT is saved unconditionally even if Dialyzer fails, without polluting `_build`.
 - 109-DISCUSS: `mix ci` decomposition is deferred to Phase 111 to avoid tangling cache implementation with `test/guardrails/required_checks_contract_test.exs` rewrites. `erlef/setup-beam` will be uniformly SHA-pinned.
@@ -72,19 +72,22 @@ Phase 113 DX & Validation ................. Complete
 - 111-01: Used GitHub Actions concurrency API to cancel superseded in-progress non-main branch builds.
 - 111-00: Grouped advisory contexts into a single `advisory-checks` pipeline context, and live-proofs into a single `integration-proofs` context.
 - 111-00: Set `ci-success` as the sole required context for main branch protection.
+- C1 closeout: Non-version infrastructure milestone archived with no Hex release or library version tag.
+- C1 closeout: Remote validation evidence recorded from three green `ci.yml` runs (`29133061301`, `29133777702`, `29134266708`); required gate p50 783s, nearest-rank p95 1013s.
+- C1 closeout: `security-audit` remains advisory/non-required maintenance signal for dependency advisories; deterministic required gate is `ci-success`.
 
 ### Blockers / Open Questions
 
-- None. Phase 113 is locally complete with automated UAT and `threats_open: 0` security verification.
+- None.
 
 ## Next Steps
 
-1. `/gsd:complete-milestone` — close C1 after automated Phase 113 verification.
+1. `/gsd-new-milestone` — define the next milestone.
 
 ## Last Session
 
-**Last updated**: 2026-07-10T23:48:53Z
-**Stopped at**: Phase 113 verified; C1 ready for milestone completion
+**Last updated**: 2026-07-11T01:36:49Z
+**Stopped at**: C1 archived; next milestone not started
 **Blockers**: None
 
 ## Performance Metrics
@@ -99,3 +102,7 @@ Phase 113 DX & Validation ................. Complete
 | Phase 110-test-concurrency-determinism-cleanup P02 | 2 | 3 tasks | 3 files |
 | Phase 111 P00 | 5m | 2 tasks | 2 files |
 | Phase 111 P01 | 10m | 3 tasks | 1 files |
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone

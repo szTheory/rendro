@@ -26,7 +26,7 @@ nyquist:
 **Audited:** 2026-07-11
 **Scope:** Phases 108-113, 18/18 plans complete
 
-C1 is ready to archive. All phase plans have summaries, all phase verification and validation artifacts exist, `.planning/REQUIREMENTS.md` marks all 30 C1 requirements complete, local validation is green, and post-push GitHub Actions evidence closes the previous `VAL-01` gap.
+C1 is archived. All phase plans have summaries, all phase verification and validation artifacts exist, the archived C1 requirements record marks all 30 C1 requirements complete, local validation is green, and post-push GitHub Actions evidence closes the previous `VAL-01` gap.
 
 ## Pre-Flight
 
@@ -69,7 +69,7 @@ Plan readiness is complete: 18 plan files and 18 summary files exist for phases 
 | DX | 4/4 | satisfied | `mix ci.fast`, `mix ci.proofs`, and contributor docs are wired and guarded. |
 | VAL | 2/2 | satisfied | Remote before/after metrics and integrated steady-state pipeline description are complete in `113-METRICS.md`. |
 
-No orphaned requirements were found in `.planning/REQUIREMENTS.md`; all 30 traceability rows map to phases 108-113.
+No orphaned requirements were found in the C1 requirements record; all 30 traceability rows map to phases 108-113.
 
 ## Remote Validation Evidence
 
