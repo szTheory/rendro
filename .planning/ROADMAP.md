@@ -51,7 +51,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 114-07-PLAN.md — Hex packaging: mix.exs allowlist, .gitignore raster-ban, tarball inclusion/exclusion tests — EXL-05
+- [x] 114-07-PLAN.md — Hex packaging: mix.exs allowlist, .gitignore raster-ban, tarball inclusion/exclusion tests — EXL-05
 
 ### Phase 115: Invoice anatomy upgrade + Format public promotion + palette/align seams
 
@@ -141,7 +141,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 114. Domain research, rubric & example-data library | v2.10 | 6/7 | In Progress|  |
+| 114. Domain research, rubric & example-data library | v2.10 | 7/7 | Complete   | 2026-07-11 |
 | 115. Invoice anatomy + Format promotion + seams | v2.10 | 0/TBD | Not started | - |
 | 116. New families — Payslip & Ticket | v2.10 | 0/TBD | Not started | - |
 | 117. Edge-case stress matrix | v2.10 | 0/TBD | Not started | - |
