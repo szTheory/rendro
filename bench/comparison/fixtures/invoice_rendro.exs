@@ -1,5 +1,5 @@
 fixture_id = "invoice_v1"
-data = "bench/comparison/fixtures/invoice_data.json" |> File.read!() |> JSON.decode!()
+data = "priv/examples/invoice/acme-phoenix-saas/invoice.json" |> File.read!() |> JSON.decode!()
 
 unless data["fixture_id"] == fixture_id do
   raise "expected #{fixture_id}, got #{inspect(data["fixture_id"])}"

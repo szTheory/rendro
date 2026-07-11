@@ -7,7 +7,7 @@ defmodule Rendro.Comparison.Runner do
   @tmp_dir Path.join(@raw_dir, "_tmp")
   @manifest_path "bench/results/comparison.json"
   @pins_path "bench/comparison/pins.json"
-  @fixture_path "bench/comparison/fixtures/invoice_data.json"
+  @fixture_path "priv/examples/invoice/acme-phoenix-saas/invoice.json"
   @docker_image "rendro-comparison-bookworm:local"
   @dockerfile "bench/comparison/Dockerfile"
   @repetitions 3
@@ -155,7 +155,7 @@ defmodule Rendro.Comparison.Runner do
           [
             "compile",
             "--input",
-            "data-path=invoice_data.json",
+            "data-path=#{Path.expand(@fixture_path)}",
             "bench/comparison/fixtures/invoice_typst.typ",
             output
           ],
