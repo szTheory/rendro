@@ -74,4 +74,35 @@ Legend: `[ ]` in scope for this milestone.
 
 ## Traceability
 
-_(Filled by the roadmap — every REQ-ID maps to exactly one phase.)_
+Every REQ-ID maps to exactly one phase. Coverage: **26/26 mapped**, no orphans, no duplicates.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| EXL-01 | Phase 114 | Pending |
+| EXL-02 | Phase 114 | Pending |
+| EXL-03 | Phase 114 | Pending |
+| EXL-04 | Phase 114 | Pending |
+| EXL-05 | Phase 114 | Pending |
+| EXL-06 | Phase 114 | Pending |
+| RUB-01 | Phase 114 | Pending |
+| RUB-02 | Phase 114 | Pending |
+| RUB-03 | Phase 114 | Pending |
+| INV-01 | Phase 115 | Pending |
+| INV-02 | Phase 115 | Pending |
+| INV-03 | Phase 115 | Pending |
+| INV-04 | Phase 115 | Pending |
+| INV-05 | Phase 115 | Pending |
+| INV-06 | Phase 115 | Pending |
+| INV-07 | Phase 115 | Pending |
+| FAM-01 | Phase 116 | Pending |
+| FAM-02 | Phase 116 | Pending |
+| FAM-03 | Phase 116 | Pending |
+| EDGE-01 | Phase 117 | Pending |
+| EDGE-02 | Phase 117 | Pending |
+| EDGE-03 | Phase 117 | Pending |
+| SHOW-01 | Phase 118 | Pending |
+| SHOW-02 | Phase 118 | Pending |
+| SHOW-03 | Phase 118 | Pending |
+| SHOW-04 | Phase 118 | Pending |
+
+**Coverage by phase:** 114 → 9 reqs (EXL-01..06, RUB-01..03) · 115 → 7 reqs (INV-01..07) · 116 → 3 reqs (FAM-01..03) · 117 → 3 reqs (EDGE-01..03) · 118 → 4 reqs (SHOW-01..04).

@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v2.10
 milestone_name: Realistic Business-Document Examples & Anatomy
 status: planning
-last_updated: "2026-07-11T03:38:23.429Z"
-last_activity: 2026-07-11
+last_updated: "2026-07-10T00:00:00.000Z"
+last_activity: 2026-07-10
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -19,88 +19,61 @@ progress:
 
 **Project**: Rendro
 **Core Value**: Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current Focus**: C1 CI/CD Performance & Reliability is complete and archived. Next: plan the next milestone.
+**Current Focus**: v2.10 Realistic Business-Document Examples & Anatomy (Milestone A / `SEED-002`) — roadmap created; ready to plan Phase 114.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-07-11 — Milestone v2.10 started
+Phase: 114 of 118 (Domain research, reader-quality rubric & realistic example-data library)
+Plan: — (not yet planned)
+Status: Ready to plan
+Last activity: 2026-07-10 — ROADMAP.md created; 26/26 requirements mapped across phases 114–118
 
-## Progress
+Progress: [░░░░░░░░░░] 0% — 0/5 phases complete
+
+## Roadmap Snapshot (v2.10, Phases 114–118)
 
 ```text
-[########################################] 100% — 6/6 phases complete
-Phase 108 Baseline & Audit Report ........ Complete
-Phase 109 Caching & setup-beam ........... Complete
-Phase 110 Test Concurrency & Determinism . Complete
-Phase 111 Workflow Topology & Matrix ..... Complete
-Phase 112 Security & Release Hardening .... Complete
-Phase 113 DX & Validation ................. Complete
+[░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 0% — 0/5 phases complete
+Phase 114 Domain research, rubric & example-data library . Ready to plan
+Phase 115 Invoice anatomy + Format promotion + seams ..... Not started
+Phase 116 New families — Payslip & Ticket ................ Not started
+Phase 117 Edge-case stress matrix ........................ Not started
+Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 ```
 
 ## Accumulated Context
 
 ### Decisions
 
-- Framed as non-version `C1` infra milestone (phases 108–113); no Hex release; touches `.github/`, `mix.exs` aliases, tests, CONTRIBUTING only.
-- Full arc: measure baseline first (Phase 108, analysis only) → implement (109–112) → validate vs baseline (113). "Boil the ocean systematically; keep high-value tests, drop lowest-signal."
-- North Star priority order: trustworthy gates > deterministic feedback > fast PR feedback > runner efficiency > YAML simplicity > contributor DX > security > reporting.
-- Source brief preserved verbatim at `milestones/C1-AUDIT-BRIEF.md` — canonical scope/checklist cited by every phase.
-- 108-01: Used `set -o pipefail` (bash-idiomatic) for tee exit-code preservation; single brace-group `{ … } >> "$GITHUB_STEP_SUMMARY"` per house style; `# TODO(109)` seam retained for cache rows.
-- 108-02: RecipesFacadeDriftTest is a seed-dependent ordering artifact (async:true test calls function_exported? before Rendro.Recipes is VM-loaded with --seed 0) — Phase 110 finding, not a flake.
-- 108-02: ManifestTest async:false confirmed required — PublicApi.recompile_conditional_adapters() triggers global BEAM module recompilation (cannot run concurrently).
-- 108-02: BrandingContractTest and RecipesContractTest are Phase 110 async:true candidates (no global state found; DocsContract.evaluate!/2 needs Phase 110 safety verification).
-- 108-02: Two pre-existing deterministic failures noted but NOT fixed (MEASURE-ONLY): RequiredChecksContractTest (guardrail expects bare mix ci, but 108-01 used tee) and PublicApiTest (Mix.Tasks.Brand.Gen missing @moduledoc).
-- 108-03: C1-AUDIT.md authored as consolidated measure-only baseline; BASE-01/02/03/04 populated from 108-EVIDENCE.md; P0: decompose mix ci monolith (Phase 109+111); p95=insufficient green-run data (n=3); 0 flaky candidates; 2 pre-existing baseline failures noted.
-- 109-DISCUSS: `CACHE_BUSTER` will use an `env:` var in CI YAMLs for PR visibility and ease of bursting.
-- 109-DISCUSS: Dialyzer PLT will be isolated to `priv/plts` using `plt_core_path` in `mix.exs`, enabling a separate `restore/save` cache split so the PLT is saved unconditionally even if Dialyzer fails, without polluting `_build`.
-- 109-DISCUSS: `mix ci` decomposition is deferred to Phase 111 to avoid tangling cache implementation with `test/guardrails/required_checks_contract_test.exs` rewrites. `erlef/setup-beam` will be uniformly SHA-pinned.
-- 109-01: Unify erlef/setup-beam pinning to SHA 8251c48667b97e88a0a24ec512f5b72a039fcea7 across all workflow configurations.
-- 109-01: Set plt_core_path and plt_local_path to priv/plts in mix.exs to store Dialyzer PLT files outside the default _build directory, preparing for caching.
-- 109-02: Split PLT cache into restore and save actions to ensure generation is saved even on job failure or subsequent step failures, maintaining pipeline isolation.
-- 109-02: Expose cache hits to the job summary through strictly mapped env variables to prevent expression injection.
-- [Phase ?]: Quarantined RecipesFacadeDriftTest to a nightly verify.flake lane due to its non-deterministic seed-dependency.
-- [Phase ?]: ExUnit exclusions configured to automatically ignore quarantine, live_pdf_tools, live_signing, and raster_snapshot by default.
-- [Phase ?]: Explicitly rejected mix test --partitions N in favor of maximizing async: true due to BEAM initialization overhead.
-- [Phase ?]: Implemented flake quarantine lane via verify.flake and test.all aliases with --slowest 10 reporting.
-- 111-00: Allowed the contract tests to intentionally fail against the current `ci.yml` (TDD RED state) to fulfill the plan's explicit objective of preparing tests before pipeline modification.
-- 111-01: Merged 8 disjointed/dependent CI jobs into 2 serialized jobs to minimize checkout and VM setup overhead.
-- 111-01: Used GitHub Actions concurrency API to cancel superseded in-progress non-main branch builds.
-- 111-00: Grouped advisory contexts into a single `advisory-checks` pipeline context, and live-proofs into a single `integration-proofs` context.
-- 111-00: Set `ci-success` as the sole required context for main branch protection.
-- C1 closeout: Non-version infrastructure milestone archived with no Hex release or library version tag.
-- C1 closeout: Remote validation evidence recorded from three green `ci.yml` runs (`29133061301`, `29133777702`, `29134266708`); required gate p50 783s, nearest-rank p95 1013s.
-- C1 closeout: `security-audit` remains advisory/non-required maintenance signal for dependency advisories; deterministic required gate is `ci-success`.
+- Milestone A (`SEED-002`) is an **additive minor** release (hex `1.1.0`), NOT v3.0 — A2 is strictly additive (toy call preserved byte-identical), `Format` goes to the adapter/Evolving tier, new families are adapter-tier modules. Unlike C1 (infra), A changes `lib/`, so it IS a versioned release.
+- **The single irreversible act:** promoting `Rendro.Format` from `@moduledoc false` into the public SemVer surface (Phase 115). Held to the adapter/Evolving tier, smallest useful surface (`money/1`, `date/1`, `label/1`), with an "output may evolve" doc note. Requires editing Phase-79's `public_api_contract_test.exs` hidden set (likeliest surprise red build).
+- **Fold seed's 7 phases → 5** (coarse granularity; precedent: v2.4 Phase 75 shipped 2 recipes at once). 114 foundation (data+rubric) → 115 Invoice/Format (only real `lib/` change) → 116 new families → 117 stress matrix → 118 demos+docs closure.
+- **Four shape-now seams** baked into acceptance criteria so B/C/D need no breaking rework: **S1** private `palette(opts)` keyed on B's locked color roles (Phase 115, applied in 116) · **S4** fixtures reserve an optional empty `brand`/`logo` slot (Phase 114) · **S5** rubric recorded as an appendable manifest (authored 114, populated 118) · **S6** `artifacts.json` gains optional theme/mode/preset tags (Phase 118).
+- **Guards:** no tagged-PDF/PDF-UA accessibility claims ("production-grade" = information design); engine stays locale-free (VAT/sales-tax + payslip jurisdiction are DATA); no real PII (fictional businesses/employees — Payslip is the acute risk); ship `priv/examples/` text-only; byte-determinism (static fixed-date fixtures; toy call byte-identical).
+- Loader placement is load-bearing: `lib/rendro/examples.ex`, `@moduledoc false` — the only placement serving tests + bench(`:dev`) + Livebook + shipped consumers while staying out of `public_api.json`.
+- Money in fixtures as decimal **strings** (`"79.00"`), never JSON floats. De-quarantine `invoice_data.json` verbatim first (provable no-op vs advisory bench), normalize money to strings in a separate commit.
+- No text/cell right-align primitive exists today; additive `cell_align: :right` (Phase 115) is the single highest-leverage typographic upgrade — but the rubric must NOT assume it. No barcode/QR primitive; Ticket "reads as a ticket" via boxed code-area + human-readable reference + perforation + optional caller-supplied PNG.
 
 ### Blockers / Open Questions
 
-- None.
+- None. (Verify during Phase 114: the quarantined `invoice_data.json` is already fictional — a seed-wording correction, not a PII issue.)
 
 ## Next Steps
 
-1. `/gsd-new-milestone` — define the next milestone.
+1. `/gsd-plan-phase 114` — plan the domain research, rubric & example-data library foundation.
 
 ## Last Session
 
-**Last updated**: 2026-07-11T01:36:49Z
-**Stopped at**: C1 archived; next milestone not started
+**Last updated**: 2026-07-10
+**Stopped at**: v2.10 roadmap created (ROADMAP.md, REQUIREMENTS.md traceability, STATE.md); 26/26 requirements mapped across phases 114–118.
 **Blockers**: None
 
 ## Performance Metrics
 
 | Phase | Plan | Duration | Notes |
 |-------|------|----------|-------|
-| Phase 108 P01 | 5 | 1 tasks | 1 files |
-| Phase 108 P02 | 45min | 2 tasks | 1 files |
-| Phase 108 P03 | 35min | 2 tasks | 1 files |
-| Phase 109 P01 | 15m | 2 tasks | 4 files |
-| Phase 110 P01 | 5m | 2 tasks | 5 files |
-| Phase 110-test-concurrency-determinism-cleanup P02 | 2 | 3 tasks | 3 files |
-| Phase 111 P00 | 5m | 2 tasks | 2 files |
-| Phase 111 P01 | 10m | 3 tasks | 1 files |
+| — | — | — | v2.10 not yet executed |
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Plan the first phase with `/gsd-plan-phase 114`.
