@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "dimensions": [
+    {
+      "id": "information_architecture",
+      "label": "Information architecture",
+      "anchors": {
+        "1": "Related information is scattered with no discernible grouping; the reader must hunt across the whole page to assemble any one concept.",
+        "3": "Basic grouping exists (e.g. issuer vs. customer are visually separate) but placement is inconsistent or some related fields are still split across distant regions.",
+        "4": "Every field lives in one clearly bounded group matching the domain's natural structure, each in an expected location.",
+        "5": "Grouping is clear AND the zones are ordered to match the reader's natural scanning path, so the reader never backtracks to find related information."
+      }
+    },
+    {
+      "id": "content_hierarchy",
+      "label": "Content hierarchy",
+      "anchors": {
+        "1": "Every field has the same size/weight; no single fact stands out from the rest.",
+        "3": "Some size/weight variation exists, but the one fact the reader needs first is not clearly the most prominent element on the page.",
+        "4": "The one fact the reader needs first is visually dominant — larger and/or bolder than everything else.",
+        "5": "The key fact is dominant AND every other element recedes in proportion to its importance, producing one unambiguous focal point."
+      }
+    },
+    {
+      "id": "domain_fit",
+      "label": "Domain-fit / least-surprise",
+      "anchors": {
+        "1": "The layout could be mistaken for a different kind of document entirely; it lacks the conventional elements a reader expects for this document type.",
+        "3": "The document is recognizable as the right family but is missing one or more conventional elements a reader would expect.",
+        "4": "The document includes and positions the conventional elements a reader of this domain expects.",
+        "5": "The document is indistinguishable in structure and convention from a real-world professional document of this type."
+      }
+    },
+    {
+      "id": "reader_affordances",
+      "label": "Reader affordances",
+      "anchors": {
+        "1": "No navigational aids exist — a wall of unlabeled text or numbers with no alignment or whitespace to guide scanning.",
+        "3": "Some labels exist, but alignment or whitespace is inconsistent.",
+        "4": "Labels, alignment, and whitespace are applied consistently throughout.",
+        "5": "Affordances actively anticipate the reader's exact scanning path."
+      }
+    },
+    {
+      "id": "typographic_craft",
+      "label": "Typographic craft",
+      "anchors": {
+        "1": "Type sizing/weight is arbitrary or inconsistent; text is cramped, overflowing, or wrapped awkwardly.",
+        "3": "Sizing/weight is mostly consistent, but a few awkward line breaks or spacing issues remain.",
+        "4": "Sizing, weight, and spacing are consistent throughout with no awkward breaks.",
+        "5": "Every typographic choice reads as intentional — a coherent, deliberate type system with zero awkward breaks."
+      }
+    },
+    {
+      "id": "restraint_cohesion",
+      "label": "Restraint / cohesion",
+      "anchors": {
+        "1": "The document is visually noisy or internally inconsistent across sections.",
+        "3": "The document is mostly restrained, but one or two decorative inconsistencies remain.",
+        "4": "The document is fully restrained and internally consistent.",
+        "5": "The document is restrained, consistent, AND every visual element earns its place — nothing could be removed without losing information."
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "reading_order",
+      "label": "Reading order",
+      "description": "The rendered PDF's content reads top-to-bottom, left-to-right in the same order a human would naturally scan it, with no illogical jumps between regions. Pass/fail, no partial credit."
+    },
+    {
+      "id": "print_safety",
+      "label": "Print safety",
+      "description": "The document renders correctly at its actual print/paper size: no clipped text or table columns at page margins, and no essential content lost or orphaned across a page break. Pass/fail, no partial credit."
+    }
+  ],
+  "thresholds": {
+    "hierarchy_dimension": "content_hierarchy",
+    "hierarchy_min": 5,
+    "core_min": 4
+  },
+  "scores": []
+}
