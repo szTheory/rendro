@@ -3,7 +3,7 @@ id: SEED-005
 status: dormant
 planted: 2026-07-10
 planted_during: C1 (post-archive, awaiting next milestone)
-trigger_when: after Milestone C (SEED-004) — when a live, in-app, interactive theme playground is wanted
+trigger_when: any milestone considering an interactive/admin/dev UI, a theme playground, LiveView tooling, or theming developer-experience — part of the Happy-Path program (optional; needs SEED-003/004; surface whenever an interactive theme/preview UI is considered)
 scope: Large (full milestone; optional/deferrable)
 part_of: "Happy-Path Home Runs program (Milestone D of 4 — optional; see SEED-003, SEED-004)"
 ---
@@ -39,9 +39,10 @@ your code"** export philosophy (a theme is just a struct, so copy-paste is natur
 
 ## When to Surface
 
-**Trigger:** after Milestone C ships (presets + the static configurator exist), or whenever a live in-app
-theme playground is wanted. Explicitly **optional/deferrable** — the static configurator may satisfy the
-need and D can be skipped or long-deferred.
+**Trigger:** surface whenever a milestone considers an **interactive/admin/dev UI, a theme playground,
+LiveView tooling, or theming developer-experience**. Needs SEED-003/004 to exist — recommended after C,
+but that's guidance, not a gate. Explicitly **optional/deferrable** — the static configurator (C) may
+satisfy the need and D can be skipped or long-deferred; surface it so the option isn't silently lost.
 
 ## Scope Estimate
 

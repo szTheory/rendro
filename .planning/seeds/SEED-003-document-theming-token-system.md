@@ -3,7 +3,7 @@ id: SEED-003
 status: dormant
 planted: 2026-07-10
 planted_during: C1 (post-archive, awaiting next milestone)
-trigger_when: after Milestone A (SEED-002) — when adding visual/branding/theming capability to documents
+trigger_when: any product/feature milestone touching document visual / branding / theming / color / typography capability — part of the Happy-Path program (recommended after SEED-002, but surface whenever theming/branding scope arises)
 scope: Large (full milestone)
 part_of: "Happy-Path Home Runs program (Milestone B of 4 — see SEED-002, SEED-004, SEED-005)"
 ---
@@ -14,9 +14,9 @@ Give rendro a real, **public, deterministic PDF theming contract** so every layo
 (plug in brand colors + typography), gets **light/dark** for free, and ships a **strong unbranded
 default**. This is the capability that lets business documents look great and on-brand out of the box.
 
-**Milestone B of a 3-milestone program.** A (**[[SEED-002]]** realistic examples) → B (this) →
-C (**[[SEED-004]]** presets + catalog). Full program plan:
-`~/.claude/plans/btw-what-is-rendro-spicy-giraffe.md`.
+**Milestone B of a 4-milestone program.** A (**[[SEED-002]]** realistic examples) → B (this) →
+C (**[[SEED-004]]** presets + catalog + static configurator) → D (**[[SEED-005]]** optional live Studio).
+Full program plan: `~/.claude/plans/btw-what-is-rendro-spicy-giraffe.md`.
 
 ## Why This Matters
 
@@ -32,9 +32,10 @@ so a user plugs in their brand tokens and gets a cohesive, "ooze-quality" brande
 
 ## When to Surface
 
-**Trigger:** after Milestone A ships (or whenever adding document visual/branding/theming capability). B
-depends on A only loosely (A ships the rubric + the realistic documents that C later showcases); B is the
-prerequisite for C.
+**Trigger:** surface whenever a milestone touches **document visual / branding / theming / color /
+typography** capability (a theme system, brandable documents, light/dark, design polish). Recommended
+*after* Milestone A, but this is guidance, not a gate — surface it any time theming/branding scope arises
+so it isn't skipped. B is the prerequisite for C and D.
 
 ## Scope Estimate
 

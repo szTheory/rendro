@@ -48,3 +48,20 @@
 ## Current Focus
 
 No active milestone. Start the next milestone with `$gsd-new-milestone` when ready.
+
+## Planned Next — "Happy-Path Home Runs" program (dormant seeds)
+
+A sequenced 4-milestone program to make rendro's business-document happy paths shine: realistic,
+award-quality example documents; a full document theming/design-token system; style-genre presets + a
+public example catalog; and an optional interactive theme studio. Details live in dormant seeds under
+`.planning/seeds/`. See all seeds: `/gsd-capture --list-seeds`. Scope one into a milestone:
+`$gsd-new-milestone`. Full program plan: `~/.claude/plans/btw-what-is-rendro-spicy-giraffe.md`.
+
+| # | Milestone | Seed |
+|---|-----------|------|
+| A | Realistic Business-Document Examples & Anatomy (domain research + rubric, realistic fixtures, Invoice anatomy upgrade, Payslip + Ticket families) | `SEED-002` |
+| B | Document Theming & Design-Token System (`Rendro.Theme`, light/dark, unbranded default) | `SEED-003` |
+| C | Style-Genre Presets, Public Catalog & Static Configurator | `SEED-004` |
+| D | Rendro Studio: optional mountable theme playground (LiveView) | `SEED-005` *(optional)* |
+
+Dependency order: A → B → C → D. Each is a right-sized milestone; D is optional/deferrable.

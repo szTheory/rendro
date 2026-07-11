@@ -3,7 +3,7 @@ id: SEED-004
 status: dormant
 planted: 2026-07-10
 planted_during: C1 (post-archive, awaiting next milestone)
-trigger_when: after Milestone B (SEED-003) — once the Rendro.Theme token contract + light/dark exist
+trigger_when: any milestone touching style presets, the public example catalog, a theme/brand configurator, or design polish — part of the Happy-Path program (needs SEED-003's theme contract; surface whenever presets/catalog/configurator scope arises)
 scope: Large (full milestone)
 part_of: "Happy-Path Home Runs program (Milestone C of 4 — see SEED-002, SEED-003, SEED-005)"
 ---
@@ -14,9 +14,9 @@ Make GREAT-looking branded documents **turnkey** — pick a design *style* + plu
 and show the whole thing off as a **public by-domain example catalog** that doubles as a standing
 **quality ratchet**.
 
-**Milestone C of a 3-milestone program.** A (**[[SEED-002]]** realistic examples) → B (**[[SEED-003]]**
-theming) → C (this). Depends on B's `Rendro.Theme` contract. Full program plan:
-`~/.claude/plans/btw-what-is-rendro-spicy-giraffe.md`.
+**Milestone C of a 4-milestone program.** A (**[[SEED-002]]** realistic examples) → B (**[[SEED-003]]**
+theming) → C (this) → D (**[[SEED-005]]** optional live Studio). Depends on B's `Rendro.Theme` contract.
+Full program plan: `~/.claude/plans/btw-what-is-rendro-spicy-giraffe.md`.
 
 ## Why This Matters
 
@@ -31,9 +31,10 @@ default).
 
 ## When to Surface
 
-**Trigger:** after Milestone B ships — presets ARE `%Rendro.Theme{}` values, and the catalog needs the
-token contract + light/dark + unbranded default to exist. The catalog's ratchet value only materializes
-once B is in place.
+**Trigger:** surface whenever a milestone touches **style presets, the public example catalog, a
+theme/brand configurator, or design polish**. Presets ARE `%Rendro.Theme{}` values, so this needs
+SEED-003's token contract + light/dark to exist — recommended after B, but that's guidance, not a gate;
+surface it any time presets/catalog/configurator scope arises so it isn't skipped.
 
 ## Scope Estimate
 
