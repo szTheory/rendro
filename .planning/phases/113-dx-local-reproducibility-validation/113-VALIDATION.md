@@ -5,7 +5,7 @@ status: complete
 nyquist_compliant: true
 wave_0_complete: true
 created: 2026-06-16
-updated: 2026-07-10
+updated: 2026-07-11
 ---
 
 # Phase 113 — Validation Strategy
@@ -31,7 +31,7 @@ updated: 2026-07-10
 - **After alias or workflow edits:** Run `mix test test/mix/tasks/ci_alias_contract_test.exs test/guardrails/required_checks_contract_test.exs`.
 - **After README or CONTRIBUTING edits:** Run `mix test test/docs_contract/dx_local_reproducibility_claims_test.exs`.
 - **After validation metric edits:** Run the docs-contract lane and inspect `113-METRICS.md` for local/remote evidence boundaries.
-- **Before milestone close:** Run `mix ci.fast` and collect remote GitHub Actions metrics after the C1 commits are pushed.
+- **Before milestone close:** Run `mix ci.fast` and confirm the remote GitHub Actions metrics in `113-METRICS.md`.
 - **Max feedback latency:** focused checks < 10s; full local fast gate < 60s on warm PLTs.
 
 ---
@@ -44,7 +44,7 @@ updated: 2026-07-10
 | DX-02 | Contributor docs map required checks and seeded ExUnit reproduction to scoped local commands. | docs contract | `mix test test/docs_contract/dx_local_reproducibility_claims_test.exs` | `CONTRIBUTING.md` | green 2026-07-10 |
 | DX-03 | CI failure logs are split into actionable step names and slowest-test summaries. | guardrail + docs contract | `mix test test/guardrails/required_checks_contract_test.exs test/docs_contract/dx_local_reproducibility_claims_test.exs` | `.github/workflows/ci.yml` | green 2026-07-10 |
 | DX-04 | README badge targets `ci-success`. | docs contract | `mix test test/docs_contract/dx_local_reproducibility_claims_test.exs` | `README.md` | green 2026-07-10 |
-| VAL-01 | Local before/after evidence is recorded and remote metrics are not claimed before post-push CI data exists. | docs contract + manual remote evidence | `mix test test/docs_contract/dx_local_reproducibility_claims_test.exs`; `gh run list --workflow=ci.yml` after push | `113-METRICS.md` | local green; remote pending |
+| VAL-01 | Local before/after evidence and post-push remote metrics are recorded truthfully. | docs contract + manual remote evidence | `mix test test/docs_contract/dx_local_reproducibility_claims_test.exs`; `gh run view 29133061301`; `gh run view 29133777702`; `gh run view 29134266708` | `113-METRICS.md` | green 2026-07-11 |
 | VAL-02 | Steady-state target pipeline is documented as PR/main/nightly/release/docs lanes. | docs contract | `mix test test/docs_contract/dx_local_reproducibility_claims_test.exs` | `113-METRICS.md` | green 2026-07-10 |
 
 ---
@@ -63,20 +63,20 @@ Existing infrastructure covers the phase:
 
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
-| Post-push GitHub Actions p50/p95 and cache hit rates | VAL-01 | GitHub cache/timing behavior only exists after these local commits run remotely. | Push the C1 commits to a CI-triggering branch or main, collect at least three green `ci.yml` runs with `gh run view`, then update `113-METRICS.md` and the milestone audit. |
+| Post-push GitHub Actions p50/p95 and cache hit rates | VAL-01 | GitHub cache/timing behavior only exists after these commits run remotely. | Complete: runs `29133061301`, `29133777702`, and `29134266708` are recorded in `113-METRICS.md` and the milestone audit. |
 
 ---
 
 ## Validation Sign-Off
 
-- [x] All tasks have automated verification or an explicit manual-only external evidence requirement.
+- [x] All tasks have automated verification or completed manual-only external evidence.
 - [x] Sampling continuity: every Phase 113 plan has a focused verification command.
 - [x] Wave 0 covers all local validation references.
 - [x] No watch-mode flags.
 - [x] Feedback latency < 60s for focused checks and local fast gate.
 - [x] `nyquist_compliant: true` set in frontmatter for local/structural validation coverage.
 
-**Approval:** approved 2026-07-10 for local validation; remote `VAL-01` evidence remains a milestone gate.
+**Approval:** approved 2026-07-11 for local and remote validation evidence.
 
 ---
 
@@ -85,7 +85,7 @@ Existing infrastructure covers the phase:
 | Metric | Count |
 |--------|-------|
 | Gaps found | 2 |
-| Resolved | 1 |
-| Escalated/manual-only | 1 |
+| Resolved | 2 |
+| Escalated/manual-only | 0 |
 
-Resolved: the placeholder validation template was replaced with a concrete requirement-to-command map. Escalated/manual-only: remote GitHub Actions metrics for `VAL-01`, which cannot be generated from local state.
+Resolved: the placeholder validation template was replaced with a concrete requirement-to-command map. The manual-only remote GitHub Actions metrics for `VAL-01` were then collected from runs `29133061301`, `29133777702`, and `29134266708`.

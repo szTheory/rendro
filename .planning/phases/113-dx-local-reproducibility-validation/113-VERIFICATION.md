@@ -1,17 +1,17 @@
 ---
 phase: 113-dx-local-reproducibility-validation
-verified: 2026-07-10T23:57:26Z
+verified: 2026-07-11T01:30:00Z
 status: passed
-score: 5/5 local verification checks passed
-remote_metrics_status: pending_post_push
+score: 5/5 verification checks passed
+remote_metrics_status: complete
 overrides_applied: 0
 ---
 
 # Phase 113: DX, Local Reproducibility & Validation Verification Report
 
 **Phase Goal:** Make the C1 pipeline reproducible for contributors, keep failures actionable, document the required gate, and record before/after validation evidence truthfully.
-**Verified:** 2026-07-10T23:57:26Z
-**Status:** passed for local/structural verification; remote post-push metrics remain pending for milestone-level VAL-01 closure.
+**Verified:** 2026-07-11T01:30:00Z
+**Status:** passed for local, structural, and remote validation evidence.
 
 ---
 
@@ -23,7 +23,7 @@ overrides_applied: 0
 | 2 | The CI fast lane is split into actionable named steps while preserving the local `ci.fast` command sequence. | VERIFIED | `.github/workflows/ci.yml` has Format, Hex Build, Compile, Test, Docs, Credo, and Dialyzer steps; `test/docs_contract/dx_local_reproducibility_claims_test.exs` checks this contract. |
 | 3 | Contributor docs state the local/CI parity contract without hiding proof-tool divergence. | VERIFIED | `CONTRIBUTING.md` defines `mix ci.fast` as the deterministic local gate and explains that `mix ci` is 1:1 only when local proof tooling matches CI. |
 | 4 | README badging targets the meaningful required check name. | VERIFIED | README badge uses the `ci-success` check-run name. |
-| 5 | Validation evidence does not claim unavailable remote data. | VERIFIED | `113-METRICS.md` records the local gate and marks post-push GitHub p50/p95 and cache-hit rates pending. |
+| 5 | Validation evidence records local and remote data truthfully. | VERIFIED | `113-METRICS.md` records the local gate plus three green remote `ci.yml` runs, p50/p95 timing, cache restore behavior, failure/rerun rate, compile time, and slowest-test evidence. |
 
 ---
 
@@ -35,9 +35,10 @@ overrides_applied: 0
 | DX-02 | SATISFIED | `CONTRIBUTING.md` documents required checks, scoped local commands, and seeded ExUnit reproduction. |
 | DX-03 | SATISFIED | CI workflow exposes named steps, slowest-test summaries, and separate proof/advisory jobs so failures map to a concrete command or environment. |
 | DX-04 | SATISFIED | README badge targets `ci-success`. |
+| VAL-01 | SATISFIED | `113-METRICS.md` records before/after wall-clock, cache, failure/rerun, compile, and slowest-test evidence from three green remote `ci.yml` runs. |
 | VAL-02 | SATISFIED | `113-METRICS.md` includes the steady-state PR/main/nightly/release/docs pipeline design. |
 
-`VAL-01` is intentionally treated as milestone-level remote evidence rather than a local phase verification claim: current GitHub Actions history predates the 105 local C1 commits, so post-push p50/p95 and cache-hit statistics cannot be verified from this checkout alone.
+`VAL-01` is now closed by post-push GitHub Actions evidence from runs `29133061301`, `29133777702`, and `29134266708`.
 
 ---
 
@@ -47,18 +48,20 @@ overrides_applied: 0
 |----------|---------|--------|--------|
 | Scoped alias/docs contract remains wired | `mix test test/docs_contract/dx_local_reproducibility_claims_test.exs test/mix/tasks/ci_alias_contract_test.exs` | 8 tests, 0 failures | PASS |
 | Alias structure remains wired | `mix test test/docs_contract/dx_local_reproducibility_claims_test.exs test/mix/tasks/ci_alias_contract_test.exs` | 8 tests, 0 failures | PASS |
-| Full deterministic local fast gate | `mix ci.fast` | Passed: 1216 tests, 12 doctests, 4 properties, 0 failures, 20 excluded; Credo clean; Dialyzer 0 errors | PASS |
+| Full deterministic local fast gate | `mix ci.fast` | Passed: 1219 tests, 12 doctests, 4 properties, 0 failures, 20 excluded; Credo clean; Dialyzer 0 errors | PASS |
+| Remote required gate sample | `gh run view 29133061301`, `gh run view 29133777702`, `gh run view 29134266708` | Three workflow-level successes; `ci-success` p50 783s and nearest-rank p95 1013s; primary test jobs restored caches | PASS |
 
 ---
 
-## Remote Evidence Boundary
+## Remote Evidence Closure
 
-Remote Actions metrics are not closed by this file. `VAL-01` still requires post-push GitHub Actions evidence from the C1 workflow state:
+Remote Actions metrics are closed for C1:
 
-- at least three green `ci.yml` runs for the C1 commits
-- wall-clock p50/p95
-- cache hit rates for deps, `_build`, and PLT
-- failure/rerun rate
-- compile time and slowest-test evidence
+- three green `ci.yml` runs for the C1 validation branch
+- required-gate wall-clock p50 783s and nearest-rank p95 1013s
+- deps exact hit 3/3; `_build` restored 3/3 with exact hit 2/3; PLT exact hit 3/3
+- failure/rerun rate 0/3 workflow failures, no reruns
+- compile step 1s in all sampled primary test jobs
+- slowest-test summaries recorded in GitHub logs
 
-This report closes the missing Phase 113 verification artifact and the local DX proof, but the milestone audit should remain blocked until the remote metrics are collected or explicitly deferred.
+The advisory `security-audit` job remains non-required maintenance signal for known dependency advisories and does not block the deterministic C1 required gate.

@@ -80,16 +80,24 @@ defmodule Rendro.DocsContract.DxLocalReproducibilityClaimsTest do
 
     assert metrics =~ "mix ci.fast"
     assert metrics =~ "ci.fast_exit=0"
-    assert metrics =~ "1216 tests, 12 doctests, 4 properties, 0 failures"
-    assert metrics =~ "Pending post-push GitHub run for this branch"
-    assert metrics =~ "Pending post-push GitHub summaries"
-    assert metrics =~ "post-merge GitHub timing proof"
-    assert metrics =~ "cache-hit rates are intentionally marked pending"
+    assert metrics =~ "1219 tests, 12 doctests, 4 properties, 0 failures"
+    assert metrics =~ "29133061301"
+    assert metrics =~ "29133777702"
+    assert metrics =~ "29134266708"
+    assert metrics =~ "p50 783s"
+    assert metrics =~ "nearest-rank p95 1013s"
+    assert metrics =~ "deps exact hit 3/3"
+    assert metrics =~ "`_build` restored 3/3"
+    assert metrics =~ "PLT exact hit 3/3"
+    assert metrics =~ "intentionally advisory/non-required"
 
     assert audit =~ "## Phase 113 Validation Summary"
     assert audit =~ "The final local validation gate is green"
-    assert audit =~ "Remote GitHub timing improvement remains intentionally unclaimed"
-    assert audit =~ "at least three green `ci.yml` runs"
+    assert audit =~ "Remote GitHub timing improvement is now claimed"
+    assert audit =~ "three green `ci.yml` runs"
+    assert audit =~ "p50 783s"
+    assert audit =~ "nearest-rank p95 1013s"
+    assert audit =~ "advisory `security-audit` job remains non-required signal"
   end
 
   test "Phase 113 UAT is completed from automated evidence with no human prompt remaining" do

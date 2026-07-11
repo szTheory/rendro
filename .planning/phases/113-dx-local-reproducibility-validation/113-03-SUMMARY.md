@@ -63,10 +63,10 @@ status: complete
 
 ## Accomplishments
 
-- Created `113-METRICS.md` with Phase 108 baseline comparison, latest remote run snapshot, local final gate details, and steady-state pipeline design.
+- Created `113-METRICS.md` with Phase 108 baseline comparison, post-push remote run evidence, local final gate details, and steady-state pipeline design.
 - Appended `## Phase 113 Validation Summary` to `C1-AUDIT.md`.
-- Verified the current local fast gate with `mix ci.fast` successfully: 1211 tests, 12 doctests, 4 properties, 0 failures, Credo clean, Dialyzer 0 errors.
-- Preserved truthfulness by marking remote GitHub p50/p95 and cache-hit metrics as pending until these local commits run on Actions.
+- Verified the current local fast gate with `mix ci.fast` successfully: 1219 tests, 12 doctests, 4 properties, 0 failures, Credo clean, Dialyzer 0 errors.
+- Preserved truthfulness by recording remote GitHub p50/p95 and cache evidence only after collecting three green `ci.yml` runs.
 
 ## Task Commits
 
@@ -94,7 +94,7 @@ Validation blocker fixes committed during this plan:
 
 ## Decisions Made
 
-- Remote timing improvement was not claimed because the latest GitHub runs predate the local C1 closure commits.
+- Remote timing improvement was claimed only after post-push GitHub runs `29133061301`, `29133777702`, and `29134266708` completed successfully.
 - Local `mix ci.fast` was recorded as the final available gate for this checkout.
 
 ## Deviations from Plan
@@ -140,7 +140,7 @@ Validation blocker fixes committed during this plan:
 
 ## Issues Encountered
 
-- Latest remote GitHub Actions runs predate the local phase 113 work, so remote p50/p95 and cache-hit metrics are not claimed.
+- Initial remote GitHub Actions runs predated the local phase 113 work, so remote p50/p95 and cache-hit metrics were not claimed until the C1 validation branch produced three green runs.
 
 ## Verification
 
@@ -154,6 +154,9 @@ Validation blocker fixes committed during this plan:
 - `mix dialyzer`
 - `mix ci.fast`
 - `grep -q "Phase 113 Validation Summary" .planning/milestones/C1-AUDIT.md`
+- `gh run view 29133061301 --json databaseId,status,conclusion,createdAt,updatedAt,url,headSha,jobs`
+- `gh run view 29133777702 --json databaseId,status,conclusion,createdAt,updatedAt,url,headSha,jobs`
+- `gh run view 29134266708 --json databaseId,status,conclusion,createdAt,updatedAt,url,headSha,jobs`
 
 ## User Setup Required
 
@@ -161,7 +164,7 @@ None - no external service configuration required.
 
 ## Next Phase Readiness
 
-Phase 113 is complete locally. The only remaining measurement follow-up is to collect post-push GitHub p50/p95 and cache-hit data after these commits run on Actions.
+Phase 113 is complete locally and remotely. Post-push GitHub p50/p95 and cache-hit data are recorded in `113-METRICS.md` and the milestone audit.
 
 ---
 *Phase: 113-dx-local-reproducibility-validation*
