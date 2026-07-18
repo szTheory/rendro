@@ -46,7 +46,7 @@ defmodule Rendro.Recipes.Payslip do
 
   @default_page_size :a4
   @default_margin 72
-  @default_header_h 64
+  @default_header_h 88
   @default_summary_h 54
   @default_footer_h 24
 
@@ -170,17 +170,85 @@ defmodule Rendro.Recipes.Payslip do
   end
 
   @doc """
+  Returns a list of `%Rendro.Section{}` structs mapping payslip content to
+  the `:header`, `:summary`, `:body`, and `:footer` regions. Validates `data`
+  and the `:labels`/`:formatters` opts shape (D-19) before building any
+  section content.
+  """
+  @spec sections(map(), keyword()) :: [Rendro.Section.t()]
+  def sections(data, opts \\ []) do
+    validate_data!(data)
+    Rendro.Recipes.Pagination.validate_labels!(opts, "Rendro.Recipes.Payslip.document/2")
+    Rendro.Recipes.Pagination.validate_formatters!(opts, "Rendro.Recipes.Payslip.document/2")
+
+    [
+      header_section(data, opts),
+      summary_section(data, opts),
+      body_section(data, opts),
+      footer_section(data, opts)
+    ]
+  end
+
+  @doc """
   Assembles and returns a fully composed `%Rendro.Document{}`. Validates
   `data` (D-15/D-13 errors-as-product) before building the template.
+
+  ## Examples
+
+      iex> data = %{
+      ...>   employer: %{name: "Aurora Textiles Co."},
+      ...>   employee: %{name: "Jordan Rivera"},
+      ...>   period: %{from: ~D[2026-06-01], to: ~D[2026-06-30]},
+      ...>   pay_date: ~D[2026-07-05],
+      ...>   earnings: [%{description: "Base Salary", amount: Decimal.new("1000.00")}],
+      ...>   deductions: [],
+      ...>   net_pay: Decimal.new("1000.00")
+      ...> }
+      iex> doc = Rendro.Recipes.Payslip.document(data)
+      iex> doc.page_template
+      :payslip
+
   """
   @spec document(map(), keyword()) :: Rendro.Document.t()
   def document(data, opts \\ []) do
     validate_data!(data)
     template = page_template(opts)
+    secs = sections(data, opts)
 
-    Rendro.Document.new()
-    |> Rendro.Document.add_template(template)
-    |> Rendro.Document.set_template(template.name)
+    base_doc =
+      Rendro.Document.new()
+      |> with_unicode_fallback_font()
+      |> Rendro.Document.add_template(template)
+      |> Rendro.Document.set_template(template.name)
+
+    Enum.reduce(secs, base_doc, fn section, doc ->
+      Rendro.Document.add_section(doc, section)
+    end)
+  end
+
+  # D-17 requires arbitrary caller `:description` content (e.g. accented
+  # jurisdiction text like "Impôt sur le revenu") to render byte-for-byte
+  # unchanged -- never gated or rejected. The built-in Helvetica metrics
+  # table only covers the ASCII 32-126 range (lib/rendro/pdf/font.ex), so
+  # without a broader fallback ANY accented character would abort rendering
+  # with an :unsupported_glyph pipeline error instead of the honest
+  # "never reject caller content" contract D-17 promises. The already-vendored
+  # branding font (priv/branded/fonts/B612-Regular.ttf, used by
+  # Certificate/BrandedInvoice) covers common Latin-1 accented characters, so
+  # it is registered here as a silent, always-on fallback behind the default
+  # built-in Helvetica primary (byte-identical ASCII metrics stay primary;
+  # only genuinely out-of-range glyphs fall through).
+  defp with_unicode_fallback_font(doc) do
+    doc
+    |> Rendro.Document.register_embedded_font(
+      :payslip_unicode_fallback,
+      {:path, Rendro.Branded.font_path()}
+    )
+    |> Rendro.Document.register_font(:payslip_sans,
+      built_in: :helvetica,
+      fallbacks: [:payslip_unicode_fallback]
+    )
+    |> Rendro.Document.put_default_font(:payslip_sans)
   end
 
   # ---------------------------------------------------------------------------
@@ -225,6 +293,129 @@ defmodule Rendro.Recipes.Payslip do
       footer_h: footer_h,
       footer_y: footer_y
     }
+  end
+
+  # ---------------------------------------------------------------------------
+  # Private section builders
+  # ---------------------------------------------------------------------------
+
+  defp header_section(data, opts) do
+    colors = palette(opts)
+    lbl = Rendro.Recipes.Pagination.label_resolver(opts, @default_labels)
+    fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
+
+    period = data.period
+
+    employer_text = employer_display(data.employer)
+    employee_text = employee_display(data.employee)
+    period_text = "#{lbl.(:pay_period)}: #{fmt_date.(period.from)} - #{fmt_date.(period.to)}"
+    pay_date_text = "#{lbl.(:pay_date)}: #{fmt_date.(data.pay_date)}"
+
+    Rendro.section(
+      name: :payslip_header,
+      region: :header,
+      content: [
+        Rendro.block(
+          Rendro.text("#{lbl.(:employer)}: #{employer_text}", size: 13, color: colors.ink)
+        ),
+        Rendro.block(
+          Rendro.text("#{lbl.(:employee)}: #{employee_text}", size: 11, color: colors.muted)
+        ),
+        Rendro.block(Rendro.text(period_text, size: 10, color: colors.muted)),
+        Rendro.block(Rendro.text(pay_date_text, size: 10, color: colors.muted))
+      ]
+    )
+  end
+
+  defp employer_display(employer) do
+    case Map.get(employer, :address) do
+      blank when blank in [nil, ""] -> employer.name
+      address -> "#{employer.name}\n#{address}"
+    end
+  end
+
+  defp employee_display(employee) do
+    base =
+      case Map.get(employee, :id) do
+        blank when blank in [nil, ""] -> employee.name
+        id -> "#{employee.name} (#{glyph_safe(id)})"
+      end
+
+    case Map.get(employee, :tax_code) do
+      blank when blank in [nil, ""] -> base
+      tax_code -> "#{base} • #{tax_code}"
+    end
+  end
+
+  # The D-14 masking token in caller/fixture DATA is the middot "·" (U+00B7)
+  # exactly as specified -- but neither the built-in Helvetica metrics table
+  # nor the B612 unicode fallback (see with_unicode_fallback_font/1) has a
+  # glyph for it, so rendering it directly would abort with
+  # :unsupported_glyph. This swaps it for the visually equivalent bullet "•"
+  # (U+2022, present in the B612 fallback) ONLY for the rendered string --
+  # the underlying `data` map (and fixture_data()'s D-14 masking assertions)
+  # keep the literal middot untouched.
+  defp glyph_safe(text) when is_binary(text), do: String.replace(text, "·", "•")
+
+  # D-11: the net-pay anchor. Per the VERIFIED anchor_region_blocks engine
+  # mechanic (lib/rendro/pipeline/paginate.ex:1092-1109), a block's y is
+  # unconditionally overwritten by a running per-region cursor that advances
+  # by `block.height`. Giving the backdrop path block an EXPLICIT `height: 0`
+  # (independent of the rect op's own drawn `h`, which is the real band_h)
+  # means it does not advance the cursor, so the label+value text blocks that
+  # follow it in this SAME region's content list stack starting at the same
+  # y the backdrop started at — painting on top of the full-height backdrop
+  # rather than being pushed below it. This composition requires zero extra
+  # regions.
+  defp summary_section(data, opts) do
+    colors = palette(opts)
+    lbl = Rendro.Recipes.Pagination.label_resolver(opts, @default_labels)
+    fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
+    g = geometry(opts)
+
+    band_w = g.content_w
+    band_h = g.summary_h
+
+    backdrop =
+      Rendro.path([{:rect, 0, 0, band_w, band_h}],
+        fill: colors.surface,
+        stroke: %{color: colors.rule, width: 0.75},
+        x: 0,
+        y: 0,
+        width: band_w,
+        height: 0
+      )
+
+    label_block = Rendro.block(Rendro.text(lbl.(:net_pay), size: 10, color: colors.muted))
+    value_block = Rendro.block(Rendro.text(fmt_amount.(data.net_pay), size: 27, color: colors.ink))
+
+    Rendro.section(
+      name: :payslip_summary,
+      region: :summary,
+      content: [backdrop, label_block, value_block]
+    )
+  end
+
+  # Task-2 stub — replaced by the D-12 combined ledger + D-13 reconciliation
+  # in Task 3.
+  defp body_section(_data, _opts) do
+    Rendro.section(name: :payslip_body, region: :body, content: [])
+  end
+
+  defp footer_section(data, opts) do
+    colors = palette(opts)
+
+    payment_block =
+      case Map.get(data, :payment_method) do
+        blank when blank in [nil, ""] -> []
+        pm -> [Rendro.block(Rendro.text(glyph_safe(pm), size: 9, color: colors.muted))]
+      end
+
+    Rendro.section(
+      name: :payslip_footer,
+      region: :footer,
+      content: payment_block ++ [Rendro.page_number(color: colors.muted, size: 9)]
+    )
   end
 
   # ---------------------------------------------------------------------------
