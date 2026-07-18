@@ -208,4 +208,97 @@ defmodule Rendro.Recipes.PayslipTest do
       end
     end
   end
+
+  # ---------------------------------------------------------------------------
+  # sections/2, document/2, D-11 net-pay visual anchor (Task 2)
+  # ---------------------------------------------------------------------------
+
+  describe "sections/2 and document/2" do
+    test "sections/2 returns %Section{} structs whose regions include :header and :footer" do
+      sections = Payslip.sections(fixture_data())
+      assert Enum.all?(sections, &match?(%Rendro.Section{}, &1))
+
+      region_names = Enum.map(sections, & &1.region)
+      assert :header in region_names
+      assert :footer in region_names
+    end
+
+    test "document/2 renders {:ok, pdf} starting with the PDF magic bytes" do
+      doc = Payslip.document(fixture_data())
+      assert %Rendro.Document{} = doc
+
+      assert {:ok, pdf} = Rendro.render(doc)
+      assert String.starts_with?(pdf, "%PDF-")
+    end
+
+    test "the net-pay anchor's value is the single largest text element on the page (D-11)" do
+      data = fixture_data()
+      sections = Payslip.sections(data)
+
+      sizes_by_region =
+        Enum.map(sections, fn section -> {section.region, collect_text_sizes(section)} end)
+
+      all_sizes = Enum.flat_map(sizes_by_region, fn {_region, sizes} -> sizes end)
+      max_size = Enum.max(all_sizes)
+
+      summary_sizes = sizes_for_region(sizes_by_region, :summary)
+      header_sizes = sizes_for_region(sizes_by_region, :header)
+      footer_sizes = sizes_for_region(sizes_by_region, :footer)
+
+      assert max_size in summary_sizes,
+             "expected the global-max text size #{max_size} to occur in the :summary (net-pay anchor) region"
+
+      refute max_size in header_sizes,
+             "the :header region must not contain the global-max text size"
+
+      refute max_size in footer_sizes,
+             "the :footer region must not contain the global-max text size"
+    end
+
+    test ":labels opts override the net-pay label end to end" do
+      doc = Payslip.document(fixture_data(), labels: %{net_pay: "TAKE HOME"})
+      assert {:ok, pdf} = Rendro.render(doc)
+      assert pdf =~ "(TAKE HOME)"
+    end
+  end
+
+  # ---------------------------------------------------------------------------
+  # Recursive %Rendro.Text{} size collectors — reused by Task 3's table
+  # assertions (a table's header/rows/cells may wrap Rendro.Block/Rendro.Cell
+  # content, per lib/rendro/pipeline/measure.ex's normalize_cells/1).
+  # ---------------------------------------------------------------------------
+
+  defp sizes_for_region(sizes_by_region, region) do
+    sizes_by_region
+    |> Enum.filter(fn {r, _sizes} -> r == region end)
+    |> Enum.flat_map(fn {_r, sizes} -> sizes end)
+  end
+
+  defp collect_text_sizes(%Rendro.Section{content: content}) do
+    Enum.flat_map(content, &collect_from_block/1)
+  end
+
+  defp collect_from_block(%Rendro.Block{content: %Rendro.Text{size: size}}), do: [size]
+
+  defp collect_from_block(%Rendro.Block{content: %Rendro.Table{} = table}) do
+    collect_from_table(table)
+  end
+
+  defp collect_from_block(_other), do: []
+
+  defp collect_from_table(table) do
+    header_sizes = if table.header, do: collect_from_row(table.header), else: []
+    row_sizes = Enum.flat_map(table.rows, &collect_from_row/1)
+    header_sizes ++ row_sizes
+  end
+
+  defp collect_from_row(%Rendro.Row{cells: cells}), do: Enum.flat_map(cells, &collect_from_cell/1)
+  defp collect_from_row(cells) when is_list(cells), do: Enum.flat_map(cells, &collect_from_cell/1)
+
+  defp collect_from_cell(%Rendro.Cell{content: content}), do: collect_from_cell_content(content)
+  defp collect_from_cell(content), do: collect_from_cell_content(content)
+
+  defp collect_from_cell_content(%Rendro.Block{} = block), do: collect_from_block(block)
+  defp collect_from_cell_content(%Rendro.Text{size: size}), do: [size]
+  defp collect_from_cell_content(_other), do: []
 end
