@@ -8,7 +8,7 @@ defmodule Rendro.Recipes.PayslipByteIdentityTest do
   # render of the SAME fixed, deterministic fixture must keep hashing to this
   # exact value. Changing this hash is a defect, not a golden-file refresh,
   # unless a human explicitly re-authorizes a new baseline.
-  @toy_golden_sha256 "PLACEHOLDER_COMPUTED_AFTER_IMPLEMENTATION"
+  @toy_golden_sha256 "3e89a150660a037f352f38c3a66ef07773f0b438611f38c8be1b985c9b20c2bd"
 
   # Fixed, deterministic minimal fixture (no anatomy variance) -- one
   # earnings line, one deductions line, no :totals, no accented content, so
@@ -20,7 +20,11 @@ defmodule Rendro.Recipes.PayslipByteIdentityTest do
       period: %{from: ~D[2026-06-01], to: ~D[2026-06-30]},
       pay_date: ~D[2026-07-05],
       earnings: [
-        %{description: "Base Salary", amount: Decimal.new("4200.00"), ytd: Decimal.new("25200.00")}
+        %{
+          description: "Base Salary",
+          amount: Decimal.new("4200.00"),
+          ytd: Decimal.new("25200.00")
+        }
       ],
       deductions: [
         %{

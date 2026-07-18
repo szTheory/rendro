@@ -387,7 +387,9 @@ defmodule Rendro.Recipes.Payslip do
       )
 
     label_block = Rendro.block(Rendro.text(lbl.(:net_pay), size: 10, color: colors.muted))
-    value_block = Rendro.block(Rendro.text(fmt_amount.(data.net_pay), size: 27, color: colors.ink))
+
+    value_block =
+      Rendro.block(Rendro.text(fmt_amount.(data.net_pay), size: 27, color: colors.ink))
 
     Rendro.section(
       name: :payslip_summary,
@@ -396,10 +398,215 @@ defmodule Rendro.Recipes.Payslip do
     )
   end
 
-  # Task-2 stub — replaced by the D-12 combined ledger + D-13 reconciliation
-  # in Task 3.
-  defp body_section(_data, _opts) do
-    Rendro.section(name: :payslip_body, region: :body, content: [])
+  # D-12: the combined earnings/deductions ledger table (6 columns:
+  # Earnings|Current|YTD|Deductions|Current|YTD), a bold subtotal row as the
+  # table's LAST data row, native multi-page pagination via
+  # Pagination.chunk_rows_into_pages/2, and the D-13 kept-with-last
+  # reconciliation block (reserved on every page so the final page always has
+  # room for it — mirrors invoice.ex's @totals_line_height idiom).
+  @row_epsilon 2.0
+  @reconciliation_line_height 16
+
+  defp body_section(data, opts) do
+    colors = palette(opts)
+    lbl = Rendro.Recipes.Pagination.label_resolver(opts, @default_labels)
+    fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
+    g = geometry(opts)
+
+    totals = derive_totals(data)
+
+    zipped = zip_pad(data.earnings, data.deductions)
+
+    formatted_rows =
+      Enum.map(zipped, fn {earn, ded} ->
+        [
+          Map.get(earn, :description, ""),
+          fmt_amount_or_blank(Map.get(earn, :amount), fmt_amount),
+          fmt_amount_or_blank(Map.get(earn, :ytd), fmt_amount),
+          Map.get(ded, :description, ""),
+          fmt_amount_or_blank(Map.get(ded, :amount), fmt_amount),
+          fmt_amount_or_blank(Map.get(ded, :ytd), fmt_amount)
+        ]
+      end)
+
+    subtotal_row = subtotal_row(lbl, fmt_amount, colors, totals)
+    all_rows = formatted_rows ++ [subtotal_row]
+
+    table_opts = [
+      header: [
+        lbl.(:earnings),
+        lbl.(:amount),
+        lbl.(:ytd_amount),
+        lbl.(:deductions),
+        lbl.(:amount),
+        lbl.(:ytd_amount)
+      ],
+      columns: [
+        {:share, 2},
+        {:fixed, 55},
+        {:fixed, 55},
+        {:share, 2},
+        {:fixed, 55},
+        {:fixed, 55}
+      ],
+      borders: :columns,
+      cell_align: %{1 => :right, 2 => :right, 4 => :right, 5 => :right}
+    ]
+
+    # D-17: measurement must know about the unicode fallback font too (not
+    # just document/2's final render), or an accented caller :description
+    # would abort sections/2 itself with :unsupported_glyph before a
+    # document is ever assembled.
+    doc_for_measure = Rendro.Document.new() |> with_unicode_fallback_font()
+
+    {header_h, row_heights} =
+      Rendro.measure_rows(all_rows, g.content_w, doc_for_measure, table_opts)
+
+    effective_capacity =
+      g.body_h - header_h - reconciliation_reserved_height(data) - @row_epsilon
+
+    rows_with_meta =
+      Enum.zip(all_rows, row_heights)
+      |> Enum.map(fn {row, height} -> {row, height, nil} end)
+
+    pages = Rendro.Recipes.Pagination.chunk_rows_into_pages(rows_with_meta, effective_capacity)
+
+    table_blocks =
+      pages
+      |> Enum.with_index()
+      |> Enum.map(fn {{page_rows, _meta}, idx} ->
+        table = Rendro.table(page_rows, table_opts)
+        Rendro.block(table, break_before: idx > 0)
+      end)
+
+    reconciliation_blocks = build_reconciliation_blocks(data, colors, lbl, fmt_amount, totals)
+
+    Rendro.section(
+      name: :payslip_body,
+      region: :body,
+      content: table_blocks ++ reconciliation_blocks
+    )
+  end
+
+  defp subtotal_row(lbl, fmt_amount, colors, totals) do
+    blank = Rendro.block(Rendro.text("", size: 11, color: colors.ink))
+
+    [
+      Rendro.block(Rendro.text(lbl.(:gross_pay), size: 11, color: colors.ink)),
+      Rendro.block(Rendro.text(fmt_amount.(totals.gross), size: 11, color: colors.ink)),
+      blank,
+      Rendro.block(Rendro.text(lbl.(:total_deductions), size: 11, color: colors.ink)),
+      Rendro.block(Rendro.text(fmt_amount.(totals.deductions), size: 11, color: colors.ink)),
+      Rendro.block(Rendro.text("", size: 11, color: colors.ink))
+    ]
+  end
+
+  # Zips earnings/deductions to equal length, blank-padding the shorter list
+  # (D-12) so the combined ledger always has one row per zipped pair.
+  defp zip_pad(earnings, deductions) do
+    len = max(length(earnings), length(deductions))
+    blank_line = %{description: "", amount: nil, ytd: nil}
+
+    Enum.zip(pad_to(earnings, len, blank_line), pad_to(deductions, len, blank_line))
+  end
+
+  defp pad_to(list, len, blank), do: list ++ List.duplicate(blank, len - length(list))
+
+  defp fmt_amount_or_blank(nil, _fmt), do: ""
+  defp fmt_amount_or_blank(%Decimal{} = amount, fmt), do: fmt.(amount)
+
+  # Conservative reserved height for the trailing reconciliation block (D-13),
+  # used only to bias per-page chunking capacity — never to change rendered
+  # geometry (mirrors invoice.ex's @totals_line_height idiom). The equation
+  # line always renders; the optional YTD trio line renders only when
+  # data.totals includes at least one *_ytd field.
+  defp reconciliation_reserved_height(data) do
+    if has_ytd_totals?(Map.get(data, :totals)) do
+      @reconciliation_line_height * 2
+    else
+      @reconciliation_line_height
+    end
+  end
+
+  defp has_ytd_totals?(totals) when is_map(totals) do
+    Enum.any?([:gross_ytd, :deductions_ytd, :net_ytd], &Map.has_key?(totals, &1))
+  end
+
+  defp has_ytd_totals?(_totals), do: false
+
+  # Render half of D-13: the gross-to-net reconciliation equation, appended
+  # ONLY after the LAST ledger table block (never keep_together — mirrors
+  # Invoice's explicit anti-pattern warning, so a genuinely oversized ledger
+  # still surfaces the engine's typed :content_overflow rather than an
+  # artificially-forced single unbreakable group).
+  defp build_reconciliation_blocks(data, colors, lbl, fmt_amount, totals) do
+    equation_text =
+      "#{lbl.(:gross_pay)} #{fmt_amount.(totals.gross)} - " <>
+        "#{lbl.(:total_deductions)} #{fmt_amount.(totals.deductions)} = " <>
+        "#{lbl.(:net_pay)} #{fmt_amount.(data.net_pay)}"
+
+    equation_block = Rendro.block(Rendro.text(equation_text, size: 10, color: colors.ink))
+
+    [equation_block | ytd_summary_blocks(data, colors, lbl, fmt_amount, totals)]
+  end
+
+  defp ytd_summary_blocks(data, colors, lbl, fmt_amount, totals) do
+    case Map.get(data, :totals) do
+      caller_totals when is_map(caller_totals) ->
+        if has_ytd_totals?(caller_totals) do
+          parts =
+            []
+            |> maybe_ytd_part(lbl.(:gross_pay), totals.gross_ytd, fmt_amount)
+            |> maybe_ytd_part(lbl.(:total_deductions), totals.deductions_ytd, fmt_amount)
+            |> maybe_ytd_part(lbl.(:net_pay), totals.net_ytd, fmt_amount)
+
+          text = "#{lbl.(:year_to_date)}: " <> Enum.join(parts, " | ")
+          [Rendro.block(Rendro.text(text, size: 9, color: colors.muted))]
+        else
+          []
+        end
+
+      _other ->
+        []
+    end
+  end
+
+  defp maybe_ytd_part(acc, label, amount, fmt), do: acc ++ ["#{label} #{fmt.(amount)}"]
+
+  # ---------------------------------------------------------------------------
+  # Totals derivation (D-13) — shared by validate_reconciliation!/1 (validate
+  # half) and body_section/2 (render half).
+  # ---------------------------------------------------------------------------
+
+  defp derive_totals(%{earnings: earnings, deductions: deductions}) do
+    gross = sum_amounts(earnings)
+    total_deductions = sum_amounts(deductions)
+    net = Decimal.sub(gross, total_deductions)
+    gross_ytd = sum_ytd(earnings)
+    deductions_ytd = sum_ytd(deductions)
+    net_ytd = Decimal.sub(gross_ytd, deductions_ytd)
+
+    %{
+      gross: gross,
+      deductions: total_deductions,
+      net: net,
+      gross_ytd: gross_ytd,
+      deductions_ytd: deductions_ytd,
+      net_ytd: net_ytd
+    }
+  end
+
+  defp sum_amounts(lines) do
+    Enum.reduce(lines, Decimal.new(0), fn %{amount: amount}, acc -> Decimal.add(acc, amount) end)
+  end
+
+  defp sum_ytd(lines) do
+    Enum.reduce(lines, Decimal.new(0), fn line, acc ->
+      case Map.get(line, :ytd) do
+        %Decimal{} = ytd -> Decimal.add(acc, ytd)
+        _other -> acc
+      end
+    end)
   end
 
   defp footer_section(data, opts) do
@@ -465,6 +672,61 @@ defmodule Rendro.Recipes.Payslip do
     validate_lines!(Map.get(data, :earnings), :earnings, require_non_empty: true)
     validate_lines!(Map.get(data, :deductions), :deductions, require_non_empty: false)
     validate_decimal_field!(Map.get(data, :net_pay), ":net_pay")
+    validate_reconciliation!(data)
+    :ok
+  end
+
+  # D-13: gross-to-net reconciliation, validated via Decimal.equal?/2 (never
+  # `==`, which would treat 1.0 and 1.00 as unequal struct field values).
+  # Runs only after every field above has already passed shape/type
+  # validation, so derive_totals/1's Decimal folds are safe.
+  defp validate_reconciliation!(data) do
+    totals = derive_totals(data)
+    net_pay = Map.get(data, :net_pay)
+
+    unless Decimal.equal?(net_pay, totals.net) do
+      raise ArgumentError, """
+      Rendro.Recipes.Payslip.document/2 — :net_pay mismatch.
+
+      What:  :net_pay must equal gross earnings minus total deductions.
+      Where: Rendro.Recipes.Payslip.validate_data!/1
+      Why:   Supplied net_pay: #{inspect(net_pay)},
+             Derived net_pay (gross #{inspect(totals.gross)} - deductions #{inspect(totals.deductions)}): #{inspect(totals.net)}.
+      Next:  Correct :net_pay, or adjust :earnings/:deductions amounts so they reconcile.
+      """
+    end
+
+    maybe_validate_totals!(Map.get(data, :totals), totals)
+  end
+
+  defp maybe_validate_totals!(caller_totals, derived) when is_map(caller_totals) do
+    assert_totals_field!(caller_totals, :gross, derived.gross)
+    assert_totals_field!(caller_totals, :deductions, derived.deductions)
+    assert_totals_field!(caller_totals, :net, derived.net)
+    assert_totals_field!(caller_totals, :gross_ytd, derived.gross_ytd)
+    assert_totals_field!(caller_totals, :deductions_ytd, derived.deductions_ytd)
+    assert_totals_field!(caller_totals, :net_ytd, derived.net_ytd)
+    :ok
+  end
+
+  defp maybe_validate_totals!(_caller_totals, _derived), do: :ok
+
+  defp assert_totals_field!(caller_totals, key, derived_value) do
+    if Map.has_key?(caller_totals, key) do
+      supplied = Map.get(caller_totals, key)
+
+      unless Decimal.equal?(supplied, derived_value) do
+        raise ArgumentError, """
+        Rendro.Recipes.Payslip.document/2 — :totals.#{key} mismatch.
+
+        What:  The caller-supplied :totals.#{key} does not match the derived value.
+        Where: Rendro.Recipes.Payslip.validate_data!/1
+        Why:   Supplied #{key}: #{inspect(supplied)}, Derived #{key}: #{inspect(derived_value)}.
+        Next:  Remove :totals.#{key} to skip this check, or correct the value.
+        """
+      end
+    end
+
     :ok
   end
 
