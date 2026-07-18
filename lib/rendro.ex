@@ -372,6 +372,7 @@ defmodule Rendro do
     |> normalize_table_borders()
     |> normalize_table_border_style()
     |> normalize_table_header_fill()
+    |> normalize_table_cell_align()
   end
 
   defp normalize_table_split_policy(attrs) do
@@ -465,6 +466,34 @@ defmodule Rendro do
           {:error, msg} -> raise ArgumentError, msg
         end
     end
+  end
+
+  # Column-level opt-in horizontal alignment (INV-05). Unset (`nil`) is the
+  # inert default that preserves today's left-flush layout byte-for-byte.
+  # Accepts a map of 0-based column index => `:right`; any other value
+  # (including any alignment atom other than `:right`) raises instructively.
+  defp normalize_table_cell_align(attrs) do
+    case Keyword.get(attrs, :cell_align) do
+      nil ->
+        Keyword.put(attrs, :cell_align, nil)
+
+      cell_align when is_map(cell_align) ->
+        Enum.each(cell_align, &validate_cell_align_entry!/1)
+        Keyword.put(attrs, :cell_align, cell_align)
+
+      other ->
+        raise ArgumentError,
+              "Rendro.table/2 received invalid cell_align value: #{inspect(other)}. " <>
+                "Expected a map of column index => :right (e.g. %{1 => :right}), or nil."
+    end
+  end
+
+  defp validate_cell_align_entry!({col, :right}) when is_integer(col) and col >= 0, do: :ok
+
+  defp validate_cell_align_entry!({col, align}) do
+    raise ArgumentError,
+          "Rendro.table/2 cell_align entry #{inspect({col, align})} is invalid. " <>
+            "Keys must be non-negative integer column indices; values must currently be :right."
   end
 
   defp normalize_path_attrs(attrs) do

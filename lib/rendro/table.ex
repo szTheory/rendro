@@ -16,6 +16,11 @@ defmodule Rendro.Table do
     borders: :none,
     border_style: nil,
     header_fill: nil,
+    # Opt-in column-level horizontal alignment (inert default preserves the
+    # existing left-flush layout path). A map of 0-based column index =>
+    # `:right`; unset columns keep today's left-flush behavior. See also
+    # `Rendro.Cell` `:cell_align` for a per-cell override.
+    cell_align: nil,
     # Pipeline geometry fields populated by Measure
     column_widths: nil,
     row_heights: nil,
@@ -45,6 +50,7 @@ defmodule Rendro.Table do
           borders: borders(),
           border_style: nil | map(),
           header_fill: nil | {non_neg_integer(), non_neg_integer(), non_neg_integer()},
+          cell_align: %{non_neg_integer() => :right} | nil,
           column_widths: [number()] | nil,
           row_heights: [number()] | nil,
           header_height: number() | nil,
