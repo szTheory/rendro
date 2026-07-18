@@ -2,16 +2,18 @@
 gsd_state_version: 1.0
 milestone: v2.10
 milestone_name: Realistic Business-Document Examples & Anatomy
-status: executing
+current_phase: 115
+current_phase_name: invoice-anatomy-upgrade-format-public-promotion-palette-alig
+status: verifying
 stopped_at: Completed 115-02-PLAN.md
-last_updated: "2026-07-18T18:28:12.009Z"
+last_updated: "2026-07-18T18:44:36.405Z"
 last_activity: 2026-07-18
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 11
-  completed_plans: 10
-  percent: 20
+  completed_plans: 11
+  percent: 40
 ---
 
 # Project State
@@ -26,7 +28,7 @@ progress:
 
 Phase: 115 (invoice-anatomy-upgrade-format-public-promotion-palette-alig) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-18
 
 Progress: [█████████░] 91%
@@ -66,6 +68,8 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 - [Phase 115]: 115-02: Promoted Rendro.Format from @moduledoc false to the public adapter/Evolving tier (money/1, date/1, label/1) in one atomic commit (INV-04, the milestone's single irreversible act); fixed a second, plan-unlisted duplicate hidden-modules assertion in test/rendro/public_api/manifest_test.exs that also expected Format hidden.
 - [Phase ?]: [Phase 115]: 115-03: Resolved RESEARCH OQ2 (cell_align offset location) in favor of paginate.ex stack_cells alone — writer.ex needed zero changes since it already forwards cell.x transparently into rendered block.x.
 - [Phase ?]: [Phase 115]: 115-03: Both new Cell.cell_align / Table.cell_align struct-field types are inlined into t() rather than declared as named @type, since named types are enumerated in priv/public_api.json and would have widened the frozen Stable-tier manifest.
+- [Phase ?]: 115-04: body_section rewritten to per-page chunked pagination (mirrors Receipt), reserving conservative totals-block height uniformly on every page so the LAST table page always keeps room for the trailing totals block (shared chunker only accepts one capacity value, mirroring Statement's CF/BF reservation idiom).
+- [Phase ?]: 115-04: Decimal.equal?/2 totals caller-assertion derives its comparison value from items (qty x price via item_line_total/1), not from a Decimal-typed source field, since Invoice's legacy line-item :price intentionally stays bare-number typed per INV-02's byte-compat split.
 
 ### Blockers / Open Questions
 
@@ -95,6 +99,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 | Phase 115 P01 | ~3min | 2 tasks | 2 files |
 | Phase 115 P02 | ~4min | 2 tasks | 5 files |
 | Phase 115 P03 | ~9min | - tasks | - files |
+| Phase 115 P04 | ~20min | 3 tasks | 3 files |
 
 ## Operator Next Steps
 
@@ -102,6 +107,6 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 
 ## Session
 
-**Last session:** 2026-07-18T18:28:00.469Z
+**Last session:** 2026-07-18T18:43:42.642Z
 **Stopped at:** Completed 115-02-PLAN.md
 **Resume file:** None
