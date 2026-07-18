@@ -69,7 +69,7 @@ Plans:
 **Plans**: 4 plans
 **Wave 1**
 
-- [ ] 115-01-PLAN.md — Wave-0 byte-identity golden baselines (toy render + no-cell_align table) [INV-01, INV-05]
+- [x] 115-01-PLAN.md — Wave-0 byte-identity golden baselines (toy render + no-cell_align table) [INV-01, INV-05]
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -154,7 +154,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 114. Domain research, rubric & example-data library | v2.10 | 7/7 | Complete    | 2026-07-11 |
-| 115. Invoice anatomy + Format promotion + seams | v2.10 | 0/TBD | Not started | - |
+| 115. Invoice anatomy + Format promotion + seams | v2.10 | 1/4 | In Progress|  |
 | 116. New families — Payslip & Ticket | v2.10 | 0/TBD | Not started | - |
 | 117. Edge-case stress matrix | v2.10 | 0/TBD | Not started | - |
 | 118. Rubric-gated demos, gallery & docs closure | v2.10 | 0/TBD | Not started | - |
