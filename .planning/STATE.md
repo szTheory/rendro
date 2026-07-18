@@ -2,9 +2,12 @@
 gsd_state_version: 1.0
 milestone: v2.10
 milestone_name: Realistic Business-Document Examples & Anatomy
-status: verifying
-last_updated: "2026-07-11T05:44:59.128Z"
-last_activity: 2026-07-11
+current_phase: 115
+current_phase_name: Invoice anatomy upgrade + Format public promotion + palette/align seams
+status: planning
+last_updated: "2026-07-18T17:02:34.004Z"
+last_activity: 2026-07-18
+last_activity_desc: Phase 114 complete, transitioned to Phase 115
 progress:
   total_phases: 5
   completed_phases: 1
@@ -19,23 +22,23 @@ progress:
 
 **Project**: Rendro
 **Core Value**: Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current Focus**: v2.10 Realistic Business-Document Examples & Anatomy (Milestone A / `SEED-002`) — roadmap created; ready to plan Phase 114.
+**Current Focus**: v2.10 Realistic Business-Document Examples & Anatomy (Milestone A / `SEED-002`) — Phase 114 complete (data + quality foundation shipped); ready to plan Phase 115 (Invoice anatomy upgrade + `Format` public promotion).
 
 ## Current Position
 
-Phase: 114 (Domain research, reader-quality rubric & realistic example-data library) — EXECUTING
-Plan: 7 of 7
-Status: Phase complete — ready for verification
-Last activity: 2026-07-11
+Phase: 115 — Invoice anatomy upgrade + Format public promotion + palette/align seams
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-07-18 — Phase 114 complete (UAT passed, security review clean), transitioned to Phase 115
 
-Progress: [██████████] 100%
+Progress: [████░░░░░░░░░░░░░░░░] 20% — 1/5 phases complete
 
 ## Roadmap Snapshot (v2.10, Phases 114–118)
 
 ```text
-[░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 0% — 0/5 phases complete
-Phase 114 Domain research, rubric & example-data library . Ready to plan
-Phase 115 Invoice anatomy + Format promotion + seams ..... Not started
+[████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 20% — 1/5 phases complete
+Phase 114 Domain research, rubric & example-data library . ✓ Complete (2026-07-18)
+Phase 115 Invoice anatomy + Format promotion + seams ..... Ready to plan
 Phase 116 New families — Payslip & Ticket ................ Not started
 Phase 117 Edge-case stress matrix ........................ Not started
 Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
@@ -63,16 +66,16 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 
 ### Blockers / Open Questions
 
-- None. (Verify during Phase 114: the quarantined `invoice_data.json` is already fictional — a seed-wording correction, not a PII issue.)
+- None. (Phase 114 confirmed the de-quarantined `invoice_data.json` is fictional — no PII issue. Phase 115 watch item: the `Format` public promotion will edit Phase-79's `public_api_contract_test.exs` hidden set — expect a deliberate red build until the hidden-set + tier tags are updated.)
 
 ## Next Steps
 
-1. `/gsd-plan-phase 114` — plan the domain research, rubric & example-data library foundation.
+1. `/gsd-plan-phase 115` — plan the additive Invoice anatomy upgrade + `Rendro.Format` public (adapter-tier) promotion + private `palette(opts)` (S1) and `cell_align: :right` seams.
 
 ## Last Session
 
-**Last updated**: 2026-07-11
-**Stopped at**: Completed 114-03-PLAN.md — invoice fixture money normalized to Decimal-safe strings + S4 brand/logo slot (byte-identical render); examples_schema_contract_test.exs validates every priv/examples/ fixture; EXL-01/03/06 satisfied.
+**Last updated**: 2026-07-18
+**Stopped at**: Phase 114 complete — UAT 2/2 passed (DOMAIN.md faithfulness + rubric anchor applicability), verification canonicalized `human_needed → passed`, security review closed 16 threats (0 open), transitioned to Phase 115.
 **Blockers**: None
 
 ## Performance Metrics
@@ -89,4 +92,4 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 
 ## Operator Next Steps
 
-- Plan the first phase with `/gsd-plan-phase 114`.
+- Plan the next phase with `/gsd-plan-phase 115`.

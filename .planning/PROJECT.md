@@ -25,7 +25,9 @@ Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir d
 
 ## Current State
 
-**Active milestone:** v2.10 Realistic Business-Document Examples & Anatomy — **planning** (defining requirements → roadmap). Retargets `SEED-002`; Milestone A of the Happy-Path program. C1 CI/CD Performance & Reliability shipped 2026-07-11 as a non-version infrastructure milestone.
+**Active milestone:** v2.10 Realistic Business-Document Examples & Anatomy — **executing** (Phase 114 of 118 complete, 2026-07-18). Retargets `SEED-002`; Milestone A of the Happy-Path program. C1 CI/CD Performance & Reliability shipped 2026-07-11 as a non-version infrastructure milestone.
+
+**Phase 114 (Domain research, reader-quality rubric & realistic example-data library) complete 2026-07-18** — the milestone's data + quality foundation is in place with NO `lib/` product change except the `@moduledoc false` `Rendro.Examples` loader: a realistic, schema-validated `priv/examples/invoice/acme-phoenix-saas/invoice.json` fixture (Decimal-string money, optional empty `brand`/`logo` S4 slot, de-quarantined from the bench harness as a provable byte-identical no-op), a co-located `DOMAIN.md` (domain language, personas+JTBD, reading context, layout conventions), and an appendable schema-backed reader-quality rubric (`priv/quality/rubric_scores.json`: 6 core 1–5 dims + 2 gates, non-designer anchors, empty `scores: []` S5 seam) — all enforced by 3 new + 2 extended docs-contract lanes (guardrail count 22→25), text-only Hex packaging (`priv/examples` allowlisted, `priv/schemas`/`priv/quality` refuted from tarball, 11-extension raster ban), and `Path.safe_relative` traversal guards on the loader. All 9 requirements (EXL-01..06, RUB-01..03) structurally verified; 2 subjective prose-quality UAT checks (DOMAIN.md faithfulness, rubric anchor applicability) passed; security review closed 16 threats (0 open).
 
 **Shipped milestone:** C1 CI/CD Performance & Reliability — **SHIPPED 2026-07-11** (Phases 108-113, 30/30 requirements; milestone audit `passed`; no Hex release or library version tag). Rendro's CI/CD pipeline is now split into actionable fast/proof/advisory lanes, backed by precise BEAM caches, a stable `ci-success` required gate, local `mix ci.fast` / `mix ci.proofs` reproduction commands, and remote validation evidence from three green `ci.yml` runs.
 
@@ -239,6 +241,9 @@ As of v2.7 (2026-06-13), public claims are bounded by checked proof artifacts: p
 | Use `ci-success` as the sole required merge check while keeping advisory lanes visible | Branch protection needs one stable context; advisory failures should surface maintenance signal without blocking deterministic fast/proof gates | ✓ Shipped in C1 |
 | Keep release preflight strict by default, but let CI's deterministic release proof skip duplicate CI/security audits | Real release/tag preflight must remain comprehensive; PR proof should avoid recursive CI duplication and avoid coupling deterministic proof to flaky advisory network audits | ✓ Shipped in C1 |
 | Keep security dependency audits advisory in PR CI and strict in maintenance/release posture | Dependency advisory checks are valuable but network/advisory-state sensitive; they should not make the required deterministic merge gate red | ✓ Shipped in C1 |
+| Place the example-data loader at `lib/rendro/examples.ex` as `@moduledoc false`, using built-in `JSON.decode!` (never `Jason`) and `Path.safe_relative` guards | The only placement serving tests + `:dev` bench + Livebook + shipped consumers while staying out of `public_api.json`; `Jason` is a dev/test-only transitive dep that would crash prod Hex consumers | ✓ Shipped in Phase 114 (v2.10) |
+| Fixture money as Decimal-safe **strings** (`"79.00"`), never JSON floats; de-quarantine the invoice fixture verbatim first, then normalize money + add S4 brand slot in separate commits | Floats break Decimal determinism; separating the byte-identical move from normalization (Pitfall 6) keeps the bench no-op provable | ✓ Shipped in Phase 114 (v2.10) |
+| Author the reader-quality rubric as an appendable schema-backed manifest (`scores: []` S5 seam); threshold arithmetic (hierarchy=5, core≥4, gates pass) lives only as a test helper, not `lib/` code | Preserves the "no `lib/` product change except the loader" boundary; C's quality-ratchet (Phase 118) appends through the identical schema gate | ✓ Shipped in Phase 114 (v2.10) |
 
 ## Archived Milestone Context
 
@@ -303,4 +308,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-10 — started milestone v2.10 (Realistic Business-Document Examples & Anatomy)*
+*Last updated: 2026-07-18 after Phase 114 (Domain research, reader-quality rubric & realistic example-data library) — v2.10*
