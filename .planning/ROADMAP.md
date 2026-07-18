@@ -100,7 +100,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 116-02-PLAN.md — Payslip recipe: geometry, palette, net-pay anchor, combined ledger + pagination, gross-to-net reconciliation — FAM-01, FAM-03
+- [x] 116-02-PLAN.md — Payslip recipe: geometry, palette, net-pay anchor, combined ledger + pagination, gross-to-net reconciliation — FAM-01, FAM-03
 - [ ] 116-03-PLAN.md — Ticket recipe: geometry-derived band, placement-grid anchor, code box + reference + perforation, caller-image validation — FAM-02, FAM-03
 
 **Wave 3** *(blocked on Wave 2 completion)*
@@ -168,7 +168,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 114. Domain research, rubric & example-data library | v2.10 | 7/7 | Complete    | 2026-07-11 |
 | 115. Invoice anatomy + Format promotion + seams | v2.10 | 4/4 | Complete    | 2026-07-18 |
-| 116. New families — Payslip & Ticket | v2.10 | 1/4 | In Progress|  |
+| 116. New families — Payslip & Ticket | v2.10 | 2/4 | In Progress|  |
 | 117. Edge-case stress matrix | v2.10 | 0/TBD | Not started | - |
 | 118. Rubric-gated demos, gallery & docs closure | v2.10 | 0/TBD | Not started | - |
 | 108. Baseline & Audit Report | C1 | 3/3 | Complete | 2026-06-14 |

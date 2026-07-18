@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.10
 milestone_name: Realistic Business-Document Examples & Anatomy
 status: executing
-stopped_at: Completed 116-01-PLAN.md
-last_updated: "2026-07-18T23:14:51.712Z"
+stopped_at: Completed 116-02-PLAN.md
+last_updated: "2026-07-18T23:51:39.310Z"
 last_activity: 2026-07-18
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 15
-  completed_plans: 12
+  completed_plans: 13
   percent: 40
 ---
 
@@ -25,11 +25,11 @@ progress:
 ## Current Position
 
 Phase: 116 (new-families-payslip-ticket) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-07-18
 
-Progress: [████████░░] 80%
+Progress: [█████████░] 87%
 
 ## Roadmap Snapshot (v2.10, Phases 114–118)
 
@@ -70,6 +70,8 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 - [Phase ?]: 115-04: Decimal.equal?/2 totals caller-assertion derives its comparison value from items (qty x price via item_line_total/1), not from a Decimal-typed source field, since Invoice's legacy line-item :price intentionally stays bare-number typed per INV-02's byte-compat split.
 - [Phase 116]: 116-01: Implemented label_resolver/2 merge order (opts[:labels] -> default_labels -> Rendro.Format.label/1) exactly as prescribed in 116-RESEARCH.md's code example; default_labels defaults to %{} so Statement's arity-1 call sites (statement.ex:274,294) compile and resolve unmodified.
 - [Phase 116]: 116-01: validate_labels!/2 and validate_formatters!/2 take a recipe_mfa string naming the caller's public entry point (e.g. Rendro.Recipes.Payslip.document/2), mirroring Invoice's four-part What/Where/Why/Next ArgumentError idiom, so 116-02/116-03 share one validated seam instead of each inventing their own guards.
+- [Phase 116]: 116-02: Registered the vendored B612 branding font as a silent unicode fallback (built-in Helvetica -> B612) applied to both document/2 and body_section/2's own measurement document, since the built-in font's ASCII-only metrics table would otherwise crash rendering on any accented caller text (needed for D-17).
+- [Phase 116]: 116-02: D-14's middot masking token stays literal in data/fixtures (test-enforced via String.contains?/2); rendering swaps it display-only for bullet (glyph_safe/1) since neither built-in Helvetica nor B612 has a middot glyph.
 
 ### Blockers / Open Questions
 
@@ -101,6 +103,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 | Phase 115 P03 | ~9min | - tasks | - files |
 | Phase 115 P04 | ~20min | 3 tasks | 3 files |
 | Phase 116 P01 | 5min | 2 tasks | 2 files |
+| Phase 116 P02 | 17min | 3 tasks | 3 files |
 
 ## Operator Next Steps
 
@@ -108,6 +111,6 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 
 ## Session
 
-**Last session:** 2026-07-18T23:14:51.704Z
-**Stopped at:** Completed 116-01-PLAN.md
+**Last session:** 2026-07-18T23:51:39.307Z
+**Stopped at:** Completed 116-02-PLAN.md
 **Resume file:** None
