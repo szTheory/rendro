@@ -170,6 +170,54 @@ defmodule Rendro.Recipes.InvoiceTest do
         Invoice.document(data)
       end
     end
+
+    test "a non-map line item raises ArgumentError, not BadMapError" do
+      data = Map.put(sample_data(), :items, ["not-a-map"])
+
+      assert_raise ArgumentError, ~r/line item/i, fn ->
+        Invoice.document(data)
+      end
+    end
+
+    test "a line item missing :qty raises ArgumentError, not KeyError" do
+      data = Map.put(sample_data(), :items, [%{name: "Widget", price: 10}])
+
+      assert_raise ArgumentError, ~r/qty/i, fn ->
+        Invoice.document(data)
+      end
+    end
+
+    test "a line item missing :name raises ArgumentError naming :name" do
+      data = Map.put(sample_data(), :items, [%{qty: 1, price: 10}])
+
+      assert_raise ArgumentError, ~r/name/i, fn ->
+        Invoice.document(data)
+      end
+    end
+
+    test "a line item missing :price raises ArgumentError naming :price" do
+      data = Map.put(sample_data(), :items, [%{name: "Widget", qty: 1}])
+
+      assert_raise ArgumentError, ~r/price/i, fn ->
+        Invoice.document(data)
+      end
+    end
+
+    test "a non-integer :qty raises ArgumentError, not a downstream crash" do
+      data = Map.put(sample_data(), :items, [%{name: "Widget", qty: "two", price: 10}])
+
+      assert_raise ArgumentError, ~r/qty/i, fn ->
+        Invoice.document(data)
+      end
+    end
+
+    test "a non-number :price raises an instructive ArgumentError" do
+      data = Map.put(sample_data(), :items, [%{name: "Widget", qty: 1, price: "ten"}])
+
+      assert_raise ArgumentError, ~r/price/i, fn ->
+        Invoice.document(data)
+      end
+    end
   end
 
   # ---------------------------------------------------------------------------

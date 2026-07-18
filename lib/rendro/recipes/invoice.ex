@@ -500,7 +500,62 @@ defmodule Rendro.Recipes.Invoice do
   defp validate_items!(items) do
     items
     |> Enum.with_index()
-    |> Enum.each(fn {item, idx} -> validate_item_price!(Map.get(item, :price), idx) end)
+    |> Enum.each(fn {item, idx} ->
+      validate_item_shape!(item, idx)
+      validate_item_price!(Map.get(item, :price), idx)
+    end)
+  end
+
+  # Every line item is unconditionally read during rendering — body_section/2
+  # interpolates item.name and "$#{item.price}", calls Integer.to_string(item.qty),
+  # and item_line_total/1 pattern-matches %{qty:, price:}. Validating item shape
+  # up front keeps the errors-as-product contract (INV-06): a malformed item
+  # raises an instructive ArgumentError here instead of leaking a raw
+  # BadMapError/KeyError from deep in the render pipeline.
+  defp validate_item_shape!(item, idx) when not is_map(item) do
+    raise ArgumentError, """
+    Rendro.Recipes.Invoice.document/2 — invalid line item at index #{idx}.
+
+    What:  Each :items entry must be a map, e.g. %{name: "Widget", qty: 1, price: 10}.
+    Where: Rendro.Recipes.Invoice.validate_data!/1
+    Why:   items[#{idx}] = #{inspect(item)} (#{Rendro.Recipes.Pagination.type_name(item)}).
+    Next:  Pass a map with :name, :qty, and :price keys.
+    """
+  end
+
+  defp validate_item_shape!(item, idx) do
+    validate_item_field!(item, :name, idx, &is_binary/1, "a string", ~s(name: "Widget"))
+    validate_item_field!(item, :qty, idx, &is_integer/1, "an integer", "qty: 3")
+    validate_item_key_present!(item, :price, idx)
+  end
+
+  defp validate_item_field!(item, key, idx, type_ok?, type_desc, example) do
+    validate_item_key_present!(item, key, idx)
+    value = Map.fetch!(item, key)
+
+    unless type_ok?.(value) do
+      raise ArgumentError, """
+      Rendro.Recipes.Invoice.document/2 — invalid item :#{key} at index #{idx}.
+
+      What:  A line item's :#{key} must be #{type_desc}.
+      Where: Rendro.Recipes.Invoice.validate_data!/1
+      Why:   items[#{idx}].#{key} = #{inspect(value)} (#{Rendro.Recipes.Pagination.type_name(value)}).
+      Next:  Pass #{type_desc}, e.g. #{example}.
+      """
+    end
+  end
+
+  defp validate_item_key_present!(item, key, idx) do
+    unless Map.has_key?(item, key) do
+      raise ArgumentError, """
+      Rendro.Recipes.Invoice.document/2 — line item at index #{idx} missing :#{key}.
+
+      What:  Each line item must include :#{key}.
+      Where: Rendro.Recipes.Invoice.validate_data!/1
+      Why:   items[#{idx}] has no :#{key} key: #{inspect(item)}.
+      Next:  Add a :#{key} key to the line item map.
+      """
+    end
   end
 
   # The legacy :price slot renders via bare-number string interpolation
@@ -522,7 +577,18 @@ defmodule Rendro.Recipes.Invoice do
     """
   end
 
-  defp validate_item_price!(_price, _idx), do: :ok
+  defp validate_item_price!(price, _idx) when is_number(price), do: :ok
+
+  defp validate_item_price!(price, idx) do
+    raise ArgumentError, """
+    Rendro.Recipes.Invoice.document/2 — invalid item :price type at index #{idx}.
+
+    What:  A line item's :price must be a bare number (Integer or Float).
+    Where: Rendro.Recipes.Invoice.validate_data!/1
+    Why:   items[#{idx}].price = #{inspect(price)} (#{Rendro.Recipes.Pagination.type_name(price)}).
+    Next:  Pass a bare number, e.g. price: 79.00.
+    """
+  end
 
   # New Decimal money fields (currently only :totals.*) must be Decimal, not
   # Float — Float arithmetic is inexact and can produce incorrect financial
