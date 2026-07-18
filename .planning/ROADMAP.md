@@ -92,7 +92,20 @@ Plans:
   3. Both recipes validate input as errors-as-product (instructive `ArgumentError`) and read colors via the `palette(opts)` seam (S1) — no section inlines `{0,0,0}`.
   4. Both recipes are registered in `priv/public_api.json` (adapter tier) and `priv/support_matrix.json` with proof-backed rows.
 
-**Plans**: TBD
+**Plans**: 4 plans
+
+**Wave 1**
+
+- [ ] 116-01-PLAN.md — Shared seam: Pagination label_resolver/2 (D-18) + :labels/:formatters opts validators (D-19) — FAM-03
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 116-02-PLAN.md — Payslip recipe: geometry, palette, net-pay anchor, combined ledger + pagination, gross-to-net reconciliation — FAM-01, FAM-03
+- [ ] 116-03-PLAN.md — Ticket recipe: geometry-derived band, placement-grid anchor, code box + reference + perforation, caller-image validation — FAM-02, FAM-03
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 116-04-PLAN.md — Registration: @public_modules allowlist, priv/public_api.json regen, priv/support_matrix.json rows — FAM-03
 
 ### Phase 117: Edge-case stress matrix
 
@@ -155,7 +168,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 114. Domain research, rubric & example-data library | v2.10 | 7/7 | Complete    | 2026-07-11 |
 | 115. Invoice anatomy + Format promotion + seams | v2.10 | 4/4 | Complete    | 2026-07-18 |
-| 116. New families — Payslip & Ticket | v2.10 | 0/TBD | Not started | - |
+| 116. New families — Payslip & Ticket | v2.10 | 0/4 | Not started | - |
 | 117. Edge-case stress matrix | v2.10 | 0/TBD | Not started | - |
 | 118. Rubric-gated demos, gallery & docs closure | v2.10 | 0/TBD | Not started | - |
 | 108. Baseline & Audit Report | C1 | 3/3 | Complete | 2026-06-14 |
