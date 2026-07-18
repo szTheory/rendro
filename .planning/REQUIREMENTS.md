@@ -29,7 +29,7 @@ Legend: `[ ]` in scope for this milestone.
 - [x] **INV-01**: `Rendro.Recipes.Invoice` accepts additive optional `:issuer`, `:customer`, `:due_date`, `:terms`, and `:totals`, rendering each only when present; the pre-upgrade toy call (`%{id:, date:, items:}`) renders byte-identically to before.
 - [ ] **INV-02**: Invoice money uses `%Decimal{}` routed through `Rendro.Format.money/1` (bare-number `price` still renders `"$#{price}"`); new money fields are Decimal-only and reject Floats instructively.
 - [ ] **INV-03**: A totals block renders only when `:totals` is supplied, is validated as a caller assertion via `Decimal.equal?/2` (mirroring Statement/Receipt), and is kept with the last table rows across a page break via `Recipes.Pagination`.
-- [ ] **INV-04**: `Rendro.Format` is promoted from `@moduledoc false` to the public **adapter** tier with a minimal surface (`money/1`, `date/1`, `label/1`), `@spec`s, a `public_api.json` entry, a migration note, and documentation that its formatted output may evolve; the public-API contract lane (incl. Phase-79 hidden set) passes.
+- [x] **INV-04**: `Rendro.Format` is promoted from `@moduledoc false` to the public **adapter** tier with a minimal surface (`money/1`, `date/1`, `label/1`), `@spec`s, a `public_api.json` entry, a migration note, and documentation that its formatted output may evolve; the public-API contract lane (incl. Phase-79 hidden set) passes.
 - [x] **INV-05**: An additive `cell_align: :right` option on table cells/columns right-aligns tabular money; existing tables (no `cell_align`) render byte-identically.
 - [ ] **INV-06**: `Rendro.Recipes.Invoice.validate_data!/1` raises an instructive `ArgumentError` on malformed input instead of leaking `BadMapError`/`FunctionClauseError`, and never rejects a valid toy call.
 - [ ] **INV-07** *(seam S1)*: Invoice sections read colors through a private `palette(opts)` keyed on Milestone-B's locked color roles (`ink`/`muted`/`accent`/`on_accent`/`background`/`surface`/`rule`), defaulting to today's literals; no section inlines `{0,0,0}`. The `page_template/1` opts leak is closed via a `Keyword.take` whitelist while the top-level `opts` stays open for B's future `theme:`.
@@ -90,7 +90,7 @@ Every REQ-ID maps to exactly one phase. Coverage: **26/26 mapped**, no orphans, 
 | INV-01 | Phase 115 | Complete |
 | INV-02 | Phase 115 | Pending |
 | INV-03 | Phase 115 | Pending |
-| INV-04 | Phase 115 | Pending |
+| INV-04 | Phase 115 | Complete |
 | INV-05 | Phase 115 | Complete |
 | INV-06 | Phase 115 | Pending |
 | INV-07 | Phase 115 | Pending |

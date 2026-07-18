@@ -5,15 +5,15 @@ milestone_name: Realistic Business-Document Examples & Anatomy
 current_phase: 115
 current_phase_name: invoice-anatomy-upgrade-format-public-promotion-palette-alig
 status: executing
-stopped_at: Completed 115-01-PLAN.md
-last_updated: "2026-07-18T18:08:17.774Z"
+stopped_at: Completed 115-02-PLAN.md
+last_updated: "2026-07-18T18:15:06.184Z"
 last_activity: 2026-07-18
 last_activity_desc: Phase 115 execution started
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 11
-  completed_plans: 8
+  completed_plans: 9
   percent: 20
 ---
 
@@ -28,7 +28,7 @@ progress:
 ## Current Position
 
 Phase: 115 (invoice-anatomy-upgrade-format-public-promotion-palette-alig) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-07-18 — Phase 115 execution started
 
@@ -66,6 +66,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 - [Phase ?]: Rubric threshold arithmetic (hierarchy=5, core>=4, gates pass) lives only as a test helper — no lib/ product change except the loader.
 - [Phase 115]: 115-01: Used Rendro.flow/1 (not the Invoice recipe) as the minimal document/section wrapper for the INV-05 table golden, mirroring the existing table_borders_test.exs pattern. — Established lightweight pattern for exercising Rendro.table/2 through the full render pipeline without recipe-specific coupling.
 - [Phase 115]: 115-01: Both sha256 goldens (@toy_golden_sha256, @table_golden_sha256) were computed by actually running renders on pristine code via mix run, not hand-typed, then embedded as module attributes. — Eliminates risk of a mistyped/stale golden silently freezing wrong bytes, per the plan's threat model T-115-01-01.
+- [Phase 115]: 115-02: Promoted Rendro.Format from @moduledoc false to the public adapter/Evolving tier (money/1, date/1, label/1) in one atomic commit (INV-04, the milestone's single irreversible act); fixed a second, plan-unlisted duplicate hidden-modules assertion in test/rendro/public_api/manifest_test.exs that also expected Format hidden.
 
 ### Blockers / Open Questions
 
@@ -93,6 +94,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 | Phase 114 P04 | ~2 min | 2 tasks | 3 files |
 | Phase 114 P06 | 4 min | 2 tasks | 2 files |
 | Phase 115 P01 | ~3min | 2 tasks | 2 files |
+| Phase 115 P02 | ~4min | 2 tasks | 5 files |
 
 ## Operator Next Steps
 
@@ -100,6 +102,6 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 
 ## Session
 
-**Last session:** 2026-07-18T18:08:17.770Z
-**Stopped at:** Completed 115-01-PLAN.md
+**Last session:** 2026-07-18T18:15:06.180Z
+**Stopped at:** Completed 115-02-PLAN.md
 **Resume file:** None
