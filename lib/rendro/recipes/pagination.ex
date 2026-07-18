@@ -59,15 +59,33 @@ defmodule Rendro.Recipes.Pagination do
     Keyword.get(formatters, key, default_fn)
   end
 
-  # Returns a function that resolves a label key, merging caller-supplied
-  # :labels over the default Rendro.Format labels.
-  def label_resolver(opts) do
+  # Returns a function that resolves a label key. Merge order (D-18):
+  # opts[:labels] -> default_labels -> Rendro.Format.label/1.
+  #
+  # default_labels defaults to %{}, which collapses the merge order to
+  # opts[:labels] -> Rendro.Format.label/1 -- byte-identical to the original
+  # arity-1 behavior, so existing arity-1 call sites (e.g. statement.ex:274,
+  # statement.ex:294) keep compiling and resolving unmodified.
+  #
+  # GOTCHA: Rendro.Format.label/1 has NO fallback clause -- it only knows
+  # :balance, :brought_forward, :carried_forward, :opening_balance, and
+  # :closing_balance. Every label key any recipe resolves via the returned
+  # closure MUST be present in either opts[:labels] or that recipe's own
+  # default_labels map, or the call raises FunctionClauseError (not a
+  # silent/humanized fallback string).
+  def label_resolver(opts, default_labels \\ %{}) do
     user_labels = Keyword.get(opts, :labels, %{})
 
     fn key ->
       case Map.fetch(user_labels, key) do
-        {:ok, val} -> val
-        :error -> Rendro.Format.label(key)
+        {:ok, val} ->
+          val
+
+        :error ->
+          case Map.fetch(default_labels, key) do
+            {:ok, val} -> val
+            :error -> Rendro.Format.label(key)
+          end
       end
     end
   end
