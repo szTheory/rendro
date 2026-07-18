@@ -566,9 +566,12 @@ defmodule Rendro.Pipeline.Paginate do
     header_y = block.y
     start_x = block.x
     col_widths = table.column_widths || []
+    cell_align = table.cell_align || %{}
 
     stacked_header =
-      if table.header, do: stack_cells(table.header, start_x, header_y, col_widths), else: nil
+      if table.header,
+        do: stack_cells(table.header, start_x, header_y, col_widths, cell_align),
+        else: nil
 
     header_offset = table.header_height || 0
 
@@ -577,7 +580,7 @@ defmodule Rendro.Pipeline.Paginate do
         Enum.zip(table.rows, table.row_heights || []),
         {[], header_y + header_offset},
         fn {row, row_h}, {acc, y} ->
-          stacked_row = stack_cells(row, start_x, y, col_widths)
+          stacked_row = stack_cells(row, start_x, y, col_widths, cell_align)
           {acc ++ [stacked_row], y + row_h}
         end
       )
@@ -587,19 +590,62 @@ defmodule Rendro.Pipeline.Paginate do
 
   defp stack_table_cells(block), do: block
 
-  defp stack_cells(%Rendro.Row{} = row, start_x, y, col_widths) do
-    %{row | cells: stack_cells(row.cells, start_x, y, col_widths)}
+  defp stack_cells(%Rendro.Row{} = row, start_x, y, col_widths, cell_align) do
+    %{row | cells: stack_cells(row.cells, start_x, y, col_widths, cell_align)}
   end
 
-  defp stack_cells(row, start_x, y, col_widths) when is_list(row) do
+  defp stack_cells(row, start_x, y, col_widths, cell_align) when is_list(row) do
     {cells, _} =
-      Enum.reduce(Enum.zip(row, col_widths), {[], start_x}, fn {cell, col_w}, {acc, x} ->
-        # Cell already has its width set by Measure, but its x needs stacking
-        {acc ++ [%{cell | x: x, y: y}], x + col_w}
+      row
+      |> Enum.zip(col_widths)
+      |> Enum.with_index()
+      |> Enum.reduce({[], start_x}, fn {{cell, col_w}, col_index}, {acc, x} ->
+        # Cell already has its width set by Measure, but its x needs stacking.
+        # INV-05: the right-align offset is gated STRICTLY on the cell's
+        # effective alignment resolving to :right — every other value
+        # (including the default :left) takes this exact unchanged
+        # left-flush path, so no-cell_align tables stay byte-identical.
+        stacked_cell =
+          case cell_effective_align(cell, cell_align, col_index) do
+            :right -> %{cell | x: x + right_align_offset(cell), y: y}
+            :left -> %{cell | x: x, y: y}
+          end
+
+        {acc ++ [stacked_cell], x + col_w}
       end)
 
     cells
   end
+
+  # Per-cell `cell_align: :right` (set directly on an authored `%Rendro.Cell{}`)
+  # takes precedence; otherwise fall back to the table's column-level
+  # `cell_align` map (`Rendro.table/2` `cell_align:` option). Default is
+  # :left for both, so an untouched table resolves :left for every cell.
+  defp cell_effective_align(%Rendro.Cell{cell_align: :right}, _cell_align_map, _col_index),
+    do: :right
+
+  defp cell_effective_align(_cell, cell_align_map, col_index) do
+    Map.get(cell_align_map, col_index, :left)
+  end
+
+  # Right-align slack = column width minus the already-measured content
+  # width (post-Measure; no re-measuring). Negative slack (content wider
+  # than the column) falls back to zero offset rather than shifting left
+  # (T-115-03-03).
+  defp right_align_offset(%Rendro.Cell{width: col_w} = cell) do
+    max((col_w || 0) - measured_content_width(cell), 0)
+  end
+
+  defp measured_content_width(%Rendro.Cell{
+         content: %Rendro.Block{content: %Rendro.Pipeline.MeasuredText{width: width}}
+       }),
+       do: width
+
+  defp measured_content_width(%Rendro.Cell{content: %Rendro.Block{width: width}})
+       when is_number(width),
+       do: width
+
+  defp measured_content_width(_cell), do: 0
 
   defp paginate_block(
          block,
