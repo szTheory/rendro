@@ -1,14 +1,16 @@
 ---
 phase: 114-domain-research-reader-quality-rubric-realistic-example-data
 verified: 2026-07-11T00:00:00Z
-status: human_needed
+status: passed
 score: 5/5 must-haves verified
 behavior_unverified: 0
 overrides_applied: 0
 human_verification:
+
   - test: "Read priv/examples/invoice/DOMAIN.md end-to-end and judge whether the domain language, personas+JTBD, reading context, and layout/typographic conventions are genuinely faithful Invoice domain research (RUB-01) rather than plausible-looking filler."
     expected: "The prose reads as accurate, specific domain knowledge an AP clerk / issuer / bookkeeper would recognize; the 'ONE fact the reader needs first' (total due + due date) is correctly identified."
     why_human: "Structural test proves the four required headings exist and are substantive (94 lines), but faithfulness of synthesized domain-research prose (flagged MEDIUM/LOW confidence in 114-RESEARCH.md, human_judgment:true in 114-05 SUMMARY) is a subjective quality judgment grep cannot make."
+
   - test: "Read the 6 dimensions' 1/3/4/5 anchor prose in priv/quality/rubric_scores.json (RUB-02) and confirm a non-designer could actually apply each anchor to score a rendered document."
     expected: "Each anchor is concrete and observable (e.g. 'the one fact the reader needs first is visually dominant'), not vague design jargon — a non-designer can pick a level without training."
     why_human: "The schema/contract test enforces exactly-6-dimensions/2-gates and threshold arithmetic structurally, but whether the anchor wording is genuinely non-designer-applicable is a subjective usability judgment."
