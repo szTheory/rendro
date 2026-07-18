@@ -66,7 +66,11 @@ Plans:
   4. An additive `cell_align: :right` option right-aligns tabular money while existing tables (no `cell_align`) render byte-identically, and `Rendro.Recipes.Invoice.validate_data!/1` raises an instructive `ArgumentError` on malformed input (never leaking `BadMapError`/`FunctionClauseError`) and never rejects a valid toy call.
   5. Invoice sections read colors through a private `palette(opts)` keyed on Milestone-B's locked color roles (`ink`/`muted`/`accent`/`on_accent`/`background`/`surface`/`rule`) defaulting to today's literals — no section inlines `{0,0,0}`; the `page_template/1` opts leak is closed via a `Keyword.take` whitelist while top-level `opts` stays open for B's future `theme:` (seam S1).
 
-**Plans**: TBD
+**Plans**: 4 plans
+- [ ] 115-01-PLAN.md — Wave-0 byte-identity golden baselines (toy render + no-cell_align table) [INV-01, INV-05]
+- [ ] 115-02-PLAN.md — `Rendro.Format` public adapter-tier promotion (atomic 4-artifact, irreversible) [INV-04]
+- [ ] 115-03-PLAN.md — additive `cell_align: :right` primitive (spike + gated offset + no-op guard) [INV-05]
+- [ ] 115-04-PLAN.md — Invoice anatomy upgrade (validate_data!/palette/whitelist/anatomy/Decimal money/totals) [INV-01, INV-02, INV-03, INV-06, INV-07]
 
 ### Phase 116: New families — Payslip & Ticket
 
