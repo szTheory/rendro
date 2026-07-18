@@ -93,7 +93,23 @@ defmodule Rendro.Recipes.Invoice do
       ]
     ]
 
-    Rendro.page_template(Keyword.merge(defaults, opts))
+    # page_template/1 only understands PageTemplate struct keys. Recipe-level
+    # opts (:formatters, :labels, :palette, ...) are consumed by the section
+    # builders via opts, not here — filter them out so they thread through to
+    # sections/2 / palette/1 instead of reaching struct!/2 and raising KeyError.
+    template_opts =
+      Keyword.take(opts, [
+        :name,
+        :width,
+        :height,
+        :margin_top,
+        :margin_right,
+        :margin_bottom,
+        :margin_left,
+        :regions
+      ])
+
+    Rendro.page_template(Keyword.merge(defaults, template_opts))
   end
 
   @doc """
@@ -110,6 +126,8 @@ defmodule Rendro.Recipes.Invoice do
   """
   @spec sections(map(), keyword()) :: [Rendro.Section.t()]
   def sections(data, opts \\ []) do
+    validate_data!(data)
+
     [
       header_section(data, opts),
       body_section(data, opts),
@@ -134,6 +152,7 @@ defmodule Rendro.Recipes.Invoice do
   """
   @spec document(map(), keyword()) :: Rendro.Document.t()
   def document(data, opts \\ []) do
+    validate_data!(data)
     template = page_template(opts)
     secs = sections(data, opts)
 
@@ -181,13 +200,80 @@ defmodule Rendro.Recipes.Invoice do
     )
   end
 
-  defp footer_section(_data, _opts) do
+  defp footer_section(_data, opts) do
+    colors = palette(opts)
+
     Rendro.section(
       name: :invoice_footer,
       region: :footer,
       content: [
-        Rendro.block(Rendro.text("Thank you for your business!", size: 10))
+        Rendro.block(Rendro.text("Thank you for your business!", size: 10, color: colors.ink))
       ]
     )
+  end
+
+  # ---------------------------------------------------------------------------
+  # Color seam (INV-07 / S1)
+  # ---------------------------------------------------------------------------
+
+  # Returns the role → RGB map for this render. Defaults reproduce today's
+  # literals (all-black ink, white surfaces) so sections that read colors from
+  # here stay byte-identical unless the caller supplies a `:palette` override.
+  # Any section that sets a color MUST source it from here — never inline a
+  # literal `{r, g, b}` tuple — so Milestone B's `Rendro.Theme` can slot in
+  # without breaking rework (S1).
+  defp palette(opts) do
+    overrides = Keyword.get(opts, :palette, %{})
+
+    Map.merge(
+      %{
+        ink: {0, 0, 0},
+        muted: {0, 0, 0},
+        accent: {0, 0, 0},
+        on_accent: {0, 0, 0},
+        background: {255, 255, 255},
+        surface: {255, 255, 255},
+        rule: {0, 0, 0}
+      },
+      overrides
+    )
+  end
+
+  # ---------------------------------------------------------------------------
+  # Data validation (errors-as-product, INV-06)
+  # ---------------------------------------------------------------------------
+
+  defp validate_data!(data) when not is_map(data) do
+    raise ArgumentError, """
+    Rendro.Recipes.Invoice.document/2 — invalid data argument.
+
+    What:  data must be a map.
+    Where: Rendro.Recipes.Invoice.validate_data!/1
+    Why:   Received a non-map value: #{inspect(data)} (#{Rendro.Recipes.Pagination.type_name(data)}).
+    Next:  Pass a map with required keys :id, :date, :items.
+    """
+  end
+
+  defp validate_data!(data) do
+    validate_required_keys!(data)
+    :ok
+  end
+
+  defp validate_required_keys!(data) do
+    required = [:id, :date, :items]
+
+    missing = Enum.filter(required, fn key -> not Map.has_key?(data, key) end)
+
+    unless missing == [] do
+      raise ArgumentError, """
+      Rendro.Recipes.Invoice.document/2 — missing required key(s) in data.
+
+      What:  Required invoice data keys are missing.
+      Where: Rendro.Recipes.Invoice.validate_data!/1
+      Why:   Missing key(s): #{inspect(missing)}.
+      Next:  Provide all required keys: :id, :date, :items. All other keys
+             (:issuer, :customer, :due_date, :terms, :totals) are optional.
+      """
+    end
   end
 end
