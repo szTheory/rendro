@@ -1,8 +1,8 @@
 ---
 phase: 116
 slug: new-families-payslip-ticket
-status: draft
-nyquist_compliant: false
+status: approved
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-07-18
 ---
@@ -67,9 +67,18 @@ Sample the data-contract edges, not just the happy path. Minimum coverage per re
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 116-01-01 | 01 | 1 | FAM-01/02/03 | T-116-01 / — | bad image bytes → instructive ArgumentError, no InvalidAssetError leak | unit | `mix test test/rendro/recipes/` | ❌ W0 | ⬜ pending |
+| 116-01-01 | 01 | 1 | FAM-03 | — | `label_resolver/2` additive; Statement arity-1 call sites unaffected | unit + regression | `mix test test/rendro/recipes/pagination_test.exs test/rendro/recipes/statement_test.exs` | ❌ W0 | ⬜ pending |
+| 116-01-02 | 01 | 1 | FAM-03 | T-116-01-* | D-19 `:labels`/`:formatters` opts-shape validators → four-part ArgumentError, no BadMapError/BadArityError/FunctionClauseError leak | unit | `mix test test/rendro/recipes/pagination_test.exs` | ❌ W0 | ⬜ pending |
+| 116-02-01 | 02 | 2 | FAM-01, FAM-03 | T-116-02-01/03 | `validate_data!/1` shape/type checks; Float money → ArgumentError; **PII masking test-enforced** (D-14 regex assertions) | unit | `mix test test/rendro/recipes/payslip_test.exs` | ❌ W0 | ⬜ pending |
+| 116-02-02 | 02 | 2 | FAM-01, FAM-03 | — | net-pay anchor is the single dominant element (D-11); palette seam (no inlined `{0,0,0}`) | unit + source | `mix test test/rendro/recipes/payslip_test.exs` | ❌ W0 | ⬜ pending |
+| 116-02-03 | 02 | 2 | FAM-01, FAM-03 | T-116-02-02 | combined ledger paginates; D-13 reconciliation via `Decimal.equal?/2`; D-17 arbitrary `:description` round-trips (negative test); byte-identity | unit | `mix test test/rendro/recipes/payslip_test.exs test/rendro/recipes/payslip_byte_identity_test.exs` | ❌ W0 | ⬜ pending |
+| 116-03-01 | 03 | 2 | FAM-02, FAM-03 | T-116-03-01 | geometry from `PageSize.resolve/2`; byte guards; **D-10 image pre-validation** → ArgumentError naming `data.code.image`, no InvalidAssetError leak | unit | `mix test test/rendro/recipes/ticket_test.exs` | ❌ W0 | ⬜ pending |
+| 116-03-02 | 03 | 2 | FAM-02, FAM-03 | — | D-02 placement-grid anchor (largest type on page) via `Rendro.table/2`; palette seam | unit + source | `mix test test/rendro/recipes/ticket_test.exs` | ❌ W0 | ⬜ pending |
+| 116-03-03 | 03 | 2 | FAM-02, FAM-03 | T-116-03-02 | code box + always-on reference (D-06); NO faux barcode (D-07); PNG fit-contain, `image: nil` byte-identical to no-image; overflow → typed `:content_overflow` | unit | `mix test test/rendro/recipes/ticket_test.exs test/rendro/recipes/ticket_byte_identity_test.exs` | ❌ W0 | ⬜ pending |
+| 116-04-01 | 04 | 3 | FAM-03 | — | both recipes added to `@public_modules`; `priv/public_api.json` regenerated via `mix rendro.api.gen` (not hand-edited); byte-compare passes | contract | `mix test test/docs_contract/public_api_contract_test.exs` | ❌ W0 | ⬜ pending |
+| 116-04-02 | 04 | 3 | FAM-03 | — | proof-backed `payslip`/`ticket` rows in `priv/support_matrix.json`; per-capability assertions | contract | `mix test test/docs_contract/` | ❌ W0 | ⬜ pending |
 
-*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky. `File Exists ❌ W0` = test file is a Wave-0 deliverable (created before/with the task's implementation).*
 
 ---
 
@@ -96,11 +105,11 @@ Sample the data-contract edges, not just the happy path. Minimum coverage per re
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 90s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies (all 10 tasks map to an ExUnit command)
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references (test files created before/with each task)
+- [x] No watch-mode flags
+- [x] Feedback latency < 90s (full suite ~30–90s)
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** approved 2026-07-18
