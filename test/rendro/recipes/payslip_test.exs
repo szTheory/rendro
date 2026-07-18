@@ -263,10 +263,148 @@ defmodule Rendro.Recipes.PayslipTest do
   end
 
   # ---------------------------------------------------------------------------
-  # Recursive %Rendro.Text{} size collectors — reused by Task 3's table
-  # assertions (a table's header/rows/cells may wrap Rendro.Block/Rendro.Cell
-  # content, per lib/rendro/pipeline/measure.ex's normalize_cells/1).
+  # D-12 combined ledger, pagination, D-13 reconciliation, D-17 (Task 3)
   # ---------------------------------------------------------------------------
+
+  describe "body_section/2 — combined ledger, pagination, D-13 reconciliation" do
+    test "1 earnings + 1 deductions line renders with right-aligned formatted amounts" do
+      doc = Payslip.document(fixture_data())
+      assert {:ok, pdf} = Rendro.render(doc)
+
+      assert pdf =~ "(Base Salary)"
+      assert pdf =~ "(Federal Income Tax)"
+      assert pdf =~ Rendro.Format.money(Decimal.new("4200.00"))
+      assert pdf =~ Rendro.Format.money(Decimal.new("620.00"))
+    end
+
+    test "overflowing earnings paginate across 2+ pages, repeating the header, reconciliation only on the last page" do
+      earnings =
+        for i <- 1..30 do
+          %{
+            description: "Earning Line #{i}",
+            amount: Decimal.new("100.00"),
+            ytd: Decimal.new("1200.00")
+          }
+        end
+
+      data = fixture_data(earnings: earnings)
+      doc = Payslip.document(data)
+      assert {:ok, pdf} = Rendro.render(doc)
+
+      assert pdf =~ "(Page 2 of"
+
+      assert count_occurrences(pdf, "(Earnings)") >= 2,
+             "expected the 6-column table header to repeat on every ledger page"
+
+      assert count_occurrences(pdf, "(Gross Pay)") == 2,
+             "expected \"Gross Pay\" to appear exactly twice (subtotal row + reconciliation " <>
+               "equation), both on the last page only -- never once per page"
+    end
+
+    test "raises an instructive ArgumentError naming the net_pay mismatch" do
+      data = fixture_data(net_pay: Decimal.new("1.00"))
+
+      error =
+        assert_raise ArgumentError, fn ->
+          Payslip.document(data)
+        end
+
+      assert error.message =~ "net_pay"
+      assert error.message =~ "1.00"
+      assert error.message =~ ~r/What:.*Where:.*Why:.*Next:/s
+    end
+
+    test "raises an instructive ArgumentError (not ArithmeticError) for a Float earnings amount" do
+      data = fixture_data(earnings: [%{description: "Base", amount: 100.0}])
+
+      assert_raise ArgumentError, ~r/What:.*Where:.*Why:.*Next:/s, fn ->
+        Payslip.document(data)
+      end
+    end
+
+    test "byte-identity holds across two deterministic renders" do
+      doc = Payslip.document(fixture_data())
+      assert {:ok, pdf1} = Rendro.render(doc, deterministic: true)
+      assert {:ok, pdf2} = Rendro.render(doc, deterministic: true)
+      assert pdf1 == pdf2
+    end
+
+    test "D-17: arbitrary non-English/unrelated :description strings round-trip unchanged, no jurisdiction-keyword filtering" do
+      data =
+        fixture_data(
+          earnings: [
+            %{description: "Impôt sur le revenu (PAYE)", amount: Decimal.new("100.00")},
+            %{description: "Xyzzy Plugh Quux Nonstandard Label", amount: Decimal.new("50.00")}
+          ]
+        )
+
+      sections = Payslip.sections(data)
+      all_text_contents = Enum.flat_map(sections, &collect_text_contents/1)
+
+      assert "Impôt sur le revenu (PAYE)" in all_text_contents,
+             "expected the accented description to appear verbatim, unmutated, in the built content"
+
+      assert "Xyzzy Plugh Quux Nonstandard Label" in all_text_contents,
+             "expected the nonstandard description to appear verbatim, unmutated, in the built content"
+
+      doc = Payslip.document(data)
+      assert {:ok, pdf} = Rendro.render(doc)
+      assert String.starts_with?(pdf, "%PDF-")
+      # Pure-ASCII description: safe to assert directly against the raw PDF
+      # text stream bytes (no embedded-font glyph-ID encoding involved).
+      assert pdf =~ "Xyzzy Plugh Quux Nonstandard Label"
+    end
+  end
+
+  # ---------------------------------------------------------------------------
+  # Recursive %Rendro.Text{} size/content collectors — reused by Task 3's
+  # table assertions (a table's header/rows/cells may wrap Rendro.Block/
+  # Rendro.Cell content, or be plain (unmeasured) strings, per
+  # lib/rendro/pipeline/measure.ex's normalize_cells/1).
+  # ---------------------------------------------------------------------------
+
+  defp count_occurrences(haystack, needle) do
+    haystack
+    |> String.split(needle)
+    |> length()
+    |> Kernel.-(1)
+  end
+
+  defp collect_text_contents(%Rendro.Section{content: content}) do
+    Enum.flat_map(content, &collect_content_from_block/1)
+  end
+
+  defp collect_content_from_block(%Rendro.Block{content: %Rendro.Text{content: c}}), do: [c]
+
+  defp collect_content_from_block(%Rendro.Block{content: %Rendro.Table{} = table}) do
+    collect_content_from_table(table)
+  end
+
+  defp collect_content_from_block(_other), do: []
+
+  defp collect_content_from_table(table) do
+    header = if table.header, do: collect_content_from_row(table.header), else: []
+    rows = Enum.flat_map(table.rows, &collect_content_from_row/1)
+    header ++ rows
+  end
+
+  defp collect_content_from_row(%Rendro.Row{cells: cells}),
+    do: Enum.flat_map(cells, &collect_content_from_cell/1)
+
+  defp collect_content_from_row(cells) when is_list(cells),
+    do: Enum.flat_map(cells, &collect_content_from_cell/1)
+
+  defp collect_content_from_cell(%Rendro.Cell{content: content}),
+    do: collect_content_from_cell_value(content)
+
+  defp collect_content_from_cell(content), do: collect_content_from_cell_value(content)
+
+  defp collect_content_from_cell_value(%Rendro.Block{} = block),
+    do: collect_content_from_block(block)
+
+  defp collect_content_from_cell_value(%Rendro.Text{content: c}), do: [c]
+  defp collect_content_from_cell_value(str) when is_binary(str), do: [str]
+  defp collect_content_from_cell_value(_other), do: []
 
   defp sizes_for_region(sizes_by_region, region) do
     sizes_by_region
