@@ -2,18 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.10
 milestone_name: Realistic Business-Document Examples & Anatomy
-current_phase: 116
-current_phase_name: New families — Payslip & Ticket
 status: executing
-stopped_at: Phase 116 context gathered
-last_updated: "2026-07-18T21:49:34.922Z"
+stopped_at: Completed 116-01-PLAN.md
+last_updated: "2026-07-18T23:14:51.712Z"
 last_activity: 2026-07-18
-last_activity_desc: Phase 115 complete, transitioned to Phase 116
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 15
+  completed_plans: 12
   percent: 40
 ---
 
@@ -27,12 +24,12 @@ progress:
 
 ## Current Position
 
-Phase: 116 — New families — Payslip & Ticket
-Plan: Not started
+Phase: 116 (new-families-payslip-ticket) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-07-18 — Phase 115 complete, transitioned to Phase 116
+Last activity: 2026-07-18
 
-Progress: [█████████░] 91%
+Progress: [████████░░] 80%
 
 ## Roadmap Snapshot (v2.10, Phases 114–118)
 
@@ -71,6 +68,8 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 - [Phase ?]: [Phase 115]: 115-03: Both new Cell.cell_align / Table.cell_align struct-field types are inlined into t() rather than declared as named @type, since named types are enumerated in priv/public_api.json and would have widened the frozen Stable-tier manifest.
 - [Phase ?]: 115-04: body_section rewritten to per-page chunked pagination (mirrors Receipt), reserving conservative totals-block height uniformly on every page so the LAST table page always keeps room for the trailing totals block (shared chunker only accepts one capacity value, mirroring Statement's CF/BF reservation idiom).
 - [Phase ?]: 115-04: Decimal.equal?/2 totals caller-assertion derives its comparison value from items (qty x price via item_line_total/1), not from a Decimal-typed source field, since Invoice's legacy line-item :price intentionally stays bare-number typed per INV-02's byte-compat split.
+- [Phase 116]: 116-01: Implemented label_resolver/2 merge order (opts[:labels] -> default_labels -> Rendro.Format.label/1) exactly as prescribed in 116-RESEARCH.md's code example; default_labels defaults to %{} so Statement's arity-1 call sites (statement.ex:274,294) compile and resolve unmodified.
+- [Phase 116]: 116-01: validate_labels!/2 and validate_formatters!/2 take a recipe_mfa string naming the caller's public entry point (e.g. Rendro.Recipes.Payslip.document/2), mirroring Invoice's four-part What/Where/Why/Next ArgumentError idiom, so 116-02/116-03 share one validated seam instead of each inventing their own guards.
 
 ### Blockers / Open Questions
 
@@ -101,6 +100,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 | Phase 115 P02 | ~4min | 2 tasks | 5 files |
 | Phase 115 P03 | ~9min | - tasks | - files |
 | Phase 115 P04 | ~20min | 3 tasks | 3 files |
+| Phase 116 P01 | 5min | 2 tasks | 2 files |
 
 ## Operator Next Steps
 
@@ -108,6 +108,6 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 
 ## Session
 
-**Last session:** 2026-07-18T20:49:07.053Z
-**Stopped at:** Phase 116 context gathered
-**Resume file:** .planning/phases/116-new-families-payslip-ticket/116-CONTEXT.md
+**Last session:** 2026-07-18T23:14:51.704Z
+**Stopped at:** Completed 116-01-PLAN.md
+**Resume file:** None
