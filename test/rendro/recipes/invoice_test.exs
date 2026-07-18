@@ -114,4 +114,156 @@ defmodule Rendro.Recipes.InvoiceTest do
       assert flat =~ "Widget A"
     end
   end
+
+  # ---------------------------------------------------------------------------
+  # INV-06: validate_data!/1 — errors-as-product
+  # ---------------------------------------------------------------------------
+
+  describe "validate_data!/1 (INV-06)" do
+    test "non-map data raises ArgumentError, not BadMapError/FunctionClauseError" do
+      assert_raise ArgumentError, ~r/data must be a map/, fn ->
+        Invoice.document("not-a-map")
+      end
+    end
+
+    test "missing required key raises ArgumentError naming the missing key" do
+      data = sample_data() |> Map.delete(:date)
+
+      assert_raise ArgumentError, ~r/date/, fn ->
+        Invoice.document(data)
+      end
+    end
+
+    test "the toy call (:id, :date, :items only) is never rejected" do
+      doc = Invoice.document(sample_data())
+      assert %Rendro.Document{} = doc
+    end
+
+    test "non-map :issuer raises ArgumentError mentioning issuer" do
+      data = Map.put(sample_data(), :issuer, "not-a-map")
+
+      assert_raise ArgumentError, ~r/issuer/i, fn ->
+        Invoice.document(data)
+      end
+    end
+
+    test "non-map :customer raises ArgumentError mentioning customer" do
+      data = Map.put(sample_data(), :customer, "not-a-map")
+
+      assert_raise ArgumentError, ~r/customer/i, fn ->
+        Invoice.document(data)
+      end
+    end
+
+    test "non-Date :due_date raises ArgumentError mentioning due_date" do
+      data = Map.put(sample_data(), :due_date, "2026-05-01")
+
+      assert_raise ArgumentError, ~r/due_date/i, fn ->
+        Invoice.document(data)
+      end
+    end
+
+    test "non-string :terms raises ArgumentError mentioning terms" do
+      data = Map.put(sample_data(), :terms, 30)
+
+      assert_raise ArgumentError, ~r/terms/i, fn ->
+        Invoice.document(data)
+      end
+    end
+  end
+
+  # ---------------------------------------------------------------------------
+  # INV-01: optional anatomy fields render only when present
+  # ---------------------------------------------------------------------------
+
+  describe "optional anatomy fields (INV-01)" do
+    test "issuer renders only when present" do
+      absent = Invoice.sections(sample_data())
+      present = Invoice.sections(Map.put(sample_data(), :issuer, %{name: "Rendro Systems"}))
+
+      refute inspect(absent, limit: :infinity) =~ "Rendro Systems"
+      assert inspect(present, limit: :infinity) =~ "Rendro Systems"
+    end
+
+    test "customer renders only when present" do
+      absent = Invoice.sections(sample_data())
+      present = Invoice.sections(Map.put(sample_data(), :customer, %{name: "Acme Phoenix SaaS"}))
+
+      refute inspect(absent, limit: :infinity) =~ "Acme Phoenix SaaS"
+      assert inspect(present, limit: :infinity) =~ "Acme Phoenix SaaS"
+    end
+
+    test "due_date renders only when present" do
+      absent = Invoice.sections(sample_data())
+      present = Invoice.sections(Map.put(sample_data(), :due_date, ~D[2026-05-30]))
+
+      refute inspect(absent, limit: :infinity) =~ "2026-05-30"
+      assert inspect(present, limit: :infinity) =~ "2026-05-30"
+    end
+
+    test "terms renders only when present" do
+      absent = Invoice.sections(sample_data())
+      present = Invoice.sections(Map.put(sample_data(), :terms, "Net 30"))
+
+      refute inspect(absent, limit: :infinity) =~ "Net 30"
+      assert inspect(present, limit: :infinity) =~ "Net 30"
+    end
+
+    test "absent anatomy fields keep header section identical to the toy path" do
+      base = Invoice.sections(sample_data())
+      with_nothing_new = Invoice.sections(sample_data())
+      assert base == with_nothing_new
+    end
+  end
+
+  # ---------------------------------------------------------------------------
+  # INV-02: money split — legacy bare-number price vs new Decimal fields
+  # ---------------------------------------------------------------------------
+
+  describe "money split (INV-02)" do
+    test "legacy bare-number :price still renders as a bare-number dollar string" do
+      data = sample_data()
+      sections = Invoice.sections(data)
+      body = Enum.find(sections, &(&1.region == :body))
+      flat = inspect(body, limit: :infinity, printable_limit: :infinity)
+
+      assert flat =~ "$200"
+      assert flat =~ "$500"
+    end
+
+    test "new Decimal totals field renders via Rendro.Format.money/1" do
+      data =
+        sample_data()
+        |> Map.put(:totals, %{
+          subtotal: Decimal.new("1100"),
+          total: Decimal.new("1100")
+        })
+
+      sections = Invoice.sections(data)
+      body = Enum.find(sections, &(&1.region == :body))
+      flat = inspect(body, limit: :infinity, printable_limit: :infinity)
+
+      assert flat =~ "$1,100.00"
+    end
+
+    test "a Float in a new totals money field raises an instructive ArgumentError" do
+      data = Map.put(sample_data(), :totals, %{subtotal: 1100.0})
+
+      assert_raise ArgumentError, ~r/Decimal/i, fn ->
+        Invoice.document(data)
+      end
+    end
+
+    test "a %Decimal{} in the legacy :price slot raises an instructive ArgumentError" do
+      data = %{
+        id: "INV-DEC-01",
+        date: ~D[2026-05-01],
+        items: [%{name: "Widget", qty: 1, price: Decimal.new("10.00")}]
+      }
+
+      assert_raise ArgumentError, ~r/Decimal/i, fn ->
+        Invoice.document(data)
+      end
+    end
+  end
 end

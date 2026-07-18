@@ -170,18 +170,37 @@ defmodule Rendro.Recipes.Invoice do
   # Private builders
   # ---------------------------------------------------------------------------
 
-  defp header_section(%{id: id, date: date} = _data, _opts) do
+  defp header_section(%{id: id, date: date} = data, opts) do
+    colors = palette(opts)
+    fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
+
+    # FROZEN toy path (INV-01) — these two lines MUST stay literally
+    # unchanged: no color:, no formatter. New anatomy fields render only
+    # when present and are added as NEW blocks around this base pair.
+    base_content = [
+      Rendro.block(Rendro.text("INVOICE ##{id}", size: 18)),
+      Rendro.block(Rendro.text("Date: #{date}", size: 10))
+    ]
+
+    content =
+      base_content
+      |> maybe_prepend(Map.get(data, :issuer), &issuer_block(&1, colors))
+      |> maybe_append(Map.get(data, :customer), &customer_block(&1, colors))
+      |> maybe_append(Map.get(data, :due_date), &due_date_block(&1, colors, fmt_date))
+      |> maybe_append(Map.get(data, :terms), &terms_block(&1, colors))
+
     Rendro.section(
       name: :invoice_header,
       region: :header,
-      content: [
-        Rendro.block(Rendro.text("INVOICE ##{id}", size: 18)),
-        Rendro.block(Rendro.text("Date: #{date}", size: 10))
-      ]
+      content: content
     )
   end
 
-  defp body_section(%{items: items} = _data, _opts) do
+  defp body_section(%{items: items} = data, opts) do
+    # FROZEN toy path (INV-01) — the line-item mapping and "$#{item.price}"
+    # cell MUST stay literally unchanged; the legacy bare-number price is
+    # NEVER routed through Rendro.Format.money/1 (that would turn "$200"
+    # into "$200.00" and break byte-compat with the toy call).
     table_rows =
       Enum.map(items, fn item ->
         [item.name, Integer.to_string(item.qty), "$#{item.price}"]
@@ -193,10 +212,12 @@ defmodule Rendro.Recipes.Invoice do
         columns: [{:share, 1}, {:fixed, 50}, {:fixed, 80}]
       )
 
+    content = [Rendro.block(table)] ++ build_totals_blocks(data, opts)
+
     Rendro.section(
       name: :invoice_body,
       region: :body,
-      content: [Rendro.block(table)]
+      content: content
     )
   end
 
@@ -210,6 +231,67 @@ defmodule Rendro.Recipes.Invoice do
         Rendro.block(Rendro.text("Thank you for your business!", size: 10, color: colors.ink))
       ]
     )
+  end
+
+  # ---------------------------------------------------------------------------
+  # Optional anatomy blocks (INV-01) — render only when present in data
+  # ---------------------------------------------------------------------------
+
+  defp maybe_prepend(content, nil, _fun), do: content
+  defp maybe_prepend(content, value, fun), do: [fun.(value) | content]
+
+  defp maybe_append(content, nil, _fun), do: content
+  defp maybe_append(content, value, fun), do: content ++ [fun.(value)]
+
+  defp issuer_block(issuer, colors) when is_map(issuer) do
+    name = Map.get(issuer, :name, "")
+    address = Map.get(issuer, :address)
+    text = if address in [nil, ""], do: name, else: "#{name}\n#{address}"
+    Rendro.block(Rendro.text(text, size: 12, color: colors.ink))
+  end
+
+  defp customer_block(customer, colors) when is_map(customer) do
+    name = Map.get(customer, :name, "")
+    address = Map.get(customer, :address)
+    text = if address in [nil, ""], do: "Bill To: #{name}", else: "Bill To: #{name}\n#{address}"
+    Rendro.block(Rendro.text(text, size: 10, color: colors.muted))
+  end
+
+  defp due_date_block(due_date, colors, fmt_date) do
+    Rendro.block(Rendro.text("Due: #{fmt_date.(due_date)}", size: 10, color: colors.muted))
+  end
+
+  defp terms_block(terms, colors) do
+    Rendro.block(Rendro.text("Terms: #{terms}", size: 10, color: colors.muted))
+  end
+
+  # ---------------------------------------------------------------------------
+  # Totals block builder (INV-02 / INV-03 rendering half)
+  # ---------------------------------------------------------------------------
+
+  defp build_totals_blocks(%{totals: totals} = _data, opts) when is_map(totals) do
+    fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
+
+    lines =
+      []
+      |> maybe_append_totals_line("Subtotal", Map.get(totals, :subtotal), fmt_amount)
+      |> maybe_append_totals_line("Tax", Map.get(totals, :tax), fmt_amount)
+      |> maybe_append_totals_line("Discount", Map.get(totals, :discount), fmt_amount)
+      |> maybe_append_totals_line("Total", Map.get(totals, :total), fmt_amount)
+
+    if lines == [] do
+      []
+    else
+      [Rendro.block(Rendro.text(Enum.join(lines, "\n"), size: 10))]
+    end
+  end
+
+  defp build_totals_blocks(_data, _opts), do: []
+
+  defp maybe_append_totals_line(acc, _label, nil, _fmt), do: acc
+
+  defp maybe_append_totals_line(acc, label, %Decimal{} = amount, fmt) do
+    acc ++ ["#{label}: #{fmt.(amount)}"]
   end
 
   # ---------------------------------------------------------------------------
@@ -256,6 +338,12 @@ defmodule Rendro.Recipes.Invoice do
 
   defp validate_data!(data) do
     validate_required_keys!(data)
+    maybe_validate_issuer!(data)
+    maybe_validate_customer!(data)
+    maybe_validate_due_date!(data)
+    maybe_validate_terms!(data)
+    validate_items!(data.items)
+    maybe_validate_totals_types!(data)
     :ok
   end
 
@@ -275,5 +363,137 @@ defmodule Rendro.Recipes.Invoice do
              (:issuer, :customer, :due_date, :terms, :totals) are optional.
       """
     end
+  end
+
+  defp maybe_validate_issuer!(%{issuer: issuer})
+       when not is_nil(issuer) and not is_map(issuer) do
+    raise ArgumentError, """
+    Rendro.Recipes.Invoice.document/2 — invalid :issuer shape.
+
+    What:  :issuer must be a map, e.g. %{name: "Acme Corp"}.
+    Where: Rendro.Recipes.Invoice.validate_data!/1
+    Why:   Received: #{inspect(issuer)} (#{Rendro.Recipes.Pagination.type_name(issuer)}).
+    Next:  Pass a map with at least a :name key, e.g. %{name: "Acme Corp"}.
+    """
+  end
+
+  defp maybe_validate_issuer!(_data), do: :ok
+
+  defp maybe_validate_customer!(%{customer: customer})
+       when not is_nil(customer) and not is_map(customer) do
+    raise ArgumentError, """
+    Rendro.Recipes.Invoice.document/2 — invalid :customer shape.
+
+    What:  :customer must be a map, e.g. %{name: "Acme Corp"}.
+    Where: Rendro.Recipes.Invoice.validate_data!/1
+    Why:   Received: #{inspect(customer)} (#{Rendro.Recipes.Pagination.type_name(customer)}).
+    Next:  Pass a map with at least a :name key, e.g. %{name: "Acme Corp"}.
+    """
+  end
+
+  defp maybe_validate_customer!(_data), do: :ok
+
+  defp maybe_validate_due_date!(%{due_date: due_date})
+       when not is_nil(due_date) and not is_struct(due_date, Date) do
+    raise ArgumentError, """
+    Rendro.Recipes.Invoice.document/2 — invalid :due_date type.
+
+    What:  :due_date must be a %Date{} struct.
+    Where: Rendro.Recipes.Invoice.validate_data!/1
+    Why:   Received: #{inspect(due_date)} (#{Rendro.Recipes.Pagination.type_name(due_date)}).
+    Next:  Use the ~D[YYYY-MM-DD] sigil or Date.new!/3.
+    """
+  end
+
+  defp maybe_validate_due_date!(_data), do: :ok
+
+  defp maybe_validate_terms!(%{terms: terms})
+       when not is_nil(terms) and not is_binary(terms) do
+    raise ArgumentError, """
+    Rendro.Recipes.Invoice.document/2 — invalid :terms type.
+
+    What:  :terms must be a string, e.g. "Net 30".
+    Where: Rendro.Recipes.Invoice.validate_data!/1
+    Why:   Received: #{inspect(terms)} (#{Rendro.Recipes.Pagination.type_name(terms)}).
+    Next:  Pass a binary string, e.g. "Net 30".
+    """
+  end
+
+  defp maybe_validate_terms!(_data), do: :ok
+
+  defp validate_items!(items) when not is_list(items) do
+    raise ArgumentError, """
+    Rendro.Recipes.Invoice.document/2 — invalid :items value.
+
+    What:  :items must be a list of line item maps.
+    Where: Rendro.Recipes.Invoice.validate_data!/1
+    Why:   Received: #{inspect(items)} (#{Rendro.Recipes.Pagination.type_name(items)}).
+    Next:  Pass a list: [%{name: "...", qty: 1, price: 10}].
+    """
+  end
+
+  defp validate_items!(items) do
+    items
+    |> Enum.with_index()
+    |> Enum.each(fn {item, idx} -> validate_item_price!(Map.get(item, :price), idx) end)
+  end
+
+  # The legacy :price slot renders via bare-number string interpolation
+  # ("$#{price}") to stay byte-compatible with the toy call — a %Decimal{}
+  # there would silently render as "$#Decimal<...>" instead of a dollar
+  # amount, so it is rejected instructively (INV-02).
+  defp validate_item_price!(%Decimal{} = price, idx) do
+    raise ArgumentError, """
+    Rendro.Recipes.Invoice.document/2 — invalid item :price type at index #{idx}.
+
+    What:  A line item's legacy :price must be a bare number (Integer or Float),
+           not a Decimal.
+    Where: Rendro.Recipes.Invoice.validate_data!/1
+    Why:   items[#{idx}].price = #{inspect(price)} (Decimal). The legacy :price
+           field renders via bare-number string interpolation ("$\#{price}")
+           to stay byte-compatible with the toy call.
+    Next:  Pass a bare number, e.g. price: 79.00, or move Decimal amounts into
+           :totals (formatted via Rendro.Format.money/1).
+    """
+  end
+
+  defp validate_item_price!(_price, _idx), do: :ok
+
+  # New Decimal money fields (currently only :totals.*) must be Decimal, not
+  # Float — Float arithmetic is inexact and can produce incorrect financial
+  # output (INV-02). This checks TYPE only; INV-03's Decimal.equal?/2
+  # caller-assertion (supplied vs. derived) is layered on top separately.
+  defp maybe_validate_totals_types!(%{totals: totals}) when is_map(totals) do
+    Enum.each([:subtotal, :tax, :discount, :total], fn key ->
+      validate_totals_field_type!(Map.get(totals, key), key)
+    end)
+  end
+
+  defp maybe_validate_totals_types!(_data), do: :ok
+
+  defp validate_totals_field_type!(nil, _key), do: :ok
+  defp validate_totals_field_type!(%Decimal{}, _key), do: :ok
+
+  defp validate_totals_field_type!(value, key) when is_float(value) do
+    raise ArgumentError, """
+    Rendro.Recipes.Invoice.document/2 — invalid :totals.#{key} type.
+
+    What:  :totals.#{key} must be a Decimal, not a Float.
+    Where: Rendro.Recipes.Invoice.validate_data!/1
+    Why:   Received a Float: #{inspect(value)}. Float arithmetic is not exact
+           and can produce incorrect financial output.
+    Next:  Use Decimal.new/1 — e.g. Decimal.new("#{value}") or Decimal.from_float(#{value}).
+    """
+  end
+
+  defp validate_totals_field_type!(value, key) do
+    raise ArgumentError, """
+    Rendro.Recipes.Invoice.document/2 — invalid :totals.#{key} type.
+
+    What:  :totals.#{key} must be a Decimal.
+    Where: Rendro.Recipes.Invoice.validate_data!/1
+    Why:   Received: #{inspect(value)} (#{Rendro.Recipes.Pagination.type_name(value)}).
+    Next:  Use Decimal.new/1 — e.g. Decimal.new("50.00").
+    """
   end
 end
