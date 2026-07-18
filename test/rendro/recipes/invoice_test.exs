@@ -266,4 +266,134 @@ defmodule Rendro.Recipes.InvoiceTest do
       end
     end
   end
+
+  # ---------------------------------------------------------------------------
+  # INV-03: totals block — Decimal.equal? assertion + kept with last rows
+  # ---------------------------------------------------------------------------
+
+  describe "totals block (INV-03)" do
+    test "no :totals key → no totals block; toy golden path stays green" do
+      sections = Invoice.sections(sample_data())
+      body = Enum.find(sections, &(&1.region == :body))
+
+      refute Enum.any?(body.content, fn block ->
+               is_struct(block.content, Rendro.Text) and
+                 String.contains?(block.content.content, "Subtotal")
+             end)
+    end
+
+    test "totals present renders Subtotal/Tax/Discount/Total lines" do
+      data =
+        sample_data()
+        |> Map.put(:totals, %{
+          subtotal: Decimal.new("1100"),
+          tax: Decimal.new("88"),
+          discount: Decimal.new("10"),
+          total: Decimal.new("1178")
+        })
+
+      sections = Invoice.sections(data)
+      body = Enum.find(sections, &(&1.region == :body))
+      flat = inspect(body, limit: :infinity, printable_limit: :infinity)
+
+      assert flat =~ "Subtotal"
+      assert flat =~ "Tax"
+      assert flat =~ "Discount"
+      assert flat =~ "Total"
+    end
+
+    test "mismatched :totals.subtotal raises ArgumentError naming Supplied and Derived" do
+      data = Map.put(sample_data(), :totals, %{subtotal: Decimal.new("999.00")})
+
+      assert_raise ArgumentError, ~r/Supplied.*Derived/s, fn ->
+        Invoice.document(data)
+      end
+    end
+
+    test "mismatched :totals.total raises ArgumentError naming Supplied and Derived" do
+      data = Map.put(sample_data(), :totals, %{total: Decimal.new("999.00")})
+
+      assert_raise ArgumentError, ~r/Supplied.*Derived/s, fn ->
+        Invoice.document(data)
+      end
+    end
+
+    test "matching :totals (Decimal.equal?, not ==) is accepted" do
+      # 1100 vs 1100.00 — struct fields differ (`==` would be false), but
+      # Decimal.equal?/2 (numeric) must accept them.
+      data = Map.put(sample_data(), :totals, %{subtotal: Decimal.new("1100.00")})
+      doc = Invoice.document(data)
+      assert %Rendro.Document{} = doc
+    end
+
+    test "no block in the body section content uses keep_together" do
+      data = Map.put(sample_data(), :totals, %{subtotal: Decimal.new("1100")})
+      sections = Invoice.sections(data)
+      body = Enum.find(sections, &(&1.region == :body))
+
+      refute Enum.any?(body.content, & &1.keep_together)
+    end
+
+    test "totals stays with the last rows when the last table page is near capacity" do
+      # Build enough items to fill (roughly) exactly one page's worth of
+      # capacity WITHOUT any totals reservation. With totals present, the
+      # totals-height reservation must push at least the last item onto a
+      # second table page, proving the reservation mechanism actively keeps
+      # room for totals next to the final page's rows (rather than leaving
+      # totals to overflow onto a fresh, otherwise-empty page).
+      content_width = 595.28 - 2 * 72
+
+      table_opts = [
+        header: ["Item", "Qty", "Price"],
+        columns: [{:share, 1}, {:fixed, 50}, {:fixed, 80}]
+      ]
+
+      row = ["Widget", "1", "$10.00"]
+      doc_for_measure = Rendro.Document.new()
+
+      {header_h, row_heights} =
+        Rendro.measure_rows([row], content_width, doc_for_measure, table_opts)
+
+      row_h = hd(row_heights)
+
+      body_height = 841.89 - 2 * 72 - 56 - 24
+      capacity = body_height - 56 - 24
+      effective_capacity_no_totals = capacity - header_h - 2.0
+      n = trunc(effective_capacity_no_totals / row_h)
+
+      items = for i <- 1..n//1, do: %{name: "Item #{i}", qty: 1, price: 10}
+
+      data_no_totals = %{id: "INV-BOUNDARY", date: ~D[2026-05-01], items: items}
+
+      data_with_totals =
+        Map.put(data_no_totals, :totals, %{subtotal: Decimal.new(n * 10)})
+
+      [_h1, body_no_totals, _f1] = Invoice.sections(data_no_totals)
+      [_h2, body_with_totals, _f2] = Invoice.sections(data_with_totals)
+
+      table_blocks_no_totals =
+        Enum.filter(body_no_totals.content, &is_struct(&1.content, Rendro.Table))
+
+      table_blocks_with_totals =
+        Enum.filter(body_with_totals.content, &is_struct(&1.content, Rendro.Table))
+
+      assert length(table_blocks_no_totals) == 1,
+             "boundary item count should fit on exactly 1 page without totals reservation"
+
+      assert length(table_blocks_with_totals) >= 2,
+             "the same item count must spill onto a 2nd table page once totals height is reserved"
+
+      # The totals block must be the LAST content block, immediately after
+      # the last (2nd+) table block — i.e. on the same page as the last rows.
+      last_block = List.last(body_with_totals.content)
+      refute is_struct(last_block.content, Rendro.Table)
+
+      last_table_block = List.last(table_blocks_with_totals)
+      assert last_table_block.break_before == true
+
+      # The totals block (last_block) immediately follows the last table
+      # block in the body content list — both land on the same final page.
+      assert Enum.at(body_with_totals.content, -2) == last_table_block
+    end
+  end
 end

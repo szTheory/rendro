@@ -41,6 +41,25 @@ defmodule Rendro.Recipes.Invoice do
   @body_height @page_height - 2 * @margin - @header_height - @footer_height
   @footer_y @page_height - @margin - @footer_height
 
+  # Default table column rules: Item | Qty | Price.
+  @table_columns [{:share, 1}, {:fixed, 50}, {:fixed, 80}]
+
+  # Conservative one-row epsilon margin: pack to capacity − epsilon so
+  # sub-pixel rounding never tips a page into :content_overflow (mirrors
+  # Receipt/Statement).
+  @row_epsilon 2.0
+
+  # Conservative per-line height reserved for the totals block on every page
+  # (INV-03) so the LAST table page never fully exhausts its capacity — the
+  # shared Rendro.Recipes.Pagination chunker only accepts one uniform
+  # effective_capacity, so (mirroring how Statement reserves CF/BF rows on
+  # every page) totals height is reserved on every page, guaranteeing
+  # whichever page ends up last always has room for the totals block that
+  # trails it. No exact text measurement exists for a plain text block, so
+  # this is a conservative estimate at size: 10 (never used to change
+  # rendered geometry, only chunking decisions).
+  @totals_line_height 14
+
   @doc """
   Returns a `%Rendro.PageTemplate{}` with three named regions: `:header`, `:body`, `:footer`.
 
@@ -201,25 +220,70 @@ defmodule Rendro.Recipes.Invoice do
     # cell MUST stay literally unchanged; the legacy bare-number price is
     # NEVER routed through Rendro.Format.money/1 (that would turn "$200"
     # into "$200.00" and break byte-compat with the toy call).
-    table_rows =
+    formatted_rows =
       Enum.map(items, fn item ->
         [item.name, Integer.to_string(item.qty), "$#{item.price}"]
       end)
 
-    table =
-      Rendro.table(table_rows,
-        header: ["Item", "Qty", "Price"],
-        columns: [{:share, 1}, {:fixed, 50}, {:fixed, 80}]
-      )
+    table_opts = [header: ["Item", "Qty", "Price"], columns: @table_columns]
 
-    content = [Rendro.block(table)] ++ build_totals_blocks(data, opts)
+    # Measure all rows at the body region width using the engine's own font
+    # metrics (D-09) — avoids recipe-local estimates that cause
+    # :content_overflow. A single-page toy call (2 items) fits well within
+    # capacity and yields exactly one, byte-identical table block below.
+    doc_for_measure = Rendro.Document.new()
+
+    {header_h, row_heights} =
+      Rendro.measure_rows(formatted_rows, @content_width, doc_for_measure, table_opts)
+
+    capacity = @body_height - @header_height - @footer_height
+
+    # INV-03 "kept with the last rows" — the ONE place Invoice must exceed a
+    # pure Receipt copy (Receipt appends totals without reserving space, so
+    # totals can flow to a fresh page). Reserving the totals height on every
+    # page (see @totals_line_height doc) guarantees the final table page
+    # always has room left for the totals block that trails it.
+    effective_capacity = capacity - header_h - totals_reserved_height(data) - @row_epsilon
+
+    rows_with_meta =
+      Enum.zip(formatted_rows, row_heights)
+      |> Enum.map(fn {fmt_row, height} -> {fmt_row, height, nil} end)
+
+    pages = Rendro.Recipes.Pagination.chunk_rows_into_pages(rows_with_meta, effective_capacity)
+
+    # One table block per page. break_before: true on every page after the
+    # first. NEVER keep_together (oversized group → :content_overflow).
+    table_blocks =
+      pages
+      |> Enum.with_index()
+      |> Enum.map(fn {{page_rows, _meta}, idx} ->
+        table = Rendro.table(page_rows, table_opts)
+        Rendro.block(table, break_before: idx > 0)
+      end)
+
+    # Totals are appended after the LAST table block (on the final page) —
+    # never wrapped in keep_together.
+    totals_blocks = build_totals_blocks(data, opts)
 
     Rendro.section(
       name: :invoice_body,
       region: :body,
-      content: content
+      content: table_blocks ++ totals_blocks
     )
   end
+
+  # Conservative reserved height for the totals block, used only to bias
+  # per-page chunking capacity — never to change rendered geometry.
+  defp totals_reserved_height(%{totals: totals}) when is_map(totals) do
+    line_count =
+      Enum.count([:subtotal, :tax, :discount, :total], fn key ->
+        match?(%Decimal{}, Map.get(totals, key))
+      end)
+
+    line_count * @totals_line_height
+  end
+
+  defp totals_reserved_height(_data), do: 0
 
   defp footer_section(_data, opts) do
     colors = palette(opts)
@@ -344,6 +408,7 @@ defmodule Rendro.Recipes.Invoice do
     maybe_validate_terms!(data)
     validate_items!(data.items)
     maybe_validate_totals_types!(data)
+    maybe_validate_totals!(data)
     :ok
   end
 
@@ -495,5 +560,72 @@ defmodule Rendro.Recipes.Invoice do
     Why:   Received: #{inspect(value)} (#{Rendro.Recipes.Pagination.type_name(value)}).
     Next:  Use Decimal.new/1 — e.g. Decimal.new("50.00").
     """
+  end
+
+  # ---------------------------------------------------------------------------
+  # Totals caller-assertion validation (INV-03)
+  # ---------------------------------------------------------------------------
+
+  # Validates caller-supplied totals against derived values using
+  # Decimal.equal?/2 (numeric) — NEVER `==` (struct-field compare, where
+  # 1.0 != 1.00). By the time this runs, :items has already passed
+  # validate_items!/1 (no %Decimal{} in the legacy :price slot), so
+  # item_line_total/1 is safe to call for every item.
+  defp maybe_validate_totals!(%{totals: totals, items: items}) when is_map(totals) do
+    derived_subtotal =
+      Enum.reduce(items, Decimal.new(0), fn item, acc ->
+        Decimal.add(acc, item_line_total(item))
+      end)
+
+    if Map.has_key?(totals, :subtotal) do
+      unless Decimal.equal?(totals.subtotal, derived_subtotal) do
+        raise ArgumentError, """
+        Rendro.Recipes.Invoice.document/2 — :totals.subtotal mismatch.
+
+        What:  The caller-supplied :totals.subtotal does not match the sum of
+               item amounts (qty × price).
+        Where: Rendro.Recipes.Invoice.validate_data!/1
+        Why:   Supplied subtotal: #{inspect(totals.subtotal)},
+               Derived subtotal: #{inspect(derived_subtotal)} (sum of items qty × price).
+        Next:  Remove :totals.subtotal to skip this check, or correct the value.
+        """
+      end
+    end
+
+    if Map.has_key?(totals, :total) do
+      base = derived_subtotal
+      tax = Map.get(totals, :tax)
+      discount = Map.get(totals, :discount)
+
+      expected_total =
+        base
+        |> then(fn t -> if is_struct(tax, Decimal), do: Decimal.add(t, tax), else: t end)
+        |> then(fn t ->
+          if is_struct(discount, Decimal), do: Decimal.sub(t, discount), else: t
+        end)
+
+      unless Decimal.equal?(totals.total, expected_total) do
+        raise ArgumentError, """
+        Rendro.Recipes.Invoice.document/2 — :totals.total mismatch.
+
+        What:  The caller-supplied :totals.total does not match the derived value.
+        Where: Rendro.Recipes.Invoice.validate_data!/1
+        Why:   Supplied total: #{inspect(totals.total)},
+               Derived total: #{inspect(expected_total)}.
+        Next:  Remove :totals.total to skip this check, or correct the value.
+        """
+      end
+    end
+
+    :ok
+  end
+
+  defp maybe_validate_totals!(_data), do: :ok
+
+  # Converts a line item's qty (Integer) × legacy bare-number price (Integer
+  # or Float) into a Decimal, for derivation/comparison purposes only — the
+  # legacy :price slot itself is NEVER converted for rendering (INV-02).
+  defp item_line_total(%{qty: qty, price: price}) do
+    Decimal.new(qty) |> Decimal.mult(Decimal.new(to_string(price)))
   end
 end
