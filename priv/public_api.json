@@ -244,6 +244,15 @@
         "t/0"
       ]
     },
+    "Elixir.Rendro.Format": {
+      "functions": [
+        "date/1",
+        "label/1",
+        "money/1"
+      ],
+      "tier": "adapter",
+      "types": []
+    },
     "Elixir.Rendro.Image": {
       "functions": [],
       "tier": "stable",

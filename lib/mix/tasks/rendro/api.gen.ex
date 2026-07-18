@@ -83,6 +83,7 @@ defmodule Mix.Tasks.Rendro.Api.Gen do
     Rendro.Adapters.Poppler,
     Rendro.Adapters.PyHanko,
     Rendro.Adapters.Qpdf,
+    Rendro.Format,
     Rendro.Inspector,
     Rendro.Protect.Adapter,
     Rendro.Recipes.BrandedInvoice,
