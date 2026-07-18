@@ -350,10 +350,13 @@ assert pdf1 == pdf2
 | A3 | Totals for Invoice should reserve space so they stay on the last table page (INV-03 "kept with the last table rows"), going one step beyond Receipt's naive append. | Pitfall 5 | If "kept with" is satisfied by simple append in practice (short totals, non-full last page), the extra reservation is harmless. Low risk. [ASSUMED] |
 | A4 | The seven color roles default to today's literals: `ink`/`muted`/`accent`/`rule` = `{0,0,0}`, `background`/`surface` = `{255,255,255}`, `on_accent` = white-on-accent. Since Invoice inlines no colors today, any all-black default preserves current output. | Pattern 4 | If a section is *given* a non-black color during the anatomy upgrade, that color must be a palette role, and its default must match whatever literal the design intends — confirm exact defaults during planning/discuss. [ASSUMED] |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Does INV-01 byte-identity permit re-baselining the toy render, or must the toy code path be
    literally frozen?**
+   - **RESOLVED:** Plan 115-01 (Wave 0) records the pre-upgrade toy render as a frozen sha256 golden
+     before any Invoice edit; the toy code path stays literally unchanged (A1). Downstream tasks assert
+     equality against it.
    - What we know: existing byte-compat tests are two-render determinism (`pdf1 == pdf2`); Plan 114-01
      used a sha256 golden of a recorded render.
    - What's unclear: whether a committed golden hash of the *current* toy render exists to diff against.
@@ -368,6 +371,9 @@ assert pdf1 == pdf2
      write time.
    - Recommendation: Prototype in a spike task; prefer applying the offset where the measured width is
      already known to avoid re-measuring. Guard strictly on `:right`.
+   - **RESOLVED:** Converted into an in-plan spike — Plan 115-03 Task 1 decides the offset location
+     (paginate `stack_cells` vs writer `render_text_block`), with acceptance = byte-identical default
+     output either way and the offset gated strictly on `:right`.
 
 ## Environment Availability
 
