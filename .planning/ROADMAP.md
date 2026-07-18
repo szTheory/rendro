@@ -74,7 +74,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [x] 115-02-PLAN.md — `Rendro.Format` public adapter-tier promotion (atomic 4-artifact, irreversible) [INV-04]
-- [ ] 115-03-PLAN.md — additive `cell_align: :right` primitive (spike + gated offset + no-op guard) [INV-05]
+- [x] 115-03-PLAN.md — additive `cell_align: :right` primitive (spike + gated offset + no-op guard) [INV-05]
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -154,7 +154,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 114. Domain research, rubric & example-data library | v2.10 | 7/7 | Complete    | 2026-07-11 |
-| 115. Invoice anatomy + Format promotion + seams | v2.10 | 2/4 | In Progress|  |
+| 115. Invoice anatomy + Format promotion + seams | v2.10 | 3/4 | In Progress|  |
 | 116. New families — Payslip & Ticket | v2.10 | 0/TBD | Not started | - |
 | 117. Edge-case stress matrix | v2.10 | 0/TBD | Not started | - |
 | 118. Rubric-gated demos, gallery & docs closure | v2.10 | 0/TBD | Not started | - |

@@ -2,18 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.10
 milestone_name: Realistic Business-Document Examples & Anatomy
-current_phase: 115
-current_phase_name: invoice-anatomy-upgrade-format-public-promotion-palette-alig
 status: executing
 stopped_at: Completed 115-02-PLAN.md
-last_updated: "2026-07-18T18:15:06.184Z"
+last_updated: "2026-07-18T18:28:12.009Z"
 last_activity: 2026-07-18
-last_activity_desc: Phase 115 execution started
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 11
-  completed_plans: 9
+  completed_plans: 10
   percent: 20
 ---
 
@@ -28,11 +25,11 @@ progress:
 ## Current Position
 
 Phase: 115 (invoice-anatomy-upgrade-format-public-promotion-palette-alig) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
-Last activity: 2026-07-18 — Phase 115 execution started
+Last activity: 2026-07-18
 
-Progress: [████░░░░░░░░░░░░░░░░] 20% — 1/5 phases complete
+Progress: [█████████░] 91%
 
 ## Roadmap Snapshot (v2.10, Phases 114–118)
 
@@ -67,6 +64,8 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 - [Phase 115]: 115-01: Used Rendro.flow/1 (not the Invoice recipe) as the minimal document/section wrapper for the INV-05 table golden, mirroring the existing table_borders_test.exs pattern. — Established lightweight pattern for exercising Rendro.table/2 through the full render pipeline without recipe-specific coupling.
 - [Phase 115]: 115-01: Both sha256 goldens (@toy_golden_sha256, @table_golden_sha256) were computed by actually running renders on pristine code via mix run, not hand-typed, then embedded as module attributes. — Eliminates risk of a mistyped/stale golden silently freezing wrong bytes, per the plan's threat model T-115-01-01.
 - [Phase 115]: 115-02: Promoted Rendro.Format from @moduledoc false to the public adapter/Evolving tier (money/1, date/1, label/1) in one atomic commit (INV-04, the milestone's single irreversible act); fixed a second, plan-unlisted duplicate hidden-modules assertion in test/rendro/public_api/manifest_test.exs that also expected Format hidden.
+- [Phase ?]: [Phase 115]: 115-03: Resolved RESEARCH OQ2 (cell_align offset location) in favor of paginate.ex stack_cells alone — writer.ex needed zero changes since it already forwards cell.x transparently into rendered block.x.
+- [Phase ?]: [Phase 115]: 115-03: Both new Cell.cell_align / Table.cell_align struct-field types are inlined into t() rather than declared as named @type, since named types are enumerated in priv/public_api.json and would have widened the frozen Stable-tier manifest.
 
 ### Blockers / Open Questions
 
@@ -95,6 +94,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 | Phase 114 P06 | 4 min | 2 tasks | 2 files |
 | Phase 115 P01 | ~3min | 2 tasks | 2 files |
 | Phase 115 P02 | ~4min | 2 tasks | 5 files |
+| Phase 115 P03 | ~9min | - tasks | - files |
 
 ## Operator Next Steps
 
@@ -102,6 +102,6 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 
 ## Session
 
-**Last session:** 2026-07-18T18:15:06.180Z
+**Last session:** 2026-07-18T18:28:00.469Z
 **Stopped at:** Completed 115-02-PLAN.md
 **Resume file:** None
