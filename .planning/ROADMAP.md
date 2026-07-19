@@ -17,7 +17,7 @@
 - [x] **Phase 115: Invoice anatomy upgrade + Format public promotion + palette/align seams** — additive Invoice anatomy (issuer/customer/due_date/terms/totals + Decimal money), `Format` promoted to the public adapter tier, `cell_align: :right`, and the S1 palette seam (the milestone's only real product `lib/` change). (completed 2026-07-18)
 - [x] **Phase 116: New families — Payslip & Ticket** — two production-grade recipes on the 3-rung pattern reusing the palette seam, registered in `public_api.json` (adapter tier) + `support_matrix.json`. (completed 2026-07-19)
 - [x] **Phase 117: Edge-case stress matrix** — deterministic hash-checked goldens + pdfium raster refs + errors-as-product across the family × stress-dimension grid. (completed 2026-07-19)
-- [ ] **Phase 118: Rubric-gated demonstration set, gallery & docs closure** — family×domain demos passing the rubric, gallery/`artifacts.json` regen with S6 tags, and guides/Livebook/phoenix_example/README/support_matrix reconciliation.
+- [x] **Phase 118: Rubric-gated demonstration set, gallery & docs closure** — family×domain demos passing the rubric, gallery/`artifacts.json` regen with S6 tags, and guides/Livebook/phoenix_example/README/support_matrix reconciliation.
 
 ## Phase Details
 
@@ -175,8 +175,8 @@ Plans:
 
 **Gap closure** *(SHOW-01 — demos scored honestly but none passed the rubric; VERIFICATION 3/4)*
 
-- [ ] 118-08-PLAN.md — Rework six demo compositions so each key fact is dominant: enrich transform_invoice (parties/totals/faithful money), statement closing-balance box, receipt merchant+total, certificate centering, payslip de-crowd, ticket native-A6 (wave 1) — SHOW-01
-- [ ] 118-09-PLAN.md — Honest re-render (launch_artifacts.gen, zero drift) + re-score all six demos passed:true + reconcile REQUIREMENTS.md + regression lanes (wave 2, depends 118-08) — SHOW-01
+- [x] 118-08-PLAN.md — Rework six demo compositions so each key fact is dominant: enrich transform_invoice (parties/totals/faithful money), statement closing-balance box, receipt merchant+total, certificate centering, payslip de-crowd, ticket native-A6 (wave 1) — SHOW-01
+- [x] 118-09-PLAN.md — Honest re-render (launch_artifacts.gen, zero drift) + re-score all six demos passed:true + reconcile REQUIREMENTS.md + regression lanes (wave 2, depends 118-08) — SHOW-01
 
 <details>
 <summary>✅ C1 CI/CD Performance & Reliability (Phases 108-113) — SHIPPED 2026-07-11</summary>
@@ -214,7 +214,7 @@ Plans:
 | 115. Invoice anatomy + Format promotion + seams | v2.10 | 4/4 | Complete    | 2026-07-18 |
 | 116. New families — Payslip & Ticket | v2.10 | 4/4 | Complete    | 2026-07-19 |
 | 117. Edge-case stress matrix | v2.10 | 7/7 | Complete    | 2026-07-19 |
-| 118. Rubric-gated demos, gallery & docs closure | v2.10 | 7/7 | Gaps — SHOW-01 rubric gate unmet | — |
+| 118. Rubric-gated demos, gallery & docs closure | v2.10 | 9/9 | Complete — SHOW-01 rubric gate closed (118-08/09) | — |
 | 108. Baseline & Audit Report | C1 | 3/3 | Complete | 2026-06-14 |
 | 109. Caching & setup-beam Foundation | C1 | 2/2 | Complete | 2026-06-15 |
 | 110. Test Concurrency, Determinism & Cleanup | C1 | 3/3 | Complete | 2026-06-16 |
