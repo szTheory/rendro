@@ -52,6 +52,11 @@ defmodule Rendro.DocsContract.BrandingClaimsTest do
       assert contents =~ "priv/branded/fonts/B612-Regular.ttf"
       assert contents =~ "priv/branded/images/rendro-logo.png"
       assert contents =~ "NOTICE"
+
+      # D-12 positive companion: the core lib/ tree must still ship, so an
+      # over-aggressive future files: exclusion also fails loudly (not just
+      # an under-exclusion caught by the excludes-test below).
+      assert contents =~ "lib/rendro"
     end
 
     test "built tarball excludes operator-only priv paths" do
@@ -69,6 +74,14 @@ defmodule Rendro.DocsContract.BrandingClaimsTest do
       refute contents =~ "priv/schemas/examples.schema.json"
       refute contents =~ "priv/schemas/rubric_scores.schema.json"
       refute contents =~ "priv/quality/"
+
+      # D-12 tarball-exclusion tripwire (EDGE-01): test-only golden hashes and
+      # raster reference PNGs must never ship to Hex consumers. mix.exs's files:
+      # allowlist excludes both by omission today; these refute assertions make
+      # that exclusion an explicit, fail-loud guard against a future accidental
+      # addition of either path to the allowlist.
+      refute contents =~ "priv/goldens/"
+      refute contents =~ "priv/raster_refs/"
     end
   end
 
