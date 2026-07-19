@@ -170,4 +170,111 @@ defmodule Rendro.Recipes.TicketTest do
       assert error.message =~ ~r/What:.*Where:.*Why:.*Next:/s
     end
   end
+
+  # ---------------------------------------------------------------------------
+  # sections/2, document/2, D-02 placement-grid anchor (Task 2)
+  # ---------------------------------------------------------------------------
+
+  describe "sections/2 and document/2" do
+    test "sections/2 returns %Section{} structs including :main and :stub regions" do
+      sections = Ticket.sections(fixture_data())
+      assert Enum.all?(sections, &match?(%Rendro.Section{}, &1))
+
+      region_names = Enum.map(sections, & &1.region)
+      assert :main in region_names
+      assert :stub in region_names
+    end
+
+    test "document/2 renders {:ok, pdf} starting with the PDF magic bytes" do
+      doc = Ticket.document(fixture_data())
+      assert %Rendro.Document{} = doc
+
+      assert {:ok, pdf} = Rendro.render(doc)
+      assert String.starts_with?(pdf, "%PDF-")
+    end
+
+    test "the rendered PDF text stream contains every placement label and value" do
+      doc = Ticket.document(fixture_data())
+      assert {:ok, pdf} = Rendro.render(doc)
+
+      for %{label: label, value: value} <- fixture_data().placement do
+        assert pdf =~ "(#{String.upcase(label)})"
+        assert pdf =~ "(#{value})"
+      end
+    end
+
+    test "the SAME recipe renders a boarding-pass-shaped anchor with zero lib/ changes (D-01)" do
+      data =
+        fixture_data(
+          placement: [
+            %{label: "Gate", value: "B12"},
+            %{label: "Seat", value: "14C"},
+            %{label: "Group", value: "2"}
+          ]
+        )
+
+      doc = Ticket.document(data)
+      assert {:ok, pdf} = Rendro.render(doc)
+      assert String.starts_with?(pdf, "%PDF-")
+      assert pdf =~ "(B12)"
+      assert pdf =~ "(14C)"
+    end
+
+    test "a caller-supplied PNG registers under the fixed :ticket_code name" do
+      data =
+        Map.put(fixture_data(), :code, %{
+          reference: "AUR-1",
+          image: {:binary, @valid_png_bytes}
+        })
+
+      doc = Ticket.document(data)
+      assert {:ok, _asset} = Rendro.AssetRegistry.fetch(doc.asset_registry, :ticket_code)
+
+      assert {:ok, pdf} = Rendro.render(doc)
+      assert String.starts_with?(pdf, "%PDF-")
+    end
+
+    test "the placement-grid value cells (22pt) are the single largest text in :main content (D-02)" do
+      sections = Ticket.sections(fixture_data())
+      main_section = Enum.find(sections, &(&1.region == :main))
+
+      sizes = collect_text_sizes(main_section)
+      assert Enum.max(sizes) == 22
+    end
+  end
+
+  # ---------------------------------------------------------------------------
+  # Recursive %Rendro.Text{} size collector — a table's header/rows/cells may
+  # wrap Rendro.Block/Rendro.Cell content, or be plain (unmeasured) strings,
+  # per lib/rendro/pipeline/measure.ex's normalize_cells/1. Mirrors the
+  # collector established in test/rendro/recipes/payslip_test.exs.
+  # ---------------------------------------------------------------------------
+
+  defp collect_text_sizes(%Rendro.Section{content: content}) do
+    Enum.flat_map(content, &collect_from_block/1)
+  end
+
+  defp collect_from_block(%Rendro.Block{content: %Rendro.Text{size: size}}), do: [size]
+
+  defp collect_from_block(%Rendro.Block{content: %Rendro.Table{} = table}) do
+    collect_from_table(table)
+  end
+
+  defp collect_from_block(_other), do: []
+
+  defp collect_from_table(table) do
+    header_sizes = if table.header, do: collect_from_row(table.header), else: []
+    row_sizes = Enum.flat_map(table.rows, &collect_from_row/1)
+    header_sizes ++ row_sizes
+  end
+
+  defp collect_from_row(%Rendro.Row{cells: cells}), do: Enum.flat_map(cells, &collect_from_cell/1)
+  defp collect_from_row(cells) when is_list(cells), do: Enum.flat_map(cells, &collect_from_cell/1)
+
+  defp collect_from_cell(%Rendro.Cell{content: content}), do: collect_from_cell_content(content)
+  defp collect_from_cell(content), do: collect_from_cell_content(content)
+
+  defp collect_from_cell_content(%Rendro.Block{} = block), do: collect_from_block(block)
+  defp collect_from_cell_content(%Rendro.Text{size: size}), do: [size]
+  defp collect_from_cell_content(_other), do: []
 end
