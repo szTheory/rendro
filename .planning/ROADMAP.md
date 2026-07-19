@@ -148,7 +148,30 @@ Plans:
   3. `assets/rendro/gallery/` and `assets/rendro/artifacts.json` are regenerated via `mix rendro.launch_artifacts.gen` to realistic renders with matching SHA-256 hashes, and `artifacts.json` gains optional `theme`/`mode`/`preset` tags (seam S6) so Milestone C's grid needs no re-keying.
   4. `priv/support_matrix.json` and README are reconciled so every new family/claim is proof-backed and the milestone makes no tagged-PDF/PDF-UA accessibility claim ("production-grade" wording guarded).
 
-**Plans**: TBD
+**Plans**: 7 plans
+
+Plans:
+**Wave 1** *(local foundation, parallel)*
+
+- [ ] 118-01-PLAN.md — Generalize examples.schema.json (per-family) + author 5 fictional fixtures (statement/receipt/certificate/payslip/ticket) — SHOW-01
+- [ ] 118-02-PLAN.md — Author 5 new DOMAIN.md + strengthen DomainMdContractTest per-domain (D-04) — SHOW-01
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 118-03-PLAN.md — Rendro.ExamplesData faithful JSON→recipe transform (6 families) + unit test + hidden-internals contract — SHOW-01, SHOW-03
+
+**Wave 3** *(blocked on Wave 2)*
+
+- [ ] 118-04-PLAN.md — Repoint LaunchArtifacts to fixtures (D-06) + Payslip/Ticket tiles (D-07) + S6 tags (D-13) — SHOW-03
+
+**Wave 4** *(blocked on Wave 3; container-gated, autonomous:false)*
+
+- [ ] 118-05-PLAN.md — Container regen via mix rendro.launch_artifacts.gen: re-bless hashes + artifacts.json S6 + docs blocks (D-08) — SHOW-03
+- [ ] 118-06-PLAN.md — D-09 render→raster→self-score 6 demos + append rubric_scores.json + D-05 demo-cites-DOMAIN.md test — SHOW-01
+
+**Wave 5** *(blocked on Wave 4)*
+
+- [ ] 118-07-PLAN.md — D-14 accessibility-overclaim tripwire + SHOW-02 guides/livebook/phoenix_example + support_matrix/README reconciliation — SHOW-02, SHOW-04
 
 <details>
 <summary>✅ C1 CI/CD Performance & Reliability (Phases 108-113) — SHIPPED 2026-07-11</summary>
