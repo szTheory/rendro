@@ -85,5 +85,174 @@
     "fixture_source": "test/rendro/edge_matrix_test.exs",
     "gate_scope": "scores"
   },
-  "scores": []
+  "scores": [
+    {
+      "demo_id": "invoice-acme-phoenix-saas",
+      "domain": "invoice",
+      "family": "invoice",
+      "dimension_scores": {
+        "information_architecture": 2,
+        "content_hierarchy": 2,
+        "domain_fit": 2,
+        "reader_affordances": 3,
+        "typographic_craft": 3,
+        "restraint_cohesion": 3
+      },
+      "gate_results": {
+        "reading_order": true,
+        "print_safety": true
+      },
+      "passed": false,
+      "recorded_at": "2026-07-19",
+      "justifications": {
+        "information_architecture": "No issuer or customer block rendered; page is a bare title plus one flat line-item table, so parties are neither grouped nor located.",
+        "content_hierarchy": "The amount due — the one fact an invoice reader needs first — is absent from the render entirely; only the invoice-number title stands out.",
+        "domain_fit": "An invoice with no total, no bill-to, and no visible due date/terms is missing the conventional elements a reader expects for the type.",
+        "reader_affordances": "Item/Qty/Price column headers are present, but there is no total row to find and no subtotal/tax breakdown.",
+        "typographic_craft": "Clean table, but money renders as $79.0 (one decimal) — a formatting defect — and 36 identical rows read as filler.",
+        "restraint_cohesion": "Restrained but sparse and repetitive; 36 identical Monthly platform service lines are not a realistic composition."
+      },
+      "domain_md": "priv/examples/invoice/DOMAIN.md"
+    },
+    {
+      "demo_id": "statement-northwind-ledger-co",
+      "domain": "statement",
+      "family": "statement",
+      "dimension_scores": {
+        "information_architecture": 4,
+        "content_hierarchy": 3,
+        "domain_fit": 4,
+        "reader_affordances": 4,
+        "typographic_craft": 4,
+        "restraint_cohesion": 4
+      },
+      "gate_results": {
+        "reading_order": true,
+        "print_safety": true
+      },
+      "passed": false,
+      "recorded_at": "2026-07-19",
+      "justifications": {
+        "information_architecture": "Account header, statement period, opening balance, and the transaction ledger are each in a clearly bounded, expected group.",
+        "content_hierarchy": "The closing balance (the DOMAIN.md key fact) is only the last cell of the Balance column; the account title is the most prominent element, so the key fact is not dominant.",
+        "domain_fit": "Reads as a conventional bank statement: masked account, running balance, parenthesized debits.",
+        "reader_affordances": "Clear Date/Description/Amount/Balance columns with a running balance make it easy to trace any line.",
+        "typographic_craft": "Consistent money formatting and clean alignment throughout.",
+        "restraint_cohesion": "Restrained, cohesive, no decorative noise."
+      },
+      "domain_md": "priv/examples/statement/DOMAIN.md"
+    },
+    {
+      "demo_id": "receipt-harbor-and-oak-cafe",
+      "domain": "receipt",
+      "family": "receipt",
+      "dimension_scores": {
+        "information_architecture": 3,
+        "content_hierarchy": 3,
+        "domain_fit": 3,
+        "reader_affordances": 4,
+        "typographic_craft": 4,
+        "restraint_cohesion": 4
+      },
+      "gate_results": {
+        "reading_order": true,
+        "print_safety": true
+      },
+      "passed": false,
+      "recorded_at": "2026-07-19",
+      "justifications": {
+        "information_architecture": "Title, guest, date, item table, and totals are ordered sensibly, but the merchant identity is absent from the grouping.",
+        "content_hierarchy": "The Total ($30.78) is small text at the bottom rather than the dominant element a receipt reader scans for.",
+        "domain_fit": "Recognizable as a receipt but the merchant name/identity (Harbor & Oak Cafe) is not shown — the render says only Sales Receipt / Walk-in Guest.",
+        "reader_affordances": "Description/Amount columns plus a subtotal/tax/total breakdown make the math easy to follow.",
+        "typographic_craft": "Clean and consistent money and alignment.",
+        "restraint_cohesion": "Restrained and cohesive."
+      },
+      "domain_md": "priv/examples/receipt/DOMAIN.md"
+    },
+    {
+      "demo_id": "certificate-summit-training-institute",
+      "domain": "certificate",
+      "family": "certificate",
+      "dimension_scores": {
+        "information_architecture": 3,
+        "content_hierarchy": 3,
+        "domain_fit": 3,
+        "reader_affordances": 3,
+        "typographic_craft": 3,
+        "restraint_cohesion": 2
+      },
+      "gate_results": {
+        "reading_order": true,
+        "print_safety": true
+      },
+      "passed": false,
+      "recorded_at": "2026-07-19",
+      "justifications": {
+        "information_architecture": "All content is packed into the top ~20% of the bordered canvas; the framed space is not used to structure the certificate.",
+        "content_hierarchy": "The title 'Certificate of Completion' dominates the recipient name (the key fact), so the recipient is not the focal point.",
+        "domain_fit": "Recognizable but a certificate reader expects a centered, ceremonial layout; this reads top-left and log-like.",
+        "reader_affordances": "Fields are legible but the body paragraph runs edge-to-edge with no measure constraint.",
+        "typographic_craft": "Acceptable type, but the cramped top and full-width body hurt polish.",
+        "restraint_cohesion": "Severe imbalance: content in the top fifth, ~80% of the bordered page empty."
+      },
+      "domain_md": "priv/examples/certificate/DOMAIN.md"
+    },
+    {
+      "demo_id": "payslip-aurora-live",
+      "domain": "payslip",
+      "family": "payslip",
+      "dimension_scores": {
+        "information_architecture": 3,
+        "content_hierarchy": 5,
+        "domain_fit": 4,
+        "reader_affordances": 3,
+        "typographic_craft": 3,
+        "restraint_cohesion": 4
+      },
+      "gate_results": {
+        "reading_order": true,
+        "print_safety": true
+      },
+      "passed": false,
+      "recorded_at": "2026-07-19",
+      "justifications": {
+        "information_architecture": "Employer/employee header, the Net Pay box, and the earnings/deductions table are grouped, but the two-column earnings-vs-deductions block is cramped.",
+        "content_hierarchy": "Net Pay $3,292.50 in a large box is unambiguously dominant — genuinely earns a 5.",
+        "domain_fit": "Reads as a conventional UK payslip: PAYE, National Insurance, pension, tax code, YTD columns.",
+        "reader_affordances": "Scannability suffers: the earnings/deductions header collides ('YTDDeductions') and a YTD figure ($25,200.00) wraps a digit onto a second line.",
+        "typographic_craft": "Column collisions and the wrapped figure are real typographic defects in the table.",
+        "restraint_cohesion": "Otherwise restrained and cohesive."
+      },
+      "domain_md": "priv/examples/payslip/DOMAIN.md"
+    },
+    {
+      "demo_id": "ticket-aurora-live",
+      "domain": "ticket",
+      "family": "ticket",
+      "dimension_scores": {
+        "information_architecture": 4,
+        "content_hierarchy": 4,
+        "domain_fit": 4,
+        "reader_affordances": 4,
+        "typographic_craft": 4,
+        "restraint_cohesion": 3
+      },
+      "gate_results": {
+        "reading_order": true,
+        "print_safety": true
+      },
+      "passed": false,
+      "recorded_at": "2026-07-19",
+      "justifications": {
+        "information_architecture": "Event header, the section/row/seat/gate locator row, and the perforated reference stub are each clearly grouped.",
+        "content_hierarchy": "SECTION/ROW/SEAT/GATE are all rendered large and equal, so no single field (nor the seat locator as a group) is the clear focal point.",
+        "domain_fit": "Reads as a real ticket: perforated stub, reference number, non-transferable terms.",
+        "reader_affordances": "Labelled fields and the perforation affordance make the stub obvious.",
+        "typographic_craft": "Clean, consistent type.",
+        "restraint_cohesion": "A6-scale content sits on an A4 canvas, leaving ~65% of the page empty."
+      },
+      "domain_md": "priv/examples/ticket/DOMAIN.md"
+    }
+  ]
 }
