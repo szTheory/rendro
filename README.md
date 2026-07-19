@@ -13,7 +13,7 @@ Rendro is an open-source, Elixir-native PDF layout library for Phoenix teams tha
 - **Elixir-native core:** Build PDFs from data and components without headless Chrome or wkhtmltopdf.
 - **Deterministic output:** Same input, same binary output when rendered with deterministic options.
 - **Flow and pagination:** Compose fixed-position and flow documents with explicit break semantics.
-- **Canonical recipes:** Use `document/2`, `page_template/1`, and `sections/2` escape hatches for invoices, statements, receipts, reports, and certificates.
+- **Canonical recipes:** Use `document/2`, `page_template/1`, and `sections/2` escape hatches for invoices, statements, receipts, reports, certificates, payslips, and tickets.
 - **Operational proof:** Telemetry, diagnostics, support boundaries, and docs-contract checks keep public claims auditable.
 
 <!-- rendro-launch-artifacts-start -->

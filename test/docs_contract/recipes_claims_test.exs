@@ -155,6 +155,41 @@ defmodule Rendro.DocsContract.RecipesClaimsTest do
     end
   end
 
+  describe "demonstration_set row claim backing (SHOW-04/D-15)" do
+    test "demonstration_set row is present and supported", %{matrix: matrix} do
+      assert matrix["demonstration_set"]["status"] == "supported"
+    end
+
+    test "demonstration_set families include the new payslip and ticket families", %{
+      matrix: matrix
+    } do
+      families = matrix["demonstration_set"]["families"]
+      assert "payslip" in families
+      assert "ticket" in families
+    end
+
+    test "every demonstration_set evidence pointer resolves on disk", %{matrix: matrix} do
+      evidence = matrix["demonstration_set"]["evidence"]
+      assert map_size(evidence) > 0, "demonstration_set must carry at least one evidence pointer"
+
+      for {name, path} <- evidence do
+        assert is_binary(path), "evidence pointer #{name} must be a string path"
+
+        assert File.exists?(path),
+               "demonstration_set evidence #{name} must resolve on disk: #{path}"
+      end
+    end
+
+    test "demonstration_set makes no rubric-pass / visual-polish / accessibility claim", %{
+      matrix: matrix
+    } do
+      boundaries = matrix["demonstration_set"]["boundaries"]
+      assert boundaries["reader_quality_rubric_pass"] == "unsupported"
+      assert boundaries["visual_polish_claim"] == "unsupported"
+      assert boundaries["accessibility_conformance_claim"] == "unsupported"
+    end
+  end
+
   describe "out-of-matrix claim refutations" do
     test "guide does not claim digital signatures", %{guide: guide} do
       refute guide =~ "digital signatures"
