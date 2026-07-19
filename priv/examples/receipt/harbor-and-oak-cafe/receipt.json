@@ -5,6 +5,13 @@
   "currency": "USD",
   "title": "Sales Receipt",
   "date": "2026-06-08",
+  "merchant": {
+    "name": "Harbor & Oak Cafe",
+    "street": "214 Wharf Street",
+    "city": "Portland",
+    "region": "ME",
+    "postal_code": "04101"
+  },
   "customer": {
     "name": "Walk-in Guest"
   },

@@ -244,19 +244,38 @@ defmodule Rendro.Recipes.Receipt do
   # Private section builders
   # ---------------------------------------------------------------------------
 
-  defp header_section(%{title: title, date: date, customer: customer} = _data, opts) do
+  defp header_section(%{title: title, date: date, customer: customer} = data, opts) do
     fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
     customer_name = Map.get(customer, :name, "")
+
+    base_content = [
+      Rendro.block(Rendro.text(title, size: 14)),
+      Rendro.block(Rendro.text(customer_name, size: 12)),
+      Rendro.block(Rendro.text(fmt_date.(date), size: 10))
+    ]
+
+    # 118-08 gap-closure (SHOW-01): render the merchant identity (previously
+    # absent from the data path entirely — see transform_receipt/1). Prepend
+    # so the merchant reads as the issuer of the receipt, ahead of the title.
+    content =
+      base_content
+      |> maybe_prepend(Map.get(data, :merchant), &merchant_block/1)
 
     Rendro.section(
       name: :receipt_header,
       region: :header,
-      content: [
-        Rendro.block(Rendro.text(title, size: 14)),
-        Rendro.block(Rendro.text(customer_name, size: 12)),
-        Rendro.block(Rendro.text(fmt_date.(date), size: 10))
-      ]
+      content: content
     )
+  end
+
+  defp maybe_prepend(content, nil, _fun), do: content
+  defp maybe_prepend(content, value, fun), do: [fun.(value) | content]
+
+  defp merchant_block(merchant) when is_map(merchant) do
+    name = Map.get(merchant, :name, "")
+    address = Map.get(merchant, :address)
+    text = if address in [nil, ""], do: name, else: "#{name}\n#{address}"
+    Rendro.block(Rendro.text(text, size: 16))
   end
 
   defp body_section(%{lines: lines} = data, opts) do
@@ -330,22 +349,41 @@ defmodule Rendro.Recipes.Receipt do
   # Totals block builder
   # ---------------------------------------------------------------------------
 
+  # 118-08 gap-closure (SHOW-01): the Total must be the single dominant
+  # element on the receipt (content_hierarchy=5 anchor) — not small bottom
+  # text alongside Subtotal/Tax. Subtotal/Tax/Discount render small in one
+  # block; Total renders alone, much larger, in its own trailing block.
+  @minor_totals_size 9
+  @dominant_total_size 18
+
   defp build_totals_blocks(%{totals: totals} = _data, opts) when is_map(totals) do
     fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
 
-    lines =
+    minor_lines =
       []
       |> maybe_append_totals_line("Subtotal", Map.get(totals, :subtotal), fmt_amount)
       |> maybe_append_totals_line("Tax", Map.get(totals, :tax), fmt_amount)
       |> maybe_append_totals_line("Discount", Map.get(totals, :discount), fmt_amount)
-      |> maybe_append_totals_line("Total", Map.get(totals, :total), fmt_amount)
 
-    if lines == [] do
-      []
-    else
-      text_content = Enum.join(lines, "\n")
-      [Rendro.block(Rendro.text(text_content, size: 10), break_before: false)]
-    end
+    minor_block =
+      if minor_lines == [] do
+        []
+      else
+        [Rendro.block(Rendro.text(Enum.join(minor_lines, "\n"), size: @minor_totals_size))]
+      end
+
+    total_block =
+      case Map.get(totals, :total) do
+        %Decimal{} = total ->
+          [
+            Rendro.block(Rendro.text("Total: #{fmt_amount.(total)}", size: @dominant_total_size))
+          ]
+
+        _ ->
+          []
+      end
+
+    minor_block ++ total_block
   end
 
   defp build_totals_blocks(_data, _opts), do: []

@@ -114,6 +114,7 @@
           "title": { "type": "string", "minLength": 1 },
           "date": { "type": "string", "format": "date" },
           "customer": { "$ref": "#/$defs/party" },
+          "merchant": { "$ref": "#/$defs/party" },
           "lines": {
             "type": "array",
             "items": {
