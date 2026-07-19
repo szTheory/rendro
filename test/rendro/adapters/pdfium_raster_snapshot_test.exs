@@ -85,6 +85,49 @@ defmodule Rendro.Adapters.PdfiumRasterSnapshotTest do
     assert_or_bless("edge_payslip_pagination_60plus_odd_even", pngs)
   end
 
+  # A4/Letter geometry pair: both renders share the SAME underlying Certificate
+  # data (EdgeFixtures.build(:certificate, :page_size_a4_letter)), varying only
+  # document/2's opts. The A4 half calls Certificate.document/2 with NO opts
+  # (its default page geometry is A4); the Letter half passes
+  # EdgeFixtures.opts(:certificate, :page_size_a4_letter) (page_size: :us_letter).
+  # The two produce DIFFERENT PNG byte sequences (different page pixel dimensions
+  # at 150 DPI) — the geometry claim a byte-content-stream diff cannot verify.
+  @tag raster_snapshot: true
+  test "edge_certificate_a4 renders to committed golden PNG hashes" do
+    data = EdgeFixtures.build(:certificate, :page_size_a4_letter)
+    doc = Rendro.Recipes.Certificate.document(data)
+    pdf = Golden.assert_deterministic!(doc)
+
+    assert {:ok, pngs} = Pdfium.render(pdf, dpi: 150)
+
+    assert_or_bless("edge_certificate_a4", pngs)
+  end
+
+  @tag raster_snapshot: true
+  test "edge_certificate_us_letter renders to committed golden PNG hashes" do
+    data = EdgeFixtures.build(:certificate, :page_size_a4_letter)
+    doc = Rendro.Recipes.Certificate.document(data, EdgeFixtures.opts(:certificate, :page_size_a4_letter))
+    pdf = Golden.assert_deterministic!(doc)
+
+    assert {:ok, pngs} = Pdfium.render(pdf, dpi: 150)
+
+    assert_or_bless("edge_certificate_us_letter", pngs)
+  end
+
+  # Extreme text wrap: reuses the EXACT EdgeFixtures.document(:invoice, :text_wrap)
+  # call the byte-golden matrix (117-04) uses for that cell — Invoice's narrow
+  # {:share, 1} item-name column forces multi-line wrapping whose glyph placement
+  # only a raster snapshot can humanly verify.
+  @tag raster_snapshot: true
+  test "edge_invoice_extreme_wrap renders to committed golden PNG hashes" do
+    doc = EdgeFixtures.document(:invoice, :text_wrap)
+    pdf = Golden.assert_deterministic!(doc)
+
+    assert {:ok, pngs} = Pdfium.render(pdf, dpi: 150)
+
+    assert_or_bless("edge_invoice_extreme_wrap", pngs)
+  end
+
   # ---------------------------------------------------------------------------
   # Private helpers
   # ---------------------------------------------------------------------------
