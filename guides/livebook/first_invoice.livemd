@@ -40,7 +40,7 @@ invoice = %{
   issuer: %{name: "Rendro Systems", address: "100 Deterministic Way, Portland, OR 97205"},
   customer: %{name: "Acme Phoenix SaaS", address: "42 LiveView Lane, Austin, TX 78701"},
   items: [
-    %{name: "Platform subscription — Team plan", qty: 1, price: 3600},
+    %{name: "Platform subscription - Team plan", qty: 1, price: 3600},
     %{name: "Additional seats", qty: 12, price: 79},
     %{name: "Priority support add-on", qty: 1, price: 480}
   ],
