@@ -216,13 +216,16 @@ defmodule Rendro.Recipes.Invoice do
   end
 
   defp body_section(%{items: items} = data, opts) do
-    # FROZEN toy path (INV-01) — the line-item mapping and "$#{item.price}"
-    # cell MUST stay literally unchanged; the legacy bare-number price is
-    # NEVER routed through Rendro.Format.money/1 (that would turn "$200"
-    # into "$200.00" and break byte-compat with the toy call).
+    # FROZEN toy path (INV-01) for a bare-number :price — the "$#{price}"
+    # interpolation MUST stay literally unchanged for the toy call's
+    # byte-identity golden. 118-08 gap-closure: a %Decimal{} :price (never
+    # accepted before) is now ALSO honored and formatted via
+    # Rendro.Format.money/1 for faithful, always-2-decimal cents — this is
+    # what a realistic demo fixture uses to eliminate the `$79.0`
+    # one-decimal money defect, without touching the frozen bare-number path.
     formatted_rows =
       Enum.map(items, fn item ->
-        [item.name, Integer.to_string(item.qty), "$#{item.price}"]
+        [item.name, Integer.to_string(item.qty), format_price(item.price)]
       end)
 
     table_opts = [header: ["Item", "Qty", "Price"], columns: @table_columns]
@@ -285,6 +288,13 @@ defmodule Rendro.Recipes.Invoice do
 
   defp totals_reserved_height(_data), do: 0
 
+  # 118-08: legacy bare-number :price renders unchanged ("$#{price}", the
+  # frozen INV-01 toy path); a %Decimal{} :price is formatted via
+  # Rendro.Format.money/1 for faithful 2-decimal cents (never a lossy
+  # float/integer coercion upstream — see examples_data.ex).
+  defp format_price(%Decimal{} = price), do: Rendro.Format.money(price)
+  defp format_price(price) when is_number(price), do: "$#{price}"
+
   defp footer_section(_data, opts) do
     colors = palette(opts)
 
@@ -333,21 +343,55 @@ defmodule Rendro.Recipes.Invoice do
   # Totals block builder (INV-02 / INV-03 rendering half)
   # ---------------------------------------------------------------------------
 
+  # 118-08 gap-closure (SHOW-01): amount due (Total) must be the single
+  # dominant element on the invoice (content_hierarchy=5 anchor, mirrors
+  # Payslip's Net Pay box). Subtotal/Tax/Discount render small and muted in
+  # one block; Total renders alone, much larger, in its own trailing block —
+  # every other element recedes in proportion.
+  @minor_totals_size 9
+  @dominant_total_size 20
+
   defp build_totals_blocks(%{totals: totals} = _data, opts) when is_map(totals) do
     fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
+    colors = palette(opts)
 
-    lines =
+    minor_lines =
       []
       |> maybe_append_totals_line("Subtotal", Map.get(totals, :subtotal), fmt_amount)
       |> maybe_append_totals_line("Tax", Map.get(totals, :tax), fmt_amount)
       |> maybe_append_totals_line("Discount", Map.get(totals, :discount), fmt_amount)
-      |> maybe_append_totals_line("Total", Map.get(totals, :total), fmt_amount)
 
-    if lines == [] do
-      []
-    else
-      [Rendro.block(Rendro.text(Enum.join(lines, "\n"), size: 10))]
-    end
+    minor_block =
+      if minor_lines == [] do
+        []
+      else
+        [
+          Rendro.block(
+            Rendro.text(Enum.join(minor_lines, "\n"),
+              size: @minor_totals_size,
+              color: colors.muted
+            )
+          )
+        ]
+      end
+
+    total_block =
+      case Map.get(totals, :total) do
+        %Decimal{} = total ->
+          [
+            Rendro.block(
+              Rendro.text("Total Due: #{fmt_amount.(total)}",
+                size: @dominant_total_size,
+                color: colors.accent
+              )
+            )
+          ]
+
+        _ ->
+          []
+      end
+
+    minor_block ++ total_block
   end
 
   defp build_totals_blocks(_data, _opts), do: []
@@ -559,23 +603,13 @@ defmodule Rendro.Recipes.Invoice do
   end
 
   # The legacy :price slot renders via bare-number string interpolation
-  # ("$#{price}") to stay byte-compatible with the toy call — a %Decimal{}
-  # there would silently render as "$#Decimal<...>" instead of a dollar
-  # amount, so it is rejected instructively (INV-02).
-  defp validate_item_price!(%Decimal{} = price, idx) do
-    raise ArgumentError, """
-    Rendro.Recipes.Invoice.document/2 — invalid item :price type at index #{idx}.
-
-    What:  A line item's legacy :price must be a bare number (Integer or Float),
-           not a Decimal.
-    Where: Rendro.Recipes.Invoice.validate_data!/1
-    Why:   items[#{idx}].price = #{inspect(price)} (Decimal). The legacy :price
-           field renders via bare-number string interpolation ("$\#{price}")
-           to stay byte-compatible with the toy call.
-    Next:  Pass a bare number, e.g. price: 79.00, or move Decimal amounts into
-           :totals (formatted via Rendro.Format.money/1).
-    """
-  end
+  # ("$#{price}") to stay byte-compatible with the toy call. 118-08
+  # gap-closure: a %Decimal{} :price is ALSO honored (never rejected) and
+  # formatted via Rendro.Format.money/1 for faithful, always-2-decimal
+  # cents — see format_price/1 in body_section/2. This is what a realistic
+  # invoice demo fixture uses to eliminate the `$79.0` one-decimal money
+  # defect without a lossy float/integer coercion upstream.
+  defp validate_item_price!(%Decimal{}, _idx), do: :ok
 
   defp validate_item_price!(price, _idx) when is_number(price), do: :ok
 

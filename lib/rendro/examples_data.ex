@@ -9,12 +9,15 @@ defmodule Rendro.ExamplesData do
   # dates. This module is the one-source-of-truth seam both the demonstration
   # set (SHOW-01) and the gallery (SHOW-03) render through.
   #
-  # Money is coerced with `Decimal.new/1` so cents are preserved (never the
-  # lossy integer coercion the bench script uses, INV-02). The one exception is
-  # the Invoice recipe's legacy line `:price`, which its `validate_data!/1`
-  # requires to be a bare number (Decimal is explicitly rejected for byte-compat
-  # with the toy call, INV-02's split); there we coerce via `Decimal.to_float/1`
-  # so cents are still preserved.
+  # Money is coerced with `Decimal.new/1` so cents are preserved exactly —
+  # never a lossy float/integer coercion (118-08 gap-closure: the invoice
+  # money path used to route the legacy line `:price` through
+  # `Decimal.to_float/1` to satisfy `Rendro.Recipes.Invoice.validate_data!/1`'s
+  # historical is_number-only guard, which produced the `$79.0` one-decimal
+  # money defect. The Invoice recipe's legacy `:price` slot now also accepts
+  # `%Decimal{}` (rendered via `Rendro.Format.money/1` for faithful 2-decimal
+  # cents), so this module never needs `Decimal.to_float/1` or
+  # `Decimal.to_integer/1` anywhere on the invoice money path.)
   #
   # Callers pass the loaded map; this module never reads files directly (the
   # `Path.safe_relative/1` guard lives in `Rendro.Examples.load!/1`).
@@ -33,7 +36,7 @@ defmodule Rendro.ExamplesData do
   def transform_invoice(data) do
     invoice = Map.fetch!(data, "invoice")
 
-    %{
+    base = %{
       id: invoice["id"],
       date: date(invoice["date"]),
       items:
@@ -41,12 +44,22 @@ defmodule Rendro.ExamplesData do
           %{
             name: "#{item["name"]} - #{item["description"]}",
             qty: item["qty"],
-            # Legacy bare-number price (INV-02): faithful cents via to_float,
-            # never Decimal (rejected) nor a lossy integer coercion.
-            price: bare_money(item["price"])
+            # 118-08 gap-closure: legacy line :price is now a faithful
+            # Decimal (never Decimal.to_float/1 or Decimal.to_integer/1) —
+            # Rendro.Recipes.Invoice's legacy price slot accepts %Decimal{}
+            # and formats it via Rendro.Format.money/1 for exact 2-decimal
+            # cents (fixes the `$79.0` one-decimal money defect).
+            price: money(item["price"])
           }
         end)
     }
+
+    base
+    |> put_optional(:issuer, data["issuer"], &transform_party/1)
+    |> put_optional(:customer, data["customer"], &transform_party/1)
+    |> put_optional(:due_date, invoice["due_date"], &date/1)
+    |> put_optional(:terms, invoice["terms"], & &1)
+    |> put_optional(:totals, data["totals"], &transform_totals/1)
   end
 
   @doc false
@@ -89,6 +102,12 @@ defmodule Rendro.ExamplesData do
           }
         end)
     }
+
+    base =
+      base
+      # 118-08 gap-closure: thread the merchant identity fixture -> transform
+      # -> recipe (previously absent from the data path entirely).
+      |> put_optional(:merchant, data["merchant"], &transform_party/1)
 
     case data["totals"] do
       totals when is_map(totals) -> Map.put(base, :totals, transform_totals(totals))
@@ -174,6 +193,33 @@ defmodule Rendro.ExamplesData do
     put_optional(base, :venue, issuer["venue"], & &1)
   end
 
+  # Shared party transform (118-08) — invoice :issuer/:customer and receipt
+  # :merchant all share the same `priv/schemas/examples.schema.json`
+  # `$defs/party` shape (name + optional street/city/region/postal_code).
+  # Produces the `%{name:, address:}` shape the recipes' issuer_block/
+  # customer_block/merchant renderers already expect.
+  defp transform_party(party) do
+    %{name: party["name"], address: format_address(party)}
+  end
+
+  defp format_address(party) do
+    [party["street"], city_line(party)]
+    |> Enum.reject(&(&1 in [nil, ""]))
+    |> Enum.join(", ")
+  end
+
+  defp city_line(party) do
+    [party["city"], region_postal(party)]
+    |> Enum.reject(&(&1 in [nil, ""]))
+    |> Enum.join(", ")
+  end
+
+  defp region_postal(party) do
+    [party["region"], party["postal_code"]]
+    |> Enum.reject(&(&1 in [nil, ""]))
+    |> Enum.join(" ")
+  end
+
   defp transform_totals(totals) do
     %{}
     |> put_optional(:subtotal, totals["subtotal"], &money/1)
@@ -185,10 +231,6 @@ defmodule Rendro.ExamplesData do
   # Faithful Decimal money — preserves cents.
   defp money(nil), do: nil
   defp money(str) when is_binary(str), do: Decimal.new(str)
-
-  # Invoice-only legacy bare-number price: Decimal.to_float preserves cents
-  # (unlike the lossy integer coercion) while satisfying the is_number guard.
-  defp bare_money(str) when is_binary(str), do: str |> Decimal.new() |> Decimal.to_float()
 
   defp date(str) when is_binary(str), do: Date.from_iso8601!(str)
 

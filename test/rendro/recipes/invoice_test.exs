@@ -302,16 +302,18 @@ defmodule Rendro.Recipes.InvoiceTest do
       end
     end
 
-    test "a %Decimal{} in the legacy :price slot raises an instructive ArgumentError" do
+    test "a %Decimal{} in the legacy :price slot is accepted and renders faithful 2-decimal cents (118-08)" do
       data = %{
         id: "INV-DEC-01",
         date: ~D[2026-05-01],
         items: [%{name: "Widget", qty: 1, price: Decimal.new("10.00")}]
       }
 
-      assert_raise ArgumentError, ~r/Decimal/i, fn ->
-        Invoice.document(data)
-      end
+      sections = Invoice.sections(data)
+      body = Enum.find(sections, &(&1.region == :body))
+      flat = inspect(body, limit: :infinity, printable_limit: :infinity)
+
+      assert flat =~ "$10.00"
     end
   end
 
@@ -348,6 +350,35 @@ defmodule Rendro.Recipes.InvoiceTest do
       assert flat =~ "Tax"
       assert flat =~ "Discount"
       assert flat =~ "Total"
+    end
+
+    test "118-08: Total Due renders in its own block, larger than the Subtotal/Tax/Discount block (SHOW-01 dominance)" do
+      data =
+        sample_data()
+        |> Map.put(:totals, %{
+          subtotal: Decimal.new("1100"),
+          tax: Decimal.new("88"),
+          discount: Decimal.new("10"),
+          total: Decimal.new("1178")
+        })
+
+      sections = Invoice.sections(data)
+      body = Enum.find(sections, &(&1.region == :body))
+
+      text_blocks =
+        Enum.filter(body.content, fn block -> is_struct(block.content, Rendro.Text) end)
+
+      minor_block =
+        Enum.find(text_blocks, fn block -> block.content.content =~ "Subtotal" end)
+
+      total_block =
+        Enum.find(text_blocks, fn block -> block.content.content =~ "Total Due" end)
+
+      assert minor_block != nil
+      assert total_block != nil
+      assert total_block != minor_block
+      assert total_block.content.content =~ "$1,178.00"
+      assert total_block.content.size > minor_block.content.size
     end
 
     test "mismatched :totals.subtotal raises ArgumentError naming Supplied and Derived" do

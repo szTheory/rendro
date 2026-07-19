@@ -19,6 +19,26 @@ defmodule Rendro.ExamplesDataTest do
     assert %Rendro.Document{} = doc
   end
 
+  test "118-08: transform_invoice/1 threads issuer/customer/due_date/terms/totals through with faithful Decimal money" do
+    data =
+      "invoice/acme-phoenix-saas/invoice.json"
+      |> Examples.load!()
+      |> ExamplesData.transform_invoice()
+
+    assert %{name: _} = data.issuer
+    assert %{name: _} = data.customer
+    assert %Date{} = data.due_date
+    assert is_binary(data.terms)
+    assert %Decimal{} = data.totals.subtotal
+    assert %Decimal{} = data.totals.tax
+    assert %Decimal{} = data.totals.total
+
+    # Faithful cents — never a lossy float/integer coercion (INV-02).
+    rendered = Rendro.Recipes.Invoice.document(data)
+    flat = inspect(rendered, limit: :infinity, printable_limit: :infinity)
+    refute flat =~ ~r/\$\d[\d,]*\.\d(?!\d)/
+  end
+
   test "transform_statement feeds Rendro.Recipes.Statement.document/1" do
     doc =
       "statement/northwind-ledger-co/statement.json"
