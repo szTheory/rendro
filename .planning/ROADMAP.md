@@ -154,7 +154,7 @@ Plans:
 **Wave 1** *(local foundation, parallel)*
 
 - [x] 118-01-PLAN.md — Generalize examples.schema.json (per-family) + author 5 fictional fixtures (statement/receipt/certificate/payslip/ticket) — SHOW-01
-- [ ] 118-02-PLAN.md — Author 5 new DOMAIN.md + strengthen DomainMdContractTest per-domain (D-04) — SHOW-01
+- [x] 118-02-PLAN.md — Author 5 new DOMAIN.md + strengthen DomainMdContractTest per-domain (D-04) — SHOW-01
 
 **Wave 2** *(blocked on Wave 1)*
 
@@ -209,7 +209,7 @@ Plans:
 | 115. Invoice anatomy + Format promotion + seams | v2.10 | 4/4 | Complete    | 2026-07-18 |
 | 116. New families — Payslip & Ticket | v2.10 | 4/4 | Complete    | 2026-07-19 |
 | 117. Edge-case stress matrix | v2.10 | 7/7 | Complete    | 2026-07-19 |
-| 118. Rubric-gated demos, gallery & docs closure | v2.10 | 1/7 | In Progress|  |
+| 118. Rubric-gated demos, gallery & docs closure | v2.10 | 2/7 | In Progress|  |
 | 108. Baseline & Audit Report | C1 | 3/3 | Complete | 2026-06-14 |
 | 109. Caching & setup-beam Foundation | C1 | 2/2 | Complete | 2026-06-15 |
 | 110. Test Concurrency, Determinism & Cleanup | C1 | 3/3 | Complete | 2026-06-16 |

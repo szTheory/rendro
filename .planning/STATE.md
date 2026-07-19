@@ -2,16 +2,18 @@
 gsd_state_version: 1.0
 milestone: v2.10
 milestone_name: Realistic Business-Document Examples & Anatomy
+current_phase: 118
+current_phase_name: rubric-gated-demonstration-set-gallery-docs-closure
 status: executing
 stopped_at: Phase 118 context gathered
-last_updated: "2026-07-19T15:44:01.960Z"
+last_updated: "2026-07-19T15:50:36.888Z"
 last_activity: 2026-07-19
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 29
-  completed_plans: 23
-  percent: 79
+  completed_plans: 24
+  percent: 80
 ---
 
 # Project State
@@ -25,7 +27,7 @@ progress:
 ## Current Position
 
 Phase: 118 (rubric-gated-demonstration-set-gallery-docs-closure) — EXECUTING
-Plan: 2 of 7
+Plan: 3 of 7
 Status: Ready to execute
 Last activity: 2026-07-19
 
@@ -80,6 +82,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 - [Phase 117]: 117-04: family × stress-dimension @matrix built by zipping row-vectors against @families (transcription-resistant), independently exhaustiveness-checked by the D-02 meta-test; 62 golden refs blessed hash-only, committed as one-line SHA-256 files
 - [Phase 117]: 117-06: Six D-10 curated raster fixtures added IN PLACE to the existing pdfium_raster_snapshot_test.exs (CI Landmine 1 hardcoded single-file path) so CI discovers them with zero ci.yml edit; refs blessed in the pinned CI container per D-11 (not locally: no pdfium-cli, hashes non-portable).
 - [Phase ?]: [Phase 118]: 118-01: Generalized examples.schema.json to per-family allOf/if-then; invoice branch keyed on structural 'invoice' key (keeps original fixture byte-identical), 5 new families keyed on top-level 'family' const. Payslip employer deliberately 'Aurora Live' (D-02) reconciling recipe test's 'Aurora Textiles Co.' (Pitfall 5).
+- [Phase 118]: 118-02: Strengthened the DOMAIN.md contract to require one DOMAIN.md per demonstrated domain, derived from priv/examples/*/*/*.json fixture dirs (not a hardcoded family list) plus a non-vacuous guard, so future families inherit it automatically. Authored five new four-heading DOMAIN.md anatomy files (statement/receipt/certificate/payslip/ticket).
 
 ### Blockers / Open Questions
 
@@ -122,6 +125,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 | Phase 117 P06 | 6min | 2 tasks | 1 files |
 | Phase 117 P07 | ~4min | 2 tasks | 3 files |
 | Phase 118 P01 | 3min | 3 tasks | 6 files |
+| Phase 118 P02 | 3min | 2 tasks | 6 files |
 
 ## Operator Next Steps
 
@@ -129,6 +133,6 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 
 ## Session
 
-**Last session:** 2026-07-19T15:43:35.506Z
+**Last session:** 2026-07-19T15:49:51.666Z
 **Stopped at:** Phase 118 context gathered
 **Resume file:** None
