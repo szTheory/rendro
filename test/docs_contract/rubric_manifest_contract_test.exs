@@ -59,8 +59,11 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
   end
 
   test "threshold-arithmetic correctness, not the subjective score" do
-    # Synthetic (not real) inputs — `scores` is empty this phase, so this proves the
-    # arithmetic itself is enforced independent of any demo's subjective rating.
+    # Synthetic (not real) inputs — the near-miss cases below can't be expressed by the
+    # real all-passing demo data, so this proves the arithmetic itself rejects each
+    # failure mode independent of any demo's subjective rating. The companion test
+    # "recorded `passed` matches recomputation ..." applies the same rule to the real
+    # scores[] entries.
     all_pass_scores = %{
       "information_architecture" => 5,
       "content_hierarchy" => 5,
@@ -86,6 +89,28 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
     # Near-miss 3: one gate = false (fails gates-pass)
     refute passed?(all_pass_scores, %{all_pass_gates | "print_safety" => false}),
            "a failing gate must fail regardless of dimension scores"
+  end
+
+  test "recorded `passed` matches recomputation from each entry's own dimensions/gates" do
+    # Regression guard for SHOW-01's original failure mode: a manifest entry recorded
+    # `passed: true` that did NOT satisfy the passed?/2 arithmetic. This recomputes the
+    # verdict from each entry's own dimension_scores/gate_results and asserts it equals
+    # the recorded `passed`, so the field can never again be asserted independently.
+    scores = manifest()["scores"]
+
+    assert scores != [],
+           "manifest scores[] must not be empty once demos are recorded — an empty " <>
+             "array would make this tripwire pass vacuously"
+
+    for entry <- scores do
+      recomputed = passed?(entry["dimension_scores"], entry["gate_results"])
+
+      assert entry["passed"] == recomputed,
+             "demo #{entry["demo_id"]}: recorded passed=#{inspect(entry["passed"])} " <>
+               "but recomputation from its own dimension_scores/gate_results yields " <>
+               "#{inspect(recomputed)} — the manifest's passed field must equal the " <>
+               "passed?/2 arithmetic, never an independent assertion (SHOW-01 honesty gate)"
+    end
   end
 
   # --- D-15 fail-loud-in-both-directions stress-exemption guards ------------
