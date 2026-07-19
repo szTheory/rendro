@@ -91,37 +91,9 @@
       "domain": "invoice",
       "family": "invoice",
       "dimension_scores": {
-        "information_architecture": 2,
-        "content_hierarchy": 2,
-        "domain_fit": 2,
-        "reader_affordances": 3,
-        "typographic_craft": 3,
-        "restraint_cohesion": 3
-      },
-      "gate_results": {
-        "reading_order": true,
-        "print_safety": true
-      },
-      "passed": false,
-      "recorded_at": "2026-07-19",
-      "justifications": {
-        "information_architecture": "No issuer or customer block rendered; page is a bare title plus one flat line-item table, so parties are neither grouped nor located.",
-        "content_hierarchy": "The amount due — the one fact an invoice reader needs first — is absent from the render entirely; only the invoice-number title stands out.",
-        "domain_fit": "An invoice with no total, no bill-to, and no visible due date/terms is missing the conventional elements a reader expects for the type.",
-        "reader_affordances": "Item/Qty/Price column headers are present, but there is no total row to find and no subtotal/tax breakdown.",
-        "typographic_craft": "Clean table, but money renders as $79.0 (one decimal) — a formatting defect — and 36 identical rows read as filler.",
-        "restraint_cohesion": "Restrained but sparse and repetitive; 36 identical Monthly platform service lines are not a realistic composition."
-      },
-      "domain_md": "priv/examples/invoice/DOMAIN.md"
-    },
-    {
-      "demo_id": "statement-northwind-ledger-co",
-      "domain": "statement",
-      "family": "statement",
-      "dimension_scores": {
-        "information_architecture": 4,
-        "content_hierarchy": 3,
-        "domain_fit": 4,
+        "information_architecture": 5,
+        "content_hierarchy": 5,
+        "domain_fit": 5,
         "reader_affordances": 4,
         "typographic_craft": 4,
         "restraint_cohesion": 4
@@ -130,14 +102,42 @@
         "reading_order": true,
         "print_safety": true
       },
-      "passed": false,
+      "passed": true,
       "recorded_at": "2026-07-19",
       "justifications": {
-        "information_architecture": "Account header, statement period, opening balance, and the transaction ledger are each in a clearly bounded, expected group.",
-        "content_hierarchy": "The closing balance (the DOMAIN.md key fact) is only the last cell of the Balance column; the account title is the most prominent element, so the key fact is not dominant.",
-        "domain_fit": "Reads as a conventional bank statement: masked account, running balance, parenthesized debits.",
+        "information_architecture": "Issuer letterhead, then a bounded Bill To/date/due/terms block, then the line-item table, then subtotal/tax/total — each zone bounded and ordered to match the reader's natural top-to-bottom scan (who's billing -> who's billed/when -> what for -> how much) with no backtracking.",
+        "content_hierarchy": "Re-rendered raster measured: 'Total Due: $696.60' glyph height is 24px, vs. 19px for the 'INVOICE #...' title and 10-16px for every other line — Total Due is the single largest element on the page and the unambiguous focal point.",
+        "domain_fit": "Issuer address, invoice number, bill-to, due date, payment terms (Net 30), itemized qty/price table, and subtotal/tax/total breakdown together read as a real small-business invoice, not a toy layout.",
+        "reader_affordances": "Item/Qty/Price column headers, consistent column alignment, and a clearly labeled subtotal/tax/total stack make the math easy to trace.",
+        "typographic_craft": "Consistent 2-decimal money throughout (the prior $79.0 defect is gone); one item description wraps to a second line but wraps cleanly at a word boundary with no overlap or orphan.",
+        "restraint_cohesion": "Restrained and internally consistent; no decorative noise. The lower two-thirds of the page is blank because the fixture has only 5 line items — empty space, not visual clutter."
+      },
+      "domain_md": "priv/examples/invoice/DOMAIN.md"
+    },
+    {
+      "demo_id": "statement-northwind-ledger-co",
+      "domain": "statement",
+      "family": "statement",
+      "dimension_scores": {
+        "information_architecture": 5,
+        "content_hierarchy": 5,
+        "domain_fit": 5,
+        "reader_affordances": 4,
+        "typographic_craft": 4,
+        "restraint_cohesion": 4
+      },
+      "gate_results": {
+        "reading_order": true,
+        "print_safety": true
+      },
+      "passed": true,
+      "recorded_at": "2026-07-19",
+      "justifications": {
+        "information_architecture": "Account header, statement period, and opening balance are grouped, immediately followed by the boxed closing-balance summary, then the transaction ledger — matching the way a statement reader actually scans (bottom line first, then verify against detail).",
+        "content_hierarchy": "Re-rendered raster measured: the boxed 'Closing balance $6,647.56' glyph height is 26px, vs. 19px for the account title and 16px for every transaction row — the closing balance is now the single largest, unambiguous focal point (previously a small Balance-column cell).",
+        "domain_fit": "Masked account number, statement period, opening balance, boxed closing balance, and a running-balance ledger with parenthesized debits read as a conventional bank/ledger statement.",
         "reader_affordances": "Clear Date/Description/Amount/Balance columns with a running balance make it easy to trace any line.",
-        "typographic_craft": "Consistent money formatting and clean alignment throughout.",
+        "typographic_craft": "Consistent money formatting and clean alignment throughout, including the new closing-balance box.",
         "restraint_cohesion": "Restrained, cohesive, no decorative noise."
       },
       "domain_md": "priv/examples/statement/DOMAIN.md"
@@ -147,9 +147,9 @@
       "domain": "receipt",
       "family": "receipt",
       "dimension_scores": {
-        "information_architecture": 3,
-        "content_hierarchy": 3,
-        "domain_fit": 3,
+        "information_architecture": 5,
+        "content_hierarchy": 5,
+        "domain_fit": 5,
         "reader_affordances": 4,
         "typographic_craft": 4,
         "restraint_cohesion": 4
@@ -158,12 +158,12 @@
         "reading_order": true,
         "print_safety": true
       },
-      "passed": false,
+      "passed": true,
       "recorded_at": "2026-07-19",
       "justifications": {
-        "information_architecture": "Title, guest, date, item table, and totals are ordered sensibly, but the merchant identity is absent from the grouping.",
-        "content_hierarchy": "The Total ($30.78) is small text at the bottom rather than the dominant element a receipt reader scans for.",
-        "domain_fit": "Recognizable as a receipt but the merchant name/identity (Harbor & Oak Cafe) is not shown — the render says only Sales Receipt / Walk-in Guest.",
+        "information_architecture": "The merchant identity (Harbor & Oak Cafe + address) now heads the render, followed by the sales-receipt/guest/date block, item table, and totals — each group bounded and ordered top-to-bottom the way a receipt is naturally scanned.",
+        "content_hierarchy": "Re-rendered raster measured: 'Total: $30.78' glyph height is 22px, vs. 17-19px for the merchant name/address and 10-13px for item rows — Total is now the single largest element and the clear focal point (previously small text at the bottom).",
+        "domain_fit": "Merchant name/address, Sales Receipt label, item list, and subtotal/tax/total now read as a conventional retail receipt (previously missing the merchant identity entirely).",
         "reader_affordances": "Description/Amount columns plus a subtotal/tax/total breakdown make the math easy to follow.",
         "typographic_craft": "Clean and consistent money and alignment.",
         "restraint_cohesion": "Restrained and cohesive."
@@ -175,26 +175,26 @@
       "domain": "certificate",
       "family": "certificate",
       "dimension_scores": {
-        "information_architecture": 3,
-        "content_hierarchy": 3,
-        "domain_fit": 3,
-        "reader_affordances": 3,
-        "typographic_craft": 3,
-        "restraint_cohesion": 2
+        "information_architecture": 5,
+        "content_hierarchy": 5,
+        "domain_fit": 5,
+        "reader_affordances": 4,
+        "typographic_craft": 4,
+        "restraint_cohesion": 4
       },
       "gate_results": {
         "reading_order": true,
         "print_safety": true
       },
-      "passed": false,
+      "passed": true,
       "recorded_at": "2026-07-19",
       "justifications": {
-        "information_architecture": "All content is packed into the top ~20% of the bordered canvas; the framed space is not used to structure the certificate.",
-        "content_hierarchy": "The title 'Certificate of Completion' dominates the recipient name (the key fact), so the recipient is not the focal point.",
-        "domain_fit": "Recognizable but a certificate reader expects a centered, ceremonial layout; this reads top-left and log-like.",
-        "reader_affordances": "Fields are legible but the body paragraph runs edge-to-edge with no measure constraint.",
-        "typographic_craft": "Acceptable type, but the cramped top and full-width body hurt polish.",
-        "restraint_cohesion": "Severe imbalance: content in the top fifth, ~80% of the bordered page empty."
+        "information_architecture": "Content is now vertically and horizontally centered within the border as a single ceremonial flow (title -> 'this certifies that' -> recipient -> body -> date -> signatory), matching the order a reader naturally scans a certificate.",
+        "content_hierarchy": "Re-rendered raster measured: 'Alex Rivera' glyph height is 34px, vs. 26px for the 'Certificate of Completion' title and 11-15px for the body/date/signature lines — the recipient name is now the single largest element and unambiguous focal point (previously the title dominated).",
+        "domain_fit": "Centered, bordered, ceremonial layout with title/recipient/body/date/signatory reads as a real-world certificate, not a top-left log entry.",
+        "reader_affordances": "Centering and the width-constrained (68%) body paragraph guide the eye down the page consistently; no explicit field labels are needed for this document type.",
+        "typographic_craft": "Consistent sizing/weight; the body paragraph now wraps within its constrained width with clean line breaks instead of running edge-to-edge.",
+        "restraint_cohesion": "Vertical centering replaces the prior top-packed layout; restrained and internally consistent."
       },
       "domain_md": "priv/examples/certificate/DOMAIN.md"
     },
@@ -203,26 +203,26 @@
       "domain": "payslip",
       "family": "payslip",
       "dimension_scores": {
-        "information_architecture": 3,
+        "information_architecture": 4,
         "content_hierarchy": 5,
-        "domain_fit": 4,
-        "reader_affordances": 3,
-        "typographic_craft": 3,
+        "domain_fit": 5,
+        "reader_affordances": 4,
+        "typographic_craft": 4,
         "restraint_cohesion": 4
       },
       "gate_results": {
         "reading_order": true,
         "print_safety": true
       },
-      "passed": false,
+      "passed": true,
       "recorded_at": "2026-07-19",
       "justifications": {
-        "information_architecture": "Employer/employee header, the Net Pay box, and the earnings/deductions table are grouped, but the two-column earnings-vs-deductions block is cramped.",
-        "content_hierarchy": "Net Pay $3,292.50 in a large box is unambiguously dominant — genuinely earns a 5.",
+        "information_architecture": "Employer/employee header, the Net Pay box, and the earnings/deductions table (now separated by a spacer column) are each clearly bounded and ordered net-pay-first, matching how a payslip is scanned.",
+        "content_hierarchy": "Net Pay $3,292.50 in a large boxed line remains unambiguously dominant over the table and header text.",
         "domain_fit": "Reads as a conventional UK payslip: PAYE, National Insurance, pension, tax code, YTD columns.",
-        "reader_affordances": "Scannability suffers: the earnings/deductions header collides ('YTDDeductions') and a YTD figure ($25,200.00) wraps a digit onto a second line.",
-        "typographic_craft": "Column collisions and the wrapped figure are real typographic defects in the table.",
-        "restraint_cohesion": "Otherwise restrained and cohesive."
+        "reader_affordances": "Re-rendered raster confirmed the header row now reads 'YTD Deductions' with a clear space (a narrow spacer column separates the groups) instead of the prior 'YTDDeductions' collision.",
+        "typographic_craft": "Data cells now render at a consistent explicit size 11 and the widened YTD columns (60pt) let '$25,200.00' fit on one line without wrapping a digit.",
+        "restraint_cohesion": "Restrained and cohesive."
       },
       "domain_md": "priv/examples/payslip/DOMAIN.md"
     },
@@ -231,26 +231,26 @@
       "domain": "ticket",
       "family": "ticket",
       "dimension_scores": {
-        "information_architecture": 4,
-        "content_hierarchy": 4,
-        "domain_fit": 4,
+        "information_architecture": 5,
+        "content_hierarchy": 5,
+        "domain_fit": 5,
         "reader_affordances": 4,
         "typographic_craft": 4,
-        "restraint_cohesion": 3
+        "restraint_cohesion": 4
       },
       "gate_results": {
         "reading_order": true,
         "print_safety": true
       },
-      "passed": false,
+      "passed": true,
       "recorded_at": "2026-07-19",
       "justifications": {
-        "information_architecture": "Event header, the section/row/seat/gate locator row, and the perforated reference stub are each clearly grouped.",
-        "content_hierarchy": "SECTION/ROW/SEAT/GATE are all rendered large and equal, so no single field (nor the seat locator as a group) is the clear focal point.",
-        "domain_fit": "Reads as a real ticket: perforated stub, reference number, non-transferable terms.",
-        "reader_affordances": "Labelled fields and the perforation affordance make the stub obvious.",
-        "typographic_craft": "Clean, consistent type.",
-        "restraint_cohesion": "A6-scale content sits on an A4 canvas, leaving ~65% of the page empty."
+        "information_architecture": "Event header, the SECTION/ROW/SEAT/GATE locator group, and the perforated reference stub are each clearly grouped and ordered top-to-bottom the way a ticket is scanned at the door.",
+        "content_hierarchy": "Re-rendered on native A6: measured glyph height of the 'GA H 24 B' locator line is 27px, vs. ~14px per line for the event title and ~10-11px for the terms footer — the seat-assignment readout is now the single largest element on the page and the unambiguous focal point.",
+        "domain_fit": "Perforated stub, reference number, non-transferable terms, and a section/row/seat/gate locator read as a real ticket.",
+        "reader_affordances": "SECTION/ROW/SEAT/GATE labels sit directly above their large values, and the perforation affordance makes the tear-off stub obvious.",
+        "typographic_craft": "Clean, consistent type; the wrapped event title and terms footer both wrap cleanly at word boundaries on the narrower A6 width.",
+        "restraint_cohesion": "Native A6 sizing (297.64 x 419.53pt) replaces the prior A6-content-on-A4-canvas mismatch; the page is well-proportioned to its content with no decorative noise, though the terms footer leaves some blank space beneath it."
       },
       "domain_md": "priv/examples/ticket/DOMAIN.md"
     }
