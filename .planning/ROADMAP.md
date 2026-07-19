@@ -128,7 +128,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 117-04-PLAN.md — @matrix (102 cells) + D-02 coverage-honesty meta-test + 62 golden tests — EDGE-01
+- [x] 117-04-PLAN.md — @matrix (102 cells) + D-02 coverage-honesty meta-test + 62 golden tests — EDGE-01
 - [ ] 117-05-PLAN.md — EDGE-02 typed-error assertions (overflow, tall-row, RTL x2) — EDGE-02
 - [ ] 117-06-PLAN.md — 6 curated pdfium raster fixtures, extending the existing raster test file in place — EDGE-01
 
@@ -185,7 +185,7 @@ Plans:
 | 114. Domain research, rubric & example-data library | v2.10 | 7/7 | Complete    | 2026-07-11 |
 | 115. Invoice anatomy + Format promotion + seams | v2.10 | 4/4 | Complete    | 2026-07-18 |
 | 116. New families — Payslip & Ticket | v2.10 | 4/4 | Complete    | 2026-07-19 |
-| 117. Edge-case stress matrix | v2.10 | 3/7 | In Progress|  |
+| 117. Edge-case stress matrix | v2.10 | 4/7 | In Progress|  |
 | 118. Rubric-gated demos, gallery & docs closure | v2.10 | 0/TBD | Not started | - |
 | 108. Baseline & Audit Report | C1 | 3/3 | Complete | 2026-06-14 |
 | 109. Caching & setup-beam Foundation | C1 | 2/2 | Complete | 2026-06-15 |
