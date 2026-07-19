@@ -41,6 +41,18 @@ defmodule Rendro.Test.GoldenTest do
     fun.()
   end
 
+  defp with_dump(value, fun) do
+    prior = System.get_env("MIX_GOLDEN_DUMP")
+    on_exit(fn -> restore_env("MIX_GOLDEN_DUMP", prior) end)
+
+    case value do
+      nil -> System.delete_env("MIX_GOLDEN_DUMP")
+      v -> System.put_env("MIX_GOLDEN_DUMP", v)
+    end
+
+    fun.()
+  end
+
   describe "assert_deterministic!/1" do
     test "renders twice with deterministic: true and returns the byte-identical PDF" do
       pdf = Golden.assert_deterministic!(fixture_doc())
@@ -144,6 +156,63 @@ defmodule Rendro.Test.GoldenTest do
       refute File.exists?(
                "priv/goldens/__nonexistent_family__/__nonexistent_dimension__.sha256"
              )
+    end
+  end
+
+  describe "assert_or_bless/3 — MIX_GOLDEN_DUMP escape hatch" do
+    test "when set, dumps raw PDF bytes to <dir>/<family>_<dimension>.pdf, creating the dir" do
+      base_dir = scratch_dir()
+      dump_dir = scratch_dir()
+      pdf = Golden.assert_deterministic!(fixture_doc())
+
+      # Bless branch so the underlying call succeeds — dump is independent of it.
+      dumped = Path.join(dump_dir, "invoice_text_wrap.pdf")
+
+      with_bless("true", fn ->
+        with_dump(dump_dir, fn ->
+          assert :ok = Golden.assert_or_bless({:invoice, :text_wrap}, pdf, base_dir: base_dir)
+        end)
+      end)
+
+      assert File.exists?(dumped)
+      assert File.read!(dumped) == pdf
+    end
+
+    test "when unset, writes no dump file and creates no dump directory" do
+      base_dir = scratch_dir()
+      dump_dir = Path.join(System.tmp_dir!(), "rendro-golden-nodump-#{System.unique_integer([:positive])}")
+      on_exit(fn -> File.rm_rf!(dump_dir) end)
+      pdf = Golden.assert_deterministic!(fixture_doc())
+
+      with_bless("true", fn ->
+        with_dump(nil, fn ->
+          assert :ok = Golden.assert_or_bless({:invoice, :text_wrap}, pdf, base_dir: base_dir)
+        end)
+      end)
+
+      refute File.exists?(dump_dir)
+    end
+
+    test "dump never alters the assert outcome — a ref mismatch still fails while dumping" do
+      base_dir = scratch_dir()
+      dump_dir = scratch_dir()
+      pdf = Golden.assert_deterministic!(fixture_doc())
+      ref_path = "#{base_dir}/invoice/text_wrap.sha256"
+      File.mkdir_p!(Path.dirname(ref_path))
+      File.write!(ref_path, String.duplicate("0", 64) <> "\n")
+      dumped = Path.join(dump_dir, "invoice_text_wrap.pdf")
+
+      with_bless(nil, fn ->
+        with_dump(dump_dir, fn ->
+          assert_raise ExUnit.AssertionError, fn ->
+            Golden.assert_or_bless({:invoice, :text_wrap}, pdf, base_dir: base_dir)
+          end
+        end)
+      end)
+
+      # The mismatch still failed AND the eyeball dump was still written.
+      assert File.exists?(dumped)
+      assert File.read!(dumped) == pdf
     end
   end
 end
