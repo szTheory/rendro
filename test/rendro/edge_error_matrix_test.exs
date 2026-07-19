@@ -31,8 +31,10 @@ defmodule Rendro.EdgeErrorMatrixTest do
       assert {:error, %Rendro.Error{stage: :paginate, reason: :content_overflow} = error} =
                Rendro.render(EdgeFixtures.overflow_document())
 
-      assert error.next ==
-               "Reduce content size or expand the declared page/region bounds; Rendro does not auto-fit overflowing content."
+      # D-07 idiom: assert `next` as a SUBSTRING, never full prose equality —
+      # wording may drift; the {stage, reason} contract and this guidance keyword
+      # may not.
+      assert error.next =~ "does not auto-fit"
 
       # Generic check_overflow!/4 path merges a :block rect into details.
       assert is_map(error.details.block)
@@ -42,9 +44,9 @@ defmodule Rendro.EdgeErrorMatrixTest do
       assert {:error, %Rendro.Error{stage: :paginate, reason: :content_overflow} = error} =
                Rendro.render(EdgeFixtures.tall_row_document())
 
-      # Identical next string — next_step/2 pattern-matches only on {stage, reason}.
-      assert error.next ==
-               "Reduce content size or expand the declared page/region bounds; Rendro does not auto-fit overflowing content."
+      # Identical next guidance — next_step/2 pattern-matches only on {stage, reason}.
+      # D-07 idiom: substring, not full-prose equality.
+      assert error.next =~ "does not auto-fit"
 
       # The table-row-overflow branch identifies the offending row, never silently
       # truncating it.
@@ -92,12 +94,26 @@ defmodule Rendro.EdgeErrorMatrixTest do
   end
 
   describe "EDGE-02: coverage discipline (D-08)" do
-    test "exactly the 4 engine-level representative inputs are covered, not per-family" do
+    test "every covered engine-level input maps to a real EdgeFixtures builder (non-vacuous)" do
       # Engine-level granularity (D-08): overflow/tall-row (paginate) + both RTL
       # refusal modes (measure) are pipeline concerns identical across all six
       # recipes. This is deliberately NOT a per-family matrix.
-      assert @error_cases == [:overflow, :tall_row, :rtl_default_font, :rtl_shaping_required]
+      #
+      # A coverage-honesty phase must not ship a coverage guard that can't fail.
+      # Tie each declared case to its `<case>_document/0` builder so the marker
+      # tracks the actual fixtures the tests above exercise: declaring a 5th case
+      # without a fixture, or renaming/removing a fixture, trips this guard.
+      Code.ensure_loaded!(EdgeFixtures)
+
+      for c <- @error_cases do
+        builder = :"#{c}_document"
+
+        assert function_exported?(EdgeFixtures, builder, 0),
+               "EDGE-02 case #{inspect(c)} has no EdgeFixtures.#{builder}/0 builder"
+      end
+
       assert length(@error_cases) == 4
+      assert Enum.uniq(@error_cases) == @error_cases
     end
   end
 end
