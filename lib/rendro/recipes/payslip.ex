@@ -407,6 +407,37 @@ defmodule Rendro.Recipes.Payslip do
   @row_epsilon 2.0
   @reconciliation_line_height 16
 
+  # 118-08 gap-closure (SHOW-01): de-crowd the earnings/deductions table.
+  #
+  # Two compounding defects, per 118-06-FINDINGS.md:
+  #
+  #   1. Data rows were plain strings, so they measured at Rendro.Text's
+  #      DEFAULT size (12) rather than the size 11 the subtotal row already
+  #      uses explicitly — an inconsistency that also made the prior 55pt
+  #      fixed amount-column width too narrow for the widest realistic YTD
+  #      figure ("$25,200.00" measures 60.048pt at size 12, ~5pt over its
+  #      own column, wrapping the last digit onto a second line). Making
+  #      every data cell an explicit size-11 Rendro.Text (matching the
+  #      subtotal row) is both a consistency fix and a de-crowding win: it
+  #      shrinks every cell's measured width, freeing column budget.
+  #   2. The engine has no cell-padding primitive, so the earnings and
+  #      deductions column GROUPS butted directly against each other with
+  #      zero gap even with `borders: :columns` (a thin rule alone, with
+  #      each side's text pushed flush against it, still reads as
+  #      crowded — the "YTDDeductions" header collision). A narrow empty
+  #      spacer column between the two groups gives every row a genuine
+  #      visual gap.
+  #
+  # At size 11, "$25,200.00" measures 55.044pt and "$4,200.00" measures
+  # 48.928pt — @ytd_col_width and @current_col_width below give both
+  # comfortable headroom while the @group_spacer_width column keeps the two
+  # remaining description share-columns wide enough for the widest realistic
+  # line-item description (e.g. "Pension Contribution", 102.102pt at size 11).
+  @current_col_width 55
+  @ytd_col_width 60
+  @group_spacer_width 10
+  @cell_size 11
+
   defp body_section(data, opts) do
     colors = palette(opts)
     lbl = Rendro.Recipes.Pagination.label_resolver(opts, @default_labels)
@@ -420,37 +451,42 @@ defmodule Rendro.Recipes.Payslip do
     formatted_rows =
       Enum.map(zipped, fn {earn, ded} ->
         [
-          Map.get(earn, :description, ""),
-          fmt_amount_or_blank(Map.get(earn, :amount), fmt_amount),
-          fmt_amount_or_blank(Map.get(earn, :ytd), fmt_amount),
-          Map.get(ded, :description, ""),
-          fmt_amount_or_blank(Map.get(ded, :amount), fmt_amount),
-          fmt_amount_or_blank(Map.get(ded, :ytd), fmt_amount)
+          cell_text(Map.get(earn, :description, ""), colors),
+          cell_text(fmt_amount_or_blank(Map.get(earn, :amount), fmt_amount), colors),
+          cell_text(fmt_amount_or_blank(Map.get(earn, :ytd), fmt_amount), colors),
+          cell_text("", colors),
+          cell_text(Map.get(ded, :description, ""), colors),
+          cell_text(fmt_amount_or_blank(Map.get(ded, :amount), fmt_amount), colors),
+          cell_text(fmt_amount_or_blank(Map.get(ded, :ytd), fmt_amount), colors)
         ]
       end)
 
     subtotal_row = subtotal_row(lbl, fmt_amount, colors, totals)
     all_rows = formatted_rows ++ [subtotal_row]
 
+    # 118-08: column 3 is a narrow empty spacer between the earnings group
+    # (0-2) and the deductions group (4-6) — see @group_spacer_width above.
     table_opts = [
       header: [
         lbl.(:earnings),
         lbl.(:amount),
         lbl.(:ytd_amount),
+        "",
         lbl.(:deductions),
         lbl.(:amount),
         lbl.(:ytd_amount)
       ],
       columns: [
         {:share, 2},
-        {:fixed, 55},
-        {:fixed, 55},
+        {:fixed, @current_col_width},
+        {:fixed, @ytd_col_width},
+        {:fixed, @group_spacer_width},
         {:share, 2},
-        {:fixed, 55},
-        {:fixed, 55}
+        {:fixed, @current_col_width},
+        {:fixed, @ytd_col_width}
       ],
       borders: :columns,
-      cell_align: %{1 => :right, 2 => :right, 4 => :right, 5 => :right}
+      cell_align: %{1 => :right, 2 => :right, 5 => :right, 6 => :right}
     ]
 
     # D-17: measurement must know about the unicode fallback font too (not
@@ -489,17 +525,26 @@ defmodule Rendro.Recipes.Payslip do
   end
 
   defp subtotal_row(lbl, fmt_amount, colors, totals) do
-    blank = Rendro.block(Rendro.text("", size: 11, color: colors.ink))
+    blank = cell_text("", colors)
 
     [
-      Rendro.block(Rendro.text(lbl.(:gross_pay), size: 11, color: colors.ink)),
-      Rendro.block(Rendro.text(fmt_amount.(totals.gross), size: 11, color: colors.ink)),
+      cell_text(lbl.(:gross_pay), colors),
+      cell_text(fmt_amount.(totals.gross), colors),
       blank,
-      Rendro.block(Rendro.text(lbl.(:total_deductions), size: 11, color: colors.ink)),
-      Rendro.block(Rendro.text(fmt_amount.(totals.deductions), size: 11, color: colors.ink)),
-      Rendro.block(Rendro.text("", size: 11, color: colors.ink))
+      blank,
+      cell_text(lbl.(:total_deductions), colors),
+      cell_text(fmt_amount.(totals.deductions), colors),
+      cell_text("", colors)
     ]
   end
+
+  # 118-08: every ledger data cell (line items AND the subtotal row) renders
+  # at the SAME explicit size (@cell_size) — never the Rendro.Text default
+  # (12) a bare string would silently fall back to. Consistency here is both
+  # a correctness fix (predictable column-width math) and a de-crowding win
+  # (a deliberately smaller, uniform cell font frees column budget).
+  defp cell_text(text, colors),
+    do: Rendro.block(Rendro.text(text, size: @cell_size, color: colors.ink))
 
   # Zips earnings/deductions to equal length, blank-padding the shorter list
   # (D-12) so the combined ledger always has one row per zipped pair.

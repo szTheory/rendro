@@ -8,7 +8,13 @@ defmodule Rendro.Recipes.TicketByteIdentityTest do
   # render of the SAME fixed, deterministic fixture must keep hashing to
   # this exact value. Changing this hash is a defect, not a golden-file
   # refresh, unless a human explicitly re-authorizes a new baseline.
-  @toy_golden_sha256 "97643571d8f29f3e389bf35a25718b804a6e302491529dc6928cd540fb172d95"
+  #
+  # 118-08 gap-closure (SHOW-01): re-blessed after switching the ticket's
+  # default page size from A4 to its native A6 (with A6-appropriate margins,
+  # re-tuned stub text sizes, and a taller @band_ratio so a realistic full
+  # ticket's main-region content fits) — an authorized, reviewed geometry
+  # change, not drift.
+  @toy_golden_sha256 "4697ac9340c1677320de14eed1d9d9e7c4d2a48ae0264cc7538cbfd1192eb2bf"
 
   # Fixed, deterministic minimal fixture (no anatomy variance) -- Aurora
   # Live, one 3-cell placement grid, no image, no subtitle/terms -- so the

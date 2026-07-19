@@ -29,8 +29,9 @@ defmodule Rendro.Recipes.Ticket do
                           `%Rendro.Document{}` ready for `Rendro.render/2`.
     - `page_template/1` — Layout only; returns the `%Rendro.PageTemplate{}`.
                           Geometry is derived from `Rendro.PageSize.resolve/2`
-                          (A4 default, portrait) — zero hardcoded numerics
-                          (D-03), so both A4 and US Letter render correctly.
+                          (A6 default, portrait — the ticket's native physical
+                          size, per 118-08/SHOW-01) — zero hardcoded numerics
+                          (D-03), so A4, US Letter, and A6 all render correctly.
     - `sections/2`      — Content only; returns a list of `%Rendro.Section{}`
                           structs mapped to named regions.
 
@@ -68,19 +69,32 @@ defmodule Rendro.Recipes.Ticket do
   """
   @moduledoc tags: [:adapter]
 
-  @default_page_size :a4
-  @default_margin 72
+  # 118-08 gap-closure (SHOW-01): the ticket now defaults to its native A6
+  # physical size (postcard/ticket-stock, 297.64 x 419.53pt) instead of a
+  # much larger A4 canvas — the prior A6-sized content sitting on an A4
+  # sheet left ~65% of the page empty (118-06-FINDINGS.md). The fixture
+  # already carries `"paper": "a6"`; this makes that the recipe's own
+  # default rather than requiring every caller to pass page_size: :a6.
+  # @default_margin is likewise A6-appropriate (a 72pt/1in margin would
+  # consume nearly half of an A6 sheet's width).
+  @default_page_size :a6
+  @default_margin 18
 
-  # D-03: band height is a dimensionless RATIO of content width (~2.4:1),
-  # never a fixed-point constant, so A4/US Letter geometry falls out
-  # identically. The stub split is likewise a ratio of the band's own width.
-  @band_ratio 2.4
+  # D-03: band height is a dimensionless RATIO of content width, never a
+  # fixed-point constant, so A4/US Letter/A6 geometry falls out identically.
+  # The stub split is likewise a ratio of the band's own width. 118-08:
+  # lowered from 2.4 to 2.0 (taller band relative to its width) — font sizes
+  # are absolute pt values that do NOT shrink with the page, so switching
+  # the default to the much-narrower A6 band_w left too little band_h for a
+  # realistic ticket's full main-region content (issuer + a wrapped 2-line
+  # title + a wrapped 2-line subtitle + the placement grid).
+  @band_ratio 2.0
   @stub_ratio 0.68
   @gap 16
 
   # D-05: interior padding subtracted from the smaller of (stub width, band
   # height) to compute the code box side length -- see stub_section/2.
-  @box_pad 12.0
+  @box_pad 8.0
 
   # D-18: recipe-owned default labels so Ticket.document(data) with zero
   # :labels/:formatters opts renders correct jurisdiction-neutral English
@@ -98,14 +112,14 @@ defmodule Rendro.Recipes.Ticket do
 
   @doc """
   Returns a `%Rendro.PageTemplate{}` with geometry derived from the page size
-  option. Default is A4 portrait. Three named regions: `:main` (the D-02
-  placement-grid anchor), `:stub` (the D-05/D-06/D-07/D-08/D-09 code area),
-  and `:terms` (optional fine print).
+  option. Default is A6 portrait (the ticket's native physical size). Three
+  named regions: `:main` (the D-02 placement-grid anchor), `:stub` (the
+  D-05/D-06/D-07/D-08/D-09 code area), and `:terms` (optional fine print).
 
   ## Options
 
-    - `:page_size` — `:a4` (default), `:us_letter`, or `{width, height}` tuple
-    - `:margin_top` / `:margin_right` / `:margin_bottom` / `:margin_left` — margin in pt (default 72)
+    - `:page_size` — `:a6` (default), `:a4`, `:us_letter`, or `{width, height}` tuple
+    - `:margin_top` / `:margin_right` / `:margin_bottom` / `:margin_left` — margin in pt (default 18)
     - `:name` — template name atom (default `:ticket`)
 
   ## Examples
@@ -243,13 +257,31 @@ defmodule Rendro.Recipes.Ticket do
   # stacking -- a hand-stacked multi-column layout would require fragile
   # height-zeroing tricks against paginate.ex's single shared per-region Y
   # cursor; a table's own column-layout logic already handles this
-  # correctly). One data row of large (22pt) values under a header row of
-  # small caps (8pt) labels -- the values are the single largest text
-  # anywhere on the page, matching D-02's dominant-anchor requirement. The
-  # SAME code renders any 1-4 cell :placement shape (event or boarding-pass)
-  # purely via data -- zero archetype branching (D-01).
+  # correctly). One data row of large (@placement_value_size pt) values
+  # under a header row of small caps (8pt) labels -- the values are the
+  # single largest text anywhere on the page, matching D-02's dominant-anchor
+  # requirement. 118-08 gap-closure (SHOW-01): bumped from 22pt so the WHOLE
+  # placement-grid group reads as unambiguously the page's one dominant
+  # anchor (not four equally-large-but-unremarkable fields) now that the
+  # ticket renders at its smaller native A6 size. The SAME code renders any
+  # 1-4 cell :placement shape (event or boarding-pass) purely via data --
+  # zero archetype branching (D-01); no individual label (e.g. "Seat") is
+  # ever singled out.
+  @placement_value_size 26
+
   defp main_section(data, opts) do
     colors = palette(opts)
+    g = geometry(opts)
+
+    # 118-08: the :main region is narrower now that the ticket defaults to
+    # native A6 (g.stub_split, ~178pt vs. ~307pt at the prior A4 default).
+    # Free-standing text blocks measure at their NATURAL (unwrapped) width
+    # unless a block width is supplied (lib/rendro/pipeline/measure.ex's Text
+    # clause), so any realistic issuer/title/subtitle string now needs an
+    # explicit width to wrap within the region instead of raising
+    # :content_overflow. The placement-grid table is unaffected — its cells
+    # already wrap to their own share-column width.
+    main_w = g.stub_split
 
     header_cells =
       Enum.map(data.placement, fn %{label: l} ->
@@ -258,7 +290,7 @@ defmodule Rendro.Recipes.Ticket do
 
     value_cells =
       Enum.map(data.placement, fn %{value: v} ->
-        Rendro.block(Rendro.text(v, size: 22, color: colors.ink))
+        Rendro.block(Rendro.text(v, size: @placement_value_size, color: colors.ink))
       end)
 
     grid =
@@ -270,8 +302,11 @@ defmodule Rendro.Recipes.Ticket do
 
     subtitle_blocks =
       case Map.get(data, :subtitle) do
-        blank when blank in [nil, ""] -> []
-        subtitle -> [Rendro.block(Rendro.text(subtitle, size: 10, color: colors.muted))]
+        blank when blank in [nil, ""] ->
+          []
+
+        subtitle ->
+          [Rendro.block(Rendro.text(subtitle, size: 10, color: colors.muted), width: main_w)]
       end
 
     Rendro.section(
@@ -279,8 +314,10 @@ defmodule Rendro.Recipes.Ticket do
       region: :main,
       content:
         [
-          Rendro.block(Rendro.text(issuer_display(data.issuer), size: 9, color: colors.muted)),
-          Rendro.block(Rendro.text(data.title, size: 16, color: colors.ink))
+          Rendro.block(Rendro.text(issuer_display(data.issuer), size: 9, color: colors.muted),
+            width: main_w
+          ),
+          Rendro.block(Rendro.text(data.title, size: 16, color: colors.ink), width: main_w)
         ] ++
           subtitle_blocks ++
           [Rendro.block(grid)]
@@ -301,6 +338,17 @@ defmodule Rendro.Recipes.Ticket do
   # at the SAME y, producing a visual overlay). The perforation and code-box
   # backdrop are both height: 0 so neither displaces the reference/image
   # content that follows.
+  # 118-08: reference/caption text sizes were tuned for the prior A4-default
+  # stub width (~144pt); the ticket's smaller native A6 stub is ~84pt. Every
+  # stub text block below gets an explicit `width:` (never left to measure
+  # at its natural, unwrapped width) so a too-long value safely WRAPS
+  # (lib/rendro/pipeline/measure.ex's wrap_text/5 falls back to
+  # per-grapheme splitting for a single unbreakable token) instead of
+  # raising :content_overflow.
+  @reference_size 8
+  @caption_size 7
+  @present_code_size 6
+
   defp stub_section(data, opts) do
     colors = palette(opts)
     lbl = Rendro.Recipes.Pagination.label_resolver(opts, @default_labels)
@@ -308,6 +356,8 @@ defmodule Rendro.Recipes.Ticket do
 
     box_size = min(g.stub_width, g.band_h) - 2 * @box_pad
     box_x = (g.stub_width - box_size) / 2
+    text_x = box_x + 8
+    avail_w = max(g.stub_width - text_x - 4, 1.0)
 
     # D-09: dashed perforation at the stub's own left edge (x=0 relative to
     # this region = the boundary with :main).
@@ -320,10 +370,10 @@ defmodule Rendro.Recipes.Ticket do
         height: 0
       )
 
-    # D-05: the bordered code box backdrop -- always drawn, >= ~100x100pt at
-    # A4-default geometry (derived, not hardcoded). height: 0 so the box's
-    # own drawn rectangle (real height = box_size, from the :rounded_rect
-    # op's own h argument) does not push subsequent content down.
+    # D-05: the bordered code box backdrop -- always drawn, derived (not
+    # hardcoded) from the region geometry. height: 0 so the box's own drawn
+    # rectangle (real height = box_size, from the :rounded_rect op's own h
+    # argument) does not push subsequent content down.
     code_box =
       Rendro.path([{:rounded_rect, box_x, 0, box_size, box_size, 6.0}],
         stroke: %{color: colors.rule, width: 1.0},
@@ -338,7 +388,9 @@ defmodule Rendro.Recipes.Ticket do
     Rendro.section(
       name: :ticket_stub,
       region: :stub,
-      content: [perforation, code_box] ++ code_area_blocks(data, colors, lbl, image, box_x, box_size)
+      content:
+        [perforation, code_box] ++
+          code_area_blocks(data, colors, lbl, image, box_x, box_size, text_x, avail_w)
     )
   end
 
@@ -346,8 +398,9 @@ defmodule Rendro.Recipes.Ticket do
   # optional caption), never a faux barcode/QR stripe pattern. Reference
   # block(s) start at the SAME y as the box backdrop (height: 0), so they
   # overlay the box from its top edge.
-  defp code_area_blocks(data, colors, lbl, nil, box_x, _box_size) do
-    reference_blocks(data, colors, lbl, box_x) ++ [present_code_caption(colors, lbl, box_x)]
+  defp code_area_blocks(data, colors, lbl, nil, _box_x, _box_size, text_x, avail_w) do
+    reference_blocks(data, colors, lbl, text_x, avail_w) ++
+      [present_code_caption(colors, lbl, text_x, avail_w)]
   end
 
   # D-08: image supplied -- fit-contain (aspect-preserving), centered, under
@@ -356,41 +409,54 @@ defmodule Rendro.Recipes.Ticket do
   # clause) naturally advances the cursor past the box, so the
   # ALWAYS-VISIBLE reference (D-06) renders AFTER it -- below the image,
   # never overlaid on top of it.
-  defp code_area_blocks(data, colors, lbl, _image, box_x, box_size) do
+  defp code_area_blocks(data, colors, lbl, _image, box_x, box_size, text_x, avail_w) do
     image_block =
       Rendro.Component.image(:ticket_code, fit: {box_size, box_size})
       |> Map.put(:x, box_x)
 
-    [image_block | reference_blocks(data, colors, lbl, box_x)]
+    [image_block | reference_blocks(data, colors, lbl, text_x, avail_w)]
   end
 
   # D-06: the human-readable reference -- REQUIRED, ALWAYS renders, even
   # when a PNG is supplied. Upper-cased, with a small muted caption above.
-  defp reference_blocks(data, colors, lbl, box_x) do
+  defp reference_blocks(data, colors, lbl, text_x, avail_w) do
     caption_label = Map.get(data.code, :label) || lbl.(:reference)
     reference_text = String.upcase(data.code.reference)
 
     [
-      Rendro.block(Rendro.text(caption_label, size: 8, color: colors.muted))
-      |> Map.put(:x, box_x + 8),
-      Rendro.block(Rendro.text(reference_text, size: 15, color: colors.ink))
-      |> Map.put(:x, box_x + 8)
+      Rendro.block(Rendro.text(caption_label, size: @caption_size, color: colors.muted),
+        x: text_x,
+        width: avail_w
+      ),
+      Rendro.block(Rendro.text(reference_text, size: @reference_size, color: colors.ink),
+        x: text_x,
+        width: avail_w
+      )
     ]
   end
 
-  # D-07: optional 1-line caption, no-image path only.
-  defp present_code_caption(colors, lbl, box_x) do
-    Rendro.block(Rendro.text(lbl.(:present_code), size: 7, color: colors.muted))
-    |> Map.put(:x, box_x + 8)
+  # D-07: optional caption, no-image path only.
+  defp present_code_caption(colors, lbl, text_x, avail_w) do
+    Rendro.block(Rendro.text(lbl.(:present_code), size: @present_code_size, color: colors.muted),
+      x: text_x,
+      width: avail_w
+    )
   end
 
   defp terms_section(data, opts) do
     colors = palette(opts)
+    g = geometry(opts)
 
+    # 118-08: an explicit width lets long fine-print terms wrap within the
+    # :terms region instead of measuring at their natural (unwrapped) width
+    # and raising :content_overflow — mirrors the same fix in main_section/2.
     content =
       case Map.get(data, :terms) do
-        blank when blank in [nil, ""] -> []
-        terms -> [Rendro.block(Rendro.text(terms, size: 8, color: colors.muted))]
+        blank when blank in [nil, ""] ->
+          []
+
+        terms ->
+          [Rendro.block(Rendro.text(terms, size: 8, color: colors.muted), width: g.content_w)]
       end
 
     Rendro.section(name: :ticket_terms, region: :terms, content: content)

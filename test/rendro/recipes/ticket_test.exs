@@ -8,8 +8,8 @@ defmodule Rendro.Recipes.TicketTest do
   # HEADER-ONLY validation (validate_data!/1's D-10 pre-check never fully
   # decodes pixel data, only the signature/IHDR chunk).
   @valid_png_bytes Base.decode64!(
-                      "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVQIW2NkYGD4z8DAwMgAI0AMADjKAu09+3WTAAAAAElFTkSuQmCC"
-                    )
+                     "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVQIW2NkYGD4z8DAwMgAI0AMADjKAu09+3WTAAAAAElFTkSuQmCC"
+                   )
 
   # A real, fully-decodable PNG (used by test/rendro/pipeline/render_test.exs
   # for the same reason) -- needed wherever a test actually renders a
@@ -64,11 +64,29 @@ defmodule Rendro.Recipes.TicketTest do
       assert by_name[:stub].role == :custom
     end
 
-    test "page_size: :us_letter yields different geometry than the :a4 default" do
-      a4 = Ticket.page_template()
+    test "page_size: :us_letter yields different geometry than the default" do
+      default = Ticket.page_template()
       letter = Ticket.page_template(page_size: :us_letter)
 
-      refute {a4.width, a4.height} == {letter.width, letter.height}
+      refute {default.width, default.height} == {letter.width, letter.height}
+    end
+
+    test "118-08: page_template() defaults to native A6 (SHOW-01 — no ~65% empty A4 canvas)" do
+      template = Ticket.page_template()
+      assert {template.width, template.height} == Rendro.PageSize.resolve(:a6, :portrait)
+      # Sanity: A6 is far smaller than A4 in both dimensions.
+      {a4_w, a4_h} = Rendro.PageSize.resolve(:a4, :portrait)
+      assert template.width < a4_w
+      assert template.height < a4_h
+    end
+
+    test "118-08: the :main region occupies most of the (now much smaller) page — seat-locator focal" do
+      template = Ticket.page_template()
+      main = Enum.find(template.regions, &(&1.name == :main))
+
+      # main width is the D-03 @stub_ratio complement (0.68) of the band —
+      # the placement grid gets the majority of the ticket band's width.
+      assert main.width / template.width > 0.5
     end
   end
 
@@ -243,12 +261,12 @@ defmodule Rendro.Recipes.TicketTest do
       assert String.starts_with?(pdf, "%PDF-")
     end
 
-    test "the placement-grid value cells (22pt) are the single largest text in :main content (D-02)" do
+    test "the placement-grid value cells (118-08: 26pt) are the single largest text in :main content (D-02)" do
       sections = Ticket.sections(fixture_data())
       main_section = Enum.find(sections, &(&1.region == :main))
 
       sizes = collect_text_sizes(main_section)
-      assert Enum.max(sizes) == 22
+      assert Enum.max(sizes) == 26
     end
   end
 
@@ -285,7 +303,7 @@ defmodule Rendro.Recipes.TicketTest do
       refute Enum.any?(all_ops, &match?({:rect, _, _, _, _}, &1))
     end
 
-    test "code box is >= 100x100pt at the A4-default geometry (D-05), derived not hardcoded" do
+    test "code box is >= 60x60pt (square) at the 118-08 A6-default geometry (D-05), derived not hardcoded" do
       sections = Ticket.sections(fixture_data())
       stub_section = Enum.find(sections, &(&1.region == :stub))
 
@@ -297,8 +315,30 @@ defmodule Rendro.Recipes.TicketTest do
         end)
         |> Enum.filter(&match?({:rounded_rect, _, _, _, _, _}, &1))
 
-      assert w >= 100
-      assert h >= 100
+      assert w >= 60
+      assert h >= 60
+      assert_in_delta w, h, 0.01
+    end
+
+    test "code box size differs between A6 (default) and A4 geometry (derived, not hardcoded)" do
+      a6_sections = Ticket.sections(fixture_data())
+      a4_sections = Ticket.sections(fixture_data(), page_size: :a4)
+
+      box_side = fn sections ->
+        stub = Enum.find(sections, &(&1.region == :stub))
+
+        [{:rounded_rect, _x, _y, w, _h, _radius}] =
+          stub.content
+          |> Enum.flat_map(fn
+            %Rendro.Block{content: %Rendro.Path{ops: ops}} -> ops
+            _other -> []
+          end)
+          |> Enum.filter(&match?({:rounded_rect, _, _, _, _, _}, &1))
+
+        w
+      end
+
+      refute_in_delta box_side.(a6_sections), box_side.(a4_sections), 0.01
     end
 
     test "PNG-supplied: code.reference STILL appears in the text stream (D-06 always-on)" do

@@ -8,7 +8,12 @@ defmodule Rendro.Recipes.PayslipByteIdentityTest do
   # render of the SAME fixed, deterministic fixture must keep hashing to this
   # exact value. Changing this hash is a defect, not a golden-file refresh,
   # unless a human explicitly re-authorizes a new baseline.
-  @toy_golden_sha256 "3e89a150660a037f352f38c3a66ef07773f0b438611f38c8be1b985c9b20c2bd"
+  #
+  # 118-08 gap-closure (SHOW-01): re-blessed after de-crowding the
+  # earnings/deductions table (explicit size-11 data cells, a group spacer
+  # column, and a widened YTD column) — an authorized, reviewed geometry
+  # change, not drift.
+  @toy_golden_sha256 "85f6242490047cd14b2b1f8f7071fdd76ba5c828aac11b4ac22369b72d24f165"
 
   # Fixed, deterministic minimal fixture (no anatomy variance) -- one
   # earnings line, one deductions line, no :totals, no accented content, so

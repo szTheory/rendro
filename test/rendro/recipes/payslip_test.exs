@@ -359,6 +359,68 @@ defmodule Rendro.Recipes.PayslipTest do
   end
 
   # ---------------------------------------------------------------------------
+  # 118-08 gap-closure — de-crowd the earnings/deductions table (SHOW-01)
+  # ---------------------------------------------------------------------------
+
+  describe "118-08: de-crowded earnings/deductions table" do
+    test "a group spacer column separates the earnings YTD header from the Deductions header" do
+      sections = Payslip.sections(fixture_data())
+      body = Enum.find(sections, &(&1.region == :body))
+      table_block = Enum.find(body.content, fn b -> is_struct(b.content, Rendro.Table) end)
+      table = table_block.content
+
+      # 7 columns: Earnings|Current|YTD|<spacer>|Deductions|Current|YTD.
+      # The spacer's own header cell is blank, giving the two groups a
+      # genuine visual gap (never zero-width butting, per 118-06-FINDINGS.md).
+      assert length(table.header) == 7
+      assert Enum.at(table.header, 3) == ""
+      assert Enum.at(table.header, 0) =~ "Earnings"
+      assert Enum.at(table.header, 4) =~ "Deductions"
+    end
+
+    test "a wide YTD money value ($25,200.00) does not wrap onto a second line" do
+      data =
+        fixture_data(
+          earnings: [
+            %{
+              description: "Base Salary",
+              amount: Decimal.new("4200.00"),
+              ytd: Decimal.new("25200.00")
+            }
+          ],
+          deductions: []
+        )
+
+      sections = Payslip.sections(data)
+      body = Enum.find(sections, &(&1.region == :body))
+      table_block = Enum.find(body.content, fn b -> is_struct(b.content, Rendro.Table) end)
+      table = table_block.content
+
+      content_width = 595.28 - 2 * 72
+      table_opts = [header: table.header, columns: table.columns, cell_align: table.cell_align]
+      doc = Rendro.Document.new()
+      {_header_h, row_heights} = Rendro.measure_rows(table.rows, content_width, doc, table_opts)
+
+      # Single-line height at size 11 * line_height 1.2 = 13.2. A wrapped
+      # 2-line cell would measure ~26.4 — assert every row stays single-line.
+      assert Enum.all?(row_heights, fn h -> h < 20 end),
+             "expected every row (incl. the $25,200.00 YTD cell) to stay single-line, got: #{inspect(row_heights)}"
+    end
+
+    test "the Net Pay summary box remains the dominant (largest) element (CH=5 preserved)" do
+      doc = Payslip.document(fixture_data())
+      sizes_by_region = doc.sections |> Enum.map(&{&1.region, collect_text_sizes(&1)})
+
+      all_sizes = Enum.flat_map(sizes_by_region, fn {_region, sizes} -> sizes end)
+      max_size = Enum.max(all_sizes)
+      summary_sizes = sizes_for_region(sizes_by_region, :summary)
+
+      assert max_size in summary_sizes,
+             "expected the global-max text size #{max_size} to remain in the :summary (net-pay anchor) region"
+    end
+  end
+
+  # ---------------------------------------------------------------------------
   # Recursive %Rendro.Text{} size/content collectors — reused by Task 3's
   # table assertions (a table's header/rows/cells may wrap Rendro.Block/
   # Rendro.Cell content, or be plain (unmeasured) strings, per
