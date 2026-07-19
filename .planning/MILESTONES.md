@@ -1,5 +1,39 @@
 # Milestones
 
+## v2.10 Realistic Business-Document Examples & Anatomy (Shipped: 2026-07-19)
+
+**Phases completed:** 5 phases, 31 plans, 56 tasks
+
+**Key accomplishments:**
+
+- The realistic invoice fixture was moved verbatim from `bench/comparison/fixtures/invoice_data.json` into the shared `priv/examples/invoice/acme-phoenix-saas/invoice.json` library, with every consumer repointed and behavior-preservation proven two ways: a byte-identical sha256 blob diff and a fresh Rendro render matching the already-recorded benchmark PDF hash.
+- Invoice fixture money normalized to Decimal-safe 2-decimal strings with an S4 brand/logo slot (byte-identical Rendro render), plus the first automated JSV schema-validation lane over priv/examples/.
+- Authored `priv/examples/invoice/DOMAIN.md` (domain language, personas + JTBD, reading context, layout conventions) and a structural docs-contract test enforcing the four-heading shape for every domain family.
+- 1. [Out of scope] Comparison claims lane fails on stale generated guide block
+- Froze two sha256 goldens — pre-upgrade toy Invoice render and pre-`cell_align` table render — on pristine code, resolving RESEARCH OQ1 before any `lib/` edit lands in this phase.
+- Flipped `Rendro.Format` from `@moduledoc false` to the public adapter/Evolving tier in one atomic commit — the milestone's single irreversible act (INV-04) — regenerating `priv/public_api.json` and fixing two independent hidden-module contract checks so the lane stays green.
+- Added the only net-new engine primitive in Phase 115 — opt-in `cell_align: :right` on `Rendro.table/2` (column-level) or a direct `%Rendro.Cell{}` (per-cell) — resolving RESEARCH Open Question 2 in favor of applying the x-offset entirely in `paginate.ex`'s `stack_cells`, so `writer.ex` needed zero changes and every existing table stays byte-identical.
+- Upgraded `Rendro.Recipes.Invoice` from a toy 3-field recipe to full optional anatomy (issuer/customer/due_date/terms/totals) with a Decimal money split routed through `Rendro.Format.money/1`, an errors-as-product `validate_data!/1` boundary, a `Decimal.equal?/2`-validated totals block kept with the last table rows via per-page capacity reservation, and a `palette(opts)` color seam — while the pre-upgrade toy call keeps rendering byte-identically to the frozen sha256 golden.
+- Additive `label_resolver/2` merge-order generalization plus `validate_labels!/2`/`validate_formatters!/2` opts-shape guards in `Rendro.Recipes.Pagination`, landed via strict RED/GREEN TDD with zero edits to Statement's existing call sites or tests.
+- `Rendro.Recipes.Payslip` shipped end-to-end on the 3-rung pattern: a geometry-derived 4-region template with a zero-height-backdrop net-pay anchor band, a D-12 combined 6-column earnings/deductions ledger that paginates natively, and a `Decimal.equal?/2`-asserted D-13 gross-to-net reconciliation kept with the last page — plus a reusable vendored-font unicode-fallback pattern so D-17's "never reject caller content" promise actually renders accented text instead of crashing.
+- `Rendro.Recipes.Ticket.document/2` on the 3-rung pattern -- a geometry-derived fixed landscape band with a D-02 placement-grid anchor (single Rendro.table/2 row, 22pt values), a D-05/D-06/D-07/D-08/D-09 stub (bordered code box, always-on human-readable reference, optional caller-supplied PNG, dashed perforation), and D-10's genuinely-new caller-image pre-validation plumbing that guarantees `Rendro.AssetRegistry.InvalidAssetError` never leaks.
+- Closed FAM-03's registration loop: added `Rendro.Recipes.Payslip`/`Rendro.Recipes.Ticket` to the hardcoded `@public_modules` allowlist, regenerated `priv/public_api.json` via `mix rendro.api.gen`, and added proof-backed `payslip`/`ticket` rows to `priv/support_matrix.json` with individually-asserted capability claims in `recipes_claims_test.exs` — Phase 116's two new recipes are now visible to every downstream consumer of the public manifest and support contract.
+- `Rendro.Test.Golden` — the un-gated byte-SHA-256 assert/bless helper with a two-run determinism pre-check, missing-ref hard-flunk, and a MIX_GOLDEN_DUMP eyeball escape hatch, self-tested in isolation.
+- Built `Rendro.Test.EdgeFixtures`, the single {family, dimension} -> recipe-shaped document dispatch table covering all 62 `:applies` cells across the six families plus the four EDGE-02 error fixtures — pure test-support composition of shipped recipes and public primitives, zero `lib/` edits.
+- Automated fail-loud guard proving the Hex tarball excludes test-only priv/goldens/ and priv/raster_refs/ while still shipping lib/rendro — turning an implicit allowlist omission into an enforced tripwire.
+- Authored `Rendro.EdgeMatrixTest` — the phase's central, machine-checked-honest @matrix mapping all 102 {family, dimension} pairs to `:applies` or an N/A reason string, with a D-02 coverage-honesty meta-test, two transcription tripwires, a public `stress_fixture_ids/0`, and 62 data-driven golden byte-identity tests blessed against committed hash-only refs — zero `lib/` edits.
+- Extended the existing `test/rendro/adapters/pdfium_raster_snapshot_test.exs` in place with the six D-10 curated raster fixtures — three combined pagination+60plus+odd-even renders (Invoice/Statement/Payslip), a Certificate A4/Letter geometry pair, and an Invoice extreme-wrap — each building its PDF via `EdgeFixtures`, proving two-run determinism, and reusing the file's private `assert_or_bless/2` verbatim, with zero `lib/` and zero `ci.yml` edits.
+- Recorded EDGE-03's rubric beauty-gate exemption as a single explicit, schema-enforced `stress_exemption` block (D-13/D-14) and added 4 D-15 fail-loud-in-both-directions contract guards proving the exemption is present, that no real demo entry can hijack the per-entry `stress_exempt` loophole, and that the 62-entry stress-fixture ID set (imported from 117-04 as the single source of truth) is provably disjoint from — and non-vacuous relative to — Phase 118's future `scores` entries. Zero `lib/` changes.
+- Task 1 — Schema generalization (`priv/schemas/examples.schema.json`)
+- Five co-located four-heading DOMAIN.md anatomy files (statement, receipt, certificate, payslip, ticket) plus a DomainMdContractTest strengthened from "at least one" to "one per demonstrated domain" derived from fixture dirs.
+- Rendro.ExamplesData — a faithful, `@moduledoc false` per-family transform (`transform_{invoice,statement,receipt,certificate,payslip,ticket}/1` + a `transform/2` dispatcher) that turns string-keyed fixture JSON into the atom-keyed, Decimal/Date-typed maps each recipe's `document/2` consumes, preserving cents and unit-tested end-to-end through all six recipes.
+- `Rendro.LaunchArtifacts` now sources all seven gallery tiles (invoice, branded_invoice, statement, receipt_report, certificate, payslip, ticket) from `priv/examples/
+- D-14 accessibility-overclaim tripwire authored test-first, then the guides/Livebook/phoenix_example and support_matrix/README reconciled to demonstrate the realistic example library + new Payslip/Ticket families — every claim proof-backed, no accessibility overclaim, and no quality/rubric-pass claim (all six demos are honestly below the rubric gate per 118-06).
+- Task 1 — Invoice overhaul.
+- 1. [Rule 1 - Bug] Stale `@expected_gallery_dimensions["ticket"]` blocked `launch_artifacts.check`
+
+---
+
 ## C1 CI/CD Performance & Reliability (Shipped: 2026-07-11)
 
 **Delivered:** Non-version CI/CD infrastructure milestone that turned the pipeline into a split, cached, observable required gate with local reproduction commands and remote validation evidence. No Hex release or library version tag was cut.
