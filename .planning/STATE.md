@@ -4,13 +4,13 @@ milestone: v2.10
 milestone_name: Realistic Business-Document Examples & Anatomy
 status: executing
 stopped_at: Phase 117 context gathered
-last_updated: "2026-07-19T02:33:31.206Z"
+last_updated: "2026-07-19T02:40:35.384Z"
 last_activity: 2026-07-19
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 22
-  completed_plans: 20
+  completed_plans: 21
   percent: 60
 ---
 
@@ -25,11 +25,11 @@ progress:
 ## Current Position
 
 Phase: 117 (edge-case-stress-matrix) — EXECUTING
-Plan: 6 of 7
+Plan: 7 of 7
 Status: Ready to execute
 Last activity: 2026-07-19
 
-Progress: [█████████░] 91%
+Progress: [██████████] 95%
 
 ## Roadmap Snapshot (v2.10, Phases 114–118)
 
@@ -78,6 +78,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 - [Phase 116]: 116-04: Registered Payslip/Ticket in @public_modules (mix rendro.api.gen) and added proof-backed payslip/ticket priv/support_matrix.json rows with matching recipes_claims_test.exs assertions. — FAM-01/02/03 all satisfied, Phase 116 complete.
 - [Phase 117]: 117-01: Rendro.Test.Golden uses the Rendro.Test.* namespace (matching HexBuildCache); byte-golden bless is un-gated (MIX_GOLDEN_BLESS) because PDF-byte hashes are cross-platform stable; a missing ref hard-flunks (never silent auto-create).
 - [Phase 117]: 117-04: family × stress-dimension @matrix built by zipping row-vectors against @families (transcription-resistant), independently exhaustiveness-checked by the D-02 meta-test; 62 golden refs blessed hash-only, committed as one-line SHA-256 files
+- [Phase 117]: 117-06: Six D-10 curated raster fixtures added IN PLACE to the existing pdfium_raster_snapshot_test.exs (CI Landmine 1 hardcoded single-file path) so CI discovers them with zero ci.yml edit; refs blessed in the pinned CI container per D-11 (not locally: no pdfium-cli, hashes non-portable).
 
 ### Blockers / Open Questions
 
@@ -117,6 +118,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 | Phase 117 P03 | 4min | 1 tasks | 1 files |
 | Phase 117 P04 | 3min | 2 tasks | 63 files |
 | Phase 117 P05 | 1m | 2 tasks | 1 files |
+| Phase 117 P06 | 6min | 2 tasks | 1 files |
 
 ## Operator Next Steps
 
@@ -124,6 +126,6 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 
 ## Session
 
-**Last session:** 2026-07-19T02:33:13.010Z
+**Last session:** 2026-07-19T02:39:21.846Z
 **Stopped at:** Phase 117 context gathered
 **Resume file:** None
