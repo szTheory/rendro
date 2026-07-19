@@ -471,6 +471,30 @@
       "deterministic_output": "supported"
     }
   },
+  "payslip": {
+    "surface": "payslip",
+    "status": "supported",
+    "evidence": "test/rendro/recipes/payslip_test.exs",
+    "recorded_at": "2026-07-18",
+    "capabilities": {
+      "net_pay_visual_anchor": "supported",
+      "multi_page_ledger_continuation": "supported",
+      "jurisdiction_as_data": "supported",
+      "deterministic_output": "supported"
+    }
+  },
+  "ticket": {
+    "surface": "ticket",
+    "status": "supported",
+    "evidence": "test/rendro/recipes/ticket_test.exs",
+    "recorded_at": "2026-07-18",
+    "capabilities": {
+      "geometry_derived_layout": "supported",
+      "caller_supplied_code_image": "supported",
+      "no_faux_barcode": "supported",
+      "deterministic_output": "supported"
+    }
+  },
   "text_shaping": {
     "latin_and_cjk": {
       "status": "supported",
