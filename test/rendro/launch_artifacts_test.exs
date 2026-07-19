@@ -88,11 +88,13 @@ defmodule Rendro.LaunchArtifactsTest do
     end
 
     test "tiles are sourced from the realistic priv/examples fixtures (D-06)" do
-      # Invoice fixture line items carry the fixture's realistic descriptions
-      # (never the old toy "Implementation Sprint" rows).
+      # Invoice fixture line items carry the fixture's realistic, DISTINCT
+      # SaaS line-item descriptions (118-08: replaced the 36 identical
+      # "Monthly platform service" filler rows) — never the old toy
+      # "Implementation Sprint" rows.
       invoice = Rendro.LaunchArtifacts.source_document_for(%{id: "invoice"})
       cells = invoice |> collect_tables() |> Enum.flat_map(& &1.rows) |> List.flatten()
-      assert Enum.any?(cells, &(is_binary(&1) and &1 =~ "Monthly platform service"))
+      assert Enum.any?(cells, &(is_binary(&1) and &1 =~ "Growth tier monthly platform service"))
       refute Enum.any?(cells, &(is_binary(&1) and &1 =~ "Implementation Sprint"))
 
       # Certificate body text comes from the realistic fixture recipient/body.
@@ -151,7 +153,10 @@ defmodule Rendro.LaunchArtifactsTest do
       entry = %{"id" => "invoice", "mode" => 42}
       errors = Rendro.LaunchArtifacts.manifest_shape_errors(%{"gallery" => [entry]})
 
-      assert Enum.any?(errors, &String.contains?(&1, "mode must be null or a string when present"))
+      assert Enum.any?(
+               errors,
+               &String.contains?(&1, "mode must be null or a string when present")
+             )
     end
   end
 
@@ -195,14 +200,26 @@ defmodule Rendro.LaunchArtifactsTest do
     |> Enum.reject(&is_nil/1)
   end
 
-  defp collect_texts(%Rendro.Section{content: content}), do: Enum.flat_map(content, &collect_texts/1)
+  defp collect_texts(%Rendro.Section{content: content}),
+    do: Enum.flat_map(content, &collect_texts/1)
+
   defp collect_texts(%Rendro.Block{content: %Rendro.Text{content: content}}), do: [content]
 
   defp collect_texts(%Rendro.Block{content: %Rendro.Table{} = table}) do
     [table.header | table.rows]
     |> List.flatten()
-    |> Enum.filter(&is_binary/1)
+    |> Enum.flat_map(&collect_texts_from_cell/1)
   end
 
   defp collect_texts(_other), do: []
+
+  # 118-08: table cells may be plain (unmeasured) strings OR a
+  # %Rendro.Block{content: %Rendro.Text{}} (e.g. Payslip's de-crowded ledger
+  # cells, all rendered at an explicit, consistent size) — unwrap both.
+  defp collect_texts_from_cell(cell) when is_binary(cell), do: [cell]
+
+  defp collect_texts_from_cell(%Rendro.Block{content: %Rendro.Text{content: content}}),
+    do: [content]
+
+  defp collect_texts_from_cell(_other), do: []
 end

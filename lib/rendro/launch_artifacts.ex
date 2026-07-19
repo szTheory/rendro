@@ -109,7 +109,8 @@ defmodule Rendro.LaunchArtifacts do
       fit: {320, 452},
       alt:
         "Rendered payslip PDF showing employer and employee details, earnings and deductions, and the net pay figure.",
-      caption: "Payslip with earnings, deductions, year-to-date figures, and a reconciled net pay."
+      caption:
+        "Payslip with earnings, deductions, year-to-date figures, and a reconciled net pay."
     },
     %{
       id: "ticket",
@@ -441,7 +442,15 @@ defmodule Rendro.LaunchArtifacts do
 
   defp wrap_named_section(other, _name, _width), do: other
 
-  defp constrain_text_width(%Rendro.Block{content: %Rendro.Text{}} = block, width) do
+  # 118-08 gap-closure: a block that ALREADY carries an explicit width (e.g.
+  # Certificate's centered/width-constrained title, recipient, and body-
+  # paragraph blocks, added in 118-08 for SHOW-01) must be left alone —
+  # overwriting it to the full region width would strand its hand-computed
+  # centering `x` offset, producing `x + width > region width`
+  # (:content_overflow). Only a block with NO width (still `nil`, the
+  # "unbounded text block" this launch-only post-process was written for)
+  # gets constrained.
+  defp constrain_text_width(%Rendro.Block{content: %Rendro.Text{}, width: nil} = block, width) do
     %Rendro.Block{block | width: width}
   end
 
