@@ -8,20 +8,20 @@ Rendro is a pure-Elixir, Phoenix-first PDF and document generation library for t
 
 Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
 
-## Current Milestone: v2.10 Realistic Business-Document Examples & Anatomy
+## Current Milestone: v2.11 Document Theming & Design-Token System
 
-> Additive minor release (hex `1.1.0`). Milestone A of the 4-milestone "Happy-Path Home Runs" program (A realistic examples → B theming → C presets+catalog → D optional Studio). Retargets `SEED-002`. Phases continue global numbering (114–118). Research synthesis: `.planning/research/milestone-a/SUMMARY.md`.
+> Additive minor release (hex `1.2.0` intent). Milestone B of the 4-milestone "Happy-Path Home Runs" program (A realistic examples → **B theming** → C presets+catalog → D optional Studio). Retargets `SEED-003`. Phases continue global numbering (from 119). Builds on the S1 `palette(opts)` seam baked into v2.10 recipes.
 
-**Goal:** Close the toy→production gap so a serious user can adopt an award-quality, domain-correct business document immediately — realistic example corpus, an additive Invoice anatomy upgrade, two new document families (Payslip, Ticket), and a durable reader-quality rubric — without widening the deterministic core or the family-not-industry boundary.
+**Goal:** Give Rendro a public, deterministic PDF theming contract so every recipe is fully themable (brand colors + typography), gets light/dark for free, and ships a strong unbranded default that clears the Milestone-A reader-quality rubric — without widening the deterministic core or the family-not-industry boundary.
 
 **Target features:**
-- A realistic example-data library (`priv/examples/<domain>/<business>/<family>.json` + `@moduledoc false` loader), de-quarantining the one realistic invoice fixture and repointing the bench harness.
-- Per-domain `DOMAIN.md` (domain language, personas + JTBD, conventions) + a schema-backed, appendable reader-quality rubric (hierarchy = 5, core dims ≥ 4, reading-order/print-safety gates).
-- An additive `Rendro.Recipes.Invoice` anatomy upgrade (optional issuer/customer/due_date/terms/totals + Decimal money + totals-kept-with-last-rows), the toy call preserved byte-identical; promote `Rendro.Format` to the public **adapter** tier; add an additive `cell_align: :right` primitive for tabular money.
-- Two new families on the 3-rung pattern: `Rendro.Recipes.Payslip` (anchor = net pay) and `Rendro.Recipes.Ticket` (fixed-box; anchor = seat/gate).
-- An edge-case stress matrix (deterministic hash-checked goldens + raster refs + errors-as-product), a rubric-gated demonstration set, and gallery/docs/README closure.
+- New public `Rendro.Theme` struct (`lib/rendro/theme.ex`) — a pure inert value resolved once and threaded through the 3 rungs; full shape defined up front, implemented in tiers: semantic color **roles** (`ink`/`muted`/`accent`/`on_accent`/`background`/`surface`/`rule` + optional `positive`/`negative`), typography (`fonts` + named `scale` + `leading` + widows/orphans), and optional `spacing`/`rules`/`radius`/`density`.
+- `mode: :light | :dark` as a role-derived variant selector (`Rendro.Theme.dark/1`); recipes prepend a full-page background fill so every recipe gets dark for free by reading roles, never literals.
+- `theme:` opt resolved at `document/2` (`Rendro.Theme.resolve/1`, default `Rendro.Theme.default/0`) and threaded through `page_template/1` + `sections/2` across all recipes.
+- `Rendro.Theme.default/0` — a restrained neutral-ink (Swiss-ish) unbranded default that clears the Milestone-A rubric on its own, closing the Phase-118 SHOW-01 gap (all six v2.10 demos honestly scored below the rubric).
+- `brand:` stays orthogonal (assets = *who*, theme = *how*); `Rendro.Theme.from_brand/2` + a single `accent:` seed. Machine-checked manifests (`priv/public_api.json`, `priv/support_matrix.json`) updated.
 
-**Key context:** Confirmed GREEN by a 5-lens research fan-out (domain/rubric, API/DX, example-data arch, prior-art/pitfalls, coherence/pillars). The only irreversible act is the `Format` public promotion — held to the *adapter/Evolving* tier with a documented "output may evolve" note. Four forward-compat "shape-now" seams are baked into acceptance criteria so Milestones B/C/D need no breaking rework: **S1** private `palette(opts)` keyed on B's locked color roles (sections never inline `{0,0,0}`) · **S4** fixtures reserve an optional brand/logo slot for C · **S5** rubric recorded as an appendable manifest for C's quality-ratchet · **S6** `artifacts.json` gains optional theme/mode/preset tags. Guards: no tagged-PDF/PDF-UA accessibility claims; engine stays locale-free (differences are data); no real PII (fictional businesses only; Payslip is the acute risk); ship `priv/examples/` text-only.
+**Key context:** Direction locked via the settled Happy-Path program (Milestone B); the Phase-118 SHOW-01 rubric gap is **folded into scope** — the unbranded default and themed demos must clear the Milestone-A rubric (fix the invoice under-build, make key facts dominant). Explicit non-goals deferred to later milestones: style-genre presets, public catalog, static configurator, curated preset fonts → Milestone C (`SEED-004`); live Studio → D (`SEED-005`). Permanently EXCLUDED from the theme contract (do not map to deterministic PDF): shadow/elevation, z-index, motion, focus/hover, opacity/gradient. Guards held from A: engine stays locale-free, no tagged-PDF/PDF-UA accessibility claims, `Theme` is pure presentation and industry-agnostic (family-not-industry boundary), byte-determinism preserved. Mine `brand/tokens/tokens.json` (web-only, excluded from Hex) for `{r,g,b}` values (hex→tuple at the boundary).
 
 ## Current State
 
@@ -143,6 +143,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Validated
 
+- ✓ Rendro v2.10 shipped Realistic Business-Document Examples & Anatomy (Milestone A / `SEED-002`): realistic `priv/examples/` fixture library + `@moduledoc false` loaders, an additive Invoice anatomy upgrade with `Rendro.Format` promoted to the public adapter tier + `cell_align: :right`, new Payslip & Ticket families, a family × edge-case stress matrix (hash-checked goldens), and rubric-gated demos + gallery/docs closure. All requirements satisfied; PR #3 squash-merged to `main`. Known carryover: Phase-118 SHOW-01 (six demos honestly scored below the reader-quality rubric) — folded into v2.11 scope. Shipped 2026-07-19 and archived under `milestones/v2.10-*`. — v2.10
 - ✓ Rendro C1 shipped CI/CD Performance & Reliability: split fast/proof/advisory lanes, precise BEAM caches, stable `ci-success` required gate, scoped local reproduction commands, supply-chain/release hardening, and before/after validation evidence from three green remote `ci.yml` runs. All 30 requirements satisfied; milestone audit `passed`. Shipped 2026-07-11 and archived in `milestones/C1-ROADMAP.md` / `milestones/C1-REQUIREMENTS.md` / `milestones/C1-MILESTONE-AUDIT.md`. — C1
 - ✓ Rendro v2.9 shipped TOC & Document Navigation: explicit page anchors, hierarchical document outlines with UTF-16BE support, fail-fast validated internal cross-reference links, and layout-preserving `{{anchor_page:id}}` Table of Contents substitution tokens. All 13 requirements satisfied; milestone audit `passed`. Shipped 2026-06-14 and archived in `milestones/v2.9-ROADMAP.md` / `milestones/v2.9-REQUIREMENTS.md` / `milestones/v2.9-phases/`. — v2.9
 - ✓ Rendro v2.8 completed the done-enough stewardship & adoption signal loop. Validated in Phase 96: adoption-signal-review-stewardship-posture.
@@ -169,7 +170,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-- v2.10 Realistic Business-Document Examples & Anatomy (Milestone A / `SEED-002`) — realistic example-data library + per-domain `DOMAIN.md` + reader-quality rubric; additive Invoice anatomy upgrade + `Format` public (adapter tier) + `cell_align: :right`; new Payslip + Ticket families; edge-case stress matrix + rubric-gated demos + gallery/docs closure. Requirements defined in `REQUIREMENTS.md`; phases 114–118.
+- v2.11 Document Theming & Design-Token System (Milestone B / `SEED-003`) — new public `Rendro.Theme` contract (semantic color roles + typography scale + optional spacing/rules/radius/density), role-derived `mode: :light | :dark`, `theme:` threaded through all recipes' 3-rung pattern, a strong unbranded `Theme.default/0` that clears the Milestone-A rubric (closing the Phase-118 SHOW-01 gap), and orthogonal `brand:`/`from_brand/2` plumbing. Requirements defined in `REQUIREMENTS.md`; phases from 119. Presets/catalog/configurator deferred to C, Studio to D.
 
 ### Out of Scope
 
@@ -312,4 +313,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-18 after Phase 117 (Edge-case stress matrix) — v2.10*
+*Last updated: 2026-07-19 after starting milestone v2.11 Document Theming & Design-Token System (Milestone B / SEED-003)*
