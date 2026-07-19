@@ -166,12 +166,12 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3; container-gated, autonomous:false)*
 
-- [ ] 118-05-PLAN.md — Container regen via mix rendro.launch_artifacts.gen: re-bless hashes + artifacts.json S6 + docs blocks (D-08) — SHOW-03
-- [ ] 118-06-PLAN.md — D-09 render→raster→self-score 6 demos + append rubric_scores.json + D-05 demo-cites-DOMAIN.md test — SHOW-01
+- [x] 118-05-PLAN.md — Container regen via mix rendro.launch_artifacts.gen: re-bless hashes + artifacts.json S6 + docs blocks (D-08) — SHOW-03
+- [x] 118-06-PLAN.md — D-09 render→raster→self-score 6 demos + append rubric_scores.json + D-05 demo-cites-DOMAIN.md test — SHOW-01
 
 **Wave 5** *(blocked on Wave 4)*
 
-- [ ] 118-07-PLAN.md — D-14 accessibility-overclaim tripwire + SHOW-02 guides/livebook/phoenix_example + support_matrix/README reconciliation — SHOW-02, SHOW-04
+- [x] 118-07-PLAN.md — D-14 accessibility-overclaim tripwire + SHOW-02 guides/livebook/phoenix_example + support_matrix/README reconciliation — SHOW-02, SHOW-04
 
 <details>
 <summary>✅ C1 CI/CD Performance & Reliability (Phases 108-113) — SHIPPED 2026-07-11</summary>
@@ -209,7 +209,7 @@ Plans:
 | 115. Invoice anatomy + Format promotion + seams | v2.10 | 4/4 | Complete    | 2026-07-18 |
 | 116. New families — Payslip & Ticket | v2.10 | 4/4 | Complete    | 2026-07-19 |
 | 117. Edge-case stress matrix | v2.10 | 7/7 | Complete    | 2026-07-19 |
-| 118. Rubric-gated demos, gallery & docs closure | v2.10 | 4/7 | In Progress|  |
+| 118. Rubric-gated demos, gallery & docs closure | v2.10 | 7/7 | Complete   | 2026-07-19 |
 | 108. Baseline & Audit Report | C1 | 3/3 | Complete | 2026-06-14 |
 | 109. Caching & setup-beam Foundation | C1 | 2/2 | Complete | 2026-06-15 |
 | 110. Test Concurrency, Determinism & Cleanup | C1 | 3/3 | Complete | 2026-06-16 |

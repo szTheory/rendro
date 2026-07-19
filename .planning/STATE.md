@@ -2,18 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.10
 milestone_name: Realistic Business-Document Examples & Anatomy
-current_phase: 118
-current_phase_name: rubric-gated-demonstration-set-gallery-docs-closure
 status: executing
 stopped_at: Phase 118 context gathered
-last_updated: "2026-07-19T16:21:50.950Z"
+last_updated: "2026-07-19T17:32:09.022Z"
 last_activity: 2026-07-19
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 29
-  completed_plans: 26
-  percent: 80
+  completed_plans: 29
+  percent: 100
 ---
 
 # Project State
@@ -27,11 +25,11 @@ progress:
 ## Current Position
 
 Phase: 118 (rubric-gated-demonstration-set-gallery-docs-closure) — EXECUTING
-Plan: 5 of 7
+Plan: 6 of 7
 Status: Ready to execute
 Last activity: 2026-07-19
 
-Progress: [█████████░] 86%
+Progress: [██████████] 100%
 
 ## Roadmap Snapshot (v2.10, Phases 114–118)
 
@@ -87,6 +85,9 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 - [Phase ?]: [Phase 118]: 118-03: Statement fixture ASCII-ified (em-dash→hyphen, ····8140→****8140) — Statement recipe uses built-in Helvetica with no unicode fallback (unlike Payslip 116-02) and no opts font-injection; recipe-level fallback logged in deferred-items.md.
 - [Phase ?]: [Phase 118]: 118-04: Repointed Rendro.LaunchArtifacts gallery to priv/examples/** via Rendro.ExamplesData (D-06); 7 tiles in fixed order incl. new payslip/ticket (D-07); S6 theme/mode/preset optional seam tags per entry (D-13). Byte re-baseline + PNG rasters container-gated to 118-05 (2 launch_artifacts_claims_test cases expected-red until then).
 - [Phase ?]: [Phase 118]: 118-04: ASCII-ified certificate seal_line em-dash and ticket subtitle middots (recipes render built-in Helvetica, no unicode fallback); certificate body + ticket terms wrapped via launch-only wrap_section_text_to_region/3; branded_invoice renders an 8-item fixture slice (recipe body does not paginate).
+- [Phase 118]: Phase 118 paused at 4/7: Wave 4 (118-05 gallery re-bless + 118-06 rubric scoring) is container-gated (pinned pdfium absent locally) with blocking human-verify checkpoints; user runs these in the pinned CI/container env and authorizes the D-08 re-bless + rubric sign-off, then resume at Wave 5 (118-07).
+- [Phase 118]: 118-05 committed (gallery re-bless, 7 tiles, determinism-proven). 118-06 PAUSED per D-11: rendered demos do not honestly clear the rubric gate (invoice under-built — transform_invoice drops parties/totals; others don't make key fact dominant). No scores committed. See 118-06-FINDINGS.md. User to decide remediation vs accept gaps.
+- [Phase 118-07]: Encoded the 118-06 honesty ceiling as machine-checked data (demonstration_set.boundaries disclaim rubric-pass/visual-polish/accessibility-conformance) plus a D-14 tripwire guarding all docs against accessibility overclaim
 
 ### Blockers / Open Questions
 
@@ -132,6 +133,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 | Phase 118 P02 | 3min | 2 tasks | 6 files |
 | Phase 118 P03 | 8min | 2 tasks | 4 files |
 | Phase 118 P04 | 14min | 3 tasks | 4 files |
+| Phase 118 P07 | 11min | 3 tasks | 9 files |
 
 ## Operator Next Steps
 
@@ -139,6 +141,6 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 
 ## Session
 
-**Last session:** 2026-07-19T16:21:18.382Z
+**Last session:** 2026-07-19T17:31:22.793Z
 **Stopped at:** Phase 118 context gathered
 **Resume file:** None
