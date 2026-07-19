@@ -183,4 +183,20 @@ defmodule Rendro.EdgeMatrixTest do
   test "exactly 62 cells are :applies" do
     assert Enum.count(@matrix, fn {_, v} -> v == :applies end) == 62
   end
+
+  # --- Data-driven golden byte-identity tests (one per :applies cell) --------
+  #
+  # The `{{family, dimension}, :applies}` pattern filters the comprehension to
+  # exactly the 62 `:applies` cells. Each generated test proves two-run
+  # determinism BEFORE any hash is taken (D-04), then compares/blesses the
+  # SHA-256 against priv/goldens/<family>/<dimension>.sha256. A missing ref
+  # hard-flunks (never a silent auto-create). `unquote/1` injects each
+  # compile-time comprehension value into the quoted test body.
+  for {{family, dimension}, :applies} <- @matrix do
+    test "#{family}/#{dimension} golden byte-identity" do
+      data_doc = Rendro.Test.EdgeFixtures.document(unquote(family), unquote(dimension))
+      pdf = Rendro.Test.Golden.assert_deterministic!(data_doc)
+      Rendro.Test.Golden.assert_or_bless({unquote(family), unquote(dimension)}, pdf)
+    end
+  end
 end
