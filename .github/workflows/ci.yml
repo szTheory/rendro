@@ -38,7 +38,7 @@ jobs:
     steps:
       - name: Checkout
         if: github.event_name != 'pull_request' || matrix.primary == true
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Setup Beam
         if: github.event_name != 'pull_request' || matrix.primary == true
@@ -51,7 +51,7 @@ jobs:
       - name: Cache dependencies
         if: github.event_name != 'pull_request' || matrix.primary == true
         id: deps-cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: deps
           key: ${{ runner.os }}-deps-${{ env.CACHE_BUSTER }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ env.MIX_ENV }}-${{ hashFiles('**/mix.lock') }}
@@ -61,7 +61,7 @@ jobs:
       - name: Cache build artifacts
         if: github.event_name != 'pull_request' || matrix.primary == true
         id: build-cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: _build
           key: ${{ runner.os }}-build-${{ env.CACHE_BUSTER }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ env.MIX_ENV }}-${{ hashFiles('**/mix.lock') }}
@@ -79,7 +79,7 @@ jobs:
       - name: Cache PLT
         if: github.event_name != 'pull_request' || matrix.primary == true
         id: plt-cache
-        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: priv/plts
           key: ${{ runner.os }}-plt-${{ env.CACHE_BUSTER }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ env.MIX_ENV }}-${{ hashFiles('**/mix.lock') }}
@@ -121,7 +121,7 @@ jobs:
         run: mix test --exclude quarantine --slowest 10 2>&1 | tee /tmp/mix-test-output.log
 
       - name: Save PLT Cache
-        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: always() && (github.event_name != 'pull_request' || matrix.primary == true) && steps.plt-cache.outputs.cache-hit != 'true'
         with:
           path: priv/plts
@@ -165,7 +165,7 @@ jobs:
     # no `needs:` -> graph-disconnected (D-09); no continue-on-error (D-10)
     steps:
       - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Setup Beam
         uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
@@ -185,7 +185,7 @@ jobs:
     # no 'needs:' -> graph-disconnected; failures cannot block engine merges
     steps:
       - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Setup Beam
         uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
@@ -194,7 +194,7 @@ jobs:
           elixir-version: '1.19.5'
 
       - name: Setup Node
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
         with:
           node-version: '22.14.0'
           cache: 'npm'
@@ -240,7 +240,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Setup Beam
         uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
@@ -249,7 +249,7 @@ jobs:
           elixir-version: '1.19.5'
 
       - name: Setup Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: '3.12'
 
@@ -306,7 +306,7 @@ jobs:
     continue-on-error: true
     steps:
       - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Setup Beam
         uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
