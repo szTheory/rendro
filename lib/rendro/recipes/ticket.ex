@@ -198,10 +198,111 @@ defmodule Rendro.Recipes.Ticket do
   def document(data, opts \\ []) do
     validate_data!(data)
     template = page_template(opts)
+    secs = sections(data, opts)
 
-    Rendro.Document.new()
+    # D-08/D-10: register the caller-supplied image ONLY after
+    # validate_data!/1 (called above, and again inside sections/2) has
+    # already pre-validated the bytes -- register_image/3 re-parses, but the
+    # bytes are already known-good, so Rendro.AssetRegistry.InvalidAssetError
+    # should never actually trigger here. image: nil and image omitted both
+    # take the `else` branch, so they register nothing -- byte-identical
+    # output (D-08).
+    base_doc =
+      if image = get_in(data, [:code, :image]) do
+        Rendro.Document.new() |> Rendro.Document.register_image(:ticket_code, image)
+      else
+        Rendro.Document.new()
+      end
+
+    base_doc
     |> Rendro.Document.add_template(template)
     |> Rendro.Document.set_template(template.name)
+    |> then(fn d -> Enum.reduce(secs, d, &Rendro.Document.add_section(&2, &1)) end)
+  end
+
+  @doc """
+  Returns a list of `%Rendro.Section{}` structs mapping ticket content to the
+  `:main`, `:stub`, and `:terms` regions. Validates `data` and the
+  `:labels`/`:formatters` opts shape (D-19) before building any section
+  content.
+  """
+  @spec sections(map(), keyword()) :: [Rendro.Section.t()]
+  def sections(data, opts \\ []) do
+    validate_data!(data)
+    Rendro.Recipes.Pagination.validate_labels!(opts, "Rendro.Recipes.Ticket.document/2")
+    Rendro.Recipes.Pagination.validate_formatters!(opts, "Rendro.Recipes.Ticket.document/2")
+
+    [main_section(data, opts), stub_section(data, opts), terms_section(data, opts)]
+  end
+
+  # ---------------------------------------------------------------------------
+  # Private section builders
+  # ---------------------------------------------------------------------------
+
+  # D-02: the placement-grid anchor, via Rendro.table/2 (NOT manual block
+  # stacking -- a hand-stacked multi-column layout would require fragile
+  # height-zeroing tricks against paginate.ex's single shared per-region Y
+  # cursor; a table's own column-layout logic already handles this
+  # correctly). One data row of large (22pt) values under a header row of
+  # small caps (8pt) labels -- the values are the single largest text
+  # anywhere on the page, matching D-02's dominant-anchor requirement. The
+  # SAME code renders any 1-4 cell :placement shape (event or boarding-pass)
+  # purely via data -- zero archetype branching (D-01).
+  defp main_section(data, opts) do
+    colors = palette(opts)
+
+    header_cells =
+      Enum.map(data.placement, fn %{label: l} ->
+        Rendro.block(Rendro.text(String.upcase(l), size: 8, color: colors.muted))
+      end)
+
+    value_cells =
+      Enum.map(data.placement, fn %{value: v} ->
+        Rendro.block(Rendro.text(v, size: 22, color: colors.ink))
+      end)
+
+    grid =
+      Rendro.table([value_cells],
+        header: header_cells,
+        columns: List.duplicate({:share, 1}, length(data.placement)),
+        borders: :none
+      )
+
+    subtitle_blocks =
+      case Map.get(data, :subtitle) do
+        blank when blank in [nil, ""] -> []
+        subtitle -> [Rendro.block(Rendro.text(subtitle, size: 10, color: colors.muted))]
+      end
+
+    Rendro.section(
+      name: :ticket_main,
+      region: :main,
+      content:
+        [
+          Rendro.block(Rendro.text(issuer_display(data.issuer), size: 9, color: colors.muted)),
+          Rendro.block(Rendro.text(data.title, size: 16, color: colors.ink))
+        ] ++
+          subtitle_blocks ++
+          [Rendro.block(grid)]
+    )
+  end
+
+  defp issuer_display(issuer) do
+    case Map.get(issuer, :venue) do
+      blank when blank in [nil, ""] -> issuer.name
+      venue -> "#{issuer.name} - #{venue}"
+    end
+  end
+
+  # Task-2 stub -- replaced by Task 3's D-05/D-06/D-07/D-08/D-09 stub
+  # composition (code box, always-on reference, optional PNG, perforation).
+  defp stub_section(_data, _opts) do
+    Rendro.section(name: :ticket_stub, region: :stub, content: [])
+  end
+
+  # Task-2 stub -- replaced by Task 3's optional fine-print terms content.
+  defp terms_section(_data, _opts) do
+    Rendro.section(name: :ticket_terms, region: :terms, content: [])
   end
 
   # ---------------------------------------------------------------------------
