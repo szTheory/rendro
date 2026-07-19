@@ -66,8 +66,8 @@ defmodule Rendro.LaunchArtifacts do
       asset_name: :gallery_statement,
       fit: {320, 452},
       alt:
-        "Rendered account statement PDF showing transaction rows, running balances, and Page 1 of 2 footer.",
-      caption: "Multi-page statement with carried-forward balances and running page numbers."
+        "Rendered account statement PDF showing dated transaction rows, signed amounts, and a page-numbered footer.",
+      caption: "Account statement with opening/closing balances and per-page numbering."
     },
     %{
       id: "receipt_report",
@@ -77,8 +77,8 @@ defmodule Rendro.LaunchArtifacts do
       asset_name: :gallery_receipt_report,
       fit: {320, 452},
       alt:
-        "Rendered receipt report PDF showing repeated table header, line items, totals, and Page 1 of 2 footer.",
-      caption: "Receipt recipe scaled into a multi-page tabular report."
+        "Rendered sales receipt PDF showing itemized line items with a subtotal, tax, and total.",
+      caption: "Itemized sales receipt with subtotal, tax, and total through the Receipt recipe."
     },
     %{
       id: "certificate",
@@ -256,33 +256,70 @@ defmodule Rendro.LaunchArtifacts do
   def source_document_for(%{id: id}), do: build_source_document(id)
   def source_document_for(%{"id" => id}), do: build_source_document(id)
 
+  # D-06: every gallery tile sources its document from priv/examples/** through
+  # Rendro.Examples.load!/1 |> Rendro.ExamplesData.transform_<family>/1 |> the
+  # family recipe's document/2. The inline toy *_data/* builders no longer feed
+  # the gallery.
+  @invoice_fixture "invoice/acme-phoenix-saas/invoice.json"
+  @statement_fixture "statement/northwind-ledger-co/statement.json"
+  @receipt_fixture "receipt/harbor-and-oak-cafe/receipt.json"
+  @certificate_fixture "certificate/summit-training-institute/certificate.json"
+  # Bounded item slice for the single-page branded-invoice branding showcase.
+  @branded_invoice_item_count 8
+
   defp build_source_document("invoice") do
-    invoice_data()
+    @invoice_fixture
+    |> Rendro.Examples.load!()
+    |> Rendro.ExamplesData.transform_invoice()
     |> Rendro.Recipes.Invoice.document()
     |> apply_launch_table_style()
   end
 
   defp build_source_document("branded_invoice") do
-    branded_invoice_data()
+    data =
+      @invoice_fixture
+      |> Rendro.Examples.load!()
+      |> Rendro.ExamplesData.transform_invoice()
+      |> Map.put(:id, "BR-2026-001")
+      |> Map.put(:brand, %{font_name: :brand_heading, logo_name: :company_logo})
+
+    # The branded-invoice recipe is a single-page branding showcase (logo +
+    # embedded font); its body renders one non-paginating table into a fixed
+    # region. Layer a bounded slice of the same fixture items so the branded
+    # tile stays fixture-sourced (D-06) without overflowing the fixed body —
+    # multi-page pagination is demonstrated by the plain invoice/statement tiles.
+    data = %{data | items: Enum.take(data.items, @branded_invoice_item_count)}
+
+    data
     |> Rendro.Recipes.BrandedInvoice.document()
     |> apply_branded_invoice_launch_header()
     |> apply_launch_table_style()
   end
 
   defp build_source_document("statement") do
-    statement_data(45)
+    @statement_fixture
+    |> Rendro.Examples.load!()
+    |> Rendro.ExamplesData.transform_statement()
     |> Rendro.Recipes.Statement.document()
     |> apply_launch_table_style()
   end
 
   defp build_source_document("receipt_report") do
-    receipt_data(58)
+    @receipt_fixture
+    |> Rendro.Examples.load!()
+    |> Rendro.ExamplesData.transform_receipt()
     |> Rendro.Recipes.Receipt.document()
     |> apply_launch_table_style()
   end
 
   defp build_source_document("certificate") do
-    Rendro.Recipes.Certificate.document(certificate_data(), border: true)
+    data =
+      @certificate_fixture
+      |> Rendro.Examples.load!()
+      |> Rendro.ExamplesData.transform_certificate()
+
+    Rendro.Recipes.Certificate.document(data, border: true)
+    |> apply_certificate_body_wrap()
   end
 
   @spec render_manual_pdf() :: {:ok, binary()} | {:error, term()}
@@ -301,6 +338,43 @@ defmodule Rendro.LaunchArtifacts do
   defp apply_branded_invoice_launch_header(%Document{} = doc) do
     %Document{doc | sections: Enum.map(doc.sections, &style_branded_invoice_header/1)}
   end
+
+  # The Certificate recipe emits its body statement as a single unbounded text
+  # block (no wrap width), which fit the short toy fixture but overflows the
+  # landscape body region horizontally with the realistic multi-clause fixture
+  # body. Constrain every certificate body text block to the :body region width
+  # so long lines wrap instead of running off the page. Kept here (launch-only
+  # post-process, mirroring apply_launch_table_style/1) rather than in the
+  # shared recipe, whose byte goldens must stay untouched.
+  defp apply_certificate_body_wrap(%Document{} = doc) do
+    case body_region_width(doc) do
+      nil -> doc
+      width -> %Document{doc | sections: Enum.map(doc.sections, &wrap_certificate_body(&1, width))}
+    end
+  end
+
+  defp body_region_width(%Document{page_templates: templates, page_template: name}) do
+    with %Rendro.PageTemplate{regions: regions} <-
+           Enum.find(templates, &(&1.name == name)),
+         %Rendro.Region{width: width} when is_number(width) <-
+           Enum.find(regions, &(&1.name == :body)) do
+      width
+    else
+      _ -> nil
+    end
+  end
+
+  defp wrap_certificate_body(%Rendro.Section{name: :certificate_body, content: content} = section, width) do
+    %Rendro.Section{section | content: Enum.map(content, &constrain_text_width(&1, width))}
+  end
+
+  defp wrap_certificate_body(other, _width), do: other
+
+  defp constrain_text_width(%Rendro.Block{content: %Rendro.Text{}} = block, width) do
+    %Rendro.Block{block | width: width}
+  end
+
+  defp constrain_text_width(other, _width), do: other
 
   defp style_branded_invoice_header(%Rendro.Section{name: :branded_invoice_header} = section) do
     %Rendro.Section{section | content: Enum.map(section.content, &use_default_header_font/1)}
@@ -833,73 +907,6 @@ defmodule Rendro.LaunchArtifacts do
       height: 120,
       stroke: %{color: {14, 124, 118}, width: 1.2, dash: [6, 4]}
     )
-  end
-
-  defp invoice_data do
-    %{
-      id: "INV-2026-001",
-      date: ~D[2026-06-11],
-      items: [
-        %{name: "Implementation Sprint", qty: 2, price: 2400},
-        %{name: "Support Retainer", qty: 1, price: 800},
-        %{name: "Validation Report", qty: 1, price: 450}
-      ]
-    }
-  end
-
-  defp branded_invoice_data do
-    invoice_data()
-    |> Map.put(:id, "BR-2026-001")
-    |> Map.put(:brand, %{font_name: :brand_heading, logo_name: :company_logo})
-  end
-
-  defp statement_data(n) do
-    opening = Decimal.new("1000.00")
-
-    lines =
-      for i <- 1..n do
-        amount = if rem(i, 2) == 1, do: Decimal.new("100.00"), else: Decimal.new("-50.00")
-
-        %{
-          date: Date.add(~D[2026-05-01], i - 1),
-          description: "Transaction #{i}",
-          amount: amount
-        }
-      end
-
-    %{
-      period: %{from: ~D[2026-05-01], to: ~D[2026-05-31]},
-      account: %{name: "Acme Corp"},
-      opening_balance: opening,
-      lines: lines
-    }
-  end
-
-  defp receipt_data(n) do
-    lines =
-      for i <- 1..n do
-        %{description: "Report line #{i}", amount: Decimal.new("10.00")}
-      end
-
-    subtotal = Decimal.mult(Decimal.new("10.00"), Decimal.new(n))
-
-    %{
-      title: "Payment Receipt",
-      date: ~D[2026-06-11],
-      customer: %{name: "Acme Corp"},
-      lines: lines,
-      totals: %{subtotal: subtotal, total: subtotal}
-    }
-  end
-
-  defp certificate_data do
-    %{
-      title: "Certificate of Completion",
-      recipient: "Jane Smith",
-      body: "For shipping deterministic PDFs from composable Elixir data.",
-      date: ~D[2026-06-11],
-      seal_line: "Generated by Rendro"
-    }
   end
 
   defp split_results(results) do

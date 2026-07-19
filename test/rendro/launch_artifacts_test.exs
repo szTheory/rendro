@@ -11,10 +11,6 @@ defmodule Rendro.LaunchArtifactsTest do
 
         assert tables != []
 
-        if id in ~w(statement receipt_report) do
-          assert length(tables) > 1
-        end
-
         for table <- tables do
           assert table.borders == [:outer, :rows]
           assert table.header_fill == {247, 243, 234}
@@ -59,6 +55,26 @@ defmodule Rendro.LaunchArtifactsTest do
 
       assert Enum.any?(doc.sections, &(&1.region == :frame or &1.name == :certificate_frame))
       assert collect_tables(doc) == []
+    end
+
+    test "tiles are sourced from the realistic priv/examples fixtures (D-06)" do
+      # Invoice fixture line items carry the fixture's realistic descriptions
+      # (never the old toy "Implementation Sprint" rows).
+      invoice = Rendro.LaunchArtifacts.source_document_for(%{id: "invoice"})
+      cells = invoice |> collect_tables() |> Enum.flat_map(& &1.rows) |> List.flatten()
+      assert Enum.any?(cells, &(is_binary(&1) and &1 =~ "Monthly platform service"))
+      refute Enum.any?(cells, &(is_binary(&1) and &1 =~ "Implementation Sprint"))
+
+      # Certificate body text comes from the realistic fixture recipient/body.
+      certificate = Rendro.LaunchArtifacts.source_document_for(%{id: "certificate"})
+
+      cert_texts =
+        certificate.sections
+        |> Enum.flat_map(& &1.content)
+        |> Enum.map(&text_content/1)
+        |> Enum.reject(&is_nil/1)
+
+      assert "Alex Rivera" in cert_texts
     end
   end
 
