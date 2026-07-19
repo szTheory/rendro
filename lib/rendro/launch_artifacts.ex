@@ -23,6 +23,10 @@ defmodule Rendro.LaunchArtifacts do
     header_fill: {247, 243, 234}
   ]
   @gallery_required_keys ~w(id title recipe_module png_path png_sha256 source_pdf_sha256 page dpi width_px height_px renderer_kind renderer_version alt caption)
+  # S6 (D-13): optional theme/mode/preset seam tags. Intentionally NOT part of
+  # @gallery_required_keys — their absence must never fail the required-keys
+  # contract (older/other readers). When present, each must be null or a string.
+  @gallery_optional_s6_keys ~w(theme mode preset)
   @expected_gallery_dimensions %{
     "invoice" => {794, 1123},
     "branded_invoice" => {794, 1123},
@@ -190,6 +194,16 @@ defmodule Rendro.LaunchArtifacts do
     |> collect_source_pdf_errors(manifest)
     |> collect_manual_render_errors(manifest)
     |> collect_docs_block_errors(manifest)
+  end
+
+  @doc false
+  # Render-free manifest shape validation only (no source-PDF/manual render, no
+  # file hashing, no docs-block comparison). Exposed so the S6 seam tolerance
+  # (D-13) can be unit-tested without pdfium or on-disk assets. Stays hidden —
+  # the whole module is @moduledoc false.
+  @spec manifest_shape_errors(map()) :: [String.t()]
+  def manifest_shape_errors(manifest) when is_map(manifest) do
+    collect_manifest_shape_errors([], manifest)
   end
 
   @spec read_manifest!() :: map()
@@ -483,7 +497,16 @@ defmodule Rendro.LaunchArtifacts do
              "renderer_kind" => @renderer_kind,
              "renderer_version" => renderer_version,
              "alt" => spec.alt,
-             "caption" => spec.caption
+             "caption" => spec.caption,
+             # S6 (D-13): optional theme/mode/preset seam tags. Explicit null for
+             # theme/preset means "seam present, not yet populated"; "light" is
+             # the one defensible non-null default for mode. These keys are
+             # deliberately absent from @gallery_required_keys so a manifest
+             # written by an older/other generator without them never fails the
+             # required-keys contract.
+             "theme" => nil,
+             "mode" => "light",
+             "preset" => nil
            }}
         else
           {:error, reason} -> {:error, {spec.id, reason}}
@@ -628,9 +651,30 @@ defmodule Rendro.LaunchArtifacts do
             {entry["width_px"], entry["height_px"]} == expected_dimensions,
           "gallery #{label} dimensions must be #{format_dimensions(expected_dimensions)}"
         )
+        |> Enum.concat(s6_seam_errors(label, entry))
 
       entry ->
         ["gallery entry must be a map: #{inspect(entry)}"]
+    end)
+  end
+
+  # S6 (D-13): tolerant optional-key check. An entry that omits the seam keys
+  # entirely produces NO errors (absence is valid); a present key must be null
+  # or a string. This keeps older/other manifests passing while validating the
+  # seam shape when populated.
+  defp s6_seam_errors(label, entry) do
+    Enum.flat_map(@gallery_optional_s6_keys, fn key ->
+      if Map.has_key?(entry, key) do
+        value = entry[key]
+
+        if is_nil(value) or is_binary(value) do
+          []
+        else
+          ["gallery #{label} #{key} must be null or a string when present"]
+        end
+      else
+        []
+      end
     end)
   end
 
@@ -1018,7 +1062,12 @@ defmodule Rendro.LaunchArtifacts do
       {"renderer_kind", entry["renderer_kind"]},
       {"renderer_version", entry["renderer_version"]},
       {"alt", entry["alt"]},
-      {"caption", entry["caption"]}
+      {"caption", entry["caption"]},
+      # S6 (D-13): appended after caption to keep a stable, deterministic key
+      # order. Optional seam tags — see build_gallery_entries/1.
+      {"theme", entry["theme"]},
+      {"mode", entry["mode"]},
+      {"preset", entry["preset"]}
     ])
   end
 

@@ -108,6 +108,53 @@ defmodule Rendro.LaunchArtifactsTest do
     end
   end
 
+  describe "S6 theme/mode/preset seam tags (D-13)" do
+    test "required-keys contract tolerates a manifest whose entries omit the seam keys" do
+      base_entry = %{
+        "id" => "invoice",
+        "title" => "Invoice",
+        "recipe_module" => "Rendro.Recipes.Invoice",
+        "png_path" => "assets/rendro/gallery/invoice.png",
+        "png_sha256" => String.duplicate("a", 64),
+        "source_pdf_sha256" => String.duplicate("b", 64),
+        "page" => 1,
+        "dpi" => 96,
+        "width_px" => 794,
+        "height_px" => 1123,
+        "renderer_kind" => "pdfium-render",
+        "renderer_version" => "1.0",
+        "alt" => "alt text",
+        "caption" => "caption text"
+      }
+
+      manifest = %{"gallery" => [base_entry]}
+      errors = Rendro.LaunchArtifacts.manifest_shape_errors(manifest)
+
+      refute Enum.any?(errors, &String.contains?(&1, "missing theme"))
+      refute Enum.any?(errors, &String.contains?(&1, "missing mode"))
+      refute Enum.any?(errors, &String.contains?(&1, "missing preset"))
+      refute Enum.any?(errors, &String.contains?(&1, "invoice theme"))
+      refute Enum.any?(errors, &String.contains?(&1, "invoice mode"))
+      refute Enum.any?(errors, &String.contains?(&1, "invoice preset"))
+    end
+
+    test "present seam keys with null/string placeholder values pass the shape check" do
+      entry = %{"id" => "invoice", "theme" => nil, "mode" => "light", "preset" => nil}
+      errors = Rendro.LaunchArtifacts.manifest_shape_errors(%{"gallery" => [entry]})
+
+      refute Enum.any?(errors, &String.contains?(&1, "theme must be"))
+      refute Enum.any?(errors, &String.contains?(&1, "mode must be"))
+      refute Enum.any?(errors, &String.contains?(&1, "preset must be"))
+    end
+
+    test "seam shape check rejects a non-string, non-null seam value when present" do
+      entry = %{"id" => "invoice", "mode" => 42}
+      errors = Rendro.LaunchArtifacts.manifest_shape_errors(%{"gallery" => [entry]})
+
+      assert Enum.any?(errors, &String.contains?(&1, "mode must be null or a string when present"))
+    end
+  end
+
   test "canonical recipe defaults remain unchanged" do
     doc =
       Rendro.Recipes.Invoice.document(%{
