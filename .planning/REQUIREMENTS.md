@@ -44,7 +44,7 @@ Legend: `[ ]` in scope for this milestone.
 
 - [x] **EDGE-01**: Each family × stress dimension (text length/wrapping, line-item counts 0/1/few/page-boundary/60+, missing optional fields, numeric edges $0.00/negatives-as-parens/$1M+/cents-rounding/zero-qty, USD vs GBP/EUR + VAT vs sales-tax labels, pagination boundaries, A4 vs US Letter, odd/even running content) renders a deterministic golden artifact verified by SHA-256, with matching pdfium raster refs where applicable.
 - [x] **EDGE-02**: Overflow (`:content_overflow`), a single row taller than the body, and RTL input each raise an instructive typed `Rendro.Error`/`ArgumentError` — never silent truncation or a leaked internal error.
-- [ ] **EDGE-03**: Stress fixtures are exempt from the rubric beauty gate (they prove robustness, not aesthetics) and this exemption is explicit in the rubric manifest/tests.
+- [x] **EDGE-03**: Stress fixtures are exempt from the rubric beauty gate (they prove robustness, not aesthetics) and this exemption is explicit in the rubric manifest/tests.
 
 ## Demonstration Set, Gallery & Docs Closure (SHOW)
 
@@ -99,7 +99,7 @@ Every REQ-ID maps to exactly one phase. Coverage: **26/26 mapped**, no orphans, 
 | FAM-03 | Phase 116 | Complete |
 | EDGE-01 | Phase 117 | Complete |
 | EDGE-02 | Phase 117 | Complete |
-| EDGE-03 | Phase 117 | Pending |
+| EDGE-03 | Phase 117 | Complete |
 | SHOW-01 | Phase 118 | Pending |
 | SHOW-02 | Phase 118 | Pending |
 | SHOW-03 | Phase 118 | Pending |
