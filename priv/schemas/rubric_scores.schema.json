@@ -4,7 +4,7 @@
   "title": "Rendro Rubric Scores Manifest",
   "description": "Structural contract for priv/quality/rubric_scores.json. Constrains structure and threshold arithmetic only (6 dimensions, 2 gates, hierarchy=5/core>=4) — never the subjective score values, which Phase 118 appends.",
   "type": "object",
-  "required": ["schema_version", "dimensions", "gates", "thresholds", "scores"],
+  "required": ["schema_version", "dimensions", "gates", "thresholds", "scores", "stress_exemption"],
   "properties": {
     "schema_version": { "const": 1 },
     "dimensions": {
@@ -67,6 +67,17 @@
         "hierarchy_dimension": { "const": "content_hierarchy" },
         "hierarchy_min": { "const": 5 },
         "core_min": { "type": "integer", "minimum": 4, "maximum": 5 }
+      },
+      "additionalProperties": true
+    },
+    "stress_exemption": {
+      "type": "object",
+      "required": ["exempt", "reason"],
+      "properties": {
+        "exempt": { "const": true },
+        "reason": { "type": "string", "minLength": 1 },
+        "fixture_source": { "type": "string" },
+        "gate_scope": { "type": "string" }
       },
       "additionalProperties": true
     },

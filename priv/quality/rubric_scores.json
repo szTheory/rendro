@@ -79,5 +79,11 @@
     "hierarchy_min": 5,
     "core_min": 4
   },
+  "stress_exemption": {
+    "exempt": true,
+    "reason": "Stress-matrix fixtures (test/rendro/edge_matrix_test.exs) exist to prove pipeline robustness and byte-determinism under adversarial inputs -- overflow, extreme text length, empty/60+ line-item counts, numeric edge cases, currency and page-size variance -- not reader-facing aesthetic quality. They are deliberately excluded from the reader-quality rubric's beauty gate; the gate applies only to curated family x domain demonstration documents.",
+    "fixture_source": "test/rendro/edge_matrix_test.exs",
+    "gate_scope": "scores"
+  },
   "scores": []
 }
