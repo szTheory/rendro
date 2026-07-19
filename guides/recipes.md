@@ -20,8 +20,8 @@ Source PDFs and the self-rendered manual are byte-checked by the required docs c
 
 Standard invoice from Elixir data through the canonical Invoice recipe.
 
-- Source PDF SHA-256: `fc65ac5688462a77e1cc3cdfd8cb25e8ac1d61677d430615443c23f565068105`
-- PNG SHA-256: `8acf5472e4c7a7ec6d04843464536b3f291e8cfc0d2c7fe8040913af4e648988`
+- Source PDF SHA-256: `93ed6eac5c89a198269b008f1bed259cfdc3d23e55544b8c2896619ac738bf59`
+- PNG SHA-256: `f5bd13f300ba3f64cc13a731405d6bc321dbbb93d8405dae2907874ad7c19565`
 
 ### Branded Invoice
 
@@ -29,26 +29,26 @@ Standard invoice from Elixir data through the canonical Invoice recipe.
 
 Branded invoice with registered font and logo assets.
 
-- Source PDF SHA-256: `9bc4a0ea94e2a7cb09dbeeaf5f57b24f624a34a2c7d8012343bca1c66c8e95c9`
-- PNG SHA-256: `3618e386c02b622dddb785ead24843481aa963e91653614aeab22287354138b5`
+- Source PDF SHA-256: `79480093f83c18a90bf3e3c0dc56aeabf703f665ddc0b3c899e6721d4d85317b`
+- PNG SHA-256: `39b90a75ed9283d53339779f7bc20473db7ce63efe2d2efbcf727fc92e7d65cd`
 
 ### Statement
 
-<a href="assets/rendro/gallery/statement.png"><img src="assets/rendro/gallery/statement.png" alt="Rendered account statement PDF showing transaction rows, running balances, and Page 1 of 2 footer." width="320"></a>
+<a href="assets/rendro/gallery/statement.png"><img src="assets/rendro/gallery/statement.png" alt="Rendered account statement PDF showing dated transaction rows, signed amounts, and a page-numbered footer." width="320"></a>
 
-Multi-page statement with carried-forward balances and running page numbers.
+Account statement with opening/closing balances and per-page numbering.
 
-- Source PDF SHA-256: `fa4fd6f3d84ccdccc8a1812c0212a9b17820cd25ffb615519154e9dd3792b835`
-- PNG SHA-256: `ec13a842b4ea48308ec682f4765c17fa3b70f75efb58739c3f9eb1a6d8963ec0`
+- Source PDF SHA-256: `320ad1abb0686986baad35678202bb7270f4eb9b16c5ab7ee70ff5a1587c0847`
+- PNG SHA-256: `7922197ae89b894dfe4341c725658c5647006ddf57b786cb64c0a8a1a6179e56`
 
 ### Receipt / Report
 
-<a href="assets/rendro/gallery/receipt_report.png"><img src="assets/rendro/gallery/receipt_report.png" alt="Rendered receipt report PDF showing repeated table header, line items, totals, and Page 1 of 2 footer." width="320"></a>
+<a href="assets/rendro/gallery/receipt_report.png"><img src="assets/rendro/gallery/receipt_report.png" alt="Rendered sales receipt PDF showing itemized line items with a subtotal, tax, and total." width="320"></a>
 
-Receipt recipe scaled into a multi-page tabular report.
+Itemized sales receipt with subtotal, tax, and total through the Receipt recipe.
 
-- Source PDF SHA-256: `68f3a44f655c4783bc9bd94ad3c37675edb09cfbe92009b2a54e4a35a91258b5`
-- PNG SHA-256: `c2af63ac8460c85f8eb51240567d06ab71b72fd69be337bc165884f4af98c1c4`
+- Source PDF SHA-256: `d2bdb031f3efd33b2652036dcc2d7232ef11c1039bcb8ff622a528dc100d7996`
+- PNG SHA-256: `cdf5921c8d186bdf2fe5c91b438a380cdd8bcf123d4649c5c9ac96381dca3ba9`
 
 ### Certificate
 
@@ -56,15 +56,33 @@ Receipt recipe scaled into a multi-page tabular report.
 
 Landscape certificate with a Path-backed, geometry-derived border frame.
 
-- Source PDF SHA-256: `51b43c00c1e7afba093c6f6a682630576c639fb65912f504ddc9c6c6db0d3c95`
-- PNG SHA-256: `7194ebe35228f4026cc804b0b38913545ef997335d08f6d579f5d450a5c3fcf4`
+- Source PDF SHA-256: `dd165dc55793619df375695ed5b2d31cbe7e00eee09ca119c55fb4e37a813af5`
+- PNG SHA-256: `7bf2f9f30065ef7ff5d2ef3484d582f1747508434a8a2a85893310e7c54bdae8`
+
+### Payslip
+
+<a href="assets/rendro/gallery/payslip.png"><img src="assets/rendro/gallery/payslip.png" alt="Rendered payslip PDF showing employer and employee details, earnings and deductions, and the net pay figure." width="320"></a>
+
+Payslip with earnings, deductions, year-to-date figures, and a reconciled net pay.
+
+- Source PDF SHA-256: `962968fd7283339a08f723f13253c041b743d28926addc451e1ec56d94e7c0e1`
+- PNG SHA-256: `16860d9b09665d134d21ae6b7f710bed5800f02998067a31aaafd4fe072bd8ab`
+
+### Ticket
+
+<a href="assets/rendro/gallery/ticket.png"><img src="assets/rendro/gallery/ticket.png" alt="Rendered event ticket PDF showing the event title, seat placement grid, and a human-readable reference code." width="320"></a>
+
+Event ticket with a placement grid and a quotable, human-readable reference code.
+
+- Source PDF SHA-256: `631bed07c407ba4d246510c229cbb34a61a7286b934ce7b42139dedbdf08ef4c`
+- PNG SHA-256: `8b4833c17a0bd51e0160c5937e20a63e08013b1ba747a632810845dbcc1adeff`
 
 
 ## Self-Rendered Manual
 
 Rendro also renders its own compact launch manual: [manual.pdf](assets/rendro/manual.pdf).
 
-SHA-256: `a9f1a241c3fb331ad5522d905af8acf26d9848b8862cb9a6f3e4033c3ee1dc94`
+SHA-256: `2fbf0a0ef7405fc6ed2feb664c6404abdb25e91406caab0cec4a6ed353f4129d`
 <!-- rendro-recipe-gallery-end -->
 
 ## Statement
