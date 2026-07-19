@@ -1,0 +1,22 @@
+{
+  "fixture_id": "ticket_v1",
+  "family": "ticket",
+  "paper": "a6",
+  "issuer": {
+    "name": "Aurora Live",
+    "venue": "The Foundry Hall"
+  },
+  "title": "Indie Night: The Lumen Set",
+  "subtitle": "Doors 7:00 PM · Show 8:00 PM · Saturday 27 June 2026",
+  "placement": [
+    {"label": "Section", "value": "GA"},
+    {"label": "Row", "value": "H"},
+    {"label": "Seat", "value": "24"},
+    {"label": "Gate", "value": "B"}
+  ],
+  "code": {
+    "reference": "AUR-88213-GA"
+  },
+  "terms": "Non-transferable. Valid photo ID may be required at entry. No refunds or exchanges except as required by law. Present this reference at the gate for scanning.",
+  "brand": {"logo": null}
+}

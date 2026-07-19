@@ -1,0 +1,32 @@
+{
+  "fixture_id": "payslip_v1",
+  "family": "payslip",
+  "paper": "a4",
+  "currency": "GBP",
+  "employer": {
+    "name": "Aurora Live",
+    "address": "18 Northgate Road, Manchester M3 2LF"
+  },
+  "employee": {
+    "name": "Jordan Vega",
+    "id": "E-·····4821",
+    "tax_code": "1257L"
+  },
+  "period": {
+    "from": "2026-06-01",
+    "to": "2026-06-30"
+  },
+  "pay_date": "2026-07-05",
+  "earnings": [
+    {"description": "Base Salary", "amount": "4200.00", "ytd": "25200.00"},
+    {"description": "Performance Bonus", "amount": "350.00", "ytd": "1050.00"}
+  ],
+  "deductions": [
+    {"description": "Income Tax (PAYE)", "amount": "742.00", "ytd": "4452.00"},
+    {"description": "National Insurance", "amount": "288.00", "ytd": "1728.00"},
+    {"description": "Pension Contribution", "amount": "227.50", "ytd": "1365.00"}
+  ],
+  "net_pay": "3292.50",
+  "payment_method": "Direct Deposit ···· 4321",
+  "brand": {"logo": null}
+}
