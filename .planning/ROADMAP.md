@@ -168,7 +168,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 114. Domain research, rubric & example-data library | v2.10 | 7/7 | Complete    | 2026-07-11 |
 | 115. Invoice anatomy + Format promotion + seams | v2.10 | 4/4 | Complete    | 2026-07-18 |
-| 116. New families — Payslip & Ticket | v2.10 | 4/4 | Complete   | 2026-07-19 |
+| 116. New families — Payslip & Ticket | v2.10 | 4/4 | Complete    | 2026-07-19 |
 | 117. Edge-case stress matrix | v2.10 | 0/TBD | Not started | - |
 | 118. Rubric-gated demos, gallery & docs closure | v2.10 | 0/TBD | Not started | - |
 | 108. Baseline & Audit Report | C1 | 3/3 | Complete | 2026-06-14 |
