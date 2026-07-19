@@ -16,7 +16,7 @@
 - [x] **Phase 114: Domain research, reader-quality rubric & realistic example-data library** — realistic `priv/examples/` fixtures + `@moduledoc false` loader + de-quarantine + per-domain `DOMAIN.md` + schema-backed appendable rubric manifest (no `lib/` product change beyond the loader). (completed 2026-07-18)
 - [x] **Phase 115: Invoice anatomy upgrade + Format public promotion + palette/align seams** — additive Invoice anatomy (issuer/customer/due_date/terms/totals + Decimal money), `Format` promoted to the public adapter tier, `cell_align: :right`, and the S1 palette seam (the milestone's only real product `lib/` change). (completed 2026-07-18)
 - [x] **Phase 116: New families — Payslip & Ticket** — two production-grade recipes on the 3-rung pattern reusing the palette seam, registered in `public_api.json` (adapter tier) + `support_matrix.json`. (completed 2026-07-19)
-- [ ] **Phase 117: Edge-case stress matrix** — deterministic hash-checked goldens + pdfium raster refs + errors-as-product across the family × stress-dimension grid.
+- [x] **Phase 117: Edge-case stress matrix** — deterministic hash-checked goldens + pdfium raster refs + errors-as-product across the family × stress-dimension grid. (completed 2026-07-19)
 - [ ] **Phase 118: Rubric-gated demonstration set, gallery & docs closure** — family×domain demos passing the rubric, gallery/`artifacts.json` regen with S6 tags, and guides/Livebook/phoenix_example/README/support_matrix reconciliation.
 
 ## Phase Details
@@ -134,7 +134,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 117-07-PLAN.md — Rubric stress_exemption block + schema + D-15 contract-test guards — EDGE-03
+- [x] 117-07-PLAN.md — Rubric stress_exemption block + schema + D-15 contract-test guards — EDGE-03
 
 ### Phase 118: Rubric-gated demonstration set, gallery & docs closure
 
@@ -185,7 +185,7 @@ Plans:
 | 114. Domain research, rubric & example-data library | v2.10 | 7/7 | Complete    | 2026-07-11 |
 | 115. Invoice anatomy + Format promotion + seams | v2.10 | 4/4 | Complete    | 2026-07-18 |
 | 116. New families — Payslip & Ticket | v2.10 | 4/4 | Complete    | 2026-07-19 |
-| 117. Edge-case stress matrix | v2.10 | 6/7 | In Progress|  |
+| 117. Edge-case stress matrix | v2.10 | 7/7 | Complete    | 2026-07-19 |
 | 118. Rubric-gated demos, gallery & docs closure | v2.10 | 0/TBD | Not started | - |
 | 108. Baseline & Audit Report | C1 | 3/3 | Complete | 2026-06-14 |
 | 109. Caching & setup-beam Foundation | C1 | 2/2 | Complete | 2026-06-15 |
