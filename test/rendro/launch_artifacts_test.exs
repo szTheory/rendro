@@ -21,10 +21,40 @@ defmodule Rendro.LaunchArtifactsTest do
     end
 
     test "render_source_pdf renders every curated source fixture" do
-      for id <- @styled_fixture_ids ++ ["certificate"] do
+      for id <- @styled_fixture_ids ++ ~w(certificate payslip ticket) do
         assert {:ok, <<"%PDF-", _rest::binary>>} =
                  Rendro.LaunchArtifacts.render_source_pdf(%{id: id})
       end
+    end
+
+    test "payslip tile is sourced from the payslip fixture (D-07)" do
+      doc = Rendro.LaunchArtifacts.source_document_for(%{id: "payslip"})
+      texts = all_texts(doc)
+
+      # Realistic employer + earnings line from priv/examples/payslip fixture.
+      assert Enum.any?(texts, &(&1 =~ "Aurora Live"))
+      assert Enum.any?(texts, &(&1 =~ "Base Salary"))
+    end
+
+    test "ticket tile is sourced from the ticket fixture (D-07)" do
+      doc = Rendro.LaunchArtifacts.source_document_for(%{id: "ticket"})
+      texts = all_texts(doc)
+
+      # Realistic event title + reference code from priv/examples/ticket fixture.
+      assert Enum.any?(texts, &(&1 =~ "Indie Night"))
+      assert Enum.any?(texts, &(&1 =~ "AUR-88213-GA"))
+    end
+
+    test "gallery has exactly seven tiles in the fixed order (D-07)" do
+      assert Enum.map(Rendro.LaunchArtifacts.gallery_specs(), & &1.id) == [
+               "invoice",
+               "branded_invoice",
+               "statement",
+               "receipt_report",
+               "certificate",
+               "payslip",
+               "ticket"
+             ]
     end
 
     test "branded invoice keeps brand font, logo, and readable header blocks" do
@@ -111,4 +141,21 @@ defmodule Rendro.LaunchArtifactsTest do
 
   defp text_content(%Rendro.Block{content: %Rendro.Text{content: content}}), do: content
   defp text_content(_other), do: nil
+
+  defp all_texts(%Rendro.Document{sections: sections}) do
+    sections
+    |> Enum.flat_map(&collect_texts/1)
+    |> Enum.reject(&is_nil/1)
+  end
+
+  defp collect_texts(%Rendro.Section{content: content}), do: Enum.flat_map(content, &collect_texts/1)
+  defp collect_texts(%Rendro.Block{content: %Rendro.Text{content: content}}), do: [content]
+
+  defp collect_texts(%Rendro.Block{content: %Rendro.Table{} = table}) do
+    [table.header | table.rows]
+    |> List.flatten()
+    |> Enum.filter(&is_binary/1)
+  end
+
+  defp collect_texts(_other), do: []
 end

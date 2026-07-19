@@ -28,7 +28,12 @@ defmodule Rendro.LaunchArtifacts do
     "branded_invoice" => {794, 1123},
     "statement" => {794, 1123},
     "receipt_report" => {794, 1123},
-    "certificate" => {1123, 794}
+    "certificate" => {1123, 794},
+    # Provisional A4-portrait dimensions for the two new tiles. @expected_gallery_dimensions
+    # is advisory-tier; the container `.gen` in 118-05 renders the real rasters and
+    # confirms/corrects these pixel dims (ticket is A6, so its actual dims will differ).
+    "payslip" => {794, 1123},
+    "ticket" => {794, 1123}
   }
 
   @readme_start "<!-- rendro-launch-artifacts-start -->"
@@ -90,6 +95,28 @@ defmodule Rendro.LaunchArtifacts do
       alt:
         "Rendered landscape certificate PDF showing recipient text and geometry-derived keyline border.",
       caption: "Landscape certificate with a Path-backed, geometry-derived border frame."
+    },
+    %{
+      id: "payslip",
+      title: "Payslip",
+      module: Rendro.Recipes.Payslip,
+      png_path: Path.join(@gallery_dir, "payslip.png"),
+      asset_name: :gallery_payslip,
+      fit: {320, 452},
+      alt:
+        "Rendered payslip PDF showing employer and employee details, earnings and deductions, and the net pay figure.",
+      caption: "Payslip with earnings, deductions, year-to-date figures, and a reconciled net pay."
+    },
+    %{
+      id: "ticket",
+      title: "Ticket",
+      module: Rendro.Recipes.Ticket,
+      png_path: Path.join(@gallery_dir, "ticket.png"),
+      asset_name: :gallery_ticket,
+      fit: {320, 452},
+      alt:
+        "Rendered event ticket PDF showing the event title, seat placement grid, and a human-readable reference code.",
+      caption: "Event ticket with a placement grid and a quotable, human-readable reference code."
     }
   ]
 
@@ -264,6 +291,8 @@ defmodule Rendro.LaunchArtifacts do
   @statement_fixture "statement/northwind-ledger-co/statement.json"
   @receipt_fixture "receipt/harbor-and-oak-cafe/receipt.json"
   @certificate_fixture "certificate/summit-training-institute/certificate.json"
+  @payslip_fixture "payslip/aurora-live/payslip.json"
+  @ticket_fixture "ticket/aurora-live/ticket.json"
   # Bounded item slice for the single-page branded-invoice branding showcase.
   @branded_invoice_item_count 8
 
@@ -322,6 +351,21 @@ defmodule Rendro.LaunchArtifacts do
     |> apply_certificate_body_wrap()
   end
 
+  defp build_source_document("payslip") do
+    @payslip_fixture
+    |> Rendro.Examples.load!()
+    |> Rendro.ExamplesData.transform_payslip()
+    |> Rendro.Recipes.Payslip.document()
+  end
+
+  defp build_source_document("ticket") do
+    @ticket_fixture
+    |> Rendro.Examples.load!()
+    |> Rendro.ExamplesData.transform_ticket()
+    |> Rendro.Recipes.Ticket.document()
+    |> apply_ticket_terms_wrap()
+  end
+
   @spec render_manual_pdf() :: {:ok, binary()} | {:error, term()}
   def render_manual_pdf do
     render_doc(manual_document())
@@ -339,36 +383,49 @@ defmodule Rendro.LaunchArtifacts do
     %Document{doc | sections: Enum.map(doc.sections, &style_branded_invoice_header/1)}
   end
 
-  # The Certificate recipe emits its body statement as a single unbounded text
-  # block (no wrap width), which fit the short toy fixture but overflows the
-  # landscape body region horizontally with the realistic multi-clause fixture
-  # body. Constrain every certificate body text block to the :body region width
-  # so long lines wrap instead of running off the page. Kept here (launch-only
-  # post-process, mirroring apply_launch_table_style/1) rather than in the
-  # shared recipe, whose byte goldens must stay untouched.
-  defp apply_certificate_body_wrap(%Document{} = doc) do
-    case body_region_width(doc) do
-      nil -> doc
-      width -> %Document{doc | sections: Enum.map(doc.sections, &wrap_certificate_body(&1, width))}
+  # Several recipes emit long paragraph text (certificate body statement, ticket
+  # fine-print terms) as a single unbounded text block with no wrap width. That
+  # fit the short toy fixtures but overflows the region horizontally with the
+  # realistic multi-clause fixture text. Constrain each flow text block in the
+  # named section to its region width so long lines wrap instead of running off
+  # the page. Kept here as a launch-only post-process (mirroring
+  # apply_launch_table_style/1) rather than in the shared recipes, whose byte
+  # goldens must stay untouched.
+  defp apply_certificate_body_wrap(%Document{} = doc),
+    do: wrap_section_text_to_region(doc, :certificate_body, :body)
+
+  defp apply_ticket_terms_wrap(%Document{} = doc),
+    do: wrap_section_text_to_region(doc, :ticket_terms, :terms)
+
+  defp wrap_section_text_to_region(%Document{} = doc, section_name, region_name) do
+    case region_width(doc, region_name) do
+      nil ->
+        doc
+
+      width ->
+        %Document{
+          doc
+          | sections: Enum.map(doc.sections, &wrap_named_section(&1, section_name, width))
+        }
     end
   end
 
-  defp body_region_width(%Document{page_templates: templates, page_template: name}) do
+  defp region_width(%Document{page_templates: templates, page_template: name}, region_name) do
     with %Rendro.PageTemplate{regions: regions} <-
            Enum.find(templates, &(&1.name == name)),
          %Rendro.Region{width: width} when is_number(width) <-
-           Enum.find(regions, &(&1.name == :body)) do
+           Enum.find(regions, &(&1.name == region_name)) do
       width
     else
       _ -> nil
     end
   end
 
-  defp wrap_certificate_body(%Rendro.Section{name: :certificate_body, content: content} = section, width) do
+  defp wrap_named_section(%Rendro.Section{name: name, content: content} = section, name, width) do
     %Rendro.Section{section | content: Enum.map(content, &constrain_text_width(&1, width))}
   end
 
-  defp wrap_certificate_body(other, _width), do: other
+  defp wrap_named_section(other, _name, _width), do: other
 
   defp constrain_text_width(%Rendro.Block{content: %Rendro.Text{}} = block, width) do
     %Rendro.Block{block | width: width}
