@@ -380,6 +380,15 @@
       "tier": "adapter",
       "types": []
     },
+    "Elixir.Rendro.Recipes.Payslip": {
+      "functions": [
+        "document/2",
+        "page_template/1",
+        "sections/2"
+      ],
+      "tier": "adapter",
+      "types": []
+    },
     "Elixir.Rendro.Recipes.Receipt": {
       "functions": [
         "document/2",
@@ -390,6 +399,15 @@
       "types": []
     },
     "Elixir.Rendro.Recipes.Statement": {
+      "functions": [
+        "document/2",
+        "page_template/1",
+        "sections/2"
+      ],
+      "tier": "adapter",
+      "types": []
+    },
+    "Elixir.Rendro.Recipes.Ticket": {
       "functions": [
         "document/2",
         "page_template/1",
