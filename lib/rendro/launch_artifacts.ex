@@ -33,11 +33,10 @@ defmodule Rendro.LaunchArtifacts do
     "statement" => {794, 1123},
     "receipt_report" => {794, 1123},
     "certificate" => {1123, 794},
-    # Provisional A4-portrait dimensions for the two new tiles. @expected_gallery_dimensions
-    # is advisory-tier; the container `.gen` in 118-05 renders the real rasters and
-    # confirms/corrects these pixel dims (ticket is A6, so its actual dims will differ).
     "payslip" => {794, 1123},
-    "ticket" => {794, 1123}
+    # Ticket renders on native A6 (118-08: Rendro.PageSize gained :a6, 297.64 x 419.53pt)
+    # instead of A4 as its recipe default -> 397x560px at the gallery's 96 DPI.
+    "ticket" => {397, 560}
   }
 
   @readme_start "<!-- rendro-launch-artifacts-start -->"
