@@ -9,7 +9,7 @@ defmodule Rendro.DocsContract.LaunchArtifactsClaimsTest do
     assert Rendro.LaunchArtifacts.static_contract_errors() == []
   end
 
-  test "manifest records exactly the five Phase 86 recipe previews" do
+  test "manifest records exactly the seven recipe previews" do
     manifest = Rendro.LaunchArtifacts.read_manifest!()
 
     assert Enum.map(manifest["gallery"], & &1["id"]) == [
@@ -17,7 +17,9 @@ defmodule Rendro.DocsContract.LaunchArtifactsClaimsTest do
              "branded_invoice",
              "statement",
              "receipt_report",
-             "certificate"
+             "certificate",
+             "payslip",
+             "ticket"
            ]
   end
 
@@ -147,6 +149,8 @@ defmodule Rendro.DocsContract.LaunchArtifactsClaimsTest do
       "assets/rendro/gallery/statement.png",
       "assets/rendro/gallery/receipt_report.png",
       "assets/rendro/gallery/certificate.png",
+      "assets/rendro/gallery/payslip.png",
+      "assets/rendro/gallery/ticket.png",
       "ADOPTION.md",
       "CHANGELOG.md"
     ]
