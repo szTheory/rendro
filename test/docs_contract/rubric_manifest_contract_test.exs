@@ -1,3 +1,9 @@
+# Compile Rendro.EdgeMatrixTest so stress_fixture_ids/0 is available even when this
+# file runs in isolation (`mix test test/docs_contract/rubric_manifest_contract_test.exs`).
+# `.exs` test files outside test/support/ are not on elixirc_paths(:test), so without
+# this require the module would be undefined. Mirrors test/scripts/release_preflight_proof_test.exs:1.
+Code.require_file("test/rendro/edge_matrix_test.exs", File.cwd!())
+
 defmodule Rendro.DocsContract.RubricManifestContractTest do
   @moduledoc false
   use ExUnit.Case, async: true
@@ -80,5 +86,38 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
     # Near-miss 3: one gate = false (fails gates-pass)
     refute passed?(all_pass_scores, %{all_pass_gates | "print_safety" => false}),
            "a failing gate must fail regardless of dimension scores"
+  end
+
+  # --- D-15 fail-loud-in-both-directions stress-exemption guards ------------
+
+  test "D-15i: stress_exemption is present, exempt, and carries a non-empty reason" do
+    exemption = manifest()["stress_exemption"]
+
+    assert exemption["exempt"] == true,
+           "stress_exemption.exempt must be true"
+
+    assert is_binary(exemption["reason"]) and exemption["reason"] != "",
+           "stress_exemption.reason must be a non-empty string"
+  end
+
+  test "D-15ii: no scores entry may set stress_exempt to dodge the beauty gate" do
+    refute Enum.any?(manifest()["scores"], &Map.get(&1, "stress_exempt", false)),
+           "the per-entry stress_exempt field is a loophole tripwire — no real demo " <>
+             "score may set it true to bypass the reader-quality rubric"
+  end
+
+  test "D-15iii: stress-fixture ID set is disjoint from the scores array's demo_ids" do
+    stress_ids = Rendro.EdgeMatrixTest.stress_fixture_ids()
+    score_ids = MapSet.new(Enum.map(manifest()["scores"], & &1["demo_id"]))
+
+    assert MapSet.disjoint?(stress_ids, score_ids),
+           "stress-matrix fixture IDs must never collide with curated demo demo_ids; " <>
+             "overlap: #{inspect(MapSet.intersection(stress_ids, score_ids))}"
+  end
+
+  test "D-15iv teeth guard: the stress-fixture ID set is non-empty (62 cells)" do
+    assert MapSet.size(Rendro.EdgeMatrixTest.stress_fixture_ids()) == 62,
+           "disjointness must not pass vacuously — the imported stress-fixture set " <>
+             "must be the full 62 :applies cells"
   end
 end
