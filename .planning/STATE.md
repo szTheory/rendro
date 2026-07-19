@@ -2,15 +2,17 @@
 gsd_state_version: 1.0
 milestone: v2.10
 milestone_name: Realistic Business-Document Examples & Anatomy
+current_phase: 118
+current_phase_name: rubric-gated-demonstration-set-gallery-docs-closure
 status: executing
 stopped_at: Phase 118 context gathered
-last_updated: "2026-07-19T16:02:41.412Z"
+last_updated: "2026-07-19T16:21:50.950Z"
 last_activity: 2026-07-19
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 29
-  completed_plans: 25
+  completed_plans: 26
   percent: 80
 ---
 
@@ -25,7 +27,7 @@ progress:
 ## Current Position
 
 Phase: 118 (rubric-gated-demonstration-set-gallery-docs-closure) — EXECUTING
-Plan: 4 of 7
+Plan: 5 of 7
 Status: Ready to execute
 Last activity: 2026-07-19
 
@@ -83,6 +85,8 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 - [Phase 118]: 118-02: Strengthened the DOMAIN.md contract to require one DOMAIN.md per demonstrated domain, derived from priv/examples/*/*/*.json fixture dirs (not a hardcoded family list) plus a non-vacuous guard, so future families inherit it automatically. Authored five new four-heading DOMAIN.md anatomy files (statement/receipt/certificate/payslip/ticket).
 - [Phase ?]: [Phase 118]: 118-03: Authored Rendro.ExamplesData (@moduledoc false) — the D-06 single JSON→recipe transform seam. Money via Decimal.new (cents preserved, INV-02); invoice legacy :price via Decimal.to_float (bare number the recipe requires, never to_integer). Certificate transform drops the empty S4 brand slot (validate_brand!/1 rejects %{logo: nil}).
 - [Phase ?]: [Phase 118]: 118-03: Statement fixture ASCII-ified (em-dash→hyphen, ····8140→****8140) — Statement recipe uses built-in Helvetica with no unicode fallback (unlike Payslip 116-02) and no opts font-injection; recipe-level fallback logged in deferred-items.md.
+- [Phase ?]: [Phase 118]: 118-04: Repointed Rendro.LaunchArtifacts gallery to priv/examples/** via Rendro.ExamplesData (D-06); 7 tiles in fixed order incl. new payslip/ticket (D-07); S6 theme/mode/preset optional seam tags per entry (D-13). Byte re-baseline + PNG rasters container-gated to 118-05 (2 launch_artifacts_claims_test cases expected-red until then).
+- [Phase ?]: [Phase 118]: 118-04: ASCII-ified certificate seal_line em-dash and ticket subtitle middots (recipes render built-in Helvetica, no unicode fallback); certificate body + ticket terms wrapped via launch-only wrap_section_text_to_region/3; branded_invoice renders an 8-item fixture slice (recipe body does not paginate).
 
 ### Blockers / Open Questions
 
@@ -127,6 +131,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 | Phase 118 P01 | 3min | 3 tasks | 6 files |
 | Phase 118 P02 | 3min | 2 tasks | 6 files |
 | Phase 118 P03 | 8min | 2 tasks | 4 files |
+| Phase 118 P04 | 14min | 3 tasks | 4 files |
 
 ## Operator Next Steps
 
@@ -134,6 +139,6 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 
 ## Session
 
-**Last session:** 2026-07-19T16:02:11.050Z
+**Last session:** 2026-07-19T16:21:18.382Z
 **Stopped at:** Phase 118 context gathered
 **Resume file:** None

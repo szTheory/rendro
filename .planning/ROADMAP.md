@@ -162,7 +162,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2)*
 
-- [ ] 118-04-PLAN.md — Repoint LaunchArtifacts to fixtures (D-06) + Payslip/Ticket tiles (D-07) + S6 tags (D-13) — SHOW-03
+- [x] 118-04-PLAN.md — Repoint LaunchArtifacts to fixtures (D-06) + Payslip/Ticket tiles (D-07) + S6 tags (D-13) — SHOW-03
 
 **Wave 4** *(blocked on Wave 3; container-gated, autonomous:false)*
 
@@ -209,7 +209,7 @@ Plans:
 | 115. Invoice anatomy + Format promotion + seams | v2.10 | 4/4 | Complete    | 2026-07-18 |
 | 116. New families — Payslip & Ticket | v2.10 | 4/4 | Complete    | 2026-07-19 |
 | 117. Edge-case stress matrix | v2.10 | 7/7 | Complete    | 2026-07-19 |
-| 118. Rubric-gated demos, gallery & docs closure | v2.10 | 3/7 | In Progress|  |
+| 118. Rubric-gated demos, gallery & docs closure | v2.10 | 4/7 | In Progress|  |
 | 108. Baseline & Audit Report | C1 | 3/3 | Complete | 2026-06-14 |
 | 109. Caching & setup-beam Foundation | C1 | 2/2 | Complete | 2026-06-15 |
 | 110. Test Concurrency, Determinism & Cleanup | C1 | 3/3 | Complete | 2026-06-16 |
