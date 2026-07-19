@@ -3,16 +3,17 @@ gsd_state_version: 1.0
 milestone: v2.10
 milestone_name: Realistic Business-Document Examples & Anatomy
 current_phase: 117
+current_phase_name: edge-case-stress-matrix
 status: executing
 stopped_at: Phase 117 context gathered
-last_updated: "2026-07-19T01:43:06.675Z"
+last_updated: "2026-07-19T01:52:55.646Z"
 last_activity: 2026-07-19
-last_activity_desc: Phase 117 planning complete
+last_activity_desc: Phase 117 execution started
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 15
-  completed_plans: 15
+  total_plans: 22
+  completed_plans: 16
   percent: 60
 ---
 
@@ -26,10 +27,10 @@ progress:
 
 ## Current Position
 
-Phase: 117
-Plan: Not started
+Phase: 117 (edge-case-stress-matrix) — EXECUTING
+Plan: 2 of 7
 Status: Ready to execute
-Last activity: 2026-07-19 — Phase 117 planning complete
+Last activity: 2026-07-19 — Phase 117 execution started
 
 Progress: [██████████] 100%
 
@@ -78,6 +79,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 - [Phase ?]: 116-03: D-10 caller-image pre-validation mirrors asset_registry.ex's exact source-resolution logic inside validate_data!/1, pre-parses with the pure Rendro.ImageParser.parse/1, and raises an instructive ArgumentError naming data.code.image -- the first caller-supplied (not library-shipped) image asset in any Rendro recipe; Rendro.AssetRegistry.InvalidAssetError never leaks.
 - [Phase ?]: 116-03: full-render PNG tests use priv/branded/images/rendro-logo.png ({:path, ...}) instead of the minimal 2x2 base64 PNG fixture -- the minimal fixture passes ImageParser.parse/1's header-only check but is not decodable by the PDF writer's stricter Rendro.PDF.PNG chunk decoder when actually embedded.
 - [Phase 116]: 116-04: Registered Payslip/Ticket in @public_modules (mix rendro.api.gen) and added proof-backed payslip/ticket priv/support_matrix.json rows with matching recipes_claims_test.exs assertions. — FAM-01/02/03 all satisfied, Phase 116 complete.
+- [Phase 117]: 117-01: Rendro.Test.Golden uses the Rendro.Test.* namespace (matching HexBuildCache); byte-golden bless is un-gated (MIX_GOLDEN_BLESS) because PDF-byte hashes are cross-platform stable; a missing ref hard-flunks (never silent auto-create).
 
 ### Blockers / Open Questions
 
@@ -112,6 +114,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 | Phase 116 P02 | 17min | 3 tasks | 3 files |
 | Phase 116 P03 | 7min | 3 tasks | 3 files |
 | Phase 116 P04 | 8min | 2 tasks | 4 files |
+| Phase 117 P01 | 18min | 2 tasks | 2 files |
 
 ## Operator Next Steps
 
@@ -119,6 +122,6 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 
 ## Session
 
-**Last session:** 2026-07-19T00:50:17.775Z
+**Last session:** 2026-07-19T01:52:20.798Z
 **Stopped at:** Phase 117 context gathered
 **Resume file:** .planning/phases/117-edge-case-stress-matrix/117-CONTEXT.md

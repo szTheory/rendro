@@ -122,7 +122,7 @@ Plans:
 
 **Wave 1**
 
-- [ ] 117-01-PLAN.md — Byte-golden assert/bless helper (Rendro.Test.Golden, D-03/D-04) — EDGE-01
+- [x] 117-01-PLAN.md — Byte-golden assert/bless helper (Rendro.Test.Golden, D-03/D-04) — EDGE-01
 - [ ] 117-02-PLAN.md — EdgeFixtures builder: 62 :applies cells + 4 EDGE-02 error fixtures — EDGE-01, EDGE-02
 - [ ] 117-03-PLAN.md — Tarball-exclusion tripwire (D-12) — EDGE-01
 
@@ -185,7 +185,7 @@ Plans:
 | 114. Domain research, rubric & example-data library | v2.10 | 7/7 | Complete    | 2026-07-11 |
 | 115. Invoice anatomy + Format promotion + seams | v2.10 | 4/4 | Complete    | 2026-07-18 |
 | 116. New families — Payslip & Ticket | v2.10 | 4/4 | Complete    | 2026-07-19 |
-| 117. Edge-case stress matrix | v2.10 | 0/7 | Ready to execute | - |
+| 117. Edge-case stress matrix | v2.10 | 1/7 | In Progress|  |
 | 118. Rubric-gated demos, gallery & docs closure | v2.10 | 0/TBD | Not started | - |
 | 108. Baseline & Audit Report | C1 | 3/3 | Complete | 2026-06-14 |
 | 109. Caching & setup-beam Foundation | C1 | 2/2 | Complete | 2026-06-15 |
