@@ -20,7 +20,7 @@ progress:
 
 **Project**: Rendro
 **Core Value**: Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current Focus**: v2.10 Realistic Business-Document Examples & Anatomy (Milestone A / `SEED-002`) — Phase 114 complete (data + quality foundation shipped); ready to plan Phase 115 (Invoice anatomy upgrade + `Format` public promotion).
+**Current Focus**: v2.10 Realistic Business-Document Examples & Anatomy (Milestone A / `SEED-002`) — Phases 114–116 complete (data + quality foundation, Invoice anatomy + `Format` promotion, and the Payslip/Ticket families all shipped); ready to plan Phase 117 (Edge-case stress matrix).
 
 ## Current Position
 
@@ -34,11 +34,11 @@ Progress: [██████████] 100%
 ## Roadmap Snapshot (v2.10, Phases 114–118)
 
 ```text
-[████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 20% — 1/5 phases complete
+[████████████████████████░░░░░░░░░░░░░░░░] 60% — 3/5 phases complete
 Phase 114 Domain research, rubric & example-data library . ✓ Complete (2026-07-18)
-Phase 115 Invoice anatomy + Format promotion + seams ..... Ready to plan
-Phase 116 New families — Payslip & Ticket ................ Not started
-Phase 117 Edge-case stress matrix ........................ Not started
+Phase 115 Invoice anatomy + Format promotion + seams ..... ✓ Complete (2026-07-18)
+Phase 116 New families — Payslip & Ticket ................ ✓ Complete (2026-07-19)
+Phase 117 Edge-case stress matrix ........................ Ready to plan
 Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 ```
 

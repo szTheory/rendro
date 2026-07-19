@@ -15,7 +15,7 @@
 
 - [x] **Phase 114: Domain research, reader-quality rubric & realistic example-data library** — realistic `priv/examples/` fixtures + `@moduledoc false` loader + de-quarantine + per-domain `DOMAIN.md` + schema-backed appendable rubric manifest (no `lib/` product change beyond the loader). (completed 2026-07-18)
 - [x] **Phase 115: Invoice anatomy upgrade + Format public promotion + palette/align seams** — additive Invoice anatomy (issuer/customer/due_date/terms/totals + Decimal money), `Format` promoted to the public adapter tier, `cell_align: :right`, and the S1 palette seam (the milestone's only real product `lib/` change). (completed 2026-07-18)
-- [ ] **Phase 116: New families — Payslip & Ticket** — two production-grade recipes on the 3-rung pattern reusing the palette seam, registered in `public_api.json` (adapter tier) + `support_matrix.json`.
+- [x] **Phase 116: New families — Payslip & Ticket** — two production-grade recipes on the 3-rung pattern reusing the palette seam, registered in `public_api.json` (adapter tier) + `support_matrix.json`. (completed 2026-07-19)
 - [ ] **Phase 117: Edge-case stress matrix** — deterministic hash-checked goldens + pdfium raster refs + errors-as-product across the family × stress-dimension grid.
 - [ ] **Phase 118: Rubric-gated demonstration set, gallery & docs closure** — family×domain demos passing the rubric, gallery/`artifacts.json` regen with S6 tags, and guides/Livebook/phoenix_example/README/support_matrix reconciliation.
 
