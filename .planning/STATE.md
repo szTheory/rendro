@@ -2,18 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.10
 milestone_name: Realistic Business-Document Examples & Anatomy
-current_phase: 116
-current_phase_name: new-families-payslip-ticket
-status: executing
-stopped_at: Completed 116-03-PLAN.md
-last_updated: "2026-07-19T00:08:45.310Z"
+status: verifying
+stopped_at: Completed 116-04-PLAN.md — Phase 116 complete, ready for verification
+last_updated: "2026-07-19T00:14:53.778Z"
 last_activity: 2026-07-19
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 15
-  completed_plans: 14
-  percent: 40
+  completed_plans: 15
+  percent: 60
 ---
 
 # Project State
@@ -28,10 +26,10 @@ progress:
 
 Phase: 116 (new-families-payslip-ticket) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-19
 
-Progress: [█████████░] 93%
+Progress: [██████████] 100%
 
 ## Roadmap Snapshot (v2.10, Phases 114–118)
 
@@ -77,6 +75,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 - [Phase ?]: 116-03: main_section/2's D-02 placement-grid anchor uses Rendro.table/2 (single data row, Block-styled header cells) not manual multi-column stacking -- sidesteps anchor_region_blocks/3's shared per-region Y cursor.
 - [Phase ?]: 116-03: D-10 caller-image pre-validation mirrors asset_registry.ex's exact source-resolution logic inside validate_data!/1, pre-parses with the pure Rendro.ImageParser.parse/1, and raises an instructive ArgumentError naming data.code.image -- the first caller-supplied (not library-shipped) image asset in any Rendro recipe; Rendro.AssetRegistry.InvalidAssetError never leaks.
 - [Phase ?]: 116-03: full-render PNG tests use priv/branded/images/rendro-logo.png ({:path, ...}) instead of the minimal 2x2 base64 PNG fixture -- the minimal fixture passes ImageParser.parse/1's header-only check but is not decodable by the PDF writer's stricter Rendro.PDF.PNG chunk decoder when actually embedded.
+- [Phase 116]: 116-04: Registered Payslip/Ticket in @public_modules (mix rendro.api.gen) and added proof-backed payslip/ticket priv/support_matrix.json rows with matching recipes_claims_test.exs assertions. — FAM-01/02/03 all satisfied, Phase 116 complete.
 
 ### Blockers / Open Questions
 
@@ -110,6 +109,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 | Phase 116 P01 | 5min | 2 tasks | 2 files |
 | Phase 116 P02 | 17min | 3 tasks | 3 files |
 | Phase 116 P03 | 7min | 3 tasks | 3 files |
+| Phase 116 P04 | 8min | 2 tasks | 4 files |
 
 ## Operator Next Steps
 
@@ -117,6 +117,6 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 
 ## Session
 
-**Last session:** 2026-07-19T00:08:45.306Z
-**Stopped at:** Completed 116-03-PLAN.md
+**Last session:** 2026-07-19T00:14:53.773Z
+**Stopped at:** Completed 116-04-PLAN.md — Phase 116 complete, ready for verification
 **Resume file:** None
