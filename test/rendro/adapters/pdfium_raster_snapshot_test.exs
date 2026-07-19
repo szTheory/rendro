@@ -106,7 +106,13 @@ defmodule Rendro.Adapters.PdfiumRasterSnapshotTest do
   @tag raster_snapshot: true
   test "edge_certificate_us_letter renders to committed golden PNG hashes" do
     data = EdgeFixtures.build(:certificate, :page_size_a4_letter)
-    doc = Rendro.Recipes.Certificate.document(data, EdgeFixtures.opts(:certificate, :page_size_a4_letter))
+
+    doc =
+      Rendro.Recipes.Certificate.document(
+        data,
+        EdgeFixtures.opts(:certificate, :page_size_a4_letter)
+      )
+
     pdf = Golden.assert_deterministic!(doc)
 
     assert {:ok, pngs} = Pdfium.render(pdf, dpi: 150)

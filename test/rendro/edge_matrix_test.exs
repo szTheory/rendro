@@ -72,7 +72,8 @@ defmodule Rendro.EdgeMatrixTest do
     {:line_items_60_plus,
      [:applies, :applies, :applies, @na_cert_no_lineitems, :applies, @na_ticket_fixed_grid]},
     {:missing_optional_fields, [:applies, :applies, :applies, :applies, :applies, :applies]},
-    {:money_zero, [:applies, :applies, :applies, @na_cert_no_money, :applies, @na_ticket_no_money]},
+    {:money_zero,
+     [:applies, :applies, :applies, @na_cert_no_money, :applies, @na_ticket_no_money]},
     {:money_negative_parens,
      [
        "Invoice totals (subtotal/tax/discount/total) are non-negative by domain convention; discount is subtracted internally, never modeled as a negative Decimal",
@@ -82,7 +83,8 @@ defmodule Rendro.EdgeMatrixTest do
        "deductions are positive magnitudes subtracted internally (net_pay = gross - deductions); no natural negative-Decimal field",
        @na_ticket_no_money
      ]},
-    {:money_large, [:applies, :applies, :applies, @na_cert_no_money, :applies, @na_ticket_no_money]},
+    {:money_large,
+     [:applies, :applies, :applies, @na_cert_no_money, :applies, @na_ticket_no_money]},
     {:money_cents_rounding,
      [:applies, :applies, :applies, @na_cert_no_money, :applies, @na_ticket_no_money]},
     {:qty_zero,
@@ -145,10 +147,10 @@ defmodule Rendro.EdgeMatrixTest do
   # {{family, dimension} => value} map (D-01's locked shape). Structurally, a
   # short/long row would drop or add pairs — which the D-02 meta-test then
   # catches — so this construction and its guard are defense-in-depth.
-  @matrix (for {dimension, values} <- @matrix_rows,
-               {family, value} <- Enum.zip(@families, values),
-               into: %{},
-               do: {{family, dimension}, value})
+  @matrix for {dimension, values} <- @matrix_rows,
+              {family, value} <- Enum.zip(@families, values),
+              into: %{},
+              do: {{family, dimension}, value}
 
   @doc """
   The set of `"family/dimension"` string IDs for every `:applies` matrix cell.

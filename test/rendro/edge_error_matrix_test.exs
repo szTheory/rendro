@@ -72,7 +72,8 @@ defmodule Rendro.EdgeErrorMatrixTest do
     end
 
     test "Arabic under a glyph-capable but shaping-incapable font raises {:shaping_required, :arab, hint}" do
-      assert {:error, %Rendro.Error{stage: :measure, reason: {:shaping_required, :arab, hint}} = error} =
+      assert {:error,
+              %Rendro.Error{stage: :measure, reason: {:shaping_required, :arab, hint}} = error} =
                Rendro.render(EdgeFixtures.rtl_shaping_required_document())
 
       # Rendro has no UAX #9 reordering — it refuses rather than mis-render.

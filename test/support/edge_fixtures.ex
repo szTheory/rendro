@@ -43,7 +43,11 @@ defmodule Rendro.Test.EdgeFixtures do
   def document(:receipt, :currency_format) do
     data = build(:receipt, :currency_format)
     sec_opts = opts(:receipt, :currency_format)
-    compose(Rendro.Recipes.Receipt.page_template(), Rendro.Recipes.Receipt.sections(data, sec_opts))
+
+    compose(
+      Rendro.Recipes.Receipt.page_template(),
+      Rendro.Recipes.Receipt.sections(data, sec_opts)
+    )
   end
 
   # :odd_even_running_content is not a document/2 opt on any of the six recipes —
@@ -73,8 +77,11 @@ defmodule Rendro.Test.EdgeFixtures do
     all_sections = recipe_module(family).sections(data)
     base_sections = Enum.reject(all_sections, &(&1.region == :footer))
 
-    odd_footer = Rendro.section(region: :footer, only_on: :odd, content: [parity_footer_block(:odd)])
-    even_footer = Rendro.section(region: :footer, only_on: :even, content: [parity_footer_block(:even)])
+    odd_footer =
+      Rendro.section(region: :footer, only_on: :odd, content: [parity_footer_block(:odd)])
+
+    even_footer =
+      Rendro.section(region: :footer, only_on: :even, content: [parity_footer_block(:even)])
 
     compose(template, base_sections ++ [odd_footer, even_footer])
   end
@@ -135,7 +142,11 @@ defmodule Rendro.Test.EdgeFixtures do
   # ---------------------------------------------------------------------------
 
   defp base_data(:invoice) do
-    %{id: "INV-1001", date: ~D[2026-01-15], items: [%{name: "Consulting Services", qty: 2, price: 150}]}
+    %{
+      id: "INV-1001",
+      date: ~D[2026-01-15],
+      items: [%{name: "Consulting Services", qty: 2, price: 150}]
+    }
   end
 
   defp base_data(:statement) do
@@ -143,7 +154,9 @@ defmodule Rendro.Test.EdgeFixtures do
       period: %{from: ~D[2026-01-01], to: ~D[2026-01-31]},
       account: %{name: "Acme Corp"},
       opening_balance: Decimal.new("1000.00"),
-      lines: [%{date: ~D[2026-01-05], description: "Invoice #1001", amount: Decimal.new("250.00")}]
+      lines: [
+        %{date: ~D[2026-01-05], description: "Invoice #1001", amount: Decimal.new("250.00")}
+      ]
     }
   end
 
@@ -166,8 +179,16 @@ defmodule Rendro.Test.EdgeFixtures do
       employee: %{name: "Jordan Rivera"},
       period: %{from: ~D[2026-01-01], to: ~D[2026-01-31]},
       pay_date: ~D[2026-02-01],
-      earnings: [%{description: "Base Salary", amount: Decimal.new("4000.00"), ytd: Decimal.new("4000.00")}],
-      deductions: [%{description: "Federal Income Tax", amount: Decimal.new("450.00"), ytd: Decimal.new("450.00")}],
+      earnings: [
+        %{description: "Base Salary", amount: Decimal.new("4000.00"), ytd: Decimal.new("4000.00")}
+      ],
+      deductions: [
+        %{
+          description: "Federal Income Tax",
+          amount: Decimal.new("450.00"),
+          ytd: Decimal.new("450.00")
+        }
+      ],
       net_pay: Decimal.new("3550.00")
     }
   end
@@ -295,7 +316,13 @@ defmodule Rendro.Test.EdgeFixtures do
   def build(:payslip, :money_large) do
     # Vary an :earnings amount (deductions stay at the base 450), re-derive net.
     payslip_with(
-      [%{description: "Base Salary", amount: Decimal.new("1250000.00"), ytd: Decimal.new("1250000.00")}],
+      [
+        %{
+          description: "Base Salary",
+          amount: Decimal.new("1250000.00"),
+          ytd: Decimal.new("1250000.00")
+        }
+      ],
       base_data(:payslip).deductions
     )
   end
@@ -324,7 +351,13 @@ defmodule Rendro.Test.EdgeFixtures do
     # The 450 deduction still reconciles against the 4000/3550 base.
     payslip_with(
       base.earnings,
-      [%{description: "PAYE Income Tax", amount: Decimal.new("450.00"), ytd: Decimal.new("450.00")}]
+      [
+        %{
+          description: "PAYE Income Tax",
+          amount: Decimal.new("450.00"),
+          ytd: Decimal.new("450.00")
+        }
+      ]
     )
   end
 
@@ -405,7 +438,10 @@ defmodule Rendro.Test.EdgeFixtures do
   defp line_count(:line_items_few), do: 3
 
   defp invoice_item(i), do: %{name: "Line item #{i}", qty: 1, price: 100}
-  defp statement_line(i), do: %{date: ~D[2026-01-05], description: "Line item #{i}", amount: Decimal.new("100.00")}
+
+  defp statement_line(i),
+    do: %{date: ~D[2026-01-05], description: "Line item #{i}", amount: Decimal.new("100.00")}
+
   defp receipt_line(i), do: %{description: "Line item #{i}", amount: Decimal.new("100.00")}
 
   defp deduction_line(i),
@@ -425,6 +461,7 @@ defmodule Rendro.Test.EdgeFixtures do
 
   defp payslip_deduction_amount(str) do
     base = base_data(:payslip)
+
     payslip_with(
       base.earnings,
       [%{description: "Federal Income Tax", amount: Decimal.new(str), ytd: Decimal.new(str)}]
@@ -454,10 +491,20 @@ defmodule Rendro.Test.EdgeFixtures do
   defp big_line_items(:receipt, n), do: Enum.map(1..n//1, &receipt_line/1)
 
   defp big_line_items(:payslip, n),
-    do: Enum.map(1..n//1, fn i -> %{description: "Line item #{i}", amount: Decimal.new("100.00"), ytd: Decimal.new("100.00")} end)
+    do:
+      Enum.map(1..n//1, fn i ->
+        %{
+          description: "Line item #{i}",
+          amount: Decimal.new("100.00"),
+          ytd: Decimal.new("100.00")
+        }
+      end)
 
   defp with_big_rows(:invoice, n), do: %{base_data(:invoice) | items: big_line_items(:invoice, n)}
-  defp with_big_rows(:statement, n), do: %{base_data(:statement) | lines: big_line_items(:statement, n)}
+
+  defp with_big_rows(:statement, n),
+    do: %{base_data(:statement) | lines: big_line_items(:statement, n)}
+
   defp with_big_rows(:receipt, n), do: %{base_data(:receipt) | lines: big_line_items(:receipt, n)}
   # Grow the paginating :earnings ledger (max(len(earnings), len(deductions))
   # rows drive Payslip pagination), keeping the base single deduction and
@@ -480,7 +527,10 @@ defmodule Rendro.Test.EdgeFixtures do
     ]
 
     row = ["2026-05-01", "Transaction 1", "$100.00", "$1,100.00"]
-    {header_h, [row_h | _]} = Rendro.measure_rows([row], @content_width, Rendro.Document.new(), table_opts)
+
+    {header_h, [row_h | _]} =
+      Rendro.measure_rows([row], @content_width, Rendro.Document.new(), table_opts)
+
     body_height = 841.89 - 2 * 72 - 48 - 24
     capacity = body_height - 48 - 24
     effective_cap = capacity - header_h - 2 * row_h - 2.0
@@ -490,7 +540,10 @@ defmodule Rendro.Test.EdgeFixtures do
   defp rows_per_page(:receipt) do
     table_opts = [header: ["Description", "Amount"], columns: [{:share, 1}, {:fixed, 72}]]
     row = ["Item 1", "$10.00"]
-    {header_h, [row_h | _]} = Rendro.measure_rows([row], @content_width, Rendro.Document.new(), table_opts)
+
+    {header_h, [row_h | _]} =
+      Rendro.measure_rows([row], @content_width, Rendro.Document.new(), table_opts)
+
     body_height = 841.89 - 2 * 72 - 48 - 24
     capacity = body_height - 48 - 24
     effective_cap = capacity - header_h - 2.0
@@ -498,9 +551,16 @@ defmodule Rendro.Test.EdgeFixtures do
   end
 
   defp rows_per_page(:invoice) do
-    table_opts = [header: ["Item", "Qty", "Price"], columns: [{:share, 1}, {:fixed, 50}, {:fixed, 80}]]
+    table_opts = [
+      header: ["Item", "Qty", "Price"],
+      columns: [{:share, 1}, {:fixed, 50}, {:fixed, 80}]
+    ]
+
     row = ["Widget", "1", "$10.00"]
-    {header_h, [row_h | _]} = Rendro.measure_rows([row], @content_width, Rendro.Document.new(), table_opts)
+
+    {header_h, [row_h | _]} =
+      Rendro.measure_rows([row], @content_width, Rendro.Document.new(), table_opts)
+
     body_height = 841.89 - 2 * 72 - 56 - 24
     capacity = body_height - 56 - 24
     # No :totals block in the pagination fixtures, so no totals reservation.
@@ -521,7 +581,10 @@ defmodule Rendro.Test.EdgeFixtures do
     ]
 
     row = ["Base Salary", "$100.00", "$100.00", "Federal Tax", "$10.00", "$10.00"]
-    {header_h, [row_h | _]} = Rendro.measure_rows([row], content_w, Rendro.Document.new(), table_opts)
+
+    {header_h, [row_h | _]} =
+      Rendro.measure_rows([row], content_w, Rendro.Document.new(), table_opts)
+
     body_h = 841.89 - 72 - 24 - (72 + 88 + 54)
     effective_cap = body_h - header_h - 16 - 2.0
     # Reserve one row for the always-appended subtotal row.

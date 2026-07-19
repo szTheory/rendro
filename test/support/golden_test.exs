@@ -153,9 +153,7 @@ defmodule Rendro.Test.GoldenTest do
                  "priv/goldens/__nonexistent_family__/__nonexistent_dimension__.sha256"
       end)
 
-      refute File.exists?(
-               "priv/goldens/__nonexistent_family__/__nonexistent_dimension__.sha256"
-             )
+      refute File.exists?("priv/goldens/__nonexistent_family__/__nonexistent_dimension__.sha256")
     end
   end
 
@@ -180,7 +178,10 @@ defmodule Rendro.Test.GoldenTest do
 
     test "when unset, writes no dump file and creates no dump directory" do
       base_dir = scratch_dir()
-      dump_dir = Path.join(System.tmp_dir!(), "rendro-golden-nodump-#{System.unique_integer([:positive])}")
+
+      dump_dir =
+        Path.join(System.tmp_dir!(), "rendro-golden-nodump-#{System.unique_integer([:positive])}")
+
       on_exit(fn -> File.rm_rf!(dump_dir) end)
       pdf = Golden.assert_deterministic!(fixture_doc())
 

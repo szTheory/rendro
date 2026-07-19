@@ -88,14 +88,19 @@ defmodule Rendro.Test.EdgeFixturesTest do
       data = EdgeFixtures.build(:statement, :money_negative_parens)
       [line] = data.lines
       assert Decimal.equal?(line.amount, Decimal.new("-200.00"))
-      assert {:ok, _pdf} = Rendro.render(EdgeFixtures.document(:statement, :money_negative_parens))
+
+      assert {:ok, _pdf} =
+               Rendro.render(EdgeFixtures.document(:statement, :money_negative_parens))
     end
 
     test "invoice/money_large totals Decimal-equal the summed items and does not raise" do
       data = EdgeFixtures.build(:invoice, :money_large)
-      derived = Enum.reduce(data.items, Decimal.new(0), fn %{qty: q, price: p}, acc ->
-        Decimal.add(acc, Decimal.mult(Decimal.new(q), Decimal.new(to_string(p))))
-      end)
+
+      derived =
+        Enum.reduce(data.items, Decimal.new(0), fn %{qty: q, price: p}, acc ->
+          Decimal.add(acc, Decimal.mult(Decimal.new(q), Decimal.new(to_string(p))))
+        end)
+
       assert Decimal.equal?(data.totals.subtotal, derived)
       assert Decimal.equal?(data.totals.total, derived)
       assert {:ok, _pdf} = Rendro.render(EdgeFixtures.document(:invoice, :money_large))
@@ -157,7 +162,10 @@ defmodule Rendro.Test.EdgeFixturesTest do
   describe "structural pagination dimensions" do
     test "statement/line_items_page_boundary is rows_per_page + 1 lines and renders as a 2-page document" do
       data = EdgeFixtures.build(:statement, :line_items_page_boundary)
-      assert {:ok, pdf} = Rendro.render(EdgeFixtures.document(:statement, :line_items_page_boundary))
+
+      assert {:ok, pdf} =
+               Rendro.render(EdgeFixtures.document(:statement, :line_items_page_boundary))
+
       assert pdf =~ "(Page 2 of 2)", "expected exactly 2 pages for #{length(data.lines)} lines"
     end
 
