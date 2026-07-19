@@ -1,5 +1,5 @@
 defmodule Rendro.DocsContract.BrandingContractTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   alias Rendro.Test.DocsContract
 

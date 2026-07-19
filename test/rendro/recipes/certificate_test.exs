@@ -363,6 +363,56 @@ defmodule Rendro.Recipes.CertificateTest do
   end
 
   # ---------------------------------------------------------------------------
+  # C21: 118-08 gap-closure — recipient dominant, content centered (SHOW-01)
+  # ---------------------------------------------------------------------------
+
+  describe "C21: 118-08 recipient dominance + centered layout" do
+    test "recipient name block is larger (dominant) than the title block" do
+      sections = Certificate.sections(fixture_data())
+      [body | _] = sections
+
+      text_blocks = Enum.filter(body.content, fn b -> is_struct(b.content, Rendro.Text) end)
+
+      title_block =
+        Enum.find(text_blocks, fn b -> b.content.content == "Certificate of Completion" end)
+
+      recipient_block = Enum.find(text_blocks, fn b -> b.content.content == "Jane Smith" end)
+
+      assert title_block != nil
+      assert recipient_block != nil
+      assert recipient_block.content.size > title_block.content.size
+    end
+
+    test "content is pushed down from the top of the region (vertical centering)" do
+      sections = Certificate.sections(fixture_data())
+      [body | _] = sections
+
+      # The first content block is the top-centering spacer; it must have a
+      # positive height so subsequent content does not start at y=0 (the
+      # cramped top ~20% the finding flagged).
+      [spacer | _rest] = body.content
+      assert spacer.height > 0
+    end
+
+    test "body paragraph block width is narrower than the full body region width" do
+      template = Certificate.page_template()
+      body_region = Enum.find(template.regions, &(&1.role == :body))
+
+      sections = Certificate.sections(fixture_data())
+      [body | _] = sections
+
+      body_para_block =
+        Enum.find(body.content, fn b ->
+          is_struct(b.content, Rendro.Text) and
+            b.content.content =~ "Elixir PDF generation course"
+        end)
+
+      assert body_para_block != nil
+      assert body_para_block.width < body_region.width
+    end
+  end
+
+  # ---------------------------------------------------------------------------
   # C20: validate_border! rejects invalid options
   # ---------------------------------------------------------------------------
 

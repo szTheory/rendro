@@ -1,5 +1,5 @@
 defmodule Rendro.DocsContract.PublicApiContractTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   alias Rendro.PublicApi
   alias Rendro.PublicApi.Loader
@@ -86,8 +86,9 @@ defmodule Rendro.DocsContract.PublicApiContractTest do
         Rendro.PDF.CidFont,
         Rendro.PDF.FontSubsetter,
         Rendro.Text.Bidi,
-        Rendro.Format,
-        Rendro.Audit
+        Rendro.Audit,
+        Rendro.Examples,
+        Rendro.ExamplesData
       ]
 
       for module <- hidden_modules do

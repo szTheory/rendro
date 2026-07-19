@@ -24,15 +24,31 @@ Mix.install([
 
 ## Invoice Data
 
+This mirrors the realistic invoice fixture Rendro ships at
+`priv/examples/invoice/acme-phoenix-saas/invoice.json`: a full invoice anatomy with
+an issuer, a customer, a due date and terms, a handful of distinct line items, and
+`Decimal`-faithful totals. Line-item prices are bare numbers (the recipe's legacy
+line contract); the summary totals are `Decimal` and are validated to reconcile
+against the line items.
+
 ```elixir
 invoice = %{
-  id: "LB-2026-001",
+  id: "INV-CMP-2026-001",
   date: ~D[2026-06-11],
+  due_date: ~D[2026-07-11],
+  terms: "Net 30",
+  issuer: %{name: "Rendro Systems", address: "100 Deterministic Way, Portland, OR 97205"},
+  customer: %{name: "Acme Phoenix SaaS", address: "42 LiveView Lane, Austin, TX 78701"},
   items: [
-    %{name: "Implementation Sprint", qty: 2, price: 2400},
-    %{name: "Support Retainer", qty: 1, price: 800},
-    %{name: "Validation Report", qty: 1, price: 450}
-  ]
+    %{name: "Platform subscription - Team plan", qty: 1, price: 3600},
+    %{name: "Additional seats", qty: 12, price: 79},
+    %{name: "Priority support add-on", qty: 1, price: 480}
+  ],
+  totals: %{
+    subtotal: Decimal.new("5028.00"),
+    tax: Decimal.new("402.24"),
+    total: Decimal.new("5430.24")
+  }
 }
 ```
 
@@ -73,6 +89,33 @@ Kino.HTML.new("""
 ```elixir
 Kino.Download.new(fn -> pdf end, filename: "rendro-invoice.pdf")
 ```
+
+## Realistic Example Library
+
+Rendro also ships the realistic demonstration fixtures used by the Rendered Gallery
+under `priv/examples/` — one per family (invoice, statement, receipt, certificate,
+payslip, ticket). They are loaded internally through the `Rendro.Examples` helper
+and coerced to each recipe's shape by `Rendro.ExamplesData`. Both are
+`@moduledoc false` internal helpers for the shipped demonstration set. Here is the
+invoice fixture rendered through that internal path:
+
+```elixir
+raw = Rendro.Examples.load!("invoice/acme-phoenix-saas/invoice.json")
+fixture_invoice = Rendro.ExamplesData.transform_invoice(raw)
+
+fixture_doc = Rendro.Recipes.Invoice.document(fixture_invoice)
+{:ok, fixture_pdf} = Rendro.render(fixture_doc, deterministic: true)
+
+%{
+  bytes: byte_size(fixture_pdf),
+  sha256: :crypto.hash(:sha256, fixture_pdf) |> Base.encode16(case: :lower)
+}
+```
+
+These fixtures are deterministic demonstrations of each family — not a claim of
+visual polish, and Rendro makes no accessibility-standard claim about the rendered
+output. In your own app you build the recipe data map directly (as in the section
+above) and call the recipe's `document/2`.
 
 ## Phoenix Handoff
 

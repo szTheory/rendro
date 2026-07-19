@@ -471,6 +471,61 @@
       "deterministic_output": "supported"
     }
   },
+  "payslip": {
+    "surface": "payslip",
+    "status": "supported",
+    "evidence": "test/rendro/recipes/payslip_test.exs",
+    "recorded_at": "2026-07-18",
+    "capabilities": {
+      "net_pay_visual_anchor": "supported",
+      "multi_page_ledger_continuation": "supported",
+      "jurisdiction_as_data": "supported",
+      "deterministic_output": "supported"
+    }
+  },
+  "ticket": {
+    "surface": "ticket",
+    "status": "supported",
+    "evidence": "test/rendro/recipes/ticket_test.exs",
+    "recorded_at": "2026-07-18",
+    "capabilities": {
+      "geometry_derived_layout": "supported",
+      "caller_supplied_code_image": "supported",
+      "no_faux_barcode": "supported",
+      "deterministic_output": "supported"
+    }
+  },
+  "demonstration_set": {
+    "surface": "demonstration_set",
+    "status": "supported",
+    "recorded_at": "2026-07-19",
+    "families": [
+      "invoice",
+      "statement",
+      "receipt",
+      "certificate",
+      "payslip",
+      "ticket"
+    ],
+    "capabilities": {
+      "realistic_fixture_per_family": "supported",
+      "deterministic_source_pdf": "supported",
+      "domain_md_per_family": "supported"
+    },
+    "boundaries": {
+      "reader_quality_rubric_pass": "unsupported",
+      "visual_polish_claim": "unsupported",
+      "accessibility_conformance_claim": "unsupported"
+    },
+    "evidence": {
+      "fixtures_schema": "test/docs_contract/examples_schema_contract_test.exs",
+      "domain_md_citation": "test/docs_contract/demo_cites_domain_md_test.exs",
+      "rubric_scores": "priv/quality/rubric_scores.json",
+      "rubric_contract": "test/docs_contract/rubric_manifest_contract_test.exs",
+      "gallery": "test/docs_contract/launch_artifacts_claims_test.exs",
+      "accessibility_overclaim_tripwire": "test/docs_contract/accessibility_overclaim_test.exs"
+    }
+  },
   "text_shaping": {
     "latin_and_cjk": {
       "status": "supported",

@@ -1,0 +1,30 @@
+{
+  "fixture_id": "receipt_v1",
+  "family": "receipt",
+  "paper": "a5",
+  "currency": "USD",
+  "title": "Sales Receipt",
+  "date": "2026-06-08",
+  "merchant": {
+    "name": "Harbor & Oak Cafe",
+    "street": "214 Wharf Street",
+    "city": "Portland",
+    "region": "ME",
+    "postal_code": "04101"
+  },
+  "customer": {
+    "name": "Walk-in Guest"
+  },
+  "lines": [
+    {"description": "Cold Brew Coffee (2)", "amount": "9.00"},
+    {"description": "Almond Croissant", "amount": "4.75"},
+    {"description": "Avocado Toast", "amount": "11.50"},
+    {"description": "Sparkling Water", "amount": "3.25"}
+  ],
+  "totals": {
+    "subtotal": "28.50",
+    "tax": "2.28",
+    "total": "30.78"
+  },
+  "brand": {"logo": null}
+}

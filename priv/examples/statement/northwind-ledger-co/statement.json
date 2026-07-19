@@ -1,0 +1,27 @@
+{
+  "fixture_id": "statement_v1",
+  "family": "statement",
+  "paper": "us_letter",
+  "currency": "USD",
+  "period": {
+    "from": "2026-05-01",
+    "to": "2026-05-31"
+  },
+  "account": {
+    "name": "Northwind Ledger Co - Operating Account ****8140"
+  },
+  "opening_balance": "3200.00",
+  "closing_balance": "6647.56",
+  "lines": [
+    {"date": "2026-05-02", "description": "Deposit - Q2 retainer, Meridian Partners", "amount": "4800.00"},
+    {"date": "2026-05-05", "description": "ACH payment - Cascade Payroll Services", "amount": "-3120.00"},
+    {"date": "2026-05-09", "description": "Card purchase - Foundry Office Supply", "amount": "-218.44"},
+    {"date": "2026-05-14", "description": "Deposit - Invoice INV-2048, Blue Harbor LLC", "amount": "1560.00"},
+    {"date": "2026-05-18", "description": "Wire transfer - Northwind Facilities lease", "amount": "-2200.00"},
+    {"date": "2026-05-23", "description": "Card purchase - Everline Cloud Hosting", "amount": "-96.00"},
+    {"date": "2026-05-27", "description": "Service fee - monthly account maintenance", "amount": "-18.00"},
+    {"date": "2026-05-30", "description": "Deposit - Invoice INV-2051, Tandem Robotics", "amount": "2740.00"}
+  ],
+  "summary": "8 transactions this period; opening 3200.00, closing 6647.56.",
+  "brand": {"logo": null}
+}

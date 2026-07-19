@@ -1,6 +1,7 @@
 # ── Elixir/Mix ──
 /_build/
 /deps/
+/priv/plts/
 /doc/
 *.ez
 rendro-*.tar
@@ -64,3 +65,16 @@ brand/**/*.woff2
 brand/**/*.ttf
 brand/**/*.otf
 brand/**/*.eot
+
+# ── Example fixtures: keep priv/examples/ text-only (JSON/MD/SVG). No binaries. ──
+priv/examples/**/*.png
+priv/examples/**/*.jpg
+priv/examples/**/*.jpeg
+priv/examples/**/*.gif
+priv/examples/**/*.webp
+priv/examples/**/*.pdf
+priv/examples/**/*.woff
+priv/examples/**/*.woff2
+priv/examples/**/*.ttf
+priv/examples/**/*.otf
+priv/examples/**/*.eot

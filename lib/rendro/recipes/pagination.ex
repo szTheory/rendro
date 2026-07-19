@@ -59,15 +59,33 @@ defmodule Rendro.Recipes.Pagination do
     Keyword.get(formatters, key, default_fn)
   end
 
-  # Returns a function that resolves a label key, merging caller-supplied
-  # :labels over the default Rendro.Format labels.
-  def label_resolver(opts) do
+  # Returns a function that resolves a label key. Merge order (D-18):
+  # opts[:labels] -> default_labels -> Rendro.Format.label/1.
+  #
+  # default_labels defaults to %{}, which collapses the merge order to
+  # opts[:labels] -> Rendro.Format.label/1 -- byte-identical to the original
+  # arity-1 behavior, so existing arity-1 call sites (e.g. statement.ex:274,
+  # statement.ex:294) keep compiling and resolving unmodified.
+  #
+  # GOTCHA: Rendro.Format.label/1 has NO fallback clause -- it only knows
+  # :balance, :brought_forward, :carried_forward, :opening_balance, and
+  # :closing_balance. Every label key any recipe resolves via the returned
+  # closure MUST be present in either opts[:labels] or that recipe's own
+  # default_labels map, or the call raises FunctionClauseError (not a
+  # silent/humanized fallback string).
+  def label_resolver(opts, default_labels \\ %{}) do
     user_labels = Keyword.get(opts, :labels, %{})
 
     fn key ->
       case Map.fetch(user_labels, key) do
-        {:ok, val} -> val
-        :error -> Rendro.Format.label(key)
+        {:ok, val} ->
+          val
+
+        :error ->
+          case Map.fetch(default_labels, key) do
+            {:ok, val} -> val
+            :error -> Rendro.Format.label(key)
+          end
       end
     end
   end
@@ -80,4 +98,105 @@ defmodule Rendro.Recipes.Pagination do
   def type_name(value) when is_list(value), do: "List"
   def type_name(value) when is_map(value), do: "Map"
   def type_name(_value), do: "Unknown"
+
+  # ---------------------------------------------------------------------------
+  # Opts-shape validators (D-19, shared by Payslip/Ticket sections/2)
+  # ---------------------------------------------------------------------------
+
+  # Validates opts[:labels] before any recipe touches it. `recipe_mfa` is a
+  # plain string naming the caller's public entry point (e.g.
+  # "Rendro.Recipes.Payslip.document/2"), used verbatim in the raised
+  # message so the error points at the API surface the caller actually used,
+  # not this private validator.
+  #
+  # Guards against a raw BadMapError deep inside a section builder (non-map
+  # :labels) and against a silently-blanked chrome/anchor label (empty-string
+  # value) -- the exact D-18 footgun label_resolver/2's fallback chain relies
+  # on every key resolving to a non-empty string.
+  def validate_labels!(opts, recipe_mfa) do
+    case Keyword.get(opts, :labels) do
+      nil ->
+        :ok
+
+      labels when is_map(labels) ->
+        Enum.each(labels, fn {key, value} ->
+          if not (is_binary(value) and value != "") do
+            raise ArgumentError, """
+            #{recipe_mfa} — invalid :labels.#{inspect(key)} value.
+
+            What:  :labels.#{inspect(key)} must be a non-empty String.
+            Where: Rendro.Recipes.Pagination.validate_labels!/2
+            Why:   Received: #{inspect(value)} (#{type_name(value)}). An empty or
+                   non-string label would silently blank the rendered chrome/anchor
+                   text instead of raising.
+            Next:  Provide a non-empty string, e.g. labels: %{#{inspect(key)} => "Net Pay"}.
+            """
+          end
+        end)
+
+        :ok
+
+      other ->
+        raise ArgumentError, """
+        #{recipe_mfa} — invalid :labels type.
+
+        What:  :labels must be a Map.
+        Where: Rendro.Recipes.Pagination.validate_labels!/2
+        Why:   Received: #{inspect(other)} (#{type_name(other)}).
+        Next:  Use a map, e.g. labels: %{net_pay: "Net Pay"}.
+        """
+    end
+  end
+
+  # Validates opts[:formatters] before any recipe touches it. `recipe_mfa`
+  # follows the same convention as validate_labels!/2.
+  #
+  # Guards against BadArityError / a cryptic function-call crash at
+  # render-time by rejecting a non-keyword-list value or any value whose
+  # function is not arity-1 up front.
+  def validate_formatters!(opts, recipe_mfa) do
+    case Keyword.get(opts, :formatters) do
+      nil ->
+        :ok
+
+      formatters when is_list(formatters) ->
+        if Keyword.keyword?(formatters) do
+          Enum.each(formatters, fn {key, value} ->
+            if not is_function(value, 1) do
+              raise ArgumentError, """
+              #{recipe_mfa} — invalid :formatters.#{inspect(key)} value.
+
+              What:  :formatters.#{inspect(key)} must be an arity-1 function.
+              Where: Rendro.Recipes.Pagination.validate_formatters!/2
+              Why:   Received: #{inspect(value)} (#{type_name(value)}). The engine
+                     calls each formatter with exactly one argument (the raw value
+                     to format).
+              Next:  Provide an arity-1 function, e.g. formatters: [#{inspect(key)}: &Rendro.Format.money/1].
+              """
+            end
+          end)
+
+          :ok
+        else
+          raise ArgumentError, """
+          #{recipe_mfa} — invalid :formatters type.
+
+          What:  :formatters must be a keyword list.
+          Where: Rendro.Recipes.Pagination.validate_formatters!/2
+          Why:   Received: #{inspect(formatters)} (#{type_name(formatters)}).
+          Next:  Use a keyword list, e.g. formatters: [amount: &Rendro.Format.money/1].
+          """
+        end
+
+      other ->
+        raise ArgumentError, """
+        #{recipe_mfa} — invalid :formatters type.
+
+        What:  :formatters must be a keyword list.
+        Where: Rendro.Recipes.Pagination.validate_formatters!/2
+        Why:   Received: #{inspect(other)} (#{type_name(other)}).
+        Next:  Use a keyword list, e.g. formatters: [amount: &Rendro.Format.money/1].
+        """
+    end
+  end
 end

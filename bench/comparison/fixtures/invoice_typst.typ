@@ -1,5 +1,5 @@
 #let fixture_id = "invoice_v1"
-#let data_path = sys.inputs.at("data-path", default: "invoice_data.json")
+#let data_path = sys.inputs.at("data-path", default: "priv/examples/invoice/acme-phoenix-saas/invoice.json")
 #let data = json(data_path)
 
 = Invoice #data.invoice.id
@@ -18,8 +18,8 @@
     [#item.name],
     [#item.description],
     [#item.qty],
-    [#str(item.price_cents / 100)],
+    [#item.price],
   )).flatten()
 )
 
-Total: #str(data.totals.total_cents / 100)
+Total: #data.totals.total

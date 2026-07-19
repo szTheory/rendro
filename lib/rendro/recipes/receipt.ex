@@ -87,17 +87,17 @@ defmodule Rendro.Recipes.Receipt do
 
   @content_width @page_width - 2 * @margin
 
-  # Header reserved height (title + customer name + date rows).
-  @header_height 48
+  # Header reserved height (title + customer name + date rows). 118-08
+  # gap-closure: this is the DEFAULT used when no :merchant is present in
+  # `data` — an optional merchant identity block adds a line and needs a
+  # taller header, computed per-call by computed_header_height/1 below (never
+  # a stale constant, which previously caused :content_overflow rendering
+  # the realistic harbor-and-oak-cafe fixture end-to-end).
+  @default_header_height 48
 
   # Footer reserved height — MUST be non-zero so body_capacity reserves space
   # and "Page X of Y" does not overlap the last body row (PAGE-03).
   @footer_height 24
-
-  # Body height: fills the space between top margin and bottom margin minus
-  # header and footer region heights.
-  @body_y @margin + @header_height
-  @body_height @page_height - 2 * @margin - @header_height - @footer_height
 
   @footer_y @page_height - @margin - @footer_height
 
@@ -136,6 +136,10 @@ defmodule Rendro.Recipes.Receipt do
   """
   @spec page_template(keyword()) :: Rendro.PageTemplate.t()
   def page_template(opts \\ []) do
+    header_height = Keyword.get(opts, :header_height, @default_header_height)
+    body_y = @margin + header_height
+    body_height = @page_height - 2 * @margin - header_height - @footer_height
+
     defaults = [
       name: :receipt,
       regions: [
@@ -146,16 +150,16 @@ defmodule Rendro.Recipes.Receipt do
           x: @margin,
           y: @margin,
           width: @content_width,
-          height: @header_height
+          height: header_height
         ),
         Rendro.region(
           name: :body,
           role: :body,
           anchor: :flow,
           x: @margin,
-          y: @body_y,
+          y: body_y,
           width: @content_width,
-          height: @body_height
+          height: body_height
         ),
         Rendro.region(
           name: :footer,
@@ -169,7 +173,9 @@ defmodule Rendro.Recipes.Receipt do
       ]
     ]
 
-    Rendro.page_template(Keyword.merge(defaults, opts))
+    # 118-08: :header_height is consumed locally above -- never forwarded to
+    # struct!/2 (Rendro.PageTemplate has no such field).
+    Rendro.page_template(Keyword.merge(defaults, Keyword.delete(opts, :header_height)))
   end
 
   @doc """
@@ -227,6 +233,10 @@ defmodule Rendro.Recipes.Receipt do
   @spec document(map(), keyword()) :: Rendro.Document.t()
   def document(data, opts \\ []) do
     validate_data!(data)
+    # 118-08: thread ONE resolved :header_height through both page_template/1
+    # and sections/2 so the header region is tall enough for an optional
+    # :merchant identity block — see computed_header_height/1.
+    opts = Keyword.put_new(opts, :header_height, computed_header_height(data))
     template = page_template(opts)
     secs = sections(data, opts)
 
@@ -244,19 +254,38 @@ defmodule Rendro.Recipes.Receipt do
   # Private section builders
   # ---------------------------------------------------------------------------
 
-  defp header_section(%{title: title, date: date, customer: customer} = _data, opts) do
+  defp header_section(%{title: title, date: date, customer: customer} = data, opts) do
     fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
     customer_name = Map.get(customer, :name, "")
+
+    base_content = [
+      Rendro.block(Rendro.text(title, size: 14)),
+      Rendro.block(Rendro.text(customer_name, size: 12)),
+      Rendro.block(Rendro.text(fmt_date.(date), size: 10))
+    ]
+
+    # 118-08 gap-closure (SHOW-01): render the merchant identity (previously
+    # absent from the data path entirely — see transform_receipt/1). Prepend
+    # so the merchant reads as the issuer of the receipt, ahead of the title.
+    content =
+      base_content
+      |> maybe_prepend(Map.get(data, :merchant), &merchant_block/1)
 
     Rendro.section(
       name: :receipt_header,
       region: :header,
-      content: [
-        Rendro.block(Rendro.text(title, size: 14)),
-        Rendro.block(Rendro.text(customer_name, size: 12)),
-        Rendro.block(Rendro.text(fmt_date.(date), size: 10))
-      ]
+      content: content
     )
+  end
+
+  defp maybe_prepend(content, nil, _fun), do: content
+  defp maybe_prepend(content, value, fun), do: [fun.(value) | content]
+
+  defp merchant_block(merchant) when is_map(merchant) do
+    name = Map.get(merchant, :name, "")
+    address = Map.get(merchant, :address)
+    text = if address in [nil, ""], do: name, else: "#{name}\n#{address}"
+    Rendro.block(Rendro.text(text, size: 16))
   end
 
   defp body_section(%{lines: lines} = data, opts) do
@@ -278,9 +307,15 @@ defmodule Rendro.Recipes.Receipt do
     {header_h, row_heights} =
       Rendro.measure_rows(formatted_rows, @content_width, doc_for_measure, table_opts)
 
+    # 118-08: resolve the SAME header height page_template/1 uses for this
+    # call so body capacity accounting matches the actual rendered header
+    # region — never a stale constant.
+    resolved_header_height = Keyword.get(opts, :header_height, computed_header_height(data))
+    body_height = @page_height - 2 * @margin - resolved_header_height - @footer_height
+
     # Body capacity (mirrors body_capacity formula for this template's geometry):
     # capacity = body.height − header_region.height − footer_region.height
-    capacity = @body_height - @header_height - @footer_height
+    capacity = body_height - resolved_header_height - @footer_height
 
     # Receipt effective_capacity: no CF/BF overhead.
     # Statement subtracts 2 * typical_row_h for brought/carried-forward rows;
@@ -330,22 +365,41 @@ defmodule Rendro.Recipes.Receipt do
   # Totals block builder
   # ---------------------------------------------------------------------------
 
+  # 118-08 gap-closure (SHOW-01): the Total must be the single dominant
+  # element on the receipt (content_hierarchy=5 anchor) — not small bottom
+  # text alongside Subtotal/Tax. Subtotal/Tax/Discount render small in one
+  # block; Total renders alone, much larger, in its own trailing block.
+  @minor_totals_size 9
+  @dominant_total_size 18
+
   defp build_totals_blocks(%{totals: totals} = _data, opts) when is_map(totals) do
     fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
 
-    lines =
+    minor_lines =
       []
       |> maybe_append_totals_line("Subtotal", Map.get(totals, :subtotal), fmt_amount)
       |> maybe_append_totals_line("Tax", Map.get(totals, :tax), fmt_amount)
       |> maybe_append_totals_line("Discount", Map.get(totals, :discount), fmt_amount)
-      |> maybe_append_totals_line("Total", Map.get(totals, :total), fmt_amount)
 
-    if lines == [] do
-      []
-    else
-      text_content = Enum.join(lines, "\n")
-      [Rendro.block(Rendro.text(text_content, size: 10), break_before: false)]
-    end
+    minor_block =
+      if minor_lines == [] do
+        []
+      else
+        [Rendro.block(Rendro.text(Enum.join(minor_lines, "\n"), size: @minor_totals_size))]
+      end
+
+    total_block =
+      case Map.get(totals, :total) do
+        %Decimal{} = total ->
+          [
+            Rendro.block(Rendro.text("Total: #{fmt_amount.(total)}", size: @dominant_total_size))
+          ]
+
+        _ ->
+          []
+      end
+
+    minor_block ++ total_block
   end
 
   defp build_totals_blocks(_data, _opts), do: []
@@ -354,6 +408,24 @@ defmodule Rendro.Recipes.Receipt do
 
   defp maybe_append_totals_line(acc, label, %Decimal{} = amount, fmt) do
     acc ++ ["#{label}: #{fmt.(amount)}"]
+  end
+
+  # 118-08 gap-closure (SHOW-01): the default header height was sized for
+  # exactly 3 lines (title + customer + date) — an optional :merchant block
+  # adds a line (2 if it carries an address) and needs a taller header
+  # region or its content raises :content_overflow (discovered rendering
+  # the enriched harbor-and-oak-cafe fixture end-to-end). Grows the header
+  # ONLY when :merchant is present, so a caller without one still computes
+  # exactly @default_header_height — unchanged geometry otherwise.
+  @spec computed_header_height(map()) :: number()
+  defp computed_header_height(data) do
+    case Map.get(data, :merchant) do
+      nil -> @default_header_height
+      # merchant_block/1 renders at size 16 (2 lines when an address is
+      # present: 16 * 1.2 * 2 = 38.4pt) -- +40 comfortably covers both the
+      # 1-line (name only) and 2-line (name + address) cases.
+      _present -> @default_header_height + 40
+    end
   end
 
   # ---------------------------------------------------------------------------

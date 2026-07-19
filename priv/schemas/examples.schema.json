@@ -1,0 +1,284 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "examples.schema.json",
+  "title": "Rendro Example Fixtures",
+  "description": "Structural contract for priv/examples/{domain}/{business}/{family}.json realistic business-document fixtures. Money fields are decimal strings, never JSON floats. A per-family discriminator (top-level 'family') selects which keys are required; the invoice family is keyed on the structural 'invoice' property so the original invoice fixture stays byte-identical (no 'family' field added to it).",
+  "type": "object",
+  "required": ["fixture_id"],
+  "properties": {
+    "fixture_id": { "type": "string", "minLength": 1 },
+    "family": {
+      "type": "string",
+      "enum": ["invoice", "statement", "receipt", "certificate", "payslip", "ticket"]
+    },
+    "paper": { "type": "string" },
+    "currency": { "type": "string" },
+    "brand": {
+      "type": "object",
+      "properties": {
+        "logo": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "$comment": "Invoice family — keyed on the structural 'invoice' property (the original invoice fixture carries no 'family' discriminator, so this keeps it byte-identical).",
+      "if": { "required": ["invoice"] },
+      "then": {
+        "required": ["fixture_id", "issuer", "customer", "invoice", "items"],
+        "properties": {
+          "issuer": { "$ref": "#/$defs/party" },
+          "customer": { "$ref": "#/$defs/party" },
+          "invoice": {
+            "type": "object",
+            "required": ["id", "date", "due_date", "terms"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "date": { "type": "string", "format": "date" },
+              "due_date": { "type": "string", "format": "date" },
+              "terms": { "type": "string" }
+            },
+            "additionalProperties": true
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name", "qty", "price"],
+              "properties": {
+                "name": { "type": "string", "minLength": 1 },
+                "description": { "type": "string" },
+                "qty": { "type": "integer", "minimum": 0 },
+                "price": { "$ref": "#/$defs/money_string" }
+              },
+              "additionalProperties": true
+            }
+          },
+          "totals": {
+            "type": "object",
+            "properties": {
+              "subtotal": { "$ref": "#/$defs/money_string" },
+              "tax": { "$ref": "#/$defs/money_string" },
+              "total": { "$ref": "#/$defs/money_string" }
+            },
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    {
+      "$comment": "Statement family.",
+      "if": {
+        "properties": { "family": { "const": "statement" } },
+        "required": ["family"]
+      },
+      "then": {
+        "required": ["fixture_id", "period", "account", "opening_balance", "lines"],
+        "properties": {
+          "period": { "$ref": "#/$defs/period" },
+          "account": {
+            "type": "object",
+            "required": ["name"],
+            "properties": { "name": { "type": "string", "minLength": 1 } },
+            "additionalProperties": true
+          },
+          "opening_balance": { "$ref": "#/$defs/money_string" },
+          "closing_balance": { "$ref": "#/$defs/money_string" },
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["date", "description", "amount"],
+              "properties": {
+                "date": { "type": "string", "format": "date" },
+                "description": { "type": "string", "minLength": 1 },
+                "amount": { "$ref": "#/$defs/money_string" }
+              },
+              "additionalProperties": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "$comment": "Receipt family.",
+      "if": {
+        "properties": { "family": { "const": "receipt" } },
+        "required": ["family"]
+      },
+      "then": {
+        "required": ["fixture_id", "title", "date", "customer", "lines"],
+        "properties": {
+          "title": { "type": "string", "minLength": 1 },
+          "date": { "type": "string", "format": "date" },
+          "customer": { "$ref": "#/$defs/party" },
+          "merchant": { "$ref": "#/$defs/party" },
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["description", "amount"],
+              "properties": {
+                "description": { "type": "string", "minLength": 1 },
+                "amount": { "$ref": "#/$defs/money_string" }
+              },
+              "additionalProperties": true
+            }
+          },
+          "totals": {
+            "type": "object",
+            "properties": {
+              "subtotal": { "$ref": "#/$defs/money_string" },
+              "total": { "$ref": "#/$defs/money_string" }
+            },
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    {
+      "$comment": "Certificate family.",
+      "if": {
+        "properties": { "family": { "const": "certificate" } },
+        "required": ["family"]
+      },
+      "then": {
+        "required": ["fixture_id", "title", "recipient", "date"],
+        "properties": {
+          "title": { "type": "string", "minLength": 1 },
+          "recipient": { "type": "string", "minLength": 1 },
+          "date": { "type": "string", "format": "date" },
+          "body": { "type": "string" },
+          "seal_line": { "type": "string" }
+        }
+      }
+    },
+    {
+      "$comment": "Payslip family.",
+      "if": {
+        "properties": { "family": { "const": "payslip" } },
+        "required": ["family"]
+      },
+      "then": {
+        "required": [
+          "fixture_id", "employer", "employee", "period",
+          "pay_date", "earnings", "deductions", "net_pay"
+        ],
+        "properties": {
+          "employer": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "address": { "type": "string" }
+            },
+            "additionalProperties": true
+          },
+          "employee": {
+            "type": "object",
+            "required": ["name", "id", "tax_code"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "id": { "type": "string", "minLength": 1 },
+              "tax_code": { "type": "string", "minLength": 1 }
+            },
+            "additionalProperties": true
+          },
+          "period": { "$ref": "#/$defs/period" },
+          "pay_date": { "type": "string", "format": "date" },
+          "earnings": { "$ref": "#/$defs/pay_lines" },
+          "deductions": { "$ref": "#/$defs/pay_lines" },
+          "net_pay": { "$ref": "#/$defs/money_string" },
+          "payment_method": { "type": "string" }
+        }
+      }
+    },
+    {
+      "$comment": "Ticket family — text-only, no code.image this milestone.",
+      "if": {
+        "properties": { "family": { "const": "ticket" } },
+        "required": ["family"]
+      },
+      "then": {
+        "required": ["fixture_id", "issuer", "title", "placement", "code"],
+        "properties": {
+          "issuer": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "venue": { "type": "string" }
+            },
+            "additionalProperties": true
+          },
+          "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "subtitle": { "type": "string", "maxLength": 200 },
+          "placement": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["label", "value"],
+              "properties": {
+                "label": { "type": "string", "minLength": 1 },
+                "value": { "type": "string", "minLength": 1 }
+              },
+              "additionalProperties": true
+            }
+          },
+          "code": {
+            "type": "object",
+            "required": ["reference"],
+            "properties": {
+              "reference": { "type": "string", "minLength": 1 }
+            },
+            "additionalProperties": true
+          },
+          "terms": { "type": "string", "maxLength": 600 }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "money_string": {
+      "type": "string",
+      "pattern": "^-?[0-9]+\\.[0-9]{2}$"
+    },
+    "party": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "street": { "type": "string" },
+        "city": { "type": "string" },
+        "region": { "type": "string" },
+        "postal_code": { "type": "string" },
+        "country": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "period": {
+      "type": "object",
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "type": "string", "format": "date" },
+        "to": { "type": "string", "format": "date" }
+      },
+      "additionalProperties": true
+    },
+    "pay_lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["description", "amount"],
+        "properties": {
+          "description": { "type": "string", "minLength": 1 },
+          "amount": { "$ref": "#/$defs/money_string" },
+          "ytd": { "$ref": "#/$defs/money_string" }
+        },
+        "additionalProperties": true
+      }
+    }
+  }
+}

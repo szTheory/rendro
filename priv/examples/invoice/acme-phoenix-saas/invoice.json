@@ -1,0 +1,40 @@
+{
+  "fixture_id": "invoice_v1",
+  "paper": "us_letter",
+  "currency": "USD",
+  "issuer": {
+    "name": "Rendro Systems",
+    "street": "100 Deterministic Way",
+    "city": "Portland",
+    "region": "OR",
+    "postal_code": "97205",
+    "country": "US"
+  },
+  "customer": {
+    "name": "Acme Phoenix SaaS",
+    "street": "42 LiveView Lane",
+    "city": "Austin",
+    "region": "TX",
+    "postal_code": "78701",
+    "country": "US"
+  },
+  "invoice": {
+    "id": "INV-CMP-2026-001",
+    "date": "2026-06-11",
+    "due_date": "2026-07-11",
+    "terms": "Net 30"
+  },
+  "items": [
+    {"name": "Platform Plan", "description": "Growth tier monthly platform service", "qty": 1, "price": "199.00"},
+    {"name": "Seat Licenses", "description": "Additional team seats beyond plan minimum", "qty": 12, "price": "15.00"},
+    {"name": "Priority Support", "description": "24/7 priority support add-on", "qty": 1, "price": "89.00"},
+    {"name": "Advanced Analytics", "description": "Reporting & dashboards add-on", "qty": 1, "price": "129.00"},
+    {"name": "API Overage", "description": "Additional API call blocks (10k each)", "qty": 4, "price": "12.00"}
+  ],
+  "totals": {
+    "subtotal": "645.00",
+    "tax": "51.60",
+    "total": "696.60"
+  },
+  "brand": {"logo": null}
+}

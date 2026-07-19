@@ -1,5 +1,5 @@
 defmodule Rendro.DocsContract.BrandingClaimsTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   describe "NOTICE file (D-13)" do
     test "exists at top level" do
@@ -41,9 +41,8 @@ defmodule Rendro.DocsContract.BrandingClaimsTest do
   describe "hex tarball contents" do
     test "built tarball includes branded assets and NOTICE" do
       tarball = "rendro-#{Mix.Project.config()[:version]}.tar"
-      File.rm(tarball)
 
-      {output, 0} = System.cmd("mix", ["hex.build"], stderr_to_stdout: true)
+      {output, 0} = Rendro.Test.HexBuildCache.get_build_output()
       assert output =~ tarball
       assert File.exists?(tarball)
 
@@ -53,13 +52,17 @@ defmodule Rendro.DocsContract.BrandingClaimsTest do
       assert contents =~ "priv/branded/fonts/B612-Regular.ttf"
       assert contents =~ "priv/branded/images/rendro-logo.png"
       assert contents =~ "NOTICE"
+
+      # D-12 positive companion: the core lib/ tree must still ship, so an
+      # over-aggressive future files: exclusion also fails loudly (not just
+      # an under-exclusion caught by the excludes-test below).
+      assert contents =~ "lib/rendro"
     end
 
     test "built tarball excludes operator-only priv paths" do
       tarball = "rendro-#{Mix.Project.config()[:version]}.tar"
-      File.rm(tarball)
 
-      {output, 0} = System.cmd("mix", ["hex.build"], stderr_to_stdout: true)
+      {output, 0} = Rendro.Test.HexBuildCache.get_build_output()
       assert output =~ tarball
       assert File.exists?(tarball)
 
@@ -68,6 +71,17 @@ defmodule Rendro.DocsContract.BrandingClaimsTest do
 
       refute contents =~ "priv/viewer_evidence/"
       refute contents =~ "priv/support_matrix.json"
+      refute contents =~ "priv/schemas/examples.schema.json"
+      refute contents =~ "priv/schemas/rubric_scores.schema.json"
+      refute contents =~ "priv/quality/"
+
+      # D-12 tarball-exclusion tripwire (EDGE-01): test-only golden hashes and
+      # raster reference PNGs must never ship to Hex consumers. mix.exs's files:
+      # allowlist excludes both by omission today; these refute assertions make
+      # that exclusion an explicit, fail-loud guard against a future accidental
+      # addition of either path to the allowlist.
+      refute contents =~ "priv/goldens/"
+      refute contents =~ "priv/raster_refs/"
     end
   end
 

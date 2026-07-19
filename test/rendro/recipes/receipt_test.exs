@@ -134,6 +134,48 @@ defmodule Rendro.Recipes.ReceiptTest do
       flat = inspect(doc, limit: :infinity, printable_limit: :infinity)
       assert flat =~ "TestCorp"
     end
+
+    test "118-08: an optional :merchant renders the merchant identity in the header (SHOW-01)" do
+      data = fixture_data(1, merchant: %{name: "Harbor & Oak Cafe"})
+      [header, _body, _footer] = Receipt.sections(data)
+      flat = inspect(header, limit: :infinity, printable_limit: :infinity)
+      assert flat =~ "Harbor & Oak Cafe"
+    end
+
+    test "118-08: Total renders in its own block, larger than the Subtotal/Tax block (SHOW-01 dominance)" do
+      data =
+        fixture_data(1)
+        |> Map.put(:totals, %{
+          subtotal: Decimal.new("10.00"),
+          tax: Decimal.new("0.80"),
+          total: Decimal.new("10.80")
+        })
+
+      [_header, body, _footer] = Receipt.sections(data)
+
+      text_blocks =
+        Enum.filter(body.content, fn block -> is_struct(block.content, Rendro.Text) end)
+
+      minor_block = Enum.find(text_blocks, fn block -> block.content.content =~ "Subtotal" end)
+      total_block = Enum.find(text_blocks, fn block -> block.content.content =~ "Total:" end)
+
+      assert minor_block != nil
+      assert total_block != nil
+      assert total_block != minor_block
+      assert total_block.content.content =~ "$10.80"
+      assert total_block.content.size > minor_block.content.size
+    end
+
+    test "118-08: a receipt with :merchant (name + address) renders without :content_overflow" do
+      data =
+        fixture_data(4,
+          merchant: %{name: "Harbor & Oak Cafe", address: "214 Wharf Street, Portland, ME 04101"}
+        )
+
+      doc = Receipt.document(data)
+      assert {:ok, pdf} = Rendro.render(doc)
+      assert is_binary(pdf)
+    end
   end
 
   # ---------------------------------------------------------------------------

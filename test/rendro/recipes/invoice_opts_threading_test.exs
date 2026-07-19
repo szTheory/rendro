@@ -54,4 +54,52 @@ defmodule Rendro.Recipes.InvoiceOptsThreadingTest do
       assert length(sections) == 3
     end
   end
+
+  describe "page_template/1 opts whitelist (INV-07)" do
+    test ":palette does not reach struct!(PageTemplate, ...) — no KeyError" do
+      template = Invoice.page_template(palette: %{ink: {200, 0, 0}})
+      assert %Rendro.PageTemplate{} = template
+    end
+
+    test ":formatters does not reach struct!(PageTemplate, ...) — no KeyError" do
+      template =
+        Invoice.page_template(formatters: [amount: fn %Decimal{} = d -> Decimal.to_string(d) end])
+
+      assert %Rendro.PageTemplate{} = template
+    end
+
+    test "document/2 with :palette and :formatters opts does not raise" do
+      doc = Invoice.document(sample_data(), palette: %{ink: {200, 0, 0}}, formatters: [])
+      assert %Rendro.Document{} = doc
+    end
+
+    test "whitelisted keys (e.g. :name) still reach the template" do
+      template = Invoice.page_template(name: :custom_invoice, palette: %{ink: {200, 0, 0}})
+      assert template.name == :custom_invoice
+    end
+  end
+
+  describe "palette(opts) seam (INV-07 / S1)" do
+    test "a :palette override changes only the footer section's color" do
+      data = sample_data()
+      [header_default, body_default, footer_default] = Invoice.sections(data)
+
+      [header_override, body_override, footer_override] =
+        Invoice.sections(data, palette: %{ink: {200, 0, 0}})
+
+      assert header_default == header_override,
+             "header section (frozen toy path) must be unaffected by :palette"
+
+      assert body_default == body_override,
+             "body section (frozen toy path) must be unaffected by :palette"
+
+      refute footer_default == footer_override,
+             "footer section must change when :palette overrides :ink"
+    end
+
+    test "default palette (no override) renders byte-identically" do
+      data = sample_data()
+      assert Invoice.sections(data) == Invoice.sections(data, palette: %{})
+    end
+  end
 end

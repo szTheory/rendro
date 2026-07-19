@@ -17,7 +17,11 @@ defmodule Rendro.Cell do
     keep_together: false,
     keep_with_next: false,
     break_before: false,
-    break_after: false
+    break_after: false,
+    # Opt-in horizontal alignment override (inert default preserves the
+    # existing left-flush layout path). See `Rendro.Table` `:cell_align` for
+    # the column-level facade (`Rendro.table/2` `cell_align:` option).
+    cell_align: :left
   ]
 
   @type split_policy :: :atomic | :fragment
@@ -33,6 +37,7 @@ defmodule Rendro.Cell do
           keep_together: boolean(),
           keep_with_next: boolean(),
           break_before: boolean(),
-          break_after: boolean()
+          break_after: boolean(),
+          cell_align: :left | :right
         }
 end

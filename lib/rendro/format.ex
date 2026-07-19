@@ -1,5 +1,29 @@
 defmodule Rendro.Format do
-  @moduledoc false
+  @moduledoc """
+  Pure, locale-free, deterministic formatting helpers for money, dates, and labels.
+
+  These helpers back the built-in recipes (`Rendro.Recipes.Invoice`,
+  `Rendro.Recipes.Statement`, `Rendro.Recipes.Receipt`, and friends) and are safe
+  to call directly when you want the same deterministic formatting outside a
+  recipe. `Rendro.Format` performs no CLDR/gettext/locale lookups — output is
+  byte-identical across runs and machines; internationalization stays a
+  caller-supplied `:formatters`/`:labels` override, never core.
+
+  ## Migration note
+
+  `Rendro.Format` was previously an internal module (`@moduledoc false`). It is
+  now public at the adapter/Evolving tier: `money/1`, `date/1`, and `label/1`
+  are the supported surface, with unchanged behavior from their prior internal
+  use.
+
+  ## Stability caveat
+
+  Formatted **output** may evolve across minor versions (e.g. grouping,
+  rounding, or label wording could be refined). Callers who need an exact,
+  frozen string should pin it in their own golden/snapshot tests rather than
+  relying on the literal output staying fixed forever.
+  """
+  @moduledoc tags: [:adapter]
 
   @labels %{
     balance: "Balance",

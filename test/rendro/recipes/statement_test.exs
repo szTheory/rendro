@@ -57,10 +57,11 @@ defmodule Rendro.Recipes.StatementTest do
   # Memoized here as a compile-time constant derived from the recipe geometry.
   defp rows_per_page do
     # These constants mirror the recipe module's module attributes:
-    # @body_height = 841.89 - 2*72 - 48 - 24 = 625.89
-    # @header_height = 48, @footer_height = 24
-    # @row_epsilon = 2.0
-    # capacity = @body_height - @header_height - @footer_height = 553.89
+    # @header_height = 88 (118-08: bumped from 48 to fit the dominant
+    # closing-balance summary box appended in header_section/2),
+    # @footer_height = 24, @row_epsilon = 2.0
+    # @body_height = 841.89 - 2*72 - 88 - 24 = 585.89
+    # capacity = @body_height - @header_height - @footer_height = 473.89
     content_width = 595.28 - 2 * 72
 
     table_opts = [
@@ -72,8 +73,8 @@ defmodule Rendro.Recipes.StatementTest do
     doc = Rendro.Document.new()
     {header_h, row_heights} = Rendro.measure_rows([row], content_width, doc, table_opts)
     row_h = hd(row_heights)
-    body_height = 841.89 - 2 * 72 - 48 - 24
-    capacity = body_height - 48 - 24
+    body_height = 841.89 - 2 * 72 - 88 - 24
+    capacity = body_height - 88 - 24
     effective_cap = capacity - header_h - 2 * row_h - 2.0
     trunc(effective_cap / row_h)
   end
@@ -143,6 +144,31 @@ defmodule Rendro.Recipes.StatementTest do
       doc = Statement.document(data)
       flat = inspect(doc, limit: :infinity, printable_limit: :infinity)
       assert flat =~ "TestCorp"
+    end
+
+    test "118-08: header renders a dominant closing-balance summary element (SHOW-01)" do
+      data = fixture_data(3)
+      [header, _body, _footer] = Statement.sections(data)
+
+      text_blocks = Enum.filter(header.content, &is_struct(&1.content, Rendro.Text))
+
+      closing_label_block =
+        Enum.find(text_blocks, fn b -> b.content.content =~ "Closing balance" end)
+
+      closing_value_block =
+        Enum.find(text_blocks, fn b ->
+          b.content.content == Rendro.Format.money(expected_closing(3))
+        end)
+
+      account_block = Enum.find(text_blocks, fn b -> b.content.content =~ "Acme Corp" end)
+
+      assert closing_label_block != nil
+      assert closing_value_block != nil
+      assert account_block != nil
+      assert closing_value_block.content.size > account_block.content.size
+
+      # A backdrop path block must be present (the boxed summary element).
+      assert Enum.any?(header.content, &is_struct(&1.content, Rendro.Path))
     end
   end
 

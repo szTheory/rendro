@@ -7,7 +7,7 @@ defmodule Guardrails.RequiredChecksContractTest do
   @release_path ".github/workflows/release.yml"
   @verify_docs_path "scripts/verify_docs.exs"
 
-  @required_contexts ~w(long-lived-live-proof release-proof signing-live-proof test)
+  @required_contexts ~w(ci-success)
 
   describe "baseline JSON integrity" do
     test "parses with sorted required contexts, strict policy, and additive_only policy" do
@@ -19,7 +19,7 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert baseline["policy"] == "additive_only"
       assert baseline["since_milestone"] == "v2.3"
       assert baseline["required_contexts"] == Enum.sort(@required_contexts)
-      assert length(baseline["contexts"]) == 4
+      assert length(baseline["contexts"]) == 3
 
       assert baseline["supersedes_planning_refs"]["pitfalls_7_viewer_evidence_schema_required"] ==
                false
@@ -29,57 +29,23 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert test_context["notes"] =~ "Viewer-evidence"
     end
 
-    test "advisory contexts document viewer-evidence-live-proof as not required" do
+    test "advisory contexts document combined advisory checks" do
       baseline = load_baseline!()
 
-      viewer =
-        Enum.find(baseline["advisory_contexts"], &(&1["name"] == "viewer-evidence-live-proof"))
+      advisory =
+        Enum.find(baseline["advisory_contexts"], &(&1["name"] == "advisory-checks"))
 
-      assert viewer["notes"] =~ "not required"
-      assert viewer["notes"] =~ "D-32"
+      assert advisory["notes"] =~ "viewer-evidence-live-proof"
+      assert advisory["notes"] =~ "raster-advisory"
+      assert advisory["notes"] =~ "D-32"
+      assert advisory["notes"] =~ "REF-03"
+      assert advisory["command"] =~ "scripts/pdfjs_observer"
 
       example = Enum.find(baseline["advisory_contexts"], &(&1["name"] == "example-phoenix"))
       assert example, "example-phoenix advisory context must exist"
       assert example["notes"] =~ "not required"
       assert example["notes"] =~ "REF-03"
       refute "example-phoenix" in baseline["required_contexts"]
-    end
-
-    test "raster-advisory remains advisory and documents launch artifact checking" do
-      baseline = load_baseline!()
-
-      raster = advisory_context!(baseline, "raster-advisory")
-
-      refute "raster-advisory" in baseline["required_contexts"]
-
-      assert raster["command"] =~
-               "mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs"
-
-      assert raster["command"] =~ "mix rendro.launch_artifacts.check"
-      assert raster["notes"] =~ "Phase 86"
-      assert raster["notes"] =~ "not required"
-    end
-
-    test "comparison and livebook checks remain advisory and non-required" do
-      baseline = load_baseline!()
-
-      expected_advisory_contexts = [
-        {"comparison-advisory", "comparison_static_advisory", "mix rendro.comparison.check"},
-        {"livebook-advisory", "livebook_execution", "mix rendro.livebook.check"},
-        {"pdfjs-advisory", "pdfjs_advisory_observation",
-         "npm ci --prefix scripts/pdfjs_observer && node scripts/pdfjs_observer/observe.mjs --check"}
-      ]
-
-      for {name, semantic_class, command} <- expected_advisory_contexts do
-        context = advisory_context!(baseline, name)
-
-        assert context["semantic_class"] == semantic_class
-        assert context["ci_job"] == name
-        assert context["command"] == command
-        assert context["notes"] =~ "Phase 87" or context["notes"] =~ "Phase 91"
-        assert context["notes"] =~ "not required"
-        refute name in baseline["required_contexts"]
-      end
     end
 
     test "ci.yml parses as YAML" do
@@ -106,12 +72,10 @@ defmodule Guardrails.RequiredChecksContractTest do
       for job <-
             @required_contexts ++
               [
-                "viewer-evidence-live-proof",
+                "integration-proofs",
+                "advisory-checks",
                 "example-phoenix",
-                "raster-advisory",
-                "comparison-advisory",
-                "livebook-advisory",
-                "pdfjs-advisory"
+                "test"
               ] do
         assert ci =~ "  #{job}:"
       end
@@ -127,39 +91,34 @@ defmodule Guardrails.RequiredChecksContractTest do
   end
 
   describe "behavioral command wiring" do
-    test "signing-live-proof runs live_signing against signing_live_test.exs" do
+    test "integration-proofs runs live_signing, live_pdf_tools, and release_preflight_proof" do
       ci = File.read!(@ci_path)
 
       assert ci =~ "mix test --include live_signing test/rendro/adapters/signing_live_test.exs"
-    end
-
-    test "long-lived-live-proof runs live_pdf_tools against signing_live_test.exs" do
-      ci = File.read!(@ci_path)
+      assert ci =~ "mix test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs"
 
       assert ci =~
-               "mix test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs"
+               "mix run scripts/release_preflight_proof.exs --current-version-tag --skip-ci --skip-security-audits --worktree"
     end
 
     test "baseline JSON commands match behavioral wiring substrings" do
       baseline = load_baseline!()
 
-      signing =
+      integration =
         baseline["contexts"]
-        |> Enum.find(&(&1["name"] == "signing-live-proof"))
+        |> Enum.find(&(&1["name"] == "integration-proofs"))
 
-      long_lived =
-        baseline["contexts"]
-        |> Enum.find(&(&1["name"] == "long-lived-live-proof"))
-
-      assert signing["command"] =~ "live_signing"
-      assert signing["command"] =~ "signing_live_test.exs"
-      assert long_lived["command"] =~ "live_pdf_tools"
-      assert long_lived["command"] =~ "signing_live_test.exs"
+      assert integration["command"] =~ "live_signing"
+      assert integration["command"] =~ "signing_live_test.exs"
+      assert integration["command"] =~ "live_pdf_tools"
+      assert integration["command"] =~ "release_preflight_proof.exs"
+      assert integration["command"] =~ "--skip-ci"
+      assert integration["command"] =~ "--skip-security-audits"
     end
   end
 
   describe "docs-contract lane count" do
-    test "verify_docs.exs registers exactly twenty-one lanes including PDF.js advisory and GitHub intake lanes" do
+    test "verify_docs.exs registers exactly twenty-six lanes including PDF.js advisory, GitHub intake, DX local reproducibility, and the accessibility overclaim tripwire lanes" do
       script = File.read!(@verify_docs_path)
 
       lane_entries =
@@ -168,7 +127,7 @@ defmodule Guardrails.RequiredChecksContractTest do
           script
         )
 
-      assert length(lane_entries) == 21
+      assert length(lane_entries) == 26
 
       assert script =~
                ~r/\{"Viewer evidence semantic-claims lane",\s*\["test",\s*"test\/docs_contract\/viewer_evidence_claims_test\.exs"\]\}/s
@@ -178,6 +137,12 @@ defmodule Guardrails.RequiredChecksContractTest do
 
       assert script =~
                ~r/\{"PDF\.js advisory claims lane",\s*\["test",\s*"test\/docs_contract\/pdfjs_advisory_claims_test\.exs"\]\}/s
+
+      assert script =~
+               ~r/\{"DX local reproducibility claims lane",\s*\["test",\s*"test\/docs_contract\/dx_local_reproducibility_claims_test\.exs"\]\}/s
+
+      assert script =~
+               ~r/\{"Accessibility overclaim tripwire lane",\s*\["test",\s*"test\/docs_contract\/accessibility_overclaim_test\.exs"\]\}/s
     end
   end
 
@@ -185,13 +150,16 @@ defmodule Guardrails.RequiredChecksContractTest do
     test "ci alias includes structural validation steps folded into test context" do
       project = Rendro.MixProject.project()
       aliases = Keyword.fetch!(project, :aliases)
+      ci_fast_steps = Keyword.fetch!(aliases, :"ci.fast")
       ci_steps = Keyword.fetch!(aliases, :ci)
 
-      assert ci_steps == [
+      assert ci_steps == ["ci.fast", "ci.proofs"]
+
+      assert ci_fast_steps == [
                "format --check-formatted",
                "hex.build",
                "compile --warnings-as-errors",
-               "test",
+               "test --exclude quarantine --slowest 10",
                "docs --warnings-as-errors",
                "credo --strict",
                "dialyzer"
@@ -204,7 +172,11 @@ defmodule Guardrails.RequiredChecksContractTest do
       ci = File.read!(@ci_path)
       test_block = ci_job_block!(ci, "test")
 
-      assert test_block =~ "run: mix ci"
+      assert test_block =~ "run: mix format"
+      assert test_block =~ "run: mix compile"
+      assert test_block =~ "run: mix test"
+      assert test_block =~ "run: mix credo"
+      assert test_block =~ "run: mix dialyzer"
 
       forbidden_required_fragments = [
         "pdfium-cli",
@@ -231,57 +203,34 @@ defmodule Guardrails.RequiredChecksContractTest do
       end
     end
 
-    test "raster-advisory is graph-disconnected and non-blocking" do
+    test "advisory-checks is graph-disconnected and non-blocking" do
       ci = File.read!(@ci_path)
-      raster_block = ci_job_block!(ci, "raster-advisory")
+      advisory_block = ci_job_block!(ci, "advisory-checks")
 
-      assert raster_block =~ "continue-on-error: true"
+      assert advisory_block =~ "continue-on-error: true"
 
-      assert raster_block =~
+      assert advisory_block =~
                "mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs"
 
-      assert raster_block =~ "mix rendro.launch_artifacts.check"
-      refute raster_block =~ ~r/^\s+needs:/m
+      assert advisory_block =~ "mix rendro.launch_artifacts.check"
+      assert advisory_block =~ "mix rendro.comparison.check"
+      assert advisory_block =~ "mix rendro.livebook.check"
+      assert advisory_block =~ "node scripts/pdfjs_observer/observe.mjs --check"
+
+      refute advisory_block =~ ~r/^\s+needs:/m
     end
 
-    test "comparison, livebook, and PDF.js advisory jobs are graph-disconnected and non-blocking" do
+    test "integration-proofs is bounded and runs the isolated proof wrapper" do
       ci = File.read!(@ci_path)
+      integration_block = ci_job_block!(ci, "integration-proofs")
 
-      expected_advisory_jobs = [
-        {"comparison-advisory", "mix rendro.comparison.check"},
-        {"livebook-advisory", "mix rendro.livebook.check"},
-        {"pdfjs-advisory", "node scripts/pdfjs_observer/observe.mjs --check"}
-      ]
+      assert integration_block =~ "timeout-minutes:"
 
-      for {job, command} <- expected_advisory_jobs do
-        block = ci_job_block!(ci, job)
+      assert integration_block =~
+               ~s(mix run scripts/release_preflight_proof.exs --current-version-tag --skip-ci --skip-security-audits --worktree)
 
-        assert block =~ "continue-on-error: true"
-        assert block =~ "run: #{command}"
-        refute block =~ ~r/^\s+needs:/m
-      end
-    end
-
-    test "pdfjs-advisory installs Node in the advisory job only" do
-      ci = File.read!(@ci_path)
-      block = ci_job_block!(ci, "pdfjs-advisory")
-
-      assert block =~ "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6"
-      assert block =~ "node-version: '22.14.0'"
-      assert block =~ "cache-dependency-path: scripts/pdfjs_observer/package-lock.json"
-      assert block =~ "working-directory: scripts/pdfjs_observer"
-      assert block =~ "run: npm ci"
-      assert block =~ "run: node scripts/pdfjs_observer/observe.mjs --check"
-    end
-
-    test "release-proof is bounded and runs the isolated proof wrapper" do
-      ci = File.read!(@ci_path)
-      release_block = ci_job_block!(ci, "release-proof")
-
-      assert release_block =~ "timeout-minutes: 45"
-
-      assert release_block =~
-               ~s(mix run scripts/release_preflight_proof.exs --current-version-tag --worktree "$RUNNER_TEMP/rendro-release-proof")
+      assert integration_block =~ "--skip-ci"
+      assert integration_block =~ "--skip-security-audits"
     end
   end
 
@@ -335,11 +284,6 @@ defmodule Guardrails.RequiredChecksContractTest do
       {:ok, workflow} -> workflow
       {:error, reason} -> flunk("expected #{path} to parse as YAML: #{inspect(reason)}")
     end
-  end
-
-  defp advisory_context!(baseline, name) do
-    Enum.find(baseline["advisory_contexts"], &(&1["name"] == name)) ||
-      flunk("expected advisory context #{inspect(name)}")
   end
 
   defp ci_job_block!(ci, job_name) do

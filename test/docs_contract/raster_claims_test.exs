@@ -30,7 +30,7 @@ defmodule Rendro.DocsContract.RasterClaimsTest do
     guardrails =
       File.read!("priv/guardrails/required_status_checks.json") |> JSON.decode!()
 
-    refute "raster-advisory" in guardrails["required_contexts"]
+    refute "advisory-checks" in guardrails["required_contexts"]
   end
 
   # Test 4: GREEN in Plan 04 — raster-advisory added to advisory_contexts in Plan 04
@@ -38,7 +38,7 @@ defmodule Rendro.DocsContract.RasterClaimsTest do
     guardrails =
       File.read!("priv/guardrails/required_status_checks.json") |> JSON.decode!()
 
-    assert Enum.any?(guardrails["advisory_contexts"], &(&1["name"] == "raster-advisory"))
+    assert Enum.any?(guardrails["advisory_contexts"], &(&1["name"] == "advisory-checks"))
   end
 
   # Test 5: PASSES in Plan 01 — no GUI-viewer rows carry pdfium-render viewer_kind

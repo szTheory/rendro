@@ -272,24 +272,88 @@ defmodule Rendro.Recipes.Certificate do
   # Private section builders
   # ---------------------------------------------------------------------------
 
-  defp body_section(data, opts, _template) do
+  # 118-08 gap-closure (SHOW-01): recipient name must be the dominant
+  # element (larger than the title, mirrors Payslip's Net Pay box) — the
+  # title now recedes so the recipient reads as the one key fact.
+  @title_size 20
+  @subtitle_size 12
+  @recipient_size 34
+  @body_size 11
+  @meta_size 10
+  @line_height 1.2
+  # Body paragraph measure — a fraction of the body region width so the
+  # paragraph never runs edge-to-edge (118-06-FINDINGS.md certificate gap).
+  @body_measure_fraction 0.68
+
+  defp body_section(data, opts, template) do
     fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
 
     body_text = Map.get(data, :body, "")
     seal_text = Map.get(data, :seal_line, "")
 
+    body_region = Enum.find(template.regions, &(&1.role == :body))
+    region_w = body_region.width
+    region_h = body_region.height
+
+    # Only "Helvetica" is ever used for this recipe's text runs (the
+    # optional `brand` font is registered for embedding but never applied to
+    # a text block here), so built-in Helvetica metrics are always the
+    # correct font to measure against for centering.
+    font = Rendro.PDF.Font.helvetica()
+
+    body_measure_w = region_w * @body_measure_fraction
+
+    # 118-08: center content vertically within the border. No generic
+    # per-block measurement API is exposed publicly, so the total content
+    # height is estimated from known font metrics (line_height * size per
+    # line, with the wrapped body paragraph's line count approximated from
+    # its measured full-line width against the constrained measure). This is
+    # an honest approximation, not exact typesetting — good enough to move
+    # the certificate's content out of the cramped top ~20% into a visually
+    # balanced middle band.
+    body_full_w = Rendro.PDF.Font.text_width(font, body_text, @body_size)
+    body_lines = if body_full_w <= 0, do: 1, else: max(1, ceil(body_full_w / body_measure_w))
+
+    content_height_estimate =
+      line_h(@title_size) + line_h(@subtitle_size) + line_h(@recipient_size) +
+        body_lines * line_h(@body_size) + line_h(@meta_size) + line_h(@meta_size)
+
+    top_spacer_h = max((region_h - content_height_estimate) / 2, 0)
+
+    spacer = Rendro.block(Rendro.text("", size: 1), height: top_spacer_h)
+
+    content = [
+      spacer,
+      centered_line(font, data.title, @title_size, region_w),
+      centered_line(font, "This certifies that", @subtitle_size, region_w),
+      centered_line(font, data.recipient, @recipient_size, region_w),
+      centered_paragraph(body_text, @body_size, body_measure_w, region_w),
+      centered_line(font, fmt_date.(data.date), @meta_size, region_w),
+      centered_line(font, seal_text, @meta_size, region_w)
+    ]
+
     Rendro.section(
       name: :certificate_body,
       region: :body,
-      content: [
-        Rendro.block(Rendro.text(data.title, size: 28)),
-        Rendro.block(Rendro.text("This certifies that", size: 12)),
-        Rendro.block(Rendro.text(data.recipient, size: 20)),
-        Rendro.block(Rendro.text(body_text, size: 11)),
-        Rendro.block(Rendro.text(fmt_date.(data.date), size: 10)),
-        Rendro.block(Rendro.text(seal_text, size: 10))
-      ]
+      content: content
     )
+  end
+
+  defp line_h(size), do: size * @line_height
+
+  # Horizontally centers a single line of text within the body region by
+  # measuring its exact rendered width against built-in Helvetica metrics.
+  defp centered_line(font, text, size, region_w) do
+    width = Rendro.PDF.Font.text_width(font, text, size)
+    x = max((region_w - width) / 2, 0)
+    Rendro.block(Rendro.text(text, size: size), x: x, width: width)
+  end
+
+  # Constrains the body paragraph to `measure_w` (never edge-to-edge) and
+  # centers the constrained block horizontally within the region.
+  defp centered_paragraph(text, size, measure_w, region_w) do
+    x = max((region_w - measure_w) / 2, 0)
+    Rendro.block(Rendro.text(text, size: size), x: x, width: measure_w)
   end
 
   # ---------------------------------------------------------------------------

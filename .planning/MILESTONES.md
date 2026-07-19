@@ -1,5 +1,37 @@
 # Milestones
 
+## C1 CI/CD Performance & Reliability (Shipped: 2026-07-11)
+
+**Delivered:** Non-version CI/CD infrastructure milestone that turned the pipeline into a split, cached, observable required gate with local reproduction commands and remote validation evidence. No Hex release or library version tag was cut.
+
+**Phases completed:** 108-113 (18 plans, 13 tracked tasks)
+
+**Key accomplishments:**
+
+- Captured a measure-first baseline across `ci.yml`, `hexdocs.yml`, and `release.yml`, including critical path, cache absence, A-E check classification, and P0-P3 recommendations.
+- Added precise deps, `_build`, and PLT caching with unified SHA-pinned `erlef/setup-beam` and cache-hit observability.
+- Improved test trust by documenting non-async reasons, increasing safe concurrency, quarantining nondeterministic paths, and preserving slow/live proof layering.
+- Reshaped CI around named fast-lane steps, advisory/proof lane boundaries, PR cancellation, and one stable `ci-success` required check.
+- Hardened supply-chain and release posture with pinned actions, Dependabot, advisory security-audit lanes, and deterministic release proof behavior.
+- Closed DX and validation with scoped `mix ci.fast` / `mix ci.proofs` / `mix ci.advisory` commands, README/CONTRIBUTING updates, three green remote `ci.yml` runs, and a passed C1 milestone audit.
+
+**Stats:**
+
+- 6 phases, 18 plans, 13 tracked tasks
+- Local `mix ci.fast`: 1219 tests, 12 doctests, 4 properties, 0 failures
+- Remote required gate sample: p50 783s, nearest-rank p95 1013s across runs `29133061301`, `29133777702`, and `29134266708`
+- Cache evidence: deps exact hit 3/3, `_build` restored 3/3, PLT exact hit 3/3
+
+**Audit status:** `passed` — 30/30 requirements satisfied; 6/6 phases verified; 18/18 plans complete; 6/6 integration flows passed.
+
+**Archived:** `milestones/C1-ROADMAP.md`, `milestones/C1-REQUIREMENTS.md`, and `milestones/C1-MILESTONE-AUDIT.md`.
+
+**Known advisory signal:** `security-audit` reports dependency advisories in the non-required advisory lane; the deterministic required gate remains `ci-success`.
+
+**What's next:** Start the next milestone with `$gsd-new-milestone`.
+
+---
+
 ## v2.9 TOC & Document Navigation (Shipped: 2026-06-14)
 
 **Phases completed:** 4 phases, 9 plans, 7 tasks

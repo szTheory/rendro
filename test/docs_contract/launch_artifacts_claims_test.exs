@@ -1,5 +1,5 @@
 defmodule Rendro.DocsContract.LaunchArtifactsClaimsTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   @manifest_path "assets/rendro/artifacts.json"
   @readme_path "README.md"
@@ -9,7 +9,7 @@ defmodule Rendro.DocsContract.LaunchArtifactsClaimsTest do
     assert Rendro.LaunchArtifacts.static_contract_errors() == []
   end
 
-  test "manifest records exactly the five Phase 86 recipe previews" do
+  test "manifest records exactly the seven recipe previews" do
     manifest = Rendro.LaunchArtifacts.read_manifest!()
 
     assert Enum.map(manifest["gallery"], & &1["id"]) == [
@@ -17,7 +17,9 @@ defmodule Rendro.DocsContract.LaunchArtifactsClaimsTest do
              "branded_invoice",
              "statement",
              "receipt_report",
-             "certificate"
+             "certificate",
+             "payslip",
+             "ticket"
            ]
   end
 
@@ -131,10 +133,8 @@ defmodule Rendro.DocsContract.LaunchArtifactsClaimsTest do
 
   test "hex package includes public launch assets" do
     tarball = "rendro-#{Mix.Project.config()[:version]}.tar"
-    File.rm(tarball)
-    on_exit(fn -> File.rm(tarball) end)
 
-    {output, 0} = System.cmd("mix", ["hex.build"], stderr_to_stdout: true)
+    {output, 0} = Rendro.Test.HexBuildCache.get_build_output()
     assert output =~ tarball
     assert File.exists?(tarball)
 
@@ -149,6 +149,8 @@ defmodule Rendro.DocsContract.LaunchArtifactsClaimsTest do
       "assets/rendro/gallery/statement.png",
       "assets/rendro/gallery/receipt_report.png",
       "assets/rendro/gallery/certificate.png",
+      "assets/rendro/gallery/payslip.png",
+      "assets/rendro/gallery/ticket.png",
       "ADOPTION.md",
       "CHANGELOG.md"
     ]

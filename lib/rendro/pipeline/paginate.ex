@@ -26,7 +26,7 @@ defmodule Rendro.Pipeline.Paginate do
   end
 
   defp resolve_toc_tokens(%Document{} = doc) do
-    anchors = Map.get(doc.metadata || %Rendro.Metadata{}, :anchors, %{})
+    anchors = Map.get(doc.metadata, :anchors, %{})
 
     pages =
       Enum.map(doc.pages, fn page ->
@@ -106,14 +106,12 @@ defmodule Rendro.Pipeline.Paginate do
   defp substitute_anchor_tokens(other, _anchors), do: other
 
   defp collect_anchors(%Document{} = doc) do
-    try do
-      anchors = collect_page_anchors(doc.pages)
-      metadata = Map.put(doc.metadata || %Rendro.Metadata{}, :anchors, anchors)
-      {:ok, %{doc | metadata: metadata}}
-    catch
-      {:error, :duplicate_anchor_id, id} ->
-        {:error, Rendro.Error.from_stage(:paginate, :duplicate_anchor_id, %{details: %{id: id}})}
-    end
+    anchors = collect_page_anchors(doc.pages)
+    metadata = Map.put(doc.metadata, :anchors, anchors)
+    {:ok, %{doc | metadata: metadata}}
+  catch
+    {:error, :duplicate_anchor_id, id} ->
+      {:error, Rendro.Error.from_stage(:paginate, :duplicate_anchor_id, %{details: %{id: id}})}
   end
 
   defp collect_page_anchors(pages) do
@@ -126,11 +124,14 @@ defmodule Rendro.Pipeline.Paginate do
 
   defp collect_block_anchors(blocks, page_idx, acc) when is_list(blocks) do
     Enum.reduce(blocks, acc, fn block, current_acc ->
-      collect_single_anchor(block, page_idx, current_acc)
+      collect_single_anchor(block, page_idx, current_acc, 0, 0)
     end)
   end
 
-  defp collect_single_anchor(%Rendro.Block{} = block, page_idx, acc) do
+  defp collect_single_anchor(%Rendro.Block{} = block, page_idx, acc, offset_x, offset_y) do
+    x = offset_x + (block.x || 0)
+    y = offset_y + (block.y || 0)
+
     acc1 =
       case block.id do
         nil ->
@@ -140,7 +141,7 @@ defmodule Rendro.Pipeline.Paginate do
           if Map.has_key?(acc, id) do
             throw({:error, :duplicate_anchor_id, id})
           else
-            Map.put(acc, id, [page_idx, :XYZ, block.x || 0, block.y || 0, nil])
+            Map.put(acc, id, [page_idx, :XYZ, x, y, nil])
           end
       end
 
@@ -148,37 +149,47 @@ defmodule Rendro.Pipeline.Paginate do
       %Rendro.Table{} = table ->
         acc2 =
           if table.header do
-            collect_row_anchors([table.header], page_idx, acc1)
+            collect_row_anchors([table.header], page_idx, acc1, offset_x, offset_y)
           else
             acc1
           end
 
-        collect_row_anchors(table.rows || [], page_idx, acc2)
+        collect_row_anchors(table.rows || [], page_idx, acc2, offset_x, offset_y)
 
       _ ->
         acc1
     end
   end
 
-  defp collect_single_anchor(_other, _page_idx, acc), do: acc
+  defp collect_single_anchor(_other, _page_idx, acc, _offset_x, _offset_y), do: acc
 
-  defp collect_row_anchors(rows, page_idx, acc) do
+  defp collect_row_anchors(rows, page_idx, acc, offset_x, offset_y) do
     Enum.reduce(rows, acc, fn row, row_acc ->
       cells =
         case row do
-          %Rendro.Row{cells: c} -> Enum.map(c, & &1.content)
+          %Rendro.Row{cells: c} -> c
           list when is_list(list) -> list
           _ -> []
         end
 
-      Enum.reduce(cells, row_acc, fn cell_content, cell_acc ->
-        case cell_content do
-          %Rendro.Block{} = nested_block ->
-            collect_single_anchor(nested_block, page_idx, cell_acc)
+      Enum.reduce(cells, row_acc, fn
+        %Rendro.Cell{content: %Rendro.Block{} = nested_block, x: cell_x, y: cell_y}, cell_acc ->
+          collect_single_anchor(
+            nested_block,
+            page_idx,
+            cell_acc,
+            offset_x + (cell_x || 0),
+            offset_y + (cell_y || 0)
+          )
 
-          _ ->
-            cell_acc
-        end
+        cell_content, cell_acc ->
+          case cell_content do
+            %Rendro.Block{} = nested_block ->
+              collect_single_anchor(nested_block, page_idx, cell_acc, offset_x, offset_y)
+
+            _ ->
+              cell_acc
+          end
       end)
     end)
   end
@@ -186,7 +197,7 @@ defmodule Rendro.Pipeline.Paginate do
   defp collect_outlines(%Document{} = doc) do
     flat_outlines = collect_page_outlines(doc.pages)
     tree = build_outline_tree(flat_outlines)
-    metadata = Map.put(doc.metadata || %Rendro.Metadata{}, :outlines, tree)
+    metadata = Map.put(doc.metadata, :outlines, tree)
     {:ok, %{doc | metadata: metadata}}
   end
 
@@ -200,11 +211,14 @@ defmodule Rendro.Pipeline.Paginate do
 
   defp collect_block_outlines(blocks, page_idx) when is_list(blocks) do
     Enum.flat_map(blocks, fn block ->
-      collect_single_outline(block, page_idx)
+      collect_single_outline(block, page_idx, 0, 0)
     end)
   end
 
-  defp collect_single_outline(%Rendro.Block{} = block, page_idx) do
+  defp collect_single_outline(%Rendro.Block{} = block, page_idx, offset_x, offset_y) do
+    x = offset_x + (block.x || 0)
+    y = offset_y + (block.y || 0)
+
     extracted =
       if block.outline do
         title = extract_outline_title(block)
@@ -214,7 +228,7 @@ defmodule Rendro.Pipeline.Paginate do
             %{
               title: title,
               level: block.outline_level || 1,
-              dest: [page_idx, :XYZ, block.x || 0, block.y || 0, nil]
+              dest: [page_idx, :XYZ, x, y, nil]
             }
           ]
         else
@@ -228,9 +242,11 @@ defmodule Rendro.Pipeline.Paginate do
       case block.content do
         %Rendro.Table{} = table ->
           header_outlines =
-            if table.header, do: collect_row_outlines([table.header], page_idx), else: []
+            if table.header,
+              do: collect_row_outlines([table.header], page_idx, offset_x, offset_y),
+              else: []
 
-          row_outlines = collect_row_outlines(table.rows || [], page_idx)
+          row_outlines = collect_row_outlines(table.rows || [], page_idx, offset_x, offset_y)
           header_outlines ++ row_outlines
 
         _ ->
@@ -240,22 +256,34 @@ defmodule Rendro.Pipeline.Paginate do
     extracted ++ nested
   end
 
-  defp collect_single_outline(_other, _page_idx), do: []
+  defp collect_single_outline(_other, _page_idx, _offset_x, _offset_y), do: []
 
-  defp collect_row_outlines(rows, page_idx) do
+  defp collect_row_outlines(rows, page_idx, offset_x, offset_y) do
     Enum.flat_map(rows, fn row ->
       cells =
         case row do
-          %Rendro.Row{cells: c} -> Enum.map(c, & &1.content)
+          %Rendro.Row{cells: c} -> c
           list when is_list(list) -> list
           _ -> []
         end
 
-      Enum.flat_map(cells, fn cell_content ->
-        case cell_content do
-          %Rendro.Block{} = nested_block -> collect_single_outline(nested_block, page_idx)
-          _ -> []
-        end
+      Enum.flat_map(cells, fn
+        %Rendro.Cell{content: %Rendro.Block{} = nested_block, x: cell_x, y: cell_y} ->
+          collect_single_outline(
+            nested_block,
+            page_idx,
+            offset_x + (cell_x || 0),
+            offset_y + (cell_y || 0)
+          )
+
+        cell_content ->
+          case cell_content do
+            %Rendro.Block{} = nested_block ->
+              collect_single_outline(nested_block, page_idx, offset_x, offset_y)
+
+            _ ->
+              []
+          end
       end)
     end)
   end
@@ -538,9 +566,12 @@ defmodule Rendro.Pipeline.Paginate do
     header_y = block.y
     start_x = block.x
     col_widths = table.column_widths || []
+    cell_align = table.cell_align || %{}
 
     stacked_header =
-      if table.header, do: stack_cells(table.header, start_x, header_y, col_widths), else: nil
+      if table.header,
+        do: stack_cells(table.header, start_x, header_y, col_widths, cell_align),
+        else: nil
 
     header_offset = table.header_height || 0
 
@@ -549,7 +580,7 @@ defmodule Rendro.Pipeline.Paginate do
         Enum.zip(table.rows, table.row_heights || []),
         {[], header_y + header_offset},
         fn {row, row_h}, {acc, y} ->
-          stacked_row = stack_cells(row, start_x, y, col_widths)
+          stacked_row = stack_cells(row, start_x, y, col_widths, cell_align)
           {acc ++ [stacked_row], y + row_h}
         end
       )
@@ -559,19 +590,62 @@ defmodule Rendro.Pipeline.Paginate do
 
   defp stack_table_cells(block), do: block
 
-  defp stack_cells(%Rendro.Row{} = row, start_x, y, col_widths) do
-    %{row | cells: stack_cells(row.cells, start_x, y, col_widths)}
+  defp stack_cells(%Rendro.Row{} = row, start_x, y, col_widths, cell_align) do
+    %{row | cells: stack_cells(row.cells, start_x, y, col_widths, cell_align)}
   end
 
-  defp stack_cells(row, start_x, y, col_widths) when is_list(row) do
+  defp stack_cells(row, start_x, y, col_widths, cell_align) when is_list(row) do
     {cells, _} =
-      Enum.reduce(Enum.zip(row, col_widths), {[], start_x}, fn {cell, col_w}, {acc, x} ->
-        # Cell already has its width set by Measure, but its x needs stacking
-        {acc ++ [%{cell | x: x, y: y}], x + col_w}
+      row
+      |> Enum.zip(col_widths)
+      |> Enum.with_index()
+      |> Enum.reduce({[], start_x}, fn {{cell, col_w}, col_index}, {acc, x} ->
+        # Cell already has its width set by Measure, but its x needs stacking.
+        # INV-05: the right-align offset is gated STRICTLY on the cell's
+        # effective alignment resolving to :right — every other value
+        # (including the default :left) takes this exact unchanged
+        # left-flush path, so no-cell_align tables stay byte-identical.
+        stacked_cell =
+          case cell_effective_align(cell, cell_align, col_index) do
+            :right -> %{cell | x: x + right_align_offset(cell), y: y}
+            :left -> %{cell | x: x, y: y}
+          end
+
+        {acc ++ [stacked_cell], x + col_w}
       end)
 
     cells
   end
+
+  # Per-cell `cell_align: :right` (set directly on an authored `%Rendro.Cell{}`)
+  # takes precedence; otherwise fall back to the table's column-level
+  # `cell_align` map (`Rendro.table/2` `cell_align:` option). Default is
+  # :left for both, so an untouched table resolves :left for every cell.
+  defp cell_effective_align(%Rendro.Cell{cell_align: :right}, _cell_align_map, _col_index),
+    do: :right
+
+  defp cell_effective_align(_cell, cell_align_map, col_index) do
+    Map.get(cell_align_map, col_index, :left)
+  end
+
+  # Right-align slack = column width minus the already-measured content
+  # width (post-Measure; no re-measuring). Negative slack (content wider
+  # than the column) falls back to zero offset rather than shifting left
+  # (T-115-03-03).
+  defp right_align_offset(%Rendro.Cell{width: col_w} = cell) do
+    max((col_w || 0) - measured_content_width(cell), 0)
+  end
+
+  defp measured_content_width(%Rendro.Cell{
+         content: %Rendro.Block{content: %Rendro.Pipeline.MeasuredText{width: width}}
+       }),
+       do: width
+
+  defp measured_content_width(%Rendro.Cell{content: %Rendro.Block{width: width}})
+       when is_number(width),
+       do: width
+
+  defp measured_content_width(_cell), do: 0
 
   defp paginate_block(
          block,

@@ -90,8 +90,22 @@ defmodule Rendro.Recipes.Statement do
 
   @content_width @page_width - 2 * @margin
 
-  # Header reserved height (account name + period row + opening balance row).
-  @header_height 48
+  # Header reserved height (account name + period row + opening balance row,
+  # plus the 118-08 dominant closing-balance summary box appended below
+  # them — @closing_balance_band_h of the total). Bumped from the pre-118-08
+  # 48pt (3 small text lines only) so the SHOW-01 gap-closure fix (surface
+  # the closing balance as a dominant boxed summary element, mirroring
+  # Payslip's Net Pay box) fits without overlapping the body region.
+  @header_height 88
+
+  # Height of the closing-balance backdrop box appended at the bottom of the
+  # header region (118-08). Drawn via the same zero-height overlay mechanic
+  # payslip.ex's summary_section/2 uses: the backdrop's block has an
+  # explicit `height: 0` so it never advances the region's shared Y cursor,
+  # letting the label+value text blocks that follow stack starting at the
+  # SAME y the backdrop started at (painting on top of the backdrop instead
+  # of being pushed below it).
+  @closing_balance_band_h 40
 
   # Footer reserved height — MUST be non-zero so body_capacity reserves space
   # and "Page X of Y" does not overlap the last body row (D-03 / STMT-04).
@@ -268,7 +282,7 @@ defmodule Rendro.Recipes.Statement do
   # Private section builders
   # ---------------------------------------------------------------------------
 
-  defp header_section(%{period: period, account: account, opening_balance: ob} = _data, opts) do
+  defp header_section(%{period: period, account: account, opening_balance: ob} = data, opts) do
     fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
     fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
     lbl = Rendro.Recipes.Pagination.label_resolver(opts)
@@ -277,15 +291,52 @@ defmodule Rendro.Recipes.Statement do
     ob_str = "#{lbl.(:opening_balance)}: #{fmt_amount.(ob)}"
     account_name = Map.get(account, :name, "")
 
+    closing_balance = derive_closing_balance(data)
+
+    # 118-08 gap-closure (SHOW-01): surface the closing balance as a
+    # dominant boxed summary element — not merely the last cell of the
+    # running-balance column — so content_hierarchy can honestly reach 5.
+    # The backdrop's explicit `height: 0` means it does not advance the
+    # header region's shared Y cursor (mirrors payslip.ex summary_section/2),
+    # so the label+value blocks that follow it start at the same y and
+    # visually overlay the drawn box.
+    closing_backdrop =
+      Rendro.path([{:rect, 0, 0, @content_width, @closing_balance_band_h}],
+        fill: {245, 245, 245},
+        stroke: %{color: {0, 0, 0}, width: 0.75},
+        x: 0,
+        y: 0,
+        width: @content_width,
+        height: 0
+      )
+
+    closing_label =
+      Rendro.block(Rendro.text("#{lbl.(:closing_balance)}", size: 9))
+
+    closing_value =
+      Rendro.block(Rendro.text(fmt_amount.(closing_balance), size: 22))
+
     Rendro.section(
       name: :statement_header,
       region: :header,
       content: [
         Rendro.block(Rendro.text(account_name, size: 14)),
         Rendro.block(Rendro.text(period_str, size: 10)),
-        Rendro.block(Rendro.text(ob_str, size: 10))
+        Rendro.block(Rendro.text(ob_str, size: 10)),
+        closing_backdrop,
+        closing_label,
+        closing_value
       ]
     )
+  end
+
+  # Derives the exact closing balance (opening_balance + Σ signed line
+  # amounts) via the same Decimal fold maybe_validate_closing_balance!/1
+  # already uses to validate a caller-supplied :closing_balance — so the
+  # rendered dominant summary box always matches whatever value the caller
+  # asserted (or, when absent, the honest derived value).
+  defp derive_closing_balance(%{opening_balance: ob, lines: lines}) do
+    Enum.reduce(lines, ob, fn %{amount: amt}, bal -> Decimal.add(bal, amt) end)
   end
 
   defp body_section(%{opening_balance: ob, lines: lines} = _data, opts) do

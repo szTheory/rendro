@@ -8,9 +8,32 @@ Rendro is a pure-Elixir, Phoenix-first PDF and document generation library for t
 
 Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
 
+## Current Milestone: v2.10 Realistic Business-Document Examples & Anatomy
+
+> Additive minor release (hex `1.1.0`). Milestone A of the 4-milestone "Happy-Path Home Runs" program (A realistic examples → B theming → C presets+catalog → D optional Studio). Retargets `SEED-002`. Phases continue global numbering (114–118). Research synthesis: `.planning/research/milestone-a/SUMMARY.md`.
+
+**Goal:** Close the toy→production gap so a serious user can adopt an award-quality, domain-correct business document immediately — realistic example corpus, an additive Invoice anatomy upgrade, two new document families (Payslip, Ticket), and a durable reader-quality rubric — without widening the deterministic core or the family-not-industry boundary.
+
+**Target features:**
+- A realistic example-data library (`priv/examples/<domain>/<business>/<family>.json` + `@moduledoc false` loader), de-quarantining the one realistic invoice fixture and repointing the bench harness.
+- Per-domain `DOMAIN.md` (domain language, personas + JTBD, conventions) + a schema-backed, appendable reader-quality rubric (hierarchy = 5, core dims ≥ 4, reading-order/print-safety gates).
+- An additive `Rendro.Recipes.Invoice` anatomy upgrade (optional issuer/customer/due_date/terms/totals + Decimal money + totals-kept-with-last-rows), the toy call preserved byte-identical; promote `Rendro.Format` to the public **adapter** tier; add an additive `cell_align: :right` primitive for tabular money.
+- Two new families on the 3-rung pattern: `Rendro.Recipes.Payslip` (anchor = net pay) and `Rendro.Recipes.Ticket` (fixed-box; anchor = seat/gate).
+- An edge-case stress matrix (deterministic hash-checked goldens + raster refs + errors-as-product), a rubric-gated demonstration set, and gallery/docs/README closure.
+
+**Key context:** Confirmed GREEN by a 5-lens research fan-out (domain/rubric, API/DX, example-data arch, prior-art/pitfalls, coherence/pillars). The only irreversible act is the `Format` public promotion — held to the *adapter/Evolving* tier with a documented "output may evolve" note. Four forward-compat "shape-now" seams are baked into acceptance criteria so Milestones B/C/D need no breaking rework: **S1** private `palette(opts)` keyed on B's locked color roles (sections never inline `{0,0,0}`) · **S4** fixtures reserve an optional brand/logo slot for C · **S5** rubric recorded as an appendable manifest for C's quality-ratchet · **S6** `artifacts.json` gains optional theme/mode/preset tags. Guards: no tagged-PDF/PDF-UA accessibility claims; engine stays locale-free (differences are data); no real PII (fictional businesses only; Payslip is the acute risk); ship `priv/examples/` text-only.
+
 ## Current State
 
-**Active milestone:** None. See Next Milestone Goals.
+**Active milestone:** v2.10 Realistic Business-Document Examples & Anatomy — **executing** (Phase 117 of 118 complete, 2026-07-18). Retargets `SEED-002`; Milestone A of the Happy-Path program. C1 CI/CD Performance & Reliability shipped 2026-07-11 as a non-version infrastructure milestone.
+
+**Phase 117 (Edge-case stress matrix) complete 2026-07-18** — the whole six-family recipe surface is now proven robust and deterministic under a family × stress-dimension grid, with ZERO `lib/` product change (a locked TEST/INFRA scope fence: edits confined to `test/`, `test/support/`, and non-`lib/` `priv/`). Shipped: `Rendro.Test.Golden` (un-gated byte-golden `assert_or_bless/2` + two-run `assert_deterministic!/1`, missing-ref hard-flunk, `MIX_GOLDEN_BLESS` refresh, hash-only refs — never PDF bytes), `Rendro.Test.EdgeFixtures.build/2` covering all 62 `:applies` cells + 4 EDGE-02 error fixtures, `edge_matrix_test.exs` with the `@matrix` (102 cells / 62 applies / 40 reasoned N/A) + D-02 coverage-honesty meta-test + 62 blessed `priv/goldens/**` refs, `edge_error_matrix_test.exs` (overflow + tall-row → `%Rendro.Error{stage: :paginate, reason: :content_overflow}` via two distinct detail paths; RTL → `{:unsupported_glyph, _}` and `{:shaping_required, :arab, _}` at `:measure`, plus `refute {:ok,_}` regression locks), a tarball-exclusion tripwire extending `branding_claims_test.exs`, 6 curated pdfium raster fixtures added in place to the existing raster snapshot test (advisory lane, blessed only in the pinned CI container — no `ci.yml` edit, in-fence), and the EDGE-03 rubric `stress_exemption` block (schema-`required`, so deletion fails validation) with 4 fail-loud D-15 contract guards including a non-vacuous disjointness+teeth guard. All 3 requirements (EDGE-01/02/03) verified 27/27 must-haves; full suite 1518 tests / 0 failures (raster advisory-excluded); code review 0 blockers (2 test-quality warnings fixed: a vacuous coverage guard and prose-equality assertions, both re-aligned to the phase's own honesty DNA).
+
+**Phase 115 (Invoice anatomy upgrade + Format public promotion + palette/align seams) complete 2026-07-18** — the milestone's one real product `lib/` change, all additive and byte-compatible: `Rendro.Recipes.Invoice` gained optional `:issuer`/`:customer`/`:due_date`/`:terms`/`:totals` (each rendered only when present) with Decimal money routed through the newly-public `Rendro.Format.money/1`, a `Decimal.equal?/2`-asserted totals block kept with the last rows across page breaks, and an errors-as-product `validate_data!/1` (including full line-item shape validation — INV-06 gap closed post-verification so malformed items raise instructive `ArgumentError` rather than leaking `BadMapError`/`KeyError`). `Rendro.Format` was promoted from `@moduledoc false` to the public **adapter** tier (`money/1`/`date/1`/`label/1`, migration note + "output may evolve" caveat — the milestone's single irreversible act), the additive `cell_align: :right` primitive landed with the default left path preserved byte-identically, and the S1 `palette(opts)` color seam + `page_template/1` `Keyword.take` whitelist closed the opts leak. Pre-upgrade toy call renders byte-identically (sha256 golden held). All 7 requirements (INV-01..07) verified 5/5; full suite 1275 tests / 0 failures; code review clean of blockers (WR-02 non-text right-align fallback carried as a non-blocking Info follow-up).
+
+**Phase 114 (Domain research, reader-quality rubric & realistic example-data library) complete 2026-07-18** — the milestone's data + quality foundation is in place with NO `lib/` product change except the `@moduledoc false` `Rendro.Examples` loader: a realistic, schema-validated `priv/examples/invoice/acme-phoenix-saas/invoice.json` fixture (Decimal-string money, optional empty `brand`/`logo` S4 slot, de-quarantined from the bench harness as a provable byte-identical no-op), a co-located `DOMAIN.md` (domain language, personas+JTBD, reading context, layout conventions), and an appendable schema-backed reader-quality rubric (`priv/quality/rubric_scores.json`: 6 core 1–5 dims + 2 gates, non-designer anchors, empty `scores: []` S5 seam) — all enforced by 3 new + 2 extended docs-contract lanes (guardrail count 22→25), text-only Hex packaging (`priv/examples` allowlisted, `priv/schemas`/`priv/quality` refuted from tarball, 11-extension raster ban), and `Path.safe_relative` traversal guards on the loader. All 9 requirements (EXL-01..06, RUB-01..03) structurally verified; 2 subjective prose-quality UAT checks (DOMAIN.md faithfulness, rubric anchor applicability) passed; security review closed 16 threats (0 open).
+
+**Shipped milestone:** C1 CI/CD Performance & Reliability — **SHIPPED 2026-07-11** (Phases 108-113, 30/30 requirements; milestone audit `passed`; no Hex release or library version tag). Rendro's CI/CD pipeline is now split into actionable fast/proof/advisory lanes, backed by precise BEAM caches, a stable `ci-success` required gate, local `mix ci.fast` / `mix ci.proofs` reproduction commands, and remote validation evidence from three green `ci.yml` runs.
 
 **Shipped milestone:** v2.8 Done-Enough Stewardship & Adoption Signal Loop — **SHIPPED 2026-06-13** (Phases 93-96, 8/8 requirements; milestone audit `passed`). Rendro reduced maintainer/adopter friction and kept its public posture truthful by closing the `Rendro.Recipes` facade DX gap, cleaning up docs/warning hygiene, bringing header odd/even proof depth to footer parity, reconciling stale phase-validation metadata, and establishing an explicit done-enough stewardship posture tied to a dated adoption-signal review.
 
@@ -86,14 +109,21 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 **Foundation Already Shipped:** v1.3 release readiness, v1.2 typography/assets truth, v1.1 layout-authoring maturity, and v1.0 deterministic core rendering.
 
-## Current Milestone: v2.9 TOC & Document Navigation
+## Latest Milestone: C1 CI/CD Performance & Reliability
 
-**Goal:** Deliver Table of Contents, document outlines (bookmarks), anchors, and cross-references for long reports, proactively bypassing the previous adoption gate.
+> Non-version infra milestone (like B1) — pipeline/tooling work, **no library/`lib/` changes, no Hex release.** Phases continue global numbering (108–113). Source brief: `milestones/C1-AUDIT-BRIEF.md`.
 
-**Target features:**
-- Document outlines (PDF Bookmarks/Outlines)
-- Internal page anchors and cross-references (linking to pages/sections)
-- Table of Contents primitives and generation
+**Shipped:** 2026-07-11. C1 made the CI/CD pipeline faster, more deterministic, more trustworthy, and more resource-efficient with better contributor DX — measured first, then improved caching, test concurrency/determinism, workflow topology, security/release posture, and validation reporting without weakening the quality signal.
+
+**Delivered:**
+- Measure-first baseline and P0-P3 recommendations for the old CI topology.
+- Precise deps, `_build`, and PLT caching plus unified SHA-pinned setup-beam.
+- Evidence-based test concurrency, quarantine, and slow/live proof layering.
+- Named fast-lane CI steps, advisory/proof lane boundaries, PR cancellation, and one stable `ci-success` required check.
+- Supply-chain hardening with pinned actions, Dependabot, least-privilege permissions, advisory audits, and deterministic release proof behavior.
+- Scoped local reproduction commands, README/CONTRIBUTING updates, and final metrics with three green remote `ci.yml` runs.
+
+**Archive:** `milestones/C1-ROADMAP.md`, `milestones/C1-REQUIREMENTS.md`, and `milestones/C1-MILESTONE-AUDIT.md`.
 
 ## Future Milestone Candidates (demand-gated)
 
@@ -113,6 +143,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Validated
 
+- ✓ Rendro C1 shipped CI/CD Performance & Reliability: split fast/proof/advisory lanes, precise BEAM caches, stable `ci-success` required gate, scoped local reproduction commands, supply-chain/release hardening, and before/after validation evidence from three green remote `ci.yml` runs. All 30 requirements satisfied; milestone audit `passed`. Shipped 2026-07-11 and archived in `milestones/C1-ROADMAP.md` / `milestones/C1-REQUIREMENTS.md` / `milestones/C1-MILESTONE-AUDIT.md`. — C1
 - ✓ Rendro v2.9 shipped TOC & Document Navigation: explicit page anchors, hierarchical document outlines with UTF-16BE support, fail-fast validated internal cross-reference links, and layout-preserving `{{anchor_page:id}}` Table of Contents substitution tokens. All 13 requirements satisfied; milestone audit `passed`. Shipped 2026-06-14 and archived in `milestones/v2.9-ROADMAP.md` / `milestones/v2.9-REQUIREMENTS.md` / `milestones/v2.9-phases/`. — v2.9
 - ✓ Rendro v2.8 completed the done-enough stewardship & adoption signal loop. Validated in Phase 96: adoption-signal-review-stewardship-posture.
 - ✓ Rendro v2.6 shipped public launch and adoption bootstrap without overclaiming: HarfBuzz is optional behind `Rendro.Text.Shaper`, complex scripts fail instructively, `%Rendro.Path{}`/table borders/Certificate frame polish are in the core render path, `Rendro.Adapters.Pdfium.render/2` and golden-PNG snapshots provide advisory raster proof, the README/HexDocs gallery and self-rendered `manual.pdf` are hash-checked, the comparison guide and Livebook tutorial are bounded by docs-contract checks, issue-only intake and `ADOPTION.md` establish a measurable demand gate, and mobile GUI rows are terminal `explicit_deferral` entries rather than support claims. All 21 requirements satisfied; milestone audit `passed`. Shipped 2026-06-13 and archived in `milestones/v2.6-ROADMAP.md` / `milestones/v2.6-REQUIREMENTS.md` / `milestones/v2.6-MILESTONE-AUDIT.md` / `milestones/v2.6-phases/`. — v2.6
@@ -138,7 +169,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-- None
+- v2.10 Realistic Business-Document Examples & Anatomy (Milestone A / `SEED-002`) — realistic example-data library + per-domain `DOMAIN.md` + reader-quality rubric; additive Invoice anatomy upgrade + `Format` public (adapter tier) + `cell_align: :right`; new Payslip + Ticket families; edge-case stress matrix + rubric-gated demos + gallery/docs closure. Requirements defined in `REQUIREMENTS.md`; phases 114–118.
 
 ### Out of Scope
 
@@ -210,6 +241,13 @@ As of v2.7 (2026-06-13), public claims are bounded by checked proof artifacts: p
 | Keep PDF.js evidence advisory and worded as "pinned PDF.js advisory observations" | PDF.js is a browser-family renderer, not a GUI support matrix substitute; Node/npm must never become a core runtime, required CI, or Hex dependency | ✓ Shipped in v2.7 |
 | Re-pair compose section metadata with measured body blocks during pagination | Compose entries are created before measurement, but pagination must use measured heights; block counts let Rendro keep metadata without adding hidden fields to `%Rendro.Block{}` | ✓ Shipped in Phase 89 |
 | Preserve per-section running-region metadata for duplex filters | Region-wide maps cannot represent odd and even header/footer variants targeting the same region; `region_entries` keeps filters per authored section while measured blocks stay deterministic | ✓ Shipped in Phase 90 |
+| Treat C1 as a non-version infrastructure milestone, not a product/library release | CI/CD behavior changed, but `lib/` product behavior and Hex package semantics did not; cutting a release tag would overstate scope | ✓ Shipped in C1 |
+| Use `ci-success` as the sole required merge check while keeping advisory lanes visible | Branch protection needs one stable context; advisory failures should surface maintenance signal without blocking deterministic fast/proof gates | ✓ Shipped in C1 |
+| Keep release preflight strict by default, but let CI's deterministic release proof skip duplicate CI/security audits | Real release/tag preflight must remain comprehensive; PR proof should avoid recursive CI duplication and avoid coupling deterministic proof to flaky advisory network audits | ✓ Shipped in C1 |
+| Keep security dependency audits advisory in PR CI and strict in maintenance/release posture | Dependency advisory checks are valuable but network/advisory-state sensitive; they should not make the required deterministic merge gate red | ✓ Shipped in C1 |
+| Place the example-data loader at `lib/rendro/examples.ex` as `@moduledoc false`, using built-in `JSON.decode!` (never `Jason`) and `Path.safe_relative` guards | The only placement serving tests + `:dev` bench + Livebook + shipped consumers while staying out of `public_api.json`; `Jason` is a dev/test-only transitive dep that would crash prod Hex consumers | ✓ Shipped in Phase 114 (v2.10) |
+| Fixture money as Decimal-safe **strings** (`"79.00"`), never JSON floats; de-quarantine the invoice fixture verbatim first, then normalize money + add S4 brand slot in separate commits | Floats break Decimal determinism; separating the byte-identical move from normalization (Pitfall 6) keeps the bench no-op provable | ✓ Shipped in Phase 114 (v2.10) |
+| Author the reader-quality rubric as an appendable schema-backed manifest (`scores: []` S5 seam); threshold arithmetic (hierarchy=5, core≥4, gates pass) lives only as a test helper, not `lib/` code | Preserves the "no `lib/` product change except the loader" boundary; C's quality-ratchet (Phase 118) appends through the identical schema gate | ✓ Shipped in Phase 114 (v2.10) |
 
 ## Archived Milestone Context
 
@@ -274,30 +312,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-14 after v2.9 milestone*
-y?
-3. Audit Out of Scope -> reasons still valid?
-4. Update Context with current state
-
----
-*Last updated: 2026-06-14 after v2.9 milestone*
-idated? -> Move to Out of Scope with reason
-2. Requirements validated? -> Move to Validated with phase reference
-3. New requirements emerged? -> Add to Active
-4. Decisions to log? -> Add to Key Decisions
-5. "What This Is" still accurate? -> Update if drifted
-
-**After each milestone** (via `/gsd-complete-milestone`):
-1. Full review of all sections
-2. Core Value check -> still the right priority?
-3. Audit Out of Scope -> reasons still valid?
-4. Update Context with current state
-
----
-*Last updated: 2026-06-14 after v2.9 milestone*
-y?
-3. Audit Out of Scope -> reasons still valid?
-4. Update Context with current state
-
----
-*Last updated: 2026-06-14 after v2.9 milestone*
+*Last updated: 2026-07-18 after Phase 117 (Edge-case stress matrix) — v2.10*

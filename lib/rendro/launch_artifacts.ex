@@ -23,12 +23,20 @@ defmodule Rendro.LaunchArtifacts do
     header_fill: {247, 243, 234}
   ]
   @gallery_required_keys ~w(id title recipe_module png_path png_sha256 source_pdf_sha256 page dpi width_px height_px renderer_kind renderer_version alt caption)
+  # S6 (D-13): optional theme/mode/preset seam tags. Intentionally NOT part of
+  # @gallery_required_keys — their absence must never fail the required-keys
+  # contract (older/other readers). When present, each must be null or a string.
+  @gallery_optional_s6_keys ~w(theme mode preset)
   @expected_gallery_dimensions %{
     "invoice" => {794, 1123},
     "branded_invoice" => {794, 1123},
     "statement" => {794, 1123},
     "receipt_report" => {794, 1123},
-    "certificate" => {1123, 794}
+    "certificate" => {1123, 794},
+    "payslip" => {794, 1123},
+    # Ticket renders on native A6 (118-08: Rendro.PageSize gained :a6, 297.64 x 419.53pt)
+    # instead of A4 as its recipe default -> 397x560px at the gallery's 96 DPI.
+    "ticket" => {397, 560}
   }
 
   @readme_start "<!-- rendro-launch-artifacts-start -->"
@@ -66,8 +74,8 @@ defmodule Rendro.LaunchArtifacts do
       asset_name: :gallery_statement,
       fit: {320, 452},
       alt:
-        "Rendered account statement PDF showing transaction rows, running balances, and Page 1 of 2 footer.",
-      caption: "Multi-page statement with carried-forward balances and running page numbers."
+        "Rendered account statement PDF showing dated transaction rows, signed amounts, and a page-numbered footer.",
+      caption: "Account statement with opening/closing balances and per-page numbering."
     },
     %{
       id: "receipt_report",
@@ -77,8 +85,8 @@ defmodule Rendro.LaunchArtifacts do
       asset_name: :gallery_receipt_report,
       fit: {320, 452},
       alt:
-        "Rendered receipt report PDF showing repeated table header, line items, totals, and Page 1 of 2 footer.",
-      caption: "Receipt recipe scaled into a multi-page tabular report."
+        "Rendered sales receipt PDF showing itemized line items with a subtotal, tax, and total.",
+      caption: "Itemized sales receipt with subtotal, tax, and total through the Receipt recipe."
     },
     %{
       id: "certificate",
@@ -90,6 +98,29 @@ defmodule Rendro.LaunchArtifacts do
       alt:
         "Rendered landscape certificate PDF showing recipient text and geometry-derived keyline border.",
       caption: "Landscape certificate with a Path-backed, geometry-derived border frame."
+    },
+    %{
+      id: "payslip",
+      title: "Payslip",
+      module: Rendro.Recipes.Payslip,
+      png_path: Path.join(@gallery_dir, "payslip.png"),
+      asset_name: :gallery_payslip,
+      fit: {320, 452},
+      alt:
+        "Rendered payslip PDF showing employer and employee details, earnings and deductions, and the net pay figure.",
+      caption:
+        "Payslip with earnings, deductions, year-to-date figures, and a reconciled net pay."
+    },
+    %{
+      id: "ticket",
+      title: "Ticket",
+      module: Rendro.Recipes.Ticket,
+      png_path: Path.join(@gallery_dir, "ticket.png"),
+      asset_name: :gallery_ticket,
+      fit: {320, 452},
+      alt:
+        "Rendered event ticket PDF showing the event title, seat placement grid, and a human-readable reference code.",
+      caption: "Event ticket with a placement grid and a quotable, human-readable reference code."
     }
   ]
 
@@ -163,6 +194,16 @@ defmodule Rendro.LaunchArtifacts do
     |> collect_source_pdf_errors(manifest)
     |> collect_manual_render_errors(manifest)
     |> collect_docs_block_errors(manifest)
+  end
+
+  @doc false
+  # Render-free manifest shape validation only (no source-PDF/manual render, no
+  # file hashing, no docs-block comparison). Exposed so the S6 seam tolerance
+  # (D-13) can be unit-tested without pdfium or on-disk assets. Stays hidden —
+  # the whole module is @moduledoc false.
+  @spec manifest_shape_errors(map()) :: [String.t()]
+  def manifest_shape_errors(manifest) when is_map(manifest) do
+    collect_manifest_shape_errors([], manifest)
   end
 
   @spec read_manifest!() :: map()
@@ -256,33 +297,87 @@ defmodule Rendro.LaunchArtifacts do
   def source_document_for(%{id: id}), do: build_source_document(id)
   def source_document_for(%{"id" => id}), do: build_source_document(id)
 
+  # D-06: every gallery tile sources its document from priv/examples/** through
+  # Rendro.Examples.load!/1 |> Rendro.ExamplesData.transform_<family>/1 |> the
+  # family recipe's document/2. The inline toy *_data/* builders no longer feed
+  # the gallery.
+  @invoice_fixture "invoice/acme-phoenix-saas/invoice.json"
+  @statement_fixture "statement/northwind-ledger-co/statement.json"
+  @receipt_fixture "receipt/harbor-and-oak-cafe/receipt.json"
+  @certificate_fixture "certificate/summit-training-institute/certificate.json"
+  @payslip_fixture "payslip/aurora-live/payslip.json"
+  @ticket_fixture "ticket/aurora-live/ticket.json"
+  # Bounded item slice for the single-page branded-invoice branding showcase.
+  @branded_invoice_item_count 8
+
   defp build_source_document("invoice") do
-    invoice_data()
+    @invoice_fixture
+    |> Rendro.Examples.load!()
+    |> Rendro.ExamplesData.transform_invoice()
     |> Rendro.Recipes.Invoice.document()
     |> apply_launch_table_style()
   end
 
   defp build_source_document("branded_invoice") do
-    branded_invoice_data()
+    data =
+      @invoice_fixture
+      |> Rendro.Examples.load!()
+      |> Rendro.ExamplesData.transform_invoice()
+      |> Map.put(:id, "BR-2026-001")
+      |> Map.put(:brand, %{font_name: :brand_heading, logo_name: :company_logo})
+
+    # The branded-invoice recipe is a single-page branding showcase (logo +
+    # embedded font); its body renders one non-paginating table into a fixed
+    # region. Layer a bounded slice of the same fixture items so the branded
+    # tile stays fixture-sourced (D-06) without overflowing the fixed body —
+    # multi-page pagination is demonstrated by the plain invoice/statement tiles.
+    data = %{data | items: Enum.take(data.items, @branded_invoice_item_count)}
+
+    data
     |> Rendro.Recipes.BrandedInvoice.document()
     |> apply_branded_invoice_launch_header()
     |> apply_launch_table_style()
   end
 
   defp build_source_document("statement") do
-    statement_data(45)
+    @statement_fixture
+    |> Rendro.Examples.load!()
+    |> Rendro.ExamplesData.transform_statement()
     |> Rendro.Recipes.Statement.document()
     |> apply_launch_table_style()
   end
 
   defp build_source_document("receipt_report") do
-    receipt_data(58)
+    @receipt_fixture
+    |> Rendro.Examples.load!()
+    |> Rendro.ExamplesData.transform_receipt()
     |> Rendro.Recipes.Receipt.document()
     |> apply_launch_table_style()
   end
 
   defp build_source_document("certificate") do
-    Rendro.Recipes.Certificate.document(certificate_data(), border: true)
+    data =
+      @certificate_fixture
+      |> Rendro.Examples.load!()
+      |> Rendro.ExamplesData.transform_certificate()
+
+    Rendro.Recipes.Certificate.document(data, border: true)
+    |> apply_certificate_body_wrap()
+  end
+
+  defp build_source_document("payslip") do
+    @payslip_fixture
+    |> Rendro.Examples.load!()
+    |> Rendro.ExamplesData.transform_payslip()
+    |> Rendro.Recipes.Payslip.document()
+  end
+
+  defp build_source_document("ticket") do
+    @ticket_fixture
+    |> Rendro.Examples.load!()
+    |> Rendro.ExamplesData.transform_ticket()
+    |> Rendro.Recipes.Ticket.document()
+    |> apply_ticket_terms_wrap()
   end
 
   @spec render_manual_pdf() :: {:ok, binary()} | {:error, term()}
@@ -301,6 +396,64 @@ defmodule Rendro.LaunchArtifacts do
   defp apply_branded_invoice_launch_header(%Document{} = doc) do
     %Document{doc | sections: Enum.map(doc.sections, &style_branded_invoice_header/1)}
   end
+
+  # Several recipes emit long paragraph text (certificate body statement, ticket
+  # fine-print terms) as a single unbounded text block with no wrap width. That
+  # fit the short toy fixtures but overflows the region horizontally with the
+  # realistic multi-clause fixture text. Constrain each flow text block in the
+  # named section to its region width so long lines wrap instead of running off
+  # the page. Kept here as a launch-only post-process (mirroring
+  # apply_launch_table_style/1) rather than in the shared recipes, whose byte
+  # goldens must stay untouched.
+  defp apply_certificate_body_wrap(%Document{} = doc),
+    do: wrap_section_text_to_region(doc, :certificate_body, :body)
+
+  defp apply_ticket_terms_wrap(%Document{} = doc),
+    do: wrap_section_text_to_region(doc, :ticket_terms, :terms)
+
+  defp wrap_section_text_to_region(%Document{} = doc, section_name, region_name) do
+    case region_width(doc, region_name) do
+      nil ->
+        doc
+
+      width ->
+        %Document{
+          doc
+          | sections: Enum.map(doc.sections, &wrap_named_section(&1, section_name, width))
+        }
+    end
+  end
+
+  defp region_width(%Document{page_templates: templates, page_template: name}, region_name) do
+    with %Rendro.PageTemplate{regions: regions} <-
+           Enum.find(templates, &(&1.name == name)),
+         %Rendro.Region{width: width} when is_number(width) <-
+           Enum.find(regions, &(&1.name == region_name)) do
+      width
+    else
+      _ -> nil
+    end
+  end
+
+  defp wrap_named_section(%Rendro.Section{name: name, content: content} = section, name, width) do
+    %Rendro.Section{section | content: Enum.map(content, &constrain_text_width(&1, width))}
+  end
+
+  defp wrap_named_section(other, _name, _width), do: other
+
+  # 118-08 gap-closure: a block that ALREADY carries an explicit width (e.g.
+  # Certificate's centered/width-constrained title, recipient, and body-
+  # paragraph blocks, added in 118-08 for SHOW-01) must be left alone —
+  # overwriting it to the full region width would strand its hand-computed
+  # centering `x` offset, producing `x + width > region width`
+  # (:content_overflow). Only a block with NO width (still `nil`, the
+  # "unbounded text block" this launch-only post-process was written for)
+  # gets constrained.
+  defp constrain_text_width(%Rendro.Block{content: %Rendro.Text{}, width: nil} = block, width) do
+    %Rendro.Block{block | width: width}
+  end
+
+  defp constrain_text_width(other, _width), do: other
 
   defp style_branded_invoice_header(%Rendro.Section{name: :branded_invoice_header} = section) do
     %Rendro.Section{section | content: Enum.map(section.content, &use_default_header_font/1)}
@@ -352,7 +505,16 @@ defmodule Rendro.LaunchArtifacts do
              "renderer_kind" => @renderer_kind,
              "renderer_version" => renderer_version,
              "alt" => spec.alt,
-             "caption" => spec.caption
+             "caption" => spec.caption,
+             # S6 (D-13): optional theme/mode/preset seam tags. Explicit null for
+             # theme/preset means "seam present, not yet populated"; "light" is
+             # the one defensible non-null default for mode. These keys are
+             # deliberately absent from @gallery_required_keys so a manifest
+             # written by an older/other generator without them never fails the
+             # required-keys contract.
+             "theme" => nil,
+             "mode" => "light",
+             "preset" => nil
            }}
         else
           {:error, reason} -> {:error, {spec.id, reason}}
@@ -497,9 +659,30 @@ defmodule Rendro.LaunchArtifacts do
             {entry["width_px"], entry["height_px"]} == expected_dimensions,
           "gallery #{label} dimensions must be #{format_dimensions(expected_dimensions)}"
         )
+        |> Enum.concat(s6_seam_errors(label, entry))
 
       entry ->
         ["gallery entry must be a map: #{inspect(entry)}"]
+    end)
+  end
+
+  # S6 (D-13): tolerant optional-key check. An entry that omits the seam keys
+  # entirely produces NO errors (absence is valid); a present key must be null
+  # or a string. This keeps older/other manifests passing while validating the
+  # seam shape when populated.
+  defp s6_seam_errors(label, entry) do
+    Enum.flat_map(@gallery_optional_s6_keys, fn key ->
+      if Map.has_key?(entry, key) do
+        value = entry[key]
+
+        if is_nil(value) or is_binary(value) do
+          []
+        else
+          ["gallery #{label} #{key} must be null or a string when present"]
+        end
+      else
+        []
+      end
     end)
   end
 
@@ -835,73 +1018,6 @@ defmodule Rendro.LaunchArtifacts do
     )
   end
 
-  defp invoice_data do
-    %{
-      id: "INV-2026-001",
-      date: ~D[2026-06-11],
-      items: [
-        %{name: "Implementation Sprint", qty: 2, price: 2400},
-        %{name: "Support Retainer", qty: 1, price: 800},
-        %{name: "Validation Report", qty: 1, price: 450}
-      ]
-    }
-  end
-
-  defp branded_invoice_data do
-    invoice_data()
-    |> Map.put(:id, "BR-2026-001")
-    |> Map.put(:brand, %{font_name: :brand_heading, logo_name: :company_logo})
-  end
-
-  defp statement_data(n) do
-    opening = Decimal.new("1000.00")
-
-    lines =
-      for i <- 1..n do
-        amount = if rem(i, 2) == 1, do: Decimal.new("100.00"), else: Decimal.new("-50.00")
-
-        %{
-          date: Date.add(~D[2026-05-01], i - 1),
-          description: "Transaction #{i}",
-          amount: amount
-        }
-      end
-
-    %{
-      period: %{from: ~D[2026-05-01], to: ~D[2026-05-31]},
-      account: %{name: "Acme Corp"},
-      opening_balance: opening,
-      lines: lines
-    }
-  end
-
-  defp receipt_data(n) do
-    lines =
-      for i <- 1..n do
-        %{description: "Report line #{i}", amount: Decimal.new("10.00")}
-      end
-
-    subtotal = Decimal.mult(Decimal.new("10.00"), Decimal.new(n))
-
-    %{
-      title: "Payment Receipt",
-      date: ~D[2026-06-11],
-      customer: %{name: "Acme Corp"},
-      lines: lines,
-      totals: %{subtotal: subtotal, total: subtotal}
-    }
-  end
-
-  defp certificate_data do
-    %{
-      title: "Certificate of Completion",
-      recipient: "Jane Smith",
-      body: "For shipping deterministic PDFs from composable Elixir data.",
-      date: ~D[2026-06-11],
-      seal_line: "Generated by Rendro"
-    }
-  end
-
   defp split_results(results) do
     Enum.reduce_while(results, {:ok, []}, fn
       {:ok, value}, {:ok, acc} -> {:cont, {:ok, acc ++ [value]}}
@@ -954,7 +1070,12 @@ defmodule Rendro.LaunchArtifacts do
       {"renderer_kind", entry["renderer_kind"]},
       {"renderer_version", entry["renderer_version"]},
       {"alt", entry["alt"]},
-      {"caption", entry["caption"]}
+      {"caption", entry["caption"]},
+      # S6 (D-13): appended after caption to keep a stable, deterministic key
+      # order. Optional seam tags — see build_gallery_entries/1.
+      {"theme", entry["theme"]},
+      {"mode", entry["mode"]},
+      {"preset", entry["preset"]}
     ])
   end
 

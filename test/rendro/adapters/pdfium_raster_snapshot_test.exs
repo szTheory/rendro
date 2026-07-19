@@ -2,6 +2,8 @@ defmodule Rendro.Adapters.PdfiumRasterSnapshotTest do
   use ExUnit.Case, async: false
 
   alias Rendro.Adapters.Pdfium
+  alias Rendro.Test.EdgeFixtures
+  alias Rendro.Test.Golden
 
   @fixture_name "forms_support_fixture"
   @fixture_path "test/fixtures/forms_support_fixture.pdf"
@@ -33,6 +35,103 @@ defmodule Rendro.Adapters.PdfiumRasterSnapshotTest do
     assert length(pngs) == 1
 
     assert_or_bless(@fixture_name, pngs)
+  end
+
+  # ---------------------------------------------------------------------------
+  # D-10 curated raster fixtures (Plan 117-06) — added IN PLACE to this exact
+  # file so the CI raster job's hardcoded single-file path
+  # (`mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs`)
+  # discovers them with zero .github/workflows/ci.yml edit (RESEARCH Landmine 1).
+  # Each builds its PDF via Rendro (EdgeFixtures), proves two-run byte-determinism
+  # (Golden.assert_deterministic!/1) before rasterization, then reuses the file's
+  # existing private assert_or_bless/2. Refs at priv/raster_refs/<fixture>/page_N
+  # are blessed once in the pinned CI container (D-11) — not authored here, so
+  # these assert-only tests fail at the missing-ref stage until that CI run, just
+  # like the forms_support_fixture case does today.
+  # ---------------------------------------------------------------------------
+
+  # D-10a combined fixtures: one multi-page render simultaneously proves
+  # pagination + 60+ line items + odd/even running-content parity.
+  @tag raster_snapshot: true
+  test "edge_invoice_pagination_60plus_odd_even renders to committed golden PNG hashes" do
+    doc = EdgeFixtures.document(:invoice, :odd_even_running_content)
+    pdf = Golden.assert_deterministic!(doc)
+
+    assert {:ok, pngs} = Pdfium.render(pdf, dpi: 150)
+    assert length(pngs) >= 2
+
+    assert_or_bless("edge_invoice_pagination_60plus_odd_even", pngs)
+  end
+
+  @tag raster_snapshot: true
+  test "edge_statement_pagination_60plus_odd_even renders to committed golden PNG hashes" do
+    doc = EdgeFixtures.document(:statement, :odd_even_running_content)
+    pdf = Golden.assert_deterministic!(doc)
+
+    assert {:ok, pngs} = Pdfium.render(pdf, dpi: 150)
+    assert length(pngs) >= 2
+
+    assert_or_bless("edge_statement_pagination_60plus_odd_even", pngs)
+  end
+
+  @tag raster_snapshot: true
+  test "edge_payslip_pagination_60plus_odd_even renders to committed golden PNG hashes" do
+    doc = EdgeFixtures.document(:payslip, :odd_even_running_content)
+    pdf = Golden.assert_deterministic!(doc)
+
+    assert {:ok, pngs} = Pdfium.render(pdf, dpi: 150)
+    assert length(pngs) >= 2
+
+    assert_or_bless("edge_payslip_pagination_60plus_odd_even", pngs)
+  end
+
+  # A4/Letter geometry pair: both renders share the SAME underlying Certificate
+  # data (EdgeFixtures.build(:certificate, :page_size_a4_letter)), varying only
+  # document/2's opts. The A4 half calls Certificate.document/2 with NO opts
+  # (its default page geometry is A4); the Letter half passes
+  # EdgeFixtures.opts(:certificate, :page_size_a4_letter) (page_size: :us_letter).
+  # The two produce DIFFERENT PNG byte sequences (different page pixel dimensions
+  # at 150 DPI) — the geometry claim a byte-content-stream diff cannot verify.
+  @tag raster_snapshot: true
+  test "edge_certificate_a4 renders to committed golden PNG hashes" do
+    data = EdgeFixtures.build(:certificate, :page_size_a4_letter)
+    doc = Rendro.Recipes.Certificate.document(data)
+    pdf = Golden.assert_deterministic!(doc)
+
+    assert {:ok, pngs} = Pdfium.render(pdf, dpi: 150)
+
+    assert_or_bless("edge_certificate_a4", pngs)
+  end
+
+  @tag raster_snapshot: true
+  test "edge_certificate_us_letter renders to committed golden PNG hashes" do
+    data = EdgeFixtures.build(:certificate, :page_size_a4_letter)
+
+    doc =
+      Rendro.Recipes.Certificate.document(
+        data,
+        EdgeFixtures.opts(:certificate, :page_size_a4_letter)
+      )
+
+    pdf = Golden.assert_deterministic!(doc)
+
+    assert {:ok, pngs} = Pdfium.render(pdf, dpi: 150)
+
+    assert_or_bless("edge_certificate_us_letter", pngs)
+  end
+
+  # Extreme text wrap: reuses the EXACT EdgeFixtures.document(:invoice, :text_wrap)
+  # call the byte-golden matrix (117-04) uses for that cell — Invoice's narrow
+  # {:share, 1} item-name column forces multi-line wrapping whose glyph placement
+  # only a raster snapshot can humanly verify.
+  @tag raster_snapshot: true
+  test "edge_invoice_extreme_wrap renders to committed golden PNG hashes" do
+    doc = EdgeFixtures.document(:invoice, :text_wrap)
+    pdf = Golden.assert_deterministic!(doc)
+
+    assert {:ok, pngs} = Pdfium.render(pdf, dpi: 150)
+
+    assert_or_bless("edge_invoice_extreme_wrap", pngs)
   end
 
   # ---------------------------------------------------------------------------
