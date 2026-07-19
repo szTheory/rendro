@@ -165,6 +165,17 @@ defmodule Rendro.Recipes.ReceiptTest do
       assert total_block.content.content =~ "$10.80"
       assert total_block.content.size > minor_block.content.size
     end
+
+    test "118-08: a receipt with :merchant (name + address) renders without :content_overflow" do
+      data =
+        fixture_data(4,
+          merchant: %{name: "Harbor & Oak Cafe", address: "214 Wharf Street, Portland, ME 04101"}
+        )
+
+      doc = Receipt.document(data)
+      assert {:ok, pdf} = Rendro.render(doc)
+      assert is_binary(pdf)
+    end
   end
 
   # ---------------------------------------------------------------------------

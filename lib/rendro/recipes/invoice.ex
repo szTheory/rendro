@@ -35,10 +35,15 @@ defmodule Rendro.Recipes.Invoice do
   @page_height 841.89
   @margin 72
   @content_width @page_width - 2 * @margin
-  @header_height 56
+  # FROZEN toy default (INV-01) — the pre-Phase-115 header region height.
+  # A toy call (no :issuer/:customer/:due_date/:terms) always gets exactly
+  # this height, keeping @toy_golden_sha256 byte-identical. 118-08
+  # gap-closure: an invoice with anatomy fields present needs MORE header
+  # room than the frozen 2-line (title+date) toy path was ever sized for —
+  # see computed_header_height/1 below, which grows the header only when
+  # those optional fields are actually present in `data`.
+  @default_header_height 56
   @footer_height 24
-  @body_y @margin + @header_height
-  @body_height @page_height - 2 * @margin - @header_height - @footer_height
   @footer_y @page_height - @margin - @footer_height
 
   # Default table column rules: Item | Qty | Price.
@@ -68,6 +73,14 @@ defmodule Rendro.Recipes.Invoice do
   All options are forwarded to `%Rendro.PageTemplate{}` as keyword overrides.
   The `name` defaults to `:invoice`.
 
+  118-08: `:header_height` sizes the `:header` region (default: the frozen
+  56pt toy height). `document/2` computes and threads a data-appropriate
+  value automatically (see `computed_header_height/1`) — callers using the
+  escape hatch (`page_template/1` + `sections/2` directly, without
+  `document/2`) with anatomy fields present in `data` (`:issuer`,
+  `:customer`, `:due_date`, `:terms`) should pass the SAME `:header_height`
+  to both calls, or the header content may overflow its region.
+
   ## Examples
 
       iex> Rendro.Recipes.Invoice.page_template()
@@ -79,6 +92,10 @@ defmodule Rendro.Recipes.Invoice do
   """
   @spec page_template(keyword()) :: Rendro.PageTemplate.t()
   def page_template(opts \\ []) do
+    header_height = Keyword.get(opts, :header_height, @default_header_height)
+    body_y = @margin + header_height
+    body_height = @page_height - 2 * @margin - header_height - @footer_height
+
     defaults = [
       name: :invoice,
       regions: [
@@ -89,16 +106,16 @@ defmodule Rendro.Recipes.Invoice do
           x: @margin,
           y: @margin,
           width: @content_width,
-          height: @header_height
+          height: header_height
         ),
         Rendro.region(
           name: :body,
           role: :body,
           anchor: :flow,
           x: @margin,
-          y: @body_y,
+          y: body_y,
           width: @content_width,
-          height: @body_height
+          height: body_height
         ),
         Rendro.region(
           name: :footer,
@@ -113,9 +130,10 @@ defmodule Rendro.Recipes.Invoice do
     ]
 
     # page_template/1 only understands PageTemplate struct keys. Recipe-level
-    # opts (:formatters, :labels, :palette, ...) are consumed by the section
-    # builders via opts, not here — filter them out so they thread through to
-    # sections/2 / palette/1 instead of reaching struct!/2 and raising KeyError.
+    # opts (:formatters, :labels, :palette, :header_height, ...) are consumed
+    # by the section builders / this function locally, not by struct!/2 --
+    # filter them out so they thread through to sections/2 / palette/1
+    # instead of reaching struct!/2 and raising KeyError.
     template_opts =
       Keyword.take(opts, [
         :name,
@@ -172,6 +190,11 @@ defmodule Rendro.Recipes.Invoice do
   @spec document(map(), keyword()) :: Rendro.Document.t()
   def document(data, opts \\ []) do
     validate_data!(data)
+    # 118-08: thread ONE resolved :header_height through both page_template/1
+    # and sections/2 so the header region is always tall enough for
+    # whichever anatomy fields `data` actually carries (never just the
+    # frozen 2-line toy height) — see computed_header_height/1.
+    opts = Keyword.put_new(opts, :header_height, computed_header_height(data))
     template = page_template(opts)
     secs = sections(data, opts)
 
@@ -239,7 +262,13 @@ defmodule Rendro.Recipes.Invoice do
     {header_h, row_heights} =
       Rendro.measure_rows(formatted_rows, @content_width, doc_for_measure, table_opts)
 
-    capacity = @body_height - @header_height - @footer_height
+    # 118-08: resolve the SAME header height page_template/1 uses for this
+    # call (explicit opts override, or computed_header_height/1's
+    # data-derived default) so body capacity accounting matches the actual
+    # rendered header region — never the stale frozen constant.
+    resolved_header_height = Keyword.get(opts, :header_height, computed_header_height(data))
+    body_height = @page_height - 2 * @margin - resolved_header_height - @footer_height
+    capacity = body_height - resolved_header_height - @footer_height
 
     # INV-03 "kept with the last rows" — the ONE place Invoice must exceed a
     # pure Receipt copy (Receipt appends totals without reserving space, so
@@ -287,6 +316,28 @@ defmodule Rendro.Recipes.Invoice do
   end
 
   defp totals_reserved_height(_data), do: 0
+
+  # 118-08 gap-closure (SHOW-01): the frozen INV-01 toy header (56pt) was
+  # sized for exactly 2 lines (title + date) — a real invoice with issuer/
+  # customer/due_date/terms present needs a taller header region or its
+  # content raises :content_overflow (discovered rendering the enriched
+  # acme-phoenix-saas fixture end-to-end). Grows the header ONLY when the
+  # corresponding optional field is present, so a toy call (none present)
+  # still computes exactly @default_header_height — byte-identical geometry,
+  # preserving INV-01. Conservative flat per-field budgets (not exact text
+  # measurement) mirror totals_reserved_height/1's idiom: issuer/customer
+  # can each render 2 lines (name + address), due_date/terms are always 1.
+  @spec computed_header_height(map()) :: number()
+  defp computed_header_height(data) do
+    @default_header_height
+    |> add_if_present(Map.get(data, :issuer), 30)
+    |> add_if_present(Map.get(data, :customer), 30)
+    |> add_if_present(Map.get(data, :due_date), 14)
+    |> add_if_present(Map.get(data, :terms), 14)
+  end
+
+  defp add_if_present(height, nil, _extra), do: height
+  defp add_if_present(height, _present, extra), do: height + extra
 
   # 118-08: legacy bare-number :price renders unchanged ("$#{price}", the
   # frozen INV-01 toy path); a %Decimal{} :price is formatted via

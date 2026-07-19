@@ -381,6 +381,24 @@ defmodule Rendro.Recipes.InvoiceTest do
       assert total_block.content.size > minor_block.content.size
     end
 
+    test "118-08: a fully-populated invoice (issuer+customer+due_date+terms+totals) renders without :content_overflow" do
+      data =
+        sample_data()
+        |> Map.put(:issuer, %{name: "Rendro Systems", address: "1 Foundry Way, Raleigh, NC"})
+        |> Map.put(:customer, %{name: "Acme Phoenix SaaS", address: "200 Market St, Denver, CO"})
+        |> Map.put(:due_date, ~D[2026-05-30])
+        |> Map.put(:terms, "Net 30")
+        |> Map.put(:totals, %{
+          subtotal: Decimal.new("1100"),
+          tax: Decimal.new("88"),
+          total: Decimal.new("1188")
+        })
+
+      doc = Invoice.document(data)
+      assert {:ok, pdf} = Rendro.render(doc)
+      assert is_binary(pdf)
+    end
+
     test "mismatched :totals.subtotal raises ArgumentError naming Supplied and Derived" do
       data = Map.put(sample_data(), :totals, %{subtotal: Decimal.new("999.00")})
 
