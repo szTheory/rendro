@@ -9,9 +9,30 @@ defmodule Rendro.DocsContract.DomainMdContractTest do
   ]
 
   describe "DOMAIN.md structural contract (RUB-01)" do
-    test "at least one domain DOMAIN.md exists" do
-      assert Path.wildcard("priv/examples/*/DOMAIN.md") != [],
-             "expected at least one priv/examples/*/DOMAIN.md, found none"
+    test "every demonstrated domain has a co-located DOMAIN.md (D-04)" do
+      # Derive the demonstrated-domain set from the fixture directories on disk
+      # (priv/examples/<domain>/<business>/<domain>.json) so future domains
+      # inherit the contract automatically — never a hardcoded family list.
+      demonstrated_domains =
+        "priv/examples/*/*/*.json"
+        |> Path.wildcard()
+        |> Enum.map(fn path ->
+          path |> Path.relative_to("priv/examples") |> Path.split() |> hd()
+        end)
+        |> Enum.uniq()
+        |> Enum.sort()
+
+      # Non-vacuous guard: the derivation must actually find demonstrated
+      # domains, otherwise the per-domain assertion below would pass trivially.
+      assert demonstrated_domains != [],
+             "expected at least one demonstrated domain under priv/examples/*/*/*.json, found none"
+
+      for domain <- demonstrated_domains do
+        path = Path.join(["priv/examples", domain, "DOMAIN.md"])
+
+        assert File.exists?(path),
+               "demonstrated domain #{inspect(domain)} is missing its co-located DOMAIN.md (expected #{path})"
+      end
     end
 
     test "every DOMAIN.md carries all four required section headings" do
