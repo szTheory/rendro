@@ -87,7 +87,8 @@ defmodule Rendro.DocsContract.PublicApiContractTest do
         Rendro.PDF.FontSubsetter,
         Rendro.Text.Bidi,
         Rendro.Audit,
-        Rendro.Examples
+        Rendro.Examples,
+        Rendro.ExamplesData
       ]
 
       for module <- hidden_modules do
