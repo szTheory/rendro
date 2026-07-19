@@ -2,10 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.10
 milestone_name: Realistic Business-Document Examples & Anatomy
+current_phase: 118
+current_phase_name: rubric-gated-demonstration-set-gallery-docs-closure
 status: executing
 stopped_at: Phase 118 context gathered
-last_updated: "2026-07-19T17:32:09.022Z"
+last_updated: "2026-07-19T17:58:47.956Z"
 last_activity: 2026-07-19
+last_activity_desc: Phase 118 planning complete
 progress:
   total_phases: 5
   completed_phases: 5
@@ -27,7 +30,7 @@ progress:
 Phase: 118 (rubric-gated-demonstration-set-gallery-docs-closure) — EXECUTING
 Plan: 6 of 7
 Status: Ready to execute
-Last activity: 2026-07-19
+Last activity: 2026-07-19 — Phase 118 planning complete
 
 Progress: [██████████] 100%
 
@@ -88,6 +91,7 @@ Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
 - [Phase 118]: Phase 118 paused at 4/7: Wave 4 (118-05 gallery re-bless + 118-06 rubric scoring) is container-gated (pinned pdfium absent locally) with blocking human-verify checkpoints; user runs these in the pinned CI/container env and authorizes the D-08 re-bless + rubric sign-off, then resume at Wave 5 (118-07).
 - [Phase 118]: 118-05 committed (gallery re-bless, 7 tiles, determinism-proven). 118-06 PAUSED per D-11: rendered demos do not honestly clear the rubric gate (invoice under-built — transform_invoice drops parties/totals; others don't make key fact dominant). No scores committed. See 118-06-FINDINGS.md. User to decide remediation vs accept gaps.
 - [Phase 118-07]: Encoded the 118-06 honesty ceiling as machine-checked data (demonstration_set.boundaries disclaim rubric-pass/visual-polish/accessibility-conformance) plus a D-14 tripwire guarding all docs against accessibility overclaim
+- [Phase 118]: Phase 118 verification: gaps_found 3/4. SHOW-02/03/04 met; SHOW-01 (rubric-PASSING demos) is a gap — all 6 honestly scored passed:false (D-11). Phase NOT complete. Next: /gsd-plan-phase 118 --gaps to plan demo-quality remediation (transform_invoice enrichment + make key facts dominant); see 118-06-FINDINGS.md.
 
 ### Blockers / Open Questions
 
