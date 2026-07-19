@@ -244,6 +244,105 @@ defmodule Rendro.Recipes.TicketTest do
   end
 
   # ---------------------------------------------------------------------------
+  # Stub composition: code box, reference, perforation, PNG fit-contain,
+  # overflow, byte-identity (Task 3)
+  # ---------------------------------------------------------------------------
+
+  describe "stub_section/2 — code box, reference, perforation (D-05/D-06/D-07/D-09)" do
+    test "no-image: PDF text stream contains the upper-cased reference and the reference caption" do
+      doc = Ticket.document(fixture_data())
+      assert {:ok, pdf} = Rendro.render(doc)
+
+      assert pdf =~ "(AUR-88213-GA)"
+      assert pdf =~ "(Reference)"
+    end
+
+    test "no-image: the stub region's Path ops are exactly the perforation line + the one code-box rounded_rect (no faux barcode, D-07)" do
+      sections = Ticket.sections(fixture_data())
+      stub_section = Enum.find(sections, &(&1.region == :stub))
+
+      path_blocks =
+        Enum.filter(stub_section.content, &match?(%Rendro.Block{content: %Rendro.Path{}}, &1))
+
+      assert length(path_blocks) == 2
+
+      all_ops = Enum.flat_map(path_blocks, fn %{content: %Rendro.Path{ops: ops}} -> ops end)
+
+      rounded_rects = Enum.filter(all_ops, &match?({:rounded_rect, _, _, _, _, _}, &1))
+      assert length(rounded_rects) == 1
+
+      # No additional {:rect, ...} ops -- would signal a hand-drawn faux
+      # barcode/QR stripe pattern rather than the single bordered code box.
+      refute Enum.any?(all_ops, &match?({:rect, _, _, _, _}, &1))
+    end
+
+    test "code box is >= 100x100pt at the A4-default geometry (D-05), derived not hardcoded" do
+      sections = Ticket.sections(fixture_data())
+      stub_section = Enum.find(sections, &(&1.region == :stub))
+
+      [{:rounded_rect, _x, _y, w, h, _radius}] =
+        stub_section.content
+        |> Enum.flat_map(fn
+          %Rendro.Block{content: %Rendro.Path{ops: ops}} -> ops
+          _other -> []
+        end)
+        |> Enum.filter(&match?({:rounded_rect, _, _, _, _, _}, &1))
+
+      assert w >= 100
+      assert h >= 100
+    end
+
+    test "PNG-supplied: code.reference STILL appears in the text stream (D-06 always-on)" do
+      data =
+        Map.put(fixture_data(), :code, %{
+          reference: "AUR-1",
+          image: {:binary, @valid_png_bytes}
+        })
+
+      doc = Ticket.document(data)
+      assert {:ok, pdf} = Rendro.render(doc)
+      assert pdf =~ "(AUR-1)"
+    end
+
+    test "code.image: nil is byte-identical to code.image omitted (D-08)" do
+      data_with_nil = Map.put(fixture_data(), :code, %{reference: "AUR-88213-GA", image: nil})
+      data_omitted = fixture_data()
+
+      doc_with_nil = Ticket.document(data_with_nil)
+      doc_omitted = Ticket.document(data_omitted)
+
+      assert {:ok, pdf_with_nil} = Rendro.render(doc_with_nil, deterministic: true)
+      assert {:ok, pdf_omitted} = Rendro.render(doc_omitted, deterministic: true)
+
+      assert pdf_with_nil == pdf_omitted
+    end
+
+    test "a placement value that cannot fit the grid table's narrow column at 22pt raises :content_overflow, never a crash" do
+      data =
+        fixture_data(
+          placement: [
+            %{label: "Section", value: String.duplicate("X", 40)},
+            %{label: "Row", value: "H"},
+            %{label: "Seat", value: "24"}
+          ]
+        )
+
+      doc = Ticket.document(data)
+
+      assert {:error, %Rendro.Error{} = error} = Rendro.render(doc)
+      assert error.stage == :paginate
+      assert error.reason == :content_overflow
+    end
+
+    test "two deterministic renders of the same fixture are byte-identical" do
+      doc = Ticket.document(fixture_data())
+      assert {:ok, pdf1} = Rendro.render(doc, deterministic: true)
+      assert {:ok, pdf2} = Rendro.render(doc, deterministic: true)
+      assert pdf1 == pdf2
+    end
+  end
+
+  # ---------------------------------------------------------------------------
   # Recursive %Rendro.Text{} size collector — a table's header/rows/cells may
   # wrap Rendro.Block/Rendro.Cell content, or be plain (unmeasured) strings,
   # per lib/rendro/pipeline/measure.ex's normalize_cells/1. Mirrors the
