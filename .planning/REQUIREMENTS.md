@@ -37,7 +37,7 @@ Legend: `[ ]` in scope for this milestone.
 ## New Families: Payslip & Ticket (FAM)
 
 - [x] **FAM-01**: `Rendro.Recipes.Payslip` renders a production-grade payslip on the 3-rung pattern (`document/2` / `page_template/1` / `sections/2`) with net pay as the visual anchor, side-by-side earnings/deductions, and YTD totals; jurisdiction differences (e.g. PAYE/NI vs FICA/401k) are label **data**, not engine logic.
-- [ ] **FAM-02**: `Rendro.Recipes.Ticket` renders a fixed-box ticket/boarding-pass on the 3-rung pattern with seat/gate/section as the anchor, a boxed code-area + human-readable reference + perforation line, and an optional caller-supplied PNG code image; content overflow raises a typed error.
+- [x] **FAM-02**: `Rendro.Recipes.Ticket` renders a fixed-box ticket/boarding-pass on the 3-rung pattern with seat/gate/section as the anchor, a boxed code-area + human-readable reference + perforation line, and an optional caller-supplied PNG code image; content overflow raises a typed error.
 - [x] **FAM-03**: Both new recipes validate input as errors-as-product (instructive `ArgumentError`), read colors via the `palette(opts)` seam (S1), and are registered in `priv/public_api.json` (adapter tier) and `priv/support_matrix.json`.
 
 ## Edge-Case Stress Matrix (EDGE)
@@ -95,7 +95,7 @@ Every REQ-ID maps to exactly one phase. Coverage: **26/26 mapped**, no orphans, 
 | INV-06 | Phase 115 | Complete |
 | INV-07 | Phase 115 | Complete |
 | FAM-01 | Phase 116 | Complete |
-| FAM-02 | Phase 116 | Pending |
+| FAM-02 | Phase 116 | Complete |
 | FAM-03 | Phase 116 | Complete |
 | EDGE-01 | Phase 117 | Pending |
 | EDGE-02 | Phase 117 | Pending |
