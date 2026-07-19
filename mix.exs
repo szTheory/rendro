@@ -21,7 +21,7 @@ defmodule Rendro.MixProject do
       homepage_url: @source_url,
       docs: docs(),
       dialyzer: [
-        plt_add_apps: [:mix, :stream_data, :jsv, :yaml_elixir, :livebook],
+        plt_add_apps: [:ex_unit, :mix, :stream_data, :jsv, :yaml_elixir, :livebook],
         plt_core_path: "priv/plts",
         plt_local_path: "priv/plts"
       ]
