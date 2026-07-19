@@ -4,10 +4,19 @@ defmodule Rendro.Recipes.TicketTest do
   alias Rendro.Recipes.Ticket
 
   # 2x2 PNG -- reused verbatim from test/rendro/image_parser_test.exs, a
-  # proven-valid fixture the codebase already trusts for ImageParser.parse/1.
+  # proven-valid fixture the codebase already trusts for ImageParser.parse/1
+  # HEADER-ONLY validation (validate_data!/1's D-10 pre-check never fully
+  # decodes pixel data, only the signature/IHDR chunk).
   @valid_png_bytes Base.decode64!(
                       "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVQIW2NkYGD4z8DAwMgAI0AMADjKAu09+3WTAAAAAElFTkSuQmCC"
                     )
+
+  # A real, fully-decodable PNG (used by test/rendro/pipeline/render_test.exs
+  # for the same reason) -- needed wherever a test actually renders a
+  # document with an embedded image, since the writer's PDF.PNG chunk
+  # decoder requires a genuinely well-formed IDAT stream that the minimal
+  # @valid_png_bytes fixture above does not provide.
+  @embeddable_png_path "priv/branded/images/rendro-logo.png"
 
   # ---------------------------------------------------------------------------
   # Test Fixture Helpers
@@ -224,7 +233,7 @@ defmodule Rendro.Recipes.TicketTest do
       data =
         Map.put(fixture_data(), :code, %{
           reference: "AUR-1",
-          image: {:binary, @valid_png_bytes}
+          image: {:path, @embeddable_png_path}
         })
 
       doc = Ticket.document(data)
@@ -296,7 +305,7 @@ defmodule Rendro.Recipes.TicketTest do
       data =
         Map.put(fixture_data(), :code, %{
           reference: "AUR-1",
-          image: {:binary, @valid_png_bytes}
+          image: {:path, @embeddable_png_path}
         })
 
       doc = Ticket.document(data)

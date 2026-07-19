@@ -8,9 +8,7 @@ defmodule Rendro.Recipes.TicketByteIdentityTest do
   # render of the SAME fixed, deterministic fixture must keep hashing to
   # this exact value. Changing this hash is a defect, not a golden-file
   # refresh, unless a human explicitly re-authorizes a new baseline.
-  # Placeholder pending Task 3 GREEN implementation -- recomputed once
-  # stub_section/2's final composition lands.
-  @toy_golden_sha256 "0000000000000000000000000000000000000000000000000000000000000000"
+  @toy_golden_sha256 "97643571d8f29f3e389bf35a25718b804a6e302491529dc6928cd540fb172d95"
 
   # Fixed, deterministic minimal fixture (no anatomy variance) -- Aurora
   # Live, one 3-cell placement grid, no image, no subtitle/terms -- so the

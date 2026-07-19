@@ -294,15 +294,106 @@ defmodule Rendro.Recipes.Ticket do
     end
   end
 
-  # Task-2 stub -- replaced by Task 3's D-05/D-06/D-07/D-08/D-09 stub
-  # composition (code box, always-on reference, optional PNG, perforation).
-  defp stub_section(_data, _opts) do
-    Rendro.section(name: :ticket_stub, region: :stub, content: [])
+  # D-05/D-06/D-07/D-08/D-09: the stub's code-area composition. Content list
+  # order relies on the VERIFIED zero-height overlay mechanic
+  # (paginate.ex:anchor_region_blocks/3 -- a block with explicit height: 0
+  # does not advance the region's shared Y cursor, so the next block starts
+  # at the SAME y, producing a visual overlay). The perforation and code-box
+  # backdrop are both height: 0 so neither displaces the reference/image
+  # content that follows.
+  defp stub_section(data, opts) do
+    colors = palette(opts)
+    lbl = Rendro.Recipes.Pagination.label_resolver(opts, @default_labels)
+    g = geometry(opts)
+
+    box_size = min(g.stub_width, g.band_h) - 2 * @box_pad
+    box_x = (g.stub_width - box_size) / 2
+
+    # D-09: dashed perforation at the stub's own left edge (x=0 relative to
+    # this region = the boundary with :main).
+    perforation =
+      Rendro.path([{:move, 0, 0}, {:line, 0, g.band_h}],
+        stroke: %{color: colors.rule, width: 0.75, dash: [3, 3]},
+        x: 0,
+        y: 0,
+        width: 1,
+        height: 0
+      )
+
+    # D-05: the bordered code box backdrop -- always drawn, >= ~100x100pt at
+    # A4-default geometry (derived, not hardcoded). height: 0 so the box's
+    # own drawn rectangle (real height = box_size, from the :rounded_rect
+    # op's own h argument) does not push subsequent content down.
+    code_box =
+      Rendro.path([{:rounded_rect, box_x, 0, box_size, box_size, 6.0}],
+        stroke: %{color: colors.rule, width: 1.0},
+        x: 0,
+        y: 0,
+        width: box_x + box_size,
+        height: 0
+      )
+
+    image = get_in(data, [:code, :image])
+
+    Rendro.section(
+      name: :ticket_stub,
+      region: :stub,
+      content: [perforation, code_box] ++ code_area_blocks(data, colors, lbl, image, box_x, box_size)
+    )
   end
 
-  # Task-2 stub -- replaced by Task 3's optional fine-print terms content.
-  defp terms_section(_data, _opts) do
-    Rendro.section(name: :ticket_terms, region: :terms, content: [])
+  # D-07: no image -- the box contains ONLY the centered reference (+
+  # optional caption), never a faux barcode/QR stripe pattern. Reference
+  # block(s) start at the SAME y as the box backdrop (height: 0), so they
+  # overlay the box from its top edge.
+  defp code_area_blocks(data, colors, lbl, nil, box_x, _box_size) do
+    reference_blocks(data, colors, lbl, box_x) ++ [present_code_caption(colors, lbl, box_x)]
+  end
+
+  # D-08: image supplied -- fit-contain (aspect-preserving), centered, under
+  # the fixed internal logical name :ticket_code, placed IMMEDIATELY after
+  # the box backdrop. Its measured height (real, per measure.ex's Image
+  # clause) naturally advances the cursor past the box, so the
+  # ALWAYS-VISIBLE reference (D-06) renders AFTER it -- below the image,
+  # never overlaid on top of it.
+  defp code_area_blocks(data, colors, lbl, _image, box_x, box_size) do
+    image_block =
+      Rendro.Component.image(:ticket_code, fit: {box_size, box_size})
+      |> Map.put(:x, box_x)
+
+    [image_block | reference_blocks(data, colors, lbl, box_x)]
+  end
+
+  # D-06: the human-readable reference -- REQUIRED, ALWAYS renders, even
+  # when a PNG is supplied. Upper-cased, with a small muted caption above.
+  defp reference_blocks(data, colors, lbl, box_x) do
+    caption_label = Map.get(data.code, :label) || lbl.(:reference)
+    reference_text = String.upcase(data.code.reference)
+
+    [
+      Rendro.block(Rendro.text(caption_label, size: 8, color: colors.muted))
+      |> Map.put(:x, box_x + 8),
+      Rendro.block(Rendro.text(reference_text, size: 15, color: colors.ink))
+      |> Map.put(:x, box_x + 8)
+    ]
+  end
+
+  # D-07: optional 1-line caption, no-image path only.
+  defp present_code_caption(colors, lbl, box_x) do
+    Rendro.block(Rendro.text(lbl.(:present_code), size: 7, color: colors.muted))
+    |> Map.put(:x, box_x + 8)
+  end
+
+  defp terms_section(data, opts) do
+    colors = palette(opts)
+
+    content =
+      case Map.get(data, :terms) do
+        blank when blank in [nil, ""] -> []
+        terms -> [Rendro.block(Rendro.text(terms, size: 8, color: colors.muted))]
+      end
+
+    Rendro.section(name: :ticket_terms, region: :terms, content: content)
   end
 
   # ---------------------------------------------------------------------------
