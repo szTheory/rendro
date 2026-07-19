@@ -158,7 +158,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 118-03-PLAN.md — Rendro.ExamplesData faithful JSON→recipe transform (6 families) + unit test + hidden-internals contract — SHOW-01, SHOW-03
+- [x] 118-03-PLAN.md — Rendro.ExamplesData faithful JSON→recipe transform (6 families) + unit test + hidden-internals contract — SHOW-01, SHOW-03
 
 **Wave 3** *(blocked on Wave 2)*
 
@@ -209,7 +209,7 @@ Plans:
 | 115. Invoice anatomy + Format promotion + seams | v2.10 | 4/4 | Complete    | 2026-07-18 |
 | 116. New families — Payslip & Ticket | v2.10 | 4/4 | Complete    | 2026-07-19 |
 | 117. Edge-case stress matrix | v2.10 | 7/7 | Complete    | 2026-07-19 |
-| 118. Rubric-gated demos, gallery & docs closure | v2.10 | 2/7 | In Progress|  |
+| 118. Rubric-gated demos, gallery & docs closure | v2.10 | 3/7 | In Progress|  |
 | 108. Baseline & Audit Report | C1 | 3/3 | Complete | 2026-06-14 |
 | 109. Caching & setup-beam Foundation | C1 | 2/2 | Complete | 2026-06-15 |
 | 110. Test Concurrency, Determinism & Cleanup | C1 | 3/3 | Complete | 2026-06-16 |
