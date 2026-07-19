@@ -137,6 +137,122 @@ defmodule Rendro.Test.EdgeFixturesTest do
     end
   end
 
+  # Structural + page_size + odd/even cells implemented in Task 2 — document/2
+  # must render each successfully.
+  @task2_cells (for family <- [:invoice, :statement, :receipt, :payslip],
+                    dim <- [
+                      :line_items_page_boundary,
+                      :pagination_boundary,
+                      :line_items_60_plus,
+                      :odd_even_running_content
+                    ] do
+                  {family, dim}
+                end) ++
+                 [
+                   {:certificate, :page_size_a4_letter},
+                   {:payslip, :page_size_a4_letter},
+                   {:ticket, :page_size_a4_letter}
+                 ]
+
+  describe "structural pagination dimensions" do
+    test "statement/line_items_page_boundary is rows_per_page + 1 lines and renders as a 2-page document" do
+      data = EdgeFixtures.build(:statement, :line_items_page_boundary)
+      assert {:ok, pdf} = Rendro.render(EdgeFixtures.document(:statement, :line_items_page_boundary))
+      assert pdf =~ "(Page 2 of 2)", "expected exactly 2 pages for #{length(data.lines)} lines"
+    end
+
+    test "receipt/pagination_boundary is 2*rows_per_page + 1 lines and renders as a 3-page document" do
+      data = EdgeFixtures.build(:receipt, :pagination_boundary)
+      assert {:ok, pdf} = Rendro.render(EdgeFixtures.document(:receipt, :pagination_boundary))
+      assert pdf =~ "(Page 3 of 3)", "expected exactly 3 pages for #{length(data.lines)} lines"
+    end
+
+    test "payslip/line_items_60_plus returns 65+ earnings and renders as a multi-page document" do
+      data = EdgeFixtures.build(:payslip, :line_items_60_plus)
+      assert length(data.earnings) >= 65
+      assert {:ok, pdf} = Rendro.render(EdgeFixtures.document(:payslip, :line_items_60_plus))
+      assert pdf =~ "(Page 2 of"
+    end
+  end
+
+  describe "page_size_a4_letter" do
+    test "certificate renders byte-different at US Letter vs the default A4 geometry" do
+      {:ok, letter} = Rendro.render(EdgeFixtures.document(:certificate, :page_size_a4_letter))
+      {:ok, a4} = Rendro.render(EdgeFixtures.document(:certificate, :missing_optional_fields))
+      assert letter != a4
+    end
+  end
+
+  describe "odd_even_running_content" do
+    test "invoice document wires distinct odd/even footer sections and spans 2+ pages" do
+      doc = EdgeFixtures.document(:invoice, :odd_even_running_content)
+      assert %Rendro.Document{} = doc
+
+      footers = Enum.filter(doc.sections, &(&1.region == :footer))
+      odd = Enum.find(footers, &(&1.only_on == :odd))
+      even = Enum.find(footers, &(&1.only_on == :even))
+      assert odd, "expected an only_on: :odd footer section"
+      assert even, "expected an only_on: :even footer section"
+
+      odd_text = odd.content |> hd() |> get_text()
+      even_text = even.content |> hd() |> get_text()
+      assert odd_text != even_text
+
+      assert {:ok, pdf} = Rendro.render(doc)
+      # Both parity footers only render if the document spans 2+ pages.
+      assert pdf =~ "Odd-page footer"
+      assert pdf =~ "Even-page footer"
+    end
+  end
+
+  describe "EDGE-02 error fixtures" do
+    test "overflow_document renders to a paginate/content_overflow error whose details.block is a map" do
+      assert {:error, %Rendro.Error{stage: :paginate, reason: :content_overflow} = e} =
+               Rendro.render(EdgeFixtures.overflow_document())
+
+      assert is_map(e.details.block)
+      assert e.next =~ "does not auto-fit"
+    end
+
+    test "tall_row_document renders to a paginate/content_overflow error with :row_height and no :block key" do
+      assert {:error, %Rendro.Error{stage: :paginate, reason: :content_overflow} = e} =
+               Rendro.render(EdgeFixtures.tall_row_document())
+
+      assert Map.has_key?(e.details, :row_height)
+      refute Map.has_key?(e.details, :block)
+    end
+
+    test "rtl_default_font_document renders to a measure/unsupported_glyph error" do
+      assert {:error, %Rendro.Error{stage: :measure} = e} =
+               Rendro.render(EdgeFixtures.rtl_default_font_document())
+
+      assert match?({:unsupported_glyph, _char}, e.reason)
+    end
+
+    test "rtl_shaping_required_document renders to a measure/shaping_required :arab error" do
+      assert {:error, %Rendro.Error{stage: :measure} = e} =
+               Rendro.render(EdgeFixtures.rtl_shaping_required_document())
+
+      assert match?({:shaping_required, :arab, _hint}, e.reason)
+    end
+
+    test "render/2 never returns {:ok, _} for RTL under the default shaper" do
+      refute match?({:ok, _}, Rendro.render(EdgeFixtures.rtl_default_font_document()))
+      refute match?({:ok, _}, Rendro.render(EdgeFixtures.rtl_shaping_required_document()))
+    end
+  end
+
+  describe "document/2 — Task 2 cells all render without raising" do
+    for {family, dimension} <- @task2_cells do
+      test "#{family}/#{dimension} renders successfully" do
+        assert {:ok, _pdf} =
+                 Rendro.render(EdgeFixtures.document(unquote(family), unquote(dimension)))
+      end
+    end
+  end
+
+  defp get_text(%Rendro.Block{content: %Rendro.Text{content: text}}), do: text
+
   defp sum(lines) do
     Enum.reduce(lines, Decimal.new(0), fn %{amount: a}, acc -> Decimal.add(acc, a) end)
   end
