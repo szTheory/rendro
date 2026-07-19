@@ -46,6 +46,12 @@ defmodule Rendro.Test.Golden do
     ref_path = "#{base_dir}/#{family}/#{dimension}.sha256"
     actual = Base.encode16(:crypto.hash(:sha256, pdf), case: :lower)
 
+    # MIX_GOLDEN_DUMP eyeball escape hatch: a side-effecting human aid only,
+    # unconditional on and independent of the assert/bless/flunk branch below.
+    # Never commit PDF bytes — this writes to a caller-supplied (gitignored)
+    # scratch dir only.
+    maybe_dump(family, dimension, pdf)
+
     cond do
       System.get_env("MIX_GOLDEN_BLESS") == "true" ->
         # Un-gated bless (D-04): no GITHUB_ACTIONS check — byte hashes are
@@ -84,6 +90,22 @@ defmodule Rendro.Test.Golden do
           """
         )
 
+        :ok
+    end
+  end
+
+  # Writes raw PDF bytes to `#{dump_dir}/#{family}_#{dimension}.pdf` for human
+  # eyeballing when MIX_GOLDEN_DUMP names a non-empty directory; otherwise a
+  # no-op. Deliberately has zero effect on the assert/bless/flunk decision.
+  @spec maybe_dump(atom(), atom(), binary()) :: :ok
+  defp maybe_dump(family, dimension, pdf) do
+    case System.get_env("MIX_GOLDEN_DUMP") do
+      dir when is_binary(dir) and dir != "" ->
+        File.mkdir_p!(dir)
+        File.write!(Path.join(dir, "#{family}_#{dimension}.pdf"), pdf)
+        :ok
+
+      _ ->
         :ok
     end
   end
