@@ -48,7 +48,7 @@ Legend: `[ ]` in scope for this milestone.
 
 ## Demonstration Set, Gallery & Docs Closure (SHOW)
 
-- [ ] **SHOW-01**: The family × domain demonstration matrix (Invoice/Statement/Receipt/Certificate/Payslip/Ticket across the named fictional businesses) is rendered via recipes + the escape hatch, each demo citing its `DOMAIN.md` and passing the rubric (hierarchy = 5, core ≥ 4, gates pass), with scores recorded in the rubric manifest.
+- [x] **SHOW-01**: The family × domain demonstration matrix (Invoice/Statement/Receipt/Certificate/Payslip/Ticket across the named fictional businesses) is rendered via recipes + the escape hatch, each demo citing its `DOMAIN.md` and passing the rubric (hierarchy = 5, core ≥ 4, gates pass), with scores recorded in the rubric manifest.
 - [ ] **SHOW-02**: `guides/recipes.md`, `guides/branding.md`, `guides/livebook/first_invoice.livemd`, and `examples/phoenix_example` are updated to demonstrate the upgraded Invoice + new families against the realistic example library, with docs-contract claims bounded to evidence.
 - [ ] **SHOW-03**: `assets/rendro/gallery/` and `assets/rendro/artifacts.json` are regenerated via `mix rendro.launch_artifacts.gen` to realistic renders with matching SHA-256 hashes; `artifacts.json` gains optional `theme`/`mode`/`preset` tags (seam S6) so Milestone C's grid needs no re-keying.
 - [ ] **SHOW-04**: `priv/support_matrix.json` and README are reconciled so every new family/claim is proof-backed and the milestone makes no tagged-PDF/PDF-UA accessibility claim ("production-grade" wording guarded).
@@ -100,7 +100,7 @@ Every REQ-ID maps to exactly one phase. Coverage: **26/26 mapped**, no orphans, 
 | EDGE-01 | Phase 117 | Complete |
 | EDGE-02 | Phase 117 | Complete |
 | EDGE-03 | Phase 117 | Complete |
-| SHOW-01 | Phase 118 | Pending |
+| SHOW-01 | Phase 118 | Complete |
 | SHOW-02 | Phase 118 | Pending |
 | SHOW-03 | Phase 118 | Pending |
 | SHOW-04 | Phase 118 | Pending |
