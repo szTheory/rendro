@@ -148,7 +148,7 @@ Plans:
   3. `assets/rendro/gallery/` and `assets/rendro/artifacts.json` are regenerated via `mix rendro.launch_artifacts.gen` to realistic renders with matching SHA-256 hashes, and `artifacts.json` gains optional `theme`/`mode`/`preset` tags (seam S6) so Milestone C's grid needs no re-keying.
   4. `priv/support_matrix.json` and README are reconciled so every new family/claim is proof-backed and the milestone makes no tagged-PDF/PDF-UA accessibility claim ("production-grade" wording guarded).
 
-**Plans**: 7 plans
+**Plans**: 9 plans (7 executed + 2 gap-closure for SHOW-01)
 
 Plans:
 **Wave 1** *(local foundation, parallel)*
@@ -172,6 +172,11 @@ Plans:
 **Wave 5** *(blocked on Wave 4)*
 
 - [x] 118-07-PLAN.md — D-14 accessibility-overclaim tripwire + SHOW-02 guides/livebook/phoenix_example + support_matrix/README reconciliation — SHOW-02, SHOW-04
+
+**Gap closure** *(SHOW-01 — demos scored honestly but none passed the rubric; VERIFICATION 3/4)*
+
+- [ ] 118-08-PLAN.md — Rework six demo compositions so each key fact is dominant: enrich transform_invoice (parties/totals/faithful money), statement closing-balance box, receipt merchant+total, certificate centering, payslip de-crowd, ticket native-A6 (wave 1) — SHOW-01
+- [ ] 118-09-PLAN.md — Honest re-render (launch_artifacts.gen, zero drift) + re-score all six demos passed:true + reconcile REQUIREMENTS.md + regression lanes (wave 2, depends 118-08) — SHOW-01
 
 <details>
 <summary>✅ C1 CI/CD Performance & Reliability (Phases 108-113) — SHIPPED 2026-07-11</summary>
