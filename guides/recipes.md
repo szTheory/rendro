@@ -85,6 +85,45 @@ Rendro also renders its own compact launch manual: [manual.pdf](assets/rendro/ma
 SHA-256: `2fbf0a0ef7405fc6ed2feb664c6404abdb25e91406caab0cec4a6ed353f4129d`
 <!-- rendro-recipe-gallery-end -->
 
+## Realistic Example Library
+
+Rendro ships a small library of realistic, fictional business-document fixtures
+under `priv/examples/`, one directory per family. These are the same curated
+fixtures the Rendered Gallery above renders, so what the gallery shows is what
+these fixtures produce — rendered deterministically and byte-checked by the
+required source-PDF SHA-256 docs contract.
+
+| Family | Fixture | Domain notes |
+|---|---|---|
+| Invoice | `priv/examples/invoice/acme-phoenix-saas/invoice.json` | `priv/examples/invoice/DOMAIN.md` |
+| Statement | `priv/examples/statement/northwind-ledger-co/statement.json` | `priv/examples/statement/DOMAIN.md` |
+| Receipt | `priv/examples/receipt/harbor-and-oak-cafe/receipt.json` | `priv/examples/receipt/DOMAIN.md` |
+| Certificate | `priv/examples/certificate/summit-training-institute/certificate.json` | `priv/examples/certificate/DOMAIN.md` |
+| Payslip | `priv/examples/payslip/aurora-live/payslip.json` | `priv/examples/payslip/DOMAIN.md` |
+| Ticket | `priv/examples/ticket/aurora-live/ticket.json` | `priv/examples/ticket/DOMAIN.md` |
+
+Each fixture is plain JSON: money is carried as a decimal string (never a float)
+and dates as ISO-8601 strings. Internally, Rendro loads these fixtures through the
+`Rendro.Examples` helper and coerces them to the atom-keyed, `Decimal`-faithful,
+`Date`-typed shape each recipe expects through `Rendro.ExamplesData`. Both are
+`@moduledoc false` internal helpers for the shipped demonstration set — in your own
+app you build the recipe data map directly (as shown in each recipe section below)
+and call the recipe's `document/2`.
+
+These fixtures demonstrate each family rendered deterministically; they are not a
+claim of visual polish, and Rendro makes no accessibility-standard claim about the
+rendered output. Each family's supported capabilities are bounded by
+`priv/support_matrix.json` and backed by the recipe's evidence test.
+
+Loading a shipped fixture through the internal helpers looks like this:
+
+```elixir-schematic
+raw = Rendro.Examples.load!("invoice/acme-phoenix-saas/invoice.json")
+data = Rendro.ExamplesData.transform_invoice(raw)
+doc = Rendro.Recipes.Invoice.document(data)
+{:ok, _pdf} = Rendro.render(doc, deterministic: true)
+```
+
 ## Statement
 
 A multi-page billing statement with running "Page X of Y" footers and automatic
@@ -305,6 +344,116 @@ Optional keys:
 - `:body` — `String.t()` (body statement, default `""`, must be ≤ 2000 bytes)
 - `:seal_line` — `String.t()` (signature / seal line, default `""`)
 - `:brand` — `%{font_name: atom(), logo_name: atom()}` (branded output)
+
+---
+
+## Payslip
+
+A payslip with an earnings/deductions ledger and a reconciled **net pay** figure
+rendered as the page's visual anchor. Money is `Decimal`-faithful, and the net pay
+is validated to reconcile against earnings minus deductions. The realistic fixture
+lives at `priv/examples/payslip/aurora-live/payslip.json`.
+
+**Support matrix row:** `payslip` (backed by `test/rendro/recipes/payslip_test.exs`)
+
+**Supported capabilities:**
+
+| Capability | Status |
+|---|---|
+| Net pay visual anchor | supported |
+| Multi-page ledger continuation | supported |
+| Jurisdiction carried as data (no hardcoded tax logic) | supported |
+| Deterministic output | supported |
+
+### Zero-to-one
+
+```elixir-schematic
+data = %{
+  employer: %{name: "Aurora Live", address: "500 Harbor Blvd, Portland, OR"},
+  employee: %{name: "Jordan Reyes", id: "E-1042", tax_code: "1257L"},
+  period: %{from: ~D[2026-06-01], to: ~D[2026-06-30]},
+  pay_date: ~D[2026-07-05],
+  earnings: [
+    %{description: "Base salary", amount: Decimal.new("4200.00"), ytd: Decimal.new("25200.00")}
+  ],
+  deductions: [
+    %{description: "Income tax", amount: Decimal.new("907.50"), ytd: Decimal.new("5445.00")}
+  ],
+  net_pay: Decimal.new("3292.50")
+}
+
+doc = Rendro.Recipes.Payslip.document(data)
+{:ok, _pdf} = Rendro.render(doc, deterministic: true)
+```
+
+### Data contract
+
+Required keys:
+
+- `:employer` — `%{name: String.t(), address: String.t()}`
+- `:employee` — `%{name: String.t(), id: String.t(), tax_code: String.t()}`
+- `:period` — `%{from: Date.t(), to: Date.t()}`
+- `:pay_date` — `Date.t()`
+- `:earnings` / `:deductions` — `[%{description: String.t(), amount: Decimal.t(), ytd: Decimal.t()}]`
+- `:net_pay` — `Decimal.t()` (validated to reconcile: earnings − deductions)
+
+Optional keys:
+
+- `:payment_method` — masked account string (e.g. `···· 4321`)
+
+---
+
+## Ticket
+
+An event ticket with a placement grid (section / row / seat / gate) and a quotable,
+human-readable reference code. Rendro renders the caller-supplied reference text
+as-is and never synthesizes a faux barcode; supply your own code image if you need
+a scannable one. The realistic fixture lives at
+`priv/examples/ticket/aurora-live/ticket.json`.
+
+**Support matrix row:** `ticket` (backed by `test/rendro/recipes/ticket_test.exs`)
+
+**Supported capabilities:**
+
+| Capability | Status |
+|---|---|
+| Geometry-derived layout | supported |
+| Caller-supplied code image | supported |
+| No faux barcode (human-readable reference unless you supply an image) | supported |
+| Deterministic output | supported |
+
+### Zero-to-one
+
+```elixir-schematic
+data = %{
+  issuer: %{name: "Aurora Live"},
+  title: "Midsummer Night Concert",
+  placement: [
+    %{label: "Section", value: "GA"},
+    %{label: "Row", value: "H"},
+    %{label: "Seat", value: "24"},
+    %{label: "Gate", value: "B"}
+  ],
+  code: %{reference: "AUR-88213-GA"}
+}
+
+doc = Rendro.Recipes.Ticket.document(data)
+{:ok, _pdf} = Rendro.render(doc, deterministic: true)
+```
+
+### Data contract
+
+Required keys:
+
+- `:issuer` — `%{name: String.t()}`
+- `:title` — `String.t()`
+- `:placement` — `[%{label: String.t(), value: String.t()}]`
+- `:code` — `%{reference: String.t()}` (optional `:image` registers a caller-supplied code asset as `:ticket_code`)
+
+Optional keys:
+
+- `:subtitle` — `String.t()` (≤ 200 bytes)
+- `:terms` — `String.t()` (≤ 600 bytes)
 
 ---
 

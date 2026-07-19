@@ -66,6 +66,21 @@ branding mirrors `BrandedInvoice`.
 - `GET /certificate/download` — renders `Rendro.Recipes.Certificate` as an attachment (`certificate.pdf`)
 - `GET /certificate/preview` — renders inline for browser preview
 
+## Realistic Example Library
+
+The routes above render from inline demo data in the controllers. Rendro itself
+also ships a small library of realistic, fictional business-document fixtures under
+`priv/examples/` (in the Rendro package), loaded internally through the
+`Rendro.Examples` helper. Those fixtures — including two families this example app
+does **not** expose as routes, **Payslip** and **Ticket** — are what the library's
+Rendered Recipe Gallery renders.
+
+To see the full demonstration set (invoice, statement, receipt, certificate,
+payslip, and ticket) and how each family is sourced from the realistic library, see
+`guides/recipes.md` in the Rendro repository. This example app intentionally scopes
+its routes to the five recipes wired above; the fixtures are deterministic
+demonstrations, not a claim of visual polish.
+
 ## Adapter Pattern
 
 Each controller action follows the same two-line pattern:

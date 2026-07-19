@@ -140,3 +140,30 @@ doc =
 assert {:error, %Rendro.Error{stage: :measure, reason: {:missing_asset, :missing_logo}}} =
          Rendro.render(doc)
 ```
+
+## Branding the realistic invoice fixture
+
+Rendro ships a realistic, fictional invoice fixture at
+`priv/examples/invoice/acme-phoenix-saas/invoice.json` — issuer, customer, due date,
+terms, line items, and `Decimal`-faithful totals. It is loaded internally through
+`Rendro.Examples` (an `@moduledoc false` loader for the shipped demonstration set)
+and coerced to the recipe's atom-keyed shape by `Rendro.ExamplesData`.
+
+To tell the branded story against that fixture, layer the registered brand font and
+logo over the invoice data and render through `Rendro.Recipes.BrandedInvoice`:
+
+```elixir-schematic
+data =
+  "invoice/acme-phoenix-saas/invoice.json"
+  |> Rendro.Examples.load!()
+  |> Rendro.ExamplesData.transform_invoice()
+  |> Map.put(:brand, %{font_name: :brand_heading, logo_name: :company_logo})
+
+doc = Rendro.Recipes.BrandedInvoice.document(data)
+{:ok, _pdf} = Rendro.render(doc, deterministic: true)
+```
+
+This is a deterministic demonstration of the branded path, not a claim of visual
+polish. The branded surface stays inside the same truthful boundaries described
+above: no silent font fallback, no system-font discovery, no remote asset fetching,
+and no accessibility-standard claim about the rendered output.
