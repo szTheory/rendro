@@ -135,7 +135,7 @@
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 119. `Rendro.Theme` core module (the one-way door) | v2.11 | 0/TBD | Not started | - |
+| 119. `Rendro.Theme` core module (the one-way door) | v2.11 | 1/2 | In Progress|  |
 | 120. S1 seam retrofit + full `theme:` swap (7 recipes) | v2.11 | 0/TBD | Not started | - |
 | 121. Light/dark background-fill mechanism (7 recipes) | v2.11 | 0/TBD | Not started | - |
 | 122. Typography type-scale + font-role/leading wiring | v2.11 | 0/TBD | Not started | - |

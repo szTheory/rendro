@@ -2,18 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
-current_phase: 119
-current_phase_name: `Rendro.Theme` core module — the one-way door
 status: executing
 stopped_at: Phase 119 context gathered
-last_updated: "2026-07-24T13:54:36.774Z"
-last_activity: 2026-07-23
-last_activity_desc: ROADMAP created; all 21 requirements mapped to Phases 119-123 (100% coverage)
+last_updated: "2026-07-24T22:57:12.965Z"
+last_activity: 2026-07-24
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 2
+  completed_plans: 1
   percent: 0
 ---
 
@@ -24,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-19)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** v2.11 Document Theming & Design-Token System (Milestone B / `SEED-003`) — additive minor (hex `1.2.0`). Roadmap created; ready to plan Phase 119.
+**Current focus:** Phase 119 — rendro-theme-core-module-the-one-way-door
 
 ## Current Position
 
-Phase: 119 of 123 (`Rendro.Theme` core module — the one-way door)
-Plan: — (not yet planned)
+Phase: 119 (rendro-theme-core-module-the-one-way-door) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-07-23 — ROADMAP created; all 21 requirements mapped to Phases 119-123 (100% coverage)
+Last activity: 2026-07-24
 
-Progress: [░░░░░░░░░░] 0% — 0/5 phases
+Progress: [█████░░░░░] 50%
 
 ## Roadmap Snapshot (v2.11, Phases 119-123)
 
@@ -59,6 +56,8 @@ Full log in PROJECT.md Key Decisions. Milestone-B locks carried into planning:
 - **Type scale = the one net-new surface + biggest rubric lever.** Materialize as explicit point sizes (not a `:math.pow` formula); `default/0` scale/leading is a metric no-op (Phase-117 goldens unchanged); `leading` is a multiplier matching `Text.line_height`.
 - **Rubric-gap remediation honesty:** the Phase-118 SHOW-01 root cause is DATA not color. Fix `transform_invoice` (dropped parties/totals) → make the one key fact structurally dominant → THEN apply `default/0` → re-score with human sign-off. Never flip a rubric score to `passed:true` in a commit that only changed colors.
 - **Guards held:** engine untouched (no theme-aware field on any pipeline stage); `brand:` orthogonal to `theme:` (`from_brand/2` emits tokens only, never registers an asset); every shipped demo is light (dark is screen-oriented, no print/PDF-UA claim); permanent exclusions by construction (shadow/z-index/opacity/gradient/motion/focus/raw-scales/weight-axis/letter-spacing/wide-gamut); industry-agnostic `lib/` guard on `theme.ex`; zero new dependencies.
+- [Phase ?]: Compact density honored as fixed-constant leading nudge (1.1) to preserve resolve/1 idempotence
+- [Phase 119]: WCAG 2.4 gamma computed via :math.exp/:math.log (no :math.pow); type scale stays explicit points
 
 ### Pending Todos
 
@@ -79,9 +78,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-24T04:15:30.140Z
+Last session: 2026-07-24T22:54:37.386Z
 Stopped at: Phase 119 context gathered
-Resume file: .planning/phases/119-rendro-theme-core-module-the-one-way-door/119-CONTEXT.md
+Resume file: None
 
 ## Next Steps
 

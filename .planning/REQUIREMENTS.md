@@ -11,15 +11,15 @@ Requirements for this milestone. Each maps to exactly one roadmap phase.
 
 ### Theme Contract (THEME)
 
-- [ ] **THEME-01**: A public `Rendro.Theme` struct defines the FULL token shape up front — color roles, typography, spacing, rules, radius, density, mode — including honored-with-defaults tiers, so later milestones append token *values* never *fields*.
-- [ ] **THEME-02**: `Rendro.Theme.resolve/1` returns an idempotent, fully-resolved theme with every color role an integer `{r,g,b}` validated via `Rendro.Color.validate/1`, raising an instructive errors-as-product error on an invalid token.
-- [ ] **THEME-03**: `Rendro.Theme` ships on the **adapter/Evolving** tier in `priv/public_api.json` with `@spec` on every public function and a doc note that token values and rendered output may evolve while the field shape stays stable; all derivation helpers (`on_accent`, dark-swap, hex→tuple, normalize) stay private/`@doc false`.
-- [ ] **THEME-04**: Web concepts that do not map to deterministic PDF (shadow/elevation, z-index, motion, focus/hover, opacity/gradient, raw color scales, numeric weight axis, letter-spacing, wide-gamut color) are excluded *by construction* — never present as `%Theme{}` fields — with the honest flat-elevation guidance (express elevation via `surface` tint + `rule` hairline).
+- [x] **THEME-01**: A public `Rendro.Theme` struct defines the FULL token shape up front — color roles, typography, spacing, rules, radius, density, mode — including honored-with-defaults tiers, so later milestones append token *values* never *fields*.
+- [x] **THEME-02**: `Rendro.Theme.resolve/1` returns an idempotent, fully-resolved theme with every color role an integer `{r,g,b}` validated via `Rendro.Color.validate/1`, raising an instructive errors-as-product error on an invalid token.
+- [x] **THEME-03**: `Rendro.Theme` ships on the **adapter/Evolving** tier in `priv/public_api.json` with `@spec` on every public function and a doc note that token values and rendered output may evolve while the field shape stays stable; all derivation helpers (`on_accent`, dark-swap, hex→tuple, normalize) stay private/`@doc false`.
+- [x] **THEME-04**: Web concepts that do not map to deterministic PDF (shadow/elevation, z-index, motion, focus/hover, opacity/gradient, raw color scales, numeric weight axis, letter-spacing, wide-gamut color) are excluded *by construction* — never present as `%Theme{}` fields — with the honest flat-elevation guidance (express elevation via `surface` tint + `rule` hairline).
 
 ### Color Roles & Brand (COLOR)
 
-- [ ] **COLOR-01**: Semantic color roles — `ink`, `muted`, `accent`, `on_accent`, `background`, `surface`, `rule` (+ optional `positive`/`negative`) — are `{r,g,b}` tokens that recipe sections read by role, never as inline literals.
-- [ ] **COLOR-02**: `Rendro.Theme.from_brand/2` produces a theme from a single `accent:` seed (+ optional brand tokens) with `on_accent` deterministically derived; it emits only tokens and never registers an asset, keeping `brand:` (who — logo/font files) orthogonal to `theme:` (how — tokens).
+- [x] **COLOR-01**: Semantic color roles — `ink`, `muted`, `accent`, `on_accent`, `background`, `surface`, `rule` (+ optional `positive`/`negative`) — are `{r,g,b}` tokens that recipe sections read by role, never as inline literals.
+- [x] **COLOR-02**: `Rendro.Theme.from_brand/2` produces a theme from a single `accent:` seed (+ optional brand tokens) with `on_accent` deterministically derived; it emits only tokens and never registers an asset, keeping `brand:` (who — logo/font files) orthogonal to `theme:` (how — tokens).
 
 ### Typography (TYPE)
 
@@ -90,12 +90,12 @@ Which phases cover which requirements. Populated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| THEME-01 | Phase 119 | Pending |
-| THEME-02 | Phase 119 | Pending |
-| THEME-03 | Phase 119 | Pending |
-| THEME-04 | Phase 119 | Pending |
-| COLOR-01 | Phase 119 | Pending |
-| COLOR-02 | Phase 119 | Pending |
+| THEME-01 | Phase 119 | Complete |
+| THEME-02 | Phase 119 | Complete |
+| THEME-03 | Phase 119 | Complete |
+| THEME-04 | Phase 119 | Complete |
+| COLOR-01 | Phase 119 | Complete |
+| COLOR-02 | Phase 119 | Complete |
 | TYPE-01 | Phase 122 | Pending |
 | TYPE-02 | Phase 122 | Pending |
 | TYPE-03 | Phase 122 | Pending |
