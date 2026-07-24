@@ -74,7 +74,10 @@
   4. `Rendro.Theme` ships on the **adapter/Evolving** tier in a regenerated `priv/public_api.json` (`mix rendro.api.gen`) with `@spec` on every public function, a doc note that token values and rendered output may evolve while the field shape stays stable, and all derivation helpers (`on_accent`, dark-swap, hex→tuple, normalize) private/`@doc false`; `public_api_contract_test.exs` and **every** duplicate hidden-modules assertion (including any in `manifest_test.exs`) reconcile green as a pre-declared planned red→green step.
   5. An industry-agnostic `lib/` guard fails if `theme.ex` references any industry or named brand, holding the family-not-industry / "brands = data, design systems = code" boundary; B ships exactly one theme (`default/0`) + `from_brand/2` — no genre presets, catalog, or configurator.
 
-**Plans**: TBD
+**Plans**: 2/2 plans complete
+
+- [x] 119-01-PLAN.md
+- [x] 119-02-PLAN.md
 
 ### Phase 120: S1 seam retrofit + full `theme:` swap across all 7 recipes
 
@@ -135,7 +138,7 @@
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 119. `Rendro.Theme` core module (the one-way door) | v2.11 | 1/2 | In Progress|  |
+| 119. `Rendro.Theme` core module (the one-way door) | v2.11 | 2/2 | Complete   | 2026-07-24 |
 | 120. S1 seam retrofit + full `theme:` swap (7 recipes) | v2.11 | 0/TBD | Not started | - |
 | 121. Light/dark background-fill mechanism (7 recipes) | v2.11 | 0/TBD | Not started | - |
 | 122. Typography type-scale + font-role/leading wiring | v2.11 | 0/TBD | Not started | - |

@@ -47,9 +47,9 @@ Requirements for this milestone. Each maps to exactly one roadmap phase.
 
 ### Contract, Docs & Boundary (CONTRACT)
 
-- [ ] **CONTRACT-01**: `priv/public_api.json` is regenerated via `mix rendro.api.gen` with the `Theme` entry and `public_api_contract_test.exs` reconciled — ALL hidden-modules assertions (including any duplicate in `manifest_test.exs`) green, as a pre-declared planned red→green step.
+- [x] **CONTRACT-01**: `priv/public_api.json` is regenerated via `mix rendro.api.gen` with the `Theme` entry and `public_api_contract_test.exs` reconciled — ALL hidden-modules assertions (including any duplicate in `manifest_test.exs`) green, as a pre-declared planned red→green step.
 - [ ] **CONTRACT-02**: `priv/support_matrix.json` gains proof-backed theming row(s), a `guides/theming.md` + claims test binds every public theming claim to proof, and docs-contract + Hex-tarball lanes stay green (theme is pure code — no new asset ships in the tarball).
-- [ ] **CONTRACT-03**: An industry-agnostic `lib/` guard fails if `theme.ex` references an industry or named brand, holding the family-not-industry / "brands = data, design systems = code" boundary; B ships exactly one theme (`default/0`) + `from_brand/2` — no genre presets, catalog, or configurator.
+- [x] **CONTRACT-03**: An industry-agnostic `lib/` guard fails if `theme.ex` references an industry or named brand, holding the family-not-industry / "brands = data, design systems = code" boundary; B ships exactly one theme (`default/0`) + `from_brand/2` — no genre presets, catalog, or configurator.
 
 ## v2 Requirements (deferred — NOT anti-features; they map fine but belong to later milestones)
 
@@ -108,16 +108,18 @@ Which phases cover which requirements. Populated during roadmap creation.
 | DEFAULT-01 | Phase 123 | Pending |
 | DEFAULT-02 | Phase 123 | Pending |
 | DEFAULT-03 | Phase 123 | Pending |
-| CONTRACT-01 | Phase 119 | Pending |
+| CONTRACT-01 | Phase 119 | Complete |
 | CONTRACT-02 | Phase 123 | Pending |
-| CONTRACT-03 | Phase 119 | Pending |
+| CONTRACT-03 | Phase 119 | Complete |
 
 **Coverage:**
+
 - v1 requirements: 21 total
 - Mapped to phases: 21 (100% — each requirement in exactly one phase) ✓
 - Unmapped: 0 ✓
 
 **Per-phase counts:**
+
 - Phase 119 (`Rendro.Theme` core module): 8 — THEME-01, THEME-02, THEME-03, THEME-04, COLOR-01, COLOR-02, CONTRACT-01, CONTRACT-03
 - Phase 120 (S1 retrofit + `theme:` swap): 3 — PLUMB-01, PLUMB-02, PLUMB-03
 - Phase 121 (light/dark mechanism): 3 — MODE-01, MODE-02, MODE-03
