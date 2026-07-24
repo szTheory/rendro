@@ -292,10 +292,10 @@ across minor versions. Express elevation flatly via `surface` tint + `rule` hair
 
 **All other findings are `[VERIFIED]` against live files this session.**
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Exact `@type` phrasing for group maps (`colors`, `typography`, etc.)** — CONTEXT leaves this to planner discretion. Recommendation: use closed `%{required(...) => ...}` map types so the frozen shape is machine-checkable, but confirm the manifest generator emits them cleanly (it lists `types` — verify `mix rendro.api.gen` output after first gen).
-2. **`density: :compact` shallow-honoring mechanics in `resolve/1`** — planner discretion (D-01). Recommendation: nudge `typography.leading`/`spacing` by a fixed factor when `:compact`; keep it a pure transform with no new field. Not gated by any golden this phase.
+1. **Exact `@type` phrasing for group maps (`colors`, `typography`, etc.)** — CONTEXT leaves this to planner discretion. **RESOLVED:** Plan 01 Task 1 uses closed `%{required(...) => ...}` map types so the frozen shape is machine-checkable; the acceptance criteria include confirming `mix rendro.api.gen` emits them cleanly on first gen.
+2. **`density: :compact` shallow-honoring mechanics in `resolve/1`** — planner discretion (D-01). **RESOLVED:** Plan 01 Task 1 honors `:compact` shallowly as a pure leading/spacing nudge with no new field; not gated by any golden this phase.
 
 ## Environment Availability
 
@@ -355,7 +355,7 @@ Nyquist validation enabled. All tests are **pure unit tests** (no rendering, no 
 ### Zero-recipe-change regression proof (the central guard)
 This phase touches **no** recipe file, so every v2.10 golden must remain byte-identical. Prove by running the existing suites **unchanged, without blessing**:
 - `mix test test/rendro/recipes/` — includes `invoice_byte_identity_test.exs` (frozen sha `c3625eb5…`, invoice_byte_identity_test.exs:12), `payslip_byte_identity_test.exs`, `ticket_byte_identity_test.exs`, plus `invoice_test.exs`/`certificate_test.exs`/`statement_test.exs`/`receipt_test.exs`/`payslip_test.exs`/`ticket_test.exs`/`branded_invoice_test.exs`.
-- The 63 committed `priv/goldens/**/*.sha256` files (across certificate/invoice/payslip/receipt/statement/ticket) must NOT change. **Do NOT set `MIX_GOLDEN_BLESS`.** A changed hash is a defect, not a refresh.
+- The 62 committed `priv/goldens/**/*.sha256` files (across certificate/invoice/payslip/receipt/statement/ticket) must NOT change. **Do NOT set `MIX_GOLDEN_BLESS`.** A changed hash is a defect, not a refresh.
 - Assertion of intent: since `theme.ex` is a new file imported by nothing this phase, a full `mix test` green with zero golden diff *is* the proof. The planner should add a task-level check: `git status priv/goldens` shows no modifications after the suite runs.
 
 ### Sampling rate

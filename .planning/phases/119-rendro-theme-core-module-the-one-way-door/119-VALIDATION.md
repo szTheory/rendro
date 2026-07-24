@@ -2,7 +2,7 @@
 phase: 119
 slug: rendro-theme-core-module-the-one-way-door
 status: draft
-nyquist_compliant: false
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-07-24
 ---
@@ -60,7 +60,7 @@ created: 2026-07-24
 | CONTRACT-03 | `theme.ex` names no industry/brand | **source-grep guard** | `source = File.read!("lib/rendro/theme.ex")`; refute each forbidden term + "preset"/"catalog"/"configurator" (mirror `integrations_claims_test.exs:37-42`) | ❌ W0 |
 | Byte-repro | all default/dark color values integers | unit (property) | `for {_r,{r,g,b}} <- Theme.default().colors, do: assert is_integer(r) and is_integer(g) and is_integer(b)` | ❌ W0 |
 | Byte-repro | type-scale values integers/single-decimals | unit (example) | `for {_s,v} <- Theme.default().typography.scale, do: assert v == Float.round(v,1)` | ❌ W0 |
-| **Zero-recipe-change** | every v2.10 golden byte-identical | regression | `mix test test/rendro/recipes/` green, NO bless, `git status priv/goldens` clean (63 committed `.sha256` unchanged) | ✅ exist |
+| **Zero-recipe-change** | every v2.10 golden byte-identical | regression | `mix test test/rendro/recipes/` green, NO bless, `git status priv/goldens` clean (62 committed `.sha256` unchanged) | ✅ exist |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -91,6 +91,6 @@ created: 2026-07-24
 - [ ] Wave 0 covers all MISSING references (`theme_test.exs`, `theme_industry_guard_test.exs`)
 - [ ] No watch-mode flags
 - [ ] Feedback latency < 30s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending
