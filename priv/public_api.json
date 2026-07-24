@@ -538,6 +538,26 @@
       ],
       "tier": "stable",
       "types": []
+    },
+    "Elixir.Rendro.Theme": {
+      "functions": [
+        "dark/1",
+        "default/0",
+        "from_brand/2",
+        "resolve/1"
+      ],
+      "tier": "adapter",
+      "types": [
+        "colors/0",
+        "font_role/0",
+        "radius/0",
+        "rgb/0",
+        "rules/0",
+        "spacing/0",
+        "t/0",
+        "type_step/0",
+        "typography/0"
+      ]
     }
   }
 }

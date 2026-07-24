@@ -97,6 +97,7 @@ defmodule Mix.Tasks.Rendro.Api.Gen do
     Rendro.Storage,
     Rendro.Storage.Local,
     Rendro.Telemetry,
+    Rendro.Theme,
     # Conditional adapters (only present when optional deps are available)
     Rendro.Adapters.Accrue,
     Rendro.Adapters.Mailglass,
