@@ -90,32 +90,39 @@ Which phases cover which requirements. Populated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| THEME-01 | TBD | Pending |
-| THEME-02 | TBD | Pending |
-| THEME-03 | TBD | Pending |
-| THEME-04 | TBD | Pending |
-| COLOR-01 | TBD | Pending |
-| COLOR-02 | TBD | Pending |
-| TYPE-01 | TBD | Pending |
-| TYPE-02 | TBD | Pending |
-| TYPE-03 | TBD | Pending |
-| MODE-01 | TBD | Pending |
-| MODE-02 | TBD | Pending |
-| MODE-03 | TBD | Pending |
-| PLUMB-01 | TBD | Pending |
-| PLUMB-02 | TBD | Pending |
-| PLUMB-03 | TBD | Pending |
-| DEFAULT-01 | TBD | Pending |
-| DEFAULT-02 | TBD | Pending |
-| DEFAULT-03 | TBD | Pending |
-| CONTRACT-01 | TBD | Pending |
-| CONTRACT-02 | TBD | Pending |
-| CONTRACT-03 | TBD | Pending |
+| THEME-01 | Phase 119 | Pending |
+| THEME-02 | Phase 119 | Pending |
+| THEME-03 | Phase 119 | Pending |
+| THEME-04 | Phase 119 | Pending |
+| COLOR-01 | Phase 119 | Pending |
+| COLOR-02 | Phase 119 | Pending |
+| TYPE-01 | Phase 122 | Pending |
+| TYPE-02 | Phase 122 | Pending |
+| TYPE-03 | Phase 122 | Pending |
+| MODE-01 | Phase 121 | Pending |
+| MODE-02 | Phase 121 | Pending |
+| MODE-03 | Phase 121 | Pending |
+| PLUMB-01 | Phase 120 | Pending |
+| PLUMB-02 | Phase 120 | Pending |
+| PLUMB-03 | Phase 120 | Pending |
+| DEFAULT-01 | Phase 123 | Pending |
+| DEFAULT-02 | Phase 123 | Pending |
+| DEFAULT-03 | Phase 123 | Pending |
+| CONTRACT-01 | Phase 119 | Pending |
+| CONTRACT-02 | Phase 123 | Pending |
+| CONTRACT-03 | Phase 119 | Pending |
 
 **Coverage:**
 - v1 requirements: 21 total
-- Mapped to phases: 0 (roadmap pending)
-- Unmapped: 21 ⚠️ (resolved at roadmap creation)
+- Mapped to phases: 21 (100% — each requirement in exactly one phase) ✓
+- Unmapped: 0 ✓
+
+**Per-phase counts:**
+- Phase 119 (`Rendro.Theme` core module): 8 — THEME-01, THEME-02, THEME-03, THEME-04, COLOR-01, COLOR-02, CONTRACT-01, CONTRACT-03
+- Phase 120 (S1 retrofit + `theme:` swap): 3 — PLUMB-01, PLUMB-02, PLUMB-03
+- Phase 121 (light/dark mechanism): 3 — MODE-01, MODE-02, MODE-03
+- Phase 122 (typography application): 3 — TYPE-01, TYPE-02, TYPE-03
+- Phase 123 (`from_brand/2` E2E + rubric/docs closure): 4 — DEFAULT-01, DEFAULT-02, DEFAULT-03, CONTRACT-02
 
 ## Open Questions for Phase Planning (calibration, not architecture — locked recommendations)
 
@@ -127,4 +134,4 @@ Which phases cover which requirements. Populated during roadmap creation.
 
 ---
 *Requirements defined: 2026-07-19*
-*Last updated: 2026-07-19 after initial definition (milestone v2.11)*
+*Last updated: 2026-07-23 — roadmap created, all 21 requirements mapped to Phases 119-123 (100% coverage)*

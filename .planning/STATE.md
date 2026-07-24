@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
 status: planning
-last_updated: "2026-07-19T21:15:42.970Z"
-last_activity: 2026-07-19
+last_updated: "2026-07-23"
+last_activity: 2026-07-23
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -15,130 +15,70 @@ progress:
 
 # Project State
 
-## Reference
+## Project Reference
 
-**Project**: Rendro
-**Core Value**: Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current Focus**: v2.10 Realistic Business-Document Examples & Anatomy (Milestone A / `SEED-002`) — Phases 114–116 complete (data + quality foundation, Invoice anatomy + `Format` promotion, and the Payslip/Ticket families all shipped); ready to plan Phase 117 (Edge-case stress matrix).
+See: .planning/PROJECT.md (updated 2026-07-19)
+
+**Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
+**Current focus:** v2.11 Document Theming & Design-Token System (Milestone B / `SEED-003`) — additive minor (hex `1.2.0`). Roadmap created; ready to plan Phase 119.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-07-19 — Milestone v2.11 started
+Phase: 119 of 123 (`Rendro.Theme` core module — the one-way door)
+Plan: — (not yet planned)
+Status: Ready to plan
+Last activity: 2026-07-23 — ROADMAP created; all 21 requirements mapped to Phases 119-123 (100% coverage)
 
-## Roadmap Snapshot (v2.10, Phases 114–118)
+Progress: [░░░░░░░░░░] 0% — 0/5 phases
+
+## Roadmap Snapshot (v2.11, Phases 119-123)
 
 ```text
-[████████████████████████░░░░░░░░░░░░░░░░] 60% — 3/5 phases complete
-Phase 114 Domain research, rubric & example-data library . ✓ Complete (2026-07-18)
-Phase 115 Invoice anatomy + Format promotion + seams ..... ✓ Complete (2026-07-18)
-Phase 116 New families — Payslip & Ticket ................ ✓ Complete (2026-07-19)
-Phase 117 Edge-case stress matrix ........................ Ready to plan
-Phase 118 Rubric-gated demos, gallery & docs closure ..... Not started
+[░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 0% — 0/5 phases complete
+Phase 119 Rendro.Theme core module (one-way door) ........ Ready to plan
+Phase 120 S1 retrofit + theme: swap (7 recipes) .......... Not started
+Phase 121 Light/dark background-fill mechanism ........... Not started
+Phase 122 Typography type-scale application .............. Not started
+Phase 123 from_brand/2 E2E + honest rubric-gap + docs .... Not started
 ```
 
 ## Accumulated Context
 
 ### Decisions
 
-- Milestone A (`SEED-002`) is an **additive minor** release (hex `1.1.0`), NOT v3.0 — A2 is strictly additive (toy call preserved byte-identical), `Format` goes to the adapter/Evolving tier, new families are adapter-tier modules. Unlike C1 (infra), A changes `lib/`, so it IS a versioned release.
-- **The single irreversible act:** promoting `Rendro.Format` from `@moduledoc false` into the public SemVer surface (Phase 115). Held to the adapter/Evolving tier, smallest useful surface (`money/1`, `date/1`, `label/1`), with an "output may evolve" doc note. Requires editing Phase-79's `public_api_contract_test.exs` hidden set (likeliest surprise red build).
-- **Fold seed's 7 phases → 5** (coarse granularity; precedent: v2.4 Phase 75 shipped 2 recipes at once). 114 foundation (data+rubric) → 115 Invoice/Format (only real `lib/` change) → 116 new families → 117 stress matrix → 118 demos+docs closure.
-- **Four shape-now seams** baked into acceptance criteria so B/C/D need no breaking rework: **S1** private `palette(opts)` keyed on B's locked color roles (Phase 115, applied in 116) · **S4** fixtures reserve an optional empty `brand`/`logo` slot (Phase 114) · **S5** rubric recorded as an appendable manifest (authored 114, populated 118) · **S6** `artifacts.json` gains optional theme/mode/preset tags (Phase 118).
-- **Guards:** no tagged-PDF/PDF-UA accessibility claims ("production-grade" = information design); engine stays locale-free (VAT/sales-tax + payslip jurisdiction are DATA); no real PII (fictional businesses/employees — Payslip is the acute risk); ship `priv/examples/` text-only; byte-determinism (static fixed-date fixtures; toy call byte-identical).
-- Loader placement is load-bearing: `lib/rendro/examples.ex`, `@moduledoc false` — the only placement serving tests + bench(`:dev`) + Livebook + shipped consumers while staying out of `public_api.json`.
-- Money in fixtures as decimal **strings** (`"79.00"`), never JSON floats. De-quarantine `invoice_data.json` verbatim first (provable no-op vs advisory bench), normalize money to strings in a separate commit.
-- No text/cell right-align primitive exists today; additive `cell_align: :right` (Phase 115) is the single highest-leverage typographic upgrade — but the rubric must NOT assume it. No barcode/QR primitive; Ticket "reads as a ticket" via boxed code-area + human-readable reference + perforation + optional caller-supplied PNG.
-- [Phase ?]: Plan 114-01: invoice fixture de-quarantined into priv/examples/invoice/acme-phoenix-saas/invoice.json as a provable byte-identical no-op; move kept verbatim (money/brand normalization deferred to 114-03 per Pitfall 6), consumers repointed, fresh render sha256-identical to recorded benchmark evidence.
-- [Phase ?]: 114-05: Authored Invoice DOMAIN.md as locked research-first recommendation (synthesized domain-research prose), light human sanity-check reserved for phase verification.
-- [Phase ?]: 114-05: DOMAIN.md structural contract test iterates priv/examples/*/DOMAIN.md so future domain families inherit the four-heading contract automatically.
-- [Phase 114]: 114-03: Normalized invoice fixture money from integer cents to Decimal-safe 2-decimal strings + added S4 empty brand/logo slot in a commit separate from 114-01's verbatim move (Pitfall 6); Rendro render byte-identical. Added first schema-validation lane (examples_schema_contract_test.exs) validating every priv/examples/ fixture. EXL-01/03/06 satisfied.
-- [Phase ?]: Rendro.Examples loader kept String.t() path signature with Path.safe_relative/1 defense-in-depth guard; all current callers are internal/hardcoded
-- [Phase ?]: Loader uses built-in JSON.decode!/1 (never Jason) — Jason is a dev/test-only transitive dep that would crash prod Hex consumers
-- [Phase ?]: Rubric threshold arithmetic (hierarchy=5, core>=4, gates pass) lives only as a test helper — no lib/ product change except the loader.
-- [Phase 115]: 115-01: Used Rendro.flow/1 (not the Invoice recipe) as the minimal document/section wrapper for the INV-05 table golden, mirroring the existing table_borders_test.exs pattern. — Established lightweight pattern for exercising Rendro.table/2 through the full render pipeline without recipe-specific coupling.
-- [Phase 115]: 115-01: Both sha256 goldens (@toy_golden_sha256, @table_golden_sha256) were computed by actually running renders on pristine code via mix run, not hand-typed, then embedded as module attributes. — Eliminates risk of a mistyped/stale golden silently freezing wrong bytes, per the plan's threat model T-115-01-01.
-- [Phase 115]: 115-02: Promoted Rendro.Format from @moduledoc false to the public adapter/Evolving tier (money/1, date/1, label/1) in one atomic commit (INV-04, the milestone's single irreversible act); fixed a second, plan-unlisted duplicate hidden-modules assertion in test/rendro/public_api/manifest_test.exs that also expected Format hidden.
-- [Phase ?]: [Phase 115]: 115-03: Resolved RESEARCH OQ2 (cell_align offset location) in favor of paginate.ex stack_cells alone — writer.ex needed zero changes since it already forwards cell.x transparently into rendered block.x.
-- [Phase ?]: [Phase 115]: 115-03: Both new Cell.cell_align / Table.cell_align struct-field types are inlined into t() rather than declared as named @type, since named types are enumerated in priv/public_api.json and would have widened the frozen Stable-tier manifest.
-- [Phase ?]: 115-04: body_section rewritten to per-page chunked pagination (mirrors Receipt), reserving conservative totals-block height uniformly on every page so the LAST table page always keeps room for the trailing totals block (shared chunker only accepts one capacity value, mirroring Statement's CF/BF reservation idiom).
-- [Phase ?]: 115-04: Decimal.equal?/2 totals caller-assertion derives its comparison value from items (qty x price via item_line_total/1), not from a Decimal-typed source field, since Invoice's legacy line-item :price intentionally stays bare-number typed per INV-02's byte-compat split.
-- [Phase 116]: 116-01: Implemented label_resolver/2 merge order (opts[:labels] -> default_labels -> Rendro.Format.label/1) exactly as prescribed in 116-RESEARCH.md's code example; default_labels defaults to %{} so Statement's arity-1 call sites (statement.ex:274,294) compile and resolve unmodified.
-- [Phase 116]: 116-01: validate_labels!/2 and validate_formatters!/2 take a recipe_mfa string naming the caller's public entry point (e.g. Rendro.Recipes.Payslip.document/2), mirroring Invoice's four-part What/Where/Why/Next ArgumentError idiom, so 116-02/116-03 share one validated seam instead of each inventing their own guards.
-- [Phase 116]: 116-02: Registered the vendored B612 branding font as a silent unicode fallback (built-in Helvetica -> B612) applied to both document/2 and body_section/2's own measurement document, since the built-in font's ASCII-only metrics table would otherwise crash rendering on any accented caller text (needed for D-17).
-- [Phase 116]: 116-02: D-14's middot masking token stays literal in data/fixtures (test-enforced via String.contains?/2); rendering swaps it display-only for bullet (glyph_safe/1) since neither built-in Helvetica nor B612 has a middot glyph.
-- [Phase ?]: 116-03: main_section/2's D-02 placement-grid anchor uses Rendro.table/2 (single data row, Block-styled header cells) not manual multi-column stacking -- sidesteps anchor_region_blocks/3's shared per-region Y cursor.
-- [Phase ?]: 116-03: D-10 caller-image pre-validation mirrors asset_registry.ex's exact source-resolution logic inside validate_data!/1, pre-parses with the pure Rendro.ImageParser.parse/1, and raises an instructive ArgumentError naming data.code.image -- the first caller-supplied (not library-shipped) image asset in any Rendro recipe; Rendro.AssetRegistry.InvalidAssetError never leaks.
-- [Phase ?]: 116-03: full-render PNG tests use priv/branded/images/rendro-logo.png ({:path, ...}) instead of the minimal 2x2 base64 PNG fixture -- the minimal fixture passes ImageParser.parse/1's header-only check but is not decodable by the PDF writer's stricter Rendro.PDF.PNG chunk decoder when actually embedded.
-- [Phase 116]: 116-04: Registered Payslip/Ticket in @public_modules (mix rendro.api.gen) and added proof-backed payslip/ticket priv/support_matrix.json rows with matching recipes_claims_test.exs assertions. — FAM-01/02/03 all satisfied, Phase 116 complete.
-- [Phase 117]: 117-01: Rendro.Test.Golden uses the Rendro.Test.* namespace (matching HexBuildCache); byte-golden bless is un-gated (MIX_GOLDEN_BLESS) because PDF-byte hashes are cross-platform stable; a missing ref hard-flunks (never silent auto-create).
-- [Phase 117]: 117-04: family × stress-dimension @matrix built by zipping row-vectors against @families (transcription-resistant), independently exhaustiveness-checked by the D-02 meta-test; 62 golden refs blessed hash-only, committed as one-line SHA-256 files
-- [Phase 117]: 117-06: Six D-10 curated raster fixtures added IN PLACE to the existing pdfium_raster_snapshot_test.exs (CI Landmine 1 hardcoded single-file path) so CI discovers them with zero ci.yml edit; refs blessed in the pinned CI container per D-11 (not locally: no pdfium-cli, hashes non-portable).
-- [Phase ?]: [Phase 118]: 118-01: Generalized examples.schema.json to per-family allOf/if-then; invoice branch keyed on structural 'invoice' key (keeps original fixture byte-identical), 5 new families keyed on top-level 'family' const. Payslip employer deliberately 'Aurora Live' (D-02) reconciling recipe test's 'Aurora Textiles Co.' (Pitfall 5).
-- [Phase 118]: 118-02: Strengthened the DOMAIN.md contract to require one DOMAIN.md per demonstrated domain, derived from priv/examples/*/*/*.json fixture dirs (not a hardcoded family list) plus a non-vacuous guard, so future families inherit it automatically. Authored five new four-heading DOMAIN.md anatomy files (statement/receipt/certificate/payslip/ticket).
-- [Phase ?]: [Phase 118]: 118-03: Authored Rendro.ExamplesData (@moduledoc false) — the D-06 single JSON→recipe transform seam. Money via Decimal.new (cents preserved, INV-02); invoice legacy :price via Decimal.to_float (bare number the recipe requires, never to_integer). Certificate transform drops the empty S4 brand slot (validate_brand!/1 rejects %{logo: nil}).
-- [Phase ?]: [Phase 118]: 118-03: Statement fixture ASCII-ified (em-dash→hyphen, ····8140→****8140) — Statement recipe uses built-in Helvetica with no unicode fallback (unlike Payslip 116-02) and no opts font-injection; recipe-level fallback logged in deferred-items.md.
-- [Phase ?]: [Phase 118]: 118-04: Repointed Rendro.LaunchArtifacts gallery to priv/examples/** via Rendro.ExamplesData (D-06); 7 tiles in fixed order incl. new payslip/ticket (D-07); S6 theme/mode/preset optional seam tags per entry (D-13). Byte re-baseline + PNG rasters container-gated to 118-05 (2 launch_artifacts_claims_test cases expected-red until then).
-- [Phase ?]: [Phase 118]: 118-04: ASCII-ified certificate seal_line em-dash and ticket subtitle middots (recipes render built-in Helvetica, no unicode fallback); certificate body + ticket terms wrapped via launch-only wrap_section_text_to_region/3; branded_invoice renders an 8-item fixture slice (recipe body does not paginate).
-- [Phase 118]: Phase 118 paused at 4/7: Wave 4 (118-05 gallery re-bless + 118-06 rubric scoring) is container-gated (pinned pdfium absent locally) with blocking human-verify checkpoints; user runs these in the pinned CI/container env and authorizes the D-08 re-bless + rubric sign-off, then resume at Wave 5 (118-07).
-- [Phase 118]: 118-05 committed (gallery re-bless, 7 tiles, determinism-proven). 118-06 PAUSED per D-11: rendered demos do not honestly clear the rubric gate (invoice under-built — transform_invoice drops parties/totals; others don't make key fact dominant). No scores committed. See 118-06-FINDINGS.md. User to decide remediation vs accept gaps.
-- [Phase 118-07]: Encoded the 118-06 honesty ceiling as machine-checked data (demonstration_set.boundaries disclaim rubric-pass/visual-polish/accessibility-conformance) plus a D-14 tripwire guarding all docs against accessibility overclaim
-- [Phase 118]: Phase 118 verification: gaps_found 3/4. SHOW-02/03/04 met; SHOW-01 (rubric-PASSING demos) is a gap — all 6 honestly scored passed:false (D-11). Phase NOT complete. Next: /gsd-plan-phase 118 --gaps to plan demo-quality remediation (transform_invoice enrichment + make key facts dominant); see 118-06-FINDINGS.md.
+Full log in PROJECT.md Key Decisions. Milestone-B locks carried into planning:
 
-### Blockers / Open Questions
+- **Additive minor (hex `1.2.0`), NOT a major.** The public API only grows (new `Rendro.Theme`); `default/0` is engineered so an un-themed `document(data)` reproduces v2.10 bytes for all 7 recipes (PLUMB-03 — the central regression guard).
+- **The single irreversible act:** `Rendro.Theme` entering `priv/public_api.json` on the **adapter/Evolving** tier (field shape frozen by discipline; token values + rendered output may evolve). Expect a planned red→green on `public_api_contract_test.exs` — grep ALL hidden-modules assertions incl. any duplicate in `manifest_test.exs` (the Phase-115 `Format` lesson).
+- **Code-grounded correction:** the S1 `palette` seam exists in only **3 of 7** recipes. The 4 un-seamed recipes (Statement/Certificate/Receipt/BrandedInvoice) need a byte-identical `palette/1` retrofit (Phase 120) with sha256 goldens committed **separately** from any theme swap. Certificate's `{34,34,34}` frame is the non-black default to flag in-plan.
+- **Light/dark determinism:** background is a first-in-list `:background` page-template region (`apply_page_template/5` repeats it on every page incl. overflow — zero paginate change); emit the rect ONLY when it changes pixels; resolve every role to integer `{r,g,b}` once in `resolve/1` (no per-draw float tint math).
+- **Type scale = the one net-new surface + biggest rubric lever.** Materialize as explicit point sizes (not a `:math.pow` formula); `default/0` scale/leading is a metric no-op (Phase-117 goldens unchanged); `leading` is a multiplier matching `Text.line_height`.
+- **Rubric-gap remediation honesty:** the Phase-118 SHOW-01 root cause is DATA not color. Fix `transform_invoice` (dropped parties/totals) → make the one key fact structurally dominant → THEN apply `default/0` → re-score with human sign-off. Never flip a rubric score to `passed:true` in a commit that only changed colors.
+- **Guards held:** engine untouched (no theme-aware field on any pipeline stage); `brand:` orthogonal to `theme:` (`from_brand/2` emits tokens only, never registers an asset); every shipped demo is light (dark is screen-oriented, no print/PDF-UA claim); permanent exclusions by construction (shadow/z-index/opacity/gradient/motion/focus/raw-scales/weight-axis/letter-spacing/wide-gamut); industry-agnostic `lib/` guard on `theme.ex`; zero new dependencies.
 
-- None. (Phase 114 confirmed the de-quarantined `invoice_data.json` is fictional — no PII issue. Phase 115 watch item: the `Format` public promotion will edit Phase-79's `public_api_contract_test.exs` hidden set — expect a deliberate red build until the hidden-set + tier tags are updated.)
+### Pending Todos
+
+None yet.
+
+### Blockers/Concerns
+
+- **Watch (Phase 119):** the `Theme` public promotion will edit `public_api_contract_test.exs`'s hidden set — expect a deliberate red build until the manifest is regenerated and the tier tag applied. Grep for the second, plan-unlisted hidden-modules assertion.
+- **Calibration open questions** (not architecture — locked recommendations in REQUIREMENTS.md): exact type-scale point sizes, `on_accent` luminance heuristic, legacy `:palette` preservation via `Map.merge`, `theming.light`/`theming.dark` as separate support rows, `density: :compact` shallow honoring.
+
+## Deferred Items
+
+| Category | Item | Status | Deferred At |
+|----------|------|--------|-------------|
+| Presets/Catalog | Style-genre presets, preset fonts, public catalog, static configurator | Deferred to Milestone C (`SEED-004`) | v2.11 scoping |
+| Studio | Live server-rendered theme playground | Deferred to Milestone D (`SEED-005`) | v2.11 scoping |
+| Typography | Tabular figures / small-caps / OpenType features | Demand-gated (need new engine primitives) | v2.11 scoping |
+
+## Session Continuity
+
+Last session: 2026-07-23
+Stopped at: ROADMAP.md created for v2.11 (Phases 119-123); REQUIREMENTS.md traceability populated (21/21 mapped); STATE.md reset.
+Resume file: None
 
 ## Next Steps
 
-1. `/gsd-plan-phase 115` — plan the additive Invoice anatomy upgrade + `Rendro.Format` public (adapter-tier) promotion + private `palette(opts)` (S1) and `cell_align: :right` seams.
-
-## Last Session
-
-**Last updated**: 2026-07-18
-**Stopped at**: Phase 114 complete — UAT 2/2 passed (DOMAIN.md faithfulness + rubric anchor applicability), verification canonicalized `human_needed → passed`, security review closed 16 threats (0 open), transitioned to Phase 115.
-**Blockers**: None
-
-## Performance Metrics
-
-| Phase | Plan | Duration | Notes |
-|-------|------|----------|-------|
-| — | — | — | v2.10 not yet executed |
-| Phase 114 P01 | 1min | 2 tasks | 5 files |
-| Phase 114 P02 | 3min | 2 tasks | 2 files |
-| Phase 114 P05 | 1min | 2 tasks | 2 files |
-| Phase 114 P03 | 2min | 2 tasks | 6 files |
-| Phase 114 P04 | ~2 min | 2 tasks | 3 files |
-| Phase 114 P06 | 4 min | 2 tasks | 2 files |
-| Phase 115 P01 | ~3min | 2 tasks | 2 files |
-| Phase 115 P02 | ~4min | 2 tasks | 5 files |
-| Phase 115 P03 | ~9min | - tasks | - files |
-| Phase 115 P04 | ~20min | 3 tasks | 3 files |
-| Phase 116 P01 | 5min | 2 tasks | 2 files |
-| Phase 116 P02 | 17min | 3 tasks | 3 files |
-| Phase 116 P03 | 7min | 3 tasks | 3 files |
-| Phase 116 P04 | 8min | 2 tasks | 4 files |
-| Phase 117 P01 | 18min | 2 tasks | 2 files |
-| Phase 117 P02 | 35min | 2 tasks | 2 files |
-| Phase 117 P03 | 4min | 1 tasks | 1 files |
-| Phase 117 P04 | 3min | 2 tasks | 63 files |
-| Phase 117 P05 | 1m | 2 tasks | 1 files |
-| Phase 117 P06 | 6min | 2 tasks | 1 files |
-| Phase 117 P07 | ~4min | 2 tasks | 3 files |
-| Phase 118 P01 | 3min | 3 tasks | 6 files |
-| Phase 118 P02 | 3min | 2 tasks | 6 files |
-| Phase 118 P03 | 8min | 2 tasks | 4 files |
-| Phase 118 P04 | 14min | 3 tasks | 4 files |
-| Phase 118 P07 | 11min | 3 tasks | 9 files |
-
-## Operator Next Steps
-
-- Start the next milestone with /gsd-new-milestone
-
-## Session
-
-**Last session:** 2026-07-19T17:31:22.793Z
-**Stopped at:** Phase 118 context gathered
-**Resume file:** None
+1. `/gsd-plan-phase 119` — plan the `Rendro.Theme` core module (the one-way door): full struct shape up front, `resolve/1`/`default/0`/`dark/1`/`from_brand/2`, adapter-tier manifest entry + planned red→green contract reconciliation, industry-agnostic guard. Zero recipe change.
