@@ -2,16 +2,19 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
-status: verifying
+current_phase: 121
+current_phase_name: all 7 recipes
+status: planning
 stopped_at: Completed 120-04-PLAN.md
-last_updated: "2026-07-27T22:18:35.418Z"
+last_updated: "2026-07-27T22:31:30.609Z"
 last_activity: 2026-07-27
+last_activity_desc: Phase 120 complete, transitioned to Phase 121
 progress:
-  total_phases: 5
+  total_phases: 9
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
-  percent: 40
+  total_plans: 11
+  completed_plans: 7
+  percent: 22
 ---
 
 # Project State
@@ -25,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-07-19)
 
 ## Current Position
 
-Phase: 120 (s1-seam-retrofit-full-theme-swap-across-all-7-recipes) — EXECUTING
-Plan: 4 of 4
-Status: Phase complete — ready for verification
-Last activity: 2026-07-27
+Phase: 121 — Light/dark background-fill mechanism (all 7 recipes)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-07-27 — Phase 120 complete, transitioned to Phase 121
 
 Progress: [██████████] 100%
 
