@@ -173,9 +173,26 @@ defmodule Rendro.Recipes.Receipt do
       ]
     ]
 
-    # 118-08: :header_height is consumed locally above -- never forwarded to
-    # struct!/2 (Rendro.PageTemplate has no such field).
-    Rendro.page_template(Keyword.merge(defaults, Keyword.delete(opts, :header_height)))
+    # page_template/1 only understands PageTemplate struct keys. Recipe-level
+    # opts (:header_height, :palette, :theme, :formatters, :labels, ...) are
+    # consumed locally by this function / the section builders / palette/1 --
+    # filter them out with a struct-key whitelist so they thread through to
+    # sections/2 / palette/1 instead of reaching struct!/2 and raising
+    # KeyError. :header_height stays consumed locally above; :palette/:theme
+    # must NOT be added here -- dropping them lets them reach palette/1.
+    template_opts =
+      Keyword.take(opts, [
+        :name,
+        :width,
+        :height,
+        :margin_top,
+        :margin_right,
+        :margin_bottom,
+        :margin_left,
+        :regions
+      ])
+
+    Rendro.page_template(Keyword.merge(defaults, template_opts))
   end
 
   @doc """
@@ -255,13 +272,14 @@ defmodule Rendro.Recipes.Receipt do
   # ---------------------------------------------------------------------------
 
   defp header_section(%{title: title, date: date, customer: customer} = data, opts) do
+    colors = palette(opts)
     fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
     customer_name = Map.get(customer, :name, "")
 
     base_content = [
-      Rendro.block(Rendro.text(title, size: 14)),
-      Rendro.block(Rendro.text(customer_name, size: 12)),
-      Rendro.block(Rendro.text(fmt_date.(date), size: 10))
+      Rendro.block(Rendro.text(title, size: 14, color: colors.ink)),
+      Rendro.block(Rendro.text(customer_name, size: 12, color: colors.ink)),
+      Rendro.block(Rendro.text(fmt_date.(date), size: 10, color: colors.ink))
     ]
 
     # 118-08 gap-closure (SHOW-01): render the merchant identity (previously
@@ -269,7 +287,7 @@ defmodule Rendro.Recipes.Receipt do
     # so the merchant reads as the issuer of the receipt, ahead of the title.
     content =
       base_content
-      |> maybe_prepend(Map.get(data, :merchant), &merchant_block/1)
+      |> maybe_prepend(Map.get(data, :merchant), &merchant_block(&1, colors))
 
     Rendro.section(
       name: :receipt_header,
@@ -281,11 +299,11 @@ defmodule Rendro.Recipes.Receipt do
   defp maybe_prepend(content, nil, _fun), do: content
   defp maybe_prepend(content, value, fun), do: [fun.(value) | content]
 
-  defp merchant_block(merchant) when is_map(merchant) do
+  defp merchant_block(merchant, colors) when is_map(merchant) do
     name = Map.get(merchant, :name, "")
     address = Map.get(merchant, :address)
     text = if address in [nil, ""], do: name, else: "#{name}\n#{address}"
-    Rendro.block(Rendro.text(text, size: 16))
+    Rendro.block(Rendro.text(text, size: 16, color: colors.ink))
   end
 
   defp body_section(%{lines: lines} = data, opts) do
@@ -374,6 +392,7 @@ defmodule Rendro.Recipes.Receipt do
 
   defp build_totals_blocks(%{totals: totals} = _data, opts) when is_map(totals) do
     fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
+    colors = palette(opts)
 
     minor_lines =
       []
@@ -385,14 +404,26 @@ defmodule Rendro.Recipes.Receipt do
       if minor_lines == [] do
         []
       else
-        [Rendro.block(Rendro.text(Enum.join(minor_lines, "\n"), size: @minor_totals_size))]
+        [
+          Rendro.block(
+            Rendro.text(Enum.join(minor_lines, "\n"),
+              size: @minor_totals_size,
+              color: colors.ink
+            )
+          )
+        ]
       end
 
     total_block =
       case Map.get(totals, :total) do
         %Decimal{} = total ->
           [
-            Rendro.block(Rendro.text("Total: #{fmt_amount.(total)}", size: @dominant_total_size))
+            Rendro.block(
+              Rendro.text("Total: #{fmt_amount.(total)}",
+                size: @dominant_total_size,
+                color: colors.ink
+              )
+            )
           ]
 
         _ ->
@@ -426,6 +457,34 @@ defmodule Rendro.Recipes.Receipt do
       # 1-line (name only) and 2-line (name + address) cases.
       _present -> @default_header_height + 40
     end
+  end
+
+  # ---------------------------------------------------------------------------
+  # Color seam (S1 / PLUMB-01)
+  # ---------------------------------------------------------------------------
+
+  # Returns the role → RGB map for this render. Defaults reproduce today's
+  # implicit black ink / white surfaces so every text run that reads a color
+  # from here stays byte-identical unless the caller supplies a `:palette`
+  # override. Any run that sets a color MUST source it here — never inline a
+  # literal `{r, g, b}` tuple — so Milestone B's design-token layer can slot in
+  # (Plan 03) without rework (S1). This retrofit reads NO tokens: `colors.ink`
+  # defaults to `{0, 0, 0}`, which renders identically to no color arg.
+  defp palette(opts) do
+    overrides = Keyword.get(opts, :palette, %{})
+
+    Map.merge(
+      %{
+        ink: {0, 0, 0},
+        muted: {0, 0, 0},
+        accent: {0, 0, 0},
+        on_accent: {0, 0, 0},
+        background: {255, 255, 255},
+        surface: {255, 255, 255},
+        rule: {0, 0, 0}
+      },
+      overrides
+    )
   end
 
   # ---------------------------------------------------------------------------
