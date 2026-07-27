@@ -335,24 +335,29 @@ defmodule Rendro.Recipes.Statement do
   # Color seam (S1 / PLUMB-01)
   # ---------------------------------------------------------------------------
 
-  # Returns the role → RGB map for this render. Defaults reproduce Statement's
-  # exact current literals — `surface {245, 245, 245}` (closing-balance band
-  # fill) and `rule {0, 0, 0}` (band stroke) — so the `closing_backdrop` path
-  # stays byte-identical unless the caller supplies a `:palette` override. Any
-  # section that sets a color MUST source it from here — never inline a literal
-  # `{r, g, b}` tuple — so Milestone B's design-token layer can slot in later
-  # without breaking rework (S1). Non-color numerics (band stroke `width: 0.75`)
-  # are NOT seamed.
+  # Returns the role → RGB map for this render. When no `:theme` is supplied the
+  # `nil` branch reproduces Statement's exact current literals — `surface
+  # {245, 245, 245}` (closing-balance band fill) and `rule {0, 0, 0}` (band
+  # stroke) — so the `closing_backdrop` path stays byte-identical (PLUMB-03).
+  # When a `:theme` is supplied the base becomes `Rendro.Theme.resolve(theme).colors`
+  # (9 integer-{r,g,b} roles, colors ONLY — no type-scale read). The final
+  # `Map.merge(base, :palette-override)` keeps an explicit `:palette` as the
+  # winning layer (D-01). Non-color numerics (band stroke `width: 0.75`) are NOT
+  # seamed.
   defp palette(opts) do
-    overrides = Keyword.get(opts, :palette, %{})
+    base =
+      case opts[:theme] do
+        nil ->
+          %{
+            surface: {245, 245, 245},
+            rule: {0, 0, 0}
+          }
 
-    Map.merge(
-      %{
-        surface: {245, 245, 245},
-        rule: {0, 0, 0}
-      },
-      overrides
-    )
+        theme ->
+          Rendro.Theme.resolve(theme).colors
+      end
+
+    Map.merge(base, Keyword.get(opts, :palette, %{}))
   end
 
   # Derives the exact closing balance (opening_balance + Σ signed line

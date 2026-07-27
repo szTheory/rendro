@@ -361,21 +361,29 @@ defmodule Rendro.Recipes.Certificate do
   # Frame geometry helpers
   # ---------------------------------------------------------------------------
 
-  # Returns the role → RGB map for this render. The `rule` default reproduces
-  # Certificate's exact current frame literal `{34, 34, 34}` — the NON-BLACK
-  # stress case (D-02): it is deliberately NOT `{0, 0, 0}` and NOT the theme's
-  # `rule`. The frame color sources from here so Milestone B's design-token
-  # layer can slot in later without breaking rework (S1); an explicit
-  # `border: %{color: ...}` override still wins over this default.
+  # Returns the role → RGB map for this render. When no `:theme` is supplied the
+  # `nil` branch's `rule` default reproduces Certificate's exact current frame
+  # literal `{34, 34, 34}` — the NON-BLACK stress case (D-02): deliberately NOT
+  # `{0, 0, 0}` and NOT the theme's `rule`. When a `:theme` is supplied the base
+  # becomes `Rendro.Theme.resolve(theme).colors` and the theme's `rule` recolors
+  # the frame (colors ONLY — no type-scale read). The final
+  # `Map.merge(base, :palette-override)` keeps an explicit `:palette` as the
+  # winning layer, and an explicit `border: %{color: ...}` still wins over the
+  # frame default downstream (precedence: border color > :palette > :theme rule
+  # > literal {34,34,34}).
   defp palette(opts) do
-    overrides = Keyword.get(opts, :palette, %{})
+    base =
+      case opts[:theme] do
+        nil ->
+          %{
+            rule: {34, 34, 34}
+          }
 
-    Map.merge(
-      %{
-        rule: {34, 34, 34}
-      },
-      overrides
-    )
+        theme ->
+          Rendro.Theme.resolve(theme).colors
+      end
+
+    Map.merge(base, Keyword.get(opts, :palette, %{}))
   end
 
   # Resolves frame opts, computing geometry-derived defaults.
