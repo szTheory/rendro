@@ -89,7 +89,24 @@ defmodule Rendro.Recipes.BrandedInvoice do
       ]
     ]
 
-    Rendro.page_template(Keyword.merge(defaults, opts))
+    # page_template/1 only understands PageTemplate struct keys. Recipe-level
+    # opts (:palette, :theme, ...) must be dropped here with a struct-key
+    # whitelist so they thread through to sections/2 / palette/1 instead of
+    # reaching struct!/2 and raising KeyError. Do NOT add :palette/:theme to
+    # this list — dropping them is what lets palette/1 read them.
+    template_opts =
+      Keyword.take(opts, [
+        :name,
+        :width,
+        :height,
+        :margin_top,
+        :margin_right,
+        :margin_bottom,
+        :margin_left,
+        :regions
+      ])
+
+    Rendro.page_template(Keyword.merge(defaults, template_opts))
   end
 
   @doc """
@@ -146,7 +163,9 @@ defmodule Rendro.Recipes.BrandedInvoice do
     )
   end
 
-  defp header_section(%{brand: %{font_name: font_name}, id: id, date: date}, _opts) do
+  defp header_section(%{brand: %{font_name: font_name}, id: id, date: date}, opts) do
+    colors = palette(opts)
+
     # Industry-standard invoice typography: brand is the heading, invoice id
     # is subordinate metadata. Stacking brand/id/date as three independent
     # blocks lets each size to its natural text width — `Rendro.Pipeline.Paginate`
@@ -157,9 +176,9 @@ defmodule Rendro.Recipes.BrandedInvoice do
       name: :branded_invoice_header,
       region: :header,
       content: [
-        Rendro.block(Rendro.text("Rendro, Inc.", font: font_name, size: 18)),
-        Rendro.block(Rendro.text("Invoice ##{id}", font: font_name, size: 12)),
-        Rendro.block(Rendro.text("Date: #{date}", size: 10))
+        Rendro.block(Rendro.text("Rendro, Inc.", font: font_name, size: 18, color: colors.ink)),
+        Rendro.block(Rendro.text("Invoice ##{id}", font: font_name, size: 12, color: colors.ink)),
+        Rendro.block(Rendro.text("Date: #{date}", size: 10, color: colors.ink))
       ]
     )
   end
@@ -183,13 +202,43 @@ defmodule Rendro.Recipes.BrandedInvoice do
     )
   end
 
-  defp footer_section(_data, _opts) do
+  defp footer_section(_data, opts) do
+    colors = palette(opts)
+
     Rendro.section(
       name: :branded_invoice_footer,
       region: :footer,
       content: [
-        Rendro.block(Rendro.text("Thank you for your business!", size: 10))
+        Rendro.block(Rendro.text("Thank you for your business!", size: 10, color: colors.ink))
       ]
+    )
+  end
+
+  # ---------------------------------------------------------------------------
+  # Color seam (S1 / PLUMB-01)
+  # ---------------------------------------------------------------------------
+
+  # Returns the role → RGB map for this render. Defaults reproduce today's
+  # implicit black ink / white surfaces so every text run that reads a color
+  # from here stays byte-identical unless the caller supplies a `:palette`
+  # override. Any run that sets a color MUST source it here — never inline a
+  # literal `{r, g, b}` tuple — so Milestone B's design-token layer can slot in
+  # (Plan 03) without rework (S1). This retrofit reads NO tokens: `colors.ink`
+  # defaults to `{0, 0, 0}`, which renders identically to no color arg.
+  defp palette(opts) do
+    overrides = Keyword.get(opts, :palette, %{})
+
+    Map.merge(
+      %{
+        ink: {0, 0, 0},
+        muted: {0, 0, 0},
+        accent: {0, 0, 0},
+        on_accent: {0, 0, 0},
+        background: {255, 255, 255},
+        surface: {255, 255, 255},
+        rule: {0, 0, 0}
+      },
+      overrides
     )
   end
 
