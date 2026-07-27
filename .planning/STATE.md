@@ -2,10 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
+current_phase: 120
+current_phase_name: "S1 seam retrofit + full `theme:` swap across all 7 recipes"
 status: verifying
 stopped_at: Phase 119 context gathered
-last_updated: "2026-07-24T23:03:15.010Z"
-last_activity: 2026-07-24
+last_updated: "2026-07-27T19:59:08.829Z"
+last_activity: 2026-07-27
+last_activity_desc: Phase 119 complete, transitioned to Phase 120
 progress:
   total_phases: 5
   completed_phases: 1
@@ -25,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-07-19)
 
 ## Current Position
 
-Phase: 119 (rendro-theme-core-module-the-one-way-door) — EXECUTING
-Plan: 2 of 2
+Phase: 120 — S1 seam retrofit + full `theme:` swap across all 7 recipes
+Plan: Not started
 Status: Phase complete — ready for verification
-Last activity: 2026-07-24
+Last activity: 2026-07-27 — Phase 119 complete, transitioned to Phase 120
 
 Progress: [█████░░░░░] 50%
 
