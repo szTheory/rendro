@@ -286,6 +286,7 @@ defmodule Rendro.Recipes.Statement do
     fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
     fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
     lbl = Rendro.Recipes.Pagination.label_resolver(opts)
+    colors = palette(opts)
 
     period_str = "#{fmt_date.(period.from)} to #{fmt_date.(period.to)}"
     ob_str = "#{lbl.(:opening_balance)}: #{fmt_amount.(ob)}"
@@ -302,8 +303,8 @@ defmodule Rendro.Recipes.Statement do
     # visually overlay the drawn box.
     closing_backdrop =
       Rendro.path([{:rect, 0, 0, @content_width, @closing_balance_band_h}],
-        fill: {245, 245, 245},
-        stroke: %{color: {0, 0, 0}, width: 0.75},
+        fill: colors.surface,
+        stroke: %{color: colors.rule, width: 0.75},
         x: 0,
         y: 0,
         width: @content_width,
@@ -327,6 +328,30 @@ defmodule Rendro.Recipes.Statement do
         closing_label,
         closing_value
       ]
+    )
+  end
+
+  # ---------------------------------------------------------------------------
+  # Color seam (S1 / PLUMB-01)
+  # ---------------------------------------------------------------------------
+
+  # Returns the role → RGB map for this render. Defaults reproduce Statement's
+  # exact current literals — `surface {245, 245, 245}` (closing-balance band
+  # fill) and `rule {0, 0, 0}` (band stroke) — so the `closing_backdrop` path
+  # stays byte-identical unless the caller supplies a `:palette` override. Any
+  # section that sets a color MUST source it from here — never inline a literal
+  # `{r, g, b}` tuple — so Milestone B's design-token layer can slot in later
+  # without breaking rework (S1). Non-color numerics (band stroke `width: 0.75`)
+  # are NOT seamed.
+  defp palette(opts) do
+    overrides = Keyword.get(opts, :palette, %{})
+
+    Map.merge(
+      %{
+        surface: {245, 245, 245},
+        rule: {0, 0, 0}
+      },
+      overrides
     )
   end
 
