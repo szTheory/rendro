@@ -96,11 +96,11 @@ Plans:
 **Wave 1**
 
 - [x] 120-01-PLAN.md — Retrofit Statement + Certificate (byte-identical palette/1 seams, non-black {34,34,34} stress case, 2 frozen goldens) [Wave 1]
-- [ ] 120-02-PLAN.md — Retrofit Receipt + BrandedInvoice (ink seam D-03, KeyError whitelist fixes, net-new branded golden) [Wave 1]
+- [x] 120-02-PLAN.md — Retrofit Receipt + BrandedInvoice (ink seam D-03, KeyError whitelist fixes, net-new branded golden) [Wave 1]
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 120-03-PLAN.md — Swap the 4 retrofitted recipes to theme.colors + threading tests [Wave 2]
+- [x] 120-03-PLAN.md — Swap the 4 retrofitted recipes to theme.colors + threading tests [Wave 2]
 - [ ] 120-04-PLAN.md — Swap Invoice/Payslip/Ticket + phase-wide no-inline-literal source-scan test [Wave 2]
 
 ### Phase 121: Light/dark background-fill mechanism (all 7 recipes)
@@ -150,7 +150,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 119. `Rendro.Theme` core module (the one-way door) | v2.11 | 2/2 | Complete    | 2026-07-24 |
-| 120. S1 seam retrofit + full `theme:` swap (7 recipes) | v2.11 | 1/4 | In Progress|  |
+| 120. S1 seam retrofit + full `theme:` swap (7 recipes) | v2.11 | 3/4 | In Progress|  |
 | 121. Light/dark background-fill mechanism (7 recipes) | v2.11 | 0/TBD | Not started | - |
 | 122. Typography type-scale + font-role/leading wiring | v2.11 | 0/TBD | Not started | - |
 | 123. `from_brand/2` E2E + honest rubric-gap + docs closure | v2.11 | 0/TBD | Not started | - |
