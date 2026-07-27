@@ -218,28 +218,33 @@ defmodule Rendro.Recipes.BrandedInvoice do
   # Color seam (S1 / PLUMB-01)
   # ---------------------------------------------------------------------------
 
-  # Returns the role → RGB map for this render. Defaults reproduce today's
-  # implicit black ink / white surfaces so every text run that reads a color
-  # from here stays byte-identical unless the caller supplies a `:palette`
-  # override. Any run that sets a color MUST source it here — never inline a
-  # literal `{r, g, b}` tuple — so Milestone B's design-token layer can slot in
-  # (Plan 03) without rework (S1). This retrofit reads NO tokens: `colors.ink`
-  # defaults to `{0, 0, 0}`, which renders identically to no color arg.
+  # Returns the role → RGB map for this render. When no `:theme` is supplied the
+  # `nil` branch reproduces today's implicit black ink / white surfaces
+  # (`ink {0, 0, 0}`, which renders identically to no color arg) so every text
+  # run stays byte-identical (PLUMB-03). When a `:theme` is supplied the base
+  # becomes `Rendro.Theme.resolve(theme).colors` (9 integer-{r,g,b} roles,
+  # colors ONLY — no type-scale read) and a themed `ink` recolors the header /
+  # footer text. The final `Map.merge(base, :palette-override)` keeps an
+  # explicit `:palette` as the winning layer (D-01).
   defp palette(opts) do
-    overrides = Keyword.get(opts, :palette, %{})
+    base =
+      case opts[:theme] do
+        nil ->
+          %{
+            ink: {0, 0, 0},
+            muted: {0, 0, 0},
+            accent: {0, 0, 0},
+            on_accent: {0, 0, 0},
+            background: {255, 255, 255},
+            surface: {255, 255, 255},
+            rule: {0, 0, 0}
+          }
 
-    Map.merge(
-      %{
-        ink: {0, 0, 0},
-        muted: {0, 0, 0},
-        accent: {0, 0, 0},
-        on_accent: {0, 0, 0},
-        background: {255, 255, 255},
-        surface: {255, 255, 255},
-        rule: {0, 0, 0}
-      },
-      overrides
-    )
+        theme ->
+          Rendro.Theme.resolve(theme).colors
+      end
+
+    Map.merge(base, Keyword.get(opts, :palette, %{}))
   end
 
   defp validate_data!(%{brand: %{font_name: font_name, logo_name: logo_name}})

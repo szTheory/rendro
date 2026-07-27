@@ -55,4 +55,32 @@ defmodule Rendro.Recipes.BrandedInvoiceOptsThreadingTest do
       assert length(sections) == 4
     end
   end
+
+  describe "BrandedInvoice :theme threading (Phase 120 Plan 03 swap, PLUMB-02)" do
+    test ":theme threads through page_template/1 without KeyError" do
+      assert %Rendro.PageTemplate{} = BrandedInvoice.page_template(theme: Rendro.Theme.default())
+    end
+
+    test "a themed render differs from the no-theme render" do
+      data = sample_data()
+
+      refute BrandedInvoice.sections(data) ==
+               BrandedInvoice.sections(data, theme: Rendro.Theme.default())
+    end
+
+    test ":palette override wins over :theme (D-01)" do
+      data = sample_data()
+      themed = BrandedInvoice.sections(data, theme: Rendro.Theme.default())
+
+      overridden =
+        BrandedInvoice.sections(data, theme: Rendro.Theme.default(), palette: %{ink: {200, 0, 0}})
+
+      refute themed == overridden
+    end
+
+    test "no-theme sections identical to empty-opts sections (PLUMB-03)" do
+      data = sample_data()
+      assert BrandedInvoice.sections(data) == BrandedInvoice.sections(data, [])
+    end
+  end
 end
