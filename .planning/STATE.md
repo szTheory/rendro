@@ -2,13 +2,10 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
-current_phase: 120
-current_phase_name: "S1 seam retrofit + full `theme:` swap across all 7 recipes"
 status: verifying
-stopped_at: Phase 119 context gathered
-last_updated: "2026-07-27T19:59:08.829Z"
-last_activity: 2026-07-27
-last_activity_desc: Phase 119 complete, transitioned to Phase 120
+stopped_at: Phase 120 context gathered
+last_updated: "2026-07-27T21:21:50.502Z"
+last_activity: 2026-07-27 — Phase 119 complete, transitioned to Phase 120
 progress:
   total_phases: 5
   completed_phases: 1
@@ -82,9 +79,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-24T23:02:22.332Z
-Stopped at: Phase 119 context gathered
-Resume file: None
+Last session: 2026-07-27T21:21:50.497Z
+Stopped at: Phase 120 context gathered
+Resume file: .planning/phases/120-s1-seam-retrofit-full-theme-swap-across-all-7-recipes/120-CONTEXT.md
 
 ## Next Steps
 
