@@ -93,8 +93,13 @@
 **Plans**: 4 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 120-01-PLAN.md — Retrofit Statement + Certificate (byte-identical palette/1 seams, non-black {34,34,34} stress case, 2 frozen goldens) [Wave 1]
 - [ ] 120-02-PLAN.md — Retrofit Receipt + BrandedInvoice (ink seam D-03, KeyError whitelist fixes, net-new branded golden) [Wave 1]
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 120-03-PLAN.md — Swap the 4 retrofitted recipes to theme.colors + threading tests [Wave 2]
 - [ ] 120-04-PLAN.md — Swap Invoice/Payslip/Ticket + phase-wide no-inline-literal source-scan test [Wave 2]
 

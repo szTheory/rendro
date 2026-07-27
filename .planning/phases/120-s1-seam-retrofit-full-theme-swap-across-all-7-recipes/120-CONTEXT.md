@@ -41,7 +41,7 @@ Phase 120 is heavily pre-specified by the milestone-b research SUMMARY and Phase
 locked `%Theme{}` shape. Four decisions below; three locked from research + code
 evidence, one (D-03) chosen by the user.
 
-### D-01 — Legacy `:palette` opt: preserve, override-wins (PLUMB-02 back-compat)
+- **D-01 — Legacy `:palette` opt: preserve, override-wins** (PLUMB-02 back-compat)
 - **Preserve** `:palette` — do NOT retire it. Resolution per recipe:
   `base = if theme = opts[:theme], do: Rendro.Theme.resolve(theme).colors, else: <today's literal defaults>`,
   then `Map.merge(base, Keyword.get(opts, :palette, %{}))` as the **final** layer.
@@ -55,7 +55,7 @@ evidence, one (D-03) chosen by the user.
   (Phase 119 D-01), so re-resolving at each of the 3 rungs is free and prevents a
   partial-theme draw-time `KeyError`.
 
-### D-02 — Per-literal role mapping; no-theme path stays byte-identical (PLUMB-01/03)
+- **D-02 — Per-literal role mapping; no-theme path stays byte-identical** (PLUMB-01/03)
 - The retrofit `palette/1` default for each recipe reproduces its **exact current
   literal** — per-recipe, NOT a uniform all-black default. Concretely:
   - **Certificate:** frame `{34,34,34}` (near-ink keyline) → maps to `rule` role;
@@ -71,7 +71,7 @@ evidence, one (D-03) chosen by the user.
 - **Flag every literal→role mapping explicitly in the plan** (research directive):
   which role each recipe literal binds to is a deliberate, reviewable choice.
 
-### D-03 — Colorless recipes (Receipt, BrandedInvoice): seam text→ink NOW *(user decision)*
+- **D-03 — Colorless recipes (Receipt, BrandedInvoice): seam text→ink NOW** *(user decision)*
 - Introduce explicit `theme.colors.ink` reads on the **primary text** of both
   recipes now, defaulting to `{0,0,0}` so the no-theme render is byte-identical.
 - **Rationale (user-selected):** makes both recipes genuinely themable in Phase 120,
@@ -81,7 +81,7 @@ evidence, one (D-03) chosen by the user.
 - Accepts a slightly larger byte-identity blast radius for these two recipes; proven
   by their fresh retrofit sha256 goldens (all default to `{0,0,0}` → identical bytes).
 
-### D-04 — Typography threading boundary: colors only in 120 (scope split with Phase 122)
+- **D-04 — Typography threading boundary: colors only in 120** (scope split with Phase 122)
 - Phase 120 threads the **whole resolved `%Theme{}`** value through the 3 rungs
   (shared plumbing) but reads **only** `theme.colors.*`.
 - All `theme.typography.*` reads into `%Text{size,font,line_height,widows,orphans}`
