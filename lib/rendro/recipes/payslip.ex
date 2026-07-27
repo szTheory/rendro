@@ -671,24 +671,31 @@ defmodule Rendro.Recipes.Payslip do
   end
 
   # ---------------------------------------------------------------------------
-  # Color seam (S1) — verbatim from invoice.ex:371-386
+  # Color seam (S1 / PLUMB-02 swap)
   # ---------------------------------------------------------------------------
 
+  # `nil` branch keeps Payslip's exact current literals (byte-identical no-theme
+  # path, PLUMB-03); the `theme ->` branch reads `Rendro.Theme.resolve(theme).colors`
+  # (colors ONLY — no type-scale read). `:palette` stays the winning layer (D-01).
   defp palette(opts) do
-    overrides = Keyword.get(opts, :palette, %{})
+    base =
+      case opts[:theme] do
+        nil ->
+          %{
+            ink: {0, 0, 0},
+            muted: {0, 0, 0},
+            accent: {0, 0, 0},
+            on_accent: {0, 0, 0},
+            background: {255, 255, 255},
+            surface: {255, 255, 255},
+            rule: {0, 0, 0}
+          }
 
-    Map.merge(
-      %{
-        ink: {0, 0, 0},
-        muted: {0, 0, 0},
-        accent: {0, 0, 0},
-        on_accent: {0, 0, 0},
-        background: {255, 255, 255},
-        surface: {255, 255, 255},
-        rule: {0, 0, 0}
-      },
-      overrides
-    )
+        theme ->
+          Rendro.Theme.resolve(theme).colors
+      end
+
+    Map.merge(base, Keyword.get(opts, :palette, %{}))
   end
 
   # ---------------------------------------------------------------------------

@@ -457,27 +457,33 @@ defmodule Rendro.Recipes.Invoice do
   # Color seam (INV-07 / S1)
   # ---------------------------------------------------------------------------
 
-  # Returns the role → RGB map for this render. Defaults reproduce today's
-  # literals (all-black ink, white surfaces) so sections that read colors from
-  # here stay byte-identical unless the caller supplies a `:palette` override.
-  # Any section that sets a color MUST source it from here — never inline a
-  # literal `{r, g, b}` tuple — so Milestone B's `Rendro.Theme` can slot in
-  # without breaking rework (S1).
+  # Returns the role → RGB map for this render. When no `:theme` is supplied the
+  # `nil` branch reproduces Invoice's exact current literals (all-black ink,
+  # white surfaces) so every section that reads colors from here stays
+  # byte-identical (PLUMB-03). When a `:theme` is supplied the base becomes
+  # `Rendro.Theme.resolve(theme).colors` (9 integer-{r,g,b} roles, colors ONLY
+  # — no type-scale read). The final `Map.merge(base, :palette-override)` keeps
+  # an explicit `:palette` as the winning layer (D-01). Any section that sets a
+  # color MUST source it from here — never inline a literal `{r, g, b}` tuple.
   defp palette(opts) do
-    overrides = Keyword.get(opts, :palette, %{})
+    base =
+      case opts[:theme] do
+        nil ->
+          %{
+            ink: {0, 0, 0},
+            muted: {0, 0, 0},
+            accent: {0, 0, 0},
+            on_accent: {0, 0, 0},
+            background: {255, 255, 255},
+            surface: {255, 255, 255},
+            rule: {0, 0, 0}
+          }
 
-    Map.merge(
-      %{
-        ink: {0, 0, 0},
-        muted: {0, 0, 0},
-        accent: {0, 0, 0},
-        on_accent: {0, 0, 0},
-        background: {255, 255, 255},
-        surface: {255, 255, 255},
-        rule: {0, 0, 0}
-      },
-      overrides
-    )
+        theme ->
+          Rendro.Theme.resolve(theme).colors
+      end
+
+    Map.merge(base, Keyword.get(opts, :palette, %{}))
   end
 
   # ---------------------------------------------------------------------------

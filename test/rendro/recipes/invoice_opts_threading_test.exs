@@ -102,4 +102,30 @@ defmodule Rendro.Recipes.InvoiceOptsThreadingTest do
       assert Invoice.sections(data) == Invoice.sections(data, palette: %{})
     end
   end
+
+  describe "Invoice :theme threading (PLUMB-02 swap)" do
+    test ":theme threads through page_template/1 without KeyError" do
+      assert %Rendro.PageTemplate{} = Invoice.page_template(theme: Rendro.Theme.default())
+    end
+
+    test "a themed render differs from the no-theme render" do
+      data = sample_data()
+      refute Invoice.sections(data) == Invoice.sections(data, theme: Rendro.Theme.default())
+    end
+
+    test ":palette override wins over :theme (D-01)" do
+      data = sample_data()
+      themed = Invoice.sections(data, theme: Rendro.Theme.default())
+
+      overridden =
+        Invoice.sections(data, theme: Rendro.Theme.default(), palette: %{ink: {200, 0, 0}})
+
+      refute themed == overridden
+    end
+
+    test "no-theme sections(data) equals sections(data, []) (PLUMB-03)" do
+      data = sample_data()
+      assert Invoice.sections(data) == Invoice.sections(data, [])
+    end
+  end
 end
