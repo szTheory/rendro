@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
 current_phase: 121
-current_phase_name: all 7 recipes
+current_phase_name: Light/dark background-fill mechanism (all 7 recipes)
 status: planning
 stopped_at: Completed 120-04-PLAN.md
 last_updated: "2026-07-27T22:31:30.609Z"
@@ -21,10 +21,10 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-07-19)
+See: .planning/PROJECT.md (updated 2026-07-27)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 120 — s1-seam-retrofit-full-theme-swap-across-all-7-recipes
+**Current focus:** Phase 121 — Light/dark background-fill mechanism (all 7 recipes)
 
 ## Current Position
 
@@ -33,15 +33,15 @@ Plan: Not started
 Status: Ready to plan
 Last activity: 2026-07-27 — Phase 120 complete, transitioned to Phase 121
 
-Progress: [██████████] 100%
+Progress: [█████████████░░░░░░░] 7/11 plans (64%)
 
 ## Roadmap Snapshot (v2.11, Phases 119-123)
 
 ```text
-[░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 0% — 0/5 phases complete
-Phase 119 Rendro.Theme core module (one-way door) ........ Ready to plan
-Phase 120 S1 retrofit + theme: swap (7 recipes) .......... Not started
-Phase 121 Light/dark background-fill mechanism ........... Not started
+[████████████████░░░░░░░░░░░░░░░░░░░░░░░░] 40% — 2/5 phases complete
+Phase 119 Rendro.Theme core module (one-way door) ........ ✓ Complete
+Phase 120 S1 retrofit + theme: swap (7 recipes) .......... ✓ Complete
+Phase 121 Light/dark background-fill mechanism ........... Ready to plan
 Phase 122 Typography type-scale application .............. Not started
 Phase 123 from_brand/2 E2E + honest rubric-gap + docs .... Not started
 ```
@@ -88,10 +88,11 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-27T22:18:35.414Z
-Stopped at: Completed 120-04-PLAN.md
+Last session: 2026-07-27T22:31:30.609Z
+Stopped at: Phase 120 complete and verified (8/8 must-haves); ready to plan Phase 121
 Resume file: None
 
 ## Next Steps
 
-1. `/gsd-plan-phase 119` — plan the `Rendro.Theme` core module (the one-way door): full struct shape up front, `resolve/1`/`default/0`/`dark/1`/`from_brand/2`, adapter-tier manifest entry + planned red→green contract reconciliation, industry-agnostic guard. Zero recipe change.
+1. `/gsd-discuss-phase 121` — gather context for the light/dark background-fill mechanism: a role-derived full-page `:background` page-template region that repeats on every page (incl. overflow), giving every recipe dark for free, with the light default emitting no rect and staying byte-identical. (Watch WR-01 from Phase 120: Statement's closing-balance band text is not seamed and would be invisible on a dark background — seam it here.)
+2. `/gsd-plan-phase 121` — skip discussion and plan directly.
