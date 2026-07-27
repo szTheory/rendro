@@ -113,7 +113,7 @@ defmodule Rendro.Recipes.Certificate do
 
     regions =
       if border do
-        frame_opts = resolve_frame_opts(border, pw, ph, ml, mr, mt, mb)
+        frame_opts = resolve_frame_opts(border, pw, ph, ml, mr, mt, mb, palette(opts))
         inset = frame_opts.inset
 
         frame_region =
@@ -172,7 +172,8 @@ defmodule Rendro.Recipes.Certificate do
       mt = Keyword.get(opts, :margin_top, @default_margin)
       mb = Keyword.get(opts, :margin_bottom, @default_margin)
 
-      frame_opts = resolve_frame_opts(border, pw, ph, ml, mr, mt, mb)
+      colors = palette(opts)
+      frame_opts = resolve_frame_opts(border, pw, ph, ml, mr, mt, mb, colors)
       inset = frame_opts.inset
       region_w = pw - 2 * inset
       region_h = ph - 2 * inset
@@ -360,9 +361,26 @@ defmodule Rendro.Recipes.Certificate do
   # Frame geometry helpers
   # ---------------------------------------------------------------------------
 
+  # Returns the role → RGB map for this render. The `rule` default reproduces
+  # Certificate's exact current frame literal `{34, 34, 34}` — the NON-BLACK
+  # stress case (D-02): it is deliberately NOT `{0, 0, 0}` and NOT the theme's
+  # `rule`. The frame color sources from here so Milestone B's design-token
+  # layer can slot in later without breaking rework (S1); an explicit
+  # `border: %{color: ...}` override still wins over this default.
+  defp palette(opts) do
+    overrides = Keyword.get(opts, :palette, %{})
+
+    Map.merge(
+      %{
+        rule: {34, 34, 34}
+      },
+      overrides
+    )
+  end
+
   # Resolves frame opts, computing geometry-derived defaults.
   # Returns a fully resolved map with :style, :color, :inset, :weight, :gap.
-  defp resolve_frame_opts(border, pw, ph, ml, mr, mt, mb) do
+  defp resolve_frame_opts(border, pw, ph, ml, mr, mt, mb, colors) do
     border_map = if is_map(border), do: border, else: %{}
 
     short = min(pw, ph)
@@ -371,7 +389,7 @@ defmodule Rendro.Recipes.Certificate do
 
     %{
       style: Map.get(border_map, :style, :single),
-      color: Map.get(border_map, :color, {34, 34, 34}),
+      color: Map.get(border_map, :color, colors.rule),
       inset: Map.get(border_map, :inset, default_inset),
       weight: Map.get(border_map, :weight, default_weight),
       gap: Map.get(border_map, :gap, 0)
