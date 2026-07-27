@@ -2,18 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
-current_phase: 120
-current_phase_name: "S1 seam retrofit + full `theme:` swap across all 7 recipes"
 status: executing
-stopped_at: Phase 120 context gathered
-last_updated: "2026-07-27T21:52:37.841Z"
+stopped_at: Completed 120-01-PLAN.md
+last_updated: "2026-07-27T22:00:58.572Z"
 last_activity: 2026-07-27
-last_activity_desc: Phase 119 complete, transitioned to Phase 120
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 6
-  completed_plans: 2
+  completed_plans: 3
   percent: 20
 ---
 
@@ -24,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-19)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 119 — rendro-theme-core-module-the-one-way-door
+**Current focus:** Phase 120 — s1-seam-retrofit-full-theme-swap-across-all-7-recipes
 
 ## Current Position
 
-Phase: 120 — S1 seam retrofit + full `theme:` swap across all 7 recipes
-Plan: Not started
+Phase: 120 (s1-seam-retrofit-full-theme-swap-across-all-7-recipes) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-07-27 — Phase 119 complete, transitioned to Phase 120
+Last activity: 2026-07-27
 
 Progress: [█████░░░░░] 50%
 
@@ -62,6 +59,8 @@ Full log in PROJECT.md Key Decisions. Milestone-B locks carried into planning:
 - [Phase ?]: Compact density honored as fixed-constant leading nudge (1.1) to preserve resolve/1 idempotence
 - [Phase 119]: WCAG 2.4 gamma computed via :math.exp/:math.log (no :math.pow); type scale stays explicit points
 - [Phase ?]: 119-02: Rendro.Theme registered on adapter tier; both byte-equality manifest assertions RG-1 (public_api_contract_test:72) + RG-2 (manifest_test:98) reconciled green together per D-06
+- [Phase ?]: 120-01: Certificate resolve_frame_opts widened /7->/8 to thread colors; byte-identical since colors.rule defaults to {34,34,34}
+- [Phase ?]: 120-01: Statement/Certificate palette/1 seams frozen with sha256 byte-identity tests; zero theme reads (split-commit before swap)
 
 ### Pending Todos
 
@@ -82,9 +81,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-27T21:21:50.497Z
-Stopped at: Phase 120 context gathered
-Resume file: .planning/phases/120-s1-seam-retrofit-full-theme-swap-across-all-7-recipes/120-CONTEXT.md
+Last session: 2026-07-27T22:00:46.715Z
+Stopped at: Completed 120-01-PLAN.md
+Resume file: None
 
 ## Next Steps
 

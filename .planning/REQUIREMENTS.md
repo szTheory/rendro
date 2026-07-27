@@ -35,9 +35,9 @@ Requirements for this milestone. Each maps to exactly one roadmap phase.
 
 ### Recipe Plumbing (PLUMB)
 
-- [ ] **PLUMB-01**: The 4 un-seamed recipes (Statement, Certificate, Receipt, BrandedInvoice) are retrofitted with a byte-identical `palette/1` seam (defaults = today's exact literals), proven by fresh sha256 goldens in commits *separate* from any theme wiring.
-- [ ] **PLUMB-02**: All 7 recipes thread a resolved `theme:` through the 3-rung pattern (`document/2` → `page_template/1` → `sections/2`), reading `theme.colors.*` / `theme.typography.*`, with each recipe's opts whitelist admitting `:theme`.
-- [ ] **PLUMB-03**: `document(data)` with no `theme:` opt is a byte-identity no-op for all 7 recipes — reproduces v2.10 bytes (the milestone's central regression guard).
+- [x] **PLUMB-01**: The 4 un-seamed recipes (Statement, Certificate, Receipt, BrandedInvoice) are retrofitted with a byte-identical `palette/1` seam (defaults = today's exact literals), proven by fresh sha256 goldens in commits *separate* from any theme wiring.
+- [x] **PLUMB-02**: All 7 recipes thread a resolved `theme:` through the 3-rung pattern (`document/2` → `page_template/1` → `sections/2`), reading `theme.colors.*` / `theme.typography.*`, with each recipe's opts whitelist admitting `:theme`.
+- [x] **PLUMB-03**: `document(data)` with no `theme:` opt is a byte-identity no-op for all 7 recipes — reproduces v2.10 bytes (the milestone's central regression guard).
 
 ### Unbranded Default & Rubric Closure (DEFAULT)
 
@@ -102,9 +102,9 @@ Which phases cover which requirements. Populated during roadmap creation.
 | MODE-01 | Phase 121 | Pending |
 | MODE-02 | Phase 121 | Pending |
 | MODE-03 | Phase 121 | Pending |
-| PLUMB-01 | Phase 120 | Pending |
-| PLUMB-02 | Phase 120 | Pending |
-| PLUMB-03 | Phase 120 | Pending |
+| PLUMB-01 | Phase 120 | Complete |
+| PLUMB-02 | Phase 120 | Complete |
+| PLUMB-03 | Phase 120 | Complete |
 | DEFAULT-01 | Phase 123 | Pending |
 | DEFAULT-02 | Phase 123 | Pending |
 | DEFAULT-03 | Phase 123 | Pending |
