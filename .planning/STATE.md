@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
 status: executing
-stopped_at: Completed 120-01-PLAN.md
-last_updated: "2026-07-27T22:00:58.572Z"
+stopped_at: Completed 120-02-PLAN.md
+last_updated: "2026-07-27T22:05:29.855Z"
 last_activity: 2026-07-27
 progress:
   total_phases: 5
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-07-19)
 ## Current Position
 
 Phase: 120 (s1-seam-retrofit-full-theme-swap-across-all-7-recipes) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-07-27
 
@@ -61,6 +61,8 @@ Full log in PROJECT.md Key Decisions. Milestone-B locks carried into planning:
 - [Phase ?]: 119-02: Rendro.Theme registered on adapter tier; both byte-equality manifest assertions RG-1 (public_api_contract_test:72) + RG-2 (manifest_test:98) reconciled green together per D-06
 - [Phase ?]: 120-01: Certificate resolve_frame_opts widened /7->/8 to thread colors; byte-identical since colors.rule defaults to {34,34,34}
 - [Phase ?]: 120-01: Statement/Certificate palette/1 seams frozen with sha256 byte-identity tests; zero theme reads (split-commit before swap)
+- [Phase ?]: 120-02: Receipt/BrandedInvoice palette/1 ink seams retrofitted; primary text reads colors.ink (default {0,0,0}); byte-identical frozen sha256 goldens (BrandedInvoice net-new). Zero theme reads (split-commit before swap).
+- [Phase ?]: 120-02: Receipt/BrandedInvoice page_template/1 KeyError gotcha fixed via Keyword.take struct-key whitelist (dropping :palette/:theme so they thread to palette/1).
 
 ### Pending Todos
 
@@ -81,8 +83,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-27T22:00:46.715Z
-Stopped at: Completed 120-01-PLAN.md
+Last session: 2026-07-27T22:05:29.851Z
+Stopped at: Completed 120-02-PLAN.md
 Resume file: None
 
 ## Next Steps
