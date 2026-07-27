@@ -389,20 +389,25 @@ assert pdf =~ Rendro.Color.rg(Rendro.Theme.dark(Rendro.Theme.default()).colors.b
 | A3 | Ecosystem framing (Typst `page(fill:)`, ReportLab draw-rect-first, Material surface-tint) — used only as design rationale, not as an API claim. | State of the Art | NONE — decorative context; the locked decisions already encode it. |
 | A4 | Committing new `priv/goldens/<recipe>/dark.sha256` 1-line refs is acceptable Hex-tarball content (consistent with existing golden refs). | Runtime State Inventory | LOW — existing goldens already ship in `priv/`; confirm no PDF bytes are committed (the helper writes only hashes, `golden.ex:59`). |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Which recipe carries the forced-overflow dark golden (D-08b)?**
+*All three resolved by the Phase-121 plans — each recommendation was adopted (121-01/02/04).*
+
+1. **Which recipe carries the forced-overflow dark golden (D-08b)?** — **RESOLVED**
    - What we know: Certificate is single-page (body ≤ 2000 bytes, `certificate.ex:550`), so it cannot spill. Statement and Payslip paginate natively (`chunk_rows_into_pages`).
    - What's unclear: whether to prove overflow on Statement (simplest data) or Payslip.
    - Recommendation: use **Statement** with enough `:lines` to force page 2+ (mirror the existing Statement multi-page fixtures); assert the fill op appears in **each** page content stream. Keep a single-page dark golden on a second recipe (e.g. Certificate landscape) to prove non-portrait geometry.
+   - **RESOLVED:** Adopted — 121-01 Task 2 uses Statement as the forced-overflow vehicle (occurrence count == page count); 121-02 uses Certificate landscape for non-portrait geometry.
 
-2. **Home for the D-10 helper: new `Rendro.Recipes.Background` vs a function in `Rendro.Recipes.Pagination`?**
+2. **Home for the D-10 helper: new `Rendro.Recipes.Background` vs a function in `Rendro.Recipes.Pagination`?** — **RESOLVED**
    - What we know: `Pagination` is the existing shared recipe-utility module but is semantically about row chunking.
    - Recommendation: a new `@moduledoc false` `Rendro.Recipes.Background` — cleaner single responsibility; `@doc false` keeps it out of the public API manifest (mirrors `payslip.ex:77-79`).
+   - **RESOLVED:** Adopted — 121-01 creates the new `@moduledoc false` `Rendro.Recipes.Background` helper (`emit?/1`, `region/2`, `section/3`).
 
-3. **Should each recipe expose a convenience `mode: :dark` opt, or is `theme: Theme.dark(base)` the sole selector?**
+3. **Should each recipe expose a convenience `mode: :dark` opt, or is `theme: Theme.dark(base)` the sole selector?** — **RESOLVED**
    - What we know: MODE-01's "selector" is satisfied by `dark/1` + the existing `theme:` opt; no recipe currently reads a `mode:` opt.
    - Recommendation: no new `mode:` opt this phase — `theme: Rendro.Theme.dark(...)` is the selector. (A `mode:` sugar, if ever wanted, is a Phase-123 ergonomics concern.)
+   - **RESOLVED:** Adopted — no new `mode:` opt; `theme: Rendro.Theme.dark(...)` is the sole selector.
 
 ## Environment Availability
 
