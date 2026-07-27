@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
-status: executing
-stopped_at: Completed 120-03-PLAN.md
-last_updated: "2026-07-27T22:12:00.525Z"
+status: verifying
+stopped_at: Completed 120-04-PLAN.md
+last_updated: "2026-07-27T22:18:35.418Z"
 last_activity: 2026-07-27
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 6
-  completed_plans: 5
-  percent: 20
+  completed_plans: 6
+  percent: 40
 ---
 
 # Project State
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-07-19)
 
 Phase: 120 (s1-seam-retrofit-full-theme-swap-across-all-7-recipes) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-27
 
-Progress: [████████░░] 83%
+Progress: [██████████] 100%
 
 ## Roadmap Snapshot (v2.11, Phases 119-123)
 
@@ -64,6 +64,7 @@ Full log in PROJECT.md Key Decisions. Milestone-B locks carried into planning:
 - [Phase ?]: 120-02: Receipt/BrandedInvoice palette/1 ink seams retrofitted; primary text reads colors.ink (default {0,0,0}); byte-identical frozen sha256 goldens (BrandedInvoice net-new). Zero theme reads (split-commit before swap).
 - [Phase ?]: 120-02: Receipt/BrandedInvoice page_template/1 KeyError gotcha fixed via Keyword.take struct-key whitelist (dropping :palette/:theme so they thread to palette/1).
 - [Phase ?]: Phase 120 Plan 03: swapped Statement/Certificate/Receipt/BrandedInvoice palette/1 to theme.colors via case opts[:theme]; :palette wins over :theme (D-01); no-theme byte-identical (PLUMB-03)
+- [Phase ?]: 120-04: swapped Invoice/Payslip/Ticket palette/1 to theme.colors via case opts[:theme]; :palette wins over :theme (D-01); no-theme byte-identical (PLUMB-03). Phase-wide no_inline_color_literals source-scan (PLUMB-02) + typography-free guard (D-04) added. Phase 120 complete: all 7 recipes themable.
 
 ### Pending Todos
 
@@ -84,8 +85,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-27T22:11:52.588Z
-Stopped at: Completed 120-03-PLAN.md
+Last session: 2026-07-27T22:18:35.414Z
+Stopped at: Completed 120-04-PLAN.md
 Resume file: None
 
 ## Next Steps
