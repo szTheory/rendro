@@ -228,6 +228,9 @@ defmodule Rendro.Theme do
   dark targets and sets `mode: :dark`. `accent` is unchanged and `on_accent`
   stays white (R2) — no transcendental color math at draw time.
 
+  Dark is screen-oriented, not recommended for print: it carries no print,
+  accessibility, PDF/UA, or WCAG contrast support claim.
+
   ## Examples
 
       iex> Rendro.Theme.dark(Rendro.Theme.default()).mode
