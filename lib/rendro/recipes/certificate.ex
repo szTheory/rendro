@@ -295,22 +295,35 @@ defmodule Rendro.Recipes.Certificate do
   # Private section builders
   # ---------------------------------------------------------------------------
 
-  # 118-08 gap-closure (SHOW-01): recipient name must be the dominant
-  # element (larger than the title, mirrors Payslip's Net Pay box) — the
-  # title now recedes so the recipient reads as the one key fact.
-  @title_size 20
-  @subtitle_size 12
-  @recipient_size 34
-  @body_size 11
-  @meta_size 10
   @line_height 1.2
   # Body paragraph measure — a fraction of the body region width so the
   # paragraph never runs edge-to-edge (118-06-FINDINGS.md certificate gap).
   @body_measure_fraction 0.68
 
+  # 122-03 typography seam. The five former @*_size module attrs
+  # (title 20 / subtitle 12 / recipient 34 / body 11 / meta 10) are now the
+  # named scale steps of typography/1's no-theme literal-default map:
+  #   recipient 34 -> scale.display (SOLE anchor, a name -> fonts.heading)
+  #   title     20 -> scale.title (fonts.heading)
+  #   subtitle  12 -> scale.subtitle (fonts.body)
+  #   body      11 -> scale.body (fonts.body)
+  #   meta      10 -> scale.small (fonts.body)
+  # RESEARCH Pitfall 2 (measurement coupling): each element's size is resolved
+  # ONCE from the seam and fed into BOTH the %Text{} run AND the centering math
+  # (line_h/1, text_width/3) — never let the text run read the seam while the
+  # measurement reads a stale attr, or a themed render de-centers.
   defp body_section(data, opts, template) do
     fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
     colors = palette(opts)
+    type = typography(opts)
+
+    # Resolve each element's size ONCE — the single source both the text run
+    # and the centering measurement below read from.
+    title_size = type.scale.title
+    subtitle_size = type.scale.subtitle
+    recipient_size = type.scale.display
+    body_size = type.scale.body
+    meta_size = type.scale.small
 
     body_text = Map.get(data, :body, "")
     seal_text = Map.get(data, :seal_line, "")
@@ -321,7 +334,8 @@ defmodule Rendro.Recipes.Certificate do
 
     # Only "Helvetica" is ever used for this recipe's text runs (the
     # optional `brand` font is registered for embedding but never applied to
-    # a text block here), so built-in Helvetica metrics are always the
+    # a text block here, and the seam's font roles default to `:default` ==
+    # built-in Helvetica), so built-in Helvetica metrics are always the
     # correct font to measure against for centering.
     font = Rendro.PDF.Font.helvetica()
 
@@ -335,25 +349,43 @@ defmodule Rendro.Recipes.Certificate do
     # an honest approximation, not exact typesetting — good enough to move
     # the certificate's content out of the cramped top ~20% into a visually
     # balanced middle band.
-    body_full_w = Rendro.PDF.Font.text_width(font, body_text, @body_size)
+    body_full_w = Rendro.PDF.Font.text_width(font, body_text, body_size)
     body_lines = if body_full_w <= 0, do: 1, else: max(1, ceil(body_full_w / body_measure_w))
 
     content_height_estimate =
-      line_h(@title_size) + line_h(@subtitle_size) + line_h(@recipient_size) +
-        body_lines * line_h(@body_size) + line_h(@meta_size) + line_h(@meta_size)
+      line_h(title_size) + line_h(subtitle_size) + line_h(recipient_size) +
+        body_lines * line_h(body_size) + line_h(meta_size) + line_h(meta_size)
 
     top_spacer_h = max((region_h - content_height_estimate) / 2, 0)
 
+    # The empty spacer is a pure layout hack (vertical centering), NOT
+    # typography — keep its literal size: 1, never seamed to a scale role.
     spacer = Rendro.block(Rendro.text("", size: 1), height: top_spacer_h)
 
     content = [
       spacer,
-      centered_line(font, data.title, @title_size, region_w, colors),
-      centered_line(font, "This certifies that", @subtitle_size, region_w, colors),
-      centered_line(font, data.recipient, @recipient_size, region_w, colors),
-      centered_paragraph(body_text, @body_size, body_measure_w, region_w, colors),
-      centered_line(font, fmt_date.(data.date), @meta_size, region_w, colors),
-      centered_line(font, seal_text, @meta_size, region_w, colors)
+      centered_line(font, data.title, title_size, region_w, colors, type, type.fonts.heading),
+      centered_line(
+        font,
+        "This certifies that",
+        subtitle_size,
+        region_w,
+        colors,
+        type,
+        type.fonts.body
+      ),
+      centered_line(
+        font,
+        data.recipient,
+        recipient_size,
+        region_w,
+        colors,
+        type,
+        type.fonts.heading
+      ),
+      centered_paragraph(body_text, body_size, body_measure_w, region_w, colors, type),
+      centered_line(font, fmt_date.(data.date), meta_size, region_w, colors, type, type.fonts.body),
+      centered_line(font, seal_text, meta_size, region_w, colors, type, type.fonts.body)
     ]
 
     Rendro.section(
@@ -368,18 +400,46 @@ defmodule Rendro.Recipes.Certificate do
   # Horizontally centers a single line of text within the body region by
   # measuring its exact rendered width against built-in Helvetica metrics.
   # 121-02 D-01/D-02: text seamed to colors.ink so it rides the dark swap.
-  defp centered_line(font, text, size, region_w, colors) do
+  # 122-03: the resolved `size` here is the SAME value the caller fed into the
+  # content-height estimate (measurement coupling) — plus font role +
+  # leading/widows/orphans from the typography seam.
+  defp centered_line(font, text, size, region_w, colors, type, font_role) do
     width = Rendro.PDF.Font.text_width(font, text, size)
     x = max((region_w - width) / 2, 0)
-    Rendro.block(Rendro.text(text, size: size, color: colors.ink), x: x, width: width)
+
+    Rendro.block(
+      Rendro.text(text,
+        size: size,
+        font: font_role,
+        color: colors.ink,
+        line_height: type.leading,
+        widows: type.widows,
+        orphans: type.orphans
+      ),
+      x: x,
+      width: width
+    )
   end
 
   # Constrains the body paragraph to `measure_w` (never edge-to-edge) and
   # centers the constrained block horizontally within the region.
   # 121-02 D-01/D-02: text seamed to colors.ink so it rides the dark swap.
-  defp centered_paragraph(text, size, measure_w, region_w, colors) do
+  # 122-03: body role (fonts.body) + leading/widows/orphans from the seam.
+  defp centered_paragraph(text, size, measure_w, region_w, colors, type) do
     x = max((region_w - measure_w) / 2, 0)
-    Rendro.block(Rendro.text(text, size: size, color: colors.ink), x: x, width: measure_w)
+
+    Rendro.block(
+      Rendro.text(text,
+        size: size,
+        font: type.fonts.body,
+        color: colors.ink,
+        line_height: type.leading,
+        widows: type.widows,
+        orphans: type.orphans
+      ),
+      x: x,
+      width: measure_w
+    )
   end
 
   # ---------------------------------------------------------------------------
@@ -416,6 +476,43 @@ defmodule Rendro.Recipes.Certificate do
       end
 
     Map.merge(base, Keyword.get(opts, :palette, %{}))
+  end
+
+  # ---------------------------------------------------------------------------
+  # Typography seam (TYPE-01 / TYPE-02 / TYPE-03) — structural twin of palette/1.
+  # ---------------------------------------------------------------------------
+
+  # Returns the resolved typography for this render: a named type scale, three
+  # font roles, and leading/widows/orphans. When no `:theme` is supplied the
+  # `nil` branch reproduces Certificate's exact CURRENT size literals
+  # (display 34 = recipient name, title 20, subtitle 12, body 11, small 10 =
+  # date/seal) — NEVER `Rendro.Theme.default().typography` (that would apply the
+  # frozen 21/16.5/... scale and break byte-identity, RESEARCH Pitfall 1). The
+  # three font roles default to `:default` (the always-registered
+  # Helvetica-compatible built-in, which normalizes identically to today's
+  # implicit `"Helvetica"` — Certificate never calls put_default_font, so this
+  # is byte-identical). `leading` == the former @line_height 1.2 == the %Text{}
+  # struct default. When a `:theme` is supplied the base becomes
+  # `Rendro.Theme.resolve(theme).typography`. The final `Map.merge` keeps an
+  # explicit `:typography` opt as the winning override layer (mirrors :palette).
+  # `caption` is unused by this recipe.
+  defp typography(opts) do
+    base =
+      case opts[:theme] do
+        nil ->
+          %{
+            scale: %{display: 34, title: 20, subtitle: 12, body: 11, small: 10, caption: 8},
+            fonts: %{heading: :default, body: :default, mono: :default},
+            leading: 1.2,
+            widows: 2,
+            orphans: 2
+          }
+
+        theme ->
+          Rendro.Theme.resolve(theme).typography
+      end
+
+    Map.merge(base, Keyword.get(opts, :typography, %{}))
   end
 
   # Resolves frame opts, computing geometry-derived defaults.
