@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
 status: executing
-stopped_at: Completed 122-02-PLAN.md
-last_updated: "2026-07-28T02:58:53.400Z"
+stopped_at: Completed 122-03-PLAN.md
+last_updated: "2026-07-28T03:09:34.895Z"
 last_activity: 2026-07-28
 progress:
   total_phases: 5
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-07-27)
 ## Current Position
 
 Phase: 122 (typography-type-scale-application-font-role-leading-wiring) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-07-28
 
@@ -75,6 +75,9 @@ Full log in PROJECT.md Key Decisions. Milestone-B locks carried into planning:
 - [Phase ?]: 122-02: replicated the typography/1 tracer onto Statement/Receipt/Payslip; each has a defp typography/1 (twin of palette/1) threading scale/fonts/leading into every %Text with exactly one display anchor (closing balance / total / net pay); no-theme byte-identity preserved (zero re-bless)
 - [Phase ?]: 122-02: Payslip no-theme fonts use the STRING "Helvetica" (resolves to document default :payslip_sans + B612 unicode fallback), NOT :default atom — :default drops the fallback + changes the font resource, breaking the '•' glyph and byte-identity. General rule: recipes overriding put_default_font must use the string literal on the no-theme path
 - [Phase ?]: 122-02: statement/dark themed golden re-blessed — the seam intentionally collapses the themed render onto the theme's uniform type scale (TYPE-01); determinism held, no-theme goldens unchanged, dark is screen-oriented
+- [Phase ?]: 122-03: BrandedInvoice display anchor = brand name (18), the sole non-:default literal-default font exception (brand font kept on both paths, brand-orthogonal-to-theme)
+- [Phase ?]: 122-03: Certificate threads one resolved size into BOTH the %Text{} run AND the centering math (line_h/text_width) to avoid themed de-centering (Pitfall 2)
+- [Phase ?]: 122-03: Ticket exempts @caption_size(7)/@present_code_size(6) from the scale seam (font-only mono); reference code(8) is the sole display anchor via non-monotone assignment (Q3)
 
 ### Pending Todos
 
@@ -95,8 +98,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-28T02:58:42.504Z
-Stopped at: Completed 122-02-PLAN.md
+Last session: 2026-07-28T03:09:34.890Z
+Stopped at: Completed 122-03-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -114,3 +117,4 @@ Resume file: None
 | Phase 121 P03 | 20min | 2 tasks | 7 files |
 | Phase 122 P01 | 18min | 2 tasks | 4 files |
 | Phase 122 P02 | 32min | 3 tasks | 7 files |
+| Phase 122 P03 | 9min | 3 tasks | 8 files |
