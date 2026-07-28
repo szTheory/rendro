@@ -199,6 +199,7 @@ defmodule Rendro.Recipes.BrandedInvoice do
 
   defp header_section(%{brand: %{font_name: font_name}, id: id, date: date}, opts) do
     colors = palette(opts)
+    type = typography(opts)
 
     # Industry-standard invoice typography: brand is the heading, invoice id
     # is subordinate metadata. Stacking brand/id/date as three independent
@@ -206,13 +207,51 @@ defmodule Rendro.Recipes.BrandedInvoice do
     # fit-validates each block against the `:header` region (371.28pt) so any
     # future regression (longer id, new locale label) surfaces as a typed
     # `:content_overflow` error rather than a silent grapheme split.
+    #
+    # 122-03 typography seam (Q1 + Q2): the brand name is BrandedInvoice's SOLE
+    # `display` anchor (Q1) — a branded invoice leads with the brand, and there
+    # is no Total-Due `%Text{}` run to anchor (its totals live inside the body
+    # `Rendro.table/2`, never promoted to a text run — byte-risk). The two brand
+    # runs (name + id) KEEP `font: font_name` on BOTH the no-theme AND themed
+    # paths (Q2, brand ⊥ theme) — the data-driven embedded brand font is the
+    # SOLE non-`:default` literal-default in this milestone. Only Date (and the
+    # footer thank-you) are seamed to a theme font role. No-theme literal
+    # defaults are exactly this recipe's prior sizes (18/12/10) so the
+    # branded-invoice byte-identity golden stays byte-identical (zero re-bless).
     Rendro.section(
       name: :branded_invoice_header,
       region: :header,
       content: [
-        Rendro.block(Rendro.text("Rendro, Inc.", font: font_name, size: 18, color: colors.ink)),
-        Rendro.block(Rendro.text("Invoice ##{id}", font: font_name, size: 12, color: colors.ink)),
-        Rendro.block(Rendro.text("Date: #{date}", size: 10, color: colors.ink))
+        Rendro.block(
+          Rendro.text("Rendro, Inc.",
+            font: font_name,
+            size: type.scale.display,
+            color: colors.ink,
+            line_height: type.leading,
+            widows: type.widows,
+            orphans: type.orphans
+          )
+        ),
+        Rendro.block(
+          Rendro.text("Invoice ##{id}",
+            font: font_name,
+            size: type.scale.title,
+            color: colors.ink,
+            line_height: type.leading,
+            widows: type.widows,
+            orphans: type.orphans
+          )
+        ),
+        Rendro.block(
+          Rendro.text("Date: #{date}",
+            size: type.scale.body,
+            font: type.fonts.body,
+            color: colors.ink,
+            line_height: type.leading,
+            widows: type.widows,
+            orphans: type.orphans
+          )
+        )
       ]
     )
   end
@@ -238,12 +277,22 @@ defmodule Rendro.Recipes.BrandedInvoice do
 
   defp footer_section(_data, opts) do
     colors = palette(opts)
+    type = typography(opts)
 
     Rendro.section(
       name: :branded_invoice_footer,
       region: :footer,
       content: [
-        Rendro.block(Rendro.text("Thank you for your business!", size: 10, color: colors.ink))
+        Rendro.block(
+          Rendro.text("Thank you for your business!",
+            size: type.scale.body,
+            font: type.fonts.body,
+            color: colors.ink,
+            line_height: type.leading,
+            widows: type.widows,
+            orphans: type.orphans
+          )
+        )
       ]
     )
   end
@@ -279,6 +328,42 @@ defmodule Rendro.Recipes.BrandedInvoice do
       end
 
     Map.merge(base, Keyword.get(opts, :palette, %{}))
+  end
+
+  # ---------------------------------------------------------------------------
+  # Typography seam (TYPE-01 / TYPE-02 / TYPE-03) — structural twin of palette/1.
+  # ---------------------------------------------------------------------------
+
+  # Returns the resolved typography for this render: a named type scale, three
+  # font roles, and leading/widows/orphans. When no `:theme` is supplied the
+  # `nil` branch reproduces BrandedInvoice's exact CURRENT size literals
+  # (display 18 = brand name, title 12 = invoice id, body 10 = date/thank-you)
+  # — NEVER `Rendro.Theme.default().typography` (that would apply the frozen
+  # 21/16.5/... scale and break byte-identity, RESEARCH Pitfall 1). The three
+  # font roles default to `:default` (the always-registered Helvetica-compatible
+  # built-in, which normalizes identically to today's implicit `"Helvetica"`),
+  # but note the two BRAND runs bypass this map entirely and keep `font_name`
+  # on both paths (Q2, brand ⊥ theme). When a `:theme` is supplied the base
+  # becomes `Rendro.Theme.resolve(theme).typography`. The final `Map.merge`
+  # keeps an explicit `:typography` opt as the winning override layer (mirrors
+  # :palette). `subtitle`/`small`/`caption` are unused by this recipe.
+  defp typography(opts) do
+    base =
+      case opts[:theme] do
+        nil ->
+          %{
+            scale: %{display: 18, title: 12, subtitle: 11, body: 10, small: 9, caption: 8},
+            fonts: %{heading: :default, body: :default, mono: :default},
+            leading: 1.2,
+            widows: 2,
+            orphans: 2
+          }
+
+        theme ->
+          Rendro.Theme.resolve(theme).typography
+      end
+
+    Map.merge(base, Keyword.get(opts, :typography, %{}))
   end
 
   defp validate_data!(%{brand: %{font_name: font_name, logo_name: logo_name}})

@@ -83,4 +83,21 @@ defmodule Rendro.Recipes.BrandedInvoiceOptsThreadingTest do
       assert BrandedInvoice.sections(data) == BrandedInvoice.sections(data, [])
     end
   end
+
+  describe "typography(opts) seam (TYPE-01/02/03)" do
+    test "no-op: sections(data) equals sections(data, typography: %{})" do
+      data = sample_data()
+      assert BrandedInvoice.sections(data) == BrandedInvoice.sections(data, typography: %{})
+    end
+
+    test "a :typography override changes the output (live seam)" do
+      data = sample_data()
+
+      # `leading` is threaded onto every seamed %Text{} block (including the two
+      # brand runs), so overriding it is guaranteed to change the sections —
+      # proving the seam is live, not inert.
+      refute BrandedInvoice.sections(data) ==
+               BrandedInvoice.sections(data, typography: %{leading: 2.0})
+    end
+  end
 end
