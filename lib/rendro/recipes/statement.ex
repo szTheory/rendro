@@ -95,8 +95,22 @@ defmodule Rendro.Recipes.Statement do
   # them — @closing_balance_band_h of the total). Bumped from the pre-118-08
   # 48pt (3 small text lines only) so the SHOW-01 gap-closure fix (surface
   # the closing balance as a dominant boxed summary element, mirroring
-  # Payslip's Net Pay box) fits without overlapping the body region.
+  # Payslip's Net Pay box) fits without overlapping the body region. This is
+  # the frozen no-theme budget — NEVER changed by a theme (byte-identity,
+  # PLUMB-03); see `header_height/1` for the themed budget.
   @header_height 88
+
+  # 123-02 (D-01 fallout): under `Theme.default()` the 6 stacked header
+  # blocks (title/body/body/backdrop(h=0)/small/display) total ~91.1pt at
+  # the theme's type scale + the new 1.35 leading — a few points over the
+  # frozen 88pt no-theme budget (which was sized for the SMALLER no-theme
+  # literals at 1.2 leading). Rather than touch the type scale/leading (the
+  # deliberate D-01 change) or the no-theme geometry (PLUMB-03), the honest
+  # lever is the header capacity itself: give the themed path more room,
+  # mirroring the vertical-centering-estimate lever used for Certificate's
+  # single-page fit-check (RESEARCH GT-3). 96pt clears the ~91.1pt need with
+  # a small safety margin (mirrors @row_epsilon's spirit).
+  @themed_header_height 96
 
   # Height of the closing-balance backdrop box appended at the bottom of the
   # header region (118-08). Drawn via the same zero-height overlay mechanic
@@ -110,11 +124,6 @@ defmodule Rendro.Recipes.Statement do
   # Footer reserved height — MUST be non-zero so body_capacity reserves space
   # and "Page X of Y" does not overlap the last body row (D-03 / STMT-04).
   @footer_height 24
-
-  # Body height: fills the space between top margin and bottom margin minus
-  # header and footer region heights.
-  @body_y @margin + @header_height
-  @body_height @page_height - 2 * @margin - @header_height - @footer_height
 
   @footer_y @page_height - @margin - @footer_height
 
@@ -159,6 +168,9 @@ defmodule Rendro.Recipes.Statement do
   @spec page_template(keyword()) :: Rendro.PageTemplate.t()
   def page_template(opts \\ []) do
     colors = palette(opts)
+    hh = header_height(opts)
+    body_y = @margin + hh
+    body_height = @page_height - 2 * @margin - hh - @footer_height
 
     base_regions = [
       Rendro.region(
@@ -168,16 +180,16 @@ defmodule Rendro.Recipes.Statement do
         x: @margin,
         y: @margin,
         width: @content_width,
-        height: @header_height
+        height: hh
       ),
       Rendro.region(
         name: :body,
         role: :body,
         anchor: :flow,
         x: @margin,
-        y: @body_y,
+        y: body_y,
         width: @content_width,
-        height: @body_height
+        height: body_height
       ),
       Rendro.region(
         name: :footer,
@@ -403,6 +415,20 @@ defmodule Rendro.Recipes.Statement do
   end
 
   # ---------------------------------------------------------------------------
+  # Header geometry seam (123-02 D-01 fallout) — the structural twin of
+  # palette/1 and typography/1 for the ONE geometry constant that must vary
+  # by theme presence. The `nil` branch is the frozen no-theme budget
+  # (PLUMB-03); the themed branch is the wider budget the default theme's
+  # type scale + 1.35 leading actually needs (see @themed_header_height).
+  # ---------------------------------------------------------------------------
+  defp header_height(opts) do
+    case opts[:theme] do
+      nil -> @header_height
+      _theme -> @themed_header_height
+    end
+  end
+
+  # ---------------------------------------------------------------------------
   # Color seam (S1 / PLUMB-01)
   # ---------------------------------------------------------------------------
 
@@ -518,11 +544,15 @@ defmodule Rendro.Recipes.Statement do
     {header_h, row_heights} =
       Rendro.measure_rows(formatted_rows, @content_width, doc_for_measure, table_opts)
 
-    # Body capacity: @body_height already excludes header and footer regions
-    # (it is derived as page_height − 2×margin − @header_height − @footer_height).
-    # Subtracting them again gives a conservative ~8% under-pack with no overflow
-    # risk — a small blank gap at the bottom is always preferable to :content_overflow.
-    capacity = @body_height - @header_height - @footer_height
+    # Body capacity: body_height already excludes header and footer regions
+    # (it is derived as page_height − 2×margin − header_height(opts) − @footer_height,
+    # mirroring page_template/1 exactly so the region and this capacity can
+    # never disagree — Pitfall 3). Subtracting them again gives a conservative
+    # ~8% under-pack with no overflow risk — a small blank gap at the bottom
+    # is always preferable to :content_overflow.
+    hh = header_height(opts)
+    body_height = @page_height - 2 * @margin - hh - @footer_height
+    capacity = body_height - hh - @footer_height
 
     # Chunk rows into pages, accounting for the repeated table header on each page
     # and the brought/carried-forward extra rows. Reserve a conservative one-row

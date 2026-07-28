@@ -83,6 +83,23 @@ defmodule Rendro.ExamplesDataTest do
     assert %Rendro.Document{} = doc
   end
 
+  # 123-02 (GT-3 fit-check): the themed Certificate body citation (176 bytes,
+  # ~3-4 wrapped lines) must still fit a SINGLE A4-landscape page at the
+  # default theme's leading 1.35. This is a fit-CHECK on the rendered themed
+  # artifact's page count, NOT a validate_body!/1 change and NOT a measure_w
+  # change (RESEARCH GT-3) — the honest lever if this ever fails is the
+  # vertical-centering estimate, never narrowing measure_w.
+  test "themed Certificate (leading 1.35) still fits a single A4-landscape page" do
+    doc =
+      "certificate/summit-training-institute/certificate.json"
+      |> Examples.load!()
+      |> ExamplesData.transform_certificate()
+      |> Rendro.Recipes.Certificate.document(theme: Rendro.Theme.default(), border: true)
+
+    assert {:ok, artifact} = Rendro.render_to_artifact(doc, deterministic: true)
+    assert artifact.metadata.page_count == 1
+  end
+
   test "transform_payslip feeds Rendro.Recipes.Payslip.document/1 and net_pay reconciles" do
     data =
       "payslip/aurora-live/payslip.json"

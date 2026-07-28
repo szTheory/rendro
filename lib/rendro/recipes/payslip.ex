@@ -50,6 +50,21 @@ defmodule Rendro.Recipes.Payslip do
   @default_summary_h 54
   @default_footer_h 24
 
+  # 123-02 (D-01 fallout): under `Theme.default()` the 4 stacked header
+  # lines (employer/employee/period/pay_date) total a bit more at the
+  # theme's type scale + the new 1.35 leading than the frozen 88pt no-theme
+  # budget (sized for the smaller no-theme literals at 1.2 leading). The
+  # no-theme budget stays untouched (byte-identity, PLUMB-03); the themed
+  # path gets a wider budget instead of touching type scale/leading — the
+  # same honest geometry lever used in statement.ex.
+  @themed_header_h 96
+
+  # Same fallout, footer region: the footer stacks an optional payment_method
+  # line + the page-number line at `small` role. At the theme's leading 1.35
+  # two stacked small lines need ~24.3pt, a hair over the frozen 24pt
+  # no-theme budget (sized for 1.2 leading). Widen only the themed path.
+  @themed_footer_h 28
+
   # D-18: recipe-owned default labels so Payslip.document(data) with zero
   # :labels/:formatters opts renders a correct jurisdiction-neutral English
   # payslip. Rendro.Format.label/1 has NO fallback clause -- every label key
@@ -292,9 +307,20 @@ defmodule Rendro.Recipes.Payslip do
     mb = Keyword.get(opts, :margin_bottom, @default_margin)
 
     content_w = pw - ml - mr
-    header_h = @default_header_h
+
+    header_h =
+      case Keyword.get(opts, :theme) do
+        nil -> @default_header_h
+        _theme -> @themed_header_h
+      end
+
     summary_h = @default_summary_h
-    footer_h = @default_footer_h
+
+    footer_h =
+      case Keyword.get(opts, :theme) do
+        nil -> @default_footer_h
+        _theme -> @themed_footer_h
+      end
 
     header_y = mt
     summary_y = mt + header_h
