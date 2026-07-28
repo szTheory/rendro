@@ -99,6 +99,7 @@ defmodule Rendro.Recipes.Certificate do
     content_h = ph - mt - mb
 
     border = Keyword.get(opts, :border, false)
+    colors = palette(opts)
 
     body_region =
       Rendro.region(
@@ -111,9 +112,9 @@ defmodule Rendro.Recipes.Certificate do
         height: content_h
       )
 
-    regions =
+    base_regions =
       if border do
-        frame_opts = resolve_frame_opts(border, pw, ph, ml, mr, mt, mb, palette(opts))
+        frame_opts = resolve_frame_opts(border, pw, ph, ml, mr, mt, mb, colors)
         inset = frame_opts.inset
 
         frame_region =
@@ -130,6 +131,19 @@ defmodule Rendro.Recipes.Certificate do
         [body_region, frame_region]
       else
         [body_region]
+      end
+
+    # 121-02 D-04/D-10: prepend the :background region FIRST (bottom of the
+    # paint stack) iff the resolved palette differs from paper-white — gated
+    # on the SAME palette(opts) sections/2 uses below (Pitfall 3), so region
+    # and section can never disagree. Certificate's OWN resolved landscape
+    # {pw, ph} — never A4-portrait constants (Pitfall 4). The light no-theme
+    # path leaves `regions` untouched (byte-identical, PLUMB-03).
+    regions =
+      if Rendro.Recipes.Background.emit?(colors) do
+        [Rendro.Recipes.Background.region(pw, ph) | base_regions]
+      else
+        base_regions
       end
 
     Rendro.page_template(
@@ -161,44 +175,52 @@ defmodule Rendro.Recipes.Certificate do
     body = body_section(data, opts, template)
 
     border = Keyword.get(opts, :border, false)
+    page_size = Keyword.get(opts, :page_size, @default_page_size)
+    orientation = Keyword.get(opts, :orientation, @default_orientation)
+    {pw, ph} = Rendro.PageSize.resolve(page_size, orientation)
+    colors = palette(opts)
 
-    if border do
-      page_size = Keyword.get(opts, :page_size, @default_page_size)
-      orientation = Keyword.get(opts, :orientation, @default_orientation)
-      {pw, ph} = Rendro.PageSize.resolve(page_size, orientation)
+    base_sections =
+      if border do
+        ml = Keyword.get(opts, :margin_left, @default_margin)
+        mr = Keyword.get(opts, :margin_right, @default_margin)
+        mt = Keyword.get(opts, :margin_top, @default_margin)
+        mb = Keyword.get(opts, :margin_bottom, @default_margin)
 
-      ml = Keyword.get(opts, :margin_left, @default_margin)
-      mr = Keyword.get(opts, :margin_right, @default_margin)
-      mt = Keyword.get(opts, :margin_top, @default_margin)
-      mb = Keyword.get(opts, :margin_bottom, @default_margin)
+        frame_opts = resolve_frame_opts(border, pw, ph, ml, mr, mt, mb, colors)
+        inset = frame_opts.inset
+        region_w = pw - 2 * inset
+        region_h = ph - 2 * inset
 
-      colors = palette(opts)
-      frame_opts = resolve_frame_opts(border, pw, ph, ml, mr, mt, mb, colors)
-      inset = frame_opts.inset
-      region_w = pw - 2 * inset
-      region_h = ph - 2 * inset
-
-      frame_block = %Rendro.Block{
-        width: region_w,
-        height: region_h,
-        x: 0,
-        y: 0,
-        content: %Rendro.Path{
-          ops: [{:rect, 0, 0, region_w, region_h}],
-          stroke: %{color: frame_opts.color, width: frame_opts.weight}
+        frame_block = %Rendro.Block{
+          width: region_w,
+          height: region_h,
+          x: 0,
+          y: 0,
+          content: %Rendro.Path{
+            ops: [{:rect, 0, 0, region_w, region_h}],
+            stroke: %{color: frame_opts.color, width: frame_opts.weight}
+          }
         }
-      }
 
-      frame_section =
-        Rendro.section(
-          name: :certificate_frame,
-          region: :frame,
-          content: [frame_block]
-        )
+        frame_section =
+          Rendro.section(
+            name: :certificate_frame,
+            region: :frame,
+            content: [frame_block]
+          )
 
-      [body, frame_section]
+        [body, frame_section]
+      else
+        [body]
+      end
+
+    # Same predicate + same palette(opts)/dims as page_template/1 (Pitfall 3)
+    # — the region and section can never disagree.
+    if Rendro.Recipes.Background.emit?(colors) do
+      [Rendro.Recipes.Background.section(colors, pw, ph) | base_sections]
     else
-      [body]
+      base_sections
     end
   end
 
@@ -288,6 +310,7 @@ defmodule Rendro.Recipes.Certificate do
 
   defp body_section(data, opts, template) do
     fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
+    colors = palette(opts)
 
     body_text = Map.get(data, :body, "")
     seal_text = Map.get(data, :seal_line, "")
@@ -325,12 +348,12 @@ defmodule Rendro.Recipes.Certificate do
 
     content = [
       spacer,
-      centered_line(font, data.title, @title_size, region_w),
-      centered_line(font, "This certifies that", @subtitle_size, region_w),
-      centered_line(font, data.recipient, @recipient_size, region_w),
-      centered_paragraph(body_text, @body_size, body_measure_w, region_w),
-      centered_line(font, fmt_date.(data.date), @meta_size, region_w),
-      centered_line(font, seal_text, @meta_size, region_w)
+      centered_line(font, data.title, @title_size, region_w, colors),
+      centered_line(font, "This certifies that", @subtitle_size, region_w, colors),
+      centered_line(font, data.recipient, @recipient_size, region_w, colors),
+      centered_paragraph(body_text, @body_size, body_measure_w, region_w, colors),
+      centered_line(font, fmt_date.(data.date), @meta_size, region_w, colors),
+      centered_line(font, seal_text, @meta_size, region_w, colors)
     ]
 
     Rendro.section(
@@ -344,17 +367,19 @@ defmodule Rendro.Recipes.Certificate do
 
   # Horizontally centers a single line of text within the body region by
   # measuring its exact rendered width against built-in Helvetica metrics.
-  defp centered_line(font, text, size, region_w) do
+  # 121-02 D-01/D-02: text seamed to colors.ink so it rides the dark swap.
+  defp centered_line(font, text, size, region_w, colors) do
     width = Rendro.PDF.Font.text_width(font, text, size)
     x = max((region_w - width) / 2, 0)
-    Rendro.block(Rendro.text(text, size: size), x: x, width: width)
+    Rendro.block(Rendro.text(text, size: size, color: colors.ink), x: x, width: width)
   end
 
   # Constrains the body paragraph to `measure_w` (never edge-to-edge) and
   # centers the constrained block horizontally within the region.
-  defp centered_paragraph(text, size, measure_w, region_w) do
+  # 121-02 D-01/D-02: text seamed to colors.ink so it rides the dark swap.
+  defp centered_paragraph(text, size, measure_w, region_w, colors) do
     x = max((region_w - measure_w) / 2, 0)
-    Rendro.block(Rendro.text(text, size: size), x: x, width: measure_w)
+    Rendro.block(Rendro.text(text, size: size, color: colors.ink), x: x, width: measure_w)
   end
 
   # ---------------------------------------------------------------------------
@@ -364,18 +389,25 @@ defmodule Rendro.Recipes.Certificate do
   # Returns the role → RGB map for this render. When no `:theme` is supplied the
   # `nil` branch's `rule` default reproduces Certificate's exact current frame
   # literal `{34, 34, 34}` — the NON-BLACK stress case (D-02): deliberately NOT
-  # `{0, 0, 0}` and NOT the theme's `rule`. When a `:theme` is supplied the base
-  # becomes `Rendro.Theme.resolve(theme).colors` and the theme's `rule` recolors
-  # the frame (colors ONLY — no type-scale read). The final
-  # `Map.merge(base, :palette-override)` keeps an explicit `:palette` as the
-  # winning layer, and an explicit `border: %{color: ...}` still wins over the
-  # frame default downstream (precedence: border color > :palette > :theme rule
-  # > literal {34,34,34}).
+  # `{0, 0, 0}` and NOT the theme's `rule`. `ink`/`background` are added at
+  # today's implicit black/paper-white defaults (121-02 D-03) — `muted` too,
+  # for symmetry, even though Certificate draws no muted text today — so every
+  # newly-seamed text/background site resolves to its current literal on the
+  # no-theme path (byte-identical) and to the swapped pole under a theme. When
+  # a `:theme` is supplied the base becomes `Rendro.Theme.resolve(theme).colors`
+  # and the theme's `rule` recolors the frame (colors ONLY — no type-scale
+  # read). The final `Map.merge(base, :palette-override)` keeps an explicit
+  # `:palette` as the winning layer, and an explicit `border: %{color: ...}`
+  # still wins over the frame default downstream (precedence: border color >
+  # :palette > :theme rule > literal {34,34,34}).
   defp palette(opts) do
     base =
       case opts[:theme] do
         nil ->
           %{
+            ink: {0, 0, 0},
+            muted: {0, 0, 0},
+            background: {255, 255, 255},
             rule: {34, 34, 34}
           }
 
