@@ -5,16 +5,16 @@ milestone_name: Document Theming & Design-Token System
 current_phase: 123
 current_phase_name: "`from_brand/2` E2E + honest rubric-gap closure + gallery/docs/manifest closure"
 status: planning
-stopped_at: Completed 122-05-PLAN.md
-last_updated: "2026-07-28T16:58:59.709Z"
+stopped_at: Phase 123 context gathered
+last_updated: "2026-07-28T18:21:01.504Z"
 last_activity: 2026-07-28
 last_activity_desc: Phase 122 complete, transitioned to Phase 123
 progress:
-  total_phases: 11
+  total_phases: 12
   completed_phases: 4
   total_plans: 20
   completed_plans: 16
-  percent: 36
+  percent: 33
 ---
 
 # Project State
@@ -104,9 +104,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-28T16:47:16.417Z
-Stopped at: Completed 122-05-PLAN.md
-Resume file: None
+Last session: 2026-07-28T18:21:01.491Z
+Stopped at: Phase 123 context gathered
+Resume file: .planning/phases/123-from-brand-2-e2e-honest-rubric-gap-closure-gallery-docs-mani/123-CONTEXT.md
 
 ## Next Steps
 
