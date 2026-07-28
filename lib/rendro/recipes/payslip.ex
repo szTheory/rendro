@@ -327,6 +327,7 @@ defmodule Rendro.Recipes.Payslip do
 
   defp header_section(data, opts) do
     colors = palette(opts)
+    type = typography(opts)
     lbl = Rendro.Recipes.Pagination.label_resolver(opts, @default_labels)
     fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
 
@@ -342,13 +343,45 @@ defmodule Rendro.Recipes.Payslip do
       region: :header,
       content: [
         Rendro.block(
-          Rendro.text("#{lbl.(:employer)}: #{employer_text}", size: 13, color: colors.ink)
+          Rendro.text("#{lbl.(:employer)}: #{employer_text}",
+            size: type.scale.title,
+            font: type.fonts.heading,
+            line_height: type.leading,
+            widows: type.widows,
+            orphans: type.orphans,
+            color: colors.ink
+          )
         ),
         Rendro.block(
-          Rendro.text("#{lbl.(:employee)}: #{employee_text}", size: 11, color: colors.muted)
+          Rendro.text("#{lbl.(:employee)}: #{employee_text}",
+            size: type.scale.subtitle,
+            font: type.fonts.body,
+            line_height: type.leading,
+            widows: type.widows,
+            orphans: type.orphans,
+            color: colors.muted
+          )
         ),
-        Rendro.block(Rendro.text(period_text, size: 10, color: colors.muted)),
-        Rendro.block(Rendro.text(pay_date_text, size: 10, color: colors.muted))
+        Rendro.block(
+          Rendro.text(period_text,
+            size: type.scale.body,
+            font: type.fonts.body,
+            line_height: type.leading,
+            widows: type.widows,
+            orphans: type.orphans,
+            color: colors.muted
+          )
+        ),
+        Rendro.block(
+          Rendro.text(pay_date_text,
+            size: type.scale.body,
+            font: type.fonts.body,
+            line_height: type.leading,
+            widows: type.widows,
+            orphans: type.orphans,
+            color: colors.muted
+          )
+        )
       ]
     )
   end
@@ -395,6 +428,7 @@ defmodule Rendro.Recipes.Payslip do
   # regions.
   defp summary_section(data, opts) do
     colors = palette(opts)
+    type = typography(opts)
     lbl = Rendro.Recipes.Pagination.label_resolver(opts, @default_labels)
     fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
     g = geometry(opts)
@@ -412,10 +446,31 @@ defmodule Rendro.Recipes.Payslip do
         height: 0
       )
 
-    label_block = Rendro.block(Rendro.text(lbl.(:net_pay), size: 10, color: colors.muted))
+    label_block =
+      Rendro.block(
+        Rendro.text(lbl.(:net_pay),
+          size: type.scale.body,
+          font: type.fonts.body,
+          line_height: type.leading,
+          widows: type.widows,
+          orphans: type.orphans,
+          color: colors.muted
+        )
+      )
 
+    # The SOLE `display`-anchored element on the Payslip (D-01) — the "one key
+    # fact." mono font, since it is an amount.
     value_block =
-      Rendro.block(Rendro.text(fmt_amount.(data.net_pay), size: 27, color: colors.ink))
+      Rendro.block(
+        Rendro.text(fmt_amount.(data.net_pay),
+          size: type.scale.display,
+          font: type.fonts.mono,
+          line_height: type.leading,
+          widows: type.widows,
+          orphans: type.orphans,
+          color: colors.ink
+        )
+      )
 
     Rendro.section(
       name: :payslip_summary,
@@ -462,10 +517,12 @@ defmodule Rendro.Recipes.Payslip do
   @current_col_width 55
   @ytd_col_width 60
   @group_spacer_width 10
-  @cell_size 11
+  # 122-02: the former @cell_size (11) literal is now the `subtitle` step of the
+  # typography/1 seam (no-theme literal-default preserves that exact value).
 
   defp body_section(data, opts) do
     colors = palette(opts)
+    type = typography(opts)
     lbl = Rendro.Recipes.Pagination.label_resolver(opts, @default_labels)
     fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
     g = geometry(opts)
@@ -477,17 +534,17 @@ defmodule Rendro.Recipes.Payslip do
     formatted_rows =
       Enum.map(zipped, fn {earn, ded} ->
         [
-          cell_text(Map.get(earn, :description, ""), colors),
-          cell_text(fmt_amount_or_blank(Map.get(earn, :amount), fmt_amount), colors),
-          cell_text(fmt_amount_or_blank(Map.get(earn, :ytd), fmt_amount), colors),
-          cell_text("", colors),
-          cell_text(Map.get(ded, :description, ""), colors),
-          cell_text(fmt_amount_or_blank(Map.get(ded, :amount), fmt_amount), colors),
-          cell_text(fmt_amount_or_blank(Map.get(ded, :ytd), fmt_amount), colors)
+          cell_text(Map.get(earn, :description, ""), colors, type),
+          cell_text(fmt_amount_or_blank(Map.get(earn, :amount), fmt_amount), colors, type),
+          cell_text(fmt_amount_or_blank(Map.get(earn, :ytd), fmt_amount), colors, type),
+          cell_text("", colors, type),
+          cell_text(Map.get(ded, :description, ""), colors, type),
+          cell_text(fmt_amount_or_blank(Map.get(ded, :amount), fmt_amount), colors, type),
+          cell_text(fmt_amount_or_blank(Map.get(ded, :ytd), fmt_amount), colors, type)
         ]
       end)
 
-    subtotal_row = subtotal_row(lbl, fmt_amount, colors, totals)
+    subtotal_row = subtotal_row(lbl, fmt_amount, colors, type, totals)
     all_rows = formatted_rows ++ [subtotal_row]
 
     # 118-08: column 3 is a narrow empty spacer between the earnings group
@@ -541,7 +598,8 @@ defmodule Rendro.Recipes.Payslip do
         Rendro.block(table, break_before: idx > 0)
       end)
 
-    reconciliation_blocks = build_reconciliation_blocks(data, colors, lbl, fmt_amount, totals)
+    reconciliation_blocks =
+      build_reconciliation_blocks(data, colors, type, lbl, fmt_amount, totals)
 
     Rendro.section(
       name: :payslip_body,
@@ -550,27 +608,40 @@ defmodule Rendro.Recipes.Payslip do
     )
   end
 
-  defp subtotal_row(lbl, fmt_amount, colors, totals) do
-    blank = cell_text("", colors)
+  defp subtotal_row(lbl, fmt_amount, colors, type, totals) do
+    blank = cell_text("", colors, type)
 
     [
-      cell_text(lbl.(:gross_pay), colors),
-      cell_text(fmt_amount.(totals.gross), colors),
+      cell_text(lbl.(:gross_pay), colors, type),
+      cell_text(fmt_amount.(totals.gross), colors, type),
       blank,
       blank,
-      cell_text(lbl.(:total_deductions), colors),
-      cell_text(fmt_amount.(totals.deductions), colors),
-      cell_text("", colors)
+      cell_text(lbl.(:total_deductions), colors, type),
+      cell_text(fmt_amount.(totals.deductions), colors, type),
+      cell_text("", colors, type)
     ]
   end
 
   # 118-08: every ledger data cell (line items AND the subtotal row) renders
-  # at the SAME explicit size (@cell_size) — never the Rendro.Text default
-  # (12) a bare string would silently fall back to. Consistency here is both
-  # a correctness fix (predictable column-width math) and a de-crowding win
-  # (a deliberately smaller, uniform cell font frees column budget).
-  defp cell_text(text, colors),
-    do: Rendro.block(Rendro.text(text, size: @cell_size, color: colors.ink))
+  # through the typography seam at the `subtitle` role (no-theme literal-default
+  # 11 == the former @cell_size) — never the Rendro.Text default (12) a bare
+  # string would silently fall back to. Consistency here is both a correctness
+  # fix (predictable column-width math) and a de-crowding win. RESEARCH Pitfall
+  # 5: this shared helper renders BOTH label and amount columns, so it keeps
+  # ONE font role (`body`) — it is NOT mono-ised. Color/font do not affect
+  # measurement, so heights stay byte-identical on the no-theme path.
+  defp cell_text(text, colors, type),
+    do:
+      Rendro.block(
+        Rendro.text(text,
+          size: type.scale.subtitle,
+          font: type.fonts.body,
+          line_height: type.leading,
+          widows: type.widows,
+          orphans: type.orphans,
+          color: colors.ink
+        )
+      )
 
   # Zips earnings/deductions to equal length, blank-padding the shorter list
   # (D-12) so the combined ledger always has one row per zipped pair.
@@ -610,18 +681,29 @@ defmodule Rendro.Recipes.Payslip do
   # Invoice's explicit anti-pattern warning, so a genuinely oversized ledger
   # still surfaces the engine's typed :content_overflow rather than an
   # artificially-forced single unbreakable group).
-  defp build_reconciliation_blocks(data, colors, lbl, fmt_amount, totals) do
+  defp build_reconciliation_blocks(data, colors, type, lbl, fmt_amount, totals) do
     equation_text =
       "#{lbl.(:gross_pay)} #{fmt_amount.(totals.gross)} - " <>
         "#{lbl.(:total_deductions)} #{fmt_amount.(totals.deductions)} = " <>
         "#{lbl.(:net_pay)} #{fmt_amount.(data.net_pay)}"
 
-    equation_block = Rendro.block(Rendro.text(equation_text, size: 10, color: colors.ink))
+    # The reconciliation equation is a machine/formula string → `mono` font.
+    equation_block =
+      Rendro.block(
+        Rendro.text(equation_text,
+          size: type.scale.body,
+          font: type.fonts.mono,
+          line_height: type.leading,
+          widows: type.widows,
+          orphans: type.orphans,
+          color: colors.ink
+        )
+      )
 
-    [equation_block | ytd_summary_blocks(data, colors, lbl, fmt_amount, totals)]
+    [equation_block | ytd_summary_blocks(data, colors, type, lbl, fmt_amount, totals)]
   end
 
-  defp ytd_summary_blocks(data, colors, lbl, fmt_amount, totals) do
+  defp ytd_summary_blocks(data, colors, type, lbl, fmt_amount, totals) do
     case Map.get(data, :totals) do
       caller_totals when is_map(caller_totals) ->
         if has_ytd_totals?(caller_totals) do
@@ -632,7 +714,19 @@ defmodule Rendro.Recipes.Payslip do
             |> maybe_ytd_part(lbl.(:net_pay), totals.net_ytd, fmt_amount)
 
           text = "#{lbl.(:year_to_date)}: " <> Enum.join(parts, " | ")
-          [Rendro.block(Rendro.text(text, size: 9, color: colors.muted))]
+
+          [
+            Rendro.block(
+              Rendro.text(text,
+                size: type.scale.small,
+                font: type.fonts.body,
+                line_height: type.leading,
+                widows: type.widows,
+                orphans: type.orphans,
+                color: colors.muted
+              )
+            )
+          ]
         else
           []
         end
@@ -682,17 +776,44 @@ defmodule Rendro.Recipes.Payslip do
 
   defp footer_section(data, opts) do
     colors = palette(opts)
+    type = typography(opts)
 
     payment_block =
       case Map.get(data, :payment_method) do
-        blank when blank in [nil, ""] -> []
-        pm -> [Rendro.block(Rendro.text(glyph_safe(pm), size: 9, color: colors.muted))]
+        blank when blank in [nil, ""] ->
+          []
+
+        pm ->
+          [
+            Rendro.block(
+              Rendro.text(glyph_safe(pm),
+                size: type.scale.small,
+                font: type.fonts.body,
+                line_height: type.leading,
+                widows: type.widows,
+                orphans: type.orphans,
+                color: colors.muted
+              )
+            )
+          ]
       end
+
+    # page_number/1 wraps Rendro.text/1, so the same typography attrs thread
+    # through it (small role, body font, leading/widows/orphans).
+    page_number_block =
+      Rendro.page_number(
+        color: colors.muted,
+        size: type.scale.small,
+        font: type.fonts.body,
+        line_height: type.leading,
+        widows: type.widows,
+        orphans: type.orphans
+      )
 
     Rendro.section(
       name: :payslip_footer,
       region: :footer,
-      content: payment_block ++ [Rendro.page_number(color: colors.muted, size: 9)]
+      content: payment_block ++ [page_number_block]
     )
   end
 
@@ -722,6 +843,54 @@ defmodule Rendro.Recipes.Payslip do
       end
 
     Map.merge(base, Keyword.get(opts, :palette, %{}))
+  end
+
+  # ---------------------------------------------------------------------------
+  # Typography seam (TYPE-01 / TYPE-02 / TYPE-03) — the exact structural twin of
+  # palette/1 for the type scale, font roles, and leading/widows/orphans.
+  # ---------------------------------------------------------------------------
+
+  # `nil` branch keeps Payslip's exact current typographic literals — NEVER
+  # `Rendro.Theme.default().typography` (that would apply the frozen 21/16.5/...
+  # scale and break byte-identity, RESEARCH Pitfall 1) — so every `%Text{}` that
+  # reads sizes/fonts/leading from here stays byte-identical (TYPE-01/TYPE-03).
+  # The literal scale mirrors Payslip's current sizes: net pay 27 (display, the
+  # D-01 anchor), employer 13 (title), employee + ledger cells 11 (subtitle),
+  # period/pay-date/net-pay-label/equation 10 (body), footer/notes/page number 9
+  # (small); `caption` is unused on the no-theme path.
+  #
+  # CRITICAL — Payslip's no-theme fonts are the STRING `"Helvetica"`, NOT the
+  # `:default` atom the other recipes use. Payslip calls
+  # `put_default_font(:payslip_sans)` (a Helvetica built-in WITH the B612
+  # unicode fallback, see with_unicode_fallback_font/1) so accented/·-class
+  # glyphs render. In `font_registry.ex` `normalize_reference/2`, the STRING
+  # "Helvetica" resolves to the DOCUMENT DEFAULT font (:payslip_sans + fallback)
+  # while the `:default` ATOM resolves to the bare built-in Helvetica (NO
+  # fallback + a different font resource). Every current Payslip text run passes
+  # no `font:` → the `%Text{}` struct default "Helvetica" string → :payslip_sans;
+  # seaming to `:default` would both drop the unicode fallback (breaking the "•"
+  # payment-method glyph) AND change the font resource (byte drift). Threading
+  # "Helvetica" reproduces the current resolution exactly. The `theme ->` branch
+  # reads `Rendro.Theme.resolve(theme).typography` (whose fonts ARE `:default`
+  # atoms — the intended themed behavior + the TYPE-02 raise surface).
+  # `:typography` stays the winning override layer (mirrors :palette).
+  defp typography(opts) do
+    base =
+      case opts[:theme] do
+        nil ->
+          %{
+            scale: %{display: 27, title: 13, subtitle: 11, body: 10, small: 9, caption: 8},
+            fonts: %{heading: "Helvetica", body: "Helvetica", mono: "Helvetica"},
+            leading: 1.2,
+            widows: 2,
+            orphans: 2
+          }
+
+        theme ->
+          Rendro.Theme.resolve(theme).typography
+      end
+
+    Map.merge(base, Keyword.get(opts, :typography, %{}))
   end
 
   # ---------------------------------------------------------------------------
