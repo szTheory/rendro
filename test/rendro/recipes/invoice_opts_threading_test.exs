@@ -103,6 +103,22 @@ defmodule Rendro.Recipes.InvoiceOptsThreadingTest do
     end
   end
 
+  describe "typography(opts) seam (TYPE-01/02/03)" do
+    test "no-op: sections(data) equals sections(data, typography: %{})" do
+      data = sample_data()
+      assert Invoice.sections(data) == Invoice.sections(data, typography: %{})
+    end
+
+    test "a :typography override changes the output (live seam)" do
+      data = sample_data()
+
+      # `leading` is threaded onto every %Text{} block, so overriding it is
+      # guaranteed to change the sections regardless of which anatomy fields
+      # `data` carries — proving the seam is live, not inert.
+      refute Invoice.sections(data) == Invoice.sections(data, typography: %{leading: 2.0})
+    end
+  end
+
   describe "Invoice :theme threading (PLUMB-02 swap)" do
     test ":theme threads through page_template/1 without KeyError" do
       assert %Rendro.PageTemplate{} = Invoice.page_template(theme: Rendro.Theme.default())
