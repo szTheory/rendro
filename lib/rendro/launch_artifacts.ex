@@ -22,7 +22,7 @@ defmodule Rendro.LaunchArtifacts do
     border_style: %{color: {216, 210, 195}, width: 0.6},
     header_fill: {247, 243, 234}
   ]
-  @gallery_required_keys ~w(id title recipe_module png_path png_sha256 source_pdf_sha256 page dpi width_px height_px renderer_kind renderer_version alt caption)
+  @gallery_required_keys ~w(id title recipe_module png_path png_sha256 source_pdf_sha256 page dpi width_px height_px renderer_kind renderer_version alt caption readme_hero)
   # S6 (D-13): optional theme/mode/preset seam tags. Intentionally NOT part of
   # @gallery_required_keys — their absence must never fail the required-keys
   # contract (older/other readers). When present, each must be null or a string.
@@ -36,7 +36,13 @@ defmodule Rendro.LaunchArtifacts do
     "payslip" => {794, 1123},
     # Ticket renders on native A6 (118-08: Rendro.PageSize gained :a6, 297.64 x 419.53pt)
     # instead of A4 as its recipe default -> 397x560px at the gallery's 96 DPI.
-    "ticket" => {397, 560}
+    "ticket" => {397, 560},
+    # D-03 (123-03): 3 dark + 1 from_brand rows, same page geometry as their
+    # light siblings (theming recolors, it never resizes the page).
+    "invoice_dark" => {794, 1123},
+    "certificate_dark" => {1123, 794},
+    "ticket_dark" => {397, 560},
+    "invoice_brand" => {794, 1123}
   }
 
   @readme_start "<!-- rendro-launch-artifacts-start -->"
@@ -44,6 +50,12 @@ defmodule Rendro.LaunchArtifacts do
   @recipes_start "<!-- rendro-recipe-gallery-start -->"
   @recipes_end "<!-- rendro-recipe-gallery-end -->"
 
+  # D-03 (123-03): every spec now carries three additional tags —
+  # `readme_hero` (S7, README hero-subset filter, distinct from the S6
+  # theme/mode/preset seam), `theme_tag`/`mode_tag` (the literal S6 values
+  # this spec's themed render actually produces, read by build_gallery_entries/1
+  # instead of a hardcoded nil/"light"). All 11 rows render `preset: null`
+  # (Milestone C reserves this key untouched).
   @gallery_specs [
     %{
       id: "invoice",
@@ -53,7 +65,10 @@ defmodule Rendro.LaunchArtifacts do
       asset_name: :gallery_invoice,
       fit: {320, 452},
       alt: "Rendered invoice PDF showing invoice header, line-item table, and thank-you footer.",
-      caption: "Standard invoice from Elixir data through the canonical Invoice recipe."
+      caption: "Standard invoice from Elixir data through the canonical Invoice recipe.",
+      readme_hero: true,
+      theme_tag: "default",
+      mode_tag: "light"
     },
     %{
       id: "branded_invoice",
@@ -64,7 +79,10 @@ defmodule Rendro.LaunchArtifacts do
       fit: {320, 452},
       alt:
         "Rendered branded invoice PDF showing Rendro logo, embedded brand font, and invoice table.",
-      caption: "Branded invoice with registered font and logo assets."
+      caption: "Branded invoice with registered font and logo assets.",
+      readme_hero: true,
+      theme_tag: "default",
+      mode_tag: "light"
     },
     %{
       id: "statement",
@@ -75,7 +93,10 @@ defmodule Rendro.LaunchArtifacts do
       fit: {320, 452},
       alt:
         "Rendered account statement PDF showing dated transaction rows, signed amounts, and a page-numbered footer.",
-      caption: "Account statement with opening/closing balances and per-page numbering."
+      caption: "Account statement with opening/closing balances and per-page numbering.",
+      readme_hero: true,
+      theme_tag: "default",
+      mode_tag: "light"
     },
     %{
       id: "receipt_report",
@@ -86,7 +107,10 @@ defmodule Rendro.LaunchArtifacts do
       fit: {320, 452},
       alt:
         "Rendered sales receipt PDF showing itemized line items with a subtotal, tax, and total.",
-      caption: "Itemized sales receipt with subtotal, tax, and total through the Receipt recipe."
+      caption: "Itemized sales receipt with subtotal, tax, and total through the Receipt recipe.",
+      readme_hero: true,
+      theme_tag: "default",
+      mode_tag: "light"
     },
     %{
       id: "certificate",
@@ -97,7 +121,10 @@ defmodule Rendro.LaunchArtifacts do
       fit: {390, 276},
       alt:
         "Rendered landscape certificate PDF showing recipient text and geometry-derived keyline border.",
-      caption: "Landscape certificate with a Path-backed, geometry-derived border frame."
+      caption: "Landscape certificate with a Path-backed, geometry-derived border frame.",
+      readme_hero: true,
+      theme_tag: "default",
+      mode_tag: "light"
     },
     %{
       id: "payslip",
@@ -109,7 +136,10 @@ defmodule Rendro.LaunchArtifacts do
       alt:
         "Rendered payslip PDF showing employer and employee details, earnings and deductions, and the net pay figure.",
       caption:
-        "Payslip with earnings, deductions, year-to-date figures, and a reconciled net pay."
+        "Payslip with earnings, deductions, year-to-date figures, and a reconciled net pay.",
+      readme_hero: true,
+      theme_tag: "default",
+      mode_tag: "light"
     },
     %{
       id: "ticket",
@@ -120,7 +150,71 @@ defmodule Rendro.LaunchArtifacts do
       fit: {320, 452},
       alt:
         "Rendered event ticket PDF showing the event title, seat placement grid, and a human-readable reference code.",
-      caption: "Event ticket with a placement grid and a quotable, human-readable reference code."
+      caption:
+        "Event ticket with a placement grid and a quotable, human-readable reference code.",
+      readme_hero: true,
+      theme_tag: "default",
+      mode_tag: "light"
+    },
+    %{
+      id: "invoice_dark",
+      title: "Invoice (Dark)",
+      module: Rendro.Recipes.Invoice,
+      png_path: Path.join(@gallery_dir, "invoice_dark.png"),
+      asset_name: :gallery_invoice_dark,
+      fit: {320, 452},
+      alt:
+        "Rendered invoice PDF in dark mode, showing the themed dark background applied to the header, line-item table, and thank-you footer. Dark mode is screen-oriented, not recommended for print.",
+      caption:
+        "Invoice in dark mode via Theme.dark(Theme.default()) — screen-oriented, not recommended for print.",
+      readme_hero: true,
+      theme_tag: "default",
+      mode_tag: "dark"
+    },
+    %{
+      id: "certificate_dark",
+      title: "Certificate (Dark)",
+      module: Rendro.Recipes.Certificate,
+      png_path: Path.join(@gallery_dir, "certificate_dark.png"),
+      asset_name: :gallery_certificate_dark,
+      fit: {390, 276},
+      alt:
+        "Rendered landscape certificate PDF in dark mode, showing the themed dark background behind the geometry-derived keyline border. Dark mode is screen-oriented, not recommended for print.",
+      caption:
+        "Landscape certificate in dark mode via Theme.dark(Theme.default()) — screen-oriented, not recommended for print.",
+      readme_hero: false,
+      theme_tag: "default",
+      mode_tag: "dark"
+    },
+    %{
+      id: "ticket_dark",
+      title: "Ticket (Dark)",
+      module: Rendro.Recipes.Ticket,
+      png_path: Path.join(@gallery_dir, "ticket_dark.png"),
+      asset_name: :gallery_ticket_dark,
+      fit: {320, 452},
+      alt:
+        "Rendered event ticket PDF in dark mode, showing the themed dark background behind the seat placement grid and reference code. Dark mode is screen-oriented, not recommended for print.",
+      caption:
+        "Event ticket in dark mode via Theme.dark(Theme.default()) — screen-oriented, not recommended for print.",
+      readme_hero: false,
+      theme_tag: "default",
+      mode_tag: "dark"
+    },
+    %{
+      id: "invoice_brand",
+      title: "Invoice (Branded Accent)",
+      module: Rendro.Recipes.Invoice,
+      png_path: Path.join(@gallery_dir, "invoice_brand.png"),
+      asset_name: :gallery_invoice_brand,
+      fit: {320, 452},
+      alt:
+        "Rendered invoice PDF themed with a teal brand accent color via from_brand, showing the accent applied to the dominant Total Due figure. No logo or brand font assets are used.",
+      caption:
+        "Invoice themed via Theme.from_brand(accent: \"#0E7C76\") — accent-only, no brand assets.",
+      readme_hero: true,
+      theme_tag: "brand",
+      mode_tag: "light"
     }
   ]
 
@@ -218,8 +312,13 @@ defmodule Rendro.LaunchArtifacts do
     gallery = Map.fetch!(manifest, "gallery")
     manual = Map.fetch!(manifest, "manual")
 
+    # D-03: README shows only the hero subset (the 7 light rows + the
+    # invoice_dark/invoice_brand theming strip); the full 11-row manifest
+    # remains the source of truth read by recipes_block/1 and guides/theming.md.
+    hero_gallery = Enum.filter(gallery, & &1["readme_hero"])
+
     images =
-      gallery
+      hero_gallery
       |> Enum.map(fn entry ->
         ~s|<a href="#{entry["png_path"]}"><img src="#{entry["png_path"]}" alt="#{entry["alt"]}" width="150"></a>|
       end)
@@ -310,11 +409,16 @@ defmodule Rendro.LaunchArtifacts do
   # Bounded item slice for the single-page branded-invoice branding showcase.
   @branded_invoice_item_count 8
 
+  # D-03/D-05 Commit 2 (123-03): every gallery render threads a resolved
+  # `:theme` so the manifest's "default"/"dark"/"brand" S6 tags are literally
+  # true of the bytes they describe (Big Finding: this swaps each recipe's
+  # native type scale onto the theme's uniform scale, not just leading — all
+  # 7 "default" rows re-bless, not only the prose rows).
   defp build_source_document("invoice") do
     @invoice_fixture
     |> Rendro.Examples.load!()
     |> Rendro.ExamplesData.transform_invoice()
-    |> Rendro.Recipes.Invoice.document()
+    |> Rendro.Recipes.Invoice.document(theme: Rendro.Theme.default())
     |> apply_launch_table_style()
   end
 
@@ -334,7 +438,7 @@ defmodule Rendro.LaunchArtifacts do
     data = %{data | items: Enum.take(data.items, @branded_invoice_item_count)}
 
     data
-    |> Rendro.Recipes.BrandedInvoice.document()
+    |> Rendro.Recipes.BrandedInvoice.document(theme: Rendro.Theme.default())
     |> apply_branded_invoice_launch_header()
     |> apply_launch_table_style()
   end
@@ -343,7 +447,7 @@ defmodule Rendro.LaunchArtifacts do
     @statement_fixture
     |> Rendro.Examples.load!()
     |> Rendro.ExamplesData.transform_statement()
-    |> Rendro.Recipes.Statement.document()
+    |> Rendro.Recipes.Statement.document(theme: Rendro.Theme.default())
     |> apply_launch_table_style()
   end
 
@@ -351,7 +455,7 @@ defmodule Rendro.LaunchArtifacts do
     @receipt_fixture
     |> Rendro.Examples.load!()
     |> Rendro.ExamplesData.transform_receipt()
-    |> Rendro.Recipes.Receipt.document()
+    |> Rendro.Recipes.Receipt.document(theme: Rendro.Theme.default())
     |> apply_launch_table_style()
   end
 
@@ -361,7 +465,7 @@ defmodule Rendro.LaunchArtifacts do
       |> Rendro.Examples.load!()
       |> Rendro.ExamplesData.transform_certificate()
 
-    Rendro.Recipes.Certificate.document(data, border: true)
+    Rendro.Recipes.Certificate.document(data, border: true, theme: Rendro.Theme.default())
     |> apply_certificate_body_wrap()
   end
 
@@ -369,15 +473,52 @@ defmodule Rendro.LaunchArtifacts do
     @payslip_fixture
     |> Rendro.Examples.load!()
     |> Rendro.ExamplesData.transform_payslip()
-    |> Rendro.Recipes.Payslip.document()
+    |> Rendro.Recipes.Payslip.document(theme: Rendro.Theme.default())
   end
 
   defp build_source_document("ticket") do
     @ticket_fixture
     |> Rendro.Examples.load!()
     |> Rendro.ExamplesData.transform_ticket()
-    |> Rendro.Recipes.Ticket.document()
+    |> Rendro.Recipes.Ticket.document(theme: Rendro.Theme.default())
     |> apply_ticket_terms_wrap()
+  end
+
+  defp build_source_document("invoice_dark") do
+    @invoice_fixture
+    |> Rendro.Examples.load!()
+    |> Rendro.ExamplesData.transform_invoice()
+    |> Rendro.Recipes.Invoice.document(theme: Rendro.Theme.dark(Rendro.Theme.default()))
+    |> apply_launch_table_style()
+  end
+
+  defp build_source_document("certificate_dark") do
+    data =
+      @certificate_fixture
+      |> Rendro.Examples.load!()
+      |> Rendro.ExamplesData.transform_certificate()
+
+    Rendro.Recipes.Certificate.document(data,
+      border: true,
+      theme: Rendro.Theme.dark(Rendro.Theme.default())
+    )
+    |> apply_certificate_body_wrap()
+  end
+
+  defp build_source_document("ticket_dark") do
+    @ticket_fixture
+    |> Rendro.Examples.load!()
+    |> Rendro.ExamplesData.transform_ticket()
+    |> Rendro.Recipes.Ticket.document(theme: Rendro.Theme.dark(Rendro.Theme.default()))
+    |> apply_ticket_terms_wrap()
+  end
+
+  defp build_source_document("invoice_brand") do
+    @invoice_fixture
+    |> Rendro.Examples.load!()
+    |> Rendro.ExamplesData.transform_invoice()
+    |> Rendro.Recipes.Invoice.document(theme: Rendro.Theme.from_brand(accent: "#0E7C76"))
+    |> apply_launch_table_style()
   end
 
   @spec render_manual_pdf() :: {:ok, binary()} | {:error, term()}
@@ -506,15 +647,20 @@ defmodule Rendro.LaunchArtifacts do
              "renderer_version" => renderer_version,
              "alt" => spec.alt,
              "caption" => spec.caption,
-             # S6 (D-13): optional theme/mode/preset seam tags. Explicit null for
-             # theme/preset means "seam present, not yet populated"; "light" is
-             # the one defensible non-null default for mode. These keys are
+             # S6 (D-13): optional theme/mode/preset seam tags. These keys are
              # deliberately absent from @gallery_required_keys so a manifest
              # written by an older/other generator without them never fails the
-             # required-keys contract.
-             "theme" => nil,
-             "mode" => "light",
-             "preset" => nil
+             # required-keys contract. D-03 (123-03): theme/mode are now the
+             # spec's own literal tags (the render actually threads that theme),
+             # never a hardcoded nil/"light" — "preset" stays null on every row
+             # (Milestone C reserves this key untouched).
+             "theme" => spec.theme_tag,
+             "mode" => spec.mode_tag,
+             "preset" => nil,
+             # S7 (D-03): README hero-subset flag, distinct from the S6 seam —
+             # filters which rows readme_block/1 shows vs. the full 11-row
+             # manifest that recipes_block/1 and guides/theming.md render.
+             "readme_hero" => spec.readme_hero
            }}
         else
           {:error, reason} -> {:error, {spec.id, reason}}
@@ -653,6 +799,10 @@ defmodule Rendro.LaunchArtifacts do
         |> add_error_unless(
           non_empty_string?(entry["caption"]),
           "gallery #{label} caption must be a non-empty string"
+        )
+        |> add_error_unless(
+          is_boolean(entry["readme_hero"]),
+          "gallery #{label} readme_hero must be a boolean"
         )
         |> add_error_unless(
           is_nil(expected_dimensions) or
@@ -1075,7 +1225,9 @@ defmodule Rendro.LaunchArtifacts do
       # order. Optional seam tags — see build_gallery_entries/1.
       {"theme", entry["theme"]},
       {"mode", entry["mode"]},
-      {"preset", entry["preset"]}
+      {"preset", entry["preset"]},
+      # S7 (D-03): README hero-subset flag — see build_gallery_entries/1.
+      {"readme_hero", entry["readme_hero"]}
     ])
   end
 
