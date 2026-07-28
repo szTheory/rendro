@@ -142,8 +142,8 @@ Plans:
 
 - [x] 122-01-PLAN.md — Tracer: fully seam Invoice end-to-end across TYPE-01/02/03 (typography/1 seam, D-04 relaxation, raise-path) [Wave 1]
 - [x] 122-02-PLAN.md — Expansion: seam the 3 clean recipes (Statement/Receipt/Payslip) [Wave 2]
-- [ ] 122-03-PLAN.md — Expansion: seam the 3 risk recipes resolving Q1/Q2/Q3 (BrandedInvoice/Certificate/Ticket) [Wave 2]
-- [ ] 122-04-PLAN.md — Consolidation: no-inline-size-literals teeth test + full-suite phase gate [Wave 3]
+- [x] 122-03-PLAN.md — Expansion: seam the 3 risk recipes resolving Q1/Q2/Q3 (BrandedInvoice/Certificate/Ticket) [Wave 2]
+- [x] 122-04-PLAN.md — Consolidation: no-inline-size-literals teeth test + full-suite phase gate [Wave 3]
 
 ### Phase 123: `from_brand/2` E2E + honest rubric-gap closure + gallery/docs/manifest closure
 
@@ -168,7 +168,7 @@ Plans:
 | 119. `Rendro.Theme` core module (the one-way door) | v2.11 | 2/2 | Complete    | 2026-07-24 |
 | 120. S1 seam retrofit + full `theme:` swap (7 recipes) | v2.11 | 4/4 | Complete    | 2026-07-27 |
 | 121. Light/dark background-fill mechanism (7 recipes) | v2.11 | 4/4 | Complete    | 2026-07-28 |
-| 122. Typography type-scale + font-role/leading wiring | v2.11 | 2/4 | In Progress|  |
+| 122. Typography type-scale + font-role/leading wiring | v2.11 | 4/4 | Complete   | 2026-07-28 |
 | 123. `from_brand/2` E2E + honest rubric-gap + docs closure | v2.11 | 0/TBD | Not started | - |
 
 ## Current Focus

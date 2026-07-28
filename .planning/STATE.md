@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
-status: executing
-stopped_at: Completed 122-03-PLAN.md
-last_updated: "2026-07-28T03:09:34.895Z"
+status: verifying
+stopped_at: Completed 122-04-PLAN.md
+last_updated: "2026-07-28T03:16:00.456Z"
 last_activity: 2026-07-28
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 14
-  completed_plans: 12
-  percent: 60
+  completed_plans: 14
+  percent: 80
 ---
 
 # Project State
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-07-27)
 
 Phase: 122 (typography-type-scale-application-font-role-leading-wiring) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-28
 
-Progress: [█████████░] 86%
+Progress: [██████████] 100%
 
 ## Roadmap Snapshot (v2.11, Phases 119-123)
 
@@ -78,6 +78,7 @@ Full log in PROJECT.md Key Decisions. Milestone-B locks carried into planning:
 - [Phase ?]: 122-03: BrandedInvoice display anchor = brand name (18), the sole non-:default literal-default font exception (brand font kept on both paths, brand-orthogonal-to-theme)
 - [Phase ?]: 122-03: Certificate threads one resolved size into BOTH the %Text{} run AND the centering math (line_h/text_width) to avoid themed de-centering (Pitfall 2)
 - [Phase ?]: 122-03: Ticket exempts @caption_size(7)/@present_code_size(6) from the scale seam (font-only mono); reference code(8) is the sole display anchor via non-monotone assignment (Q3)
+- [Phase ?]: 122-04: TYPE-01 teeth test keys @size_literal on a numeric literal after size:, so size: type.scale.<role> and size: @attr variable reads are inherently non-matching — no per-recipe allowlist needed for exempt mono micro-sizes.
 
 ### Pending Todos
 
@@ -98,8 +99,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-28T03:09:34.890Z
-Stopped at: Completed 122-03-PLAN.md
+Last session: 2026-07-28T03:15:51.046Z
+Stopped at: Completed 122-04-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -118,3 +119,4 @@ Resume file: None
 | Phase 122 P01 | 18min | 2 tasks | 4 files |
 | Phase 122 P02 | 32min | 3 tasks | 7 files |
 | Phase 122 P03 | 9min | 3 tasks | 8 files |
+| Phase 122 P04 | 4min | 2 tasks | 1 files |
