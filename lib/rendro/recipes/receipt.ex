@@ -139,38 +139,51 @@ defmodule Rendro.Recipes.Receipt do
     header_height = Keyword.get(opts, :header_height, @default_header_height)
     body_y = @margin + header_height
     body_height = @page_height - 2 * @margin - header_height - @footer_height
+    colors = palette(opts)
+
+    base_regions = [
+      Rendro.region(
+        name: :header,
+        role: :header,
+        anchor: :top,
+        x: @margin,
+        y: @margin,
+        width: @content_width,
+        height: header_height
+      ),
+      Rendro.region(
+        name: :body,
+        role: :body,
+        anchor: :flow,
+        x: @margin,
+        y: body_y,
+        width: @content_width,
+        height: body_height
+      ),
+      Rendro.region(
+        name: :footer,
+        role: :footer,
+        anchor: :bottom,
+        x: @margin,
+        y: @footer_y,
+        width: @content_width,
+        height: @footer_height
+      )
+    ]
+
+    # 121-03: prepend the shared :background region FIRST iff the resolved
+    # palette differs from paper-white — gated on the SAME palette(opts)
+    # sections/2 uses below (Pitfall 3). Light no-theme path is untouched.
+    regions =
+      if Rendro.Recipes.Background.emit?(colors) do
+        [Rendro.Recipes.Background.region(@page_width, @page_height) | base_regions]
+      else
+        base_regions
+      end
 
     defaults = [
       name: :receipt,
-      regions: [
-        Rendro.region(
-          name: :header,
-          role: :header,
-          anchor: :top,
-          x: @margin,
-          y: @margin,
-          width: @content_width,
-          height: header_height
-        ),
-        Rendro.region(
-          name: :body,
-          role: :body,
-          anchor: :flow,
-          x: @margin,
-          y: body_y,
-          width: @content_width,
-          height: body_height
-        ),
-        Rendro.region(
-          name: :footer,
-          role: :footer,
-          anchor: :bottom,
-          x: @margin,
-          y: @footer_y,
-          width: @content_width,
-          height: @footer_height
-        )
-      ]
+      regions: regions
     ]
 
     # page_template/1 only understands PageTemplate struct keys. Recipe-level
@@ -220,11 +233,21 @@ defmodule Rendro.Recipes.Receipt do
   def sections(data, opts \\ []) do
     validate_data!(data)
 
-    [
+    colors = palette(opts)
+
+    base_sections = [
       header_section(data, opts),
       body_section(data, opts),
       footer_section(data, opts)
     ]
+
+    # Same predicate + same palette(opts) as page_template/1 (Pitfall 3) —
+    # the region and section can never disagree.
+    if Rendro.Recipes.Background.emit?(colors) do
+      [Rendro.Recipes.Background.section(colors, @page_width, @page_height) | base_sections]
+    else
+      base_sections
+    end
   end
 
   @doc """

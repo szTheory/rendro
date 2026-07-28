@@ -54,7 +54,12 @@ defmodule Rendro.Recipes.ReceiptByteIdentityTest do
   describe "PLUMB-02: page_template/1 opts whitelist" do
     test "page_template/1 does not raise KeyError on :palette / :theme opts" do
       assert %Rendro.PageTemplate{} = Receipt.page_template(palette: %{})
-      assert %Rendro.PageTemplate{} = Receipt.page_template(theme: :ignored)
+      # 121-03: page_template/1 now resolves palette(opts) directly (to gate
+      # the shared :background region), so :theme must be a value
+      # Rendro.Theme.resolve/1 actually accepts — an empty map resolves to
+      # the theme defaults and still exercises the whitelist (:theme is
+      # filtered from the struct!/2 keys and reaches palette/1 unharmed).
+      assert %Rendro.PageTemplate{} = Receipt.page_template(theme: %{})
     end
   end
 end

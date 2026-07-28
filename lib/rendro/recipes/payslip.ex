@@ -101,6 +101,58 @@ defmodule Rendro.Recipes.Payslip do
   @spec page_template(keyword()) :: Rendro.PageTemplate.t()
   def page_template(opts \\ []) do
     g = geometry(opts)
+    colors = palette(opts)
+
+    base_regions = [
+      Rendro.region(
+        name: :header,
+        role: :header,
+        anchor: :top,
+        x: g.ml,
+        y: g.header_y,
+        width: g.content_w,
+        height: g.header_h
+      ),
+      Rendro.region(
+        name: :summary,
+        role: :custom,
+        anchor: :top,
+        x: g.ml,
+        y: g.summary_y,
+        width: g.content_w,
+        height: g.summary_h
+      ),
+      Rendro.region(
+        name: :body,
+        role: :body,
+        anchor: :flow,
+        x: g.ml,
+        y: g.body_y,
+        width: g.content_w,
+        height: g.body_h
+      ),
+      Rendro.region(
+        name: :footer,
+        role: :footer,
+        anchor: :bottom,
+        x: g.ml,
+        y: g.footer_y,
+        width: g.content_w,
+        height: g.footer_h
+      )
+    ]
+
+    # 121-03: prepend the shared :background region FIRST (bottom of the
+    # paint stack) iff the resolved palette differs from paper-white — gated
+    # on the SAME palette(opts) sections/2 uses below (Pitfall 3), so region
+    # and section can never disagree. The light no-theme path leaves
+    # `regions` untouched (byte-identical).
+    regions =
+      if Rendro.Recipes.Background.emit?(colors) do
+        [Rendro.Recipes.Background.region(g.pw, g.ph) | base_regions]
+      else
+        base_regions
+      end
 
     defaults = [
       name: :payslip,
@@ -110,44 +162,7 @@ defmodule Rendro.Recipes.Payslip do
       margin_right: g.mr,
       margin_bottom: g.mb,
       margin_left: g.ml,
-      regions: [
-        Rendro.region(
-          name: :header,
-          role: :header,
-          anchor: :top,
-          x: g.ml,
-          y: g.header_y,
-          width: g.content_w,
-          height: g.header_h
-        ),
-        Rendro.region(
-          name: :summary,
-          role: :custom,
-          anchor: :top,
-          x: g.ml,
-          y: g.summary_y,
-          width: g.content_w,
-          height: g.summary_h
-        ),
-        Rendro.region(
-          name: :body,
-          role: :body,
-          anchor: :flow,
-          x: g.ml,
-          y: g.body_y,
-          width: g.content_w,
-          height: g.body_h
-        ),
-        Rendro.region(
-          name: :footer,
-          role: :footer,
-          anchor: :bottom,
-          x: g.ml,
-          y: g.footer_y,
-          width: g.content_w,
-          height: g.footer_h
-        )
-      ]
+      regions: regions
     ]
 
     # Recipe-level opts (:palette, :labels, :formatters, :page_size, ...)
@@ -181,12 +196,23 @@ defmodule Rendro.Recipes.Payslip do
     Rendro.Recipes.Pagination.validate_labels!(opts, "Rendro.Recipes.Payslip.document/2")
     Rendro.Recipes.Pagination.validate_formatters!(opts, "Rendro.Recipes.Payslip.document/2")
 
-    [
+    g = geometry(opts)
+    colors = palette(opts)
+
+    base_sections = [
       header_section(data, opts),
       summary_section(data, opts),
       body_section(data, opts),
       footer_section(data, opts)
     ]
+
+    # Same predicate + same palette(opts) as page_template/1 (Pitfall 3) —
+    # the region and section can never disagree.
+    if Rendro.Recipes.Background.emit?(colors) do
+      [Rendro.Recipes.Background.section(colors, g.pw, g.ph) | base_sections]
+    else
+      base_sections
+    end
   end
 
   @doc """
