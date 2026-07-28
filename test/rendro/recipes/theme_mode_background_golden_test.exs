@@ -12,6 +12,7 @@ defmodule Rendro.Recipes.ThemeModeBackgroundGoldenTest do
   """
   use ExUnit.Case, async: true
 
+  alias Rendro.Recipes.Certificate
   alias Rendro.Recipes.Statement
 
   @dark_theme Rendro.Theme.dark(Rendro.Theme.default())
@@ -104,6 +105,65 @@ defmodule Rendro.Recipes.ThemeModeBackgroundGoldenTest do
       doc = Statement.document(toy_data(), theme: @dark_theme)
       pdf = Rendro.Test.Golden.assert_deterministic!(doc)
       Rendro.Test.Golden.assert_or_bless({:statement, :dark}, pdf)
+    end
+  end
+
+  # ---------------------------------------------------------------------------
+  # 121-02: Certificate (landscape, single-page, non-portrait geometry proof)
+  # ---------------------------------------------------------------------------
+  #
+  # Certificate defaults to A4 landscape and is single-page (validate_body!/1
+  # rejects a body long enough to overflow), so it proves the mechanism paints
+  # on a page whose dims are NOT the portrait constants Statement resolves —
+  # guarding Pitfall 4 (never hardcode A4-portrait dims inside the shared
+  # helper or its callers).
+
+  defp certificate_data do
+    %{
+      title: "Certificate of Completion",
+      recipient: "Jane Smith",
+      date: ~D[2026-05-29],
+      body: "For outstanding achievement in the completion of the program.",
+      seal_line: "Program Director"
+    }
+  end
+
+  describe "(e) Certificate light/no-theme: zero background ops, byte-identical" do
+    test "two deterministic renders are byte-identical and contain no dark-bg fill op" do
+      doc = Certificate.document(certificate_data())
+      assert {:ok, pdf1} = Rendro.render(doc, deterministic: true)
+      assert {:ok, pdf2} = Rendro.render(doc, deterministic: true)
+      assert pdf1 == pdf2
+      refute pdf1 =~ @fill_op
+    end
+  end
+
+  describe "(f) Certificate dark: background fill is the first content op on the landscape page" do
+    test "the fill op's first occurrence precedes the first BT text token" do
+      doc = Certificate.document(certificate_data(), theme: @dark_theme)
+      assert {:ok, pdf} = Rendro.render(doc, deterministic: true)
+
+      assert pdf =~ @fill_op
+
+      {fill_offset, _} = :binary.match(pdf, @fill_op)
+      {bt_offset, _} = :binary.match(pdf, "BT")
+
+      assert fill_offset < bt_offset,
+             "expected the :background fill op (offset #{fill_offset}) to precede " <>
+               "the first BT text op (offset #{bt_offset}) — full-page landscape fill " <>
+               "must paint first (bottom of the paint stack)"
+
+      # Single-page landscape recipe: the fill op appears exactly once.
+      fill_count = length(:binary.matches(pdf, @fill_op))
+      assert fill_count == 1, "expected exactly one :background fill op on the single landscape page"
+    end
+  end
+
+  describe "(g) Certificate determinism/composition + blessed dark golden" do
+    test "two dark renders are byte-identical and match the blessed golden" do
+      doc = Certificate.document(certificate_data(), theme: @dark_theme)
+      pdf = Rendro.Test.Golden.assert_deterministic!(doc)
+      Rendro.Test.Golden.assert_or_bless({:certificate, :dark}, pdf)
     end
   end
 end
