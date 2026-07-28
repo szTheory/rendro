@@ -54,4 +54,20 @@ defmodule Rendro.Recipes.TicketOptsThreadingTest do
       assert Ticket.sections(data) == Ticket.sections(data, palette: %{})
     end
   end
+
+  describe "typography(opts) seam (TYPE-01/02/03)" do
+    test "no-op: sections(data) equals sections(data, typography: %{})" do
+      data = sample_data()
+      assert Ticket.sections(data) == Ticket.sections(data, typography: %{})
+    end
+
+    test "a :typography override changes the output (live seam)" do
+      data = sample_data()
+
+      # `leading` is threaded onto every seamed %Text{} block (including the two
+      # exempted mono micro-size runs), so overriding it is guaranteed to change
+      # the sections — proving the seam is live.
+      refute Ticket.sections(data) == Ticket.sections(data, typography: %{leading: 2.0})
+    end
+  end
 end

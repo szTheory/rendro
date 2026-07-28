@@ -289,16 +289,21 @@ defmodule Rendro.Recipes.Ticket do
   # under a header row of small caps (8pt) labels -- the values are the
   # single largest text anywhere on the page, matching D-02's dominant-anchor
   # requirement. 118-08 gap-closure (SHOW-01): bumped from 22pt so the WHOLE
-  # placement-grid group reads as unambiguously the page's one dominant
-  # anchor (not four equally-large-but-unremarkable fields) now that the
-  # ticket renders at its smaller native A6 size. The SAME code renders any
-  # 1-4 cell :placement shape (event or boarding-pass) purely via data --
-  # zero archetype branching (D-01); no individual label (e.g. "Seat") is
-  # ever singled out.
-  @placement_value_size 26
-
+  # placement-grid group reads as unambiguously the page's largest text (not
+  # four equally-large-but-unremarkable fields) now that the ticket renders at
+  # its smaller native A6 size. The SAME code renders any 1-4 cell :placement
+  # shape (event or boarding-pass) purely via data -- zero archetype branching
+  # (D-01); no individual label (e.g. "Seat") is ever singled out.
+  #
+  # 122-03 typography seam (Q3): the placement value's former literal 26 is now
+  # `scale.title` — the LARGEST text on the page, but NOT the `display` anchor.
+  # Q3 resolves the 7-distinct-sizes-vs-6-roles clash by making the reference
+  # CODE (8pt) the SOLE `display` anchor (D-01, the "one key fact") via
+  # non-monotone assignment, and exempting the two mono micro-sizes
+  # (@caption_size 7, @present_code_size 6) from the scale seam (font-only mono).
   defp main_section(data, opts) do
     colors = palette(opts)
+    type = typography(opts)
     g = geometry(opts)
 
     # 118-08: the :main region is narrower now that the ticket defaults to
@@ -313,12 +318,30 @@ defmodule Rendro.Recipes.Ticket do
 
     header_cells =
       Enum.map(data.placement, fn %{label: l} ->
-        Rendro.block(Rendro.text(String.upcase(l), size: 8, color: colors.muted))
+        Rendro.block(
+          Rendro.text(String.upcase(l),
+            size: type.scale.caption,
+            font: type.fonts.body,
+            color: colors.muted,
+            line_height: type.leading,
+            widows: type.widows,
+            orphans: type.orphans
+          )
+        )
       end)
 
     value_cells =
       Enum.map(data.placement, fn %{value: v} ->
-        Rendro.block(Rendro.text(v, size: @placement_value_size, color: colors.ink))
+        Rendro.block(
+          Rendro.text(v,
+            size: type.scale.title,
+            font: type.fonts.body,
+            color: colors.ink,
+            line_height: type.leading,
+            widows: type.widows,
+            orphans: type.orphans
+          )
+        )
       end)
 
     grid =
@@ -334,7 +357,19 @@ defmodule Rendro.Recipes.Ticket do
           []
 
         subtitle ->
-          [Rendro.block(Rendro.text(subtitle, size: 10, color: colors.muted), width: main_w)]
+          [
+            Rendro.block(
+              Rendro.text(subtitle,
+                size: type.scale.body,
+                font: type.fonts.body,
+                color: colors.muted,
+                line_height: type.leading,
+                widows: type.widows,
+                orphans: type.orphans
+              ),
+              width: main_w
+            )
+          ]
       end
 
     Rendro.section(
@@ -342,10 +377,28 @@ defmodule Rendro.Recipes.Ticket do
       region: :main,
       content:
         [
-          Rendro.block(Rendro.text(issuer_display(data.issuer), size: 9, color: colors.muted),
+          Rendro.block(
+            Rendro.text(issuer_display(data.issuer),
+              size: type.scale.small,
+              font: type.fonts.body,
+              color: colors.muted,
+              line_height: type.leading,
+              widows: type.widows,
+              orphans: type.orphans
+            ),
             width: main_w
           ),
-          Rendro.block(Rendro.text(data.title, size: 16, color: colors.ink), width: main_w)
+          Rendro.block(
+            Rendro.text(data.title,
+              size: type.scale.subtitle,
+              font: type.fonts.heading,
+              color: colors.ink,
+              line_height: type.leading,
+              widows: type.widows,
+              orphans: type.orphans
+            ),
+            width: main_w
+          )
         ] ++
           subtitle_blocks ++
           [Rendro.block(grid)]
@@ -373,12 +426,21 @@ defmodule Rendro.Recipes.Ticket do
   # (lib/rendro/pipeline/measure.ex's wrap_text/5 falls back to
   # per-grapheme splitting for a single unbreakable token) instead of
   # raising :content_overflow.
-  @reference_size 8
+  # 122-03 typography seam (Q3): the reference CODE's former literal 8 is now
+  # `scale.display` (the SOLE D-01 anchor) — read inline in reference_blocks/5.
+  # @caption_size (7) and @present_code_size (6) are the two EXEMPT mono
+  # micro-sizes: they stay LITERAL module attrs (never collapsed into a scale
+  # role — 7 distinct sizes cannot fit 6 roles without a byte-changing
+  # collapse, RESEARCH Q3/Pitfall 4) and their call sites seam ONLY their FONT
+  # to `mono`. The `size:` on those runs stays a variable read of the attr
+  # (NOT an inline literal) so byte-identity holds and the Wave-3 no-inline-size
+  # teeth test does not trip.
   @caption_size 7
   @present_code_size 6
 
   defp stub_section(data, opts) do
     colors = palette(opts)
+    type = typography(opts)
     lbl = Rendro.Recipes.Pagination.label_resolver(opts, @default_labels)
     g = geometry(opts)
 
@@ -418,7 +480,7 @@ defmodule Rendro.Recipes.Ticket do
       region: :stub,
       content:
         [perforation, code_box] ++
-          code_area_blocks(data, colors, lbl, image, box_x, box_size, text_x, avail_w)
+          code_area_blocks(data, colors, type, lbl, image, box_x, box_size, text_x, avail_w)
     )
   end
 
@@ -426,9 +488,9 @@ defmodule Rendro.Recipes.Ticket do
   # optional caption), never a faux barcode/QR stripe pattern. Reference
   # block(s) start at the SAME y as the box backdrop (height: 0), so they
   # overlay the box from its top edge.
-  defp code_area_blocks(data, colors, lbl, nil, _box_x, _box_size, text_x, avail_w) do
-    reference_blocks(data, colors, lbl, text_x, avail_w) ++
-      [present_code_caption(colors, lbl, text_x, avail_w)]
+  defp code_area_blocks(data, colors, type, lbl, nil, _box_x, _box_size, text_x, avail_w) do
+    reference_blocks(data, colors, type, lbl, text_x, avail_w) ++
+      [present_code_caption(colors, type, lbl, text_x, avail_w)]
   end
 
   # D-08: image supplied -- fit-contain (aspect-preserving), centered, under
@@ -437,26 +499,45 @@ defmodule Rendro.Recipes.Ticket do
   # clause) naturally advances the cursor past the box, so the
   # ALWAYS-VISIBLE reference (D-06) renders AFTER it -- below the image,
   # never overlaid on top of it.
-  defp code_area_blocks(data, colors, lbl, _image, box_x, box_size, text_x, avail_w) do
+  defp code_area_blocks(data, colors, type, lbl, _image, box_x, box_size, text_x, avail_w) do
     image_block =
       Rendro.Component.image(:ticket_code, fit: {box_size, box_size})
       |> Map.put(:x, box_x)
 
-    [image_block | reference_blocks(data, colors, lbl, text_x, avail_w)]
+    [image_block | reference_blocks(data, colors, type, lbl, text_x, avail_w)]
   end
 
   # D-06: the human-readable reference -- REQUIRED, ALWAYS renders, even
   # when a PNG is supplied. Upper-cased, with a small muted caption above.
-  defp reference_blocks(data, colors, lbl, text_x, avail_w) do
+  defp reference_blocks(data, colors, type, lbl, text_x, avail_w) do
     caption_label = Map.get(data.code, :label) || lbl.(:reference)
     reference_text = String.upcase(data.code.reference)
 
     [
-      Rendro.block(Rendro.text(caption_label, size: @caption_size, color: colors.muted),
+      # EXEMPT micro-size: keep the literal @caption_size (7) attr, seam FONT
+      # only to mono.
+      Rendro.block(
+        Rendro.text(caption_label,
+          size: @caption_size,
+          font: type.fonts.mono,
+          color: colors.muted,
+          line_height: type.leading,
+          widows: type.widows,
+          orphans: type.orphans
+        ),
         x: text_x,
         width: avail_w
       ),
-      Rendro.block(Rendro.text(reference_text, size: @reference_size, color: colors.ink),
+      # The reference code is the SOLE `display` anchor (D-01) — mono font.
+      Rendro.block(
+        Rendro.text(reference_text,
+          size: type.scale.display,
+          font: type.fonts.mono,
+          color: colors.ink,
+          line_height: type.leading,
+          widows: type.widows,
+          orphans: type.orphans
+        ),
         x: text_x,
         width: avail_w
       )
@@ -464,8 +545,18 @@ defmodule Rendro.Recipes.Ticket do
   end
 
   # D-07: optional caption, no-image path only.
-  defp present_code_caption(colors, lbl, text_x, avail_w) do
-    Rendro.block(Rendro.text(lbl.(:present_code), size: @present_code_size, color: colors.muted),
+  # EXEMPT micro-size: keep the literal @present_code_size (6) attr, seam FONT
+  # only to mono.
+  defp present_code_caption(colors, type, lbl, text_x, avail_w) do
+    Rendro.block(
+      Rendro.text(lbl.(:present_code),
+        size: @present_code_size,
+        font: type.fonts.mono,
+        color: colors.muted,
+        line_height: type.leading,
+        widows: type.widows,
+        orphans: type.orphans
+      ),
       x: text_x,
       width: avail_w
     )
@@ -473,6 +564,7 @@ defmodule Rendro.Recipes.Ticket do
 
   defp terms_section(data, opts) do
     colors = palette(opts)
+    type = typography(opts)
     g = geometry(opts)
 
     # 118-08: an explicit width lets long fine-print terms wrap within the
@@ -484,7 +576,19 @@ defmodule Rendro.Recipes.Ticket do
           []
 
         terms ->
-          [Rendro.block(Rendro.text(terms, size: 8, color: colors.muted), width: g.content_w)]
+          [
+            Rendro.block(
+              Rendro.text(terms,
+                size: type.scale.caption,
+                font: type.fonts.body,
+                color: colors.muted,
+                line_height: type.leading,
+                widows: type.widows,
+                orphans: type.orphans
+              ),
+              width: g.content_w
+            )
+          ]
       end
 
     Rendro.section(name: :ticket_terms, region: :terms, content: content)
@@ -556,6 +660,45 @@ defmodule Rendro.Recipes.Ticket do
       end
 
     Map.merge(base, Keyword.get(opts, :palette, %{}))
+  end
+
+  # ---------------------------------------------------------------------------
+  # Typography seam (TYPE-01 / TYPE-02 / TYPE-03) — structural twin of palette/1.
+  # ---------------------------------------------------------------------------
+
+  # Returns the resolved typography for this render: a named type scale, three
+  # font roles, and leading/widows/orphans. When no `:theme` is supplied the
+  # `nil` branch reproduces Ticket's exact CURRENT size literals via a
+  # NON-MONOTONE role assignment (Q3): reference code 8 -> `display` (the SOLE
+  # D-01 anchor), placement value 26 -> `title` (the largest text, NOT the
+  # anchor), ticket title 16 -> `subtitle`, subtitle text 10 -> `body`, issuer
+  # 9 -> `small`, placement-label/terms 8 -> `caption` (same literal 8 as
+  # `display`, but a distinct role key — byte-identical and NOT a second display
+  # binding). The two mono micro-sizes @caption_size (7) and @present_code_size
+  # (6) are EXEMPT from this map (they stay literal attrs, font-only mono) —
+  # this is what drops the scale-seamed distinct set from 7 to ≤6 roles. NEVER
+  # `Rendro.Theme.default().typography` in the nil branch (RESEARCH Pitfall 1).
+  # All font roles default to `:default` (built-in Helvetica; Ticket never
+  # overrides its document default, so byte-identical). When a `:theme` is
+  # supplied the base becomes `Rendro.Theme.resolve(theme).typography`. The
+  # final `Map.merge` keeps an explicit `:typography` opt as the winning layer.
+  defp typography(opts) do
+    base =
+      case opts[:theme] do
+        nil ->
+          %{
+            scale: %{display: 8, title: 26, subtitle: 16, body: 10, small: 9, caption: 8},
+            fonts: %{heading: :default, body: :default, mono: :default},
+            leading: 1.2,
+            widows: 2,
+            orphans: 2
+          }
+
+        theme ->
+          Rendro.Theme.resolve(theme).typography
+      end
+
+    Map.merge(base, Keyword.get(opts, :typography, %{}))
   end
 
   # ---------------------------------------------------------------------------
