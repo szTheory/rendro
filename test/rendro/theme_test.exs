@@ -90,10 +90,15 @@ defmodule Rendro.ThemeTest do
                caption: 8
              }
 
-      assert t.typography.leading == 1.2
+      assert t.typography.leading == 1.35
       assert t.typography.widows == 2
       assert t.typography.orphans == 2
       assert t.typography.fonts == %{heading: :default, body: :default, mono: :default}
+    end
+
+    test "leading is 1.35 (D-01/DEFAULT-01) and the colour surface is untouched by it" do
+      assert Theme.default().typography.leading == 1.35
+      assert Theme.resolve(Theme.default()).colors.accent == {44, 107, 237}
     end
 
     test "spacing, rules, radius, density, and mode are all present" do

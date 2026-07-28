@@ -70,12 +70,14 @@ defmodule Rendro.Theme do
   }
 
   # Type scale as explicit materialized points (D-03) — never a runtime formula.
-  # leading/widows/orphans are metric-identical to %Rendro.Text{} defaults so
-  # later typographic application is a proven no-op.
+  # widows/orphans are metric-identical to %Rendro.Text{} defaults. leading is
+  # 1.35 (D-01/DEFAULT-01, Brand Book §9 Swiss print-prose band 1.3-1.45) — the
+  # sole strong-default value change; it reflows wrapped multi-line prose on
+  # the themed path only (the no-theme literal 1.2 path never reads default/0).
   @default_typography %{
     fonts: %{heading: :default, body: :default, mono: :default},
     scale: %{display: 21, title: 16.5, subtitle: 13, body: 10.5, small: 9, caption: 8},
-    leading: 1.2,
+    leading: 1.35,
     widows: 2,
     orphans: 2
   }
