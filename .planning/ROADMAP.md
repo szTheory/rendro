@@ -164,7 +164,7 @@ Plans:
   3. Themed and dark gallery renders populate the existing S6 `theme`/`mode` tags on `assets/rendro/artifacts.json` (hash-checked), each `(recipe × mode)` a distinct blessed gallery row, with `preset` staying `null` (presets are Milestone C).
   4. `priv/support_matrix.json` gains proof-backed `theming.light`/`theming.dark` rows, a `guides/theming.md` + claims test binds every public theming claim to proof, and docs-contract + Hex-tarball lanes stay green (theme is pure code — no new asset ships in the tarball).
 
-**Plans**: 3/5 plans executed
+**Plans**: 5/5 plans executed
 
 Plans:
 **Wave 1**
@@ -182,7 +182,7 @@ Plans:
 **Wave 4** *(blocked on 123-03: blessed rasters/hashes as evidence)*
 
 - [x] 123-04-PLAN.md — `from_brand/2` E2E via `guides/theming.md` fences + `theming_contract_test.exs`; flip guides guard; proof-backed support-matrix; tarball lane green [Wave 4]
-- [ ] 123-05-PLAN.md — Commit 3: HONEST RE-SCORE (score-flip) — sign-off fields + schema if/then + test teeth + `SIGN-OFF.md` + human sign-off; zero-colour-code commit [Wave 4]
+- [x] 123-05-PLAN.md — Commit 3: HONEST RE-SCORE (score-flip) — sign-off fields + schema if/then + test teeth + `SIGN-OFF.md` + human sign-off; zero-colour-code commit [Wave 4]
 
 ## Progress
 
@@ -194,7 +194,7 @@ Plans:
 | 120. S1 seam retrofit + full `theme:` swap (7 recipes) | v2.11 | 4/4 | Complete    | 2026-07-27 |
 | 121. Light/dark background-fill mechanism (7 recipes) | v2.11 | 4/4 | Complete    | 2026-07-28 |
 | 122. Typography type-scale + font-role/leading wiring | v2.11 | 5/5 | Complete    | 2026-07-28 |
-| 123. `from_brand/2` E2E + honest rubric-gap + docs closure | v2.11 | 4/5 | In Progress|  |
+| 123. `from_brand/2` E2E + honest rubric-gap + docs closure | v2.11 | 5/5 | In Progress|  |
 
 ## Current Focus
 
