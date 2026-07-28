@@ -11,10 +11,6 @@ defmodule Rendro.Recipes.NoInlineColorLiteralsTest do
   defaults legitimately live), and fails — with file + line — if any inline
   color literal is assigned to a `color:` / `fill:` / `stroke:` context.
 
-  It also enforces the Phase-120 colors-only boundary (D-04): no recipe file
-  performs a `.typography` read. Phase 120 reads `theme.colors` ONLY; type-scale
-  application is Phase 122 scope.
-
   Non-color numerics (a stroke `width: 0.75`, geometry/coordinate constants)
   and comment lines are excluded by construction so they are never
   false-positives.
@@ -75,26 +71,6 @@ defmodule Rendro.Recipes.NoInlineColorLiteralsTest do
     assert violations == [],
            "Inline color literal(s) found in recipe section builder(s). " <>
              "Route every color through the recipe's palette/1 seam instead:\n" <>
-             Enum.join(violations, "\n")
-  end
-
-  test "no recipe file performs a .typography read (colors-only boundary, D-04)" do
-    violations =
-      Enum.flat_map(recipe_files(), fn path ->
-        lines = path |> File.read!() |> String.split("\n")
-
-        lines
-        |> Enum.with_index()
-        |> Enum.filter(fn {line, _idx} ->
-          not comment_line?(line) and line =~ ~r/\.typography\b/
-        end)
-        |> Enum.map(fn {line, idx} ->
-          "#{Path.relative_to_cwd(path)}:#{idx + 1}: #{String.trim(line)}"
-        end)
-      end)
-
-    assert violations == [],
-           "Phase 120 reads theme.colors ONLY — a .typography read is Phase 122 scope (D-04):\n" <>
              Enum.join(violations, "\n")
   end
 end

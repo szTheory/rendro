@@ -237,22 +237,43 @@ defmodule Rendro.Recipes.Invoice do
 
   defp header_section(%{id: id, date: date} = data, opts) do
     colors = palette(opts)
+    type = typography(opts)
     fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
 
-    # FROZEN toy path (INV-01) — these two lines MUST stay literally
-    # unchanged: no color:, no formatter. New anatomy fields render only
-    # when present and are added as NEW blocks around this base pair.
+    # 122-01: the INV-01 header pair is now typography-seamed (title/body roles,
+    # mono/body fonts, leading/widows/orphans). This preserves the INV-01
+    # byte-identity golden because the no-theme literal defaults are exactly
+    # this recipe's prior values (title == 18, body == 10, fonts == :default,
+    # leading/widows/orphans == 1.2/2/2 == %Text{} struct defaults). New
+    # anatomy fields still render only when present, as NEW blocks around this
+    # base pair.
     base_content = [
-      Rendro.block(Rendro.text("INVOICE ##{id}", size: 18)),
-      Rendro.block(Rendro.text("Date: #{date}", size: 10))
+      Rendro.block(
+        Rendro.text("INVOICE ##{id}",
+          size: type.scale.title,
+          font: type.fonts.mono,
+          line_height: type.leading,
+          widows: type.widows,
+          orphans: type.orphans
+        )
+      ),
+      Rendro.block(
+        Rendro.text("Date: #{date}",
+          size: type.scale.body,
+          font: type.fonts.body,
+          line_height: type.leading,
+          widows: type.widows,
+          orphans: type.orphans
+        )
+      )
     ]
 
     content =
       base_content
-      |> maybe_prepend(Map.get(data, :issuer), &issuer_block(&1, colors))
-      |> maybe_append(Map.get(data, :customer), &customer_block(&1, colors))
-      |> maybe_append(Map.get(data, :due_date), &due_date_block(&1, colors, fmt_date))
-      |> maybe_append(Map.get(data, :terms), &terms_block(&1, colors))
+      |> maybe_prepend(Map.get(data, :issuer), &issuer_block(&1, colors, type))
+      |> maybe_append(Map.get(data, :customer), &customer_block(&1, colors, type))
+      |> maybe_append(Map.get(data, :due_date), &due_date_block(&1, colors, type, fmt_date))
+      |> maybe_append(Map.get(data, :terms), &terms_block(&1, colors, type))
 
     Rendro.section(
       name: :invoice_header,
@@ -371,12 +392,22 @@ defmodule Rendro.Recipes.Invoice do
 
   defp footer_section(_data, opts) do
     colors = palette(opts)
+    type = typography(opts)
 
     Rendro.section(
       name: :invoice_footer,
       region: :footer,
       content: [
-        Rendro.block(Rendro.text("Thank you for your business!", size: 10, color: colors.ink))
+        Rendro.block(
+          Rendro.text("Thank you for your business!",
+            size: type.scale.body,
+            font: type.fonts.body,
+            line_height: type.leading,
+            widows: type.widows,
+            orphans: type.orphans,
+            color: colors.ink
+          )
+        )
       ]
     )
   end
@@ -391,26 +422,64 @@ defmodule Rendro.Recipes.Invoice do
   defp maybe_append(content, nil, _fun), do: content
   defp maybe_append(content, value, fun), do: content ++ [fun.(value)]
 
-  defp issuer_block(issuer, colors) when is_map(issuer) do
+  defp issuer_block(issuer, colors, type) when is_map(issuer) do
     name = Map.get(issuer, :name, "")
     address = Map.get(issuer, :address)
     text = if address in [nil, ""], do: name, else: "#{name}\n#{address}"
-    Rendro.block(Rendro.text(text, size: 12, color: colors.ink))
+
+    Rendro.block(
+      Rendro.text(text,
+        size: type.scale.subtitle,
+        font: type.fonts.body,
+        line_height: type.leading,
+        widows: type.widows,
+        orphans: type.orphans,
+        color: colors.ink
+      )
+    )
   end
 
-  defp customer_block(customer, colors) when is_map(customer) do
+  defp customer_block(customer, colors, type) when is_map(customer) do
     name = Map.get(customer, :name, "")
     address = Map.get(customer, :address)
     text = if address in [nil, ""], do: "Bill To: #{name}", else: "Bill To: #{name}\n#{address}"
-    Rendro.block(Rendro.text(text, size: 10, color: colors.muted))
+
+    Rendro.block(
+      Rendro.text(text,
+        size: type.scale.body,
+        font: type.fonts.body,
+        line_height: type.leading,
+        widows: type.widows,
+        orphans: type.orphans,
+        color: colors.muted
+      )
+    )
   end
 
-  defp due_date_block(due_date, colors, fmt_date) do
-    Rendro.block(Rendro.text("Due: #{fmt_date.(due_date)}", size: 10, color: colors.muted))
+  defp due_date_block(due_date, colors, type, fmt_date) do
+    Rendro.block(
+      Rendro.text("Due: #{fmt_date.(due_date)}",
+        size: type.scale.body,
+        font: type.fonts.body,
+        line_height: type.leading,
+        widows: type.widows,
+        orphans: type.orphans,
+        color: colors.muted
+      )
+    )
   end
 
-  defp terms_block(terms, colors) do
-    Rendro.block(Rendro.text("Terms: #{terms}", size: 10, color: colors.muted))
+  defp terms_block(terms, colors, type) do
+    Rendro.block(
+      Rendro.text("Terms: #{terms}",
+        size: type.scale.body,
+        font: type.fonts.body,
+        line_height: type.leading,
+        widows: type.widows,
+        orphans: type.orphans,
+        color: colors.muted
+      )
+    )
   end
 
   # ---------------------------------------------------------------------------
@@ -421,13 +490,15 @@ defmodule Rendro.Recipes.Invoice do
   # dominant element on the invoice (content_hierarchy=5 anchor, mirrors
   # Payslip's Net Pay box). Subtotal/Tax/Discount render small and muted in
   # one block; Total renders alone, much larger, in its own trailing block —
-  # every other element recedes in proportion.
-  @minor_totals_size 9
-  @dominant_total_size 20
+  # every other element recedes in proportion. 122-01: the former
+  # @minor_totals_size (9) and @dominant_total_size (20) literals are now the
+  # `small` and `display` steps of the typography/1 seam (no-theme
+  # literal-defaults preserve those exact values).
 
   defp build_totals_blocks(%{totals: totals} = _data, opts) when is_map(totals) do
     fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
     colors = palette(opts)
+    type = typography(opts)
 
     minor_lines =
       []
@@ -442,7 +513,11 @@ defmodule Rendro.Recipes.Invoice do
         [
           Rendro.block(
             Rendro.text(Enum.join(minor_lines, "\n"),
-              size: @minor_totals_size,
+              size: type.scale.small,
+              font: type.fonts.mono,
+              line_height: type.leading,
+              widows: type.widows,
+              orphans: type.orphans,
               color: colors.muted
             )
           )
@@ -454,8 +529,14 @@ defmodule Rendro.Recipes.Invoice do
         %Decimal{} = total ->
           [
             Rendro.block(
+              # The SOLE `display`-anchored element on the Invoice (D-01) — the
+              # "one key fact." mono font, since it is an amount.
               Rendro.text("Total Due: #{fmt_amount.(total)}",
-                size: @dominant_total_size,
+                size: type.scale.display,
+                font: type.fonts.mono,
+                line_height: type.leading,
+                widows: type.widows,
+                orphans: type.orphans,
                 color: colors.accent
               )
             )
@@ -507,6 +588,43 @@ defmodule Rendro.Recipes.Invoice do
       end
 
     Map.merge(base, Keyword.get(opts, :palette, %{}))
+  end
+
+  # ---------------------------------------------------------------------------
+  # Typography seam (TYPE-01 / TYPE-02 / TYPE-03) — the exact structural twin of
+  # palette/1 for the type scale, font roles, and leading/widows/orphans.
+  # ---------------------------------------------------------------------------
+
+  # Returns the resolved typography for this render: a named type scale, three
+  # font roles, and leading/widows/orphans. When no `:theme` is supplied the
+  # `nil` branch reproduces Invoice's exact CURRENT literals — NEVER
+  # `Rendro.Theme.default().typography` (that would apply the frozen
+  # 21/16.5/... scale and break byte-identity, RESEARCH Pitfall 1) — so every
+  # `%Text{}` that reads sizes/fonts/leading from here stays byte-identical
+  # (TYPE-01/TYPE-03). All three font roles default to `:default`, the
+  # always-registered Helvetica-compatible built-in, which the font registry
+  # normalizes identically to today's implicit `"Helvetica"` default → no byte
+  # drift. When a `:theme` is supplied the base becomes
+  # `Rendro.Theme.resolve(theme).typography`. The final `Map.merge` keeps an
+  # explicit `:typography` opt as the winning override layer (mirrors :palette).
+  # Any `%Text{}` size/font/leading MUST source from here.
+  defp typography(opts) do
+    base =
+      case opts[:theme] do
+        nil ->
+          %{
+            scale: %{display: 20, title: 18, subtitle: 12, body: 10, small: 9, caption: 8},
+            fonts: %{heading: :default, body: :default, mono: :default},
+            leading: 1.2,
+            widows: 2,
+            orphans: 2
+          }
+
+        theme ->
+          Rendro.Theme.resolve(theme).typography
+      end
+
+    Map.merge(base, Keyword.get(opts, :typography, %{}))
   end
 
   # ---------------------------------------------------------------------------
