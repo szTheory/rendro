@@ -132,6 +132,47 @@ defmodule Rendro.Recipes.Ticket do
   @spec page_template(keyword()) :: Rendro.PageTemplate.t()
   def page_template(opts \\ []) do
     g = geometry(opts)
+    colors = palette(opts)
+
+    base_regions = [
+      Rendro.region(
+        name: :main,
+        role: :custom,
+        anchor: :fixed,
+        x: g.ml,
+        y: g.mt,
+        width: g.stub_split,
+        height: g.band_h
+      ),
+      Rendro.region(
+        name: :stub,
+        role: :custom,
+        anchor: :fixed,
+        x: g.ml + g.stub_split,
+        y: g.mt,
+        width: g.stub_width,
+        height: g.band_h
+      ),
+      Rendro.region(
+        name: :terms,
+        role: :body,
+        anchor: :flow,
+        x: g.ml,
+        y: g.terms_y,
+        width: g.content_w,
+        height: g.terms_h
+      )
+    ]
+
+    # 121-03: prepend the shared :background region FIRST iff the resolved
+    # palette differs from paper-white — gated on the SAME palette(opts)
+    # sections/2 uses below (Pitfall 3). Light no-theme path is untouched.
+    regions =
+      if Rendro.Recipes.Background.emit?(colors) do
+        [Rendro.Recipes.Background.region(g.pw, g.ph) | base_regions]
+      else
+        base_regions
+      end
 
     defaults = [
       name: :ticket,
@@ -141,35 +182,7 @@ defmodule Rendro.Recipes.Ticket do
       margin_right: g.mr,
       margin_bottom: g.mb,
       margin_left: g.ml,
-      regions: [
-        Rendro.region(
-          name: :main,
-          role: :custom,
-          anchor: :fixed,
-          x: g.ml,
-          y: g.mt,
-          width: g.stub_split,
-          height: g.band_h
-        ),
-        Rendro.region(
-          name: :stub,
-          role: :custom,
-          anchor: :fixed,
-          x: g.ml + g.stub_split,
-          y: g.mt,
-          width: g.stub_width,
-          height: g.band_h
-        ),
-        Rendro.region(
-          name: :terms,
-          role: :body,
-          anchor: :flow,
-          x: g.ml,
-          y: g.terms_y,
-          width: g.content_w,
-          height: g.terms_h
-        )
-      ]
+      regions: regions
     ]
 
     # Recipe-level opts (:palette, :labels, :formatters, :page_size, ...)
@@ -246,7 +259,22 @@ defmodule Rendro.Recipes.Ticket do
     Rendro.Recipes.Pagination.validate_labels!(opts, "Rendro.Recipes.Ticket.document/2")
     Rendro.Recipes.Pagination.validate_formatters!(opts, "Rendro.Recipes.Ticket.document/2")
 
-    [main_section(data, opts), stub_section(data, opts), terms_section(data, opts)]
+    g = geometry(opts)
+    colors = palette(opts)
+
+    base_sections = [
+      main_section(data, opts),
+      stub_section(data, opts),
+      terms_section(data, opts)
+    ]
+
+    # Same predicate + same palette(opts) as page_template/1 (Pitfall 3) —
+    # the region and section can never disagree.
+    if Rendro.Recipes.Background.emit?(colors) do
+      [Rendro.Recipes.Background.section(colors, g.pw, g.ph) | base_sections]
+    else
+      base_sections
+    end
   end
 
   # ---------------------------------------------------------------------------

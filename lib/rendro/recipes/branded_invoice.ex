@@ -41,52 +41,76 @@ defmodule Rendro.Recipes.BrandedInvoice do
   """
   @moduledoc tags: [:adapter]
 
+  # BrandedInvoice never overrides %Rendro.PageTemplate{}'s :width/:height --
+  # it renders at the struct's own A4 default (lib/rendro/page_template.ex:
+  # @default_width 595.28, @default_height 841.89). These mirror that default
+  # verbatim (never invented content-box numbers) so the shared :background
+  # region/section below always cover the FULL rendered page, not the
+  # 451.28pt content column the :body region happens to use.
+  @page_width 595.28
+  @page_height 841.89
+
   @doc """
   Returns a `%Rendro.PageTemplate{}` with four named regions:
   `:logo`, `:header`, `:body`, and `:footer`.
   """
   @spec page_template(keyword()) :: Rendro.PageTemplate.t()
   def page_template(opts \\ []) do
+    colors = palette(opts)
+
+    base_regions = [
+      Rendro.region(
+        name: :logo,
+        role: :custom,
+        anchor: :fixed,
+        x: 72,
+        y: 72,
+        width: 64,
+        height: 64
+      ),
+      Rendro.region(
+        name: :header,
+        role: :header,
+        anchor: :top,
+        x: 152,
+        y: 72,
+        width: 371.28,
+        height: 112
+      ),
+      Rendro.region(
+        name: :body,
+        role: :body,
+        anchor: :flow,
+        x: 72,
+        y: 200,
+        width: 451.28,
+        height: 569.89
+      ),
+      Rendro.region(
+        name: :footer,
+        role: :footer,
+        anchor: :bottom,
+        x: 72,
+        y: 769.89,
+        width: 451.28,
+        height: 0
+      )
+    ]
+
+    # 121-03: prepend the shared :background region FIRST iff the resolved
+    # palette differs from paper-white — gated on the SAME palette(opts)
+    # sections/2 uses below (Pitfall 3). Uses the recipe's own full A4 page
+    # dims (@page_width/@page_height), NOT the 451.28pt content-box width.
+    regions =
+      if Rendro.Recipes.Background.emit?(colors) do
+        [Rendro.Recipes.Background.region(@page_width, @page_height) | base_regions]
+      else
+        base_regions
+      end
+
     defaults = [
       name: :branded_invoice,
-      regions: [
-        Rendro.region(
-          name: :logo,
-          role: :custom,
-          anchor: :fixed,
-          x: 72,
-          y: 72,
-          width: 64,
-          height: 64
-        ),
-        Rendro.region(
-          name: :header,
-          role: :header,
-          anchor: :top,
-          x: 152,
-          y: 72,
-          width: 371.28,
-          height: 112
-        ),
-        Rendro.region(
-          name: :body,
-          role: :body,
-          anchor: :flow,
-          x: 72,
-          y: 200,
-          width: 451.28,
-          height: 569.89
-        ),
-        Rendro.region(
-          name: :footer,
-          role: :footer,
-          anchor: :bottom,
-          x: 72,
-          y: 769.89,
-          width: 451.28,
-          height: 0
-        )
-      ]
+      regions: regions
     ]
 
     # page_template/1 only understands PageTemplate struct keys. Recipe-level
@@ -117,12 +141,22 @@ defmodule Rendro.Recipes.BrandedInvoice do
   def sections(data, opts \\ []) do
     validate_data!(data)
 
-    [
+    colors = palette(opts)
+
+    base_sections = [
       logo_section(data, opts),
       header_section(data, opts),
       body_section(data, opts),
       footer_section(data, opts)
     ]
+
+    # Same predicate + same palette(opts) as page_template/1 (Pitfall 3) —
+    # the region and section can never disagree.
+    if Rendro.Recipes.Background.emit?(colors) do
+      [Rendro.Recipes.Background.section(colors, @page_width, @page_height) | base_sections]
+    else
+      base_sections
+    end
   end
 
   @doc """
