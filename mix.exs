@@ -142,6 +142,7 @@ defmodule Rendro.MixProject do
         "guides/livebook/first_invoice.livemd",
         "guides/page_primitive.md",
         "guides/recipes.md",
+        "guides/theming.md",
         "guides/user_flows_and_jtbd.md",
         "lib/rendro/document.ex",
         "lib/rendro/font_registry.ex",
@@ -150,7 +151,8 @@ defmodule Rendro.MixProject do
       skip_code_autolink_to: [
         "Rendro.PDF.CidFont",
         "Rendro.PDF.FontSubsetter",
-        "Rendro.Format"
+        "Rendro.Format",
+        "Rendro.Color.validate/1"
       ],
       source_ref: "v#{@version}",
       source_url: @source_url,
@@ -160,6 +162,7 @@ defmodule Rendro.MixProject do
         "CHANGELOG.md",
         "guides/integrations.md",
         "guides/branding.md",
+        "guides/theming.md",
         "guides/api_stability.md",
         "guides/upgrading_to_1.0.md",
         "guides/viewer_evidence.md",
@@ -172,6 +175,7 @@ defmodule Rendro.MixProject do
       groups_for_extras: [
         Guides: [
           "guides/branding.md",
+          "guides/theming.md",
           "guides/integrations.md",
           "guides/user_flows_and_jtbd.md"
         ],
