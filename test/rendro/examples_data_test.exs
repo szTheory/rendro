@@ -39,6 +39,20 @@ defmodule Rendro.ExamplesDataTest do
     refute flat =~ ~r/\$\d[\d,]*\.\d(?!\d)/
   end
 
+  test "SHOW-01: transform_invoice/1 DATA survives (issuer/customer/totals.total non-nil) — honest order Commit 1" do
+    data =
+      "invoice/acme-phoenix-saas/invoice.json"
+      |> Examples.load!()
+      |> ExamplesData.transform_invoice()
+
+    # Locks the Phase-115 DATA fix (root cause of Phase-118 SHOW-01, not
+    # color) BEFORE any theme is applied or any rubric score is touched —
+    # the first, isolated, git-provable commit of the D-05 honest order.
+    refute is_nil(data.issuer)
+    refute is_nil(data.customer)
+    refute is_nil(data.totals.total)
+  end
+
   test "transform_statement feeds Rendro.Recipes.Statement.document/1" do
     doc =
       "statement/northwind-ledger-co/statement.json"
