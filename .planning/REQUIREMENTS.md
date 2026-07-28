@@ -43,7 +43,7 @@ Requirements for this milestone. Each maps to exactly one roadmap phase.
 
 - [x] **DEFAULT-01**: `Rendro.Theme.default/0` is a restrained neutral-ink (Swiss-ish) unbranded default (`{r,g,b}` mined from `brand/tokens/tokens.json`) that looks strong on its own.
 - [ ] **DEFAULT-02**: The Phase-118 SHOW-01 rubric gap is closed *honestly* — the demo DATA is fixed first (`Rendro.ExamplesData.transform_invoice` parties/totals restored; the one key fact made structurally dominant), THEN `default/0` applied, THEN re-scored against the Milestone-A reader-quality rubric (hierarchy = 5, core ≥ 4, gates pass) with human sign-off; a `passed:true` score is committed only on an honest clear.
-- [ ] **DEFAULT-03**: Themed and dark gallery renders populate the existing S6 `theme`/`mode` tags on `assets/rendro/artifacts.json` (hash-checked), each `(recipe × mode)` a distinct blessed gallery row (`preset` stays `null` for Milestone C).
+- [x] **DEFAULT-03**: Themed and dark gallery renders populate the existing S6 `theme`/`mode` tags on `assets/rendro/artifacts.json` (hash-checked), each `(recipe × mode)` a distinct blessed gallery row (`preset` stays `null` for Milestone C).
 
 ### Contract, Docs & Boundary (CONTRACT)
 
@@ -107,7 +107,7 @@ Which phases cover which requirements. Populated during roadmap creation.
 | PLUMB-03 | Phase 120 | Complete |
 | DEFAULT-01 | Phase 123 | Complete |
 | DEFAULT-02 | Phase 123 | Pending |
-| DEFAULT-03 | Phase 123 | Pending |
+| DEFAULT-03 | Phase 123 | Complete |
 | CONTRACT-01 | Phase 119 | Complete |
 | CONTRACT-02 | Phase 123 | Pending |
 | CONTRACT-03 | Phase 119 | Complete |

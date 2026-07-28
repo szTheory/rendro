@@ -2,16 +2,18 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
+current_phase: 123
+current_phase_name: from-brand-2-e2e-honest-rubric-gap-closure-gallery-docs-mani
 status: executing
-stopped_at: Completed 123-02-PLAN.md
-last_updated: "2026-07-28T19:19:19.145Z"
+stopped_at: Completed 123-03-PLAN.md
+last_updated: "2026-07-28T19:42:48.123Z"
 last_activity: 2026-07-28
 progress:
-  total_phases: 5
+  total_phases: 12
   completed_phases: 4
-  total_plans: 20
-  completed_plans: 17
-  percent: 80
+  total_plans: 25
+  completed_plans: 19
+  percent: 33
 ---
 
 # Project State
@@ -26,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-07-27)
 ## Current Position
 
 Phase: 123 (from-brand-2-e2e-honest-rubric-gap-closure-gallery-docs-mani) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-07-28
 
-Progress: [█████████░] 85%
+Progress: [████████░░] 76%
 
 ## Roadmap Snapshot (v2.11, Phases 119-123)
 
@@ -83,6 +85,7 @@ Full log in PROJECT.md Key Decisions. Milestone-B locks carried into planning:
 - [Phase ?]: 122-05: Certificate centering-measurement font keyed on the emitted font_role via centering_measure_font/1; non-Helvetica-metric role raises {:unsupported_centered_font_role} (WR-01). Certificate has no non-centered run so {:unknown_text_font} stays representatively proven on Statement
 - [Phase ?]: 123-01: Committed a test asserting transform_invoice/1's issuer/customer/totals.total survive (non-nil), locking the Phase-115 DATA fix as Commit 1 of the D-05 honest order (test-only diff, verified via git show --stat)
 - [Phase ?]: 123-02: leading 1.2 -> 1.35 landed as the sole D-01 value change (colors byte-identical); measure.ex scales EVERY %Text block's height by leading (not just multi-line prose) which crashed Statement/Payslip themed render with :content_overflow -- fixed via a theme-gated header/footer geometry budget (case opts[:theme], mirroring palette/1 idiom), no-theme byte-identity fully preserved
+- [Phase ?]: 123-03: retagged all 7 gallery rows to theme: Theme.default() (re-blesses all 7, not just leading, per the Big Finding); readme_hero S7 seam added; Certificate hierarchy checkpoint measured (ratio 1.27, visually confirmed still dominant, no fix needed); 3 new honesty findings (Invoice dark table illegibility, Ticket display/title hierarchy inversion, Payslip numeric wrap) discovered and deferred to Plan 05/WINDOWS.md rather than silently patched
 
 ### Pending Todos
 
@@ -92,6 +95,7 @@ None yet.
 
 - **Watch (Phase 119):** the `Theme` public promotion will edit `public_api_contract_test.exs`'s hidden set — expect a deliberate red build until the manifest is regenerated and the tier tag applied. Grep for the second, plan-unlisted hidden-modules assertion.
 - **Calibration open questions** (not architecture — locked recommendations in REQUIREMENTS.md): exact type-scale point sizes, `on_accent` luminance heuristic, legacy `:palette` preservation via `Map.merge`, `theming.light`/`theming.dark` as separate support rows, `density: :compact` shallow honoring.
+- Plan 05 human sign-off must consider 3 new findings from 123-03: Invoice dark-mode table illegibility (invoice_dark), Ticket display/title hierarchy inversion (ticket/ticket_dark), Payslip numeric-cell wrap (payslip) -- WINDOWS.md ids 1-3
 
 ## Deferred Items
 
@@ -103,8 +107,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-28T19:19:19.141Z
-Stopped at: Completed 123-02-PLAN.md
+Last session: 2026-07-28T19:42:48.101Z
+Stopped at: Completed 123-03-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -127,3 +131,4 @@ Resume file: None
 | Phase 122 P05 | 14min | 3 tasks | 5 files |
 | Phase 123 P01 | 2min | 2 tasks | 1 files |
 | Phase 123 P02 | 30min | 2 tasks | 7 files |
+| Phase 123 P03 | 26min | 3 tasks | 18 files |
