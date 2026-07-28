@@ -337,19 +337,22 @@ Note: the theme must survive `Rendro.Theme.resolve/1` (the seam calls it). `reso
 | A4 | Ticket resolution via exempting one `mono` micro-size (Q3 recommendation) | Ticket / Q3 | Medium — this is a binding-constraint intersection; needs planner sign-off before Ticket plan |
 | A5 | BrandedInvoice display anchor = brand name @18 (no Total-Due run) (Q1) | BrandedInvoice / Q1 | Medium — D-01 names "Total Due" but no such run exists; needs a decision |
 
-## Open Questions
+## Open Questions (RESOLVED — see plan 122-03)
 
-### Q1 — BrandedInvoice has no Total-Due text run; where does `display` bind?
+> All three resolved during planning. Q1 & Q2 → `122-03-PLAN.md` Task 1; Q3 → Task 3;
+> Certificate centering-math coupling → Task 2. Resolutions match the recommendations below.
+
+### Q1 — BrandedInvoice has no Total-Due text run; where does `display` bind? — RESOLVED (brand name @18)
 - **What we know:** D-01 names BrandedInvoice's anchor "Total Due amount," but totals live inside `Rendro.table/2` (`branded_invoice.ex:226-235`), not a `%Text{}`. The only `%Text` runs are brand name (18), invoice id (12), date (10), thank-you (10).
 - **What's unclear:** Whether to (a) bind `display` to the brand name (18, the current largest run), (b) leave BrandedInvoice with no `display` element (violates "exactly one per recipe"), or (c) promote the table total to a `%Text` (scope creep, byte-risk).
 - **Recommendation:** Bind `display` to the brand name (18) — it is BrandedInvoice's de-facto "one key fact" (a branded invoice leads with brand). Document the deviation from the literal "Total Due" wording. Do NOT add a new total run (byte-identity risk). Needs planner confirmation.
 
-### Q2 — BrandedInvoice brand-font on the themed path
+### Q2 — BrandedInvoice brand-font on the themed path — RESOLVED (brand font wins on both paths)
 - **What we know:** L213/L214 use `font: font_name` (data-driven brand embedded font, brand⊥theme). Literal-default must stay `font_name` for byte-identity.
 - **What's unclear:** On the themed path, does the brand name/id keep `font_name` (brand wins) or switch to `fonts.heading`?
 - **Recommendation:** Brand font wins (keep `font: font_name` on both paths for those two runs; do not seam them to a theme role). Rationale: brand⊥theme is a standing Key Decision; the theme controls *how* (tokens), the brand controls *who* (assets/fonts). Seam only the non-brand runs (date, thank-you) to roles. Needs planner confirmation.
 
-### Q3 — Ticket: 7 distinct sizes vs 6 roles
+### Q3 — Ticket: 7 distinct sizes vs 6 roles — RESOLVED (exempt sizes 6 & 7 from scale seam, font-only mono)
 - **What we know:** Distinct sizes {26,16,10,9,8,7,6}; byte-identity forbids collapsing any two; 6 roles can name at most 6 distinct literals.
 - **What's unclear:** Which size stays outside the scale seam.
 - **Recommendation:** **Exempt `@present_code_size` (6) — and if needed `@caption_size` (7) — from the scale seam, keeping them literal module attrs, and seam only their FONT to `mono`.** The present-code and reference-caption are machine/label micro-text, not part of the semantic display→caption hierarchy; the 6-step scale governs the semantic ramp. This drops the scale-seamed distinct set to ≤6 (e.g. 26→title, 16→subtitle, 10→body, 9→small, 8→caption, reference-code 8→**display** anchor via non-monotone assignment). Alternative (rejected): a 7th private role — but the frozen theme scale has no 7th step, so the themed path has nothing to read. Needs planner sign-off; this is the phase's one genuine architecture decision.
