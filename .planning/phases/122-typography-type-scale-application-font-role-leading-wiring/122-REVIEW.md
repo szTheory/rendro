@@ -1,203 +1,121 @@
 ---
 phase: 122-typography-type-scale-application-font-role-leading-wiring
-reviewed: 2026-07-28T15:11:51Z
+reviewed: 2026-07-28T00:00:00Z
 depth: standard
-files_reviewed: 22
+files_reviewed: 5
 files_reviewed_list:
-  - lib/rendro/recipes/branded_invoice.ex
   - lib/rendro/recipes/certificate.ex
-  - lib/rendro/recipes/invoice.ex
   - lib/rendro/recipes/payslip.ex
-  - lib/rendro/recipes/receipt.ex
-  - lib/rendro/recipes/statement.ex
-  - lib/rendro/recipes/ticket.ex
-  - priv/goldens/certificate/dark.sha256
-  - priv/goldens/statement/dark.sha256
-  - test/rendro/recipes/branded_invoice_opts_threading_test.exs
-  - test/rendro/recipes/certificate_opts_threading_test.exs
-  - test/rendro/recipes/invoice_opts_threading_test.exs
-  - test/rendro/recipes/invoice_typography_test.exs
-  - test/rendro/recipes/no_inline_color_literals_test.exs
-  - test/rendro/recipes/no_inline_size_literals_test.exs
+  - test/rendro/recipes/certificate_typography_test.exs
   - test/rendro/recipes/payslip_opts_threading_test.exs
-  - test/rendro/recipes/receipt_opts_threading_test.exs
-  - test/rendro/recipes/statement_opts_threading_test.exs
-  - test/rendro/recipes/statement_typography_test.exs
-  - test/rendro/recipes/ticket_opts_threading_test.exs
-  - test/rendro/recipes/ticket_typography_test.exs
-  - lib/rendro/font_registry.ex
+  - test/rendro/recipes/themed_render_smoke_test.exs
 findings:
-  critical: 1
+  critical: 0
   warning: 2
-  info: 2
-  total: 5
+  info: 1
+  total: 3
 status: issues_found
 ---
 
 # Phase 122: Code Review Report
 
-**Reviewed:** 2026-07-28T15:11:51Z
+**Reviewed:** 2026-07-28
 **Depth:** standard
-**Files Reviewed:** 22
+**Files Reviewed:** 5
 **Status:** issues_found
 
 ## Summary
 
-Phase 122 adds a `defp typography/1` seam (structural twin of `palette/1`) to
-all seven recipes, threading `size:`, `font:`, and `line_height/widows/orphans`
-from a resolved type scale into every `%Text{}`. The no-theme byte-identity
-contract holds: I ran all seven `*_byte_identity_test.exs`, the two static-scan
-teeth tests, all three typography raise-path tests, and every `*_opts_threading`
-test — **125+ tests, 0 failures**. The subtle `:default`-atom vs.
-`"Helvetica"`-string resolution reasoning in the `typography/1` doc comments was
-verified against `font_registry.ex` `normalize_reference/2` and is correct: both
-normalize to the same logical `:default` descriptor for documents that do not
-call `put_default_font`, so seaming `font: :default` is genuinely byte-identical
-to the prior no-`font:` runs.
+Reviewed the gap-closure diff (`553f748^..HEAD`) for plan 122-05: the Payslip
+`typography/1` themed-font remap to `:payslip_sans` (CR-01), the Certificate
+`centering_measure_font/1` guard (WR-01), and three new/edited test files (WR-02).
 
-The seam is well-executed on the **no-theme** path. The defects are on the
-**themed** path, which the phase's own tests never exercise beyond `%Section{}`
-struct equality (they never `render/2` or `measure_rows/4`). One is a hard
-render regression (BLOCKER); the rest are robustness/coverage gaps.
+The two core fixes are **correct**. The Payslip theme branch now pins all three
+font roles to the fallback-bearing `:payslip_sans`, and both the no-theme string
+`"Helvetica"` and the themed `:payslip_sans` resolve to the same font resource, so
+the fix restores the B612 unicode fallback without disturbing byte-identity. The
+Certificate guard keys the centering-measurement font off the same role the run
+emits and raises honestly on a non-Helvetica-metric role; the no-theme `:default`
+path still measures against `helvetica/0` exactly as before. I verified all 20
+tests in the three files pass and that no golden files changed in the diff.
 
-## Critical Issues
-
-### CR-01: Font seam drops Payslip's unicode fallback under any theme — themed Payslip fails to render
-
-**File:** `lib/rendro/recipes/payslip.ex:877-894` (typography seam) with call sites `633-644` (`cell_text/2`) and `781-811` (`footer_section/2`)
-
-**Issue:**
-Payslip is the one recipe that registers a document default font *with a B612
-unicode fallback* (`with_unicode_fallback_font/1`, lines 267-278:
-`put_default_font(:payslip_sans)`, whose descriptor carries
-`fallbacks: [:payslip_unicode_fallback]`). Its `typography/1` **no-theme** branch
-correctly uses the string `"Helvetica"` for every font role, because
-`normalize_reference("Helvetica", :payslip_sans)` resolves to `:payslip_sans`
-(fallback-bearing). The doc comment (lines 862-875) explains this carefully.
-
-But the **theme** branch returns `Rendro.Theme.resolve(theme).typography`, whose
-`fonts.<role>` values are the bare `:default` atom. `normalize_reference(:default, _)`
-passes straight through to `:default` — the bare built-in Helvetica descriptor
-with **no fallback**. So under *any* theme, every Payslip text run loses the B612
-fallback that its own default data handling depends on:
-
-- `glyph_safe/1` (line 417) rewrites the D-14 masking middot `"·"` to `"•"`
-  (U+2022). U+2022 is **not** in the base Helvetica metrics table (ASCII 32-126
-  only), so a masked `payment_method` — the canonical documented format — makes a
-  themed Payslip fail.
-- D-17 accented `:description` content (e.g. `"Impôt…"`, the module's own
-  example) fails the same way.
-
-Reproduced (default theme, otherwise-valid data):
-
-```
-# ASCII payslip + documented "···· 4321" payment mask, theme: Rendro.Theme.default()
-{:error, %Rendro.Error{reason: {:unsupported_glyph, "•"}, stage: :measure, ...}}
-
-# earnings description "Impôt Base", same theme
-** (ArgumentError) Rendro.measure_rows/4 could not measure the table:
-   {:unsupported_glyph, "ô"}   (raised from payslip.ex:582 inside document/2)
-```
-
-This is a regression introduced by this phase: before the font seam, themed
-Payslip (Phase 121 added `:theme` for colors only) kept the struct-default
-`"Helvetica"` → `:payslip_sans` resolution and rendered these glyphs fine. The
-`:theme` branch now overrides fonts and severs the fallback.
-
-**Fix:** The theme's font roles must resolve through Payslip's fallback-bearing
-font, not the bare `:default`. Remap the resolved theme typography's `fonts` onto
-`:payslip_sans` (or register the fallback chain on whatever role the theme names)
-before threading:
-
-```elixir
-theme ->
-  t = Rendro.Theme.resolve(theme).typography
-  # Payslip's glyph_safe/D-17 output needs the B612 fallback on every role.
-  %{t | fonts: %{heading: :payslip_sans, body: :payslip_sans, mono: :payslip_sans}}
-```
-
-(or, better, keep the theme's font intent but register those atoms *with*
-`fallbacks: [:payslip_unicode_fallback]` in `with_unicode_fallback_font/1`).
-Then add the themed-render test called for in WR-02.
+No BLOCKER/Critical defects found in the changed code. Two WARNING-level quality
+issues and one INFO item follow — the most substantive is a raw `KeyError`
+(not an errors-as-product message) that surfaces on a partial `:typography`
+override, which undermines the very "honest error" contract WR-01 was fixing.
 
 ## Warnings
 
-### WR-01: Certificate centering measures with hardcoded Helvetica but renders with the seamed font role — de-centers under a custom-font theme
+### WR-01: Partial `:typography` override raises a raw `KeyError`, not an errors-as-product message
 
-**File:** `lib/rendro/recipes/certificate.ex:340`, `352`, `406-422`
+**File:** `lib/rendro/recipes/certificate.ex:553`, `lib/rendro/recipes/payslip.ex:904`
+**Issue:** Both `typography/1` seams merge the caller override with a shallow
+`Map.merge(base, Keyword.get(opts, :typography, %{}))`. Because `Map.merge` is
+shallow, a caller passing only part of the nested `fonts` (or `scale`) map
+**replaces the whole nested map**, dropping the other keys. The downstream reads
+`type.fonts.body` / `type.fonts.heading` (and `type.scale.*`) then blow up with a
+raw `KeyError` instead of the instructive raise the module otherwise prides itself
+on. This directly weakens the WR-01 fix: the new `centering_measure_font/1` guard
+is designed to fail loudly with an actionable message, but a partial override
+never reaches the guard — it dies one layer up with an opaque error. Confirmed
+empirically:
 
-**Issue:**
-`body_section/2` fixes `font = Rendro.PDF.Font.helvetica()` (line 340) and uses it
-for every centering measurement — `text_width(font, body_text, body_size)` (line
-352) and inside `centered_line/7` `text_width(font, text, size)` (line 407) — to
-compute `x = max((region_w - width) / 2, 0)`. But the emitted `%Text{}` run now
-carries `font: font_role` where `font_role` = `type.fonts.heading` /
-`type.fonts.body` from the seam (lines 367-388, 411-419). The seam's own
-"measurement coupling" comment (lines 311-314, 400-405) explicitly resolves the
-*size* once for both measurement and rendering — but the *font* was not given the
-same treatment. On the no-theme / default-theme path `type.fonts.*` == `:default`
-== built-in Helvetica, so measurement matches. Under a theme whose
-`typography.fonts.heading`/`.body` names a real non-Helvetica embedded font
-(the raise-path tests prove `fonts.<role>` is freely settable to arbitrary
-atoms), the recipient name / title / body would be measured with Helvetica
-metrics but rendered with the themed font, producing visibly mis-centered text.
-Not a crash, but a correctness gap in the exact "font-role wiring" this phase
-delivers.
+```
+Rendro.Recipes.Certificate.sections(data, typography: %{fonts: %{heading: :default}})
+# ** (KeyError) key :body not found in: %{heading: :default}
+```
 
-**Fix:** Resolve the measurement font from the same seam role used for the run,
-e.g. resolve the run's `font_role` to its PDF font via the document font registry
-and measure against that (or, minimally, document that Certificate centering is
-only correct for Helvetica-metric font roles and guard/normalize accordingly).
+The `:typography` opt is a documented, caller-facing seam ("winning override
+layer ... mirrors :palette"), so a partial `fonts`/`scale` map is a plausible
+input. This is pre-existing to plan 122-05 (introduced by the 122-02/03 seams) but
+is squarely in the newly-touched code path and contradicts the errors-as-product
+posture the guard establishes.
+**Fix:** Deep-merge the nested `fonts` and `scale` maps (so partial overrides keep
+the recipe defaults), or validate the override shape and raise an instructive
+error. For example:
 
-### WR-02: Themed recipe rendering is untested — only `%Section{}` struct equality is asserted
+```elixir
+override = Keyword.get(opts, :typography, %{})
 
-**File:** `test/rendro/recipes/payslip_opts_threading_test.exs:33-51` (representative; same pattern in every `*_opts_threading_test.exs`)
+base
+|> Map.merge(override)
+|> Map.put(:fonts, Map.merge(base.fonts, Map.get(override, :fonts, %{})))
+|> Map.put(:scale, Map.merge(base.scale, Map.get(override, :scale, %{})))
+```
 
-**Issue:**
-Every `:theme` assertion in the threading tests compares `sections/2` output
-(`refute Payslip.sections(data) == Payslip.sections(data, theme: …)`), which
-builds `%Section{}` structs but never calls `render/2` or `measure_rows/4`. The
-TYPE-02 raise-path tests render, but only for Invoice/Statement/Ticket with
-ASCII sample data — never Payslip, and never with the non-ASCII data Payslip's
-own D-14/D-17 features generate. That is precisely why CR-01 (a themed Payslip
-render failure) passes CI. The teeth for "font role wiring is correct under a
-theme" are missing.
+### WR-02: `certificate_typography_test` coupling test does not verify what its name claims
 
-**Fix:** Add a themed end-to-end render assertion for Payslip that includes a
-masked `payment_method` (middot) and an accented `:description`, asserting
-`{:ok, _} = Rendro.render(Payslip.document(data, theme: Rendro.Theme.default()))`.
-Consider one themed render smoke test per recipe.
+**File:** `test/rendro/recipes/certificate_typography_test.exs:46-53`
+**Issue:** The test is named *"the themed render matches the no-theme render's
+centering (both :default → Helvetica)"*, but the two assertions only check that
+`Certificate.sections/2` returns a non-empty `[%Rendro.Section{} | _]` in each
+case. It never compares the themed and no-theme section geometry (the `x`/`width`
+centering values), so it cannot detect a real de-centering regression — it only
+proves neither call raises. The name and the WR-01 coupling intent oversell the
+actual coverage.
+**Fix:** Either rename the test to reflect what it asserts ("themed and no-theme
+section builds both succeed without raising"), or strengthen it to actually
+compare the centered blocks' geometry, e.g. assert
+`Certificate.sections(data) == Certificate.sections(data, theme: Rendro.Theme.default())`
+(the shipped default theme should produce identical centering) or compare the
+`x`/`width` of the extracted centered blocks.
 
 ## Info
 
-### IN-01: `no_inline_size_literals_test` proves absence of literals, not sourcing from the seam
+### IN-01: Payslip themed fixture duplicated across two test files
 
-**File:** `test/rendro/recipes/no_inline_size_literals_test.exs:78-102`
-
-**Issue:**
-The test asserts no inline numeric `size:` literal survives outside the
-`typography/1` body. That has real teeth against re-introduced hardcoded numbers,
-but it does not prove a size actually flows from `type.scale.<role>` — a builder
-passing `size: some_local_var` unrelated to the seam would still pass. The
-module's claim that "every recipe section builder MUST source its text sizes from
-typography/1" is therefore only partially enforced. Acceptable for a completeness
-proof; noted so the guarantee is not overstated.
-
-### IN-02: Ticket's two mono micro-sizes bypass the seam, so TYPE-01 is not literally "every size through the seam"
-
-**File:** `lib/rendro/recipes/ticket.ex:438-439`, `519-527`, `550-559`
-
-**Issue:**
-`@caption_size 7` and `@present_code_size 6` are read as `size: @caption_size` /
-`size: @present_code_size` (variable reads, so the teeth test does not flag them,
-by design). Consequently these two runs never scale with a theme's type scale —
-they stay 7pt / 6pt under every theme. This is a documented Q3 decision (7 distinct
-sizes cannot map onto 6 roles without a byte-changing collapse), and it is a
-reasonable trade-off; flagged only so downstream readers know two ticket sizes are
-intentionally exempt from the type-scale seam.
+**File:** `test/rendro/recipes/payslip_opts_threading_test.exs:88-111`,
+`test/rendro/recipes/themed_render_smoke_test.exs:73-88`
+**Issue:** The masked-middot + accented Payslip fixture (employer/employee/period/
+earnings/deductions/net_pay 3480.00) is copy-pasted verbatim into both the CR-01
+regression test and the cross-recipe smoke test. If the reconciliation invariant
+or fixture shape ever changes, both copies must be updated in lockstep.
+**Fix:** Acceptable as-is — the smoke test is intentionally self-contained (per the
+plan, "do not import private test helpers"). If desired, extract a shared
+`Rendro.RecipeFixtures` test-support module. Low priority.
 
 ---
 
-_Reviewed: 2026-07-28T15:11:51Z_
+_Reviewed: 2026-07-28_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
