@@ -45,7 +45,7 @@ defmodule Rendro.LaunchArtifactsTest do
       assert Enum.any?(texts, &(&1 =~ "AUR-88213-GA"))
     end
 
-    test "gallery has exactly seven tiles in the fixed order (D-07)" do
+    test "gallery has exactly eleven tiles in the fixed order (D-07)" do
       assert Enum.map(Rendro.LaunchArtifacts.gallery_specs(), & &1.id) == [
                "invoice",
                "branded_invoice",
@@ -53,7 +53,11 @@ defmodule Rendro.LaunchArtifactsTest do
                "receipt_report",
                "certificate",
                "payslip",
-               "ticket"
+               "ticket",
+               "invoice_dark",
+               "certificate_dark",
+               "ticket_dark",
+               "invoice_brand"
              ]
     end
 

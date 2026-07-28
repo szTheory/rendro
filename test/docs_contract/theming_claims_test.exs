@@ -160,7 +160,63 @@ defmodule Rendro.DocsContract.ThemingClaimsTest do
     end
   end
 
-  test "guides/theming.md is not created this phase (deferred to Phase 123, CONTRACT-02)" do
-    refute File.exists?("guides/theming.md")
+  test "guides/theming.md exists (CONTRACT-02)" do
+    assert File.exists?("guides/theming.md")
+  end
+
+  describe "guides/theming.md claims bind to priv/support_matrix.json proof (CONTRACT-02)" do
+    setup do
+      matrix = File.read!("priv/support_matrix.json") |> JSON.decode!()
+      guide = File.read!("guides/theming.md")
+      {:ok, matrix: matrix, guide: guide}
+    end
+
+    @light_capability_keys [
+      "from_brand_accent_seed",
+      "on_accent_readable_default",
+      "brand_theme_orthogonal"
+    ]
+
+    test "every new from_brand/theming claim the guide makes has a proof-backed theming.light capability",
+         %{matrix: matrix} do
+      capabilities = matrix["theming"]["light"]["capabilities"]
+
+      assert is_map(capabilities)
+
+      for key <- @light_capability_keys do
+        assert Map.has_key?(capabilities, key),
+               "expected theming.light.capabilities to declare #{inspect(key)}"
+
+        assert capabilities[key] == "supported",
+               "expected theming.light.capabilities.#{key} == \"supported\", " <>
+                 "got #{inspect(capabilities[key])}"
+      end
+    end
+
+    test "the guide's honest on_accent wording is present next to the derivation claims", %{
+      guide: guide
+    } do
+      assert guide =~ "readable default"
+      assert guide =~ "not"
+      assert guide =~ "WCAG-AA/PDF-UA"
+      assert guide =~ "overridable"
+    end
+  end
+
+  describe "guides/theming.md SHA block cannot drift from assets/rendro/artifacts.json (CONTRACT-02)" do
+    test "every gallery png_sha256 appears in guides/theming.md" do
+      manifest = File.read!("assets/rendro/artifacts.json") |> JSON.decode!()
+      guide = File.read!("guides/theming.md")
+
+      gallery = manifest["gallery"]
+      assert is_list(gallery) and gallery != [],
+             "assets/rendro/artifacts.json gallery must not be empty (guard would be vacuous)"
+
+      for %{"png_sha256" => sha} <- gallery do
+        assert guide =~ sha,
+               "expected guides/theming.md to contain gallery png_sha256 #{inspect(sha)} " <>
+                 "(SHA drift guard)"
+      end
+    end
   end
 end

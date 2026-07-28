@@ -610,7 +610,10 @@
       "capabilities": {
         "no_background_rect": "supported",
         "byte_identical_to_v2_10": "supported",
-        "deterministic_output": "supported"
+        "deterministic_output": "supported",
+        "from_brand_accent_seed": "supported",
+        "on_accent_readable_default": "supported",
+        "brand_theme_orthogonal": "supported"
       }
     },
     "dark": {
