@@ -1,0 +1,12 @@
+      - name: Install Dependencies
+        run: mix deps.get
+
+      - name: Run CI
+        shell: bash
+        # `shell: bash` runs `bash --noprofile --norc -eo pipefail {0}`, so pipefail
+        # is on by default — `mix ci`'s exit code propagates through `tee` (gate-neutral).
+        # Single-line `run:` keeps the literal `run: mix ci` lane that the
+        # required-checks guardrail (test/guardrails/required_checks_contract_test.exs) asserts.
+        run: mix ci 2>&1 | tee /tmp/mix-ci-output.log
+
+      - name: CI Baseline Summary

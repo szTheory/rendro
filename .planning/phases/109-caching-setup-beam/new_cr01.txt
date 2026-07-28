@@ -1,0 +1,2 @@
+      - name: Verify Release Proof
+        run: mix run scripts/release_preflight_proof.exs --current-version-tag --worktree "$RUNNER_TEMP/rendro-release-proof"

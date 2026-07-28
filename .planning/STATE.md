@@ -2,19 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
-current_phase: 123
-current_phase_name: "`from_brand/2` E2E + honest rubric-gap closure + gallery/docs/manifest closure"
-status: complete
-stopped_at: Milestone v2.11 fully executed — all phases 119-123 complete and verified, ready to close
-last_updated: "2026-07-28T21:08:46.675Z"
-last_activity: 2026-07-28
-last_activity_desc: Phase 123 complete — milestone v2.11 (119-123) all phases done and verified
+status: completed
+stopped_at: Completed 123-05-PLAN.md
+last_updated: "2026-07-28T21:29:50.568Z"
+last_activity: 2026-07-28 — Phase 123 complete; milestone v2.11 fully executed
 progress:
-  total_phases: 12
+  total_phases: 6
   completed_phases: 5
-  total_plans: 25
-  completed_plans: 21
-  percent: 42
+  total_plans: 20
+  completed_plans: 20
+  percent: 83
 ---
 
 # Project State
@@ -47,6 +44,10 @@ Phase 123 from_brand/2 E2E + honest rubric-gap + docs .... ✓ Complete
 ```
 
 ## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 124 added: Address v2.11 tech debt: stale 113 docs-contract test, formatter drift, ticket dialyzer contract
 
 ### Decisions
 

@@ -216,3 +216,13 @@ See all seeds: `/gsd-capture --list-seeds`.
 | D | Rendro Studio: optional mountable theme playground (LiveView) | `SEED-005` *(optional)* | dormant |
 
 Dependency order: A → B → C → D. Each is a right-sized milestone; D is optional/deferrable.
+
+### Phase 124: Address v2.11 tech debt: stale 113 docs-contract test, formatter drift, ticket dialyzer contract
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 123
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 124 to break down)
