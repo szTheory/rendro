@@ -55,4 +55,19 @@ defmodule Rendro.Recipes.ReceiptOptsThreadingTest do
       assert Receipt.sections(data) == Receipt.sections(data, palette: %{})
     end
   end
+
+  describe "typography(opts) seam (TYPE-01/02/03)" do
+    test "no-op: sections(data) equals sections(data, typography: %{})" do
+      data = sample_data()
+      assert Receipt.sections(data) == Receipt.sections(data, typography: %{})
+    end
+
+    test "a :typography override changes the output (live seam)" do
+      data = sample_data()
+
+      # `leading` is threaded onto every %Text{} block, so overriding it is
+      # guaranteed to change the sections — proving the seam is live, not inert.
+      refute Receipt.sections(data) == Receipt.sections(data, typography: %{leading: 2.0})
+    end
+  end
 end

@@ -296,13 +296,41 @@ defmodule Rendro.Recipes.Receipt do
 
   defp header_section(%{title: title, date: date, customer: customer} = data, opts) do
     colors = palette(opts)
+    type = typography(opts)
     fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
     customer_name = Map.get(customer, :name, "")
 
     base_content = [
-      Rendro.block(Rendro.text(title, size: 14, color: colors.ink)),
-      Rendro.block(Rendro.text(customer_name, size: 12, color: colors.ink)),
-      Rendro.block(Rendro.text(fmt_date.(date), size: 10, color: colors.ink))
+      Rendro.block(
+        Rendro.text(title,
+          size: type.scale.subtitle,
+          font: type.fonts.heading,
+          line_height: type.leading,
+          widows: type.widows,
+          orphans: type.orphans,
+          color: colors.ink
+        )
+      ),
+      Rendro.block(
+        Rendro.text(customer_name,
+          size: type.scale.body,
+          font: type.fonts.body,
+          line_height: type.leading,
+          widows: type.widows,
+          orphans: type.orphans,
+          color: colors.ink
+        )
+      ),
+      Rendro.block(
+        Rendro.text(fmt_date.(date),
+          size: type.scale.small,
+          font: type.fonts.body,
+          line_height: type.leading,
+          widows: type.widows,
+          orphans: type.orphans,
+          color: colors.ink
+        )
+      )
     ]
 
     # 118-08 gap-closure (SHOW-01): render the merchant identity (previously
@@ -310,7 +338,7 @@ defmodule Rendro.Recipes.Receipt do
     # so the merchant reads as the issuer of the receipt, ahead of the title.
     content =
       base_content
-      |> maybe_prepend(Map.get(data, :merchant), &merchant_block(&1, colors))
+      |> maybe_prepend(Map.get(data, :merchant), &merchant_block(&1, colors, type))
 
     Rendro.section(
       name: :receipt_header,
@@ -322,11 +350,21 @@ defmodule Rendro.Recipes.Receipt do
   defp maybe_prepend(content, nil, _fun), do: content
   defp maybe_prepend(content, value, fun), do: [fun.(value) | content]
 
-  defp merchant_block(merchant, colors) when is_map(merchant) do
+  defp merchant_block(merchant, colors, type) when is_map(merchant) do
     name = Map.get(merchant, :name, "")
     address = Map.get(merchant, :address)
     text = if address in [nil, ""], do: name, else: "#{name}\n#{address}"
-    Rendro.block(Rendro.text(text, size: 16, color: colors.ink))
+
+    Rendro.block(
+      Rendro.text(text,
+        size: type.scale.title,
+        font: type.fonts.heading,
+        line_height: type.leading,
+        widows: type.widows,
+        orphans: type.orphans,
+        color: colors.ink
+      )
+    )
   end
 
   defp body_section(%{lines: lines} = data, opts) do
@@ -410,12 +448,14 @@ defmodule Rendro.Recipes.Receipt do
   # element on the receipt (content_hierarchy=5 anchor) — not small bottom
   # text alongside Subtotal/Tax. Subtotal/Tax/Discount render small in one
   # block; Total renders alone, much larger, in its own trailing block.
-  @minor_totals_size 9
-  @dominant_total_size 18
+  # 122-02: the former @minor_totals_size (9) and @dominant_total_size (18)
+  # literals are now the `caption` and `display` steps of the typography/1 seam
+  # (no-theme literal-defaults preserve those exact values).
 
   defp build_totals_blocks(%{totals: totals} = _data, opts) when is_map(totals) do
     fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
     colors = palette(opts)
+    type = typography(opts)
 
     minor_lines =
       []
@@ -430,7 +470,11 @@ defmodule Rendro.Recipes.Receipt do
         [
           Rendro.block(
             Rendro.text(Enum.join(minor_lines, "\n"),
-              size: @minor_totals_size,
+              size: type.scale.caption,
+              font: type.fonts.mono,
+              line_height: type.leading,
+              widows: type.widows,
+              orphans: type.orphans,
               color: colors.ink
             )
           )
@@ -442,8 +486,14 @@ defmodule Rendro.Recipes.Receipt do
         %Decimal{} = total ->
           [
             Rendro.block(
+              # The SOLE `display`-anchored element on the Receipt (D-01) — the
+              # "one key fact." mono font, since it is an amount.
               Rendro.text("Total: #{fmt_amount.(total)}",
-                size: @dominant_total_size,
+                size: type.scale.display,
+                font: type.fonts.mono,
+                line_height: type.leading,
+                widows: type.widows,
+                orphans: type.orphans,
                 color: colors.ink
               )
             )
@@ -513,6 +563,44 @@ defmodule Rendro.Recipes.Receipt do
       end
 
     Map.merge(base, Keyword.get(opts, :palette, %{}))
+  end
+
+  # ---------------------------------------------------------------------------
+  # Typography seam (TYPE-01 / TYPE-02 / TYPE-03) — the exact structural twin of
+  # palette/1 for the type scale, font roles, and leading/widows/orphans.
+  # ---------------------------------------------------------------------------
+
+  # Returns the resolved typography for this render. When no `:theme` is
+  # supplied the `nil` branch reproduces Receipt's exact CURRENT literals —
+  # NEVER `Rendro.Theme.default().typography` (that would apply the frozen
+  # 21/16.5/... scale and break byte-identity, RESEARCH Pitfall 1) — so every
+  # `%Text{}` that reads sizes/fonts/leading from here stays byte-identical
+  # (TYPE-01/TYPE-03). Receipt consumes ALL SIX roles exactly once (no
+  # headroom): Total 18 (display, the D-01 anchor), merchant/section header 16
+  # (title), receipt title 14 (subtitle), customer name 12 (body), date 10
+  # (small), minor totals 9 (caption). All three font roles default to
+  # `:default`, the always-registered Helvetica-compatible built-in, which the
+  # font registry normalizes identically to today's implicit `"Helvetica"`
+  # default → no byte drift. When a `:theme` is supplied the base becomes
+  # `Rendro.Theme.resolve(theme).typography`. The final `Map.merge` keeps an
+  # explicit `:typography` opt as the winning override layer (mirrors :palette).
+  defp typography(opts) do
+    base =
+      case opts[:theme] do
+        nil ->
+          %{
+            scale: %{display: 18, title: 16, subtitle: 14, body: 12, small: 10, caption: 9},
+            fonts: %{heading: :default, body: :default, mono: :default},
+            leading: 1.2,
+            widows: 2,
+            orphans: 2
+          }
+
+        theme ->
+          Rendro.Theme.resolve(theme).typography
+      end
+
+    Map.merge(base, Keyword.get(opts, :typography, %{}))
   end
 
   # ---------------------------------------------------------------------------
