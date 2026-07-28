@@ -5,15 +5,15 @@ milestone_name: Document Theming & Design-Token System
 current_phase: 121
 current_phase_name: light-dark-background-fill-mechanism-all-7-recipes
 status: executing
-stopped_at: Completed 121-01-PLAN.md
-last_updated: "2026-07-28T00:26:25.716Z"
+stopped_at: Completed 121-04-PLAN.md
+last_updated: "2026-07-28T00:31:37.909Z"
 last_activity: 2026-07-28
 last_activity_desc: Phase 121 execution started
 progress:
   total_phases: 10
   completed_phases: 2
   total_plans: 15
-  completed_plans: 8
+  completed_plans: 9
   percent: 20
 ---
 
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-07-27)
 ## Current Position
 
 Phase: 121 (light-dark-background-fill-mechanism-all-7-recipes) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-07-28 -- Phase 121 execution started
 
-Progress: [█████████████░░░░░░░] 7/11 plans ([█████░░░░░] 53%)
+Progress: [█████████████░░░░░░░] 7/11 plans ([██████░░░░] 60%)
 
 ## Roadmap Snapshot (v2.11, Phases 119-123)
 
@@ -69,6 +69,7 @@ Full log in PROJECT.md Key Decisions. Milestone-B locks carried into planning:
 - [Phase ?]: Phase 120 Plan 03: swapped Statement/Certificate/Receipt/BrandedInvoice palette/1 to theme.colors via case opts[:theme]; :palette wins over :theme (D-01); no-theme byte-identical (PLUMB-03)
 - [Phase ?]: 120-04: swapped Invoice/Payslip/Ticket palette/1 to theme.colors via case opts[:theme]; :palette wins over :theme (D-01); no-theme byte-identical (PLUMB-03). Phase-wide no_inline_color_literals source-scan (PLUMB-02) + typography-free guard (D-04) added. Phase 120 complete: all 7 recipes themable.
 - [Phase ?]: 121-01: Rendro.Recipes.Background helper (emit?/region/section) created as the single source of truth for the :background full-page fill; Statement fully text-seamed + wired, byte-identical light path, dark golden blessed
+- [Phase ?]: 121-04: theming support-matrix rows (light=supported, dark=supported_screen_oriented) added with boundaries flat-map; dark/1 @doc gained explicit screen-oriented not-for-print sentence; theming_claims_test.exs binds every boundary to proof with overclaim tripwire + non-vacuity teeth
 
 ### Pending Todos
 
@@ -89,8 +90,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-28T00:26:25.710Z
-Stopped at: Completed 121-01-PLAN.md
+Last session: 2026-07-28T00:31:37.902Z
+Stopped at: Completed 121-04-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -103,3 +104,4 @@ Resume file: None
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 121 P01 | 25min | 2 tasks | 4 files |
+| Phase 121 P04 | 3min | 2 tasks | 3 files |

@@ -31,7 +31,7 @@ Requirements for this milestone. Each maps to exactly one roadmap phase.
 
 - [x] **MODE-01**: A `mode: :light | :dark` selector with `Rendro.Theme.dark/1` deriving dark by swapping pre-resolved role tuples (background/ink/surface/on_accent) — no separate art and no transcendental color math at draw time.
 - [x] **MODE-02**: Dark mode paints a full-page background on EVERY page (including paginate-generated overflow pages) via a page-template `:background` region; the light default emits no background rect and stays byte-identical to v2.10.
-- [ ] **MODE-03**: Dark is documented as a screen-oriented mode with an explicit non-print-recommended boundary and a support-matrix row — no print-safety or accessibility/PDF-UA claim; every shipped demo is light.
+- [x] **MODE-03**: Dark is documented as a screen-oriented mode with an explicit non-print-recommended boundary and a support-matrix row — no print-safety or accessibility/PDF-UA claim; every shipped demo is light.
 
 ### Recipe Plumbing (PLUMB)
 
@@ -101,7 +101,7 @@ Which phases cover which requirements. Populated during roadmap creation.
 | TYPE-03 | Phase 122 | Pending |
 | MODE-01 | Phase 121 | Complete |
 | MODE-02 | Phase 121 | Complete |
-| MODE-03 | Phase 121 | Pending |
+| MODE-03 | Phase 121 | Complete |
 | PLUMB-01 | Phase 120 | Complete |
 | PLUMB-02 | Phase 120 | Complete |
 | PLUMB-03 | Phase 120 | Complete |
