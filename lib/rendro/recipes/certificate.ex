@@ -332,12 +332,17 @@ defmodule Rendro.Recipes.Certificate do
     region_w = body_region.width
     region_h = body_region.height
 
-    # Only "Helvetica" is ever used for this recipe's text runs (the
-    # optional `brand` font is registered for embedding but never applied to
-    # a text block here, and the seam's font roles default to `:default` ==
-    # built-in Helvetica), so built-in Helvetica metrics are always the
-    # correct font to measure against for centering.
-    font = Rendro.PDF.Font.helvetica()
+    # WR-01 (122-VERIFICATION): horizontal centering measures each line against
+    # built-in Helvetica metrics while the emitted run carries the seam's
+    # `font_role`. That coupling is only correct while the role resolves to a
+    # Helvetica-metric font. Every shipped theme AND the no-theme branch produce
+    # `:default` (built-in Helvetica) for this recipe, so the coupling holds — but
+    # a `:typography` override naming a non-Helvetica-metric role would silently
+    # de-center. `centering_measure_font/1` keys the measurement font off the SAME
+    # role the run emits and raises honestly on a non-Helvetica-metric role rather
+    # than mis-centering. The body paragraph's measurement is keyed on
+    # `type.fonts.body` (the role centered_paragraph emits).
+    body_measure_font = centering_measure_font(type.fonts.body)
 
     body_measure_w = region_w * @body_measure_fraction
 
@@ -349,7 +354,7 @@ defmodule Rendro.Recipes.Certificate do
     # an honest approximation, not exact typesetting — good enough to move
     # the certificate's content out of the cramped top ~20% into a visually
     # balanced middle band.
-    body_full_w = Rendro.PDF.Font.text_width(font, body_text, body_size)
+    body_full_w = Rendro.PDF.Font.text_width(body_measure_font, body_text, body_size)
     body_lines = if body_full_w <= 0, do: 1, else: max(1, ceil(body_full_w / body_measure_w))
 
     content_height_estimate =
@@ -364,9 +369,8 @@ defmodule Rendro.Recipes.Certificate do
 
     content = [
       spacer,
-      centered_line(font, data.title, title_size, region_w, colors, type, type.fonts.heading),
+      centered_line(data.title, title_size, region_w, colors, type, type.fonts.heading),
       centered_line(
-        font,
         "This certifies that",
         subtitle_size,
         region_w,
@@ -375,7 +379,6 @@ defmodule Rendro.Recipes.Certificate do
         type.fonts.body
       ),
       centered_line(
-        font,
         data.recipient,
         recipient_size,
         region_w,
@@ -384,8 +387,8 @@ defmodule Rendro.Recipes.Certificate do
         type.fonts.heading
       ),
       centered_paragraph(body_text, body_size, body_measure_w, region_w, colors, type),
-      centered_line(font, fmt_date.(data.date), meta_size, region_w, colors, type, type.fonts.body),
-      centered_line(font, seal_text, meta_size, region_w, colors, type, type.fonts.body)
+      centered_line(fmt_date.(data.date), meta_size, region_w, colors, type, type.fonts.body),
+      centered_line(seal_text, meta_size, region_w, colors, type, type.fonts.body)
     ]
 
     Rendro.section(
@@ -398,12 +401,14 @@ defmodule Rendro.Recipes.Certificate do
   defp line_h(size), do: size * @line_height
 
   # Horizontally centers a single line of text within the body region by
-  # measuring its exact rendered width against built-in Helvetica metrics.
+  # measuring its exact rendered width against the font resolved from the SAME
+  # `font_role` the run emits (WR-01 coupling — see centering_measure_font/1).
   # 121-02 D-01/D-02: text seamed to colors.ink so it rides the dark swap.
   # 122-03: the resolved `size` here is the SAME value the caller fed into the
   # content-height estimate (measurement coupling) — plus font role +
   # leading/widows/orphans from the typography seam.
-  defp centered_line(font, text, size, region_w, colors, type, font_role) do
+  defp centered_line(text, size, region_w, colors, type, font_role) do
+    font = centering_measure_font(font_role)
     width = Rendro.PDF.Font.text_width(font, text, size)
     x = max((region_w - width) / 2, 0)
 
@@ -440,6 +445,39 @@ defmodule Rendro.Recipes.Certificate do
       x: x,
       width: measure_w
     )
+  end
+
+  # WR-01 guard (122-VERIFICATION): maps a resolved font role to the
+  # `%Rendro.PDF.Font{}` used to MEASURE horizontal centering. Certificate has no
+  # registry at `sections/2` compose time, so it can only measure against the
+  # built-in Helvetica metrics — which is correct exactly when the emitted run's
+  # font role is Helvetica-metric. The atom `:default` and the string
+  # `"Helvetica"` are the only roles any shipped theme (`default/0`,
+  # `from_brand/2`) or the no-theme branch ever produces for this recipe, so they
+  # measure against `helvetica/0` and keep the coupling byte-identical. Any other
+  # role (e.g. an embedded font named via a `:typography` override) cannot be
+  # correctly centered against Helvetica metrics and would silently de-center;
+  # rather than emit wrong geometry we raise honestly (errors-as-product).
+  # Resolving embedded-font metrics at compose time needs new plumbing (deferred).
+  defp centering_measure_font(role) when role == :default or role == "Helvetica" do
+    Rendro.PDF.Font.helvetica()
+  end
+
+  defp centering_measure_font(role) do
+    raise ArgumentError, """
+    Rendro.Recipes.Certificate — unsupported centered font role.
+
+    What:  #{inspect({:unsupported_centered_font_role, role})}
+    Where: Rendro.Recipes.Certificate.centering_measure_font/1
+    Why:   Certificate horizontal centering measures line widths against built-in
+           Helvetica metrics, but the resolved font role #{inspect(role)} is not a
+           Helvetica-metric font. Measuring against Helvetica while rendering a
+           different embedded font would silently de-center every centered line.
+    Next:  Use a Helvetica-metric font role for Certificate centered elements
+           (title, subtitle, recipient, date, seal), or keep the theme/no-theme
+           default (:default). Resolving arbitrary embedded-font metrics at the
+           recipe compose layer requires new plumbing and is deferred.
+    """
   end
 
   # ---------------------------------------------------------------------------
