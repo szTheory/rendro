@@ -2,16 +2,19 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
-status: planning
-stopped_at: Phase 122 context gathered
-last_updated: "2026-07-28T01:03:16.460Z"
-last_activity: 2026-07-28
+current_phase: 122
+current_phase_name: typography-type-scale-application-font-role-leading-wiring
+status: executing
+stopped_at: Completed 122-01-PLAN.md
+last_updated: "2026-07-28T02:43:40.643Z"
+last_activity: 2026-07-27
+last_activity_desc: Phase 122 execution started
 progress:
-  total_phases: 5
+  total_phases: 11
   completed_phases: 3
-  total_plans: 10
-  completed_plans: 10
-  percent: 60
+  total_plans: 19
+  completed_plans: 12
+  percent: 27
 ---
 
 # Project State
@@ -21,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-27)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 122 — typography type scale application + font role/leading wiring
+**Current focus:** Phase 122 — typography-type-scale-application-font-role-leading-wiring
 
 ## Current Position
 
-Phase: 122
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-07-28
+Phase: 122 (typography-type-scale-application-font-role-leading-wiring) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-07-27 — Phase 122 execution started
 
-Progress: [██████████] 100%
+Progress: [██████░░░░] 63%
 
 ## Roadmap Snapshot (v2.11, Phases 119-123)
 
@@ -71,6 +74,7 @@ Full log in PROJECT.md Key Decisions. Milestone-B locks carried into planning:
 - [Phase ?]: Certificate's own resolved landscape {pw,ph} threaded to Background.region/section — proves the dark mechanism on non-portrait geometry, never Statement's portrait A4 constants (121-02, Pitfall 4)
 - [Phase ?]: 121-03: Payslip/Invoice/Receipt/BrandedInvoice/Ticket all wire the shared :background region+section into page_template/1+sections/2, gated on Background.emit?(palette(opts)); BrandedInvoice gained explicit @page_width/@page_height (595.28x841.89) mirroring the PageTemplate struct default it always implicitly relied on; all 7 recipes now carry the dark-mode background mechanism
 - [Phase ?]: 121-03: fixed 2 stale PLUMB-02 whitelist tests (Receipt, BrandedInvoice) using theme: :ignored -- page_template/1 now resolves palette(opts) for real to gate the background region, so the placeholder atom no longer round-trips through Theme.resolve/1; swapped to theme: %{}
+- [Phase ?]: 122-01: Invoice typography/1 seam (twin of palette/1) threads scale/fonts/leading into every %Text; no-theme literal-defaults preserve byte-identity (zero re-bless); Total Due is the sole display anchor (D-01); TYPE-02 raise-path proven on fonts.mono/body; D-04 guard retired
 
 ### Pending Todos
 
@@ -91,9 +95,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-28T01:03:16.455Z
-Stopped at: Phase 122 context gathered
-Resume file: .planning/phases/122-typography-type-scale-application-font-role-leading-wiring/122-CONTEXT.md
+Last session: 2026-07-28T02:43:33.197Z
+Stopped at: Completed 122-01-PLAN.md
+Resume file: None
 
 ## Next Steps
 
@@ -108,3 +112,4 @@ Resume file: .planning/phases/122-typography-type-scale-application-font-role-le
 | Phase 121 P04 | 3min | 2 tasks | 3 files |
 | Phase 121 P02 | 12min | 2 tasks | 3 files |
 | Phase 121 P03 | 20min | 2 tasks | 7 files |
+| Phase 122 P01 | 18min | 2 tasks | 4 files |

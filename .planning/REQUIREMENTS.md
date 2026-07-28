@@ -23,9 +23,9 @@ Requirements for this milestone. Each maps to exactly one roadmap phase.
 
 ### Typography (TYPE)
 
-- [ ] **TYPE-01**: A named type scale (`display`/`title`/`subtitle`/`body`/`small`/`caption`) is materialized as explicit point sizes (not a runtime formula) and threaded into `%Text{}` size fields.
-- [ ] **TYPE-02**: Font roles (`heading`/`body`/`mono`) resolve through the existing `FontRegistry`; a theme referencing an unregistered font role raises the existing typed `{:unknown_text_font, _}` error and never silently substitutes.
-- [ ] **TYPE-03**: `leading` (a line-height multiplier matching `Text.line_height` semantics) plus widows/orphans are theme-driven, and `default/0`'s scale/leading is a metric no-op so existing Phase-117 stress goldens are unchanged.
+- [x] **TYPE-01**: A named type scale (`display`/`title`/`subtitle`/`body`/`small`/`caption`) is materialized as explicit point sizes (not a runtime formula) and threaded into `%Text{}` size fields.
+- [x] **TYPE-02**: Font roles (`heading`/`body`/`mono`) resolve through the existing `FontRegistry`; a theme referencing an unregistered font role raises the existing typed `{:unknown_text_font, _}` error and never silently substitutes.
+- [x] **TYPE-03**: `leading` (a line-height multiplier matching `Text.line_height` semantics) plus widows/orphans are theme-driven, and `default/0`'s scale/leading is a metric no-op so existing Phase-117 stress goldens are unchanged.
 
 ### Light / Dark Mode (MODE)
 
@@ -96,9 +96,9 @@ Which phases cover which requirements. Populated during roadmap creation.
 | THEME-04 | Phase 119 | Complete |
 | COLOR-01 | Phase 119 | Complete |
 | COLOR-02 | Phase 119 | Complete |
-| TYPE-01 | Phase 122 | Pending |
-| TYPE-02 | Phase 122 | Pending |
-| TYPE-03 | Phase 122 | Pending |
+| TYPE-01 | Phase 122 | Complete |
+| TYPE-02 | Phase 122 | Complete |
+| TYPE-03 | Phase 122 | Complete |
 | MODE-01 | Phase 121 | Complete |
 | MODE-02 | Phase 121 | Complete |
 | MODE-03 | Phase 121 | Complete |
