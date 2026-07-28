@@ -310,6 +310,7 @@ defmodule Rendro.Recipes.Statement do
     fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
     lbl = Rendro.Recipes.Pagination.label_resolver(opts)
     colors = palette(opts)
+    type = typography(opts)
 
     period_str = "#{fmt_date.(period.from)} to #{fmt_date.(period.to)}"
     ob_str = "#{lbl.(:opening_balance)}: #{fmt_amount.(ob)}"
@@ -335,18 +336,65 @@ defmodule Rendro.Recipes.Statement do
       )
 
     closing_label =
-      Rendro.block(Rendro.text("#{lbl.(:closing_balance)}", size: 9, color: colors.muted))
+      Rendro.block(
+        Rendro.text("#{lbl.(:closing_balance)}",
+          size: type.scale.small,
+          font: type.fonts.body,
+          line_height: type.leading,
+          widows: type.widows,
+          orphans: type.orphans,
+          color: colors.muted
+        )
+      )
 
+    # The SOLE `display`-anchored element on the Statement (D-01) — the "one
+    # key fact." mono font, since it is an amount.
     closing_value =
-      Rendro.block(Rendro.text(fmt_amount.(closing_balance), size: 22, color: colors.ink))
+      Rendro.block(
+        Rendro.text(fmt_amount.(closing_balance),
+          size: type.scale.display,
+          font: type.fonts.mono,
+          line_height: type.leading,
+          widows: type.widows,
+          orphans: type.orphans,
+          color: colors.ink
+        )
+      )
 
     Rendro.section(
       name: :statement_header,
       region: :header,
       content: [
-        Rendro.block(Rendro.text(account_name, size: 14, color: colors.ink)),
-        Rendro.block(Rendro.text(period_str, size: 10, color: colors.muted)),
-        Rendro.block(Rendro.text(ob_str, size: 10, color: colors.muted)),
+        Rendro.block(
+          Rendro.text(account_name,
+            size: type.scale.title,
+            font: type.fonts.heading,
+            line_height: type.leading,
+            widows: type.widows,
+            orphans: type.orphans,
+            color: colors.ink
+          )
+        ),
+        Rendro.block(
+          Rendro.text(period_str,
+            size: type.scale.body,
+            font: type.fonts.body,
+            line_height: type.leading,
+            widows: type.widows,
+            orphans: type.orphans,
+            color: colors.muted
+          )
+        ),
+        Rendro.block(
+          Rendro.text(ob_str,
+            size: type.scale.body,
+            font: type.fonts.body,
+            line_height: type.leading,
+            widows: type.widows,
+            orphans: type.orphans,
+            color: colors.muted
+          )
+        ),
         closing_backdrop,
         closing_label,
         closing_value
@@ -389,6 +437,45 @@ defmodule Rendro.Recipes.Statement do
     Map.merge(base, Keyword.get(opts, :palette, %{}))
   end
 
+  # ---------------------------------------------------------------------------
+  # Typography seam (TYPE-01 / TYPE-02 / TYPE-03) — the exact structural twin of
+  # palette/1 for the type scale, font roles, and leading/widows/orphans.
+  # ---------------------------------------------------------------------------
+
+  # Returns the resolved typography for this render. When no `:theme` is
+  # supplied the `nil` branch reproduces Statement's exact CURRENT literals —
+  # NEVER `Rendro.Theme.default().typography` (that would apply the frozen
+  # 21/16.5/... scale and break byte-identity, RESEARCH Pitfall 1) — so every
+  # `%Text{}` that reads sizes/fonts/leading from here stays byte-identical
+  # (TYPE-01/TYPE-03). The literal scale mirrors Statement's current sizes:
+  # closing balance 22 (display, the D-01 anchor), account name 14 (title),
+  # table cells 12 (subtitle), period/opening balance 10 (body), closing-balance
+  # label 9 (small); `caption` is unused on the no-theme path (any value). All
+  # three font roles default to `:default`, the always-registered
+  # Helvetica-compatible built-in, which the font registry normalizes
+  # identically to today's implicit `"Helvetica"` default → no byte drift. When
+  # a `:theme` is supplied the base becomes
+  # `Rendro.Theme.resolve(theme).typography`. The final `Map.merge` keeps an
+  # explicit `:typography` opt as the winning override layer (mirrors :palette).
+  defp typography(opts) do
+    base =
+      case opts[:theme] do
+        nil ->
+          %{
+            scale: %{display: 22, title: 14, subtitle: 12, body: 10, small: 9, caption: 8},
+            fonts: %{heading: :default, body: :default, mono: :default},
+            leading: 1.2,
+            widows: 2,
+            orphans: 2
+          }
+
+        theme ->
+          Rendro.Theme.resolve(theme).typography
+      end
+
+    Map.merge(base, Keyword.get(opts, :typography, %{}))
+  end
+
   # Derives the exact closing balance (opening_balance + Σ signed line
   # amounts) via the same Decimal fold maybe_validate_closing_balance!/1
   # already uses to validate a caller-supplied :closing_balance — so the
@@ -400,6 +487,7 @@ defmodule Rendro.Recipes.Statement do
 
   defp body_section(%{opening_balance: ob, lines: lines} = _data, opts) do
     colors = palette(opts)
+    type = typography(opts)
     fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
     fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
     lbl = Rendro.Recipes.Pagination.label_resolver(opts)
@@ -416,10 +504,10 @@ defmodule Rendro.Recipes.Statement do
     formatted_rows =
       Enum.map(rows_with_balance, fn %{date: d, description: desc, amount: amt, balance: bal} ->
         [
-          cell_text(fmt_date.(d), colors),
-          cell_text(desc, colors),
-          cell_text(fmt_amount.(amt), colors),
-          cell_text(fmt_amount.(bal), colors)
+          cell_text(fmt_date.(d), colors, type),
+          cell_text(desc, colors, type),
+          cell_text(fmt_amount.(amt), colors, type),
+          cell_text(fmt_amount.(bal), colors, type)
         ]
       end)
 
@@ -493,10 +581,10 @@ defmodule Rendro.Recipes.Statement do
         cf_row =
           if idx < last_page_idx do
             [
-              cell_text(lbl.(:carried_forward), colors),
-              cell_text("", colors),
-              cell_text("", colors),
-              cell_text(fmt_amount.(balance_at_break), colors)
+              cell_text(lbl.(:carried_forward), colors, type),
+              cell_text("", colors, type),
+              cell_text("", colors, type),
+              cell_text(fmt_amount.(balance_at_break), colors, type)
             ]
           else
             nil
@@ -506,10 +594,10 @@ defmodule Rendro.Recipes.Statement do
         bf_row =
           if idx > 0 do
             [
-              cell_text(lbl.(:brought_forward), colors),
-              cell_text("", colors),
-              cell_text("", colors),
-              cell_text(fmt_amount.(prev_balance), colors)
+              cell_text(lbl.(:brought_forward), colors, type),
+              cell_text("", colors, type),
+              cell_text("", colors, type),
+              cell_text(fmt_amount.(prev_balance), colors, type)
             ]
           else
             nil
@@ -534,13 +622,26 @@ defmodule Rendro.Recipes.Statement do
     )
   end
 
-  # Every body/CF/BF table cell renders at the SAME explicit size (12 — the
-  # implicit `Rendro.Text` default a plain-string cell already normalized to,
-  # Pitfall 1), now carrying a swappable `color: colors.ink` (D-02). Color
-  # does not affect measurement, so `Rendro.measure_rows` and `Rendro.table`
-  # both fed these same cells stay byte-identical on the no-theme path.
-  defp cell_text(text, colors),
-    do: Rendro.block(Rendro.text(text, size: 12, color: colors.ink))
+  # Every body/CF/BF table cell renders through the typography seam at the
+  # `subtitle` role (no-theme literal-default 12 — the implicit `Rendro.Text`
+  # default a plain-string cell already normalized to, Pitfall 1), carrying a
+  # swappable `color: colors.ink` (D-02). RESEARCH Pitfall 5: this shared
+  # helper renders BOTH label and amount columns, so it keeps ONE font role
+  # (`body`) — it is NOT mono-ised. Color/font do not affect measurement, so
+  # `Rendro.measure_rows` and `Rendro.table` both fed these same cells stay
+  # byte-identical on the no-theme path.
+  defp cell_text(text, colors, type),
+    do:
+      Rendro.block(
+        Rendro.text(text,
+          size: type.scale.subtitle,
+          font: type.fonts.body,
+          line_height: type.leading,
+          widows: type.widows,
+          orphans: type.orphans,
+          color: colors.ink
+        )
+      )
 
   defp footer_section(_data, opts) do
     colors = palette(opts)
