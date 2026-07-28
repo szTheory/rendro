@@ -2,18 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
-current_phase: 122
-current_phase_name: typography-type-scale-application-font-role-leading-wiring
-status: executing
-stopped_at: Completed 122-04-PLAN.md
-last_updated: "2026-07-28T16:37:15.568Z"
+status: verifying
+stopped_at: Completed 122-05-PLAN.md
+last_updated: "2026-07-28T16:47:25.691Z"
 last_activity: 2026-07-28
-last_activity_desc: Phase 122 planning complete
 progress:
-  total_phases: 11
+  total_phases: 5
   completed_phases: 4
-  total_plans: 20
-  completed_plans: 14
+  total_plans: 15
+  completed_plans: 15
   percent: 80
 ---
 
@@ -30,8 +27,8 @@ See: .planning/PROJECT.md (updated 2026-07-27)
 
 Phase: 122 (typography-type-scale-application-font-role-leading-wiring) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
-Last activity: 2026-07-28 — Phase 122 planning complete
+Status: Phase complete — ready for verification
+Last activity: 2026-07-28
 
 Progress: [██████████] 100%
 
@@ -82,6 +79,8 @@ Full log in PROJECT.md Key Decisions. Milestone-B locks carried into planning:
 - [Phase ?]: 122-03: Certificate threads one resolved size into BOTH the %Text{} run AND the centering math (line_h/text_width) to avoid themed de-centering (Pitfall 2)
 - [Phase ?]: 122-03: Ticket exempts @caption_size(7)/@present_code_size(6) from the scale seam (font-only mono); reference code(8) is the sole display anchor via non-monotone assignment (Q3)
 - [Phase ?]: 122-04: TYPE-01 teeth test keys @size_literal on a numeric literal after size:, so size: type.scale.<role> and size: @attr variable reads are inherently non-matching — no per-recipe allowlist needed for exempt mono micro-sizes.
+- [Phase ?]: 122-05: Payslip theme branch remaps fonts onto :payslip_sans (its only fallback-bearing font) to close CR-01 — themed Payslip renders its own masked/accented data; glyph correctness outranks a themed font swap since no shipped theme sets non-:default fonts
+- [Phase ?]: 122-05: Certificate centering-measurement font keyed on the emitted font_role via centering_measure_font/1; non-Helvetica-metric role raises {:unsupported_centered_font_role} (WR-01). Certificate has no non-centered run so {:unknown_text_font} stays representatively proven on Statement
 
 ### Pending Todos
 
@@ -102,8 +101,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-28T03:15:51.046Z
-Stopped at: Completed 122-04-PLAN.md
+Last session: 2026-07-28T16:47:16.417Z
+Stopped at: Completed 122-05-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -123,3 +122,4 @@ Resume file: None
 | Phase 122 P02 | 32min | 3 tasks | 7 files |
 | Phase 122 P03 | 9min | 3 tasks | 8 files |
 | Phase 122 P04 | 4min | 2 tasks | 1 files |
+| Phase 122 P05 | 14min | 3 tasks | 5 files |
