@@ -76,5 +76,41 @@ defmodule Rendro.Recipes.PayslipOptsThreadingTest do
       # guaranteed to change the sections — proving the seam is live, not inert.
       refute Payslip.sections(data) == Payslip.sections(data, typography: %{leading: 2.0})
     end
+
+    # CR-01 regression (122-VERIFICATION): the themed font branch used to return
+    # the resolved theme's bare `:default` font roles, severing the B612 unicode
+    # fallback carried by `:payslip_sans` and crashing a themed render on
+    # Payslip's own documented data (`{:unsupported_glyph, "•"}`). This exercises
+    # the full `render/2` path (not `%Section{}` struct equality — the coverage
+    # hole that let CR-01 ship) on the masked-middot payment_method (D-14 `•`)
+    # plus accented (D-17) content.
+    test "themed render succeeds on masked-middot + accented content (CR-01)" do
+      data = %{
+        employer: %{name: "Aurora Textiles Co.", address: "500 Loom Street, Raleigh, NC 27601"},
+        employee: %{name: "Jordan Rivera", id: "E-·····4821", tax_code: "1257L"},
+        period: %{from: ~D[2026-06-01], to: ~D[2026-06-30]},
+        pay_date: ~D[2026-07-05],
+        earnings: [
+          %{description: "Base Salary", amount: Decimal.new("4200.00"), ytd: Decimal.new("25200.00")}
+        ],
+        deductions: [
+          %{
+            description: "Federal Income Tax",
+            amount: Decimal.new("620.00"),
+            ytd: Decimal.new("3720.00")
+          },
+          %{
+            description: "Impôt sur le revenu",
+            amount: Decimal.new("100.00"),
+            ytd: Decimal.new("600.00")
+          }
+        ],
+        # gross 4200.00 - deductions 720.00 = net 3480.00 (D-13 reconciliation)
+        net_pay: Decimal.new("3480.00"),
+        payment_method: "Direct Deposit ···· 4321"
+      }
+
+      assert {:ok, _} = Rendro.render(Payslip.document(data, theme: Rendro.Theme.default()))
+    end
   end
 end

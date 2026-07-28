@@ -870,9 +870,19 @@ defmodule Rendro.Recipes.Payslip do
   # no `font:` → the `%Text{}` struct default "Helvetica" string → :payslip_sans;
   # seaming to `:default` would both drop the unicode fallback (breaking the "•"
   # payment-method glyph) AND change the font resource (byte drift). Threading
-  # "Helvetica" reproduces the current resolution exactly. The `theme ->` branch
-  # reads `Rendro.Theme.resolve(theme).typography` (whose fonts ARE `:default`
-  # atoms — the intended themed behavior + the TYPE-02 raise surface).
+  # "Helvetica" reproduces the current resolution exactly.
+  #
+  # The `theme ->` branch takes the resolved theme's typography (scale/leading)
+  # but REMAPS every font role onto `:payslip_sans` — the only font Payslip
+  # registers (see with_unicode_fallback_font/1) and the ONLY one carrying the
+  # B612 unicode fallback that glyph_safe (`•`, U+2022, D-14) and D-17 accented
+  # content depend on. Correctness of Payslip's own glyphs outranks a themed
+  # font swap: no shipped theme sets non-`:default` fonts anyway (both
+  # `Rendro.Theme.default/0` and `from_brand/2` emit `fonts: :default`, the bare
+  # built-in Helvetica with NO fallback), so honoring the resolved `:default`
+  # atoms here would sever the fallback and crash themed rendering with
+  # `{:unsupported_glyph, "•"}` on Payslip's own canonical data (CR-01). Pinning
+  # to `:payslip_sans` keeps the themed scale while preserving glyph correctness.
   # `:typography` stays the winning override layer (mirrors :palette).
   defp typography(opts) do
     base =
@@ -887,7 +897,8 @@ defmodule Rendro.Recipes.Payslip do
           }
 
         theme ->
-          Rendro.Theme.resolve(theme).typography
+          t = Rendro.Theme.resolve(theme).typography
+          %{t | fonts: %{heading: :payslip_sans, body: :payslip_sans, mono: :payslip_sans}}
       end
 
     Map.merge(base, Keyword.get(opts, :typography, %{}))
