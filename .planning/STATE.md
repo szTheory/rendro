@@ -2,19 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
-current_phase: 122
-current_phase_name: typography-type-scale-application-font-role-leading-wiring
 status: executing
-stopped_at: Completed 122-01-PLAN.md
-last_updated: "2026-07-28T02:43:40.643Z"
-last_activity: 2026-07-27
-last_activity_desc: Phase 122 execution started
+stopped_at: Completed 122-02-PLAN.md
+last_updated: "2026-07-28T02:58:53.400Z"
+last_activity: 2026-07-28
 progress:
-  total_phases: 11
+  total_phases: 5
   completed_phases: 3
-  total_plans: 19
+  total_plans: 14
   completed_plans: 12
-  percent: 27
+  percent: 60
 ---
 
 # Project State
@@ -29,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-27)
 ## Current Position
 
 Phase: 122 (typography-type-scale-application-font-role-leading-wiring) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
-Last activity: 2026-07-27 — Phase 122 execution started
+Last activity: 2026-07-28
 
-Progress: [██████░░░░] 63%
+Progress: [█████████░] 86%
 
 ## Roadmap Snapshot (v2.11, Phases 119-123)
 
@@ -75,6 +72,9 @@ Full log in PROJECT.md Key Decisions. Milestone-B locks carried into planning:
 - [Phase ?]: 121-03: Payslip/Invoice/Receipt/BrandedInvoice/Ticket all wire the shared :background region+section into page_template/1+sections/2, gated on Background.emit?(palette(opts)); BrandedInvoice gained explicit @page_width/@page_height (595.28x841.89) mirroring the PageTemplate struct default it always implicitly relied on; all 7 recipes now carry the dark-mode background mechanism
 - [Phase ?]: 121-03: fixed 2 stale PLUMB-02 whitelist tests (Receipt, BrandedInvoice) using theme: :ignored -- page_template/1 now resolves palette(opts) for real to gate the background region, so the placeholder atom no longer round-trips through Theme.resolve/1; swapped to theme: %{}
 - [Phase ?]: 122-01: Invoice typography/1 seam (twin of palette/1) threads scale/fonts/leading into every %Text; no-theme literal-defaults preserve byte-identity (zero re-bless); Total Due is the sole display anchor (D-01); TYPE-02 raise-path proven on fonts.mono/body; D-04 guard retired
+- [Phase ?]: 122-02: replicated the typography/1 tracer onto Statement/Receipt/Payslip; each has a defp typography/1 (twin of palette/1) threading scale/fonts/leading into every %Text with exactly one display anchor (closing balance / total / net pay); no-theme byte-identity preserved (zero re-bless)
+- [Phase ?]: 122-02: Payslip no-theme fonts use the STRING "Helvetica" (resolves to document default :payslip_sans + B612 unicode fallback), NOT :default atom — :default drops the fallback + changes the font resource, breaking the '•' glyph and byte-identity. General rule: recipes overriding put_default_font must use the string literal on the no-theme path
+- [Phase ?]: 122-02: statement/dark themed golden re-blessed — the seam intentionally collapses the themed render onto the theme's uniform type scale (TYPE-01); determinism held, no-theme goldens unchanged, dark is screen-oriented
 
 ### Pending Todos
 
@@ -95,8 +95,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-28T02:43:33.197Z
-Stopped at: Completed 122-01-PLAN.md
+Last session: 2026-07-28T02:58:42.504Z
+Stopped at: Completed 122-02-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -113,3 +113,4 @@ Resume file: None
 | Phase 121 P02 | 12min | 2 tasks | 3 files |
 | Phase 121 P03 | 20min | 2 tasks | 7 files |
 | Phase 122 P01 | 18min | 2 tasks | 4 files |
+| Phase 122 P02 | 32min | 3 tasks | 7 files |
