@@ -158,38 +158,51 @@ defmodule Rendro.Recipes.Statement do
   """
   @spec page_template(keyword()) :: Rendro.PageTemplate.t()
   def page_template(opts \\ []) do
-    defaults = [
-      name: :statement,
-      regions: [
-        Rendro.region(
-          name: :header,
-          role: :header,
-          anchor: :top,
-          x: @margin,
-          y: @margin,
-          width: @content_width,
-          height: @header_height
-        ),
-        Rendro.region(
-          name: :body,
-          role: :body,
-          anchor: :flow,
-          x: @margin,
-          y: @body_y,
-          width: @content_width,
-          height: @body_height
-        ),
-        Rendro.region(
-          name: :footer,
-          role: :footer,
-          anchor: :bottom,
-          x: @margin,
-          y: @footer_y,
-          width: @content_width,
-          height: @footer_height
-        )
-      ]
+    colors = palette(opts)
+
+    base_regions = [
+      Rendro.region(
+        name: :header,
+        role: :header,
+        anchor: :top,
+        x: @margin,
+        y: @margin,
+        width: @content_width,
+        height: @header_height
+      ),
+      Rendro.region(
+        name: :body,
+        role: :body,
+        anchor: :flow,
+        x: @margin,
+        y: @body_y,
+        width: @content_width,
+        height: @body_height
+      ),
+      Rendro.region(
+        name: :footer,
+        role: :footer,
+        anchor: :bottom,
+        x: @margin,
+        y: @footer_y,
+        width: @content_width,
+        height: @footer_height
+      )
     ]
+
+    # 121-01 D-04/D-10: prepend the :background region FIRST (bottom of the
+    # paint stack) iff the resolved palette differs from paper-white — gated
+    # on the SAME palette(opts) sections/2 uses below (Pitfall 3), so the
+    # region and section can never disagree. The light no-theme path leaves
+    # `regions` untouched (byte-identical, PLUMB-03).
+    regions =
+      if Rendro.Recipes.Background.emit?(colors) do
+        [Rendro.Recipes.Background.region(@page_width, @page_height) | base_regions]
+      else
+        base_regions
+      end
+
+    defaults = [name: :statement, regions: regions]
 
     # page_template/1 only understands PageTemplate struct keys. Recipe-level opts
     # (:labels, :formatters, ...) are consumed by the section builders via opts,
@@ -235,11 +248,21 @@ defmodule Rendro.Recipes.Statement do
   def sections(data, opts \\ []) do
     validate_data!(data)
 
-    [
+    colors = palette(opts)
+
+    base_sections = [
       header_section(data, opts),
       body_section(data, opts),
       footer_section(data, opts)
     ]
+
+    # Same predicate + same palette(opts) as page_template/1 (Pitfall 3) —
+    # the region and section can never disagree.
+    if Rendro.Recipes.Background.emit?(colors) do
+      [Rendro.Recipes.Background.section(colors, @page_width, @page_height) | base_sections]
+    else
+      base_sections
+    end
   end
 
   @doc """
@@ -312,18 +335,18 @@ defmodule Rendro.Recipes.Statement do
       )
 
     closing_label =
-      Rendro.block(Rendro.text("#{lbl.(:closing_balance)}", size: 9))
+      Rendro.block(Rendro.text("#{lbl.(:closing_balance)}", size: 9, color: colors.muted))
 
     closing_value =
-      Rendro.block(Rendro.text(fmt_amount.(closing_balance), size: 22))
+      Rendro.block(Rendro.text(fmt_amount.(closing_balance), size: 22, color: colors.ink))
 
     Rendro.section(
       name: :statement_header,
       region: :header,
       content: [
-        Rendro.block(Rendro.text(account_name, size: 14)),
-        Rendro.block(Rendro.text(period_str, size: 10)),
-        Rendro.block(Rendro.text(ob_str, size: 10)),
+        Rendro.block(Rendro.text(account_name, size: 14, color: colors.ink)),
+        Rendro.block(Rendro.text(period_str, size: 10, color: colors.muted)),
+        Rendro.block(Rendro.text(ob_str, size: 10, color: colors.muted)),
         closing_backdrop,
         closing_label,
         closing_value
@@ -339,16 +362,22 @@ defmodule Rendro.Recipes.Statement do
   # `nil` branch reproduces Statement's exact current literals — `surface
   # {245, 245, 245}` (closing-balance band fill) and `rule {0, 0, 0}` (band
   # stroke) — so the `closing_backdrop` path stays byte-identical (PLUMB-03).
-  # When a `:theme` is supplied the base becomes `Rendro.Theme.resolve(theme).colors`
-  # (9 integer-{r,g,b} roles, colors ONLY — no type-scale read). The final
-  # `Map.merge(base, :palette-override)` keeps an explicit `:palette` as the
-  # winning layer (D-01). Non-color numerics (band stroke `width: 0.75`) are NOT
-  # seamed.
+  # `ink`/`muted` are added at today's implicit black default and `background`
+  # at paper-white (121-01 D-03) so every newly-seamed text/background site
+  # resolves to its current literal on the no-theme path (byte-identical) and
+  # to the swapped pole under a theme. When a `:theme` is supplied the base
+  # becomes `Rendro.Theme.resolve(theme).colors` (9 integer-{r,g,b} roles,
+  # colors ONLY — no type-scale read). The final `Map.merge(base,
+  # :palette-override)` keeps an explicit `:palette` as the winning layer
+  # (D-01). Non-color numerics (band stroke `width: 0.75`) are NOT seamed.
   defp palette(opts) do
     base =
       case opts[:theme] do
         nil ->
           %{
+            ink: {0, 0, 0},
+            muted: {0, 0, 0},
+            background: {255, 255, 255},
             surface: {245, 245, 245},
             rule: {0, 0, 0}
           }
@@ -370,6 +399,7 @@ defmodule Rendro.Recipes.Statement do
   end
 
   defp body_section(%{opening_balance: ob, lines: lines} = _data, opts) do
+    colors = palette(opts)
     fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
     fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
     lbl = Rendro.Recipes.Pagination.label_resolver(opts)
@@ -379,10 +409,18 @@ defmodule Rendro.Recipes.Statement do
     table_header = ["Date", "Description", "Amount", lbl.(:balance)]
     table_opts = [header: table_header, columns: @table_columns]
 
-    # Convert balanced rows to formatted table rows (strings).
+    # Convert balanced rows to formatted table rows, seamed to `colors.ink`
+    # (D-02) via `cell_text/2` at size 12 — the implicit `Rendro.Text` default
+    # a plain-string cell already normalized to (Pitfall 1). Color does not
+    # affect measurement, so heights/chunking below are unchanged.
     formatted_rows =
       Enum.map(rows_with_balance, fn %{date: d, description: desc, amount: amt, balance: bal} ->
-        [fmt_date.(d), desc, fmt_amount.(amt), fmt_amount.(bal)]
+        [
+          cell_text(fmt_date.(d), colors),
+          cell_text(desc, colors),
+          cell_text(fmt_amount.(amt), colors),
+          cell_text(fmt_amount.(bal), colors)
+        ]
       end)
 
     # D-09: measure all rows at the body region width using the engine's OWN
@@ -454,7 +492,12 @@ defmodule Rendro.Recipes.Statement do
         # carried-forward: last row of each non-final page (balance at current page's break)
         cf_row =
           if idx < last_page_idx do
-            [lbl.(:carried_forward), "", "", fmt_amount.(balance_at_break)]
+            [
+              cell_text(lbl.(:carried_forward), colors),
+              cell_text("", colors),
+              cell_text("", colors),
+              cell_text(fmt_amount.(balance_at_break), colors)
+            ]
           else
             nil
           end
@@ -462,7 +505,12 @@ defmodule Rendro.Recipes.Statement do
         # brought-forward: first row of each page after page 1 (balance from previous page's break)
         bf_row =
           if idx > 0 do
-            [lbl.(:brought_forward), "", "", fmt_amount.(prev_balance)]
+            [
+              cell_text(lbl.(:brought_forward), colors),
+              cell_text("", colors),
+              cell_text("", colors),
+              cell_text(fmt_amount.(prev_balance), colors)
+            ]
           else
             nil
           end
@@ -486,8 +534,19 @@ defmodule Rendro.Recipes.Statement do
     )
   end
 
+  # Every body/CF/BF table cell renders at the SAME explicit size (12 — the
+  # implicit `Rendro.Text` default a plain-string cell already normalized to,
+  # Pitfall 1), now carrying a swappable `color: colors.ink` (D-02). Color
+  # does not affect measurement, so `Rendro.measure_rows` and `Rendro.table`
+  # both fed these same cells stay byte-identical on the no-theme path.
+  defp cell_text(text, colors),
+    do: Rendro.block(Rendro.text(text, size: 12, color: colors.ink))
+
   defp footer_section(_data, opts) do
-    page_number_opts = Keyword.get(opts, :page_number_opts, [])
+    colors = palette(opts)
+
+    page_number_opts =
+      Keyword.put_new(Keyword.get(opts, :page_number_opts, []), :color, colors.muted)
 
     Rendro.section(
       name: :statement_footer,
