@@ -10,11 +10,20 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
 
   @manifest_path "priv/quality/rubric_scores.json"
   @schema_path "priv/schemas/rubric_scores.schema.json"
+  @gallery_manifest_path "assets/rendro/artifacts.json"
 
   defp manifest do
     @manifest_path
     |> File.read!()
     |> JSON.decode!()
+  end
+
+  defp gallery_png_paths do
+    @gallery_manifest_path
+    |> File.read!()
+    |> JSON.decode!()
+    |> Map.fetch!("gallery")
+    |> MapSet.new(& &1["png_path"])
   end
 
   defp rubric_schema do
@@ -110,6 +119,43 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
                "but recomputation from its own dimension_scores/gate_results yields " <>
                "#{inspect(recomputed)} — the manifest's passed field must equal the " <>
                "passed?/2 arithmetic, never an independent assertion (SHOW-01 honesty gate)"
+    end
+  end
+
+  test "every passed:true entry carries a live, hash-checked human sign-off (DEFAULT-02 honesty gate)" do
+    # D-02 machine-enforced sign-off teeth: a `passed: true` verdict may never be recorded
+    # without provenance. This is the load-bearing guard (schema if/then is the secondary
+    # layer) — it must fail loud in BOTH directions: a passed:true without a live
+    # hash-checked evidence_ref fails the build; a passed:false must never be blocked by
+    # this loop (an honest failing finding, e.g. Ticket, must still pass the contract test).
+    scores = manifest()["scores"]
+    known_png_paths = gallery_png_paths()
+
+    for entry <- scores do
+      if entry["passed"] == true do
+        signed_off_by = entry["signed_off_by"]
+        signed_off_at = entry["signed_off_at"]
+        evidence_ref = entry["evidence_ref"]
+
+        assert is_binary(signed_off_by) and signed_off_by != "",
+               "demo #{entry["demo_id"]}: passed:true requires a non-empty signed_off_by"
+
+        assert is_binary(signed_off_at) and signed_off_at != "",
+               "demo #{entry["demo_id"]}: passed:true requires a non-empty signed_off_at"
+
+        assert is_binary(evidence_ref) and evidence_ref != "",
+               "demo #{entry["demo_id"]}: passed:true requires a non-empty evidence_ref"
+
+        assert File.exists?(evidence_ref),
+               "demo #{entry["demo_id"]}: evidence_ref #{inspect(evidence_ref)} does not " <>
+                 "exist on disk — a passed:true verdict must point at a real artifact"
+
+        assert MapSet.member?(known_png_paths, evidence_ref),
+               "demo #{entry["demo_id"]}: evidence_ref #{inspect(evidence_ref)} is not " <>
+                 "present in the hash-checked #{@gallery_manifest_path} gallery — a " <>
+                 "passed:true verdict must point at a manifest-covered, hash-verified " <>
+                 "raster, not an untracked file"
+      end
     end
   end
 

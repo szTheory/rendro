@@ -134,9 +134,19 @@
         },
         "passed": { "type": "boolean" },
         "recorded_at": { "type": "string", "format": "date" },
-        "stress_exempt": { "type": "boolean" }
+        "stress_exempt": { "type": "boolean" },
+        "signed_off_by": { "type": "string", "minLength": 1 },
+        "signed_off_at": { "type": "string", "format": "date" },
+        "evidence_ref": { "type": "string", "minLength": 1 }
       },
-      "additionalProperties": true
+      "additionalProperties": true,
+      "if": {
+        "properties": { "passed": { "const": true } },
+        "required": ["passed"]
+      },
+      "then": {
+        "required": ["signed_off_by", "signed_off_at", "evidence_ref"]
+      }
     }
   }
 }

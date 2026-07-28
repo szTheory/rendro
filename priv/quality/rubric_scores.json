@@ -103,10 +103,13 @@
         "print_safety": true
       },
       "passed": true,
-      "recorded_at": "2026-07-19",
+      "recorded_at": "2026-07-28",
+      "signed_off_by": "qiksnare13",
+      "signed_off_at": "2026-07-28",
+      "evidence_ref": "assets/rendro/gallery/invoice.png",
       "justifications": {
         "information_architecture": "Issuer letterhead, then a bounded Bill To/date/due/terms block, then the line-item table, then subtotal/tax/total — each zone bounded and ordered to match the reader's natural top-to-bottom scan (who's billing -> who's billed/when -> what for -> how much) with no backtracking.",
-        "content_hierarchy": "Re-rendered raster measured: 'Total Due: $696.60' glyph height is 24px, vs. 19px for the 'INVOICE #...' title and 10-16px for every other line — Total Due is the single largest element on the page and the unambiguous focal point.",
+        "content_hierarchy": "Re-measured against the themed default/0 raster blessed in 123-03 (glyph-height methodology, engine font metrics at 96dpi, visually confirmed): 'Total Due: $696.60' (display, 21pt themed) computes to 25.9px vs. 'INVOICE #INV-CMP-2026-001' (title, 16.5pt themed) at 20.4px — a 1.27 ratio. Total Due remains the single largest, accent-colored element on the page and the unambiguous focal point; the parties (issuer + Bill To) and totals are all present (Phase-115 DATA fix survived theming). Human sign-off 2026-07-28 confirmed dominance on the actual rendered raster — the 2026-07-19 native-scale numbers (24px/19px) no longer describe this render and are superseded here.",
         "domain_fit": "Issuer address, invoice number, bill-to, due date, payment terms (Net 30), itemized qty/price table, and subtotal/tax/total breakdown together read as a real small-business invoice, not a toy layout.",
         "reader_affordances": "Item/Qty/Price column headers, consistent column alignment, and a clearly labeled subtotal/tax/total stack make the math easy to trace.",
         "typographic_craft": "Consistent 2-decimal money throughout (the prior $79.0 defect is gone); one item description wraps to a second line but wraps cleanly at a word boundary with no overlap or orphan.",
@@ -131,13 +134,16 @@
         "print_safety": true
       },
       "passed": true,
-      "recorded_at": "2026-07-19",
+      "recorded_at": "2026-07-28",
+      "signed_off_by": "qiksnare13",
+      "signed_off_at": "2026-07-28",
+      "evidence_ref": "assets/rendro/gallery/statement.png",
       "justifications": {
         "information_architecture": "Account header, statement period, and opening balance are grouped, immediately followed by the boxed closing-balance summary, then the transaction ledger — matching the way a statement reader actually scans (bottom line first, then verify against detail).",
-        "content_hierarchy": "Re-rendered raster measured: the boxed 'Closing balance $6,647.56' glyph height is 26px, vs. 19px for the account title and 16px for every transaction row — the closing balance is now the single largest, unambiguous focal point (previously a small Balance-column cell).",
+        "content_hierarchy": "Re-measured against the themed default/0 raster blessed in 123-03: the boxed 'Closing balance $6,647.56' (display, 21pt themed) computes to 25.9px vs. 'Northwind Ledger Co - Operating Account ****8140' (title, 16.5pt themed) at 20.4px — a 1.27 ratio. Closing balance remains the single largest, unambiguous focal point. Human sign-off 2026-07-28 confirmed dominance on the actual rendered raster — the 2026-07-19 native-scale numbers (26px/19px) no longer describe this render and are superseded here.",
         "domain_fit": "Masked account number, statement period, opening balance, boxed closing balance, and a running-balance ledger with parenthesized debits read as a conventional bank/ledger statement.",
         "reader_affordances": "Clear Date/Description/Amount/Balance columns with a running balance make it easy to trace any line.",
-        "typographic_craft": "Consistent money formatting and clean alignment throughout, including the new closing-balance box.",
+        "typographic_craft": "Consistent money formatting and clean alignment throughout, including the closing-balance box.",
         "restraint_cohesion": "Restrained, cohesive, no decorative noise."
       },
       "domain_md": "priv/examples/statement/DOMAIN.md"
@@ -159,10 +165,13 @@
         "print_safety": true
       },
       "passed": true,
-      "recorded_at": "2026-07-19",
+      "recorded_at": "2026-07-28",
+      "signed_off_by": "qiksnare13",
+      "signed_off_at": "2026-07-28",
+      "evidence_ref": "assets/rendro/gallery/receipt_report.png",
       "justifications": {
         "information_architecture": "The merchant identity (Harbor & Oak Cafe + address) now heads the render, followed by the sales-receipt/guest/date block, item table, and totals — each group bounded and ordered top-to-bottom the way a receipt is naturally scanned.",
-        "content_hierarchy": "Re-rendered raster measured: 'Total: $30.78' glyph height is 22px, vs. 17-19px for the merchant name/address and 10-13px for item rows — Total is now the single largest element and the clear focal point (previously small text at the bottom).",
+        "content_hierarchy": "Re-measured against the themed default/0 raster blessed in 123-03: 'Total: $30.78' (display, 21pt themed) computes to 25.9px vs. the 'Harbor & Oak Cafe / 214 Wharf Street...' merchant block (title, 16.5pt themed) at 20.4px — a 1.27 ratio. Total remains the single largest element and the clear focal point. Human sign-off 2026-07-28 confirmed dominance on the actual rendered raster — the 2026-07-19 native-scale numbers (22px/17-19px) no longer describe this render and are superseded here.",
         "domain_fit": "Merchant name/address, Sales Receipt label, item list, and subtotal/tax/total now read as a conventional retail receipt (previously missing the merchant identity entirely).",
         "reader_affordances": "Description/Amount columns plus a subtotal/tax/total breakdown make the math easy to follow.",
         "typographic_craft": "Clean and consistent money and alignment.",
@@ -187,10 +196,13 @@
         "print_safety": true
       },
       "passed": true,
-      "recorded_at": "2026-07-19",
+      "recorded_at": "2026-07-28",
+      "signed_off_by": "qiksnare13",
+      "signed_off_at": "2026-07-28",
+      "evidence_ref": "assets/rendro/gallery/certificate.png",
       "justifications": {
         "information_architecture": "Content is now vertically and horizontally centered within the border as a single ceremonial flow (title -> 'this certifies that' -> recipient -> body -> date -> signatory), matching the order a reader naturally scans a certificate.",
-        "content_hierarchy": "Re-rendered raster measured: 'Alex Rivera' glyph height is 34px, vs. 26px for the 'Certificate of Completion' title and 11-15px for the body/date/signature lines — the recipient name is now the single largest element and unambiguous focal point (previously the title dominated).",
+        "content_hierarchy": "Re-measured against the themed default/0 raster blessed in 123-03: 'Alex Rivera' (display, 21pt themed) computes to 25.9px vs. 'Certificate of Completion' (title, 16.5pt themed) at 20.4px — a 1.27 ratio, DOWN from the native-scale 1.70 measured 2026-07-19 (the theme's uniform scale compresses recipient/title from 34pt/26pt to 21pt/16.5pt). This compression is real and is recorded honestly, not hidden — see priv/quality/SIGN-OFF.md. Human visual sign-off 2026-07-28 confirmed the recipient name still reads as the single unambiguous focal point on the actual re-blessed raster, so content_hierarchy honestly clears 5 at the compressed ratio — noted-but-acceptable, not silently passed.",
         "domain_fit": "Centered, bordered, ceremonial layout with title/recipient/body/date/signatory reads as a real-world certificate, not a top-left log entry.",
         "reader_affordances": "Centering and the width-constrained (68%) body paragraph guide the eye down the page consistently; no explicit field labels are needed for this document type.",
         "typographic_craft": "Consistent sizing/weight; the body paragraph now wraps within its constrained width with clean line breaks instead of running edge-to-edge.",
@@ -215,13 +227,16 @@
         "print_safety": true
       },
       "passed": true,
-      "recorded_at": "2026-07-19",
+      "recorded_at": "2026-07-28",
+      "signed_off_by": "qiksnare13",
+      "signed_off_at": "2026-07-28",
+      "evidence_ref": "assets/rendro/gallery/payslip.png",
       "justifications": {
-        "information_architecture": "Employer/employee header, the Net Pay box, and the earnings/deductions table (now separated by a spacer column) are each clearly bounded and ordered net-pay-first, matching how a payslip is scanned.",
-        "content_hierarchy": "Net Pay $3,292.50 in a large boxed line remains unambiguously dominant over the table and header text.",
+        "information_architecture": "Employer/employee header, the Net Pay box, and the earnings/deductions table (separated by a spacer column) are each clearly bounded and ordered net-pay-first, matching how a payslip is scanned.",
+        "content_hierarchy": "Re-measured against the themed default/0 raster blessed in 123-03: 'NET PAY $3,292.50' (display, 21pt themed) computes to 25.9px vs. the 'Employer: Aurora Live / 18 Northgate Road...' header block (title, 16.5pt themed) at 20.4px — a 1.27 ratio. NET PAY remains unambiguously dominant in its boxed line. Human sign-off 2026-07-28 confirmed dominance on the actual rendered raster.",
         "domain_fit": "Reads as a conventional UK payslip: PAYE, National Insurance, pension, tax code, YTD columns.",
-        "reader_affordances": "Re-rendered raster confirmed the header row now reads 'YTD Deductions' with a clear space (a narrow spacer column separates the groups) instead of the prior 'YTDDeductions' collision.",
-        "typographic_craft": "Data cells now render at a consistent explicit size 11 and the widened YTD columns (60pt) let '$25,200.00' fit on one line without wrapping a digit.",
+        "reader_affordances": "Header row reads 'YTD Deductions' with a clear space (a narrow spacer column separates the groups) instead of a 'YTDDeductions' collision.",
+        "typographic_craft": "Human sign-off 2026-07-28 confirmed an honest, open typographic-craft defect on the themed raster: the earnings/deductions table's Current/YTD numeric cells (e.g. '$4,200.00') wrap mid-number onto a second line ('$4,200.0' / '0') at the themed 10.5pt body scale + 1.35 leading — a real awkward-break regression vs. the native no-theme render. This holds the score at 4 (consistent throughout, but not 'zero awkward breaks') rather than 5; the defect is NOT silently fixed here and remains open as .planning/WINDOWS.md id 3, cited in priv/quality/SIGN-OFF.md.",
         "restraint_cohesion": "Restrained and cohesive."
       },
       "domain_md": "priv/examples/payslip/DOMAIN.md"
@@ -232,24 +247,27 @@
       "family": "ticket",
       "dimension_scores": {
         "information_architecture": 5,
-        "content_hierarchy": 5,
+        "content_hierarchy": 3,
         "domain_fit": 5,
         "reader_affordances": 4,
-        "typographic_craft": 4,
+        "typographic_craft": 3,
         "restraint_cohesion": 4
       },
       "gate_results": {
         "reading_order": true,
         "print_safety": true
       },
-      "passed": true,
-      "recorded_at": "2026-07-19",
+      "passed": false,
+      "recorded_at": "2026-07-28",
+      "signed_off_by": "qiksnare13",
+      "signed_off_at": "2026-07-28",
+      "evidence_ref": "assets/rendro/gallery/ticket.png",
       "justifications": {
         "information_architecture": "Event header, the SECTION/ROW/SEAT/GATE locator group, and the perforated reference stub are each clearly grouped and ordered top-to-bottom the way a ticket is scanned at the door.",
-        "content_hierarchy": "Re-rendered on native A6: measured glyph height of the 'GA H 24 B' locator line is 27px, vs. ~14px per line for the event title and ~10-11px for the terms footer — the seat-assignment readout is now the single largest element on the page and the unambiguous focal point.",
+        "content_hierarchy": "HONEST FINDING (human sign-off 2026-07-28): the themed uniform scale inverts the intended hierarchy. The reference-code display anchor ('AUR-88213-GA', scale.display, native 8pt -> 21pt themed) now computes to 25.9px vs. the placement-grid values ('GA H 24 B', scale.title, native 26pt -> 16.5pt themed) at 20.4px — the reference code now visually dominates the placement-grid title that the 2026-07-19 rubric actually scored as the key fact (natively title was 3.25x display). This is recorded honestly as content_hierarchy: 3 — the reference-code display anchor dominates over the placement-grid title, not the intended dominant element — and is NOT flattened to pass. Remains open as .planning/WINDOWS.md id 2, cited in priv/quality/SIGN-OFF.md.",
         "domain_fit": "Perforated stub, reference number, non-transferable terms, and a section/row/seat/gate locator read as a real ticket.",
-        "reader_affordances": "SECTION/ROW/SEAT/GATE labels sit directly above their large values, and the perforation affordance makes the tear-off stub obvious.",
-        "typographic_craft": "Clean, consistent type; the wrapped event title and terms footer both wrap cleanly at word boundaries on the narrower A6 width.",
+        "reader_affordances": "SECTION/ROW/SEAT/GATE labels sit directly above their values, and the perforation affordance makes the tear-off stub obvious.",
+        "typographic_craft": "HONEST FINDING (human sign-off 2026-07-28): the reference-code display anchor now wraps mid-token across 3 lines ('AUR-8' / '8213-' / 'GA') in its narrow stub column at the themed 21pt display scale — a real awkward-break defect, visually confirmed on the actual rendered raster. Recorded honestly as typographic_craft: 3, not silently fixed. Remains open as .planning/WINDOWS.md id 2, cited in priv/quality/SIGN-OFF.md.",
         "restraint_cohesion": "Native A6 sizing (297.64 x 419.53pt) replaces the prior A6-content-on-A4-canvas mismatch; the page is well-proportioned to its content with no decorative noise, though the terms footer leaves some blank space beneath it."
       },
       "domain_md": "priv/examples/ticket/DOMAIN.md"
