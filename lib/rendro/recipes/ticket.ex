@@ -285,7 +285,7 @@ defmodule Rendro.Recipes.Ticket do
   # stacking -- a hand-stacked multi-column layout would require fragile
   # height-zeroing tricks against paginate.ex's single shared per-region Y
   # cursor; a table's own column-layout logic already handles this
-  # correctly). One data row of large (@placement_value_size pt) values
+  # correctly). One data row of large (scale.title, 26pt default) values
   # under a header row of small caps (8pt) labels -- the values are the
   # single largest text anywhere on the page, matching D-02's dominant-anchor
   # requirement. 118-08 gap-closure (SHOW-01): bumped from 22pt so the WHOLE
