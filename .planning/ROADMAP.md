@@ -18,7 +18,7 @@
 - [x] **Phase 120: S1 seam retrofit + full `theme:` swap across all 7 recipes** — retrofit the 4 un-seamed recipes (Statement/Certificate/Receipt/BrandedInvoice) with a byte-identical `palette/1` seam first, then swap all 7 to read `theme.colors.*` threaded through the 3 rungs; the no-theme call stays a byte-identity no-op. (completed 2026-07-27)
 - [ ] **Phase 121: Light/dark background-fill mechanism (all 7 recipes)** — a role-derived full-page `:background` page-template region that repeats on every page (including overflow), giving every recipe dark for free, with the light default emitting no rect and staying byte-identical.
 - [x] **Phase 122: Typography type-scale application + font-role/leading wiring** — thread the materialized named type scale, `FontRegistry` font roles, and `leading`/widows/orphans into `%Text{}` across recipes (the biggest rubric-hierarchy lever), with `default/0` a metric no-op that leaves Phase-117 goldens unchanged. (completed 2026-07-28)
-- [ ] **Phase 123: `from_brand/2` E2E + honest rubric-gap closure + gallery/docs/manifest closure** — deliver the strong unbranded `default/0` and brand-seeded theming end-to-end, close the Phase-118 SHOW-01 gap in the honest order (fix DATA first, theme second, re-score with human sign-off), populate S6 gallery tags, and land `guides/theming.md` + support-matrix rows with all lanes green.
+- [x] **Phase 123: `from_brand/2` E2E + honest rubric-gap closure + gallery/docs/manifest closure** — deliver the strong unbranded `default/0` and brand-seeded theming end-to-end, close the Phase-118 SHOW-01 gap in the honest order (fix DATA first, theme second, re-score with human sign-off), populate S6 gallery tags, and land `guides/theming.md` + support-matrix rows with all lanes green. (completed 2026-07-28)
 
 <details>
 <summary>✅ v2.10 Realistic Business-Document Examples & Anatomy (Phases 114-118) — SHIPPED 2026-07-19</summary>
@@ -194,7 +194,7 @@ Plans:
 | 120. S1 seam retrofit + full `theme:` swap (7 recipes) | v2.11 | 4/4 | Complete    | 2026-07-27 |
 | 121. Light/dark background-fill mechanism (7 recipes) | v2.11 | 4/4 | Complete    | 2026-07-28 |
 | 122. Typography type-scale + font-role/leading wiring | v2.11 | 5/5 | Complete    | 2026-07-28 |
-| 123. `from_brand/2` E2E + honest rubric-gap + docs closure | v2.11 | 5/5 | In Progress|  |
+| 123. `from_brand/2` E2E + honest rubric-gap + docs closure | v2.11 | 5/5 | Complete    | 2026-07-28 |
 
 ## Current Focus
 

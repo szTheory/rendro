@@ -2,12 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
-current_phase: 123
-current_phase_name: from-brand-2-e2e-honest-rubric-gap-closure-gallery-docs-mani
-status: verifying
+current_phase: 121
+current_phase_name: all 7 recipes
+status: planning
 stopped_at: Completed 123-05-PLAN.md
-last_updated: "2026-07-28T20:55:50.240Z"
+last_updated: "2026-07-28T21:08:46.675Z"
 last_activity: 2026-07-28
+last_activity_desc: Phase 123 complete, transitioned to Phase 121
 progress:
   total_phases: 12
   completed_phases: 5
@@ -27,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-07-27)
 
 ## Current Position
 
-Phase: 123 (from-brand-2-e2e-honest-rubric-gap-closure-gallery-docs-mani) — EXECUTING
-Plan: 5 of 5
-Status: Phase complete — ready for verification
-Last activity: 2026-07-28
+Phase: 121 — Light/dark background-fill mechanism (all 7 recipes)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-07-28 — Phase 123 complete, transitioned to Phase 121
 
 Progress: [████████░░] 84%
 
