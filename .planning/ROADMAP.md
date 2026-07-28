@@ -114,12 +114,12 @@ Plans:
   2. Dark mode paints a full-page background on **EVERY** page including paginate-generated overflow pages (via a first-in-list `:background` page-template region, zero paginate change), while the light default emits **no** background rect and stays **byte-identical** to v2.10 — both proven by determinism goldens (light emits no rect; dark paints a forced-overflow page).
   3. Dark is documented as a screen-oriented mode with an explicit non-print-recommended boundary and a `theming.dark` support-matrix row — no print-safety or accessibility/PDF-UA claim; every shipped demo is light.
 
-**Plans**: 4 plans
+**Plans**: 1/4 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 121-01-PLAN.md — TRACER: `Rendro.Recipes.Background` helper + Statement end-to-end (region/section/text-seam/nil-branch) + dark golden test (page-1 first-op + forced-overflow), bless Statement dark golden [Wave 1]
+- [x] 121-01-PLAN.md — TRACER: `Rendro.Recipes.Background` helper + Statement end-to-end (region/section/text-seam/nil-branch) + dark golden test (page-1 first-op + forced-overflow), bless Statement dark golden [Wave 1]
 - [ ] 121-04-PLAN.md — Docs-contract boundary: `theming` support-matrix rows + `dark/1` @doc non-print sentence + `theming_claims_test.exs` (overclaim tripwire) [Wave 1]
 
 **Wave 2** *(blocked on 121-01: shared helper + dark golden test file)*
@@ -162,7 +162,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 119. `Rendro.Theme` core module (the one-way door) | v2.11 | 2/2 | Complete    | 2026-07-24 |
 | 120. S1 seam retrofit + full `theme:` swap (7 recipes) | v2.11 | 4/4 | Complete    | 2026-07-27 |
-| 121. Light/dark background-fill mechanism (7 recipes) | v2.11 | 0/4 | Not started | - |
+| 121. Light/dark background-fill mechanism (7 recipes) | v2.11 | 1/4 | In Progress|  |
 | 122. Typography type-scale + font-role/leading wiring | v2.11 | 0/TBD | Not started | - |
 | 123. `from_brand/2` E2E + honest rubric-gap + docs closure | v2.11 | 0/TBD | Not started | - |
 

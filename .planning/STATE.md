@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
 current_phase: 121
-current_phase_name: Light/dark background-fill mechanism (all 7 recipes)
-status: planning
-stopped_at: Phase 121 context gathered
-last_updated: "2026-07-27T22:46:59.876Z"
-last_activity: 2026-07-27
-last_activity_desc: Phase 120 complete, transitioned to Phase 121
+current_phase_name: light-dark-background-fill-mechanism-all-7-recipes
+status: executing
+stopped_at: Completed 121-01-PLAN.md
+last_updated: "2026-07-28T00:26:25.716Z"
+last_activity: 2026-07-28
+last_activity_desc: Phase 121 execution started
 progress:
   total_phases: 10
   completed_phases: 2
-  total_plans: 11
-  completed_plans: 7
+  total_plans: 15
+  completed_plans: 8
   percent: 20
 ---
 
@@ -24,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-27)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 121 — Light/dark background-fill mechanism (all 7 recipes)
+**Current focus:** Phase 121 — light-dark-background-fill-mechanism-all-7-recipes
 
 ## Current Position
 
-Phase: 121 — Light/dark background-fill mechanism (all 7 recipes)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-07-27 — Phase 120 complete, transitioned to Phase 121
+Phase: 121 (light-dark-background-fill-mechanism-all-7-recipes) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-07-28 -- Phase 121 execution started
 
-Progress: [█████████████░░░░░░░] 7/11 plans (64%)
+Progress: [█████████████░░░░░░░] 7/11 plans ([█████░░░░░] 53%)
 
 ## Roadmap Snapshot (v2.11, Phases 119-123)
 
@@ -68,6 +68,7 @@ Full log in PROJECT.md Key Decisions. Milestone-B locks carried into planning:
 - [Phase ?]: 120-02: Receipt/BrandedInvoice page_template/1 KeyError gotcha fixed via Keyword.take struct-key whitelist (dropping :palette/:theme so they thread to palette/1).
 - [Phase ?]: Phase 120 Plan 03: swapped Statement/Certificate/Receipt/BrandedInvoice palette/1 to theme.colors via case opts[:theme]; :palette wins over :theme (D-01); no-theme byte-identical (PLUMB-03)
 - [Phase ?]: 120-04: swapped Invoice/Payslip/Ticket palette/1 to theme.colors via case opts[:theme]; :palette wins over :theme (D-01); no-theme byte-identical (PLUMB-03). Phase-wide no_inline_color_literals source-scan (PLUMB-02) + typography-free guard (D-04) added. Phase 120 complete: all 7 recipes themable.
+- [Phase ?]: 121-01: Rendro.Recipes.Background helper (emit?/region/section) created as the single source of truth for the :background full-page fill; Statement fully text-seamed + wired, byte-identical light path, dark golden blessed
 
 ### Pending Todos
 
@@ -88,11 +89,17 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-27T22:46:59.865Z
-Stopped at: Phase 121 context gathered
-Resume file: .planning/phases/121-light-dark-background-fill-mechanism-all-7-recipes/121-CONTEXT.md
+Last session: 2026-07-28T00:26:25.710Z
+Stopped at: Completed 121-01-PLAN.md
+Resume file: None
 
 ## Next Steps
 
 1. `/gsd-discuss-phase 121` — gather context for the light/dark background-fill mechanism: a role-derived full-page `:background` page-template region that repeats on every page (incl. overflow), giving every recipe dark for free, with the light default emitting no rect and staying byte-identical. (Watch WR-01 from Phase 120: Statement's closing-balance band text is not seamed and would be invisible on a dark background — seam it here.)
 2. `/gsd-plan-phase 121` — skip discussion and plan directly.
+
+## Performance Metrics
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 121 P01 | 25min | 2 tasks | 4 files |
