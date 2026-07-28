@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
-current_phase: 121
-current_phase_name: all 7 recipes
-status: planning
-stopped_at: Completed 123-05-PLAN.md
+current_phase: 123
+current_phase_name: "`from_brand/2` E2E + honest rubric-gap closure + gallery/docs/manifest closure"
+status: complete
+stopped_at: Milestone v2.11 fully executed — all phases 119-123 complete and verified, ready to close
 last_updated: "2026-07-28T21:08:46.675Z"
 last_activity: 2026-07-28
-last_activity_desc: Phase 123 complete, transitioned to Phase 121
+last_activity_desc: Phase 123 complete — milestone v2.11 (119-123) all phases done and verified
 progress:
   total_phases: 12
   completed_phases: 5
@@ -28,22 +28,22 @@ See: .planning/PROJECT.md (updated 2026-07-27)
 
 ## Current Position
 
-Phase: 121 — Light/dark background-fill mechanism (all 7 recipes)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-07-28 — Phase 123 complete, transitioned to Phase 121
+Phase: 123 — `from_brand/2` E2E + honest rubric-gap closure + gallery/docs/manifest closure (complete)
+Plan: 5/5 complete — phase verified (123-VERIFICATION.md: passed, 5/5 must-haves)
+Status: Milestone v2.11 complete — all phases 119-123 done; ready to close/ship (triage WINDOWS first)
+Last activity: 2026-07-28 — Phase 123 complete; milestone v2.11 fully executed
 
-Progress: [████████░░] 84%
+Progress: [██████████] 100%
 
 ## Roadmap Snapshot (v2.11, Phases 119-123)
 
 ```text
-[████████████████░░░░░░░░░░░░░░░░░░░░░░░░] 40% — 2/5 phases complete
+[████████████████████████████████████████] 100% — 5/5 phases complete
 Phase 119 Rendro.Theme core module (one-way door) ........ ✓ Complete
 Phase 120 S1 retrofit + theme: swap (7 recipes) .......... ✓ Complete
-Phase 121 Light/dark background-fill mechanism ........... Ready to plan
-Phase 122 Typography type-scale application .............. Not started
-Phase 123 from_brand/2 E2E + honest rubric-gap + docs .... Not started
+Phase 121 Light/dark background-fill mechanism ........... ✓ Complete
+Phase 122 Typography type-scale application .............. ✓ Complete
+Phase 123 from_brand/2 E2E + honest rubric-gap + docs .... ✓ Complete
 ```
 
 ## Accumulated Context
