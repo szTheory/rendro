@@ -173,7 +173,7 @@ Plans:
 
 **Wave 2** *(blocked on 123-01: honest-order Commit-1 isolation)*
 
-- [ ] 123-02-PLAN.md — Commit 2a: `default/0` `leading: 1.35` value change + Certificate themed single-page fit-check + no-theme byte-identity guard [Wave 2]
+- [x] 123-02-PLAN.md — Commit 2a: `default/0` `leading: 1.35` value change + Certificate themed single-page fit-check + no-theme byte-identity guard [Wave 2]
 
 **Wave 3** *(blocked on 123-02: leading applied before themed re-bless)*
 
@@ -194,7 +194,7 @@ Plans:
 | 120. S1 seam retrofit + full `theme:` swap (7 recipes) | v2.11 | 4/4 | Complete    | 2026-07-27 |
 | 121. Light/dark background-fill mechanism (7 recipes) | v2.11 | 4/4 | Complete    | 2026-07-28 |
 | 122. Typography type-scale + font-role/leading wiring | v2.11 | 5/5 | Complete    | 2026-07-28 |
-| 123. `from_brand/2` E2E + honest rubric-gap + docs closure | v2.11 | 1/5 | In Progress|  |
+| 123. `from_brand/2` E2E + honest rubric-gap + docs closure | v2.11 | 2/5 | In Progress|  |
 
 ## Current Focus
 

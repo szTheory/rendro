@@ -2,19 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
-current_phase: 123
-current_phase_name: from-brand-2-e2e-honest-rubric-gap-closure-gallery-docs-mani
 status: executing
-stopped_at: Completed 123-01-PLAN.md
-last_updated: "2026-07-28T19:03:38.821Z"
+stopped_at: Completed 123-02-PLAN.md
+last_updated: "2026-07-28T19:19:19.145Z"
 last_activity: 2026-07-28
-last_activity_desc: Phase 123 execution started
 progress:
-  total_phases: 12
+  total_phases: 5
   completed_phases: 4
-  total_plans: 25
+  total_plans: 20
   completed_plans: 17
-  percent: 33
+  percent: 80
 ---
 
 # Project State
@@ -29,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-27)
 ## Current Position
 
 Phase: 123 (from-brand-2-e2e-honest-rubric-gap-closure-gallery-docs-mani) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
-Last activity: 2026-07-28 — Phase 123 execution started
+Last activity: 2026-07-28
 
-Progress: [███████░░░] 68%
+Progress: [█████████░] 85%
 
 ## Roadmap Snapshot (v2.11, Phases 119-123)
 
@@ -85,6 +82,7 @@ Full log in PROJECT.md Key Decisions. Milestone-B locks carried into planning:
 - [Phase ?]: 122-05: Payslip theme branch remaps fonts onto :payslip_sans (its only fallback-bearing font) to close CR-01 — themed Payslip renders its own masked/accented data; glyph correctness outranks a themed font swap since no shipped theme sets non-:default fonts
 - [Phase ?]: 122-05: Certificate centering-measurement font keyed on the emitted font_role via centering_measure_font/1; non-Helvetica-metric role raises {:unsupported_centered_font_role} (WR-01). Certificate has no non-centered run so {:unknown_text_font} stays representatively proven on Statement
 - [Phase ?]: 123-01: Committed a test asserting transform_invoice/1's issuer/customer/totals.total survive (non-nil), locking the Phase-115 DATA fix as Commit 1 of the D-05 honest order (test-only diff, verified via git show --stat)
+- [Phase ?]: 123-02: leading 1.2 -> 1.35 landed as the sole D-01 value change (colors byte-identical); measure.ex scales EVERY %Text block's height by leading (not just multi-line prose) which crashed Statement/Payslip themed render with :content_overflow -- fixed via a theme-gated header/footer geometry budget (case opts[:theme], mirroring palette/1 idiom), no-theme byte-identity fully preserved
 
 ### Pending Todos
 
@@ -105,8 +103,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-28T19:03:33.089Z
-Stopped at: Completed 123-01-PLAN.md
+Last session: 2026-07-28T19:19:19.141Z
+Stopped at: Completed 123-02-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -128,3 +126,4 @@ Resume file: None
 | Phase 122 P04 | 4min | 2 tasks | 1 files |
 | Phase 122 P05 | 14min | 3 tasks | 5 files |
 | Phase 123 P01 | 2min | 2 tasks | 1 files |
+| Phase 123 P02 | 30min | 2 tasks | 7 files |
