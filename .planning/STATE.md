@@ -2,19 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
-current_phase: 121
-current_phase_name: light-dark-background-fill-mechanism-all-7-recipes
-status: executing
-stopped_at: Completed 121-02-PLAN.md
-last_updated: "2026-07-28T00:37:08.849Z"
+status: verifying
+stopped_at: Completed 121-03-PLAN.md
+last_updated: "2026-07-28T00:44:18.903Z"
 last_activity: 2026-07-28
-last_activity_desc: Phase 121 execution started
 progress:
-  total_phases: 10
-  completed_phases: 2
-  total_plans: 15
+  total_phases: 5
+  completed_phases: 3
+  total_plans: 10
   completed_plans: 10
-  percent: 20
+  percent: 60
 ---
 
 # Project State
@@ -30,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-07-27)
 
 Phase: 121 (light-dark-background-fill-mechanism-all-7-recipes) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
-Last activity: 2026-07-28 -- Phase 121 execution started
+Status: Phase complete — ready for verification
+Last activity: 2026-07-28
 
-Progress: [█████████████░░░░░░░] 7/11 plans ([███████░░░] 67%)
+Progress: [██████████] 100%
 
 ## Roadmap Snapshot (v2.11, Phases 119-123)
 
@@ -72,6 +69,8 @@ Full log in PROJECT.md Key Decisions. Milestone-B locks carried into planning:
 - [Phase ?]: 121-04: theming support-matrix rows (light=supported, dark=supported_screen_oriented) added with boundaries flat-map; dark/1 @doc gained explicit screen-oriented not-for-print sentence; theming_claims_test.exs binds every boundary to proof with overclaim tripwire + non-vacuity teeth
 - [Phase ?]: Certificate palette/1 nil-branch completed with ink/muted/background; deliberate non-black rule:{34,34,34} frame stress default preserved unchanged (121-02)
 - [Phase ?]: Certificate's own resolved landscape {pw,ph} threaded to Background.region/section — proves the dark mechanism on non-portrait geometry, never Statement's portrait A4 constants (121-02, Pitfall 4)
+- [Phase ?]: 121-03: Payslip/Invoice/Receipt/BrandedInvoice/Ticket all wire the shared :background region+section into page_template/1+sections/2, gated on Background.emit?(palette(opts)); BrandedInvoice gained explicit @page_width/@page_height (595.28x841.89) mirroring the PageTemplate struct default it always implicitly relied on; all 7 recipes now carry the dark-mode background mechanism
+- [Phase ?]: 121-03: fixed 2 stale PLUMB-02 whitelist tests (Receipt, BrandedInvoice) using theme: :ignored -- page_template/1 now resolves palette(opts) for real to gate the background region, so the placeholder atom no longer round-trips through Theme.resolve/1; swapped to theme: %{}
 
 ### Pending Todos
 
@@ -92,8 +91,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-28T00:37:08.842Z
-Stopped at: Completed 121-02-PLAN.md
+Last session: 2026-07-28T00:44:18.900Z
+Stopped at: Completed 121-03-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -108,3 +107,4 @@ Resume file: None
 | Phase 121 P01 | 25min | 2 tasks | 4 files |
 | Phase 121 P04 | 3min | 2 tasks | 3 files |
 | Phase 121 P02 | 12min | 2 tasks | 3 files |
+| Phase 121 P03 | 20min | 2 tasks | 7 files |

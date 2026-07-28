@@ -125,7 +125,7 @@ Plans:
 **Wave 2** *(blocked on 121-01: shared helper + dark golden test file)*
 
 - [x] 121-02-PLAN.md — Certificate wiring + text seam (colors.ink) + landscape dark golden (non-portrait geometry proof), bless Certificate dark golden [Wave 2]
-- [ ] 121-03-PLAN.md — Background region+section wiring for the 5 verify-only recipes (Payslip/Invoice/Receipt/BrandedInvoice/Ticket) [Wave 2]
+- [x] 121-03-PLAN.md — Background region+section wiring for the 5 verify-only recipes (Payslip/Invoice/Receipt/BrandedInvoice/Ticket) [Wave 2]
 
 ### Phase 122: Typography type-scale application + font-role/leading wiring
 
@@ -162,7 +162,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 119. `Rendro.Theme` core module (the one-way door) | v2.11 | 2/2 | Complete    | 2026-07-24 |
 | 120. S1 seam retrofit + full `theme:` swap (7 recipes) | v2.11 | 4/4 | Complete    | 2026-07-27 |
-| 121. Light/dark background-fill mechanism (7 recipes) | v2.11 | 3/4 | In Progress|  |
+| 121. Light/dark background-fill mechanism (7 recipes) | v2.11 | 4/4 | Complete   | 2026-07-28 |
 | 122. Typography type-scale + font-role/leading wiring | v2.11 | 0/TBD | Not started | - |
 | 123. `from_brand/2` E2E + honest rubric-gap + docs closure | v2.11 | 0/TBD | Not started | - |
 
