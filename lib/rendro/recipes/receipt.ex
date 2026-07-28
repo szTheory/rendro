@@ -275,8 +275,8 @@ defmodule Rendro.Recipes.Receipt do
     validate_data!(data)
     # 118-08: thread ONE resolved :header_height through both page_template/1
     # and sections/2 so the header region is tall enough for an optional
-    # :merchant identity block — see computed_header_height/1.
-    opts = Keyword.put_new(opts, :header_height, computed_header_height(data))
+    # :merchant identity block — see computed_header_height/2.
+    opts = Keyword.put_new(opts, :header_height, computed_header_height(data, opts))
     template = page_template(opts)
     secs = sections(data, opts)
 
@@ -389,7 +389,7 @@ defmodule Rendro.Recipes.Receipt do
     # 118-08: resolve the SAME header height page_template/1 uses for this
     # call so body capacity accounting matches the actual rendered header
     # region — never a stale constant.
-    resolved_header_height = Keyword.get(opts, :header_height, computed_header_height(data))
+    resolved_header_height = Keyword.get(opts, :header_height, computed_header_height(data, opts))
     body_height = @page_height - 2 * @margin - resolved_header_height - @footer_height
 
     # Body capacity (mirrors body_capacity formula for this template's geometry):
@@ -521,14 +521,35 @@ defmodule Rendro.Recipes.Receipt do
   # the enriched harbor-and-oak-cafe fixture end-to-end). Grows the header
   # ONLY when :merchant is present, so a caller without one still computes
   # exactly @default_header_height — unchanged geometry otherwise.
-  @spec computed_header_height(map()) :: number()
-  defp computed_header_height(data) do
+  #
+  # 123-03: the no-theme merchant budget (+40, comfortably covering the
+  # no-theme 16*1.2*2=38.4pt 2-line merchant block alongside the 3 base
+  # lines at native sizes) is a few points short of the THEMED path — the
+  # default theme's scale + the 1.35 leading (D-01) grow the same 4-line
+  # header to ~88.4pt against the frozen 88pt (48+40) budget, discovered
+  # regenerating the themed multi-page receipt_report gallery tile
+  # end-to-end. Mirrors Statement's `header_height/1` idiom (case
+  # opts[:theme]): the no-theme budget stays PLUMB-03 byte-identical; the
+  # themed path gets a wider merchant budget so the repeating header region
+  # never clips on any page.
+  @spec computed_header_height(map(), keyword()) :: number()
+  defp computed_header_height(data, opts) do
     case Map.get(data, :merchant) do
       nil -> @default_header_height
-      # merchant_block/1 renders at size 16 (2 lines when an address is
-      # present: 16 * 1.2 * 2 = 38.4pt) -- +40 comfortably covers both the
-      # 1-line (name only) and 2-line (name + address) cases.
-      _present -> @default_header_height + 40
+      _present -> @default_header_height + merchant_extra_height(opts)
+    end
+  end
+
+  # merchant_block/1 renders at size 16 (2 lines when an address is present:
+  # 16 * 1.2 * 2 = 38.4pt) -- +40 comfortably covers both the 1-line
+  # (name only) and 2-line (name + address) cases on the no-theme path.
+  defp merchant_extra_height(opts) do
+    case opts[:theme] do
+      nil -> 40
+      # Themed: title=16.5 * 1.35 leading * 2 lines = 44.55pt alone; +48
+      # covers the 2-line merchant block plus the themed title/customer/date
+      # trio's growth over the no-theme budget.
+      _theme -> 48
     end
   end
 

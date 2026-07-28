@@ -9,7 +9,7 @@ defmodule Rendro.DocsContract.LaunchArtifactsClaimsTest do
     assert Rendro.LaunchArtifacts.static_contract_errors() == []
   end
 
-  test "manifest records exactly the seven recipe previews" do
+  test "manifest records exactly the eleven recipe previews" do
     manifest = Rendro.LaunchArtifacts.read_manifest!()
 
     assert Enum.map(manifest["gallery"], & &1["id"]) == [
@@ -19,7 +19,11 @@ defmodule Rendro.DocsContract.LaunchArtifactsClaimsTest do
              "receipt_report",
              "certificate",
              "payslip",
-             "ticket"
+             "ticket",
+             "invoice_dark",
+             "certificate_dark",
+             "ticket_dark",
+             "invoice_brand"
            ]
   end
 
@@ -63,14 +67,19 @@ defmodule Rendro.DocsContract.LaunchArtifactsClaimsTest do
     readme = File.read!(@readme_path)
     recipes = File.read!(@recipes_path)
 
+    # D-03 (123-03): README shows only the readme_hero subset (9 of 11 rows);
+    # recipes.md is the full 11-row manifest.
     for entry <- manifest["gallery"] do
-      assert readme =~ entry["png_path"]
       assert recipes =~ entry["png_path"]
-      assert readme =~ ~s|alt="#{entry["alt"]}"|
       assert recipes =~ ~s|alt="#{entry["alt"]}"|
       assert String.trim(entry["alt"]) != ""
       assert recipes =~ entry["source_pdf_sha256"]
       assert recipes =~ entry["png_sha256"]
+    end
+
+    for entry <- manifest["gallery"], entry["readme_hero"] do
+      assert readme =~ entry["png_path"]
+      assert readme =~ ~s|alt="#{entry["alt"]}"|
     end
 
     for [_, href, src] <- Regex.scan(~r/<a href="([^"]+)"><img src="([^"]+)"/, readme) do
@@ -151,6 +160,10 @@ defmodule Rendro.DocsContract.LaunchArtifactsClaimsTest do
       "assets/rendro/gallery/certificate.png",
       "assets/rendro/gallery/payslip.png",
       "assets/rendro/gallery/ticket.png",
+      "assets/rendro/gallery/invoice_dark.png",
+      "assets/rendro/gallery/certificate_dark.png",
+      "assets/rendro/gallery/ticket_dark.png",
+      "assets/rendro/gallery/invoice_brand.png",
       "ADOPTION.md",
       "CHANGELOG.md"
     ]

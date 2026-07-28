@@ -31,11 +31,13 @@ Source PDFs and the self-rendered manual are byte-checked by the required docs c
 <a href="assets/rendro/gallery/certificate.png"><img src="assets/rendro/gallery/certificate.png" alt="Rendered landscape certificate PDF showing recipient text and geometry-derived keyline border." width="150"></a>
 <a href="assets/rendro/gallery/payslip.png"><img src="assets/rendro/gallery/payslip.png" alt="Rendered payslip PDF showing employer and employee details, earnings and deductions, and the net pay figure." width="150"></a>
 <a href="assets/rendro/gallery/ticket.png"><img src="assets/rendro/gallery/ticket.png" alt="Rendered event ticket PDF showing the event title, seat placement grid, and a human-readable reference code." width="150"></a>
+<a href="assets/rendro/gallery/invoice_dark.png"><img src="assets/rendro/gallery/invoice_dark.png" alt="Rendered invoice PDF in dark mode, showing the themed dark background applied to the header, line-item table, and thank-you footer. Dark mode is screen-oriented, not recommended for print." width="150"></a>
+<a href="assets/rendro/gallery/invoice_brand.png"><img src="assets/rendro/gallery/invoice_brand.png" alt="Rendered invoice PDF themed with a teal brand accent color via from_brand, showing the accent applied to the dominant Total Due figure. No logo or brand font assets are used." width="150"></a>
 </p>
 
 Self-rendered manual: [manual.pdf](assets/rendro/manual.pdf)
 
-SHA-256: `79bc2117272d7e8d2c7de275e06672a236fd9e84ecc6a736ee43585fba5a45e4`
+SHA-256: `743bdb487ff07c0ac0c2f9a2c1e1c34cf69c789200311600b48e8acdc1b7f186`
 <!-- rendro-launch-artifacts-end -->
 
 ## Guides

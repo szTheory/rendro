@@ -165,8 +165,7 @@ defmodule Rendro.LaunchArtifacts do
       fit: {320, 452},
       alt:
         "Rendered invoice PDF in dark mode, showing the themed dark background applied to the header, line-item table, and thank-you footer. Dark mode is screen-oriented, not recommended for print.",
-      caption:
-        "Invoice in dark mode via Theme.dark(Theme.default()) — screen-oriented, not recommended for print.",
+      caption: "Invoice in dark mode via Theme.dark/1 - screen-oriented, not print-recommended.",
       readme_hero: true,
       theme_tag: "default",
       mode_tag: "dark"
@@ -181,7 +180,7 @@ defmodule Rendro.LaunchArtifacts do
       alt:
         "Rendered landscape certificate PDF in dark mode, showing the themed dark background behind the geometry-derived keyline border. Dark mode is screen-oriented, not recommended for print.",
       caption:
-        "Landscape certificate in dark mode via Theme.dark(Theme.default()) — screen-oriented, not recommended for print.",
+        "Certificate in dark mode via Theme.dark/1 - screen-oriented, not for print.",
       readme_hero: false,
       theme_tag: "default",
       mode_tag: "dark"
@@ -195,8 +194,7 @@ defmodule Rendro.LaunchArtifacts do
       fit: {320, 452},
       alt:
         "Rendered event ticket PDF in dark mode, showing the themed dark background behind the seat placement grid and reference code. Dark mode is screen-oriented, not recommended for print.",
-      caption:
-        "Event ticket in dark mode via Theme.dark(Theme.default()) — screen-oriented, not recommended for print.",
+      caption: "Ticket in dark mode via Theme.dark/1 - screen-oriented, not print-recommended.",
       readme_hero: false,
       theme_tag: "default",
       mode_tag: "dark"
@@ -211,7 +209,7 @@ defmodule Rendro.LaunchArtifacts do
       alt:
         "Rendered invoice PDF themed with a teal brand accent color via from_brand, showing the accent applied to the dominant Total Due figure. No logo or brand font assets are used.",
       caption:
-        "Invoice themed via Theme.from_brand(accent: \"#0E7C76\") — accent-only, no brand assets.",
+        "Invoice themed via from_brand(accent: \"#0E7C76\") - accent-only, no assets.",
       readme_hero: true,
       theme_tag: "brand",
       mode_tag: "light"
