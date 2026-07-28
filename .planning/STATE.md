@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
 current_phase: 123
-current_phase_name: "`from_brand/2` E2E + honest rubric-gap closure + gallery/docs/manifest closure"
-status: planning
-stopped_at: Phase 123 context gathered
-last_updated: "2026-07-28T18:21:01.504Z"
+current_phase_name: from-brand-2-e2e-honest-rubric-gap-closure-gallery-docs-mani
+status: executing
+stopped_at: Completed 123-01-PLAN.md
+last_updated: "2026-07-28T19:03:38.821Z"
 last_activity: 2026-07-28
-last_activity_desc: Phase 122 complete, transitioned to Phase 123
+last_activity_desc: Phase 123 execution started
 progress:
   total_phases: 12
   completed_phases: 4
-  total_plans: 20
-  completed_plans: 16
+  total_plans: 25
+  completed_plans: 17
   percent: 33
 ---
 
@@ -24,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-27)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 122 — typography-type-scale-application-font-role-leading-wiring
+**Current focus:** Phase 123 — from-brand-2-e2e-honest-rubric-gap-closure-gallery-docs-mani
 
 ## Current Position
 
-Phase: 123 — `from_brand/2` E2E + honest rubric-gap closure + gallery/docs/manifest closure
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-07-28 — Phase 122 complete, transitioned to Phase 123
+Phase: 123 (from-brand-2-e2e-honest-rubric-gap-closure-gallery-docs-mani) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-07-28 — Phase 123 execution started
 
-Progress: [██████████] 100%
+Progress: [███████░░░] 68%
 
 ## Roadmap Snapshot (v2.11, Phases 119-123)
 
@@ -84,6 +84,7 @@ Full log in PROJECT.md Key Decisions. Milestone-B locks carried into planning:
 - [Phase ?]: 122-04: TYPE-01 teeth test keys @size_literal on a numeric literal after size:, so size: type.scale.<role> and size: @attr variable reads are inherently non-matching — no per-recipe allowlist needed for exempt mono micro-sizes.
 - [Phase ?]: 122-05: Payslip theme branch remaps fonts onto :payslip_sans (its only fallback-bearing font) to close CR-01 — themed Payslip renders its own masked/accented data; glyph correctness outranks a themed font swap since no shipped theme sets non-:default fonts
 - [Phase ?]: 122-05: Certificate centering-measurement font keyed on the emitted font_role via centering_measure_font/1; non-Helvetica-metric role raises {:unsupported_centered_font_role} (WR-01). Certificate has no non-centered run so {:unknown_text_font} stays representatively proven on Statement
+- [Phase ?]: 123-01: Committed a test asserting transform_invoice/1's issuer/customer/totals.total survive (non-nil), locking the Phase-115 DATA fix as Commit 1 of the D-05 honest order (test-only diff, verified via git show --stat)
 
 ### Pending Todos
 
@@ -104,9 +105,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-28T18:21:01.491Z
-Stopped at: Phase 123 context gathered
-Resume file: .planning/phases/123-from-brand-2-e2e-honest-rubric-gap-closure-gallery-docs-mani/123-CONTEXT.md
+Last session: 2026-07-28T19:03:33.089Z
+Stopped at: Completed 123-01-PLAN.md
+Resume file: None
 
 ## Next Steps
 
@@ -126,3 +127,4 @@ Resume file: .planning/phases/123-from-brand-2-e2e-honest-rubric-gap-closure-gal
 | Phase 122 P03 | 9min | 3 tasks | 8 files |
 | Phase 122 P04 | 4min | 2 tasks | 1 files |
 | Phase 122 P05 | 14min | 3 tasks | 5 files |
+| Phase 123 P01 | 2min | 2 tasks | 1 files |
