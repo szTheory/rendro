@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
-status: ready_to_plan
-stopped_at: Phase 121 complete (4/4) — ready to discuss Phase 122
-last_updated: 2026-07-28T00:49:21.795Z
+status: planning
+stopped_at: Phase 122 context gathered
+last_updated: "2026-07-28T01:03:16.460Z"
 last_activity: 2026-07-28
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 10
-  completed_plans: 11
+  completed_plans: 10
   percent: 60
 ---
 
@@ -91,9 +91,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-28T00:44:18.900Z
-Stopped at: Completed 121-03-PLAN.md
-Resume file: None
+Last session: 2026-07-28T01:03:16.455Z
+Stopped at: Phase 122 context gathered
+Resume file: .planning/phases/122-typography-type-scale-application-font-role-leading-wiring/122-CONTEXT.md
 
 ## Next Steps
 
