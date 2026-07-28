@@ -2,16 +2,19 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
-status: verifying
+current_phase: 123
+current_phase_name: "`from_brand/2` E2E + honest rubric-gap closure + gallery/docs/manifest closure"
+status: planning
 stopped_at: Completed 122-05-PLAN.md
-last_updated: "2026-07-28T16:47:25.691Z"
+last_updated: "2026-07-28T16:58:59.709Z"
 last_activity: 2026-07-28
+last_activity_desc: Phase 122 complete, transitioned to Phase 123
 progress:
-  total_phases: 5
+  total_phases: 11
   completed_phases: 4
-  total_plans: 15
-  completed_plans: 15
-  percent: 80
+  total_plans: 20
+  completed_plans: 16
+  percent: 36
 ---
 
 # Project State
@@ -25,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-07-27)
 
 ## Current Position
 
-Phase: 122 (typography-type-scale-application-font-role-leading-wiring) — EXECUTING
-Plan: 4 of 4
-Status: Phase complete — ready for verification
-Last activity: 2026-07-28
+Phase: 123 — `from_brand/2` E2E + honest rubric-gap closure + gallery/docs/manifest closure
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-07-28 — Phase 122 complete, transitioned to Phase 123
 
 Progress: [██████████] 100%
 
