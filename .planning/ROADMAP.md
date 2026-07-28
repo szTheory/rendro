@@ -139,10 +139,17 @@ Plans:
   3. `leading` (a line-height multiplier matching `Text.line_height` semantics) plus widows/orphans are theme-driven, and `default/0`'s scale/leading is a **metric no-op** — existing Phase-117 stress goldens render byte-identically.
 
 **Plans**: 1/4 plans executed
+**Wave 1**
 
 - [x] 122-01-PLAN.md — Tracer: fully seam Invoice end-to-end across TYPE-01/02/03 (typography/1 seam, D-04 relaxation, raise-path) [Wave 1]
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [x] 122-02-PLAN.md — Expansion: seam the 3 clean recipes (Statement/Receipt/Payslip) [Wave 2]
 - [x] 122-03-PLAN.md — Expansion: seam the 3 risk recipes resolving Q1/Q2/Q3 (BrandedInvoice/Certificate/Ticket) [Wave 2]
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [x] 122-04-PLAN.md — Consolidation: no-inline-size-literals teeth test + full-suite phase gate [Wave 3]
 
 ### Phase 123: `from_brand/2` E2E + honest rubric-gap closure + gallery/docs/manifest closure
