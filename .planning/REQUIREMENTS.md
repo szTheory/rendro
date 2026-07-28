@@ -48,7 +48,7 @@ Requirements for this milestone. Each maps to exactly one roadmap phase.
 ### Contract, Docs & Boundary (CONTRACT)
 
 - [x] **CONTRACT-01**: `priv/public_api.json` is regenerated via `mix rendro.api.gen` with the `Theme` entry and `public_api_contract_test.exs` reconciled — ALL hidden-modules assertions (including any duplicate in `manifest_test.exs`) green, as a pre-declared planned red→green step.
-- [ ] **CONTRACT-02**: `priv/support_matrix.json` gains proof-backed theming row(s), a `guides/theming.md` + claims test binds every public theming claim to proof, and docs-contract + Hex-tarball lanes stay green (theme is pure code — no new asset ships in the tarball).
+- [x] **CONTRACT-02**: `priv/support_matrix.json` gains proof-backed theming row(s), a `guides/theming.md` + claims test binds every public theming claim to proof, and docs-contract + Hex-tarball lanes stay green (theme is pure code — no new asset ships in the tarball).
 - [x] **CONTRACT-03**: An industry-agnostic `lib/` guard fails if `theme.ex` references an industry or named brand, holding the family-not-industry / "brands = data, design systems = code" boundary; B ships exactly one theme (`default/0`) + `from_brand/2` — no genre presets, catalog, or configurator.
 
 ## v2 Requirements (deferred — NOT anti-features; they map fine but belong to later milestones)
@@ -109,7 +109,7 @@ Which phases cover which requirements. Populated during roadmap creation.
 | DEFAULT-02 | Phase 123 | Pending |
 | DEFAULT-03 | Phase 123 | Complete |
 | CONTRACT-01 | Phase 119 | Complete |
-| CONTRACT-02 | Phase 123 | Pending |
+| CONTRACT-02 | Phase 123 | Complete |
 | CONTRACT-03 | Phase 119 | Complete |
 
 **Coverage:**

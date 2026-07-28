@@ -2,18 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
-current_phase: 123
-current_phase_name: from-brand-2-e2e-honest-rubric-gap-closure-gallery-docs-mani
 status: executing
-stopped_at: Completed 123-03-PLAN.md
-last_updated: "2026-07-28T19:42:48.123Z"
+stopped_at: Completed 123-04-PLAN.md
+last_updated: "2026-07-28T19:58:11.079Z"
 last_activity: 2026-07-28
 progress:
-  total_phases: 12
+  total_phases: 5
   completed_phases: 4
-  total_plans: 25
+  total_plans: 20
   completed_plans: 19
-  percent: 33
+  percent: 80
 ---
 
 # Project State
@@ -28,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-27)
 ## Current Position
 
 Phase: 123 (from-brand-2-e2e-honest-rubric-gap-closure-gallery-docs-mani) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-07-28
 
-Progress: [████████░░] 76%
+Progress: [██████████] 95%
 
 ## Roadmap Snapshot (v2.11, Phases 119-123)
 
@@ -86,6 +84,7 @@ Full log in PROJECT.md Key Decisions. Milestone-B locks carried into planning:
 - [Phase ?]: 123-01: Committed a test asserting transform_invoice/1's issuer/customer/totals.total survive (non-nil), locking the Phase-115 DATA fix as Commit 1 of the D-05 honest order (test-only diff, verified via git show --stat)
 - [Phase ?]: 123-02: leading 1.2 -> 1.35 landed as the sole D-01 value change (colors byte-identical); measure.ex scales EVERY %Text block's height by leading (not just multi-line prose) which crashed Statement/Payslip themed render with :content_overflow -- fixed via a theme-gated header/footer geometry budget (case opts[:theme], mirroring palette/1 idiom), no-theme byte-identity fully preserved
 - [Phase ?]: 123-03: retagged all 7 gallery rows to theme: Theme.default() (re-blesses all 7, not just leading, per the Big Finding); readme_hero S7 seam added; Certificate hierarchy checkpoint measured (ratio 1.27, visually confirmed still dominant, no fix needed); 3 new honesty findings (Invoice dark table illegibility, Ticket display/title hierarchy inversion, Payslip numeric wrap) discovered and deferred to Plan 05/WINDOWS.md rather than silently patched
+- [Phase ?]: 123-04: guides/theming.md ships 3 executable from_brand/2 fences (D-04, guide fence IS the E2E test); theming.light gained proof-backed capabilities (from_brand_accent_seed/on_accent_readable_default/brand_theme_orthogonal); fixed pre-existing mix docs --warnings-as-errors break (Rendro.Color.validate/1 hidden-function doc reference, predates this phase) and a stale 7-vs-11 gallery-count test left over from 123-03
 
 ### Pending Todos
 
@@ -107,8 +106,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-28T19:42:48.101Z
-Stopped at: Completed 123-03-PLAN.md
+Last session: 2026-07-28T19:58:11.067Z
+Stopped at: Completed 123-04-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -132,3 +131,4 @@ Resume file: None
 | Phase 123 P01 | 2min | 2 tasks | 1 files |
 | Phase 123 P02 | 30min | 2 tasks | 7 files |
 | Phase 123 P03 | 26min | 3 tasks | 18 files |
+| Phase 123 P04 | 14min | 3 tasks | 6 files |
