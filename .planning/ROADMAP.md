@@ -219,8 +219,8 @@ Dependency order: A → B → C → D. Each is a right-sized milestone; D is opt
 
 ### Phase 124: Address v2.11 tech debt: stale 113 docs-contract test, formatter drift, ticket dialyzer contract
 
-**Goal:** [To be planned]
-**Requirements**: TBD
+**Goal:** Clear the three non-blocking v2.11 tech-debt items so the `ci.fast` chain runs green end-to-end, without changing any rendered output: (1) fix the stale `dx_local_reproducibility_claims_test.exs` that `File.read!`s deleted `.planning/phases/113-*` files, (2) resolve formatter-version drift on ~7 files so `mix format --check-formatted` passes, and (3) correct the `ticket.ex`/`Background.emit?/1` type contracts so `mix dialyzer` passes — all while preserving the byte-identity golden guard and leaving the locked Ticket visual-hierarchy regression (WINDOWS id 2) untouched.
+**Requirements**: TBD (maintenance phase — acceptance criteria in 124-CONTEXT.md success criteria; no new REQ-IDs)
 **Depends on:** Phase 123
 **Plans:** 0 plans
 
