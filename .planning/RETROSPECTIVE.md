@@ -246,6 +246,44 @@
 
 ---
 
+## Milestone: v2.11 — Document Theming & Design-Token System
+
+**Shipped:** 2026-07-28
+**Phases:** 6 (119-124) | **Plans:** 21 | **Files changed:** 176 (+22,051 / −697)
+
+### What Was Built
+- **Phase 119:** `Rendro.Theme` core value — the milestone's single one-way door — with the full token shape defined up front (9 WCAG-mined color roles + typography/spacing/rules/radius/density/mode), an idempotent deep-merge `resolve/1`, property-tested `on_accent` WCAG derivation, and registration on the adapter/Evolving tier with zero recipe change (every v2.10 golden untouched).
+- **Phase 120:** S1 seam retrofit + full `theme:` swap — the 4 un-seamed recipes gained byte-identical `palette/1` seams in split commits *before* all 7 were swapped to read `theme.colors.*` through the 3-rung pattern; a `no_inline_color_literals` source-scan guard + 7 frozen goldens prove the un-themed call reproduces v2.10 bytes exactly (PLUMB-03).
+- **Phase 121:** Light/dark background-fill mechanism — a shared `Rendro.Recipes.Background` helper emitting a role-derived full-page `:background` region that the paginator repeats on every page including overflow; `dark/1` is a pure `Map.merge` of pre-resolved integer tuples (no draw-time float math), bounded honestly as screen-oriented via a support-matrix row + overclaim tripwire.
+- **Phase 122:** Typography type-scale + font-role/leading wiring — a `defp typography/1` twin of `palette/1` threading the materialized named scale, `FontRegistry` roles, and `leading`/widows/orphans into `%Text{}` across all 7 recipes, with `default/0` a metric no-op and a `no_inline_size_literals` teeth test.
+- **Phase 123:** `from_brand/2` E2E + honest rubric-gap closure — the strong unbranded `default/0` and brand-seeded theming end-to-end, the Phase-118 SHOW-01 gap closed in the honest DATA-first order with machine-enforced human sign-off (5 pass, Ticket honestly `passed:false`), the 11-row hash-checked gallery, and `guides/theming.md` fences that ARE the E2E test.
+- **Phase 124:** Tech-debt remediation — cleared the 3 CI-blocking items (stale Phase-113 test, formatter drift, a `@spec` widening that resolved a 133-error dialyzer cascade) so `mix ci.fast` runs green (1697 tests, 0 failures), zero rendered-output change.
+
+### What Worked
+- **Byte-identity as the central regression guard.** PLUMB-03 — an un-themed call reproduces v2.10 bytes exactly — turned every unintended render change into a hard-flunk defect, letting a large presentation layer land with high confidence. Split-commit discipline (retrofit seam, *then* swap) kept regressions from hiding behind theme wiring.
+- **Tracer-first expansion.** Both the dark mechanism (121) and typography (122) were proven end-to-end on one recipe, then replicated mechanically across the rest — the risky design was validated once and the rest was pattern-application.
+- **Honest-order rubric closure with teeth.** Fixing DATA before colour, requiring human sign-off, and keeping the score-flip commit provably colour-free (plus honestly recording Ticket `passed:false`) avoided the trap of a slick palette manufacturing a false pass.
+- **Overclaim tripwires.** `theming_claims_test.exs` binds every public dark-mode/theming claim to proof, so no future edit can silently imply print/accessibility/WCAG support.
+
+### What Was Inefficient
+- **A `leading` value change (1.2 → 1.35) exposed a latent themed-path `:content_overflow` crash** in Statement and Payslip that only surfaced once the multiplier scaled every `%Text` block's height — fixed with a theme-gated header/footer geometry budget, but it was a mid-milestone surprise a pre-flight budget check might have caught.
+- **Three honest deferrals (WINDOWS ids 1-3) surfaced late** during gallery regeneration (Invoice dark-table illegibility, Ticket hierarchy inversion, Payslip numeric wrap) — correctly recorded rather than silently patched, but they became carryover to Milestone C.
+- **A dedicated tech-debt phase (124) was needed to close CI drift** (stale archived-artifact test, formatter version drift, a dialyzer `@spec` cascade) that accumulated across the feature phases.
+
+### Patterns Established
+- **`palette/1` / `typography/1` seam twins** as the uniform per-recipe theming boundary threaded through `document/2` → `page_template/1` → `sections/2`.
+- **Shared `Rendro.Recipes.Background` helper** (`emit?/1` exact-tuple gate, `region/2`, `section/3`) as the single source of truth for the full-page fill.
+- **Source-scan teeth tests** (`no_inline_color_literals`, `no_inline_size_literals`) that trip only on a re-introduced hardcoded literal, never on the `role`/`@attr` variable reads.
+
+### Key Lessons
+- A value-only change to a resolved theme (leading, a colour) can still cross a geometry threshold downstream — treat any metric change to `default/0` as a potential paginate-budget event and stress it on the themed path.
+- "Fix the DATA, not the colour" generalizes: when a quality rubric fails, isolate the true failing dimension before reaching for the most visible lever.
+- Defer honestly and record the id — a documented `passed:false` with a WINDOWS pointer is worth more than a flattened score.
+
+### Cost Observations
+- Model mix: predominantly opus (planning/execution/verification), sonnet for mechanical replication stages.
+- Notable: six re-audit passes converged the milestone to FULLY COMPLIANT (Nyquist all 6 phases, integration WIRED) before close — thorough but audit-heavy.
+
 ## Cross-Milestone Trends
 
 ### Process Evolution

@@ -1,5 +1,29 @@
 # Milestones
 
+## v2.11 Document Theming & Design-Token System (Shipped: 2026-07-28)
+
+**Phases completed:** 6 phases (119-124), 21 plans. Additive minor (hex `1.2.0` intent). Milestone B of the "Happy-Path Home Runs" program (`SEED-003`).
+
+**Verification:** verified_closeout — all 6 phases `phase_complete` + `verification_status: passed`; 21/21 requirements complete; milestone audit `passed` (integration WIRED 0 orphaned/0 missing, 4/4 E2E flows, all phases `nyquist_compliant`).
+
+**Key accomplishments:**
+
+- **Phase 119 — `Rendro.Theme` core (the one-way door):** shipped the pure, inert `Rendro.Theme` design-token value — 9 WCAG-mined color roles + typography/spacing/rules/radius/density/mode, built via `default/0`/`resolve/1`/`dark/1`/`from_brand/2` with an idempotent deep-merge resolver and property-tested WCAG `on_accent` derivation — registered on the adapter/Evolving tier (both byte-equality manifest assertions reconciled green, industry/brand source-grep tripwire), with every v2.10 golden byte-identical (zero rendered output changed).
+- **Phase 120 — S1 seam retrofit + full `theme:` swap (7 recipes):** retrofitted the 4 un-seamed recipes (Statement/Certificate/Receipt/BrandedInvoice) with byte-identical `palette/1` seams in split commits *before* swapping all 7 to read `theme.colors.*` through the 3-rung pattern; a `no_inline_color_literals` source-scan guard + 7 frozen sha256 goldens prove the un-themed call reproduces v2.10 bytes exactly (PLUMB-03).
+- **Phase 121 — Light/dark background-fill mechanism (7 recipes):** every recipe gets dark "for free" via the shared role-derived full-page `:background` page-template region that repeats on every page including overflow; light emits no rect and stays byte-identical, `dark/1` is a pure `Map.merge` of pre-resolved integer tuples (no draw-time float math), and dark is bounded honestly as screen-oriented (support-matrix rows + `theming_claims_test.exs` overclaim tripwire, no print/accessibility/WCAG claim).
+- **Phase 122 — Typography type-scale + font-role/leading wiring:** threaded the materialized named type scale, `FontRegistry` font roles, and `leading`/widows/orphans into `%Text{}` across all 7 recipes via a `defp typography/1` twin of `palette/1` (the biggest reader-hierarchy lever), resolving the 3 risk-recipe open questions in place, with `default/0` a metric no-op (Phase-117 goldens unchanged), a `no_inline_size_literals` teeth test, and a TYPE-02 unregistered-font raise-path.
+- **Phase 123 — `from_brand/2` E2E + honest rubric closure + gallery/docs:** delivered the strong unbranded `default/0` and brand-seeded theming end-to-end, closed the Phase-118 SHOW-01 gap in the honest order (fixed DATA first, themed second, re-scored with machine-enforced human sign-off — 5 honestly pass, Ticket honestly `passed:false`, score-flip commit provably colour-free), regenerated the 11-row hash-checked S6 gallery, and landed `guides/theming.md` (fences that ARE the E2E test) + proof-backed support-matrix rows with docs/tarball lanes green.
+- **Phase 124 — v2.11 tech-debt remediation:** cleared the 3 CI-blocking items (stale Phase-113 docs-contract test, formatter drift on 7 files, `Background.emit?/1` `@spec` widening that resolved a 133-error dialyzer cascade) so `mix ci.fast` runs green end-to-end (1697 tests, 0 failures; credo clean; dialyzer 0), with zero rendered-output change and the locked Ticket hierarchy regression deliberately untouched.
+
+**Known gaps / deferred (documented, not blocking):**
+
+- Ticket/ticket_dark themed uniform type scale inverts the intended display/title hierarchy (WINDOWS id 2, a locked Phase-122 design outcome; honestly scored `passed:false`, not the SHOW-01 gate which passed).
+- Dark-mode polish deferred to follow-up: invoice_dark table-body cells inherit default ink (illegible on dark bg, WINDOWS id 1); payslip themed numeric cells wrap mid-number (WINDOWS id 3).
+- `from_brand`-derived accent op has no dedicated byte-level golden (wiring confirmed live); typography has dedicated tests for 3 of 7 recipes (other 4 covered by byte-identity + smoke).
+- Presets/catalog/configurator → Milestone C (`SEED-004`); Studio → Milestone D (`SEED-005`); OpenType tabular figures/small-caps demand-gated.
+
+---
+
 ## v2.10 Realistic Business-Document Examples & Anatomy (Shipped: 2026-07-19)
 
 **Phases completed:** 5 phases, 31 plans, 56 tasks
