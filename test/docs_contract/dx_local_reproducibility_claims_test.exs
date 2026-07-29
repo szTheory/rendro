@@ -1,10 +1,6 @@
 defmodule Rendro.DocsContract.DxLocalReproducibilityClaimsTest do
   use ExUnit.Case, async: true
 
-  @uat_path ".planning/phases/113-dx-local-reproducibility-validation/113-UAT.md"
-  @metrics_path ".planning/phases/113-dx-local-reproducibility-validation/113-METRICS.md"
-  @audit_path ".planning/milestones/C1-AUDIT.md"
-
   test "docs verification script includes exactly one DX local reproducibility claims lane" do
     script = File.read!("scripts/verify_docs.exs")
 
@@ -74,46 +70,11 @@ defmodule Rendro.DocsContract.DxLocalReproducibilityClaimsTest do
     assert contributing =~ "Quarantined flaky-test lane"
   end
 
-  test "validation reports keep local and remote evidence boundaries truthful" do
-    metrics = File.read!(@metrics_path)
-    audit = File.read!(@audit_path)
-
-    assert metrics =~ "mix ci.fast"
-    assert metrics =~ "ci.fast_exit=0"
-    assert metrics =~ "1219 tests, 12 doctests, 4 properties, 0 failures"
-    assert metrics =~ "29133061301"
-    assert metrics =~ "29133777702"
-    assert metrics =~ "29134266708"
-    assert metrics =~ "p50 783s"
-    assert metrics =~ "nearest-rank p95 1013s"
-    assert metrics =~ "deps exact hit 3/3"
-    assert metrics =~ "`_build` restored 3/3"
-    assert metrics =~ "PLT exact hit 3/3"
-    assert metrics =~ "intentionally advisory/non-required"
-
-    assert audit =~ "## Phase 113 Validation Summary"
-    assert audit =~ "The final local validation gate is green"
-    assert audit =~ "Remote GitHub timing improvement is now claimed"
-    assert audit =~ "three green `ci.yml` runs"
-    assert audit =~ "p50 783s"
-    assert audit =~ "nearest-rank p95 1013s"
-    assert audit =~ "advisory `security-audit` job remains non-required signal"
-  end
-
-  test "Phase 113 UAT is completed from automated evidence with no human prompt remaining" do
-    uat = File.read!(@uat_path)
-
-    assert uat =~ "status: complete"
-    assert uat =~ "[testing complete]"
-    assert uat =~ "verifier: automated"
-    assert uat =~ "passed: 5"
-    assert uat =~ "issues: 0"
-    assert uat =~ "pending: 0"
-    assert uat =~ "Gaps\n\nNone."
-    assert length(Regex.scan(~r/^result: pass$/m, uat)) == 5
-
-    refute uat =~ "result: [pending]"
-    refute uat =~ "awaiting: user response"
-    refute uat =~ "Type `pass`"
-  end
+  # The 2 test cases previously here ("validation reports keep local and remote
+  # evidence boundaries truthful" and "Phase 113 UAT is completed from automated
+  # evidence with no human prompt remaining") asserted only frozen, archive-specific
+  # historical facts (GitHub Actions run IDs, a specific p50/p95 timing pair, a
+  # specific UAT pass count) from the Phase-113/C1-milestone evidence trail, deleted
+  # by milestone-cleanup commit 0de2de8. Neither had forward-looking regression
+  # value -- see 124-RESEARCH.md Target 1 for the full rationale.
 end
