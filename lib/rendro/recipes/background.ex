@@ -22,8 +22,10 @@ defmodule Rendro.Recipes.Background do
       true
 
   """
-  @spec emit?(%{background: {non_neg_integer(), non_neg_integer(), non_neg_integer()}}) ::
-          boolean()
+  @spec emit?(%{
+          required(:background) => {non_neg_integer(), non_neg_integer(), non_neg_integer()},
+          optional(atom()) => any()
+        }) :: boolean()
   def emit?(%{background: bg}), do: bg != @paper_white
 
   @doc """
