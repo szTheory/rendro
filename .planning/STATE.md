@@ -1,20 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.11
-milestone_name: Document Theming & Design-Token System
-status: Awaiting next milestone
-stopped_at: Completed 124-01-PLAN.md
-last_updated: "2026-07-29T02:33:02.847Z"
-last_activity: 2026-07-28
-last_activity_desc: Milestone v2.11 completed and archived
+milestone: v2.12
+milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
+status: planning
+last_updated: "2026-07-29T02:48:09.915Z"
+last_activity: 2026-07-29
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 21
-  completed_plans: 21
-  percent: 100
-current_phase: null
-current_phase_name: null
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -28,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-07-28)
 
 ## Current Position
 
-Phase: Milestone v2.11 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-07-28 — Milestone v2.11 completed and archived
+Status: Defining requirements
+Last activity: 2026-07-29 — Milestone v2.12 started
 
 ## Roadmap Snapshot (v2.11, Phases 119-124) — SHIPPED 2026-07-28
 

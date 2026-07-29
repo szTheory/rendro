@@ -8,13 +8,21 @@ Rendro is a pure-Elixir, Phoenix-first PDF and document generation library for t
 
 Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
 
-## Next Milestone: Milestone C (`SEED-004`) — Style-Genre Presets, Public Catalog & Static Configurator
+## Current Milestone: v2.12 Style-Genre Presets, Public Catalog & Static Configurator
 
-> Additive minor (planning). Milestone C of the 4-milestone "Happy-Path Home Runs" program (A realistic examples → B theming → **C presets+catalog** → D optional Studio). Builds directly on the shipped `Rendro.Theme` contract (v2.11 / `SEED-003`). Phases continue global numbering (from 125). Requirements to be defined via `/gsd-new-milestone`.
+**Goal:** Make great-looking branded documents turnkey — pick a design *style* + plug in palette/logo — and show it all off as a public by-domain example catalog that doubles as a standing quality ratchet.
 
-**Candidate scope (from the deferred v2.11 v2 requirements):** style-genre presets (Swiss/Humanist/Editorial/Corporate-Classic/Minimal-Mono/Brutalist) as `%Theme{}` values (`PRESET-01`), curated open-license preset fonts in `priv/fonts/` (`PRESET-02`), a public example catalog (domain × brands × light/dark grid) as hash-checked artifacts doubling as the standing quality ratchet (`CATALOG-01`), and a static client-side configurator + URL state + `mix rendro.gen.theme` codegen (`CONFIG-01`). Live server-rendered Studio stays deferred to Milestone D (`SEED-005`).
+> Milestone C of the 4-milestone "Happy-Path Home Runs" program (A realistic examples → B theming → **C presets+catalog** → D optional Studio). Additive minor (hex `1.3.0` intent; hex release is a separate tag step). Builds directly on the shipped `Rendro.Theme` contract (v2.11 / `SEED-003`). Phases continue global numbering (from 125). Source seed: `SEED-004`.
 
-**Carryover to weigh in C planning:** the three deferred v2.11 dark-mode/hierarchy polish items — Ticket themed display/title hierarchy inversion (WINDOWS id 2, a locked Phase-122 outcome), invoice_dark table-body legibility (id 1), payslip themed numeric-cell wrap (id 3) — plus a dedicated `from_brand` accent-op byte golden and typography-test depth for the 4 recipes currently on byte-identity + smoke coverage.
+**Target features:**
+- **PRESET-01** — Style-genre presets (Swiss/Humanist/Editorial/Corporate-Classic/Minimal-Mono, + Brutalist if time) as `%Rendro.Theme{}` values via `Theme.preset(:editorial, accent:, mode:)`, composing with the unbranded default + light/dark uniformly.
+- **PRESET-02** — Curated open-license preset fonts in `priv/fonts/` (a grotesque, a humanist sans, a text serif, a mono) so flagship presets render out of the box; an unregistered font role raises the existing typed error (no silent substitution).
+- **CATALOG-01** — Public example catalog (domain × 2–3 example brands/presets × light/dark + unbranded default) as deterministic hash-checked artifacts (extends `mix rendro.launch_artifacts.gen`), organized by-domain/brand-tagged, doubling as the Milestone-A rubric quality ratchet.
+- **CONFIG-01** — Static client-side configurator (browse → pick preset+accent → nearest pre-rendered preview → one-click copy snippet, URL-query state, no server/DB) + `mix rendro.gen.theme <preset> --accent` codegen task (models `mix brand.gen`, `--check` drift gate); extend the Livebook as a third tinkerer surface.
+
+**Folded-in carryover (from v2.11):** the three deferred dark-mode/hierarchy polish items — invoice_dark table-body legibility (WINDOWS id 1), Ticket themed display/title hierarchy inversion (id 2, a locked Phase-122 outcome), payslip themed numeric-cell wrap (id 3) — plus a dedicated `from_brand` accent-op byte golden and typography-test depth for the 4 recipes currently on byte-identity + smoke coverage. These directly affect catalog quality (dark tiles in the ratchet must look right).
+
+**Boundary preserved:** design systems = code (`lib/rendro/theme*`), example brands = data (`priv/examples/`) — a brand is never a module. Live server-rendered Studio stays deferred to Milestone D (`SEED-005`).
 
 ## Current State
 
@@ -172,8 +180,8 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-- Milestone C (`SEED-004`) — Style-Genre Presets, Public Catalog & Static Configurator: style-genre presets as `%Theme{}` values (`PRESET-01`), curated open-license preset fonts in `priv/fonts/` (`PRESET-02`), a public domain × brands × light/dark example catalog as hash-checked artifacts + standing quality ratchet (`CATALOG-01`), and a static client-side configurator + URL state + `mix rendro.gen.theme` codegen (`CONFIG-01`). Builds on the shipped `Rendro.Theme` contract; phases from 125. Requirements to be defined via `/gsd-new-milestone`. Live Studio deferred to Milestone D (`SEED-005`).
-- Follow-up polish (carried from v2.11, weigh in C): Ticket themed display/title hierarchy inversion (WINDOWS id 2), invoice_dark table-body legibility (id 1), payslip themed numeric-cell wrap (id 3), a dedicated `from_brand` accent-op byte golden, and typography-test depth for the 4 recipes on byte-identity + smoke coverage.
+- **v2.12 Style-Genre Presets, Public Catalog & Static Configurator (`SEED-004`, Milestone C) — IN PLANNING:** style-genre presets as `%Theme{}` values (`PRESET-01`), curated open-license preset fonts in `priv/fonts/` (`PRESET-02`), a public domain × brands × light/dark example catalog as hash-checked artifacts + standing quality ratchet (`CATALOG-01`), and a static client-side configurator + URL state + `mix rendro.gen.theme` codegen (`CONFIG-01`). Builds on the shipped `Rendro.Theme` contract; phases from 125. Requirements being defined via `/gsd-new-milestone`. Live Studio deferred to Milestone D (`SEED-005`).
+- **Folded into v2.12 scope (carried from v2.11):** invoice_dark table-body legibility (WINDOWS id 1), Ticket themed display/title hierarchy inversion (id 2), payslip themed numeric-cell wrap (id 3), a dedicated `from_brand` accent-op byte golden, and typography-test depth for the 4 recipes on byte-identity + smoke coverage — folded in because dark catalog tiles in the quality ratchet must render legibly.
 
 ### Out of Scope
 
@@ -323,4 +331,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-28 after v2.11 Document Theming & Design-Token System milestone close (Milestone B / SEED-003; Phases 119-124 shipped, archived under milestones/v2.11-*). Next: Milestone C (SEED-004).*
+*Last updated: 2026-07-28 — started Milestone v2.12 Style-Genre Presets, Public Catalog & Static Configurator (Milestone C / SEED-004; phases from 125). Builds on the shipped v2.11 Rendro.Theme contract; folds in the deferred v2.11 dark-mode polish + coverage carryover.*
