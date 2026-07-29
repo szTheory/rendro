@@ -3,9 +3,9 @@ phase: 124
 slug: address-v2-11-tech-debt-stale-113-docs-contract-test-formatt
 # status lifecycle: draft (seeded by plan-phase) → validated (set by validate-phase §6)
 # audit-milestone §5.5 distinguishes NOT-VALIDATED (draft) from PARTIAL (validated + nyquist_compliant: false) (#2117)
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: validated
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-07-28
 ---
 
@@ -44,11 +44,11 @@ Task IDs finalized by the planner; each in-scope target maps to a deterministic 
 
 | Target | Plan | Requirement (acceptance) | Test Type | Automated Command | Expected | Status |
 |--------|------|--------------------------|-----------|-------------------|----------|--------|
-| Stale 113 test | TBD | D-01: suite green, no deleted-path reads | unit | `mix test test/docs_contract/dx_local_reproducibility_claims_test.exs` | 0 failures (3 remaining tests pass; no compile warning) | ⬜ pending |
-| Formatter drift | TBD | D-02: formatted, bounded, formatting-only | format | `mix format --check-formatted` | exit 0 | ⬜ pending |
-| Dialyzer contract | TBD | D-03: contract cascade cleared, spec-only | static | `mix dialyzer` | 0 errors (was 133 across 10 files) | ⬜ pending |
-| Byte-identity guard | (cross-cutting) | D-03/D-06: rendered bytes unchanged | golden | byte-identity / frozen-SHA golden suite (per RESEARCH §Validation Architecture) | unchanged pass/fail (byte-identical) | ⬜ pending |
-| ci.fast parity | (cross-cutting) | D-06: chain green end-to-end | integration | `mix ci.fast` | passes steps 1–7 (1,4,7 were the only red gates) | ⬜ pending |
+| Stale 113 test | 124-01 | D-01: suite green, no deleted-path reads | unit | `mix test test/docs_contract/dx_local_reproducibility_claims_test.exs` | 0 failures (3 remaining tests pass; no compile warning) | ✅ green |
+| Formatter drift | 124-01 | D-02: formatted, bounded, formatting-only | format | `mix format --check-formatted` | exit 0 | ✅ green |
+| Dialyzer contract | 124-01 | D-03: contract cascade cleared, spec-only | static | `mix dialyzer` | 0 errors (was 133 across 10 files) | ✅ green |
+| Byte-identity guard | 124-01 (cross-cutting) | D-03/D-06: rendered bytes unchanged | golden | `mix test test/rendro/recipes/theme_mode_background_golden_test.exs` (+ golden suite per RESEARCH §Validation Architecture) | unchanged pass/fail (byte-identical) | ✅ green |
+| ci.fast parity | 124-01 (cross-cutting) | D-06: chain green end-to-end | integration | `mix ci.fast` | passes steps 1–7 (1,4,7 were the only red gates) | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -72,12 +72,34 @@ Task IDs finalized by the planner; each in-scope target maps to a deterministic 
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references (N/A — none)
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 90s
-- [ ] Byte-identity golden suite asserted unchanged (the milestone guard)
-- [ ] `nyquist_compliant: true` set in frontmatter (by validate-phase)
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references (N/A — none)
+- [x] No watch-mode flags
+- [x] Feedback latency < 90s
+- [x] Byte-identity golden suite asserted unchanged (the milestone guard)
+- [x] `nyquist_compliant: true` set in frontmatter (by validate-phase)
 
-**Approval:** pending
+**Approval:** validated 2026-07-28 — all 5 targets automated + live-green; 1 belt-and-suspenders manual spot-check retained (redundant with byte-identity guard).
+
+---
+
+## Validation Audit 2026-07-28
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 0 |
+| Resolved | 0 |
+| Escalated | 0 |
+
+All 5 in-scope targets (D-01, D-02, D-03, byte-identity, D-06) already carried deterministic automated commands. Each was re-run live during this audit and confirmed green:
+
+| Target | Command | Live result |
+|--------|---------|-------------|
+| D-01 stale test | `mix test test/docs_contract/dx_local_reproducibility_claims_test.exs` | 3 tests, 0 failures |
+| D-02 formatter | `mix format --check-formatted` | exit 0 |
+| D-03 dialyzer | `mix dialyzer` | Total errors: 0 |
+| Byte-identity | `mix test test/rendro/recipes/theme_mode_background_golden_test.exs` | 7 tests, 0 failures |
+| D-06 parity | `mix ci.fast` | exit 0, end-to-end green |
+
+No test generation required. Phase is Nyquist-compliant. The lone Manual-Only item ("diff is formatting-only") is a human spot-check whose behavioral claim is already automatically corroborated by the byte-identity golden guard + full green suite; it does not constitute a coverage gap.
