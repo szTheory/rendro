@@ -2,6 +2,7 @@
 
 ## Milestones
 
+- 🚧 **v2.12 Style-Genre Presets, Public Catalog & Static Configurator** — Phases 125-129 (planning; additive minor `1.3.0` intent, Milestone C of the Happy-Path program / `SEED-004`)
 - ✅ **v2.11 Document Theming & Design-Token System** — Phases 119-124 (shipped 2026-07-28; additive minor `1.2.0`, Milestone B of the Happy-Path program / `SEED-003`)
 - ✅ **v2.10 Realistic Business-Document Examples & Anatomy** — Phases 114-118 (shipped 2026-07-19; additive minor `1.1.0`, Milestone A)
 - ✅ **C1 CI/CD Performance & Reliability** — Phases 108-113 (shipped 2026-07-11; non-version infra milestone, no Hex release)
@@ -9,6 +10,18 @@
 - ✅ **v2.9 TOC & Document Navigation** — Phases 97-100 (shipped 2026-06-14)
 
 ## Phases
+
+### 🚧 v2.12 Style-Genre Presets, Public Catalog & Static Configurator (Phases 125-129) — PLANNING
+
+**Milestone Goal:** Make great-looking branded documents turnkey — pick a design *style* + plug in palette/logo — and show it all off as a public by-domain example catalog that doubles as a standing quality ratchet. Builds directly on the shipped v2.11 `Rendro.Theme` contract. Folds in the three deferred v2.11 dark-mode/hierarchy polish items (WINDOWS ids 1-3) so the catalog's dark cells and the reader-quality ratchet start from an honest baseline rather than baking a known-bad baseline into a standing artifact. Preset/genre/catalog/configurator vocabulary is structurally confined to new sibling modules/manifests (`lib/rendro/theme/presets.ex`, `Rendro.Catalog` + `assets/rendro/catalog.json`) — `theme.ex` and the existing 11-row `@gallery_specs` are never grown in place (the `theme_industry_guard_test.exs` tripwire). Zero new runtime dependencies; zero server/DB; no Node/npm in required CI or as a Hex runtime dep. Direction locked HIGH-confidence by research: every capability is pure composition over already-shipped machinery (`Theme.resolve/1`/`dark/1`, `FontRegistry`, `LaunchArtifacts`, ExDoc's asset copy-through, `mix brand.gen`'s `--check` idiom).
+
+**Phase-ordering note:** the research SUMMARY's literal Phase-1 was Carryover Polish; this roadmap sequences Foundation (fonts + presets) *before* Carryover Polish instead, because POLISH-04 (a dedicated `from_brand`/preset accent-op byte golden covering *preset* × accent combinations) cannot be satisfied until `Theme.preset/2` exists. The locked constraint — polish must land before any dark-mode catalog generation — is preserved: polish (Phase 126) still lands two phases before the catalog (Phase 127), not last.
+
+- [ ] **Phase 125: Foundation — Curated fonts, style-genre presets & brand fixtures** - `Theme.preset/2` ships 5 (6 if time allows) locked genre presets backed by 4 curated open-license embedded fonts, plus additional example-brand fixture data to seed catalog variety
+- [ ] **Phase 126: Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth** - closes the 3 deferred v2.11 WINDOWS defects and deepens golden/typography-test coverage before any dark-mode catalog cell is generated
+- [ ] **Phase 127: Public example catalog & quality ratchet** - a bounded, hash-checked domain × brand × preset × mode catalog with a fail-loud rubric-scoring coverage guard, as a new sibling of the existing launch gallery
+- [ ] **Phase 128: Static configurator, theme codegen & Livebook** - a zero-server browse → pick → copy configurator riding the catalog, `mix rendro.gen.theme --check`, and the Livebook as a third tinkerer surface
+- [ ] **Phase 129: Docs & manifest closure** - a proof-backed `theming.presets` support-matrix row, a presets guide, and no-overclaim docs-contract coverage for every new public surface
 
 <details>
 <summary>✅ v2.11 Document Theming & Design-Token System (Phases 119-124) — SHIPPED 2026-07-28</summary>
@@ -65,34 +78,114 @@
 
 </details>
 
+## Phase Details
+
+### Phase 125: Foundation — Curated fonts, style-genre presets & brand fixtures
+
+**Goal**: Callers can generate distinctive, correctly-licensed, on-brand documents via `Rendro.Theme.preset/2` backed by real embedded fonts and expanded brand-fixture data — every piece independently provable (`Theme.preset/2` → recipe `document/2` → render → pdfium raster) with no catalog or configurator dependency.
+**Depends on**: Nothing (first phase of the milestone; builds on the shipped v2.11 `Rendro.Theme` contract)
+**Requirements**: PRESET-01, PRESET-02, PRESET-03, PRESET-04, PRESET-05, PRESET-06, FONT-01, FONT-02, FONT-03, FONT-04, FONT-05, CATALOG-05
+**Success Criteria** (what must be TRUE):
+
+  1. Calling `Rendro.Theme.preset(:editorial, accent: {r,g,b}, mode: :dark)` (and the other 4 locked genres — Swiss, Humanist, Corporate-Classic, Minimal-Mono, plus Brutalist if time allows) returns a fully-resolved `%Rendro.Theme{}` that composes over the existing `resolve/1`/`dark/1` pipeline and renders through an existing recipe with the 4 curated fonts embedded, producing a genre-distinct, printable PDF.
+  2. `theme_industry_guard_test.exs` stays green with its forbidden-word list unmodified — all preset/genre token tables and dispatch live only in `lib/rendro/theme/presets.ex`, with `theme.ex` gaining at most a thin `preset/2` delegation.
+  3. `mix hex.build` output contains every `priv/fonts/**` file referenced by a shipped preset, each with its own clearly-delimited `NOTICE` attribution block and pinned upstream version, proven by a positive tarball-content test.
+  4. Referencing an unregistered preset font role raises the existing typed `FontRegistry` error (no silent substitution), and a double-subset determinism test proves byte-identical subsetting output for every vendored font.
+  5. At least one additional example brand exists per domain family under `priv/examples/<domain>/` as a data tuple (never a module), and the un-themed/`default()` render stays byte-identical to prior goldens (zero per-draw float math in preset derivation).
+
+**Plans**: TBD
+**UI hint**: no — pure library API + vendored data files, no browser-rendered surface
+
+### Phase 126: Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth
+
+**Goal**: Resolve or honestly exempt every deferred v2.11 dark-mode/hierarchy defect, and deepen golden/typography coverage — including a preset × accent golden now that `Theme.preset/2` exists — so the first catalog generation isn't the first real stress test of these paths.
+**Depends on**: Phase 125 (`Theme.preset/2` must exist for POLISH-04's preset × accent byte golden)
+**Requirements**: POLISH-01, POLISH-02, POLISH-03, POLISH-04, POLISH-05
+**Success Criteria** (what must be TRUE):
+
+  1. `invoice_dark` table-body cells render with legible ink-on-background contrast, fixed at the shared color-role level so every recipe inherits the fix rather than a per-recipe patch.
+  2. The Ticket display/title hierarchy inversion (a locked Phase-122 outcome) is either fixed, or carries an explicit, schema-enforced `stress_exemption`-style carve-out so the quality ratchet never silently flags the accepted deviation as a regression.
+  3. `payslip` themed numeric cells no longer wrap mid-number, including under Minimal-Mono's tight tabular-figure columns.
+  4. A dedicated byte-identity golden exercises `from_brand`/preset accent-op combinations (not just the single original `from_brand` call site).
+  5. All 7 recipes (not just 3) have dedicated typography-test coverage of the materialized type scale, closing the byte-identity-plus-smoke-only gap on the remaining 4.
+
+**Plans**: TBD
+**UI hint**: no — recipe/render-path bug fixes and test-depth work, no browser-rendered surface
+
+### Phase 127: Public example catalog & quality ratchet
+
+**Goal**: A public, hash-checked, by-domain example catalog exists at an explicitly bounded scale — a new sibling of the existing 11-row launch gallery, never grown in place — with every generated cell either human-scored against the reader-quality rubric or explicitly flagged unscored, never silently unverified.
+**Depends on**: Phase 125 (presets, fonts, brand fixtures), Phase 126 (polish must land first so dark-mode cells are legible from the very first generation)
+**Requirements**: CATALOG-01, CATALOG-02, CATALOG-03, CATALOG-04
+**Success Criteria** (what must be TRUE):
+
+  1. Running the new catalog-generation task produces a deterministic, sha256 hash-checked artifact tree under `assets/rendro/catalog/<domain>/<brand>/` plus `assets/rendro/catalog.json` via a new sibling `Rendro.Catalog` module, covering every domain family's unbranded default plus curated brand/preset combos in light and dark — without modifying the existing `@gallery_specs`/`artifacts.json`.
+  2. A machine-tested combinatorial row-count ceiling fails the build if a future change silently grows the grid toward the full domain × brand × preset × mode cross product.
+  3. Every generated catalog row populates the already-reserved `preset`/`theme`/`mode` manifest keys (no schema migration) and is organized on disk by domain, brand-tagged.
+  4. `priv/quality/rubric_scores.json` carries a scored or explicitly-flagged-unscored entry for every catalog cell, a fail-loud coverage guard blocks new/changed cells from shipping silently unscored, and no existing `passed:false` entry (e.g. Ticket) is ever flipped to `true` without addressing its underlying defect.
+
+**Plans**: TBD
+**UI hint**: no — build-time artifact generation, no interactive browser surface (the catalog's own public presentation ships in Phase 128's configurator)
+
+### Phase 128: Static configurator, theme codegen & Livebook
+
+**Goal**: A user can browse the public catalog from a zero-server static page, pick a preset/accent/mode/family, see the nearest truthful pre-rendered preview, and copy a working Elixir snippet or generate a committed theme module — three tinkerer surfaces (configurator, `mix rendro.gen.theme`, Livebook) sharing one canonical snippet format.
+**Depends on**: Phase 127 (the catalog must exist as the configurator's pre-rendered data source — "nearest preview" has nothing to snap to without it)
+**Requirements**: CONFIG-01, CONFIG-02, CONFIG-03, CONFIG-04, CONFIG-05, CONFIG-06
+**Success Criteria** (what must be TRUE):
+
+  1. `assets/rendro/configurator/` loads and works as a static HTML/CSS/vanilla-JS page — no `package.json`, no build step, no server/DB call anywhere in its shipped path — served through the existing ExDoc `assets:` copy-through.
+  2. Picking a preset + accent + mode + family shows the exact pre-rendered catalog tile for that exact-match combination (never a fuzzy color-distance approximation against an open picker), and clicking copy places a working `Rendro.Theme.preset(...)` snippet on the clipboard with visible success feedback.
+  3. Reloading a shared configurator URL restores the same selection from the query string alone, and every URL-derived value is rendered via safe DOM APIs (`textContent`/`setAttribute`, never `innerHTML` string interpolation of untrusted state).
+  4. `mix rendro.gen.theme <preset> --accent "#…"` writes a generated theme module and `--check` fails loudly on drift; the generated snippet and the configurator's copy button provably share one canonical template (a compile-round-trip test covers the full producible preset × mode × accent enum).
+  5. The existing Livebook exercises `Theme.preset/2` live as a third tinkerer surface alongside the configurator and `mix rendro.gen.theme`.
+
+**Plans**: TBD
+**UI hint**: yes — a real static HTML/CSS/vanilla-JS browser surface (distinct from this project's PDF-domain "theme"/"page"/"layout" terms that otherwise false-positive the UI gate on recipe phases)
+
+### Phase 129: Docs & manifest closure
+
+**Goal**: Every new public surface this milestone shipped — presets, the catalog, and the configurator — is reconciled into Rendro's proof-backed public claim surface with no overclaim, closing the loop honestly now that the actual shipped scope is known.
+**Depends on**: Phase 125, Phase 126, Phase 127, Phase 128 (every functional surface must exist before docs can honestly describe it)
+**Requirements**: DOCS-01
+**Success Criteria** (what must be TRUE):
+
+  1. `priv/support_matrix.json` carries a proof-backed `theming.presets` row, and `priv/public_api.json` is regenerated (`mix rendro.api.gen`) to include `Theme.preset/2`.
+  2. A presets guide (new `guides/presets.md` or an extended `guides/theming.md`) plus README/HexDocs wiring describe presets/catalog/configurator only as "a strong starting point," never a design-quality, accessibility, or print-safety guarantee.
+  3. Docs-contract + guardrails-lockstep lanes (lane count, `required_checks_contract_test.exs` assertion, `priv/guardrails/required_status_checks.json`) are extended together, in the same commit, to bound catalog/configurator claim language, and `mix ci.fast` runs green end-to-end.
+
+**Plans**: TBD
+**UI hint**: no — docs/manifest reconciliation only
+
 ## Progress
+
+**Execution Order:** Phases execute in numeric order: 125 → 126 → 127 → 128 → 129
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 119. `Rendro.Theme` core module (the one-way door) | v2.11 | 2/2 | Complete | 2026-07-24 |
-| 120. S1 seam retrofit + full `theme:` swap (7 recipes) | v2.11 | 4/4 | Complete | 2026-07-27 |
-| 121. Light/dark background-fill mechanism (7 recipes) | v2.11 | 4/4 | Complete | 2026-07-28 |
-| 122. Typography type-scale + font-role/leading wiring | v2.11 | 5/5 | Complete | 2026-07-28 |
-| 123. `from_brand/2` E2E + honest rubric-gap + docs closure | v2.11 | 5/5 | Complete | 2026-07-28 |
-| 124. Address v2.11 tech debt (CI-green remediation) | v2.11 | 1/1 | Complete | 2026-07-28 |
+| 125. Foundation — Curated fonts, style-genre presets & brand fixtures | v2.12 | 0/TBD | Not started | - |
+| 126. Carryover polish — dark-mode legibility, hierarchy & golden depth | v2.12 | 0/TBD | Not started | - |
+| 127. Public example catalog & quality ratchet | v2.12 | 0/TBD | Not started | - |
+| 128. Static configurator, theme codegen & Livebook | v2.12 | 0/TBD | Not started | - |
+| 129. Docs & manifest closure | v2.12 | 0/TBD | Not started | - |
 
 ## Current Focus
 
-✅ **v2.11 Document Theming & Design-Token System shipped** (Phases 119-124, 2026-07-28). All 21 requirements complete; milestone audit `passed`; archived under `milestones/v2.11-*`. Next: plan Milestone C (`SEED-004`) via `/gsd-new-milestone`.
+🚧 **v2.12 Style-Genre Presets, Public Catalog & Static Configurator** (Phases 125-129) — planning. All 28 requirements mapped (100% coverage, each requirement in exactly one phase); ready to plan Phase 125 with `/gsd-plan-phase 125`.
 
 ## Planned Next — "Happy-Path Home Runs" program (dormant seeds)
 
 A sequenced 4-milestone program to make rendro's business-document happy paths shine: realistic,
 award-quality example documents; a full document theming/design-token system; style-genre presets + a
 public example catalog; and an optional interactive theme studio. Milestone A (`SEED-002`) shipped as
-v2.10; Milestone B (`SEED-003`) shipped as v2.11. Remaining seeds live under `.planning/seeds/`.
+v2.10; Milestone B (`SEED-003`) shipped as v2.11. Milestone C (`SEED-004`) roadmap is now created.
 See all seeds: `/gsd-capture --list-seeds`.
 
 | # | Milestone | Seed | Status |
 |---|-----------|------|--------|
 | A | Realistic Business-Document Examples & Anatomy | `SEED-002` | ✅ shipped as v2.10 (Phases 114-118) |
 | B | Document Theming & Design-Token System (`Rendro.Theme`, light/dark, unbranded default) | `SEED-003` | ✅ shipped as v2.11 (Phases 119-124) |
-| C | Style-Genre Presets, Public Catalog & Static Configurator | `SEED-004` | dormant — next up |
+| C | Style-Genre Presets, Public Catalog & Static Configurator | `SEED-004` | 🚧 active — roadmap created (Phases 125-129) |
 | D | Rendro Studio: optional mountable theme playground (LiveView) | `SEED-005` *(optional)* | dormant |
 
 Dependency order: A → B → C → D. Each is a right-sized milestone; D is optional/deferrable.

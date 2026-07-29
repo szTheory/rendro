@@ -82,9 +82,35 @@ _Filled by the roadmapper — every requirement maps to exactly one phase._
 
 | REQ-ID | Phase |
 |--------|-------|
-| PRESET-01..06 | _TBD_ |
-| FONT-01..05 | _TBD_ |
-| POLISH-01..05 | _TBD_ |
-| CATALOG-01..05 | _TBD_ |
-| CONFIG-01..06 | _TBD_ |
-| DOCS-01 | _TBD_ |
+| PRESET-01 | Phase 125 |
+| PRESET-02 | Phase 125 |
+| PRESET-03 | Phase 125 |
+| PRESET-04 | Phase 125 |
+| PRESET-05 | Phase 125 |
+| PRESET-06 | Phase 125 |
+| FONT-01 | Phase 125 |
+| FONT-02 | Phase 125 |
+| FONT-03 | Phase 125 |
+| FONT-04 | Phase 125 |
+| FONT-05 | Phase 125 |
+| CATALOG-05 | Phase 125 |
+| POLISH-01 | Phase 126 |
+| POLISH-02 | Phase 126 |
+| POLISH-03 | Phase 126 |
+| POLISH-04 | Phase 126 |
+| POLISH-05 | Phase 126 |
+| CATALOG-01 | Phase 127 |
+| CATALOG-02 | Phase 127 |
+| CATALOG-03 | Phase 127 |
+| CATALOG-04 | Phase 127 |
+| CONFIG-01 | Phase 128 |
+| CONFIG-02 | Phase 128 |
+| CONFIG-03 | Phase 128 |
+| CONFIG-04 | Phase 128 |
+| CONFIG-05 | Phase 128 |
+| CONFIG-06 | Phase 128 |
+| DOCS-01 | Phase 129 |
+
+**Coverage:** 28/28 requirements mapped, 100% — every requirement in exactly one phase, no orphans.
+
+**Note on CATALOG-05 placement:** CATALOG-05 (additional example-brand data fixtures) is mapped to Phase 125 rather than the Phase 127 catalog-generation phase. Research (`ARCHITECTURE.md`) establishes it as "parallel-safe with Fonts+Presets — depends only on the shipped v2.11 theme contract, not on presets." It is pure data-fixture work with no catalog-machinery dependency, so it is grouped with the other foundational, independently-provable Phase 125 work; Phase 127 then consumes the fixtures Phase 125 produces.
