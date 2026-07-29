@@ -16,7 +16,11 @@ defmodule Rendro.Recipes.PayslipOptsThreadingTest do
       period: %{from: ~D[2026-06-01], to: ~D[2026-06-30]},
       pay_date: ~D[2026-07-05],
       earnings: [
-        %{description: "Base Salary", amount: Decimal.new("4200.00"), ytd: Decimal.new("25200.00")}
+        %{
+          description: "Base Salary",
+          amount: Decimal.new("4200.00"),
+          ytd: Decimal.new("25200.00")
+        }
       ],
       deductions: [
         %{
@@ -91,7 +95,11 @@ defmodule Rendro.Recipes.PayslipOptsThreadingTest do
         period: %{from: ~D[2026-06-01], to: ~D[2026-06-30]},
         pay_date: ~D[2026-07-05],
         earnings: [
-          %{description: "Base Salary", amount: Decimal.new("4200.00"), ytd: Decimal.new("25200.00")}
+          %{
+            description: "Base Salary",
+            amount: Decimal.new("4200.00"),
+            ytd: Decimal.new("25200.00")
+          }
         ],
         deductions: [
           %{

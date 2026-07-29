@@ -155,7 +155,9 @@ defmodule Rendro.Recipes.ThemeModeBackgroundGoldenTest do
 
       # Single-page landscape recipe: the fill op appears exactly once.
       fill_count = length(:binary.matches(pdf, @fill_op))
-      assert fill_count == 1, "expected exactly one :background fill op on the single landscape page"
+
+      assert fill_count == 1,
+             "expected exactly one :background fill op on the single landscape page"
     end
   end
 

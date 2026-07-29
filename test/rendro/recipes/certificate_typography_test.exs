@@ -48,6 +48,7 @@ defmodule Rendro.Recipes.CertificateTypographyTest do
       # Both paths resolve heading/body to :default → Helvetica metrics, so the
       # geometry-driven section build succeeds on both without raising.
       assert [%Rendro.Section{} | _] = Certificate.sections(data)
+
       assert [%Rendro.Section{} | _] =
                Certificate.sections(data, theme: Rendro.Theme.default())
     end
@@ -57,11 +58,19 @@ defmodule Rendro.Recipes.CertificateTypographyTest do
     test "an unregistered fonts.heading role raises {:unsupported_centered_font_role, _}" do
       # heading role centers the title + recipient — a non-Helvetica-metric role
       # here would silently de-center; assert the honest raise at section build.
-      assert_raise ArgumentError, ~r/unsupported_centered_font_role.*:some_unregistered_font/s, fn ->
-        Certificate.sections(sample_data(),
-          typography: %{fonts: %{heading: :some_unregistered_font, body: :default, mono: :default}}
-        )
-      end
+      assert_raise ArgumentError,
+                   ~r/unsupported_centered_font_role.*:some_unregistered_font/s,
+                   fn ->
+                     Certificate.sections(sample_data(),
+                       typography: %{
+                         fonts: %{
+                           heading: :some_unregistered_font,
+                           body: :default,
+                           mono: :default
+                         }
+                       }
+                     )
+                   end
     end
 
     test "an unregistered fonts.body role also raises {:unsupported_centered_font_role, _}" do

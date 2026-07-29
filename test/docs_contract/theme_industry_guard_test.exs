@@ -23,13 +23,13 @@ defmodule Rendro.DocsContract.ThemeIndustryGuardTest do
     forbidden = ~w(invoice payslip ticket certificate statement receipt
                    medical legal restaurant retail)
 
-    for term <- forbidden, do: refute source =~ term
+    for term <- forbidden, do: refute(source =~ term)
   end
 
   test "theme.ex ships one theme + from_brand/2 only — no genre/preset machinery (CONTRACT-03 / D-02)" do
     source = File.read!(@theme_source)
 
-    for term <- ~w(preset catalog configurator genre), do: refute source =~ term
+    for term <- ~w(preset catalog configurator genre), do: refute(source =~ term)
   end
 
   test "theme.ex exposes exactly the one-theme + from_brand/2 positive surface (CONTRACT-03)" do

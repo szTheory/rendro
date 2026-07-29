@@ -76,11 +76,23 @@ defmodule Rendro.Recipes.ThemedRenderSmokeTest do
       period: %{from: ~D[2026-06-01], to: ~D[2026-06-30]},
       pay_date: ~D[2026-07-05],
       earnings: [
-        %{description: "Base Salary", amount: Decimal.new("4200.00"), ytd: Decimal.new("25200.00")}
+        %{
+          description: "Base Salary",
+          amount: Decimal.new("4200.00"),
+          ytd: Decimal.new("25200.00")
+        }
       ],
       deductions: [
-        %{description: "Federal Income Tax", amount: Decimal.new("620.00"), ytd: Decimal.new("3720.00")},
-        %{description: "Impôt sur le revenu", amount: Decimal.new("100.00"), ytd: Decimal.new("600.00")}
+        %{
+          description: "Federal Income Tax",
+          amount: Decimal.new("620.00"),
+          ytd: Decimal.new("3720.00")
+        },
+        %{
+          description: "Impôt sur le revenu",
+          amount: Decimal.new("100.00"),
+          ytd: Decimal.new("600.00")
+        }
       ],
       # gross 4200.00 - deductions 720.00 = net 3480.00 (D-13 reconciliation)
       net_pay: Decimal.new("3480.00"),

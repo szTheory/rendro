@@ -209,6 +209,7 @@ defmodule Rendro.DocsContract.ThemingClaimsTest do
       guide = File.read!("guides/theming.md")
 
       gallery = manifest["gallery"]
+
       assert is_list(gallery) and gallery != [],
              "assets/rendro/artifacts.json gallery must not be empty (guard would be vacuous)"
 

@@ -179,8 +179,7 @@ defmodule Rendro.LaunchArtifacts do
       fit: {390, 276},
       alt:
         "Rendered landscape certificate PDF in dark mode, showing the themed dark background behind the geometry-derived keyline border. Dark mode is screen-oriented, not recommended for print.",
-      caption:
-        "Certificate in dark mode via Theme.dark/1 - screen-oriented, not for print.",
+      caption: "Certificate in dark mode via Theme.dark/1 - screen-oriented, not for print.",
       readme_hero: false,
       theme_tag: "default",
       mode_tag: "dark"
@@ -208,8 +207,7 @@ defmodule Rendro.LaunchArtifacts do
       fit: {320, 452},
       alt:
         "Rendered invoice PDF themed with a teal brand accent color via from_brand, showing the accent applied to the dominant Total Due figure. No logo or brand font assets are used.",
-      caption:
-        "Invoice themed via from_brand(accent: \"#0E7C76\") - accent-only, no assets.",
+      caption: "Invoice themed via from_brand(accent: \"#0E7C76\") - accent-only, no assets.",
       readme_hero: true,
       theme_tag: "brand",
       mode_tag: "light"
