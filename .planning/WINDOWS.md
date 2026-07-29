@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 7
+open_count: 4
 waived_count: 0
-fixed_count: 0
+fixed_count: 3
 total_count: 7
-last_updated: 2026-07-28T20:53:45.917Z
+last_updated: 2026-07-29T01:19:32.330Z
 ---
 
 # Broken Windows Ledger
@@ -18,9 +18,9 @@ last_updated: 2026-07-28T20:53:45.917Z
 | 1 | 123 | deviation | lib/rendro/recipes/invoice.ex |  | invoice_dark gallery row: item/qty/price table body cells render via bare strings (no per-cell color), so they inherit a fixed default black text color rather than colors.ink -- illegible against the dark background. Root cause: Rendro.Table cells accept Block or String, but Invoice.body_section builds plain-string rows. Fix requires wrapping cells in themed Block+Text without breaking the frozen INV-01 byte-identity golden -- deferred to a follow-up plan, not fixed in 123-03 (out of scope, risk to frozen golden). | open |  | 2026-07-28T19:39:59.602Z |  |
 | 2 | 123 | deviation | lib/rendro/recipes/ticket.ex |  | ticket/ticket_dark: the uniform themed type scale inverts the intended visual hierarchy -- the reference-code display anchor (scale.display, native 8pt) jumps to 21pt themed, now LARGER than the placement-grid title role (scale.title, native 26pt but 16.5pt themed) that the 2026-07-19 rubric actually scored as dominant. The reference code also now wraps awkwardly across 3 lines in its narrow stub column (AUR-8 / 8213- / GA). Flagged for the Plan 05 human sign-off -- not fixed in 123-03 (Q3's non-monotone role assignment is a locked Phase-122 decision; re-mapping is an architectural call, not a gallery-closure fix). | open |  | 2026-07-28T19:40:14.182Z |  |
 | 3 | 123 | deviation | lib/rendro/recipes/payslip.ex |  | payslip themed render: earnings/deductions table numeric cells (e.g. $4,200.00, $4,550.00) wrap mid-number onto a second line ($4,200.0 / 0) in the Current/YTD columns at the themed 10.5pt body scale + 1.35 leading -- a new typographic_craft awkward-break regression vs. the native 11pt no-theme render. Flagged for the Plan 05 human sign-off -- not fixed in 123-03 (column-width retuning is out of this plan's gallery-closure scope). | open |  | 2026-07-28T19:40:14.268Z |  |
-| 4 | 123 | lint-warning | lib/rendro/launch_artifacts.ex |  | mix format --check-formatted fails on 7 pre-existing files (lib/rendro/launch_artifacts.ex, test/docs_contract/theme_industry_guard_test.exs, test/docs_contract/theming_claims_test.exs, test/rendro/recipes/payslip_opts_threading_test.exs, test/rendro/recipes/themed_render_smoke_test.exs, test/rendro/recipes/certificate_typography_test.exs, test/rendro/recipes/theme_mode_background_golden_test.exs) -- last touched by phases 119/121/122/123-03/123-04, none by 123-05's rubric-score commit; blocks mix ci.fast's format-check gate. See 123-05 deferred-items.md item 1. | open |  | 2026-07-28T20:53:45.711Z |  |
-| 5 | 123 | deviation | test/docs_contract/dx_local_reproducibility_claims_test.exs |  | 2 pre-existing test failures: File.Error reading .planning/phases/113-dx-local-reproducibility-validation/113-UAT.md and 113-METRICS.md (missing from this working tree's partial phase-113 planning artifacts) -- unrelated to phase 123 rubric/gallery/theming work. See 123-05 deferred-items.md item 2. | open |  | 2026-07-28T20:53:45.778Z |  |
-| 6 | 123 | deviation | lib/rendro/recipes/ticket.ex |  | mix dialyzer fails on pre-existing lib/rendro/recipes/ticket.ex contract errors (no_return on document/1,2 and sections/1,2; Rendro.Recipes.Background.emit?/1 contract mismatch) -- not touched by 123-05's commit; plausibly related to the Ticket hierarchy-inversion regression already recorded honestly as passed:false (WINDOWS id 2) but a dialyzer fix is a separate lib/-touching change outside this plan's D-05 Commit 3 isolation scope. See 123-05 deferred-items.md item 3. | open |  | 2026-07-28T20:53:45.848Z |  |
+| 4 | 123 | lint-warning | lib/rendro/launch_artifacts.ex |  | mix format --check-formatted fails on 7 pre-existing files (lib/rendro/launch_artifacts.ex, test/docs_contract/theme_industry_guard_test.exs, test/docs_contract/theming_claims_test.exs, test/rendro/recipes/payslip_opts_threading_test.exs, test/rendro/recipes/themed_render_smoke_test.exs, test/rendro/recipes/certificate_typography_test.exs, test/rendro/recipes/theme_mode_background_golden_test.exs) -- last touched by phases 119/121/122/123-03/123-04, none by 123-05's rubric-score commit; blocks mix ci.fast's format-check gate. See 123-05 deferred-items.md item 1. | fixed |  | 2026-07-28T20:53:45.711Z | 2026-07-29T01:19:32.157Z |
+| 5 | 123 | deviation | test/docs_contract/dx_local_reproducibility_claims_test.exs |  | 2 pre-existing test failures: File.Error reading .planning/phases/113-dx-local-reproducibility-validation/113-UAT.md and 113-METRICS.md (missing from this working tree's partial phase-113 planning artifacts) -- unrelated to phase 123 rubric/gallery/theming work. See 123-05 deferred-items.md item 2. | fixed |  | 2026-07-28T20:53:45.778Z | 2026-07-29T01:19:32.243Z |
+| 6 | 123 | deviation | lib/rendro/recipes/ticket.ex |  | mix dialyzer fails on pre-existing lib/rendro/recipes/ticket.ex contract errors (no_return on document/1,2 and sections/1,2; Rendro.Recipes.Background.emit?/1 contract mismatch) -- not touched by 123-05's commit; plausibly related to the Ticket hierarchy-inversion regression already recorded honestly as passed:false (WINDOWS id 2) but a dialyzer fix is a separate lib/-touching change outside this plan's D-05 Commit 3 isolation scope. See 123-05 deferred-items.md item 3. | fixed |  | 2026-07-28T20:53:45.848Z | 2026-07-29T01:19:32.330Z |
 | 7 | 123 | deviation | priv/pdfium_pin.json |  | mix rendro.launch_artifacts.check (part of ci.advisory) fails: pdfium-cli v0.11.0 binary not installed/on PATH in this execution environment -- environment/tooling gap, not a code or manifest defect; not auto-installed per the executor's external-binary caution. See 123-05 deferred-items.md item 4. | open |  | 2026-07-28T20:53:45.917Z |  |
 
 ````json
@@ -68,10 +68,10 @@ last_updated: 2026-07-28T20:53:45.917Z
     "file": "lib/rendro/launch_artifacts.ex",
     "line": null,
     "description": "mix format --check-formatted fails on 7 pre-existing files (lib/rendro/launch_artifacts.ex, test/docs_contract/theme_industry_guard_test.exs, test/docs_contract/theming_claims_test.exs, test/rendro/recipes/payslip_opts_threading_test.exs, test/rendro/recipes/themed_render_smoke_test.exs, test/rendro/recipes/certificate_typography_test.exs, test/rendro/recipes/theme_mode_background_golden_test.exs) -- last touched by phases 119/121/122/123-03/123-04, none by 123-05's rubric-score commit; blocks mix ci.fast's format-check gate. See 123-05 deferred-items.md item 1.",
-    "status": "open",
+    "status": "fixed",
     "reason": "",
     "recorded_at": "2026-07-28T20:53:45.711Z",
-    "resolved_at": null
+    "resolved_at": "2026-07-29T01:19:32.157Z"
   },
   {
     "id": 5,
@@ -80,10 +80,10 @@ last_updated: 2026-07-28T20:53:45.917Z
     "file": "test/docs_contract/dx_local_reproducibility_claims_test.exs",
     "line": null,
     "description": "2 pre-existing test failures: File.Error reading .planning/phases/113-dx-local-reproducibility-validation/113-UAT.md and 113-METRICS.md (missing from this working tree's partial phase-113 planning artifacts) -- unrelated to phase 123 rubric/gallery/theming work. See 123-05 deferred-items.md item 2.",
-    "status": "open",
+    "status": "fixed",
     "reason": "",
     "recorded_at": "2026-07-28T20:53:45.778Z",
-    "resolved_at": null
+    "resolved_at": "2026-07-29T01:19:32.243Z"
   },
   {
     "id": 6,
@@ -92,10 +92,10 @@ last_updated: 2026-07-28T20:53:45.917Z
     "file": "lib/rendro/recipes/ticket.ex",
     "line": null,
     "description": "mix dialyzer fails on pre-existing lib/rendro/recipes/ticket.ex contract errors (no_return on document/1,2 and sections/1,2; Rendro.Recipes.Background.emit?/1 contract mismatch) -- not touched by 123-05's commit; plausibly related to the Ticket hierarchy-inversion regression already recorded honestly as passed:false (WINDOWS id 2) but a dialyzer fix is a separate lib/-touching change outside this plan's D-05 Commit 3 isolation scope. See 123-05 deferred-items.md item 3.",
-    "status": "open",
+    "status": "fixed",
     "reason": "",
     "recorded_at": "2026-07-28T20:53:45.848Z",
-    "resolved_at": null
+    "resolved_at": "2026-07-29T01:19:32.330Z"
   },
   {
     "id": 7,

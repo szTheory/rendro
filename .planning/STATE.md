@@ -2,16 +2,19 @@
 gsd_state_version: 1.0
 milestone: v2.11
 milestone_name: Document Theming & Design-Token System
-status: executing
-stopped_at: Completed 123-05-PLAN.md
-last_updated: "2026-07-29T01:09:14.167Z"
-last_activity: 2026-07-29 -- Phase 124 planning complete
+current_phase: 124
+current_phase_name: Address v2.11 tech debt (stale 113 docs-contract test, formatter drift, ticket dialyzer contract
+status: verifying
+stopped_at: Completed 124-01-PLAN.md
+last_updated: "2026-07-29T01:21:11.009Z"
+last_activity: 2026-07-29
+last_activity_desc: Phase 124 execution started
 progress:
-  total_phases: 6
-  completed_phases: 5
-  total_plans: 21
-  completed_plans: 20
-  percent: 83
+  total_phases: 13
+  completed_phases: 6
+  total_plans: 26
+  completed_plans: 22
+  percent: 46
 ---
 
 # Project State
@@ -21,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-27)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 123 — from-brand-2-e2e-honest-rubric-gap-closure-gallery-docs-mani
+**Current focus:** Phase 124 — Address v2.11 tech debt (stale 113 docs-contract test, formatter drift, ticket dialyzer contract)
 
 ## Current Position
 
-Phase: 123 — `from_brand/2` E2E + honest rubric-gap closure + gallery/docs/manifest closure (complete)
-Plan: 5/5 complete — phase verified (123-VERIFICATION.md: passed, 5/5 must-haves)
-Status: Ready to execute
-Last activity: 2026-07-29 -- Phase 124 planning complete
+Phase: 124 (Address v2.11 tech debt (stale 113 docs-contract test, formatter drift, ticket dialyzer contract)) — EXECUTING
+Plan: 1 of 1
+Status: Phase complete — ready for verification
+Last activity: 2026-07-29 -- Phase 124 execution started
 
-Progress: [██████████] 100%
+Progress: [█████████░] 85%
 
 ## Roadmap Snapshot (v2.11, Phases 119-123)
 
@@ -91,6 +94,9 @@ Full log in PROJECT.md Key Decisions. Milestone-B locks carried into planning:
 - [Phase ?]: 123-04: guides/theming.md ships 3 executable from_brand/2 fences (D-04, guide fence IS the E2E test); theming.light gained proof-backed capabilities (from_brand_accent_seed/on_accent_readable_default/brand_theme_orthogonal); fixed pre-existing mix docs --warnings-as-errors break (Rendro.Color.validate/1 hidden-function doc reference, predates this phase) and a stale 7-vs-11 gallery-count test left over from 123-03
 - [Phase ?]: Ticket honestly recorded passed:false (content_hierarchy 3, typographic_craft 3) per human sign-off -- themed uniform scale inverted the reference-code/placement-grid hierarchy; not flattened to true (D-05 anti-trap).
 - [Phase ?]: Certificate recorded passed:true despite recipient/title ratio compressing 1.70->1.27 (themed) -- human visual sign-off confirmed recipient still unambiguous focal point; compression disclosed in SIGN-OFF.md, not hidden.
+- [Phase ?]: 124-01: Background.emit?/1 @spec widened to open map type, clearing 133-error dialyzer cascade (D-03); ticket.ex untouched
+- [Phase ?]: 124-01: mix format applied bounded to 7 known drifted files, formatting-only (D-02)
+- [Phase ?]: 124-01: 2 stale Phase-113 docs-contract test cases deleted (archive-specific, zero forward-looking value) + 3 orphaned attrs removed (D-01)
 
 ### Pending Todos
 
@@ -112,8 +118,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-28T20:55:50.231Z
-Stopped at: Completed 123-05-PLAN.md
+Last session: 2026-07-29T01:21:10.999Z
+Stopped at: Completed 124-01-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -139,3 +145,4 @@ Resume file: None
 | Phase 123 P03 | 26min | 3 tasks | 18 files |
 | Phase 123 P04 | 14min | 3 tasks | 6 files |
 | Phase 123 P05 | 6min | 2 tasks | 6 files |
+| Phase 124 P01 | 6min | 3 tasks | 9 files |

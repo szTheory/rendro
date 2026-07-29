@@ -222,9 +222,9 @@ Dependency order: A → B → C → D. Each is a right-sized milestone; D is opt
 **Goal:** Clear the three non-blocking v2.11 tech-debt items so the `ci.fast` chain runs green end-to-end, without changing any rendered output: (1) fix the stale `dx_local_reproducibility_claims_test.exs` that `File.read!`s deleted `.planning/phases/113-*` files, (2) resolve formatter-version drift on ~7 files so `mix format --check-formatted` passes, and (3) correct the `ticket.ex`/`Background.emit?/1` type contracts so `mix dialyzer` passes — all while preserving the byte-identity golden guard and leaving the locked Ticket visual-hierarchy regression (WINDOWS id 2) untouched.
 **Requirements**: D-01, D-02, D-03 (maintenance phase — acceptance criteria in 124-CONTEXT.md success criteria; no new REQ-IDs)
 **Depends on:** Phase 123
-**Plans:** 1 plan
+**Plans:** 1/1 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 124-01-PLAN.md — Dialyzer contract fix (background.ex @spec) + bounded mix format (7 files) + stale 113 docs-contract test cleanup [Wave 1]
+- [x] 124-01-PLAN.md — Dialyzer contract fix (background.ex @spec) + bounded mix format (7 files) + stale 113 docs-contract test cleanup [Wave 1]
