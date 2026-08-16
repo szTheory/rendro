@@ -2,9 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.12
 milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
+current_phase: 125
+current_phase_name: Foundation — Curated fonts, style-genre presets & brand fixtures
 status: planning
-last_updated: "2026-07-29T04:00:00.000Z"
+stopped_at: Phase 125 context gathered
+last_updated: "2026-08-16T22:10:28.042Z"
 last_activity: 2026-07-29
+last_activity_desc: ROADMAP.md + REQUIREMENTS.md traceability written for Milestone v2.12
 progress:
   total_phases: 5
   completed_phases: 0
@@ -61,9 +65,9 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-07-29T04:00:00.000Z
-Stopped at: ROADMAP.md + REQUIREMENTS.md traceability written for Milestone v2.12 (Phases 125-129, 28/28 requirements mapped)
-Resume file: None
+Last session: 2026-08-16T22:10:28.035Z
+Stopped at: Phase 125 context gathered
+Resume file: .planning/phases/125-foundation-curated-fonts-style-genre-presets-brand-fixtures/125-CONTEXT.md
 
 ## Next Steps
 
