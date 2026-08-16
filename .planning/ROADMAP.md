@@ -93,7 +93,13 @@
   4. Referencing an unregistered preset font role raises the existing typed `FontRegistry` error (no silent substitution), and a double-subset determinism test proves byte-identical subsetting output for every vendored font.
   5. At least one additional example brand exists per domain family under `priv/examples/<domain>/` as a data tuple (never a module), and the un-themed/`default()` render stays byte-identical to prior goldens (zero per-draw float math in preset derivation).
 
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 125-01-PLAN.md — Trace one real Swiss invoice through strict preset construction, explicit curated-font registration, rendering, packaging, provenance, and deterministic subsetting.
+- [ ] 125-02-PLAN.md — Expand the complete preset grammar, repair Certificate exact-font metrics, and prove the bounded render/raster matrix.
+- [ ] 125-03-PLAN.md — Add exactly two schema-valid data-only synthetic brands per existing example domain.
+- [ ] 125-04-PLAN.md — Run the full deterministic phase gate, then conduct separately pinned-PDFium human review.
 **UI hint**: no — pure library API + vendored data files, no browser-rendered surface
 
 ### Phase 126: Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth
@@ -163,7 +169,7 @@
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 125. Foundation — Curated fonts, style-genre presets & brand fixtures | v2.12 | 0/TBD | Not started | - |
+| 125. Foundation — Curated fonts, style-genre presets & brand fixtures | v2.12 | 0/4 | Planned | - |
 | 126. Carryover polish — dark-mode legibility, hierarchy & golden depth | v2.12 | 0/TBD | Not started | - |
 | 127. Public example catalog & quality ratchet | v2.12 | 0/TBD | Not started | - |
 | 128. Static configurator, theme codegen & Livebook | v2.12 | 0/TBD | Not started | - |

@@ -1,8 +1,8 @@
 ---
 phase: 125
 slug: foundation-curated-fonts-style-genre-presets-brand-fixtures
-status: draft
-nyquist_compliant: false
+status: planned
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-08-16
 ---
@@ -38,14 +38,14 @@ created: 2026-08-16
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| TBD | TBD | TBD | PRESET-01..04 | T-125-01 | Strict option/color validation; deterministic light/dark composition | unit + integration | `mix test test/rendro/theme/presets_test.exs` | ❌ W0 | ⬜ pending |
-| TBD | TBD | TBD | PRESET-05 | T-125-02 | Unregistered roles retain typed failure; no silent fallback | integration | `mix test test/rendro/theme/presets_test.exs` | ❌ W0 | ⬜ pending |
-| TBD | TBD | TBD | PRESET-06 | T-125-03 | Brutalist is absent unless completely implemented and verified | unit + advisory raster | `mix test test/rendro/theme/presets_test.exs` | ❌ W0 | ⬜ pending |
-| TBD | TBD | TBD | FONT-01..02 | T-125-04 | Vendored-only static TTFs pass strict preflight and immutable provenance checks | unit | `mix test test/rendro/theme/preset_fonts_test.exs` | ❌ W0 | ⬜ pending |
-| TBD | TBD | TBD | FONT-03 | T-125-05 | Every referenced font and NOTICE entry is present in the Hex tarball | package integration | `mix test test/docs_contract/preset_fonts_package_contract_test.exs` | ❌ W0 | ⬜ pending |
-| TBD | TBD | TBD | FONT-04 | T-125-06 | Registration is idempotent for identical descriptors and rejects caller-owned collisions | integration | `mix test test/rendro/theme/presets_test.exs` | ❌ W0 | ⬜ pending |
-| TBD | TBD | TBD | FONT-05 | T-125-07 | Glyph permutations and duplicates yield identical subset bytes for all four fonts | unit | `mix test test/rendro/pdf/font_subsetter_test.exs` | ✅ extend | ⬜ pending |
-| TBD | TBD | TBD | CATALOG-05 | T-125-08 | Fixture paths remain local/safe and every brand satisfies the generic schema | schema + fixture | `mix test test/docs_contract/examples_schema_contract_test.exs` | ✅ extend | ⬜ pending |
+| 125-01-01 | 01 | 1 | PRESET-01, PRESET-04, PRESET-05, FONT-04 | T-125-01, T-125-03 | Strict validation; explicit registration; typed omission failure; real render tracer | unit + integration + E2E | `mix test test/rendro/theme/presets_test.exs` | ❌ task creates | ⬜ pending |
+| 125-02-01 | 02 | 2 | PRESET-02, PRESET-03, PRESET-06 | T-125-06 | Exact structural token matrix, source confinement, complete Brutalist semantics | unit + source contract | `mix test test/rendro/theme/presets_test.exs test/docs_contract/theme_industry_guard_test.exs` | ❌ task creates/extends | ⬜ pending |
+| 125-02-02 | 02 | 2 | PRESET-04, PRESET-05, FONT-04 | T-125-07, T-125-08 | Certificate exact metrics, bounded recipe/mode/font matrix, no silent fallback | integration + deterministic E2E | `mix test test/rendro/recipes/certificate_typography_test.exs test/rendro/theme/preset_render_matrix_test.exs` | ❌ task creates/extends | ⬜ pending |
+| 125-04-02 | 04 | 3 | PRESET-02, PRESET-04, PRESET-06 | T-125-17, T-125-18 | Pinned-PDFium genre review remains advisory and separately approved | advisory raster + human | `mix test --include raster_snapshot test/rendro/theme/preset_raster_snapshot_test.exs` | ❌ Plan 02 creates | ⬜ pending |
+| 125-01-02 | 01 | 1 | FONT-01, FONT-02 | T-125-01, T-125-02 | Vendored static TTFs pass strict preflight and immutable provenance checks | unit | `mix test test/rendro/theme/preset_fonts_test.exs` | ❌ task creates | ⬜ pending |
+| 125-01-02 | 01 | 1 | FONT-03 | T-125-02 | Every referenced font and NOTICE entry is present in the Hex tarball | package integration | `mix test test/docs_contract/preset_fonts_package_contract_test.exs` | ❌ task creates | ⬜ pending |
+| 125-01-02 | 01 | 1 | FONT-05 | T-125-01 | Empty/equal glyph sets yield parseable byte-identical subsets for all four fonts | unit | `mix test test/rendro/pdf/font_subsetter_test.exs` | ✅ extend | ⬜ pending |
+| 125-03-01..02 | 03 | 1 | CATALOG-05 | T-125-11, T-125-15 | Fixture paths remain local/safe, arithmetic exact, and every brand satisfies the generic schema | schema + fixture + package | `mix test test/docs_contract/examples_schema_contract_test.exs` | ✅ extend | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -53,11 +53,10 @@ created: 2026-08-16
 
 ## Wave 0 Requirements
 
-- [ ] `test/rendro/theme/presets_test.exs` — constructor, token, registration, collision, missing-role, recipe, and Certificate coverage.
-- [ ] `test/rendro/theme/preset_fonts_test.exs` — curated-font format, embedding, provenance, and NOTICE checks.
-- [ ] `test/docs_contract/preset_fonts_package_contract_test.exs` — positive Hex tarball-content proof for every preset font/NOTICE file.
-- [ ] Extend `test/rendro/pdf/font_subsetter_test.exs` with permutation and duplicate-glyph determinism cases for all four curated faces.
-- [ ] Extend `test/docs_contract/examples_schema_contract_test.exs` with fixture count, generic brand data, local logo, and domain invariant checks.
+- [ ] Plan 01 Task 1 creates `test/rendro/theme/presets_test.exs` before tracer implementation.
+- [ ] Plan 01 Task 2 creates `test/rendro/theme/preset_fonts_test.exs` and `test/docs_contract/preset_fonts_package_contract_test.exs`, and extends `test/rendro/pdf/font_subsetter_test.exs`, before expansion implementation.
+- [ ] Plan 02 Task 2 creates `test/rendro/theme/preset_render_matrix_test.exs` and `test/rendro/theme/preset_raster_snapshot_test.exs` before recipe/matrix implementation.
+- [ ] Plan 03 Task 1 extends `test/docs_contract/examples_schema_contract_test.exs` before fixture/schema implementation.
 
 ---
 
@@ -71,12 +70,12 @@ created: 2026-08-16
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verification or Wave 0 dependencies.
-- [ ] Sampling continuity: no three consecutive tasks without automated verification.
-- [ ] Wave 0 covers all missing test references.
-- [ ] No watch-mode flags.
-- [ ] Focused feedback latency is under 60 seconds.
-- [ ] Deterministic and advisory verification lanes remain separate.
-- [ ] `nyquist_compliant: true` set in frontmatter after validation.
+- [x] All tasks have `<automated>` verification or explicit test-first creation in the same task.
+- [x] Sampling continuity: no three consecutive tasks without automated verification.
+- [x] Wave 0 gaps are bound to the first behavior-producing task that consumes each test.
+- [x] No watch-mode flags.
+- [x] Focused feedback latency targets under 60 seconds; package/full/raster commands are explicit wave/phase gates.
+- [x] Deterministic and advisory verification lanes remain separate.
+- [x] `nyquist_compliant: true` set in frontmatter after plan binding.
 
 **Approval:** pending
