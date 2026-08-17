@@ -217,6 +217,7 @@
           "earnings": { "$ref": "#/$defs/pay_lines" },
           "deductions": { "$ref": "#/$defs/pay_lines" },
           "net_pay": { "$ref": "#/$defs/money_string" },
+          "net_pay_ytd": { "$ref": "#/$defs/money_string" },
           "payment_method": { "type": "string" }
         }
       }

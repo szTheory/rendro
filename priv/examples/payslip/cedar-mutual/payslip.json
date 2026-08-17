@@ -1,0 +1,39 @@
+{
+  "fixture_id": "payslip_cedar_mutual_v1",
+  "family": "payslip",
+  "paper": "a4",
+  "currency": "USD",
+  "employer": {
+    "name": "Cedar Mutual",
+    "address": "31 Grove Circle, Burlington, VT 05401"
+  },
+  "employee": {
+    "name": "Morgan Reed",
+    "id": "CM-DEMO-008",
+    "tax_code": "DEMO-18"
+  },
+  "period": {
+    "from": "2026-07-01",
+    "to": "2026-07-31"
+  },
+  "pay_date": "2026-08-04",
+  "earnings": [
+    {"description": "Member services salary", "amount": "3900.00", "ytd": "23400.00"},
+    {"description": "Quarterly service award", "amount": "240.00", "ytd": "720.00"}
+  ],
+  "deductions": [
+    {"description": "Payroll tax", "amount": "690.00", "ytd": "4140.00"},
+    {"description": "Member association dues", "amount": "38.00", "ytd": "228.00"},
+    {"description": "Retirement contribution", "amount": "207.00", "ytd": "1242.00"}
+  ],
+  "net_pay": "3205.00",
+  "net_pay_ytd": "18510.00",
+  "payment_method": "Payroll transfer — masked demonstration reference",
+  "brand": {
+    "slug": "cedar-mutual",
+    "display_name": "Cedar Mutual",
+    "accent": "#1F4FB8",
+    "recommended_preset": "corporate_classic",
+    "logo": "logo.svg"
+  }
+}

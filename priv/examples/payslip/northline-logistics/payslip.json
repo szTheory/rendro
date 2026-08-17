@@ -1,0 +1,39 @@
+{
+  "fixture_id": "payslip_northline_logistics_v1",
+  "family": "payslip",
+  "paper": "a4",
+  "currency": "USD",
+  "employer": {
+    "name": "Northline Logistics",
+    "address": "84 Freightway Avenue, Columbus, OH 43215"
+  },
+  "employee": {
+    "name": "Avery Lane",
+    "id": "NL-DEMO-014",
+    "tax_code": "DEMO-27"
+  },
+  "period": {
+    "from": "2026-07-01",
+    "to": "2026-07-15"
+  },
+  "pay_date": "2026-07-19",
+  "earnings": [
+    {"description": "Operations salary", "amount": "4250.00", "ytd": "25500.00"},
+    {"description": "Route coverage premium", "amount": "330.00", "ytd": "1320.00"}
+  ],
+  "deductions": [
+    {"description": "Payroll tax", "amount": "795.00", "ytd": "4770.00"},
+    {"description": "Social insurance", "amount": "302.50", "ytd": "1815.00"},
+    {"description": "Retirement contribution", "amount": "229.00", "ytd": "1374.00"}
+  ],
+  "net_pay": "3253.50",
+  "net_pay_ytd": "18861.00",
+  "payment_method": "Payroll transfer — masked demonstration reference",
+  "brand": {
+    "slug": "northline-logistics",
+    "display_name": "Northline Logistics",
+    "accent": "#2C6BED",
+    "recommended_preset": "swiss",
+    "logo": "logo.svg"
+  }
+}
