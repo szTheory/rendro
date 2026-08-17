@@ -1,8 +1,8 @@
 ---
 phase: 126
 slug: carryover-polish-dark-mode-legibility-hierarchy-decision-gol
-status: draft
-nyquist_compliant: false
+status: complete
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-08-16
 ---
@@ -49,7 +49,7 @@ created: 2026-08-16
 | 126-03-02 | 03 | 2 | POLISH-01, POLISH-02, POLISH-03 | T-126-09, T-126-10 | Human confirms exact run/ref/SHA, successful `advisory-checks`, disclosed adapter compare-only outcome, successful preset blessing, and exact pinned manifest/payload without requiring overall run success. Failed run 31996940001 and eventual accepted evidence remain recorded through cleanup. | automated artifact fence + manual provenance checkpoint | `test -f tmp/phase126_ci_raster_artifact/manifest.txt && mix test test/guardrails/required_checks_contract_test.exs` plus exact job/step provenance, six-file diff gate, and checkpoint approval | ✅ external artifact / automated approval | ✅ green |
 | 126-04-01 | 04 | 3 | POLISH-01, POLISH-02, POLISH-03 | T-126-12 | Six stable-row PNGs were reviewed individually full-size for semantic ink, Ticket hierarchy/reference fit, money integrity, and regressions; the approved summary authorizes isolated-CI-ref deletion only after all evidence is committed. | automated presence gate + manual visual checkpoint | `test -f tmp/rendro_phase126_review/swiss_invoice_light_page_1.png && test -f tmp/rendro_phase126_review/corporate_classic_invoice_dark_page_1.png && test -f tmp/rendro_phase126_review/editorial_ticket_dark_page_1.png && test -f tmp/rendro_phase126_review/minimal_mono_ticket_dark_page_1.png && test -f tmp/rendro_phase126_review/humanist_payslip_dark_page_1.png && test -f tmp/rendro_phase126_review/brutalist_payslip_dark_page_1.png` plus committed `visual_review: approved` / `cleanup_authorized: true` fields | ✅ six CI artifacts / approved bounded disposition | ✅ green |
 | 126-05-01 | 05 | 4 | POLISH-01–POLISH-05 | T-126-14, T-126-15 | Only affected quality/WINDOWS records close from approved deterministic, pinned-CI, and human evidence; Validation completion is evidence-gated. | schema + docs contract + ledger check | `jq empty priv/quality/rubric_scores.json && mix test test/docs_contract/rubric_manifest_contract_test.exs && node /Users/jon/.codex/gsd-core/bin/gsd-tools.cjs windows status` | ✅ updated affected records / schema / ledger | ✅ green |
-| 126-05-02 | 05 | 4 | POLISH-01–POLISH-05 | T-126-16 | Full deterministic phase gate, source audit, ten probes, and prohibitions pass without folding in advisory raster execution; after committed provenance, artifact changes, and Plan 04 approval are proven, every `retained_ci_ref` from failed and eventual evidence is deleted and remote absence is verified per ref. | focused + full deterministic suite + approved remote cleanup | `mix test test/rendro/recipes/invoice*_test.exs test/rendro/recipes/ticket*_test.exs test/rendro/recipes/payslip*_test.exs test/rendro/recipes/*_typography_test.exs test/rendro/theme/preset_accent_golden_test.exs test/rendro/theme/preset_render_matrix_test.exs --max-failures 1 && mix test && mix ci.fast` plus per-ref `git push origin --delete "$CI_REF"` and non-zero `git ls-remote --exit-code --heads origin "$CI_REF"`, with failed/eventual provenance and every cleanup result recorded in `126-05-SUMMARY.md` | ✅ harness / ❌ phase changes and cleanup evidence | ⬜ pending |
+| 126-05-02 | 05 | 4 | POLISH-01–POLISH-05 | T-126-16 | Full deterministic phase gate, source audit, ten probes, and prohibitions pass without folding in advisory raster execution; after committed provenance, artifact changes, and Plan 04 approval are proven, every `retained_ci_ref` from failed and eventual evidence is deleted and remote absence is verified per ref. | focused + full deterministic suite + approved remote cleanup | `mix test test/rendro/recipes/invoice*_test.exs test/rendro/recipes/ticket*_test.exs test/rendro/recipes/payslip*_test.exs test/rendro/recipes/*_typography_test.exs test/rendro/theme/preset_accent_golden_test.exs test/rendro/theme/preset_render_matrix_test.exs --max-failures 1 && mix test && mix ci.fast` plus per-ref `git push origin --delete "$CI_REF"` and non-zero `git ls-remote --exit-code --heads origin "$CI_REF"`, with failed/eventual provenance and every cleanup result recorded in `126-05-SUMMARY.md` | ✅ 183 focused / 1761 full / ci.fast / two absent refs | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -76,12 +76,12 @@ created: 2026-08-16
 
 ## Validation Sign-Off
 
-- [ ] All tasks have automated verification or explicit Wave 0 dependencies.
-- [ ] Sampling continuity: no three consecutive tasks lack automated verification.
-- [ ] Wave 0 covers every missing test artifact.
-- [ ] No watch-mode flags are used.
-- [ ] Deterministic and advisory lanes remain separate.
-- [ ] Feedback latency remains below 180 seconds for focused deterministic checks.
-- [ ] `nyquist_compliant: true` is set after validation coverage is implemented and audited.
+- [x] All tasks have automated verification or explicit Wave 0 dependencies.
+- [x] Sampling continuity: no three consecutive tasks lack automated verification.
+- [x] Wave 0 covers every missing test artifact.
+- [x] No watch-mode flags are used.
+- [x] Deterministic and advisory lanes remain separate.
+- [x] Feedback latency remains below 180 seconds for focused deterministic checks.
+- [x] `nyquist_compliant: true` is set after validation coverage is implemented and audited.
 
-**Approval:** pending
+**Approval:** complete — all eleven task rows are green; deterministic and advisory evidence remain explicitly separate.
