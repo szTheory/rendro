@@ -632,6 +632,7 @@ defmodule Rendro.Recipes.Ticket do
         nil -> band_w / @band_ratio
         _theme -> max(band_w / @band_ratio, 250)
       end
+
     stub_split = band_w * @stub_ratio
     stub_width = band_w - stub_split
 
