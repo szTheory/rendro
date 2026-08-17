@@ -123,6 +123,13 @@ defmodule Rendro.Recipes.InvoiceTypographyTest do
         Invoice.document(sample_data(), theme: theme)
       end
     end
+
+    test "ignores an unregistered heading font that Invoice does not emit" do
+      theme = theme_with_bad_font(:heading, :unregistered_invoice_heading)
+      document = Invoice.document(sample_data(), theme: theme)
+
+      assert {:ok, _built} = Build.run(document)
+    end
   end
 
   defp find_text(sections, content), do: Enum.find(texts(sections), &(&1.content == content))
