@@ -4,17 +4,17 @@ milestone: v2.12
 milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 125
 current_phase_name: Foundation — Curated fonts, style-genre presets & brand fixtures
-status: executing
-stopped_at: Completed 125-06-PLAN.md
-last_updated: "2026-08-17T01:25:59.729Z"
+status: verifying
+stopped_at: Completed 125-10-PLAN.md
+last_updated: "2026-08-17T01:42:47.554Z"
 last_activity: 2026-08-16
 last_activity_desc: Phase 125 execution started
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 10
-  completed_plans: 9
-  percent: 0
+  completed_plans: 10
+  percent: 20
 ---
 
 # Project State
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-28)
 
 Phase: 125 (Foundation — Curated fonts, style-genre presets & brand fixtures) — EXECUTING
 Plan: 10 of 10
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-08-16 — Phase 125 execution started
 
 ## Roadmap Snapshot (v2.12, Phases 125-129) — IN PLANNING
@@ -65,8 +65,8 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-17T01:25:59.723Z
-Stopped at: Completed 125-06-PLAN.md
+Last session: 2026-08-17T01:42:47.547Z
+Stopped at: Completed 125-10-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -102,6 +102,7 @@ Resume file: None
 | Phase 125 P04 | 18min | 2 tasks | 6 files |
 | Phase 125 P05 | 8min | 1 tasks | 7 files |
 | Phase 125 P06 | 3min | 1 tasks | 7 files |
+| Phase 125-foundation-curated-fonts-style-genre-presets-brand-fixtures P10 | 15min | 2 tasks | 26 files |
 
 ## Operator Next Steps
 
@@ -123,3 +124,5 @@ Resume file: None
 - [Phase ?]: Preset raster references use the existing CI-only blessing guard and pinned PDFium version; review PNGs remain external and advisory.
 - [Phase ?]: Corporate-Classic, Minimal-Mono, and Brutalist share the identical pinned advisory evidence path.
 - [Phase ?]: Normal raster comparison requires twelve unique IDs and references; CI-only blessing may seed absent references.
+- [Phase ?]: Embedded CID /W tables use glyph-ID metrics while layout retains Unicode codepoint metrics.
+- [Phase ?]: Phase 125 preset review uses a pinned PDFium v0.11.0 advisory matrix and bounded human judgment only.
