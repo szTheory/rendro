@@ -535,13 +535,17 @@ defmodule Rendro.Recipes.Payslip do
   #      spacer column between the two groups gives every row a genuine
   #      visual gap.
   #
-  # At size 11, "$25,200.00" measures 55.044pt and "$4,200.00" measures
-  # 48.928pt — @ytd_col_width and @current_col_width below give both
-  # comfortable headroom while the @group_spacer_width column keeps the two
+  # The frozen nil-theme columns keep their historical literals. At the
+  # supplied-theme subtitle size, "$25,200.00" needs 68pt; the
+  # themed-only YTD width retains one whole point of headroom. "$4,200.00"
+  # and "$4,550.00" need 61pt, so both themed amount widths are retuned. The
+  # amount columns below give stable fixtures headroom while the @group_spacer_width column keeps the two
   # remaining description share-columns wide enough for the widest realistic
   # line-item description (e.g. "Pension Contribution", 102.102pt at size 11).
   @current_col_width 55
   @ytd_col_width 60
+  @themed_current_col_width 61
+  @themed_ytd_col_width 68
   @group_spacer_width 10
   # 122-02: the former @cell_size (11) literal is now the `subtitle` step of the
   # typography/1 seam (no-theme literal-default preserves that exact value).
@@ -552,6 +556,7 @@ defmodule Rendro.Recipes.Payslip do
     lbl = Rendro.Recipes.Pagination.label_resolver(opts, @default_labels)
     fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
     g = geometry(opts)
+    {current_col_width, ytd_col_width} = money_column_widths(opts)
 
     totals = derive_totals(data)
 
@@ -587,12 +592,12 @@ defmodule Rendro.Recipes.Payslip do
       ],
       columns: [
         {:share, 2},
-        {:fixed, @current_col_width},
-        {:fixed, @ytd_col_width},
+        {:fixed, current_col_width},
+        {:fixed, ytd_col_width},
         {:fixed, @group_spacer_width},
         {:share, 2},
-        {:fixed, @current_col_width},
-        {:fixed, @ytd_col_width}
+        {:fixed, current_col_width},
+        {:fixed, ytd_col_width}
       ],
       borders: :columns,
       cell_align: %{1 => :right, 2 => :right, 5 => :right, 6 => :right}
@@ -668,6 +673,13 @@ defmodule Rendro.Recipes.Payslip do
           color: colors.ink
         )
       )
+
+  defp money_column_widths(opts) do
+    case opts[:theme] do
+      nil -> {@current_col_width, @ytd_col_width}
+      _theme -> {@themed_current_col_width, @themed_ytd_col_width}
+    end
+  end
 
   # Zips earnings/deductions to equal length, blank-padding the shorter list
   # (D-12) so the combined ledger always has one row per zipped pair.

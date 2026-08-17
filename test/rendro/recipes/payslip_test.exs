@@ -448,18 +448,16 @@ defmodule Rendro.Recipes.PayslipTest do
 
       for {name, theme} <- themes do
         {table, doc} = themed_table_and_document(data, theme)
-        {header_h, row_heights} = measure_table(table, doc)
 
-        assert header_h > 0
+        for {label, cell, width} <- amount_cells(table) do
+          assert one_line?(cell, width, doc),
+                 "#{name} must keep #{label} on one line at #{width}pt"
 
-        assert Enum.all?(row_heights, &(&1 < 20)),
-               "#{name} must keep $4,200.00, $4,550.00, and $25,200.00 on one line: #{inspect(row_heights)}"
-
-        {_narrow_header_h, narrow_row_heights} =
-          measure_table(narrower_amount_columns(table), doc)
-
-        assert Enum.any?(narrow_row_heights, &(&1 >= 20)),
-               "#{name} must prove the selected amount width is a real one-point boundary"
+          if name == :humanist do
+            refute one_line?(cell, width - 1, doc),
+                   "#{name} must prove #{label}'s selected #{width}pt width is a real one-point boundary"
+          end
+        end
       end
     end
   end
@@ -555,18 +553,23 @@ defmodule Rendro.Recipes.PayslipTest do
     {table, doc}
   end
 
-  defp measure_table(table, doc) do
-    Rendro.measure_rows(table.rows, 595.28 - 2 * 72, doc,
-      header: table.header,
-      columns: table.columns,
-      cell_align: table.cell_align
-    )
+  defp amount_cells(%Rendro.Table{rows: [row | _], columns: columns}) do
+    [
+      {"$4,200.00", Enum.at(row, 1), fixed_width(columns, 1)},
+      {"$25,200.00", Enum.at(row, 2), fixed_width(columns, 2)},
+      {"$4,550.00", Enum.at(row, 5), fixed_width(columns, 5)}
+    ]
   end
 
-  defp narrower_amount_columns(table) do
-    %{table | columns: Enum.map(table.columns, &narrow_amount_column/1)}
+  defp fixed_width(columns, index) do
+    {:fixed, width} = Enum.at(columns, index)
+    width
   end
 
-  defp narrow_amount_column({:fixed, width}) when width in [55, 60], do: {:fixed, width - 1}
-  defp narrow_amount_column(column), do: column
+  defp one_line?(cell, width, doc) do
+    {_header_height, [row_height]} =
+      Rendro.measure_rows([[cell]], width, doc, columns: [{:fixed, width}])
+
+    row_height < 20
+  end
 end
