@@ -4,6 +4,7 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
 
   @schema_path "priv/schemas/examples.schema.json"
   @original_invoice_sha256 "7368479dfc51b23a09be216f5496c1d209ec7dd543e972b3b367db6525cdafd1"
+  @original_payslip_sha256 "9924c3f434b323a2a8ff8f3c9df5427517fbb6d69c25ba87900e8f2a5d3dda05"
 
   defp examples_schema do
     @schema_path
@@ -95,8 +96,87 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
              @original_invoice_sha256
   end
 
+  test "Payslip reuses the locked brands with matching marks and exact period and YTD arithmetic" do
+    assert payslip_paths() == [
+             "priv/examples/payslip/aurora-live/payslip.json",
+             "priv/examples/payslip/cedar-mutual/payslip.json",
+             "priv/examples/payslip/northline-logistics/payslip.json"
+           ]
+
+    assert_cross_domain_brand!("northline-logistics", "#2C6BED", "swiss")
+    assert_cross_domain_brand!("cedar-mutual", "#1F4FB8", "corporate_classic")
+
+    identities =
+      for path <- Path.wildcard("priv/examples/**/*.json") do
+        fixture = path |> File.read!() |> JSON.decode!()
+
+        case fixture["brand"] do
+          %{"slug" => slug} -> {Path.basename(Path.dirname(Path.dirname(path))), slug}
+          _ -> nil
+        end
+      end
+      |> Enum.reject(&is_nil/1)
+
+    assert length(identities) == length(Enum.uniq(identities))
+
+    for path <- payslip_paths() -- ["priv/examples/payslip/aurora-live/payslip.json"] do
+      fixture = path |> File.read!() |> JSON.decode!()
+      assert_payslip_arithmetic!(fixture)
+      assert_synthetic_fixture!(fixture)
+    end
+
+    assert sha256("priv/examples/payslip/aurora-live/payslip.json") == @original_payslip_sha256
+  end
+
   defp invoice_paths do
     Path.wildcard("priv/examples/invoice/**/*.json") |> Enum.sort()
+  end
+
+  defp payslip_paths do
+    Path.wildcard("priv/examples/payslip/**/*.json") |> Enum.sort()
+  end
+
+  defp assert_cross_domain_brand!(slug, accent, recommended_preset) do
+    invoice_path = "priv/examples/invoice/#{slug}/invoice.json"
+    payslip_path = "priv/examples/payslip/#{slug}/payslip.json"
+    invoice = invoice_path |> File.read!() |> JSON.decode!()
+    payslip = payslip_path |> File.read!() |> JSON.decode!()
+
+    assert Map.take(invoice["brand"], ["slug", "display_name", "accent", "recommended_preset"]) ==
+             Map.take(payslip["brand"], ["slug", "display_name", "accent", "recommended_preset"])
+
+    assert invoice["brand"]["slug"] == slug
+    assert invoice["brand"]["accent"] == accent
+    assert invoice["brand"]["recommended_preset"] == recommended_preset
+
+    assert File.read!(Path.join(Path.dirname(invoice_path), "logo.svg")) ==
+             File.read!(Path.join(Path.dirname(payslip_path), "logo.svg"))
+  end
+
+  defp assert_payslip_arithmetic!(fixture) do
+    gross = decimal_sum(fixture["earnings"], "amount")
+    deductions = decimal_sum(fixture["deductions"], "amount")
+    gross_ytd = decimal_sum(fixture["earnings"], "ytd")
+    deductions_ytd = decimal_sum(fixture["deductions"], "ytd")
+
+    assert Decimal.equal?(Decimal.sub(gross, deductions), Decimal.new(fixture["net_pay"]))
+
+    assert Decimal.equal?(
+             Decimal.sub(gross_ytd, deductions_ytd),
+             Decimal.new(fixture["net_pay_ytd"])
+           )
+  end
+
+  defp decimal_sum(lines, key) do
+    Enum.reduce(lines, Decimal.new(0), fn line, total ->
+      Decimal.add(total, Decimal.new(line[key]))
+    end)
+  end
+
+  defp assert_synthetic_fixture!(fixture) do
+    text = inspect(fixture)
+    refute text =~ ~r/(?:password|api[_ -]?key|secret|https?:\/\/|\b\d{16}\b)/i
+    refute fixture["employee"]["id"] =~ ~r/^\d{3}-\d{2}-\d{4}$/
   end
 
   defp assert_brand_fixture!(relative_path, expected_brand) do
