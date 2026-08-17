@@ -168,6 +168,45 @@ defmodule Guardrails.RequiredChecksContractTest do
   end
 
   describe "required/advisory CI separation" do
+    test "Phase 127 catalog blessing is isolated, bounded, and absent from required CI" do
+      ci = File.read!(@ci_path)
+      advisory_block = ci_job_block!(ci, "advisory-checks")
+      test_block = ci_job_block!(ci, "test")
+
+      assert ci =~ "      - 'gsd/phase-127-catalog-bless-*'"
+
+      guard =
+        "github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-127-catalog-bless-')"
+
+      assert advisory_block =~ guard
+      assert advisory_block =~ "mix rendro.catalog.gen"
+      assert advisory_block =~ "mix rendro.catalog.check"
+      assert advisory_block =~ "RENDRO_CATALOG_REVIEW_DIR: ${{ runner.temp }}/rendro_phase127_review"
+      assert advisory_block =~ "name: phase-127-catalog-bless"
+      assert advisory_block =~ "if-no-files-found: error"
+      assert advisory_block =~ "GITHUB_SHA=${GITHUB_SHA}"
+      assert advisory_block =~ "GITHUB_RUN_ID=${GITHUB_RUN_ID}"
+      assert advisory_block =~ "PDFIUM_VERSION=$(jq -r '.version' priv/pdfium_pin.json)"
+      assert advisory_block =~ "PDFIUM_SHA256=$(jq -r '.sha256' priv/pdfium_pin.json)"
+
+      for path <- [
+            "assets/rendro/catalog.json",
+            "assets/rendro/catalog",
+            "invoice_line_items_60_plus_page_first.png",
+            "invoice_line_items_60_plus_page_final.png",
+            "statement_line_items_60_plus_page_first.png",
+            "statement_line_items_60_plus_page_final.png"
+          ] do
+        assert advisory_block =~ path
+      end
+
+      refute test_block =~ "rendro.catalog.gen"
+      refute test_block =~ "rendro.catalog.check"
+      refute test_block =~ "RENDRO_CATALOG_REVIEW_DIR"
+      refute test_block =~ "phase-127-catalog-bless"
+      refute advisory_block =~ ~r/^\s+needs:/m
+    end
+
     test "Phase 126 raster blessing accepts only the isolated guarded push ref" do
       ci = File.read!(@ci_path)
       advisory_block = ci_job_block!(ci, "advisory-checks")
