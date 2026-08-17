@@ -338,14 +338,13 @@ defmodule Rendro.Recipes.Invoice do
     # rendered header region — never the stale frozen constant.
     resolved_header_height = Keyword.get(opts, :header_height, computed_header_height(data))
     body_height = @page_height - 2 * @margin - resolved_header_height - @footer_height
-    capacity = body_height - resolved_header_height - @footer_height
 
     # INV-03 "kept with the last rows" — the ONE place Invoice must exceed a
     # pure Receipt copy (Receipt appends totals without reserving space, so
     # totals can flow to a fresh page). Reserving the totals height on every
     # page (see @totals_line_height doc) guarantees the final table page
     # always has room left for the totals block that trails it.
-    effective_capacity = capacity - header_h - totals_reserved_height(data) - @row_epsilon
+    effective_capacity = body_height - header_h - totals_reserved_height(data) - @row_epsilon
 
     rows_with_meta =
       Enum.zip(rows, row_heights)

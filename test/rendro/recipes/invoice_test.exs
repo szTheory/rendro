@@ -505,9 +505,11 @@ defmodule Rendro.Recipes.InvoiceTest do
       row_h = hd(row_heights)
 
       body_height = 841.89 - 2 * 72 - 56 - 24
-      capacity = body_height - 56 - 24
-      effective_capacity_no_totals = capacity - header_h - 2.0
+      effective_capacity_no_totals = body_height - header_h - 2.0
       n = trunc(effective_capacity_no_totals / row_h)
+
+      assert n * row_h > body_height - 56 - 24 - header_h - 2.0,
+             "boundary item count must exceed the former double-subtracted capacity"
 
       items = for i <- 1..n//1, do: %{name: "Item #{i}", qty: 1, price: 10}
 
