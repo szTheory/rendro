@@ -48,6 +48,12 @@ defmodule Rendro.Recipes.Invoice do
 
   # Default table column rules: Item | Qty | Price.
   @table_columns [{:share, 1}, {:fixed, 50}, {:fixed, 80}]
+  @curated_metric_fonts [
+    :rendro_preset_grotesque,
+    :rendro_preset_humanist_sans,
+    :rendro_preset_text_serif,
+    :rendro_preset_mono
+  ]
 
   # Conservative one-row epsilon margin: pack to capacity − epsilon so
   # sub-pixel rounding never tips a page into :content_overflow (mirrors
@@ -301,8 +307,10 @@ defmodule Rendro.Recipes.Invoice do
 
     rows = Enum.map(formatted_rows, &table_row(&1, theme, colors, type))
 
+    header = ["Item", "Qty", "Price"]
+
     table_opts = [
-      header: table_row(["Item", "Qty", "Price"], theme, colors, type),
+      header: table_row(header, theme, colors, type),
       columns: @table_columns
     ]
 
@@ -310,12 +318,19 @@ defmodule Rendro.Recipes.Invoice do
     # metrics (D-09) — avoids recipe-local estimates that cause
     # :content_overflow. A single-page toy call (2 items) fits well within
     # capacity and yields exactly one, byte-identical table block below.
+    measure_type = measurement_type(type)
+
     doc_for_measure =
       Rendro.Document.new()
-      |> Rendro.Theme.Presets.register_metric_fonts(Map.values(type.fonts))
+      |> Rendro.Theme.Presets.register_metric_fonts(Map.values(measure_type.fonts))
 
     {header_h, row_heights} =
-      Rendro.measure_rows(rows, @content_width, doc_for_measure, table_opts)
+      Rendro.measure_rows(
+        Enum.map(formatted_rows, &table_row(&1, theme, colors, measure_type)),
+        @content_width,
+        doc_for_measure,
+        table_opts_for_measure(header, theme, colors, measure_type)
+      )
 
     # 118-08: resolve the SAME header height page_template/1 uses for this
     # call (explicit opts override, or computed_header_height/1's
@@ -361,6 +376,19 @@ defmodule Rendro.Recipes.Invoice do
 
   defp table_row(values, theme, colors, type) do
     Enum.map(values, &Rendro.Recipes.TableCell.content(&1, theme, colors, type, :ink))
+  end
+
+  defp table_opts_for_measure(header, theme, colors, type) do
+    [header: table_row(header, theme, colors, type), columns: @table_columns]
+  end
+
+  defp measurement_type(type) do
+    fonts =
+      Map.new(type.fonts, fn {role, font} ->
+        {role, if(font in @curated_metric_fonts, do: font, else: :default)}
+      end)
+
+    %{type | fonts: fonts}
   end
 
   # Conservative reserved height for the totals block, used only to bias
