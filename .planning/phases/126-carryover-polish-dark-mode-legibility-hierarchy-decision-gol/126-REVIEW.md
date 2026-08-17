@@ -1,6 +1,6 @@
 ---
 phase: 126-carryover-polish-dark-mode-legibility-hierarchy-decision-gol
-reviewed: 2026-08-17T06:09:06Z
+reviewed: 2026-08-17T06:20:22Z
 depth: standard
 files_reviewed: 26
 files_reviewed_list:
@@ -32,48 +32,29 @@ files_reviewed_list:
   - priv/quality/rubric_scores.json
 findings:
   critical: 0
-  warning: 2
+  warning: 0
   info: 0
-  total: 2
-status: issues_found
+  total: 0
+status: clean
 ---
 
 # Phase 126: Code Review Report
 
-**Reviewed:** 2026-08-17T06:09:06Z
+**Reviewed:** 2026-08-17T06:20:22Z
 **Depth:** standard
 **Files Reviewed:** 26
-**Status:** issues_found
+**Status:** clean
 
 ## Summary
 
-The submitted recipes, CI contract, evidence files, and focused tests were reviewed at standard depth. The focused test set passes (161 tests), but Invoice's pagination still uses an incorrect available height and can measure with font metrics that differ from the eventual document. Both defects can produce wrong page breaks despite successful rendering.
+All four prior warnings are resolved. Invoice now calculates capacity from the real body region, measures and renders with the caller's registry, uses assertions matching its actionable error message, and validates only the body/mono roles it emits. The focused Phase 126 test scope passes: 164 tests, 0 failures. The reviewed JSON and raster hash artifacts also validate.
 
 ## Narrative Findings (AI reviewer)
 
-## Warnings
-
-### WR-01: Invoice subtracts header and footer from its body region twice
-
-**File:** `lib/rendro/recipes/invoice.ex:340-341`
-**Issue:** `body_height` already equals the actual `:body` region height (`page - margins - header - footer`). The following `capacity` calculation subtracts `resolved_header_height` and `@footer_height` a second time. With the default header this throws away 80pt of usable body space; with anatomy fields it discards even more. `chunk_rows_into_pages/2` therefore breaks tables early and creates unnecessary pages, contradicting the nearby claim that capacity matches the rendered region.
-**Fix:** Use `body_height` as the capacity before subtracting the table header, totals reserve, and epsilon.
-
-```elixir
-body_height = @page_height - 2 * @margin - resolved_header_height - @footer_height
-effective_capacity = body_height - header_h - totals_reserved_height(data) - @row_epsilon
-```
-
-Add a boundary test whose rows fit in the real body region but exceed the currently undercounted capacity, then assert it remains one page.
-
-### WR-02: Invoice silently measures arbitrary custom fonts as Helvetica
-
-**File:** `lib/rendro/recipes/invoice.ex:385-391`
-**Issue:** `measurement_type/1` replaces every font outside four preset roles with `:default`, while the table later renders with the original `type.fonts.body`. A caller can supply and register a supported custom font after `Invoice.document/2`; the real glyph widths and wraps can then differ from the measurements used for `chunk_rows_into_pages/2`. This makes page breaks font-dependent and can yield an overflowing final table page or an avoidable extra break. The fallback hides the missing measurement-font setup instead of preserving the font contract.
-**Fix:** Measure with the same registered font roles used to render. Add an explicit, validated font-registration/measurement option that is applied to the measurement document before `measure_rows/4`, or fail with an actionable error for an unregistered custom role. Do not substitute `:default` for a role that will be rendered differently. Add a regression test using a non-preset embedded font and a near-wrap table value.
+All reviewed files meet quality standards. No issues found.
 
 ---
 
-_Reviewed: 2026-08-17T06:09:06Z_
+_Reviewed: 2026-08-17T06:20:22Z_
 _Reviewer: the agent (gsd-code-reviewer)_
 _Depth: standard_
