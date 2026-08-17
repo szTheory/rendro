@@ -38,10 +38,16 @@ created: 2026-08-17
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| TBD-01 | TBD | 0/1 | CATALOG-01 | T-127-01, T-127-03 | Safe paths and pinned raster provenance | integration + advisory raster | `mix test test/rendro/catalog_test.exs`; `mix rendro.catalog.check --pdfium PATH` | ❌ W0 | ⬜ pending |
-| TBD-02 | TBD | 0/1 | CATALOG-02 | T-127-05 | Exact ordered membership and hard ceiling | unit | `mix test test/rendro/catalog_test.exs` | ❌ W0 | ⬜ pending |
-| TBD-03 | TBD | 0/1 | CATALOG-03 | T-127-01, T-127-04 | Safe relative paths and truthful manifest contract | docs/package contract | `mix test test/docs_contract/catalog_manifest_contract_test.exs` | ❌ W0 | ⬜ pending |
-| TBD-04 | TBD | 0/1 | CATALOG-04 | T-127-02, T-127-04 | Exact disposition join and fail-closed drift | schema + contract | `mix test test/docs_contract/catalog_quality_contract_test.exs test/docs_contract/rubric_manifest_contract_test.exs` | ❌ W0 | ⬜ pending |
+| 127-01-01 | 01 | 1 | CATALOG-01 | T-127-01 | Default-cell fixture/theme/render tracer and safe paths | deterministic integration | `mix test test/rendro/catalog_test.exs --max-failures 1` | ❌ W0 — Plan 01 Task 1 | ⬜ pending |
+| 127-01-02 | 01 | 1 | CATALOG-02 | T-127-05 | Exact ordered membership, 31/32/33 boundaries, hard ceiling | unit | `mix test test/rendro/catalog_test.exs --max-failures 1` | ❌ W0 — Plan 01 Task 2 | ⬜ pending |
+| 127-01-03 | 01 | 1 | CATALOG-01 | T-127-03 | Separate generation/check task semantics and read-only errors | integration | `mix test test/rendro/catalog_test.exs --max-failures 1` | ❌ W0 — Plan 01 Task 3 | ⬜ pending |
+| 127-02-01 | 02 | 2 | CATALOG-03 | T-127-01, T-127-04 | Safe relative paths, truthful manifest, package/public isolation | docs/package contract | `mix test test/docs_contract/catalog_manifest_contract_test.exs --max-failures 1` | ❌ W0 — Plan 02 Task 1 | ⬜ pending |
+| 127-02-02 | 02 | 2 | CATALOG-04 | T-127-02, T-127-04 | Exact disposition join, schema, stale/orphan/projection/transition behavior | schema + contract | `mix test test/docs_contract/catalog_quality_contract_test.exs test/docs_contract/rubric_manifest_contract_test.exs --max-failures 1` | ❌ W0 — Plan 02 Task 2 | ⬜ pending |
+| 127-03-01 | 03 | 3 | CATALOG-01 | T-127-03, T-127-05 | Pinned isolated generation, bounded review payload, CI separation | guardrail + advisory raster | `mix test test/guardrails/required_checks_contract_test.exs test/rendro/catalog_raster_review_test.exs --exclude raster_snapshot --max-failures 1` | ❌ W0 — Plan 03 Task 1 | ⬜ pending |
+| 127-03-02 | 03 | 3 | CATALOG-01, CATALOG-03, CATALOG-04 | T-127-02, T-127-03 | Exact 32 artifact import and hash-bound initial dispositions | integration + advisory raster | `mix test test/rendro/catalog_test.exs test/docs_contract/catalog_manifest_contract_test.exs test/docs_contract/catalog_quality_contract_test.exs --max-failures 1`; `mix rendro.catalog.check --pdfium PATH` | ❌ dependent artifacts | ⬜ pending |
+| 127-04-01 | 04 | 4 | CATALOG-04 | T-127-02, T-127-04 | Twelve full-size human rubric records plus bounded multipage verdict | manual procedural | `test "$(find tmp/rendro_phase127_review -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = "16"` | ❌ dependent review | ⬜ pending |
+| 127-05-01 | 05 | 5 | CATALOG-04 | T-127-02, T-127-04 | Exact 12 scored/20 unscored transcription and final projection | schema + contract | `mix test test/docs_contract/catalog_quality_contract_test.exs test/docs_contract/rubric_manifest_contract_test.exs --max-failures 1` | ❌ dependent review | ⬜ pending |
+| 127-05-02 | 05 | 5 | CATALOG-01, CATALOG-02, CATALOG-03, CATALOG-04 | T-127-01, T-127-02, T-127-03, T-127-04, T-127-05 | Full source/security/package/CI closure | full deterministic + advisory | `mix test`; `mix ci.fast`; `mix rendro.catalog.check --pdfium PATH` | ❌ dependent closure | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -49,11 +55,10 @@ created: 2026-08-17
 
 ## Wave 0 Requirements
 
-- [ ] `test/rendro/catalog_test.exs` — registry, generation, and bounded membership tests for CATALOG-01/02.
-- [ ] `test/docs_contract/catalog_manifest_contract_test.exs` — manifest, paths, and sibling-tree isolation for CATALOG-03.
-- [ ] `test/docs_contract/catalog_quality_contract_test.exs` — exact disposition join, score validation, and freshness behavior for CATALOG-04.
-- [ ] Extend `rubric_scores.schema.json` additively with the catalog scored/unscored disposition union.
-- [ ] Add the catalog checker to the advisory CI/guardrail in lockstep; keep PDFium out of the deterministic required lane.
+- [ ] Plan 01 Tasks 1-3 own `test/rendro/catalog_test.exs` before dependent catalog implementation — registry, generation/check, and bounded membership tests for CATALOG-01/02.
+- [ ] Plan 02 Task 1 owns `test/docs_contract/catalog_manifest_contract_test.exs` before manifest/package implementation — manifest, paths, and sibling-tree isolation for CATALOG-03.
+- [ ] Plan 02 Task 2 owns `test/docs_contract/catalog_quality_contract_test.exs` and the additive `rubric_scores.schema.json` union before disposition/join implementation — score validation and freshness behavior for CATALOG-04.
+- [ ] Plan 03 Task 1 owns `test/rendro/catalog_raster_review_test.exs` and advisory CI/guardrail assertions before pinned generation; PDFium remains outside deterministic required CI.
 
 ---
 
@@ -62,7 +67,7 @@ created: 2026-08-17
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
 | Curated flagship visual quality and any `false -> true` resolution evidence | CATALOG-04 | Rubric judgments are intentionally human-authored and generation must not mutate them | Review the 12 scored page-one PNGs at native geometry in both modes, record evidence, then run the catalog checker to bind dispositions to current hashes. |
-| Bounded final-page proof for paginating fixtures | CATALOG-01 | The public catalog intentionally publishes page one only | Render the selected invoice, statement, and certificate fixtures with pinned PDFium; inspect final pages for truncation/overflow and retain the small external proof artifact. |
+| Bounded final-page proof for paginating fixtures | CATALOG-01 | The public catalog intentionally publishes page one only | Render the representative 60-plus-row Invoice and Statement fixtures with pinned PDFium; inspect first/final physical pages for truncation/overflow and retain the four-image external proof artifact. |
 
 ---
 
