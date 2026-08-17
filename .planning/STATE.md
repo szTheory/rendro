@@ -5,15 +5,15 @@ milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 125
 current_phase_name: Foundation — Curated fonts, style-genre presets & brand fixtures
 status: executing
-stopped_at: Completed 125-09-PLAN.md
-last_updated: "2026-08-17T00:59:02.326Z"
+stopped_at: Completed 125-04-PLAN.md
+last_updated: "2026-08-17T01:08:09.675Z"
 last_activity: 2026-08-16
 last_activity_desc: Phase 125 execution started
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 10
-  completed_plans: 6
+  completed_plans: 7
   percent: 0
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-07-28)
 ## Current Position
 
 Phase: 125 (Foundation — Curated fonts, style-genre presets & brand fixtures) — EXECUTING
-Plan: 7 of 10
+Plan: 8 of 10
 Status: Ready to execute
 Last activity: 2026-08-16 — Phase 125 execution started
 
@@ -65,8 +65,8 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-17T00:59:02.319Z
-Stopped at: Completed 125-09-PLAN.md
+Last session: 2026-08-17T01:08:09.668Z
+Stopped at: Completed 125-04-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -99,6 +99,7 @@ Resume file: None
 | Phase 125 P08 | 2min | 2 tasks | 9 files |
 | Phase 125 P03 | 5m | 1 tasks | 4 files |
 | Phase 125 P09 | 2min | 2 tasks | 9 files |
+| Phase 125 P04 | 18min | 2 tasks | 6 files |
 
 ## Operator Next Steps
 
@@ -115,3 +116,5 @@ Resume file: None
 - [Phase ?]: Complete Brutalist ships as a sixth canonical atom under the same strict constructor and role contract.
 - [Phase ?]: Theme retains exactly one narrow delegation; all genre grammar remains in the Presets sibling.
 - [Phase ?]: Certificate and Ticket fixture corpus closes with exact data-only brands, original-byte controls, and text-only Hex packaging.
+- [Phase ?]: Certificate resolves only Rendro-owned curated metric descriptors before explicit registration.
+- [Phase ?]: The deterministic preset matrix stays PDFium-independent and requires repeat-byte equality.
