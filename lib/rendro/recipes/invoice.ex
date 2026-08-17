@@ -283,6 +283,10 @@ defmodule Rendro.Recipes.Invoice do
   end
 
   defp body_section(%{items: items} = data, opts) do
+    colors = palette(opts)
+    type = typography(opts)
+    theme = opts[:theme]
+
     # FROZEN toy path (INV-01) for a bare-number :price — the "$#{price}"
     # interpolation MUST stay literally unchanged for the toy call's
     # byte-identity golden. 118-08 gap-closure: a %Decimal{} :price (never
@@ -295,7 +299,12 @@ defmodule Rendro.Recipes.Invoice do
         [item.name, Integer.to_string(item.qty), format_price(item.price)]
       end)
 
-    table_opts = [header: ["Item", "Qty", "Price"], columns: @table_columns]
+    rows = Enum.map(formatted_rows, &table_row(&1, theme, colors, type))
+
+    table_opts = [
+      header: table_row(["Item", "Qty", "Price"], theme, colors, type),
+      columns: @table_columns
+    ]
 
     # Measure all rows at the body region width using the engine's own font
     # metrics (D-09) — avoids recipe-local estimates that cause
@@ -304,7 +313,7 @@ defmodule Rendro.Recipes.Invoice do
     doc_for_measure = Rendro.Document.new()
 
     {header_h, row_heights} =
-      Rendro.measure_rows(formatted_rows, @content_width, doc_for_measure, table_opts)
+      Rendro.measure_rows(rows, @content_width, doc_for_measure, table_opts)
 
     # 118-08: resolve the SAME header height page_template/1 uses for this
     # call (explicit opts override, or computed_header_height/1's
@@ -322,7 +331,7 @@ defmodule Rendro.Recipes.Invoice do
     effective_capacity = capacity - header_h - totals_reserved_height(data) - @row_epsilon
 
     rows_with_meta =
-      Enum.zip(formatted_rows, row_heights)
+      Enum.zip(rows, row_heights)
       |> Enum.map(fn {fmt_row, height} -> {fmt_row, height, nil} end)
 
     pages = Rendro.Recipes.Pagination.chunk_rows_into_pages(rows_with_meta, effective_capacity)
@@ -346,6 +355,10 @@ defmodule Rendro.Recipes.Invoice do
       region: :body,
       content: table_blocks ++ totals_blocks
     )
+  end
+
+  defp table_row(values, theme, colors, type) do
+    Enum.map(values, &Rendro.Recipes.TableCell.content(&1, theme, colors, type, :ink))
   end
 
   # Conservative reserved height for the totals block, used only to bias

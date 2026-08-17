@@ -78,10 +78,10 @@ defmodule Rendro.Recipes.InvoiceTest do
 
   describe "themed table cells" do
     test "uses resolved semantic ink for every header and body cell" do
-      theme = Rendro.Theme.preset(:editorial, :dark)
+      theme = Rendro.Theme.dark(Rendro.Theme.default())
       colors = Rendro.Theme.resolve(theme).colors
       ink = colors.ink
-      [_, body, _] = Invoice.sections(sample_data(), theme: theme)
+      body = Invoice.sections(sample_data(), theme: theme) |> Enum.find(&(&1.region == :body))
 
       tables = Enum.filter(body.content, &is_struct(&1.content, Rendro.Table))
 
@@ -93,11 +93,12 @@ defmodule Rendro.Recipes.InvoiceTest do
     end
 
     test "explicit palette override wins for themed table cells" do
-      [_, body, _] =
+      body =
         Invoice.sections(sample_data(),
-          theme: Rendro.Theme.preset(:editorial, :dark),
+          theme: Rendro.Theme.dark(Rendro.Theme.default()),
           palette: %{ink: {1, 2, 3}}
         )
+        |> Enum.find(&(&1.region == :body))
 
       [%Rendro.Block{content: %Rendro.Table{header: [header | _], rows: [[body_cell | _] | _]}}] =
         Enum.filter(body.content, &is_struct(&1.content, Rendro.Table))
@@ -107,8 +108,10 @@ defmodule Rendro.Recipes.InvoiceTest do
     end
 
     test "nil-theme tables retain literal string cells for empty, single, and equal rows" do
+      [_, empty_body, _] = Invoice.sections(%{sample_data() | items: []})
+      assert Enum.filter(empty_body.content, &is_struct(&1.content, Rendro.Table)) == []
+
       for items <- [
-            [],
             [%{name: "Single", qty: 1, price: 10}],
             [%{name: "Same", qty: 1, price: 10}, %{name: "Same", qty: 1, price: 10}]
           ] do
