@@ -128,11 +128,11 @@ deterministic pdfium lane and hash-checked against
 | Branded Invoice | `Rendro.Recipes.BrandedInvoice` | Registered brand font + logo. | `c6ce32b449060f8cd7b01744697ad8fe90ee779cae6c039415935fc239be3a64` | `2b075ca9a95b63726863a388057895e7edcadbd09bb68f62a1d4fd184b1de804` |
 | Statement | `Rendro.Recipes.Statement` | Unbranded `default/0`. | `12518fdaaf4e1735d15a22d928562d33a49bc9e756472e5fe21cd44f2ec5cc8f` | `829bd3bad9f5da1d0b4a54bad19e6e049300aac18b1023fcdff215fab12bf571` |
 | Receipt / Report | `Rendro.Recipes.Receipt` | Unbranded `default/0`. | `7894948c059892721a528efad2048ce49642645e2831d959b574c0306d5b2c02` | `bfaf2a1b3011591144b4ba3d16ab5dc8c37abba6e358e569547ba3e56dd94fa1` |
-| Certificate | `Rendro.Recipes.Certificate` | Unbranded `default/0`. | `68b35b1f80b9121fa23dd0737f473b37aa8f5647a4243fcfb7ddddb71a1e5c82` | `476a251c30890bf15c3fdc5b7a7e17999abcc98060307ea761d043a846ef4555` |
+| Certificate | `Rendro.Recipes.Certificate` | Unbranded `default/0`. | `4f41898b232ee078e20d89ae3698d4d709a612b24efc53c37b40e957e559d682` | `25f3c8c7218cd98b558d60a4556ad5be98ced6776f56a25251f04f2b6bbb232c` |
 | Payslip | `Rendro.Recipes.Payslip` | Unbranded `default/0`. | `19a1813b36fde337a3d7e941fca5c83fb8584540a2b1211fb801e8ae66814d9e` | `44ee6ec59d7b0593c75175203be2b31745cec5d6e5e73180293c27dd665d0e26` |
 | Ticket | `Rendro.Recipes.Ticket` | Unbranded `default/0`. | `37c617953b5562baf2ceefdefe54af04756bb0c937d0e4902dd889299246b0f9` | `336fa3629eb5cb735a7ee2fd8dba3a903a13683f7efa2190afd46439b4b21496` |
 | Invoice (Dark) | `Rendro.Recipes.Invoice` | `Theme.dark/1` — screen-oriented, not print-recommended. | `40d79ddfc79b3ae7bec6a9036c2543122e835a7ef517ec8ec9ea767e74e14629` | `29e9dcd8fb21c89a39d0fc67246895da0834eba9ee32dd1758c201b774a1cc57` |
-| Certificate (Dark) | `Rendro.Recipes.Certificate` | `Theme.dark/1` — screen-oriented, not print-recommended. | `01e78fa1960986b5a7691d24aa2dac3b0b6aba10d98391576ff8beda8c34cf85` | `095cfdc71bebd46237f645af71fc1900874387b7777d051caa59c25e472bf53b` |
+| Certificate (Dark) | `Rendro.Recipes.Certificate` | `Theme.dark/1` — screen-oriented, not print-recommended. | `88ca30f44b02c5836f6c848712486d3d06ad28f8347ad9c8603ab92cf26d295e` | `a7cf6d31fd0afebd7a73070d10c0d03849d385a08097ef87b9537e64288cf1dd` |
 | Ticket (Dark) | `Rendro.Recipes.Ticket` | `Theme.dark/1` — screen-oriented, not print-recommended. | `2806d73e8f1ae1dea5e90d9a1b571b0684369207eca636d9de7992137e4a90c4` | `ff10a3283f349ec69dfe57531cb3c45b44b34366d9993d35a432ac58b3dc7771` |
 | Invoice (Branded Accent) | `Rendro.Recipes.Invoice` | `from_brand(accent: "#0E7C76")` — accent-only, no assets. | `af285aeacdb28f024cf749b93a86a7f35dd82efc5942b2083411c1790c2431b5` | `764d0cc841d7c429e216011d614b14dce2de144c888165d33c7a1bb87db2f233` |
 
