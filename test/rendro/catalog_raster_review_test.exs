@@ -56,5 +56,5 @@ defmodule Rendro.CatalogRasterReviewTest do
   end
 
   defp page_count(pdf), do: :binary.matches(pdf, "/Type /Page") |> length()
-  defp sha256(binary), do: binary |> :crypto.hash(:sha256) |> Base.encode16(case: :lower)
+  defp sha256(binary), do: :crypto.hash(:sha256, binary) |> Base.encode16(case: :lower)
 end
