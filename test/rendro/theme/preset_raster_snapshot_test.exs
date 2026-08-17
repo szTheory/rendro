@@ -107,11 +107,13 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
       directory ->
         expanded_directory = Path.expand(directory)
         project_root = File.cwd!() |> Path.expand()
+        approved_review_directory = Path.join(project_root, "tmp/rendro_preset_raster_review")
 
-        if expanded_directory == project_root or
-             String.starts_with?(expanded_directory, project_root <> "/") do
+        if expanded_directory != approved_review_directory and
+             (expanded_directory == project_root or
+                String.starts_with?(expanded_directory, project_root <> "/")) do
           raise ArgumentError,
-                "#{@review_dir_env} must point outside the repository so generated rasters stay untracked"
+                "#{@review_dir_env} must point outside the repository or use #{approved_review_directory}"
         end
 
         File.mkdir_p!(expanded_directory)
