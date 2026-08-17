@@ -5,15 +5,15 @@ milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 126
 current_phase_name: Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth
 status: executing
-stopped_at: Completed 126-02-PLAN.md
-last_updated: "2026-08-17T04:55:04.422Z"
+stopped_at: Completed 126-03-PLAN.md
+last_updated: "2026-08-17T05:51:58.947Z"
 last_activity: 2026-08-16
 last_activity_desc: Phase 126 execution started
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 15
-  completed_plans: 12
+  completed_plans: 13
   percent: 20
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-16)
 ## Current Position
 
 Phase: 126 (Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-08-16 — Phase 126 execution started
 
@@ -73,8 +73,8 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-17T04:55:04.382Z
-Stopped at: Completed 126-02-PLAN.md
+Last session: 2026-08-17T05:51:58.941Z
+Stopped at: Completed 126-03-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -113,6 +113,7 @@ Resume file: None
 | Phase 125-foundation-curated-fonts-style-genre-presets-brand-fixtures P10 | 15min | 2 tasks | 26 files |
 | Phase 126 P01 | 29m | 3 tasks | 8 files |
 | Phase 126 P02 | 9min | 3 tasks | 8 files |
+| Phase 126 P03 | 18m | 2 tasks | 8 files |
 
 ## Operator Next Steps
 
@@ -131,3 +132,5 @@ Resume file: None
 - [Phase ?]: Keep the new accent golden to exactly three ordered variants instead of duplicating the twelve-row preset matrix.
 - [Phase ?]: Assert typography through semantic emitted Text content, without establishing global traversal ordering.
 - [Phase ?]: Preserve Payslip's payslip_sans fallback as its recipe-specific themed font bridge.
+- [Phase ?]: Keep only the legacy adapter comparison non-blocking; preset blessing, staging, manifest creation, and upload fail closed.
+- [Phase ?]: Accept raster artifacts only from one successful exact-SHA advisory-checks job plus manifest validation, not whole-workflow success.

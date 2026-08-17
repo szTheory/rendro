@@ -142,7 +142,7 @@ Plans:
   4. A dedicated byte-identity golden exercises `from_brand`/preset accent-op combinations (not just the single original `from_brand` call site).
   5. All 7 recipes (not just 3) have dedicated typography-test coverage of the materialized type scale, closing the byte-identity-plus-smoke-only gap on the remaining 4.
 
-**Plans**: 2/5 plans executed
+**Plans**: 3/5 plans executed
 
 Plans:
 **Wave 1**
@@ -152,7 +152,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 126-03-PLAN.md — Refresh only affected pinned-PDFium hashes and produce full-size row-addressable review images.
+- [x] 126-03-PLAN.md — Refresh only affected pinned-PDFium hashes and produce full-size row-addressable review images.
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -216,7 +216,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 125. Foundation — Curated fonts, style-genre presets & brand fixtures | v2.12 | 10/10 | Complete    | 2026-08-16 |
-| 126. Carryover polish — dark-mode legibility, hierarchy & golden depth | v2.12 | 2/5 | In Progress|  |
+| 126. Carryover polish — dark-mode legibility, hierarchy & golden depth | v2.12 | 3/5 | In Progress|  |
 | 127. Public example catalog & quality ratchet | v2.12 | 0/TBD | Not started | - |
 | 128. Static configurator, theme codegen & Livebook | v2.12 | 0/TBD | Not started | - |
 | 129. Docs & manifest closure | v2.12 | 0/TBD | Not started | - |
