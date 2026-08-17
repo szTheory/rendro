@@ -12,11 +12,18 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
     {:humanist_receipt_light, :humanist, :light, :receipt},
     {:humanist_payslip_dark, :humanist, :dark, :payslip},
     {:editorial_certificate_light, :editorial, :light, :certificate},
-    {:editorial_ticket_dark, :editorial, :dark, :ticket}
+    {:editorial_ticket_dark, :editorial, :dark, :ticket},
+    {:corporate_classic_invoice_light, :corporate_classic, :light, :invoice},
+    {:corporate_classic_payslip_dark, :corporate_classic, :dark, :payslip},
+    {:minimal_mono_receipt_light, :minimal_mono, :light, :receipt},
+    {:minimal_mono_ticket_dark, :minimal_mono, :dark, :ticket},
+    {:brutalist_certificate_light, :brutalist, :light, :certificate},
+    {:brutalist_ticket_dark, :brutalist, :dark, :ticket}
   ]
 
   @tag raster_snapshot: true
-  test "first three genre pairs render through pinned PDFium to committed page-one hashes" do
+  test "six genre pairs render through pinned PDFium to committed page-one hashes" do
+    assert_complete_matrix_contract!()
     assert_pinned_pdfium!()
 
     for {id, genre, mode, recipe} <- @rows do
@@ -29,6 +36,26 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
       write_review_png(id, png)
       assert_or_bless_page_one_hash(genre, mode, png)
     end
+  end
+
+  defp assert_complete_matrix_contract! do
+    row_ids = Enum.map(@rows, &elem(&1, 0))
+    reference_paths = Enum.map(@rows, fn {_id, genre, mode, _recipe} -> reference_path(genre, mode) end)
+
+    assert length(@rows) == 12
+    assert length(Enum.uniq(row_ids)) == 12
+    assert length(Enum.uniq(reference_paths)) == 12
+
+    assert Enum.frequencies_by(@rows, fn {_id, genre, _mode, _recipe} -> genre end) == %{
+             swiss: 2,
+             humanist: 2,
+             editorial: 2,
+             corporate_classic: 2,
+             minimal_mono: 2,
+             brutalist: 2
+           }
+
+    assert Enum.all?(reference_paths, &File.regular?/1)
   end
 
   defp assert_pinned_pdfium! do
