@@ -5,15 +5,15 @@ milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 125
 current_phase_name: Foundation — Curated fonts, style-genre presets & brand fixtures
 status: executing
-stopped_at: Completed 125-07-PLAN.md
-last_updated: "2026-08-17T00:40:03.156Z"
+stopped_at: Completed 125-02-PLAN.md
+last_updated: "2026-08-17T00:44:43.897Z"
 last_activity: 2026-08-16
 last_activity_desc: Phase 125 execution started
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 10
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-07-28)
 ## Current Position
 
 Phase: 125 (Foundation — Curated fonts, style-genre presets & brand fixtures) — EXECUTING
-Plan: 3 of 10
+Plan: 4 of 10
 Status: Ready to execute
 Last activity: 2026-08-16 — Phase 125 execution started
 
@@ -65,8 +65,8 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-17T00:40:03.150Z
-Stopped at: Completed 125-07-PLAN.md
+Last session: 2026-08-17T00:44:43.891Z
+Stopped at: Completed 125-02-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -95,6 +95,7 @@ Resume file: None
 | Phase 124 P01 | 6min | 3 tasks | 9 files |
 | Phase 125 P01 | 2m | 1 tasks | 6 files |
 | Phase 125-foundation-curated-fonts-style-genre-presets-brand-fixtures P07 | 9min | 2 tasks | 11 files |
+| Phase 125 P02 | 4m | 2 tasks | 9 files |
 
 ## Operator Next Steps
 
@@ -105,3 +106,5 @@ Resume file: None
 - [Phase ?]: Theme.preset/2 delegates to private Presets; font registration stays explicit and document-owned.
 - [Phase ?]: Generic brand tuples use a complete metadata branch while legacy fixtures retain explicit logo:null compatibility.
 - [Phase ?]: Northline and Cedar use byte-identical local SVG marks across Invoice and Payslip for auditable identity reuse.
+- [Phase ?]: Curated roles use one unmodified static Regular face per family; registration remains explicit and document-owned.
+- [Phase ?]: Glyph inputs are sorted and deduplicated before subset dependency traversal.

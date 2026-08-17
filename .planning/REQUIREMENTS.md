@@ -25,11 +25,11 @@
 
 ### Curated Fonts (FONT)
 
-- [ ] **FONT-01**: Four curated open-license fonts — a grotesque, a humanist sans, a text serif, a mono — are vendored as static TrueType (glyf/loca) builds under `priv/fonts/` so flagship presets render out of the box.
-- [ ] **FONT-02**: Each vendored font carries a delimited `NOTICE` attribution block with a pinned upstream version; every license is verified redistributable inside a Hex package (SIL OFL 1.1 / Apache-2.0 class), with RFN/embedding constraints respected.
-- [ ] **FONT-03**: `priv/fonts/` is added to the `mix.exs` `package.files` allowlist and its inclusion is proven by a positive tarball-content test (fonts actually ship to Hex consumers).
+- [x] **FONT-01**: Four curated open-license fonts — a grotesque, a humanist sans, a text serif, a mono — are vendored as static TrueType (glyf/loca) builds under `priv/fonts/` so flagship presets render out of the box.
+- [x] **FONT-02**: Each vendored font carries a delimited `NOTICE` attribution block with a pinned upstream version; every license is verified redistributable inside a Hex package (SIL OFL 1.1 / Apache-2.0 class), with RFN/embedding constraints respected.
+- [x] **FONT-03**: `priv/fonts/` is added to the `mix.exs` `package.files` allowlist and its inclusion is proven by a positive tarball-content test (fonts actually ship to Hex consumers).
 - [x] **FONT-04**: Curated fonts register into `FontRegistry` under logical genre roles through an explicit `Rendro.Theme.Presets.register_fonts/2` bridge that is a caller step, never auto-invoked inside recipe `document/2` (Theme stays registry-pure).
-- [ ] **FONT-05**: Font subsetting stays deterministic at catalog scale — glyph sets are sorted/deduped at the call site (or defensively in `subset/2`), proven by a double-subset byte-identity determinism test per vendored font.
+- [x] **FONT-05**: Font subsetting stays deterministic at catalog scale — glyph sets are sorted/deduped at the call site (or defensively in `subset/2`), proven by a double-subset byte-identity determinism test per vendored font.
 
 ### Carryover Polish (POLISH) — lands before dark-mode catalog generation
 
