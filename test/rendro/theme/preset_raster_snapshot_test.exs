@@ -2,24 +2,11 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
   use ExUnit.Case, async: false
 
   alias Rendro.Adapters.Pdfium
-  alias Rendro.Recipes.{Certificate, Invoice, Payslip, Receipt, Ticket}
+  alias Rendro.Recipes.{BrandedInvoice, Certificate, Invoice, Payslip, Receipt, Statement, Ticket}
   alias Rendro.Theme.Presets
 
   @review_dir_env "RENDRO_PRESET_RASTER_REVIEW_DIR"
-  @rows [
-    {:swiss_invoice_light, :swiss, :light, :invoice},
-    {:swiss_certificate_dark, :swiss, :dark, :certificate},
-    {:humanist_receipt_light, :humanist, :light, :receipt},
-    {:humanist_payslip_dark, :humanist, :dark, :payslip},
-    {:editorial_certificate_light, :editorial, :light, :certificate},
-    {:editorial_ticket_dark, :editorial, :dark, :ticket},
-    {:corporate_classic_invoice_light, :corporate_classic, :light, :invoice},
-    {:corporate_classic_payslip_dark, :corporate_classic, :dark, :payslip},
-    {:minimal_mono_receipt_light, :minimal_mono, :light, :receipt},
-    {:minimal_mono_ticket_dark, :minimal_mono, :dark, :ticket},
-    {:brutalist_certificate_light, :brutalist, :light, :certificate},
-    {:brutalist_ticket_dark, :brutalist, :dark, :ticket}
-  ]
+  @rows Rendro.TestSupport.PresetRenderMatrix.rows()
 
   @tag raster_snapshot: true
   test "six genre pairs render through pinned PDFium to committed page-one hashes" do
@@ -133,6 +120,19 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
     )
   end
 
+  defp document_for(:branded_invoice, theme) do
+    BrandedInvoice.document(
+      %{
+        id: "INV-MATRIX-002",
+        date: ~D[2026-08-16],
+        items: [%{name: "Brand audit", qty: 1, price: 250}],
+        brand: %{font_name: :brand_heading, logo_name: :company_logo}
+      },
+      theme: theme,
+      header_height: 90
+    )
+  end
+
   defp document_for(:certificate, theme) do
     Certificate.document(
       %{
@@ -182,6 +182,18 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
         ],
         net_pay: Decimal.new("3580.00"),
         payment_method: "Direct Deposit 4321"
+      },
+      theme: theme
+    )
+  end
+
+  defp document_for(:statement, theme) do
+    Statement.document(
+      %{
+        period: %{from: ~D[2026-07-01], to: ~D[2026-07-31]},
+        account: %{name: "Acme Corp"},
+        opening_balance: Decimal.new("100.00"),
+        lines: [%{date: ~D[2026-07-05], description: "Payment", amount: Decimal.new("-25.00")}]
       },
       theme: theme
     )
