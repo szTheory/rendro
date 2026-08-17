@@ -185,6 +185,35 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
     end
   end
 
+  test "Certificate adds the locked Aster Institute and Meridian Arts Fellowship fixtures" do
+    assert certificate_paths() == [
+             "priv/examples/certificate/aster-institute/certificate.json",
+             "priv/examples/certificate/meridian-arts-fellowship/certificate.json",
+             "priv/examples/certificate/summit-training-institute/certificate.json"
+           ]
+
+    assert_brand_fixture!("certificate/aster-institute/certificate.json", %{
+      "slug" => "aster-institute",
+      "display_name" => "Aster Institute",
+      "accent" => "#1F4FB8",
+      "recommended_preset" => "swiss"
+    })
+
+    assert_brand_fixture!("certificate/meridian-arts-fellowship/certificate.json", %{
+      "slug" => "meridian-arts-fellowship",
+      "display_name" => "Meridian Arts Fellowship",
+      "accent" => "#6E3CB8",
+      "recommended_preset" => "editorial"
+    })
+
+    for path <-
+          certificate_paths() --
+            ["priv/examples/certificate/summit-training-institute/certificate.json"] do
+      fixture = path |> File.read!() |> JSON.decode!()
+      assert_synthetic_fixture!(fixture)
+    end
+  end
+
   defp invoice_paths do
     Path.wildcard("priv/examples/invoice/**/*.json") |> Enum.sort()
   end
@@ -199,6 +228,10 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
 
   defp receipt_paths do
     Path.wildcard("priv/examples/receipt/**/*.json") |> Enum.sort()
+  end
+
+  defp certificate_paths do
+    Path.wildcard("priv/examples/certificate/**/*.json") |> Enum.sort()
   end
 
   defp assert_cross_domain_brand!(slug, accent, recommended_preset) do
