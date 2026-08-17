@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - 'gsd/phase-126-raster-bless-*'
   pull_request:
     branches:
       - main
@@ -216,6 +217,54 @@ jobs:
         env:
           MIX_RASTER_BLESS: "false"
         run: mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs
+
+      - name: Run Preset Raster Snapshot Tests
+        env:
+          MIX_RASTER_BLESS: ${{ github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-126-raster-bless-') && 'true' || 'false' }}
+          RENDRO_PRESET_RASTER_REVIEW_DIR: ${{ runner.temp }}/rendro_phase126_review
+        run: mix test --include raster_snapshot test/rendro/theme/preset_raster_snapshot_test.exs
+
+      - name: Stage Phase 126 preset raster blessing evidence
+        if: github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-126-raster-bless-')
+        env:
+          ARTIFACT_DIR: ${{ runner.temp }}/phase126_preset_raster_bless
+          REVIEW_DIR: ${{ runner.temp }}/rendro_phase126_review
+        run: |
+          mkdir -p "$ARTIFACT_DIR/priv/raster_refs/presets/swiss" \
+            "$ARTIFACT_DIR/priv/raster_refs/presets/corporate_classic" \
+            "$ARTIFACT_DIR/priv/raster_refs/presets/editorial" \
+            "$ARTIFACT_DIR/priv/raster_refs/presets/minimal_mono" \
+            "$ARTIFACT_DIR/priv/raster_refs/presets/humanist" \
+            "$ARTIFACT_DIR/priv/raster_refs/presets/brutalist" \
+            "$ARTIFACT_DIR/review"
+          cp priv/raster_refs/presets/swiss/light.sha256 "$ARTIFACT_DIR/priv/raster_refs/presets/swiss/light.sha256"
+          cp priv/raster_refs/presets/corporate_classic/dark.sha256 "$ARTIFACT_DIR/priv/raster_refs/presets/corporate_classic/dark.sha256"
+          cp priv/raster_refs/presets/editorial/dark.sha256 "$ARTIFACT_DIR/priv/raster_refs/presets/editorial/dark.sha256"
+          cp priv/raster_refs/presets/minimal_mono/dark.sha256 "$ARTIFACT_DIR/priv/raster_refs/presets/minimal_mono/dark.sha256"
+          cp priv/raster_refs/presets/humanist/dark.sha256 "$ARTIFACT_DIR/priv/raster_refs/presets/humanist/dark.sha256"
+          cp priv/raster_refs/presets/brutalist/dark.sha256 "$ARTIFACT_DIR/priv/raster_refs/presets/brutalist/dark.sha256"
+          cp "$REVIEW_DIR/swiss_invoice_light_page_1.png" "$ARTIFACT_DIR/review/swiss_invoice_light_page_1.png"
+          cp "$REVIEW_DIR/corporate_classic_invoice_dark_page_1.png" "$ARTIFACT_DIR/review/corporate_classic_invoice_dark_page_1.png"
+          cp "$REVIEW_DIR/editorial_ticket_dark_page_1.png" "$ARTIFACT_DIR/review/editorial_ticket_dark_page_1.png"
+          cp "$REVIEW_DIR/minimal_mono_ticket_dark_page_1.png" "$ARTIFACT_DIR/review/minimal_mono_ticket_dark_page_1.png"
+          cp "$REVIEW_DIR/humanist_payslip_dark_page_1.png" "$ARTIFACT_DIR/review/humanist_payslip_dark_page_1.png"
+          cp "$REVIEW_DIR/brutalist_payslip_dark_page_1.png" "$ARTIFACT_DIR/review/brutalist_payslip_dark_page_1.png"
+          {
+            echo "GITHUB_SHA=${GITHUB_SHA}"
+            echo "GITHUB_RUN_ID=${GITHUB_RUN_ID}"
+            echo "PDFIUM_VERSION=$(jq -r '.version' priv/pdfium_pin.json)"
+            echo "PDFIUM_SHA256=$(jq -r '.sha256' priv/pdfium_pin.json)"
+            echo "PAYLOAD_PATHS:"
+            (cd "$ARTIFACT_DIR" && find priv review -type f | sort)
+          } > "$ARTIFACT_DIR/manifest.txt"
+
+      - name: Upload Phase 126 preset raster blessing evidence
+        if: github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-126-raster-bless-')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: phase-126-preset-raster-bless
+          path: ${{ runner.temp }}/phase126_preset_raster_bless
+          if-no-files-found: error
 
       - name: Check Launch Artifacts
         run: mix rendro.launch_artifacts.check

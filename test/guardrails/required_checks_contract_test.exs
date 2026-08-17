@@ -168,6 +168,79 @@ defmodule Guardrails.RequiredChecksContractTest do
   end
 
   describe "required/advisory CI separation" do
+    test "Phase 126 raster blessing accepts only the isolated guarded push ref" do
+      ci = File.read!(@ci_path)
+      advisory_block = ci_job_block!(ci, "advisory-checks")
+      test_block = ci_job_block!(ci, "test")
+
+      assert ci =~ "  push:\n    branches:\n      - main\n      - 'gsd/phase-126-raster-bless-*'"
+      assert ci =~ "  pull_request:\n    branches:\n      - main"
+      assert ci =~ "  schedule:\n    - cron: '0 2 * * *'"
+      refute ci =~ "workflow_dispatch:"
+
+      assert advisory_block =~
+               "mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs"
+
+      assert advisory_block =~ "MIX_RASTER_BLESS: \"false\""
+
+      assert advisory_block =~
+               "mix test --include raster_snapshot test/rendro/theme/preset_raster_snapshot_test.exs"
+
+      blessing_guard =
+        "github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-126-raster-bless-')"
+
+      assert advisory_block =~
+               "MIX_RASTER_BLESS: ${{ github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-126-raster-bless-') && 'true' || 'false' }}"
+
+      assert advisory_block =~
+               "RENDRO_PRESET_RASTER_REVIEW_DIR: ${{ runner.temp }}/rendro_phase126_review"
+
+      assert advisory_block =~ blessing_guard
+      assert advisory_block =~ "ARTIFACT_DIR: ${{ runner.temp }}/phase126_preset_raster_bless"
+      assert advisory_block =~ "name: phase-126-preset-raster-bless"
+      assert advisory_block =~ "path: ${{ runner.temp }}/phase126_preset_raster_bless"
+      assert advisory_block =~ "if-no-files-found: error"
+      assert advisory_block =~ "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02"
+
+      hash_paths = [
+        "priv/raster_refs/presets/swiss/light.sha256",
+        "priv/raster_refs/presets/corporate_classic/dark.sha256",
+        "priv/raster_refs/presets/editorial/dark.sha256",
+        "priv/raster_refs/presets/minimal_mono/dark.sha256",
+        "priv/raster_refs/presets/humanist/dark.sha256",
+        "priv/raster_refs/presets/brutalist/dark.sha256"
+      ]
+
+      review_paths = [
+        "swiss_invoice_light_page_1.png",
+        "corporate_classic_invoice_dark_page_1.png",
+        "editorial_ticket_dark_page_1.png",
+        "minimal_mono_ticket_dark_page_1.png",
+        "humanist_payslip_dark_page_1.png",
+        "brutalist_payslip_dark_page_1.png"
+      ]
+
+      for path <- hash_paths do
+        assert advisory_block =~ path
+        assert advisory_block =~ "$ARTIFACT_DIR/#{path}"
+      end
+
+      for path <- review_paths do
+        assert advisory_block =~ "$REVIEW_DIR/#{path}"
+        assert advisory_block =~ "$ARTIFACT_DIR/review/#{path}"
+      end
+
+      assert advisory_block =~ "GITHUB_SHA=${GITHUB_SHA}"
+      assert advisory_block =~ "GITHUB_RUN_ID=${GITHUB_RUN_ID}"
+      assert advisory_block =~ "PDFIUM_VERSION=$(jq -r '.version' priv/pdfium_pin.json)"
+      assert advisory_block =~ "PDFIUM_SHA256=$(jq -r '.sha256' priv/pdfium_pin.json)"
+      assert advisory_block =~ "(cd \"$ARTIFACT_DIR\" && find priv review -type f | sort)"
+      refute test_block =~ "MIX_RASTER_BLESS"
+      refute test_block =~ "RENDRO_PRESET_RASTER_REVIEW_DIR"
+      refute test_block =~ "phase126_preset_raster_bless"
+      refute test_block =~ "phase-126-preset-raster-bless"
+    end
+
     test "required test job runs only the deterministic mix ci lane" do
       ci = File.read!(@ci_path)
       test_block = ci_job_block!(ci, "test")
