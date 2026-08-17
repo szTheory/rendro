@@ -5,6 +5,13 @@ defmodule Rendro.PDF.FontSubsetterTest do
   alias Rendro.PDF.FontParser
   alias Rendro.TestSupport.FontFixture
 
+  @curated_font_paths [
+    "priv/fonts/inter/Inter-Regular.ttf",
+    "priv/fonts/source-sans-3/SourceSans3-Regular.ttf",
+    "priv/fonts/source-serif-4/SourceSerif4-Regular.ttf",
+    "priv/fonts/jetbrains-mono/JetBrainsMono-Regular.ttf"
+  ]
+
   setup do
     %{bytes: bytes} = FontFixture.supported_font()
     {:ok, font: bytes}
@@ -36,5 +43,33 @@ defmodule Rendro.PDF.FontSubsetterTest do
 
   test "returns error for unsupported format" do
     assert FontSubsetter.subset("invalid_bytes", [1]) == {:error, :unsupported_font_format}
+  end
+
+  test "normalizes caller glyph ordering and duplicates before dependency traversal" do
+    source = File.read!("lib/rendro/pdf/font_subsetter.ex")
+
+    assert source =~ "used_glyphs = used_glyphs |> Enum.uniq() |> Enum.sort()"
+  end
+
+  test "curated fonts produce parseable byte-identical subsets for equal glyph sets" do
+    for path <- @curated_font_paths do
+      bytes = File.read!(path)
+
+      assert {:ok, first} = FontSubsetter.subset(bytes, [31, 3, 31, 17, 3])
+      assert {:ok, second} = FontSubsetter.subset(bytes, [17, 31, 3])
+      assert first == second
+      assert {:ok, _} = FontParser.parse(first)
+    end
+  end
+
+  test "curated fonts retain a deterministic parseable notdef subset for empty input" do
+    for path <- @curated_font_paths do
+      bytes = File.read!(path)
+
+      assert {:ok, first} = FontSubsetter.subset(bytes, [])
+      assert {:ok, second} = FontSubsetter.subset(bytes, [])
+      assert first == second
+      assert {:ok, _} = FontParser.parse(first)
+    end
   end
 end
