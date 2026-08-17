@@ -67,6 +67,16 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
     assert m["thresholds"]["core_min"] >= 4
   end
 
+  test "catalog dispositions are additive while the six legacy rubric records remain intact" do
+    m = manifest()
+
+    assert length(m["scores"]) == 6,
+           "catalog review records must not replace or rewrite the six legacy gallery scores"
+
+    assert m["catalog_dispositions"] == [],
+           "Plan 127-02 defines the additive review schema only; no catalog artifacts are pinned yet"
+  end
+
   test "threshold-arithmetic correctness, not the subjective score" do
     # Synthetic (not real) inputs — the near-miss cases below can't be expressed by the
     # real all-passing demo data, so this proves the arithmetic itself rejects each

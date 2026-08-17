@@ -140,6 +140,7 @@ defmodule Rendro.Catalog do
       with {:ok, renderer_version} <- Rendro.Adapters.Pdfium.version(),
            :ok <- File.mkdir_p(@asset_root),
            {:ok, cells} <- build_cells(renderer_version),
+           {:ok, cells} <- apply_quality_projections(cells, read_rubric_scores()),
            :ok <-
              File.write(
                @manifest_path,
@@ -176,8 +177,52 @@ defmodule Rendro.Catalog do
 
   @spec static_contract_errors(map()) :: [String.t()]
   def static_contract_errors(manifest) when is_map(manifest) do
-    manifest_shape_errors(manifest) ++ catalog_contract_errors(catalog_specs())
+    manifest_shape_errors(manifest) ++
+      catalog_contract_errors(catalog_specs()) ++
+      quality_contract_errors(manifest, read_rubric_scores())
   end
+
+  @spec quality_contract_errors(map(), map()) :: [String.t()]
+  def quality_contract_errors(%{"cells" => cells}, %{"catalog_dispositions" => dispositions})
+      when is_list(cells) and is_list(dispositions) do
+    cells_by_id = Map.new(cells, &{&1["id"], &1})
+    dispositions_by_id = Enum.group_by(dispositions, & &1["catalog_id"])
+
+    orphan_errors =
+      dispositions_by_id
+      |> Map.keys()
+      |> Enum.reject(&Map.has_key?(cells_by_id, &1))
+      |> Enum.sort()
+      |> Enum.map(&"catalog orphan disposition #{&1}; remove it or restore its catalog cell")
+
+    cell_errors =
+      Enum.flat_map(cells, fn cell ->
+        id = cell["id"]
+
+        case Map.get(dispositions_by_id, id, []) do
+          [] ->
+            [
+              "catalog #{id}: missing disposition; add one scored or reasoned-unscored reviewer record"
+            ]
+
+          [disposition] ->
+            disposition_errors(cell, disposition) ++ projection_errors(cell, disposition)
+
+          _ ->
+            ["catalog #{id}: expected exactly one disposition; remove duplicate reviewer records"]
+        end
+      end)
+
+    orphan_errors ++ cell_errors
+  end
+
+  def quality_contract_errors(%{"cells" => _cells}, _rubric),
+    do: [
+      "catalog quality records missing catalog_dispositions; add the additive reviewer-owned array"
+    ]
+
+  def quality_contract_errors(_manifest, _rubric),
+    do: ["catalog manifest cells are required for the quality join"]
 
   @spec manifest_shape_errors(map()) :: [String.t()]
   def manifest_shape_errors(manifest) when is_map(manifest) do
@@ -426,6 +471,132 @@ defmodule Rendro.Catalog do
 
   defp boundary_disclosure("dark"), do: @dark_boundary_disclosure
   defp boundary_disclosure("light"), do: nil
+
+  defp disposition_errors(cell, disposition) do
+    id = cell["id"]
+
+    []
+    |> add_unless(
+      disposition["family"] == cell["family"],
+      "catalog #{id}: family is stale; refresh the reviewer binding"
+    )
+    |> add_unless(
+      disposition["brand"] == cell["brand"],
+      "catalog #{id}: brand is stale; refresh the reviewer binding"
+    )
+    |> add_unless(
+      disposition["preset"] == cell["preset"],
+      "catalog #{id}: preset is stale; refresh the reviewer binding"
+    )
+    |> add_unless(
+      disposition["mode"] == cell["mode"],
+      "catalog #{id}: mode is stale; refresh the reviewer binding"
+    )
+    |> add_unless(
+      disposition["evidence_ref"] == cell["png_path"],
+      "catalog #{id}: evidence path is stale; deliberately rebind this artifact"
+    )
+    |> add_unless(
+      disposition["png_sha256"] == cell["png_sha256"],
+      "catalog #{id}: PNG hash is stale; deliberately rebind this artifact"
+    )
+    |> add_unless(
+      disposition["source_pdf_sha256"] == cell["source_pdf_sha256"],
+      "catalog #{id}: source PDF hash is stale; deliberately rebind this artifact"
+    )
+    |> Kernel.++(review_status_errors(id, disposition))
+  end
+
+  defp review_status_errors(id, %{"review_status" => "unscored", "reason" => reason})
+       when is_binary(reason) do
+    if concrete?(reason),
+      do: [],
+      else: [
+        "catalog #{id}: unscored disposition needs a non-empty reason; record why review is pending"
+      ]
+  end
+
+  defp review_status_errors(id, %{"review_status" => "unscored"}),
+    do: [
+      "catalog #{id}: unscored disposition needs a non-empty reason; record why review is pending"
+    ]
+
+  defp review_status_errors(id, %{"review_status" => "scored"} = disposition) do
+    scores = disposition["dimension_scores"]
+    gates = disposition["gate_results"]
+    passed = disposition["passed"]
+
+    cond do
+      not is_map(scores) or not is_map(gates) or not is_boolean(passed) ->
+        ["catalog #{id}: scored disposition needs dimensions, gates, and passed verdict"]
+
+      passed != rubric_passed?(scores, gates) ->
+        ["catalog #{id}: passed must match the rubric thresholds; correct the recorded verdict"]
+
+      passed and not concrete?(disposition["signed_off_by"]) ->
+        ["catalog #{id}: passed scored disposition needs a non-empty signed_off_by"]
+
+      passed and not concrete?(disposition["signed_off_at"]) ->
+        ["catalog #{id}: passed scored disposition needs a non-empty signed_off_at"]
+
+      concrete?(disposition["supersedes_evidence_ref"]) and
+          not concrete?(disposition["resolution_ref"]) ->
+        [
+          "catalog #{id}: a superseded evidence transition needs a non-empty behavioral resolution_ref"
+        ]
+
+      true ->
+        []
+    end
+  end
+
+  defp review_status_errors(id, _),
+    do: ["catalog #{id}: review_status must be scored or unscored; correct the reviewer record"]
+
+  defp projection_errors(%{"quality" => quality} = cell, disposition) do
+    if quality == quality_projection(disposition),
+      do: [],
+      else: [
+        "catalog #{cell["id"]}: quality projection drift; regenerate from the reviewer disposition"
+      ]
+  end
+
+  defp projection_errors(_cell, _disposition), do: []
+
+  defp quality_projection(%{"review_status" => "unscored"}),
+    do: %{"status" => "unscored", "label" => "Not yet scored"}
+
+  defp quality_projection(%{"review_status" => "scored", "passed" => true}),
+    do: %{"status" => "passes", "label" => "Scored — passes current rubric"}
+
+  defp quality_projection(%{"review_status" => "scored", "passed" => false}),
+    do: %{"status" => "needs_work", "label" => "Scored — needs work"}
+
+  defp apply_quality_projections(cells, rubric) do
+    join_cells = Enum.map(cells, &Map.delete(&1, "quality"))
+    errors = quality_contract_errors(%{"cells" => join_cells}, rubric)
+
+    if errors == [] do
+      dispositions_by_id = Map.new(rubric["catalog_dispositions"], &{&1["catalog_id"], &1})
+
+      {:ok,
+       Enum.map(cells, fn cell ->
+         Map.put(cell, "quality", quality_projection(dispositions_by_id[cell["id"]]))
+       end)}
+    else
+      {:error, errors}
+    end
+  end
+
+  defp rubric_passed?(scores, gates) do
+    scores["content_hierarchy"] == 5 and
+      Map.delete(scores, "content_hierarchy")
+      |> Enum.all?(fn {_dimension, score} -> is_integer(score) and score >= 4 end) and
+      Enum.all?(gates, fn {_gate, result} -> result == true end)
+  end
+
+  defp concrete?(value), do: is_binary(value) and byte_size(String.trim(value)) > 0
+  defp read_rubric_scores, do: "priv/quality/rubric_scores.json" |> File.read!() |> JSON.decode!()
 
   defp encode_manifest(manifest), do: Jason.encode!(manifest, pretty: true)
   defp sha256(binary), do: :crypto.hash(:sha256, binary) |> Base.encode16(case: :lower)

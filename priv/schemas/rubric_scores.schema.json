@@ -4,7 +4,7 @@
   "title": "Rendro Rubric Scores Manifest",
   "description": "Structural contract for priv/quality/rubric_scores.json. Constrains structure and threshold arithmetic only (6 dimensions, 2 gates, hierarchy=5/core>=4) — never the subjective score values, which Phase 118 appends.",
   "type": "object",
-  "required": ["schema_version", "dimensions", "gates", "thresholds", "scores", "stress_exemption"],
+  "required": ["schema_version", "dimensions", "gates", "thresholds", "scores", "stress_exemption", "catalog_dispositions"],
   "properties": {
     "schema_version": { "const": 1 },
     "dimensions": {
@@ -84,6 +84,10 @@
     "scores": {
       "type": "array",
       "items": { "$ref": "#/$defs/score_entry" }
+    },
+    "catalog_dispositions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/catalog_disposition" }
     }
   },
   "additionalProperties": true,
@@ -147,6 +151,46 @@
       "then": {
         "required": ["signed_off_by", "signed_off_at", "evidence_ref"]
       }
+    },
+    "catalog_disposition": {
+      "type": "object",
+      "required": ["catalog_id", "family", "brand", "preset", "mode", "evidence_ref", "png_sha256", "source_pdf_sha256", "recorded_at", "review_status"],
+      "properties": {
+        "catalog_id": { "type": "string", "minLength": 1 },
+        "family": { "type": "string", "minLength": 1 },
+        "brand": { "type": ["string", "null"] },
+        "preset": { "type": ["string", "null"] },
+        "mode": { "enum": ["light", "dark"] },
+        "evidence_ref": { "type": "string", "minLength": 1 },
+        "png_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "source_pdf_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "recorded_at": { "type": "string", "format": "date" },
+        "review_status": { "enum": ["scored", "unscored"] },
+        "dimension_scores": { "$ref": "#/$defs/score_entry/properties/dimension_scores" },
+        "gate_results": { "$ref": "#/$defs/score_entry/properties/gate_results" },
+        "passed": { "type": "boolean" },
+        "signed_off_by": { "type": "string", "minLength": 1 },
+        "signed_off_at": { "type": "string", "format": "date" },
+        "justifications": { "type": "object", "minProperties": 1 },
+        "reason": { "type": "string", "minLength": 1 },
+        "supersedes_evidence_ref": { "type": "string", "minLength": 1 },
+        "resolution_ref": { "type": "string", "minLength": 1 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "review_status": { "const": "scored" } }, "required": ["review_status"] },
+          "then": { "required": ["dimension_scores", "gate_results", "passed", "signed_off_by", "signed_off_at", "justifications"], "not": { "required": ["reason"] } }
+        },
+        {
+          "if": { "properties": { "review_status": { "const": "unscored" } }, "required": ["review_status"] },
+          "then": { "required": ["reason"], "not": { "anyOf": [{ "required": ["dimension_scores"] }, { "required": ["gate_results"] }, { "required": ["passed"] }] } }
+        },
+        {
+          "if": { "required": ["supersedes_evidence_ref"] },
+          "then": { "required": ["resolution_ref"] }
+        }
+      ],
+      "additionalProperties": false
     }
   }
 }

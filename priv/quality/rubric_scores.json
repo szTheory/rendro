@@ -272,5 +272,6 @@
       },
       "domain_md": "priv/examples/ticket/DOMAIN.md"
     }
-  ]
+  ],
+  "catalog_dispositions": []
 }

@@ -38,32 +38,65 @@ defmodule Rendro.DocsContract.CatalogQualityContractTest do
 
   test "exact ordered join accepts one disposition per cell and projects unscored without approval" do
     cells = catalog_cells()
-    assert Catalog.quality_contract_errors(%{"cells" => cells}, rubric(Enum.map(cells, &unscored/1))) == []
+
+    assert Catalog.quality_contract_errors(
+             %{"cells" => cells},
+             rubric(Enum.map(cells, &unscored/1))
+           ) == []
   end
 
   test "missing, duplicate, orphan, and stale dispositions fail closed with the catalog ID" do
     [first | rest] = catalog_cells()
-    missing = Catalog.quality_contract_errors(%{"cells" => [first | rest]}, rubric(Enum.map(rest, &unscored/1)))
+
+    missing =
+      Catalog.quality_contract_errors(
+        %{"cells" => [first | rest]},
+        rubric(Enum.map(rest, &unscored/1))
+      )
+
     assert Enum.any?(missing, &String.contains?(&1, "#{first["id"]}: missing disposition"))
 
-    duplicate = Catalog.quality_contract_errors(%{"cells" => [first | rest]}, rubric([unscored(first), unscored(first) | Enum.map(rest, &unscored/1)]))
-    assert Enum.any?(duplicate, &String.contains?(&1, "#{first["id"]}: expected exactly one disposition"))
+    duplicate =
+      Catalog.quality_contract_errors(
+        %{"cells" => [first | rest]},
+        rubric([unscored(first), unscored(first) | Enum.map(rest, &unscored/1)])
+      )
+
+    assert Enum.any?(
+             duplicate,
+             &String.contains?(&1, "#{first["id"]}: expected exactly one disposition")
+           )
 
     orphan = %{unscored(first) | "catalog_id" => "invoice--orphan--swiss--light"}
-    orphan_errors = Catalog.quality_contract_errors(%{"cells" => [first | rest]}, rubric([orphan | Enum.map([first | rest], &unscored/1)]))
-    assert Enum.any?(orphan_errors, &String.contains?(&1, "orphan disposition invoice--orphan--swiss--light"))
+
+    orphan_errors =
+      Catalog.quality_contract_errors(
+        %{"cells" => [first | rest]},
+        rubric([orphan | Enum.map([first | rest], &unscored/1)])
+      )
+
+    assert Enum.any?(
+             orphan_errors,
+             &String.contains?(&1, "orphan disposition invoice--orphan--swiss--light")
+           )
 
     stale = %{unscored(first) | "png_sha256" => String.duplicate("c", 64)}
-    stale_errors = Catalog.quality_contract_errors(%{"cells" => [first | rest]}, rubric([stale | Enum.map(rest, &unscored/1)]))
+
+    stale_errors =
+      Catalog.quality_contract_errors(
+        %{"cells" => [first | rest]},
+        rubric([stale | Enum.map(rest, &unscored/1)])
+      )
+
     assert Enum.any?(stale_errors, &String.contains?(&1, "#{first["id"]}: PNG hash is stale"))
   end
 
   test "scored dispositions preserve valid failed evidence and enforce threshold arithmetic" do
     [cell | rest] = catalog_cells()
 
-    scored = %{
-      unscored(cell)
-      | "review_status" => "scored",
+    scored =
+      Map.merge(unscored(cell), %{
+        "review_status" => "scored",
         "dimension_scores" => %{
           "information_architecture" => 5,
           "content_hierarchy" => 5,
@@ -77,8 +110,11 @@ defmodule Rendro.DocsContract.CatalogQualityContractTest do
         "signed_off_by" => "reviewer",
         "signed_off_at" => "2026-08-17",
         "justifications" => %{"print_safety" => "Observed a concrete issue."}
-    }
+      })
 
-    assert Catalog.quality_contract_errors(%{"cells" => [cell | rest]}, rubric([scored | Enum.map(rest, &unscored/1)])) == []
+    assert Catalog.quality_contract_errors(
+             %{"cells" => [cell | rest]},
+             rubric([scored | Enum.map(rest, &unscored/1)])
+           ) == []
   end
 end
