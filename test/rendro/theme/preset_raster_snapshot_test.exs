@@ -52,10 +52,10 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
   defp assert_pinned_pdfium! do
     pin = File.read!("priv/pdfium_pin.json") |> JSON.decode!()
 
-    assert {:ok, executable} = Pdfium.executable()
+    assert {:ok, provenance_executable} = Pdfium.provenance_executable()
 
     executable_sha256 =
-      executable
+      provenance_executable
       |> File.read!()
       |> then(&:crypto.hash(:sha256, &1))
       |> Base.encode16(case: :lower)

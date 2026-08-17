@@ -23,6 +23,24 @@ defmodule Rendro.Adapters.Pdfium do
   def executable, do: find_executable()
 
   @doc """
+  Returns the executable artifact used to establish PDFium provenance.
+
+  Most environments execute the pinned binary directly, so this is the same
+  path as `executable/0`. A container command wrapper may set
+  `RENDRO_PDFIUM_PROVENANCE_CLI` (or the application configuration
+  `:pdfium_cli_provenance_executable`) to the mounted binary it invokes; the
+  caller must still hash this returned artifact before accepting evidence.
+  """
+  @spec provenance_executable() :: {:ok, String.t()} | {:error, term()}
+  def provenance_executable do
+    case System.get_env("RENDRO_PDFIUM_PROVENANCE_CLI") ||
+           Application.get_env(:rendro, :pdfium_cli_provenance_executable) do
+      executable when is_binary(executable) and executable != "" -> {:ok, executable}
+      _ -> executable()
+    end
+  end
+
+  @doc """
   Returns PDF metadata from `pdfium info`.
 
   On success returns `{:ok, metadata_map}` with string keys (for example `"PDF Version"`).

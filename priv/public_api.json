@@ -53,6 +53,7 @@
         "executable/0",
         "form_fields/2",
         "info/2",
+        "provenance_executable/0",
         "render/2",
         "version/1"
       ],

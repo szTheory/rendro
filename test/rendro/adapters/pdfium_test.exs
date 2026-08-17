@@ -13,6 +13,39 @@ defmodule Rendro.Adapters.PdfiumTest do
     assert Pdfium.executable() == {:ok, "/usr/bin/echo"}
   end
 
+  test "provenance_executable/0 accepts a separately pinned artifact for a command wrapper" do
+    Application.put_env(:rendro, :pdfium_cli_executable_finder, fn _ -> "/tmp/pdfium-wrapper" end)
+    Application.put_env(:rendro, :pdfium_cli_provenance_executable, "/tmp/pinned-pdfium-cli")
+
+    on_exit(fn ->
+      Application.delete_env(:rendro, :pdfium_cli_executable_finder)
+      Application.delete_env(:rendro, :pdfium_cli_provenance_executable)
+    end)
+
+    assert Pdfium.executable() == {:ok, "/tmp/pdfium-wrapper"}
+    assert Pdfium.provenance_executable() == {:ok, "/tmp/pinned-pdfium-cli"}
+  end
+
+  test "provenance_executable/0 accepts the container runner environment override" do
+    System.put_env("RENDRO_PDFIUM_PROVENANCE_CLI", "/tmp/pinned-pdfium-cli")
+
+    on_exit(fn ->
+      System.delete_env("RENDRO_PDFIUM_PROVENANCE_CLI")
+    end)
+
+    assert Pdfium.provenance_executable() == {:ok, "/tmp/pinned-pdfium-cli"}
+  end
+
+  test "provenance_executable/0 defaults to the executed binary" do
+    Application.put_env(:rendro, :pdfium_cli_executable_finder, fn _ -> "/usr/bin/echo" end)
+
+    on_exit(fn ->
+      Application.delete_env(:rendro, :pdfium_cli_executable_finder)
+    end)
+
+    assert Pdfium.provenance_executable() == {:ok, "/usr/bin/echo"}
+  end
+
   test "returns missing executable when pdfium-cli is absent" do
     Application.put_env(:rendro, :pdfium_cli_executable_finder, fn _ -> nil end)
 
