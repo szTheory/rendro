@@ -142,7 +142,14 @@ Plans:
   4. A dedicated byte-identity golden exercises `from_brand`/preset accent-op combinations (not just the single original `from_brand` call site).
   5. All 7 recipes (not just 3) have dedicated typography-test coverage of the materialized type scale, closing the byte-identity-plus-smoke-only gap on the remaining 4.
 
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 126-01-PLAN.md — Repair themed Invoice ink, Ticket hierarchy/reference fit, and Payslip atomic money cells while preserving nil-theme bytes.
+- [ ] 126-02-PLAN.md — Add the bounded preset/accent byte golden and semantic typography contracts for all seven recipes.
+- [ ] 126-03-PLAN.md — Refresh only affected pinned-PDFium hashes and produce full-size row-addressable review images.
+- [ ] 126-04-PLAN.md — Review all affected rows sequentially at full size and record a bounded human disposition.
+- [ ] 126-05-PLAN.md — Reconcile quality/WINDOWS evidence and run the complete deterministic phase gate.
 **UI hint**: no — recipe/render-path bug fixes and test-depth work, no browser-rendered surface
 
 ### Phase 127: Public example catalog & quality ratchet
