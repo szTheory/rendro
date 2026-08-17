@@ -142,7 +142,7 @@ Plans:
   4. A dedicated byte-identity golden exercises `from_brand`/preset accent-op combinations (not just the single original `from_brand` call site).
   5. All 7 recipes (not just 3) have dedicated typography-test coverage of the materialized type scale, closing the byte-identity-plus-smoke-only gap on the remaining 4.
 
-**Plans**: 4/5 plans executed
+**Plans**: 5/5 plans executed
 
 Plans:
 **Wave 1**
@@ -160,7 +160,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 126-05-PLAN.md — Reconcile quality/WINDOWS evidence and run the complete deterministic phase gate.
+- [x] 126-05-PLAN.md — Reconcile quality/WINDOWS evidence and run the complete deterministic phase gate.
 
 **UI hint**: no — recipe/render-path bug fixes and test-depth work, no browser-rendered surface
 
@@ -216,7 +216,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 125. Foundation — Curated fonts, style-genre presets & brand fixtures | v2.12 | 10/10 | Complete    | 2026-08-16 |
-| 126. Carryover polish — dark-mode legibility, hierarchy & golden depth | v2.12 | 4/5 | In Progress|  |
+| 126. Carryover polish — dark-mode legibility, hierarchy & golden depth | v2.12 | 5/5 | In Progress|  |
 | 127. Public example catalog & quality ratchet | v2.12 | 0/TBD | Not started | - |
 | 128. Static configurator, theme codegen & Livebook | v2.12 | 0/TBD | Not started | - |
 | 129. Docs & manifest closure | v2.12 | 0/TBD | Not started | - |
