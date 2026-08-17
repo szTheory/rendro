@@ -11,7 +11,8 @@ defmodule Rendro.PDF.FontSubsetter do
   def subset(bytes, used_glyphs) when is_binary(bytes) and is_list(used_glyphs) do
     used_glyphs = used_glyphs |> Enum.uniq() |> Enum.sort()
 
-    with {:ok, version, num_tables, directory} <- parse_offset_table(bytes),
+    with :ok <- validate_glyph_ids(used_glyphs),
+         {:ok, version, num_tables, directory} <- parse_offset_table(bytes),
          :ok <- validate_version(version),
          {:ok, tables} <- parse_table_directory(directory, num_tables, bytes),
          {:ok, head} <- fetch_required_table(tables, "head"),
@@ -48,6 +49,13 @@ defmodule Rendro.PDF.FontSubsetter do
       {:ok, final_bytes}
     else
       {:error, _} = error -> error
+    end
+  end
+
+  defp validate_glyph_ids(glyph_ids) do
+    case Enum.find(glyph_ids, &(not is_integer(&1) or &1 < 0)) do
+      nil -> :ok
+      glyph_id -> {:error, {:invalid_glyph_id, glyph_id}}
     end
   end
 

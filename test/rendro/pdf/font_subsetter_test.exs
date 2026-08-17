@@ -45,6 +45,11 @@ defmodule Rendro.PDF.FontSubsetterTest do
     assert FontSubsetter.subset("invalid_bytes", [1]) == {:error, :unsupported_font_format}
   end
 
+  test "rejects invalid glyph IDs without traversing font tables", %{font: bytes} do
+    assert FontSubsetter.subset(bytes, [-1]) == {:error, {:invalid_glyph_id, -1}}
+    assert FontSubsetter.subset(bytes, [1, "2"]) == {:error, {:invalid_glyph_id, "2"}}
+  end
+
   test "normalizes caller glyph ordering and duplicates before dependency traversal" do
     source = File.read!("lib/rendro/pdf/font_subsetter.ex")
 
