@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 7
+open_count: 9
 waived_count: 0
 fixed_count: 3
-total_count: 10
-last_updated: 2026-08-17T00:49:04.416Z
+total_count: 12
+last_updated: 2026-08-17T01:25:59.289Z
 ---
 
 # Broken Windows Ledger
@@ -25,6 +25,8 @@ last_updated: 2026-08-17T00:49:04.416Z
 | 8 | 125 | deviation | test/docs_contract/examples_schema_contract_test.exs |  | SVG external-reference assertion excludes only real external asset references, not the XML namespace | open |  | 2026-08-17T00:39:41.106Z |  |
 | 9 | 125 | deviation | priv/schemas/examples.schema.json |  | Payslip net_pay_ytd is validated as a decimal string for exact YTD reconciliation | open |  | 2026-08-17T00:39:41.170Z |  |
 | 10 | 125 | deviation | test/docs_contract/examples_schema_contract_test.exs |  | Made the synthetic-fixture helper family-safe for Statement coverage | open |  | 2026-08-17T00:49:04.416Z |  |
+| 11 | 125 | deviation | test/rendro/theme/preset_raster_snapshot_test.exs |  | Guarded blessing bypasses only normal-run reference-existence assertion while seeding missing references. | open |  | 2026-08-17T01:25:59.222Z |  |
+| 12 | 125 | deviation | test/rendro/theme/preset_raster_snapshot_test.exs |  | ARM host uses a temporary x86 container wrapper for the exact SHA-verified pinned PDFium binary. | open |  | 2026-08-17T01:25:59.289Z |  |
 
 ````json
 [
@@ -146,6 +148,30 @@ last_updated: 2026-08-17T00:49:04.416Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-17T00:49:04.416Z",
+    "resolved_at": null
+  },
+  {
+    "id": 11,
+    "kind": "deviation",
+    "phase": "125",
+    "file": "test/rendro/theme/preset_raster_snapshot_test.exs",
+    "line": null,
+    "description": "Guarded blessing bypasses only normal-run reference-existence assertion while seeding missing references.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-17T01:25:59.222Z",
+    "resolved_at": null
+  },
+  {
+    "id": 12,
+    "kind": "deviation",
+    "phase": "125",
+    "file": "test/rendro/theme/preset_raster_snapshot_test.exs",
+    "line": null,
+    "description": "ARM host uses a temporary x86 container wrapper for the exact SHA-verified pinned PDFium binary.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-17T01:25:59.289Z",
     "resolved_at": null
   }
 ]
