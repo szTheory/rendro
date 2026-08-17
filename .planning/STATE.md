@@ -2,13 +2,10 @@
 gsd_state_version: 1.0
 milestone: v2.12
 milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
-current_phase: 127
-current_phase_name: Public example catalog & quality ratchet
 status: planning
-stopped_at: Completed 126-05-PLAN.md
-last_updated: "2026-08-17T06:32:03.905Z"
-last_activity: 2026-08-17
-last_activity_desc: Phase 126 complete, transitioned to Phase 127
+stopped_at: Phase 127 context gathered
+last_updated: "2026-08-17T20:52:43.098Z"
+last_activity: 2026-08-17 — Phase 126 complete, transitioned to Phase 127
 progress:
   total_phases: 5
   completed_phases: 2
@@ -73,9 +70,9 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-17T06:04:29.885Z
-Stopped at: Completed 126-05-PLAN.md
-Resume file: None
+Last session: 2026-08-17T20:52:43.092Z
+Stopped at: Phase 127 context gathered
+Resume file: .planning/phases/127-public-example-catalog-quality-ratchet/127-CONTEXT.md
 
 ## Next Steps
 
