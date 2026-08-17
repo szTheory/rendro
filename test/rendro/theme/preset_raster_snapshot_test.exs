@@ -27,7 +27,7 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
       assert {:ok, [png]} = Pdfium.render(pdf, dpi: 150, pages: "1")
 
       write_review_png(id, png)
-      assert_page_one_hash(genre, mode, png)
+      assert_or_bless_page_one_hash(genre, mode, png)
     end
   end
 
@@ -38,17 +38,30 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
     assert version == pin["version"], "raster snapshots require the project-pinned PDFium version"
   end
 
-  defp assert_page_one_hash(genre, mode, png) do
-    expected_hash =
-      Path.join(["priv", "raster_refs", "presets", Atom.to_string(genre), "#{mode}.sha256"])
-      |> File.read!()
-      |> String.trim()
-
+  defp assert_or_bless_page_one_hash(genre, mode, png) do
+    reference_path = reference_path(genre, mode)
     actual_hash = Base.encode16(:crypto.hash(:sha256, png), case: :lower)
 
-    assert actual_hash == expected_hash,
-           "pinned PDFium page-one hash mismatch for #{genre}/#{mode}; review the advisory raster in the bounded caller-provided directory before updating the reference"
+    if System.get_env("MIX_RASTER_BLESS") == "true" do
+      if System.get_env("GITHUB_ACTIONS") != "true" do
+        raise """
+        MIX_RASTER_BLESS=true must only run in the pinned CI container.
+        Raster hashes are not deterministic across platforms.
+        """
+      end
+
+      File.mkdir_p!(Path.dirname(reference_path))
+      File.write!(reference_path, actual_hash <> "\n")
+    else
+      expected_hash = reference_path |> File.read!() |> String.trim()
+
+      assert actual_hash == expected_hash,
+             "pinned PDFium page-one hash mismatch for #{genre}/#{mode}; review the advisory raster in the bounded caller-provided directory before updating the reference"
+    end
   end
+
+  defp reference_path(genre, mode),
+    do: Path.join(["priv", "raster_refs", "presets", Atom.to_string(genre), "#{mode}.sha256"])
 
   defp write_review_png(id, png) do
     case System.get_env(@review_dir_env) do
