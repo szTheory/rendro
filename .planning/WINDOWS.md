@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 6
+open_count: 7
 waived_count: 0
 fixed_count: 3
-total_count: 9
-last_updated: 2026-08-17T00:39:41.170Z
+total_count: 10
+last_updated: 2026-08-17T00:49:04.416Z
 ---
 
 # Broken Windows Ledger
@@ -24,6 +24,7 @@ last_updated: 2026-08-17T00:39:41.170Z
 | 7 | 123 | deviation | priv/pdfium_pin.json |  | mix rendro.launch_artifacts.check (part of ci.advisory) fails: pdfium-cli v0.11.0 binary not installed/on PATH in this execution environment -- environment/tooling gap, not a code or manifest defect; not auto-installed per the executor's external-binary caution. See 123-05 deferred-items.md item 4. | open |  | 2026-07-28T20:53:45.917Z |  |
 | 8 | 125 | deviation | test/docs_contract/examples_schema_contract_test.exs |  | SVG external-reference assertion excludes only real external asset references, not the XML namespace | open |  | 2026-08-17T00:39:41.106Z |  |
 | 9 | 125 | deviation | priv/schemas/examples.schema.json |  | Payslip net_pay_ytd is validated as a decimal string for exact YTD reconciliation | open |  | 2026-08-17T00:39:41.170Z |  |
+| 10 | 125 | deviation | test/docs_contract/examples_schema_contract_test.exs |  | Made the synthetic-fixture helper family-safe for Statement coverage | open |  | 2026-08-17T00:49:04.416Z |  |
 
 ````json
 [
@@ -133,6 +134,18 @@ last_updated: 2026-08-17T00:39:41.170Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-17T00:39:41.170Z",
+    "resolved_at": null
+  },
+  {
+    "id": 10,
+    "kind": "deviation",
+    "phase": "125",
+    "file": "test/docs_contract/examples_schema_contract_test.exs",
+    "line": null,
+    "description": "Made the synthetic-fixture helper family-safe for Statement coverage",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-17T00:49:04.416Z",
     "resolved_at": null
   }
 ]
