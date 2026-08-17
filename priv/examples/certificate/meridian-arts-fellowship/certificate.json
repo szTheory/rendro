@@ -1,0 +1,17 @@
+{
+  "fixture_id": "certificate_meridian_arts_fellowship_v1",
+  "family": "certificate",
+  "paper": "us_letter",
+  "title": "Meridian Arts Fellowship",
+  "recipient": "Elena Morales",
+  "date": "2026-08-21",
+  "body": "is recognized for a fellowship in public-making practice, awarded for a sustained body of work connecting neighborhood archives, printmaking, and shared civic memory.",
+  "seal_line": "Noor Bell, Fellowship Chair - Meridian Arts Fellowship",
+  "brand": {
+    "slug": "meridian-arts-fellowship",
+    "display_name": "Meridian Arts Fellowship",
+    "accent": "#6E3CB8",
+    "recommended_preset": "editorial",
+    "logo": "logo.svg"
+  }
+}

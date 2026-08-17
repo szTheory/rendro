@@ -1,0 +1,17 @@
+{
+  "fixture_id": "certificate_aster_institute_v1",
+  "family": "certificate",
+  "paper": "us_letter",
+  "title": "Certificate of Technical Practice",
+  "recipient": "Mara Chen",
+  "date": "2026-08-14",
+  "body": "has completed the Applied Systems Verification program and demonstrated practical fluency in deterministic document layout, reviewable rendering, and release-ready evidence.",
+  "seal_line": "Jonah Wells, Academic Director - Aster Institute",
+  "brand": {
+    "slug": "aster-institute",
+    "display_name": "Aster Institute",
+    "accent": "#1F4FB8",
+    "recommended_preset": "swiss",
+    "logo": "logo.svg"
+  }
+}
