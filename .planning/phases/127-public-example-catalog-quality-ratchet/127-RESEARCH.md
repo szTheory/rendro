@@ -17,7 +17,7 @@
 - **D-07:** Record page-one PNG SHA-256, complete source-PDF SHA-256, and exact `page_count`; render/check the full PDF but do not commit source PDFs or trailing-page PNGs.
 - **D-08:** Preserve native geometry: portrait families, landscape Certificate, native A6 Ticket; store page/DPI/dimensions and never crop/stretch/normalize.
 - **D-09:** Keep bounded representative first/final-page advisory proof for paginating families outside `assets/rendro/catalog/`; Certificate/Ticket assert one page. Deterministic PDF, pinned-PDFium advisory raster, and human review remain separate lanes.
-- **D-10:** Each cell has concrete nonempty alt and non-duplicative caption. For multi-page cells, consumer copy is `Preview: page 1 of N`.
+- **D-10:** Each cell has concrete nonempty alt and non-duplicative caption. The manifest derives a mode/quality-independent `preview_copy` during generation: for `page_count > 1` it is exactly `Preview: page 1 of <page_count>` using the integer count, and for `page_count == 1` it is JSON null. It is never reviewer-authored and remains distinct from `caption`, `alt`, `boundary_disclosure`, and quality status.
 - **D-11:** Score exactly twelve flagships, light then dark: Cedar Mutual Corporate-Classic Invoice, Northline Swiss Payslip, Signal Ledger Minimal-Mono Statement, Poppy & Grain Humanist Receipt, Meridian Editorial Certificate, and Aurora Brutalist Ticket.
 - **D-12:** Every catalog ID has one `review_status: scored | unscored` disposition in `priv/quality/rubric_scores.json`. Scored records carry dimensions/gates/verdict/reviewer/date/evidence/PNG/PDF hashes; unscored records carry same identity plus dated nonempty reason. Existing launch scores remain intact.
 - **D-13:** Freshness is derived from ID/evidence path/PNG hash/source-PDF hash, never reviewer-entered. Missing/new/changed/orphaned/mismatched projection fails CI; changed scored cells re-review, changed unscored cells explicitly rebind.
@@ -181,7 +181,7 @@ Keep existing launch `scores[]` untouched. Add a catalog disposition collection 
 
 1. **Implicit cardinality growth:** a new fixture silently creates public assets/review work. Use literal ordered specs with both exact and maximum-32 tests; reject discovery/cross-products. [VERIFIED: CONTEXT.md]
 2. **Mass re-bless conceals regressions:** `gen` must not write reviews; scored hash drift requires re-review, unscored drift explicit rebind, false-to-true resolution evidence. [VERIFIED: CONTEXT.md]
-3. **Page-one overclaim:** record complete-PDF hash/page count, use `Preview: page 1 of N`, and keep bounded multi-page proof elsewhere. [VERIFIED: CONTEXT.md]
+3. **Page-one overclaim:** record complete-PDF hash/page count, derive exact `preview_copy` as `Preview: page 1 of <page_count>` only when the count exceeds one, emit null for one-page cells, reject missing/wrong page numbers and complete-document wording, and keep bounded multi-page proof elsewhere. [VERIFIED: CONTEXT.md]
 4. **Advisory raster becomes accessibility/viewer proof:** preserve pin/version and no-overclaim dark-copy boundary. [VERIFIED: CONTEXT.md; `launch_artifacts.ex`]
 5. **Private surface leaks into runtime/public API:** hide module, exclude quality/schema/private PDFs from package, and add package/docs tripwires. [VERIFIED: CONTEXT.md; `mix.exs`]
 
