@@ -119,7 +119,7 @@ defmodule Rendro.Catalog do
       fixture_ref |> Rendro.Examples.load!() |> then(&Rendro.ExamplesData.transform(family, &1))
 
     theme = theme_for(spec)
-    doc = Map.fetch!(spec, :recipe_module).document(data, theme: theme)
+    doc = Map.fetch!(spec, :recipe_module).document(data, theme: theme, catalog_layout: true)
 
     if preset = Map.get(spec, :preset_atom),
       do: Rendro.Theme.Presets.register_fonts(doc, preset),
@@ -359,7 +359,8 @@ defmodule Rendro.Catalog do
 
   defp png_dimensions(
          <<137, 80, 78, 71, 13, 10, 26, 10, _::binary-size(8), width::32, height::32, _::binary>>
-       ), do: {width, height}
+       ),
+       do: {width, height}
 
   defp read_pdfium_pin, do: @pdfium_pin_path |> File.read!() |> JSON.decode!()
 

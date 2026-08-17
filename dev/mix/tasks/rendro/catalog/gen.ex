@@ -1,5 +1,7 @@
 defmodule Mix.Tasks.Rendro.Catalog.Gen do
   use Mix.Task
+
+  @moduledoc false
   @shortdoc "Generate bounded Rendro catalog artifacts"
   @impl Mix.Task
   def run(args) do

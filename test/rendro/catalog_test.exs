@@ -54,6 +54,11 @@ defmodule Rendro.CatalogTest do
     errors = Catalog.catalog_contract_errors(specs ++ [List.last(specs)])
     assert Enum.any?(errors, &String.contains?(&1, "exactly 32"))
     assert Enum.any?(errors, &String.contains?(&1, "ceiling"))
+
+    aurora = Enum.find(specs, &(&1.id == "ticket--aurora-live--brutalist--light"))
+    assert aurora.brand == "aurora-live"
+    assert aurora.preset == "brutalist"
+    assert aurora.accent == "#C78600"
   end
 
   test "static catalog checks are read-only and report a missing manifest" do

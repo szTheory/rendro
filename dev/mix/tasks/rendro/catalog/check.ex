@@ -1,5 +1,7 @@
 defmodule Mix.Tasks.Rendro.Catalog.Check do
   use Mix.Task
+
+  @moduledoc false
   @shortdoc "Verify bounded Rendro catalog artifacts without writing"
   @impl Mix.Task
   def run(args) do
