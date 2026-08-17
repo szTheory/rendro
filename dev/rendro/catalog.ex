@@ -8,6 +8,7 @@ defmodule Rendro.Catalog do
   @schema_version 1
   @renderer_kind "pdfium-render"
   @generated_by "mix rendro.catalog.gen"
+  @dark_boundary_disclosure "Screen-oriented; not a print, accessibility, PDF/UA, or WCAG claim."
   # This list is intentionally literal and ordered. It is the only membership
   # source; fixture discovery may validate a row but must never add one.
   @catalog_specs [
@@ -329,9 +330,11 @@ defmodule Rendro.Catalog do
     id = cell["id"] || inspect(cell)
 
     required =
-      ~w(id family brand preset theme accent mode recipe_module fixture_ref png_path png_sha256 source_pdf_sha256 page page_count dpi width_px height_px renderer_kind renderer_version alt caption preview_copy)
+      ~w(id family brand preset theme accent mode recipe_module fixture_ref png_path png_sha256 source_pdf_sha256 page page_count dpi width_px height_px renderer_kind renderer_version alt caption preview_copy boundary_disclosure quality)
 
-    Enum.map(required -- Map.keys(cell), &"catalog #{id}: missing #{&1}")
+    Enum.map(required -- Map.keys(cell), &missing_field_error(id, &1)) ++
+      preview_copy_errors(cell, id) ++
+      boundary_disclosure_errors(cell, id) ++ quality_errors(cell, id)
   end
 
   defp cell_shape_errors(other), do: ["catalog cell must be a map: #{inspect(other)}"]
@@ -349,9 +352,80 @@ defmodule Rendro.Catalog do
       "fixture_ref" => spec.fixture_ref,
       "png_path" => spec.png_path,
       "alt" => spec.alt,
-      "caption" => spec.caption
+      "caption" => spec.caption,
+      "boundary_disclosure" => boundary_disclosure(spec.mode),
+      "quality" => %{"status" => "unscored", "label" => "Not yet scored"}
     }
   end
+
+  defp missing_field_error(id, "quality"),
+    do: "catalog #{id}: missing quality; add a derived quality projection"
+
+  defp missing_field_error(id, field),
+    do: "catalog #{id}: missing #{field}; regenerate the catalog manifest"
+
+  defp preview_copy_errors(cell, id) do
+    page_count = cell["page_count"]
+    preview_copy = cell["preview_copy"]
+
+    cond do
+      not is_integer(page_count) or page_count < 1 ->
+        ["catalog #{id}: page_count must be a positive integer; inspect the complete source PDF"]
+
+      cell["page"] != 1 ->
+        ["catalog #{id}: page must be physical page 1; regenerate the page-one preview"]
+
+      page_count == 1 and not is_nil(preview_copy) ->
+        [
+          "catalog #{id}: preview_copy must be null for a one-page document; remove the page-one disclosure"
+        ]
+
+      page_count > 1 and preview_copy != "Preview: page 1 of #{page_count}" ->
+        [
+          "catalog #{id}: preview_copy must be Preview: page 1 of #{page_count}; derive it from page_count without claiming a complete document"
+        ]
+
+      true ->
+        []
+    end
+  end
+
+  defp boundary_disclosure_errors(cell, id) do
+    case {cell["mode"], cell["boundary_disclosure"]} do
+      {"dark", @dark_boundary_disclosure} ->
+        []
+
+      {"dark", _} ->
+        [
+          "catalog #{id}: dark boundary_disclosure must be the fixed screen-oriented claim; derive it from mode"
+        ]
+
+      {"light", nil} ->
+        []
+
+      {"light", _} ->
+        ["catalog #{id}: light boundary_disclosure must be null; remove the dark-mode claim"]
+
+      _ ->
+        ["catalog #{id}: mode must be light or dark; correct the catalog registry"]
+    end
+  end
+
+  defp quality_errors(%{"quality" => %{"status" => status, "label" => label}}, _id)
+       when {status, label} in [
+              {"passes", "Scored — passes current rubric"},
+              {"needs_work", "Scored — needs work"},
+              {"unscored", "Not yet scored"}
+            ],
+       do: []
+
+  defp quality_errors(_cell, id),
+    do: [
+      "catalog #{id}: quality must be one of the derived three-state projections; run the rubric contract check"
+    ]
+
+  defp boundary_disclosure("dark"), do: @dark_boundary_disclosure
+  defp boundary_disclosure("light"), do: nil
 
   defp encode_manifest(manifest), do: Jason.encode!(manifest, pretty: true)
   defp sha256(binary), do: :crypto.hash(:sha256, binary) |> Base.encode16(case: :lower)

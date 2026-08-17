@@ -131,7 +131,9 @@ defmodule Rendro.MixProject do
       links: %{"GitHub" => @source_url},
       files: ~w(
         lib
-        assets/rendro
+        assets/rendro/artifacts.json
+        assets/rendro/gallery
+        assets/rendro/manual.pdf
         priv/branded
         priv/examples
         priv/fonts

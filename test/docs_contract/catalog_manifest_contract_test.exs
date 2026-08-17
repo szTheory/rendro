@@ -55,31 +55,48 @@ defmodule Rendro.DocsContract.CatalogManifestContractTest do
     [first | rest] = cells
     errors = Catalog.manifest_shape_errors(manifest([Map.delete(first, "quality") | rest]))
 
-    assert Enum.any?(errors, &String.contains?(&1, "#{first["id"]}: missing quality; add a derived quality projection"))
+    assert Enum.any?(
+             errors,
+             &String.contains?(
+               &1,
+               "#{first["id"]}: missing quality; add a derived quality projection"
+             )
+           )
   end
 
   test "preview copy is a page-count-only disclosure and cannot call page one complete" do
     [spec | _] = Catalog.catalog_specs()
     multi_page = cell(spec, %{"page_count" => 3, "preview_copy" => "Preview: page 1 of 3"})
-    assert Catalog.manifest_shape_errors(manifest([multi_page])) |> Enum.any?(&String.contains?(&1, "cell order"))
+
+    assert Catalog.manifest_shape_errors(manifest([multi_page]))
+           |> Enum.any?(&String.contains?(&1, "cell order"))
 
     bad = %{multi_page | "preview_copy" => "Complete document"}
 
     assert Catalog.manifest_shape_errors(manifest([bad]))
-           |> Enum.any?(&String.contains?(&1, "#{spec.id}: preview_copy must be Preview: page 1 of 3"))
+           |> Enum.any?(
+             &String.contains?(&1, "#{spec.id}: preview_copy must be Preview: page 1 of 3")
+           )
   end
 
   test "boundary disclosure derives strictly from mode" do
     dark = Enum.find(Catalog.catalog_specs(), &(&1.mode == "dark"))
     light = Enum.find(Catalog.catalog_specs(), &(&1.mode == "light"))
 
-    dark_errors = Catalog.manifest_shape_errors(manifest([cell(dark, %{"boundary_disclosure" => nil})]))
+    dark_errors =
+      Catalog.manifest_shape_errors(manifest([cell(dark, %{"boundary_disclosure" => nil})]))
+
     assert Enum.any?(dark_errors, &String.contains?(&1, "#{dark.id}: dark boundary_disclosure"))
 
     light_errors =
-      Catalog.manifest_shape_errors(manifest([cell(light, %{"boundary_disclosure" => @dark_disclosure})]))
+      Catalog.manifest_shape_errors(
+        manifest([cell(light, %{"boundary_disclosure" => @dark_disclosure})])
+      )
 
-    assert Enum.any?(light_errors, &String.contains?(&1, "#{light.id}: light boundary_disclosure must be null"))
+    assert Enum.any?(
+             light_errors,
+             &String.contains?(&1, "#{light.id}: light boundary_disclosure must be null")
+           )
   end
 
   test "Hex package retains launch assets while excluding the catalog and private rubric inputs" do
