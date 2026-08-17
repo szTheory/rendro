@@ -93,7 +93,7 @@
   4. Referencing an unregistered preset font role raises the existing typed `FontRegistry` error (no silent substitution), and a double-subset determinism test proves byte-identical subsetting output for every vendored font.
   5. At least one additional example brand exists per domain family under `priv/examples/<domain>/` as a data tuple (never a module), and the un-themed/`default()` render stays byte-identical to prior goldens (zero per-draw float math in preset derivation).
 
-**Plans**: 7/10 plans executed
+**Plans**: 8/10 plans executed
 
 Plans:
 **Wave 1**
@@ -117,7 +117,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 125-05-PLAN.md — Bind Swiss, Humanist, and Editorial light/dark rows to pinned advisory rasters.
+- [x] 125-05-PLAN.md — Bind Swiss, Humanist, and Editorial light/dark rows to pinned advisory rasters.
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
@@ -196,7 +196,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 125. Foundation — Curated fonts, style-genre presets & brand fixtures | v2.12 | 7/10 | In Progress|  |
+| 125. Foundation — Curated fonts, style-genre presets & brand fixtures | v2.12 | 8/10 | In Progress|  |
 | 126. Carryover polish — dark-mode legibility, hierarchy & golden depth | v2.12 | 0/TBD | Not started | - |
 | 127. Public example catalog & quality ratchet | v2.12 | 0/TBD | Not started | - |
 | 128. Static configurator, theme codegen & Livebook | v2.12 | 0/TBD | Not started | - |
