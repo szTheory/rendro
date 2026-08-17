@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.12
 milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
-current_phase: 126
-current_phase_name: Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth
-status: verifying
+current_phase: 127
+current_phase_name: Public example catalog & quality ratchet
+status: planning
 stopped_at: Completed 126-05-PLAN.md
-last_updated: "2026-08-17T06:04:29.935Z"
-last_activity: 2026-08-16
-last_activity_desc: Phase 126 execution started
+last_updated: "2026-08-17T06:32:03.905Z"
+last_activity: 2026-08-17
+last_activity_desc: Phase 126 complete, transitioned to Phase 127
 progress:
   total_phases: 5
   completed_phases: 2
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-08-16)
 
 ## Current Position
 
-Phase: 126 (Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth) — EXECUTING
-Plan: 5 of 5
-Status: Phase complete — ready for verification
-Last activity: 2026-08-16 — Phase 126 execution started
+Phase: 127 — Public example catalog & quality ratchet
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-08-17 — Phase 126 complete, transitioned to Phase 127
 
 ## Roadmap Snapshot (v2.12, Phases 125-129) — IN PLANNING
 
