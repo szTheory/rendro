@@ -50,6 +50,7 @@
     },
     "Elixir.Rendro.Adapters.Pdfium": {
       "functions": [
+        "executable/0",
         "form_fields/2",
         "info/2",
         "render/2",
