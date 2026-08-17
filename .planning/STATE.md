@@ -5,15 +5,15 @@ milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 127
 current_phase_name: public-example-catalog-quality-ratchet
 status: executing
-stopped_at: Completed 127-01-PLAN.md
-last_updated: "2026-08-17T22:52:18.540Z"
+stopped_at: Completed 127-02-PLAN.md
+last_updated: "2026-08-17T23:05:16.042Z"
 last_activity: 2026-08-17
 last_activity_desc: Phase 127 execution started
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 20
-  completed_plans: 16
+  completed_plans: 17
   percent: 40
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-16)
 ## Current Position
 
 Phase: 127 (public-example-catalog-quality-ratchet) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-08-17 — Phase 127 execution started
 
@@ -73,8 +73,8 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-17T22:52:18.491Z
-Stopped at: Completed 127-01-PLAN.md
+Last session: 2026-08-17T23:05:16.033Z
+Stopped at: Completed 127-02-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -117,6 +117,7 @@ Resume file: None
 | Phase 126 P04 | 3m | 1 tasks | 2 files |
 | Phase 126 P05 | 25m | 2 tasks | 5 files |
 | Phase 127 P01 | 25m | 3 tasks | 8 files |
+| Phase 127 P02 | 24m | 2 tasks | 7 files |
 
 ## Operator Next Steps
 
@@ -141,3 +142,5 @@ Resume file: None
 - [Phase ?]: Close only the three named WINDOWS rows from deterministic, pinned, and approved human evidence.
 - [Phase ?]: Delete each recorded isolated CI evidence ref only after its exact SHA, committed approval, and scoped artifact gates pass.
 - [Phase ?]: Keep the catalog as an explicit, ordered 32-row dev/test registry with separate generation and checking operations.
+- [Phase ?]: Keep preview_copy page-count-derived and boundary_disclosure mode-derived, independently of reviewer quality.
+- [Phase ?]: Keep catalog quality as a reviewer-owned, exact one-to-one relation with only three derived consumer labels.
