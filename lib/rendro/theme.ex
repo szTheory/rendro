@@ -182,6 +182,16 @@ defmodule Rendro.Theme do
   def default, do: %__MODULE__{}
 
   @doc """
+  Returns a fully resolved curated style-genre preset.
+
+  `genre` must be a canonical preset atom and `opts` must include an `:accent`
+  color. Presets remain pure token values; register their required curated fonts
+  explicitly on the document with `Rendro.Theme.Presets.register_fonts/2`.
+  """
+  @spec preset(atom(), keyword()) :: t()
+  def preset(genre, opts), do: Rendro.Theme.Presets.preset(genre, opts)
+
+  @doc """
   Resolves a partial input onto the defaults, returning a full `%Theme{}`.
 
   Accepts a `keyword`, `map`, or existing `%Theme{}`. Partial input is

@@ -23,8 +23,22 @@ defmodule Rendro.Theme.PresetsTest do
       second = Theme.preset(:swiss, mode: :light, accent: {44, 107, 237})
 
       assert first == second
-      assert first.typography.fonts == %{heading: :rendro_preset_grotesque, body: :rendro_preset_grotesque, mono: :rendro_preset_mono}
-      assert first.typography.scale == %{display: 21, title: 16.5, subtitle: 13, body: 10.5, small: 9, caption: 8}
+
+      assert first.typography.fonts == %{
+               heading: :rendro_preset_grotesque,
+               body: :rendro_preset_grotesque,
+               mono: :rendro_preset_mono
+             }
+
+      assert first.typography.scale == %{
+               display: 21,
+               title: 16.5,
+               subtitle: 13,
+               body: 10.5,
+               small: 9,
+               caption: 8
+             }
+
       assert first.typography.leading == 1.3
       assert first.spacing == %{unit: 6, tight: 4, normal: 8, loose: 12, section: 24}
       assert first.rules == %{hairline: 0.5, thin: 1, thick: 2}
@@ -50,11 +64,24 @@ defmodule Rendro.Theme.PresetsTest do
       end
 
       assert_raise ArgumentError, ~r/accent/, fn -> Theme.preset(:swiss, []) end
-      assert_raise ArgumentError, ~r/keyword/, fn -> Theme.preset(:swiss, %{accent: "#2C6BED"}) end
+
+      assert_raise ArgumentError, ~r/keyword/, fn ->
+        Theme.preset(:swiss, %{accent: "#2C6BED"})
+      end
+
       assert_raise ArgumentError, ~r/#12/, fn -> Theme.preset(:swiss, accent: "#12") end
-      assert_raise ArgumentError, ~r/unknown/, fn -> Theme.preset(:swiss, accent: "#2C6BED", unknown: :value) end
-      assert_raise ArgumentError, ~r/mode/, fn -> Theme.preset(:swiss, accent: "#2C6BED", mode: :print) end
-      assert_raise ArgumentError, ~r/density/, fn -> Theme.preset(:swiss, accent: "#2C6BED", density: :spacious) end
+
+      assert_raise ArgumentError, ~r/unknown/, fn ->
+        Theme.preset(:swiss, accent: "#2C6BED", unknown: :value)
+      end
+
+      assert_raise ArgumentError, ~r/mode/, fn ->
+        Theme.preset(:swiss, accent: "#2C6BED", mode: :print)
+      end
+
+      assert_raise ArgumentError, ~r/density/, fn ->
+        Theme.preset(:swiss, accent: "#2C6BED", density: :spacious)
+      end
     end
 
     test "exposes preset/2 but not preset/1" do
@@ -69,7 +96,8 @@ defmodule Rendro.Theme.PresetsTest do
       theme = Theme.preset(:swiss, accent: "#2C6BED")
       unregistered = Invoice.document(invoice_data(), theme: theme)
 
-      assert {:error, {:unknown_logical_font, :rendro_preset_grotesque}} = Rendro.render(unregistered)
+      assert {:error, %Rendro.Error{reason: {:unknown_text_font, :rendro_preset_mono}}} =
+               Rendro.render(unregistered)
 
       document = Presets.register_fonts(unregistered, :swiss)
       assert {:ok, pdf} = Rendro.render(document, deterministic: true)
@@ -87,9 +115,10 @@ defmodule Rendro.Theme.PresetsTest do
       assert Presets.register_fonts(registered, :swiss) == registered
       assert :error = FontRegistry.fetch(second.font_registry, :rendro_preset_grotesque)
 
-      colliding = Rendro.Document.register_font(first, :rendro_preset_grotesque, built_in: :helvetica)
+      colliding =
+        Rendro.Document.register_font(first, :rendro_preset_grotesque, built_in: :helvetica)
 
-      assert_raise ArgumentError, ~r/rendro_preset_grotesque.*collision/, fn ->
+      assert_raise ArgumentError, ~r/collision.*rendro_preset_grotesque/, fn ->
         Presets.register_fonts(colliding, :swiss)
       end
 

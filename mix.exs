@@ -116,6 +116,7 @@ defmodule Rendro.MixProject do
         assets/rendro
         priv/branded
         priv/examples
+        priv/fonts
         bench/results
         guides
         .formatter.exs
