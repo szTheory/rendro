@@ -233,14 +233,10 @@ Source: the existing examples tarball contract uses this same build/cache/conten
 | A1 | A reusable internal FontRegistry preflight/metric helper can be exposed without broadening public API. | Certificate metric seam | Planner must instead add narrowly scoped private parsing or refactor compose ordering. |
 | A2 | Exact release archive filenames/layouts will match the vendoring script’s expected static Regular member. | Font vendoring | Verify archive contents and SHA-256 before committing assets. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Which private Certificate seam has the lowest blast radius?**
-   - What we know: its current compose-time helper deliberately rejects non-Helvetica roles.
-   - Recommendation: prototype a private curated-role resolver/preflight that shares existing font parsing, then select the option that leaves no-theme bytes unchanged.
-2. **Which deterministic local SVG shapes are accepted by all consuming paths?**
-   - What we know: examples permit SVG text assets, but this phase must not create recipe branches.
-   - Recommendation: use simple no-text, one-color SVG geometry and add a generic logo-reference validation test; defer recipe/catalog use decisions to later phases.
+1. **Certificate seam — resolved:** use a private `Rendro.Theme.Presets.metric_font!/1` seam that recognizes only the four Rendro-owned curated role atoms, builds and preflights the exact descriptor later consumed by `register_fonts/2` through the existing `FontRegistry` parser, and returns the parsed `%Rendro.PDF.Font{}` for Certificate centering and line estimates. Preserve the existing `:default`/`"Helvetica"` path and its bytes; unknown non-curated roles continue to fail actionably. This is private implementation only and adds no wider public API.
+2. **Deterministic SVG contract — resolved:** fixtures may use local, text-free, one-color SVG marks composed only from simple deterministic geometry accepted by the existing text-only example/package path. The generic contract requires a safe-relative path resolving inside the fixture directory and rejects scripts, external references, embedded images, gradients, filters, and text. Recipe/catalog consumption remains outside Phase 125 and requires no recipe branch here.
 
 ## Environment Availability
 
