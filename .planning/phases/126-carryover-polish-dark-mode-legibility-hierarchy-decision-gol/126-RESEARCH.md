@@ -57,10 +57,10 @@ The planner may choose private helper names, exact affected raster rows, the sta
 
 | ID | Description | Research Support |
 |---|---|---|
-| POLISH-01 | Fix `invoice_dark` table-body legibility at shared color-role level. | The concrete Invoice table currently emits bare strings; a private themed-cell helper preserves the nil-theme string path while emitting `colors.ink` blocks only for themed tables. [VERIFIED: local codebase] |
+| POLISH-01 | Fix `invoice_dark` table-body legibility at shared color-role level. | The concrete Invoice table currently emits bare strings; an internal `Rendro.Recipes.TableCell` constructor is the narrow shared boundary: literal nil theme returns the original String, while a supplied theme emits a block/text cell using the requested semantic color role. Invoice adopts it for every table header/body cell; Statement/Payslip/Ticket already use explicit colored cells and need no migration. [VERIFIED: local codebase] |
 | POLISH-02 | Resolve Ticket display/title hierarchy inversion or explicit carve-out. | Locked decisions require a real fix: preserve native mapping but give themed Ticket a semantic mapping where placement is dominant, title secondary, and reference compact. [VERIFIED: local codebase] |
 | POLISH-03 | Prevent Payslip themed money wrapping, including Minimal-Mono. | Existing measured rows, fixed columns, and explicit right alignment make narrow amount-column retuning the first private solution to validate. [VERIFIED: local codebase] |
-| POLISH-04 | Add bounded `from_brand`/preset × accent byte golden. | Existing deterministic rendering and SHA-256 in recipe byte-identity tests establish the exact test pattern; use one registered realistic recipe fixture and 3–4 variants. [VERIFIED: local codebase] |
+| POLISH-04 | Add bounded `from_brand`/preset × accent byte golden. | Existing deterministic rendering and SHA-256 in recipe byte-identity tests establish the exact test pattern; use one realistic Invoice fixture and the three resolved constructor/accent/mode variants. [VERIFIED: local codebase] |
 | POLISH-05 | Give all seven recipes explicit type-scale coverage. | Four modules exist today; add BrandedInvoice, Payslip, and Receipt contract tests and deepen existing assertions from raise-path-only to structure/override checks. [VERIFIED: local codebase] |
 </phase_requirements>
 
@@ -164,7 +164,7 @@ test/rendro/theme/
 
 **What:** Branch at the existing recipe-level seam: keep the exact string/list cells for `theme: nil`, but create `Rendro.block(Rendro.text(..., color: colors.ink))` cells for themed header/body values. [VERIFIED: local codebase]
 
-**When to use:** Invoice table construction, and only other recipes that opt into the same private helper. [VERIFIED: local codebase]
+**When to use:** Invoice table construction now; other recipes may reuse the internal boundary when converting a bare-string themed table. Statement and Payslip already have equivalent explicit semantic cells, while Ticket's placement grid already carries explicit role colors. [VERIFIED: local codebase]
 
 **Example:**
 
@@ -299,19 +299,13 @@ assert {:ok, _pdf} = Rendro.render(Presets.register_fonts(document, :humanist), 
 | # | Claim | Section | Risk if Wrong |
 |---|---|---|---|
 | A1 | The existing private `Rendro.Table`/block cell path can fit all inspected realistic Payslip money values after column retuning without a new no-wrap primitive. | Architecture Patterns | If false, implementation must evaluate the existing private fitting seam before proposing any API. |
-| A2 | The pinned container-wrapper workflow remains usable from this Docker-equipped host even though `pdfium-cli` is absent from PATH. | Environment Availability | Advisory raster regeneration needs an operator/CI environment adjustment. |
+| A2 | The repository has a proven pinned PDFium install and CI-only bless guard, but current `ci.yml` has no `workflow_dispatch` blessing input or artifact handoff. Phase 126 must add that bounded advisory route before regeneration. | Environment Availability | Without the planned dispatch/artifact contract, committed hashes cannot be retrieved from an authorized blessing run. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **What exact themed Ticket mapping preserves all six presets while keeping reference compact?**
-   - What we know: current themed `display=21`, `title=16.5`, and existing stub width cause the documented inversion and three-line reference. [VERIFIED: local codebase]
-   - What's unclear: whether reassignment alone fits the fixture reference or whether the existing `avail_w` needs a narrow geometric adjustment.
-   - Recommendation: make implementation test the full six-preset matrix with focused Ticket role/order assertions before choosing helper/width constants. [VERIFIED: CONTEXT.md]
+1. **Resolved Ticket semantic mapping and reference-fit criterion:** For every supplied theme, map placement-grid values to `scale.display`, the event title to `scale.title`, and the human-readable reference to `scale.caption`, retaining `fonts.mono`, the complete selectable `AUR-88213-GA` text, and the caller's final `:typography` merge. Preserve the historical nil-theme bindings literally. The bounded fit gate is exact: under `Theme.default/0` and each of the six registered presets, placement size is strictly greater than title size, title size is strictly greater than reference size, and measuring the emitted reference block at the production `avail_w` yields one line (measured block height no greater than that theme's single-line height, with intrinsic text width no greater than `avail_w`). If the existing stub fails this gate, widen only the existing reference text region to `ceil(max_measured_width + 2pt)` by adjusting its current inset/available-width constants; keep barcode/placement geometry, full reference bytes, and all preset-independent role assignments unchanged. [RESOLVED: local Ticket geometry and CONTEXT D-04..D-06]
 
-2. **Which 3–4 golden variants give the best accent coverage?**
-   - What we know: the requirement requires `from_brand` plus preset paths and at least two distinct accents.
-   - What's unclear: the exact hashes until the stable realistic fixture is rendered.
-   - Recommendation: choose one default-font `from_brand` Invoice fixture and two registered preset variants with visibly distinct blue/orange (or similarly distinct) accents; bind values only from an actual deterministic render. [VERIFIED: local codebase]
+2. **Resolved bounded golden variants:** Use the same stable realistic Invoice input for exactly three ordered rows: `from_brand_blue_light` with `Theme.from_brand(accent: "#2C6BED")`; `swiss_orange_light` with `Theme.preset(:swiss, accent: "#D97706", mode: :light)` plus explicit Swiss font registration; and `minimal_mono_teal_dark` with `Theme.preset(:minimal_mono, accent: "#0E7C76", mode: :dark)` plus explicit Minimal-Mono font registration. This spans both constructors, three distinct accents, light/dark, and two materially different preset grammars without duplicating the twelve-row matrix. Expected SHA-256 values remain intentionally unset until captured from two equal deterministic renders during implementation. [RESOLVED: D-10/D-12 and local constructor/font bridge]
 
 ## Environment Availability
 
@@ -319,12 +313,12 @@ assert {:ok, _pdf} = Rendro.render(Presets.register_fonts(document, :humanist), 
 |---|---|---|---|---|
 | Elixir / OTP | recipe builds and ExUnit | ✓ | Elixir 1.19.5 / OTP 28 | — [VERIFIED: local environment] |
 | Mix | focused and CI suites | ✓ | bundled with Elixir | — [VERIFIED: local environment] |
-| Docker | pinned PDFium advisory evidence | ✓ | 29.5.2 | — [VERIFIED: local environment] |
-| `pdfium-cli` on PATH | direct advisory raster run | ✗ | — | Existing provenance-aware container wrapper/CI route. [VERIFIED: local environment] |
+| Docker | optional local diagnostic only; not authorized to bless Phase 126 hashes | ✓ | 29.5.2 | Use the planned GitHub Actions dispatch route for committed evidence. [VERIFIED: local environment] |
+| `pdfium-cli` on PATH | direct advisory raster run | ✗ | — | Add/use the planned manual GitHub Actions route, which installs and SHA-verifies the pinned binary before CI-only blessing. [VERIFIED: local environment + `.github/workflows/ci.yml`] |
 
 **Missing dependencies with no fallback:** None. [VERIFIED: local codebase]
 
-**Missing dependencies with fallback:** Global `pdfium-cli`; use the existing pinned wrapper/container route, never a host-unpinned raster substitute. [VERIFIED: local codebase]
+**Missing dependencies with fallback:** Global `pdfium-cli`; implement and use the bounded manual GitHub Actions blessing/artifact route in Plans 02–03, never a host-unpinned raster substitute. [VERIFIED: local codebase]
 
 ## Validation Architecture
 

@@ -8,6 +8,7 @@
 
 | New/Modified File | Role | Data Flow | Closest Analog | Match Quality |
 |---|---|---|---|---|
+| `lib/rendro/recipes/table_cell.ex` | internal recipe utility | transform | `lib/rendro/recipes/{statement,payslip}.ex` `cell_text/3` | exact semantic-cell construction; new nil-theme compatibility branch |
 | `lib/rendro/recipes/invoice.ex` | component / recipe | transform | `lib/rendro/recipes/payslip.ex` | partial: explicit themed table cells |
 | `lib/rendro/recipes/ticket.ex` | component / recipe | transform | itself: `main_section/2`, `reference_blocks/6`, `typography/1` | exact seam |
 | `lib/rendro/recipes/payslip.ex` | component / recipe | transform | itself: `body_section/2` + `cell_text/3` | exact seam |
@@ -64,7 +65,7 @@ defp cell_text(text, colors, type),
     )
 ```
 
-Use a private Invoice-local or narrowly shared helper that selects literal strings for nil-theme and blocks with an explicit semantic color for supplied themes. Assign `ink` to primary values and only use `muted` where current semantic hierarchy warrants it; do not change global `Rendro.Table` defaults.
+Use the chosen narrowly shared internal `Rendro.Recipes.TableCell` helper: literal nil theme returns the input String unchanged, while a supplied theme returns a block/text cell with an explicit semantic role. Invoice adopts it for all headers/body values. Statement and Payslip already implement the same explicit semantic-cell behavior through their local helpers, and Ticket's placement grid already supplies explicit colors, so migration churn is unnecessary. Assign `ink` to primary values and only use `muted` where current semantic hierarchy warrants it; do not change global `Rendro.Table` defaults.
 
 **Theme / explicit-override precedence** (`lib/rendro/recipes/invoice.ex:572-626`):
 
@@ -354,7 +355,7 @@ Preset themes intentionally require `Rendro.Theme.Presets.register_fonts(documen
 
 | File / concern | Role | Data Flow | Reason / planner guidance |
 |---|---|---|---|
-| Themed Invoice semantic table-cell helper | private recipe utility | transform | No existing Invoice helper: copy Payslip's explicit text-block construction, but keep Invoice's nil-theme strings and pagination flow. |
+| Shared themed table-cell semantic boundary | internal recipe utility | transform | No existing shared module: create `Rendro.Recipes.TableCell` from the proven Statement/Payslip block/text construction shape, add the nil-theme literal compatibility clause, and adopt it only in Invoice where the bare-string defect exists. |
 | Sequential human review presentation | temporary review artifact | file-I/O | The repository writes individual readable PNGs but has no dedicated slideshow/lightbox implementation. Reuse these images or a non-shipped review mechanism; do not introduce catalog UI. |
 
 ## Metadata
