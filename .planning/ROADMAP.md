@@ -96,16 +96,37 @@
 **Plans**: 10 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 125-01-PLAN.md — Trace one real Swiss invoice through strict preset construction, explicit registration, and real embedded fonts.
-- [ ] 125-02-PLAN.md — Complete four-face provenance, Hex packaging, role descriptors, and deterministic subsetting.
-- [ ] 125-03-PLAN.md — Expand and guard the complete six-row structural genre grammar.
-- [ ] 125-04-PLAN.md — Repair Certificate exact-font metrics and prove the deterministic twelve-row render matrix.
-- [ ] 125-05-PLAN.md — Bind Swiss, Humanist, and Editorial light/dark rows to pinned advisory rasters.
-- [ ] 125-06-PLAN.md — Complete the pinned raster matrix with Corporate-Classic, Minimal-Mono, and Brutalist.
 - [ ] 125-07-PLAN.md — Establish the generic brand schema with Invoice and Payslip fixture pairs.
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 125-02-PLAN.md — Complete four-face provenance, Hex packaging, role descriptors, and deterministic subsetting.
 - [ ] 125-08-PLAN.md — Add Statement and Receipt fixture pairs with progressive corpus contracts.
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 125-03-PLAN.md — Expand and guard the complete six-row structural genre grammar.
 - [ ] 125-09-PLAN.md — Add Certificate and Ticket fixture pairs and close corpus/package invariants.
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 125-04-PLAN.md — Repair Certificate exact-font metrics and prove the deterministic twelve-row render matrix.
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 125-05-PLAN.md — Bind Swiss, Humanist, and Editorial light/dark rows to pinned advisory rasters.
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
+- [ ] 125-06-PLAN.md — Complete the pinned raster matrix with Corporate-Classic, Minimal-Mono, and Brutalist.
+
+**Wave 7** *(blocked on Wave 6 completion)*
+
 - [ ] 125-10-PLAN.md — Run the deterministic phase gate and conduct separately pinned-PDFium human review.
+
 **UI hint**: no — pure library API + vendored data files, no browser-rendered surface
 
 ### Phase 126: Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth
