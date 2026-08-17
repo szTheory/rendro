@@ -36,7 +36,7 @@
 
 ### the agent's Discretion
 
-Private helper names, additive disposition-union structure, JSON nesting, in-run caching/parallelism, and whether current multi-page proof satisfies D-09 are planner choices. Aurora’s exact accent may be selected from the existing closed palette after review, recorded only as fixture/catalog data. The 32-cell ceiling, pair matrix, flagship set, page-one policy, hash-bound dispositions, domain-first contract, and launch-gallery isolation are not discretionary. [VERIFIED: CONTEXT.md]
+Private helper names, additive disposition-union structure, JSON nesting, and in-run caching/parallelism remain planner choices. The planning resolutions below fix D-09 to the bounded Invoice/Statement four-image proof and fix Aurora's accent to living-brand `amber-600` (`#C78600`), recorded only as fixture/catalog data. The 32-cell ceiling, pair matrix, flagship set, page-one policy, hash-bound dispositions, domain-first contract, and launch-gallery isolation are not discretionary. [VERIFIED: CONTEXT.md; `brand/tokens/tokens.json`]
 
 ### Deferred Ideas (OUT OF SCOPE)
 
@@ -147,7 +147,7 @@ defp render_spec(spec) do
 end
 ```
 
-Aurora Live Ticket currently has no preset/accent metadata; add any selected closed-palette value only as safe fixture/catalog data. [VERIFIED: `priv/examples/ticket/aurora-live/ticket.json`; CONTEXT.md]
+Aurora Live Ticket currently has no preset/accent metadata; add exact living-brand `amber-600` (`#C78600`) only as safe fixture/catalog data. [VERIFIED: `priv/examples/ticket/aurora-live/ticket.json`; `brand/tokens/tokens.json`; CONTEXT.md]
 
 ### Pattern 2: Generator writes, checker recomputes and joins
 
@@ -222,13 +222,13 @@ The checker derives freshness from identity comparison; it never accepts a manua
 
 | # | Claim | Section | Risk if Wrong |
 |---|---|---|---|
-| A1 | Existing first/final-page proof can satisfy D-09 with at most a bounded extension. | Open Questions | Add one small advisory proof task. [ASSUMED] |
+| A1 | D-09 is satisfied by one bounded advisory proof containing representative Invoice and Statement first/final physical pages outside the public catalog tree. | Resolved Questions | Plans 03-04 own the exact four-image proof and human inspection. [RESOLVED] |
 | A2 | `@moduledoc false` plus public API/docs exclusion hides private catalog code. | Pitfalls | Add a dedicated docs discovery guard. [ASSUMED] |
 
-## Open Questions
+## Resolved Questions (RESOLVED)
 
-1. **D-09 proof reuse:** pipeline output supplies page counts and PDFium is advisory, but current evidence for selected Invoice/Statement first/final pages was not established. Audit it first; otherwise add exactly one bounded external proof. [VERIFIED: `lib/rendro/pipeline.ex`; `launch_artifacts.ex`; ASSUMED]
-2. **Aurora accent:** fixture has no accent/preset metadata. Select from existing closed palette in render review and retain it only in fixture/catalog data. [VERIFIED: Aurora fixture; CONTEXT.md]
+1. **D-09 proof scope — RESOLVED:** render the representative 60-plus-row Invoice and Statement fixtures as complete deterministic PDFs, use pinned PDFium to capture exactly each first and final physical page, store the resulting four PNGs outside `assets/rendro/catalog/`, and inspect them during the bounded human-review lane. Certificate and Ticket continue to assert one page. [VERIFIED: Plans 03-04; CONTEXT.md]
+2. **Aurora accent — RESOLVED:** use exact closed-palette raw token `amber-600` (`#C78600`) from the living brand source. Store `#C78600` only in Aurora Live fixture/catalog data with `recommended_preset: brutalist`; do not add a module, genre branch, or arbitrary-color surface. [VERIFIED: `brand/README.md`; `brand/tokens/tokens.json`; `brand/index.html`; CONTEXT.md]
 
 ## Environment Availability
 
