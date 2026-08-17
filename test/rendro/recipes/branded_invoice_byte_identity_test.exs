@@ -11,7 +11,7 @@ defmodule Rendro.Recipes.BrandedInvoiceByteIdentityTest do
   # so the post-seam render hashes to this same value. Changing this hash is a
   # defect, not a golden refresh, unless a human explicitly re-authorizes a new
   # baseline.
-  @toy_golden_sha256 "6b20ecc8dba82b88cb4f8216ca49bba052838e6cb3e0dd0c7ba8142139f6a9ad"
+  @toy_golden_sha256 "52c2dbf1983e290b7a9ec3972f9611284cd36f3768abac2184dec280f19415dd"
 
   # Fixed, deterministic toy data — required :id, :date, :items, :brand keys.
   defp toy_data do

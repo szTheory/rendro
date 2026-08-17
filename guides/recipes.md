@@ -65,8 +65,8 @@ Landscape certificate with a Path-backed, geometry-derived border frame.
 
 Payslip with earnings, deductions, year-to-date figures, and a reconciled net pay.
 
-- Source PDF SHA-256: `78b0d3042e051c9c621afacfe28fab48dc5e41fe5a6fb348f645b19f5ab41d9f`
-- PNG SHA-256: `21ad905a86bc786a9b63316e92b1ee7e27627472f5533aee88ef89c28f02679d`
+- Source PDF SHA-256: `19a1813b36fde337a3d7e941fca5c83fb8584540a2b1211fb801e8ae66814d9e`
+- PNG SHA-256: `44ee6ec59d7b0593c75175203be2b31745cec5d6e5e73180293c27dd665d0e26`
 
 ### Ticket
 
@@ -118,7 +118,7 @@ Invoice themed via from_brand(accent: "#0E7C76") - accent-only, no assets.
 
 Rendro also renders its own compact launch manual: [manual.pdf](assets/rendro/manual.pdf).
 
-SHA-256: `743bdb487ff07c0ac0c2f9a2c1e1c34cf69c789200311600b48e8acdc1b7f186`
+SHA-256: `06eba8bd60b8caad72e142d54b4a1bc6f5c91351d32cbc3edede42608a7d532b`
 <!-- rendro-recipe-gallery-end -->
 
 ## Realistic Example Library

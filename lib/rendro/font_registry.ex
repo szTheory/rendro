@@ -430,6 +430,7 @@ defmodule Rendro.FontRegistry do
             descent: parsed.descent,
             default_width: parsed.default_width,
             widths: parsed.widths,
+            glyph_widths: parsed.glyph_widths,
             cmap: parsed.cmap
           )
 

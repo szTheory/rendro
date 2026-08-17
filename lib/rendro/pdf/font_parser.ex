@@ -12,6 +12,7 @@ defmodule Rendro.PDF.FontParser do
              descent: integer(),
              default_width: non_neg_integer(),
              widths: %{non_neg_integer() => non_neg_integer()},
+             glyph_widths: %{non_neg_integer() => non_neg_integer()},
              cmap: %{non_neg_integer() => non_neg_integer()}
            }}
           | {:error, term()}
@@ -41,6 +42,7 @@ defmodule Rendro.PDF.FontParser do
          descent: descent,
          default_width: default_width(widths, widths_by_glyph),
          widths: widths,
+         glyph_widths: widths_by_glyph,
          cmap: codepoint_to_glyph
        }}
     else

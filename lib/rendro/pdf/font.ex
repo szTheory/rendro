@@ -28,6 +28,7 @@ defmodule Rendro.PDF.Font do
           descent: integer(),
           default_width: non_neg_integer(),
           widths: %{non_neg_integer() => non_neg_integer()},
+          glyph_widths: %{non_neg_integer() => non_neg_integer()},
           cmap: %{non_neg_integer() => non_neg_integer()} | nil
         }
 
@@ -45,6 +46,7 @@ defmodule Rendro.PDF.Font do
     :descent,
     :default_width,
     widths: %{},
+    glyph_widths: %{},
     cmap: nil
   ]
 
@@ -181,6 +183,7 @@ defmodule Rendro.PDF.Font do
       descent: Keyword.fetch!(opts, :descent),
       default_width: Keyword.fetch!(opts, :default_width),
       widths: Keyword.fetch!(opts, :widths),
+      glyph_widths: Keyword.get(opts, :glyph_widths, %{}),
       cmap: Keyword.fetch!(opts, :cmap)
     }
   end

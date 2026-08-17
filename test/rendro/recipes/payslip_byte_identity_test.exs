@@ -13,7 +13,7 @@ defmodule Rendro.Recipes.PayslipByteIdentityTest do
   # earnings/deductions table (explicit size-11 data cells, a group spacer
   # column, and a widened YTD column) — an authorized, reviewed geometry
   # change, not drift.
-  @toy_golden_sha256 "85f6242490047cd14b2b1f8f7071fdd76ba5c828aac11b4ac22369b72d24f165"
+  @toy_golden_sha256 "a0adf8f7b2ba02108a2120af9c27779df7e361ab3b779079d48f2cfb1684fc87"
 
   # Fixed, deterministic minimal fixture (no anatomy variance) -- one
   # earnings line, one deductions line, no :totals, no accented content, so

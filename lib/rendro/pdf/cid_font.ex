@@ -108,9 +108,15 @@ defmodule Rendro.PDF.CidFont do
     # The /W array can be [ c [ w1 w2 ... ] ]
     # We will just generate [ 0 [ w0 w1 w2 ... ] ] up to the max encoded glyph
 
+    # `widths` is indexed by Unicode codepoint for shaping and layout. PDF's
+    # Identity-H CID /W array is indexed by the glyph IDs emitted in the text
+    # stream, so embedded fonts must use their parser-provided glyph metrics.
+    # Falling back preserves the narrow manually-built Font compatibility path.
+    widths_by_glyph = if map_size(font.glyph_widths) > 0, do: font.glyph_widths, else: font.widths
+
     max_glyph =
-      if map_size(font.widths) > 0 do
-        font.widths |> Map.keys() |> Enum.max()
+      if map_size(widths_by_glyph) > 0 do
+        widths_by_glyph |> Map.keys() |> Enum.max()
       else
         0
       end
@@ -118,7 +124,7 @@ defmodule Rendro.PDF.CidFont do
     widths =
       0..max_glyph
       |> Enum.map(fn gid ->
-        Map.get(font.widths, gid, font.default_width) |> scale_metric(font.units_per_em)
+        Map.get(widths_by_glyph, gid, font.default_width) |> scale_metric(font.units_per_em)
       end)
 
     [0, {:array, widths}]
