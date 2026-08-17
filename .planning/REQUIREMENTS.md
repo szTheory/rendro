@@ -17,11 +17,11 @@
 ### Presets (PRESET)
 
 - [x] **PRESET-01**: A user can call `Rendro.Theme.preset(genre, accent: {r,g,b}, mode: :light | :dark)` and receive a fully-resolved `%Rendro.Theme{}`, composing over the existing `resolve/1` deep-merge and `dark/1` role-swap with `:accent`/`:mode` supplied at call time.
-- [ ] **PRESET-02**: Five locked genre presets ship — Swiss/International, Humanist, Editorial, Corporate-Classic, Minimal-Mono — each a concrete, quantified token delta from `Theme.default()` (scale-contrast ratio, leading, rule weights, radius, spacing rhythm/density, color-role usage).
-- [ ] **PRESET-03**: All preset genre token tables and dispatch live only in the new `lib/rendro/theme/presets.ex`; `theme.ex` gains at most a thin public `preset/2` delegation, keeping the `theme_industry_guard_test.exs` tripwire green (forbidden-word list never edited).
+- [x] **PRESET-02**: Five locked genre presets ship — Swiss/International, Humanist, Editorial, Corporate-Classic, Minimal-Mono — each a concrete, quantified token delta from `Theme.default()` (scale-contrast ratio, leading, rule weights, radius, spacing rhythm/density, color-role usage).
+- [x] **PRESET-03**: All preset genre token tables and dispatch live only in the new `lib/rendro/theme/presets.ex`; `theme.ex` gains at most a thin public `preset/2` delegation, keeping the `theme_industry_guard_test.exs` tripwire green (forbidden-word list never edited).
 - [x] **PRESET-04**: Every preset composes uniformly with light/dark and any caller accent without introducing nondeterminism — preset derivation adds no per-draw float math, and the un-themed/`default()` render stays byte-identical to prior goldens.
 - [x] **PRESET-05**: A preset referencing a font role that is not registered raises the existing typed `FontRegistry` error (no silent substitution).
-- [ ] **PRESET-06** *(P2 / ship-if-time)*: A Brutalist preset ships (`radius: none`, `rules.thick` motif, steepest display:body contrast in the set) kept within business-document legibility.
+- [x] **PRESET-06** *(P2 / ship-if-time)*: A Brutalist preset ships (`radius: none`, `rules.thick` motif, steepest display:body contrast in the set) kept within business-document legibility.
 
 ### Curated Fonts (FONT)
 

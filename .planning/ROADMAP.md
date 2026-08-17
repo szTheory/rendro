@@ -93,7 +93,7 @@
   4. Referencing an unregistered preset font role raises the existing typed `FontRegistry` error (no silent substitution), and a double-subset determinism test proves byte-identical subsetting output for every vendored font.
   5. At least one additional example brand exists per domain family under `priv/examples/<domain>/` as a data tuple (never a module), and the un-themed/`default()` render stays byte-identical to prior goldens (zero per-draw float math in preset derivation).
 
-**Plans**: 4/10 plans executed
+**Plans**: 5/10 plans executed
 
 Plans:
 **Wave 1**
@@ -108,7 +108,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 125-03-PLAN.md — Expand and guard the complete six-row structural genre grammar.
+- [x] 125-03-PLAN.md — Expand and guard the complete six-row structural genre grammar.
 - [ ] 125-09-PLAN.md — Add Certificate and Ticket fixture pairs and close corpus/package invariants.
 
 **Wave 4** *(blocked on Wave 3 completion)*
@@ -196,7 +196,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 125. Foundation — Curated fonts, style-genre presets & brand fixtures | v2.12 | 4/10 | In Progress|  |
+| 125. Foundation — Curated fonts, style-genre presets & brand fixtures | v2.12 | 5/10 | In Progress|  |
 | 126. Carryover polish — dark-mode legibility, hierarchy & golden depth | v2.12 | 0/TBD | Not started | - |
 | 127. Public example catalog & quality ratchet | v2.12 | 0/TBD | Not started | - |
 | 128. Static configurator, theme codegen & Livebook | v2.12 | 0/TBD | Not started | - |
