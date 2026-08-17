@@ -36,8 +36,8 @@
 - [x] **POLISH-01**: `invoice_dark` table-body cells are legible on the dark background (WINDOWS id 1), fixed at the shared color-role level so all recipes inherit the fix, not per-recipe.
 - [x] **POLISH-02**: The Ticket themed display/title hierarchy inversion (WINDOWS id 2, a locked Phase-122 decision) is explicitly resolved — either fixed, or given a named `stress_exemption`-style carve-out — so the quality ratchet never flags an accepted deviation as a regression.
 - [x] **POLISH-03**: `payslip` themed numeric cells no longer wrap mid-number (WINDOWS id 3) — a direct prerequisite for Minimal-Mono's tight tabular-figure columns.
-- [ ] **POLISH-04**: A dedicated `from_brand`/preset accent-op byte golden covers preset × accent combinations (not just the original single `from_brand` call site).
-- [ ] **POLISH-05**: Typography-test depth is extended to the 4 recipes currently on byte-identity + smoke coverage only, bringing all 7 recipes to explicit type-scale coverage.
+- [x] **POLISH-04**: A dedicated `from_brand`/preset accent-op byte golden covers preset × accent combinations (not just the original single `from_brand` call site).
+- [x] **POLISH-05**: Typography-test depth is extended to the 4 recipes currently on byte-identity + smoke coverage only, bringing all 7 recipes to explicit type-scale coverage.
 
 ### Public Catalog & Quality Ratchet (CATALOG)
 
