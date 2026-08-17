@@ -21,6 +21,17 @@ defmodule Rendro.CatalogTest do
     assert first =~ "%PDF-"
   end
 
+  test "closed catalog modes render without runtime atom conversion" do
+    for id <- [
+          "invoice--northline-logistics--swiss--light",
+          "invoice--northline-logistics--swiss--dark"
+        ] do
+      spec = Enum.find(Catalog.catalog_specs(), &(&1.id == id))
+      assert {:ok, pdf} = Catalog.render_source_pdf(spec)
+      assert pdf =~ "%PDF-"
+    end
+  end
+
   test "catalog paths reject traversal before I/O" do
     assert_raise ArgumentError, ~r/unsafe catalog/, fn ->
       Catalog.source_document_for(%{

@@ -289,7 +289,11 @@ defmodule Rendro.Catalog do
   defp theme_for(%{preset_atom: nil}), do: Rendro.Theme.default()
 
   defp theme_for(%{preset_atom: preset, accent: accent, mode: mode}),
-    do: Rendro.Theme.preset(preset, accent: accent, mode: String.to_existing_atom(mode))
+    do: Rendro.Theme.preset(preset, accent: accent, mode: catalog_mode!(mode))
+
+  defp catalog_mode!("light"), do: :light
+  defp catalog_mode!("dark"), do: :dark
+  defp catalog_mode!(mode), do: raise(ArgumentError, "unsupported catalog mode: #{inspect(mode)}")
 
   defp recipe_module(:invoice), do: Rendro.Recipes.Invoice
   defp recipe_module(:statement), do: Rendro.Recipes.Statement
