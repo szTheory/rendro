@@ -44,6 +44,7 @@ Delivered a dev-only, literal 32-cell catalog that deterministically renders com
 - `mix help rendro.catalog.check`
 - Full 32-cell deterministic source-PDF render sweep
 - `MIX_ENV=prod mix compile --warnings-as-errors`
+- `mix ci.fast` (1,768 tests, 0 failures; 27 excluded)
 
 ## Deviations from Plan
 
@@ -63,6 +64,13 @@ Delivered a dev-only, literal 32-cell catalog that deterministically renders com
 - **Files modified:** `lib/rendro/recipes/ticket.ex`
 - **Commit:** `8958b40`
 
+3. [Rule 1 - Regression] Isolated catalog capacity from protected recipe rendering
+- **Found during:** Post-wave `mix ci.fast` integration gate
+- **Issue:** The initial Statement and Ticket capacity repair changed existing themed golden bytes; Aurora fixture metadata also violated its original-byte contract, and the new Mix task modules lacked private docs tags.
+- **Fix:** Restored historical recipe geometry outside the catalog, applied the capacity only through `catalog_layout: true`, retained Aurora identity metadata in the private literal registry, and marked the dev Mix tasks hidden.
+- **Files modified:** `dev/rendro/catalog.ex`, `dev/mix/tasks/rendro/catalog/{gen,check}.ex`, `lib/rendro/recipes/{statement,ticket}.ex`, `priv/examples/ticket/aurora-live/ticket.json`, `test/rendro/catalog_test.exs`
+- **Commit:** `5785a67`
+
 ## Known Stubs
 
 None.
@@ -70,4 +78,4 @@ None.
 ## Self-Check: PASSED
 
 - Catalog module, both Mix tasks, focused test, and this summary exist.
-- Task commits `1cc42ce`, `8c71609`, `2a341ea`, `8958b40`, `f950f67`, and `fe3c7c0` exist.
+- Task commits `1cc42ce`, `8c71609`, `2a341ea`, `8958b40`, `f950f67`, `fe3c7c0`, and `5785a67` exist.
