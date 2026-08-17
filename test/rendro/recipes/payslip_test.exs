@@ -418,6 +418,50 @@ defmodule Rendro.Recipes.PayslipTest do
       assert max_size in summary_sizes,
              "expected the global-max text size #{max_size} to remain in the :summary (net-pay anchor) region"
     end
+
+    @genres [:swiss, :humanist, :editorial, :corporate_classic, :minimal_mono, :brutalist]
+
+    test "Current and YTD money tokens stay atomic at the selected width across supplied themes" do
+      data =
+        fixture_data(
+          earnings: [
+            %{
+              description: "Base Salary",
+              amount: Decimal.new("4200.00"),
+              ytd: Decimal.new("25200.00")
+            }
+          ],
+          deductions: [
+            %{
+              description: "Withholding",
+              amount: Decimal.new("4550.00"),
+              ytd: Decimal.new("25200.00")
+            }
+          ]
+        )
+
+      themes =
+        [
+          {:default, Rendro.Theme.default()}
+          | Enum.map(@genres, &{&1, Rendro.Theme.preset(&1, accent: "#2C6BED")})
+        ]
+
+      for {name, theme} <- themes do
+        {table, doc} = themed_table_and_document(data, theme)
+        {header_h, row_heights} = measure_table(table, doc)
+
+        assert header_h > 0
+
+        assert Enum.all?(row_heights, &(&1 < 20)),
+               "#{name} must keep $4,200.00, $4,550.00, and $25,200.00 on one line: #{inspect(row_heights)}"
+
+        {_narrow_header_h, narrow_row_heights} =
+          measure_table(narrower_amount_columns(table), doc)
+
+        assert Enum.any?(narrow_row_heights, &(&1 >= 20)),
+               "#{name} must prove the selected amount width is a real one-point boundary"
+      end
+    end
   end
 
   # ---------------------------------------------------------------------------
@@ -503,4 +547,26 @@ defmodule Rendro.Recipes.PayslipTest do
   defp collect_from_cell_content(%Rendro.Block{} = block), do: collect_from_block(block)
   defp collect_from_cell_content(%Rendro.Text{size: size}), do: [size]
   defp collect_from_cell_content(_other), do: []
+
+  defp themed_table_and_document(data, theme) do
+    doc = Payslip.document(data, theme: theme)
+    body = Enum.find(doc.sections, &(&1.region == :body))
+    table = Enum.find(body.content, &is_struct(&1.content, Rendro.Table)).content
+    {table, doc}
+  end
+
+  defp measure_table(table, doc) do
+    Rendro.measure_rows(table.rows, 595.28 - 2 * 72, doc,
+      header: table.header,
+      columns: table.columns,
+      cell_align: table.cell_align
+    )
+  end
+
+  defp narrower_amount_columns(table) do
+    %{table | columns: Enum.map(table.columns, &narrow_amount_column/1)}
+  end
+
+  defp narrow_amount_column({:fixed, width}) when width in [55, 60], do: {:fixed, width - 1}
+  defp narrow_amount_column(column), do: column
 end
