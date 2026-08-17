@@ -8,6 +8,8 @@ defmodule Rendro.Theme.Presets do
 
   @font_paths %{
     rendro_preset_grotesque: "priv/fonts/inter/Inter-Regular.ttf",
+    rendro_preset_humanist_sans: "priv/fonts/source-sans-3/SourceSans3-Regular.ttf",
+    rendro_preset_text_serif: "priv/fonts/source-serif-4/SourceSerif4-Regular.ttf",
     rendro_preset_mono: "priv/fonts/jetbrains-mono/JetBrainsMono-Regular.ttf"
   }
 
@@ -76,9 +78,12 @@ defmodule Rendro.Theme.Presets do
   end
 
   defp font_roles(:swiss), do: [:rendro_preset_grotesque, :rendro_preset_mono]
-  defp font_roles(:humanist), do: [:rendro_preset_mono]
-  defp font_roles(:editorial), do: [:rendro_preset_mono]
-  defp font_roles(:corporate_classic), do: [:rendro_preset_mono]
+  defp font_roles(:humanist), do: [:rendro_preset_humanist_sans, :rendro_preset_mono]
+
+  defp font_roles(:editorial),
+    do: [:rendro_preset_text_serif, :rendro_preset_humanist_sans, :rendro_preset_mono]
+
+  defp font_roles(:corporate_classic), do: [:rendro_preset_text_serif, :rendro_preset_mono]
   defp font_roles(:minimal_mono), do: [:rendro_preset_mono, :rendro_preset_grotesque]
 
   defp genre_tokens(:swiss) do

@@ -91,3 +91,60 @@ INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
 DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
+
+-----------------------------------------------------------------------
+BEGIN RENDRO CURATED FONT: priv/fonts/inter/Inter-Regular.ttf
+Path: priv/fonts/inter/Inter-Regular.ttf
+Upstream project/foundry: Inter / The Inter Project Authors (Rasmus Andersson)
+Copyright: Copyright (c) 2020 The Inter Project Authors
+License: SIL Open Font License, Version 1.1 (https://openfontlicense.org)
+Release tag: v4.1
+Commit: e3a3d4c57d5ecc01453a575621882a384c1995a3
+Immutable source URL: https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip
+Archive member/original filename: Inter-Regular.ttf
+SHA-256: 40d692fce188e4471e2b3cba937be967878f631ad3ebbbdcd587687c7ebe0c82
+Vendored bytes are the unmodified upstream static Regular TrueType face.
+The upstream Reserved Font Name "Inter" is retained; Rendro does not distribute a modified font.
+END RENDRO CURATED FONT: priv/fonts/inter/Inter-Regular.ttf
+
+BEGIN RENDRO CURATED FONT: priv/fonts/source-sans-3/SourceSans3-Regular.ttf
+Path: priv/fonts/source-sans-3/SourceSans3-Regular.ttf
+Upstream project/foundry: Source Sans 3 / Adobe
+Copyright: Copyright 2010-2023 Adobe (http://www.adobe.com/)
+License: SIL Open Font License, Version 1.1 (https://openfontlicense.org)
+Release tag: 3.052R
+Commit: ed1808970eb3e7301c9a523bee26473ba0bb62fa
+Immutable source URL: https://github.com/adobe-fonts/source-sans/releases/download/3.052R/TTF-source-sans-3.052R.zip
+Archive member/original filename: TTF/SourceSans3-Regular.ttf
+SHA-256: 4644c81b86ec9caaa76b634889968ed3c4f4f52f054855933acc7c2b21e53b0f
+Vendored bytes are the unmodified upstream static Regular TrueType face.
+The upstream Reserved Font Name "Source Sans 3" is retained; Rendro does not distribute a modified font.
+END RENDRO CURATED FONT: priv/fonts/source-sans-3/SourceSans3-Regular.ttf
+
+BEGIN RENDRO CURATED FONT: priv/fonts/source-serif-4/SourceSerif4-Regular.ttf
+Path: priv/fonts/source-serif-4/SourceSerif4-Regular.ttf
+Upstream project/foundry: Source Serif 4 / Adobe
+Copyright: Copyright 2014-2023 Adobe (http://www.adobe.com/)
+License: SIL Open Font License, Version 1.1 (https://openfontlicense.org)
+Release tag: 4.005R
+Commit: 2823e993c53fca27c5c8749f529b56a5a7c77b6b
+Immutable source URL: https://github.com/adobe-fonts/source-serif/releases/download/4.005R/source-serif-4.005_Desktop.zip
+Archive member/original filename: source-serif-4.005_Desktop/TTF/SourceSerif4-Regular.ttf
+SHA-256: e5a4ee6a3d87bb9024796be390c6771e2a0eb1883dae25effaf57ca01668e24b
+Vendored bytes are the unmodified upstream static Regular TrueType face.
+The upstream Reserved Font Name "Source Serif 4" is retained; Rendro does not distribute a modified font.
+END RENDRO CURATED FONT: priv/fonts/source-serif-4/SourceSerif4-Regular.ttf
+
+BEGIN RENDRO CURATED FONT: priv/fonts/jetbrains-mono/JetBrainsMono-Regular.ttf
+Path: priv/fonts/jetbrains-mono/JetBrainsMono-Regular.ttf
+Upstream project/foundry: JetBrains Mono / JetBrains
+Copyright: Copyright 2020 The JetBrains Mono Project Authors
+License: SIL Open Font License, Version 1.1 (https://openfontlicense.org)
+Release tag: v2.304
+Commit: cd5227bd1f61dff3bbd6c814ceaf7ffd95e947d9
+Immutable source URL: https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip
+Archive member/original filename: JetBrainsMono-Regular.ttf
+SHA-256: a0bf60ef0f83c5ed4d7a75d45838548b1f6873372dfac88f71804491898d138f
+Vendored bytes are the unmodified upstream static Regular TrueType face.
+The upstream Reserved Font Name "JetBrains Mono" is retained; Rendro does not distribute a modified font.
+END RENDRO CURATED FONT: priv/fonts/jetbrains-mono/JetBrainsMono-Regular.ttf
