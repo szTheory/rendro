@@ -4,16 +4,16 @@ milestone: v2.12
 milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 125
 current_phase_name: Foundation — Curated fonts, style-genre presets & brand fixtures
-status: planning
-stopped_at: Phase 125 context gathered
-last_updated: "2026-08-16T22:10:28.042Z"
-last_activity: 2026-07-29
-last_activity_desc: ROADMAP.md + REQUIREMENTS.md traceability written for Milestone v2.12
+status: executing
+stopped_at: Completed 125-01-PLAN.md
+last_updated: "2026-08-17T00:33:57.655Z"
+last_activity: 2026-08-16
+last_activity_desc: Phase 125 execution started
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 10
+  completed_plans: 1
   percent: 0
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-28)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Milestone C (`SEED-004`, Style-Genre Presets, Public Catalog & Static Configurator) — ROADMAP.md created, ready for phase planning starting with Phase 125.
+**Current focus:** Phase 125 — Foundation — Curated fonts, style-genre presets & brand fixtures
 
 ## Current Position
 
-Phase: 125 (Foundation — Curated fonts, style-genre presets & brand fixtures) — not started
-Plan: —
-Status: Roadmap created (100% requirement coverage, 28/28); ready to plan Phase 125
-Last activity: 2026-07-29 — ROADMAP.md + REQUIREMENTS.md traceability written for Milestone v2.12
+Phase: 125 (Foundation — Curated fonts, style-genre presets & brand fixtures) — EXECUTING
+Plan: 2 of 10
+Status: Ready to execute
+Last activity: 2026-08-16 — Phase 125 execution started
 
 ## Roadmap Snapshot (v2.12, Phases 125-129) — IN PLANNING
 
@@ -65,9 +65,9 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-16T22:10:28.035Z
-Stopped at: Phase 125 context gathered
-Resume file: .planning/phases/125-foundation-curated-fonts-style-genre-presets-brand-fixtures/125-CONTEXT.md
+Last session: 2026-08-17T00:33:57.649Z
+Stopped at: Completed 125-01-PLAN.md
+Resume file: None
 
 ## Next Steps
 
@@ -93,7 +93,12 @@ Resume file: .planning/phases/125-foundation-curated-fonts-style-genre-presets-b
 | Phase 123 P04 | 14min | 3 tasks | 6 files |
 | Phase 123 P05 | 6min | 2 tasks | 6 files |
 | Phase 124 P01 | 6min | 3 tasks | 9 files |
+| Phase 125 P01 | 2m | 1 tasks | 6 files |
 
 ## Operator Next Steps
 
 - Plan Phase 125 with `/gsd-plan-phase 125`
+
+## Decisions
+
+- [Phase ?]: Theme.preset/2 delegates to private Presets; font registration stays explicit and document-owned.

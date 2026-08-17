@@ -16,11 +16,11 @@
 
 ### Presets (PRESET)
 
-- [ ] **PRESET-01**: A user can call `Rendro.Theme.preset(genre, accent: {r,g,b}, mode: :light | :dark)` and receive a fully-resolved `%Rendro.Theme{}`, composing over the existing `resolve/1` deep-merge and `dark/1` role-swap with `:accent`/`:mode` supplied at call time.
+- [x] **PRESET-01**: A user can call `Rendro.Theme.preset(genre, accent: {r,g,b}, mode: :light | :dark)` and receive a fully-resolved `%Rendro.Theme{}`, composing over the existing `resolve/1` deep-merge and `dark/1` role-swap with `:accent`/`:mode` supplied at call time.
 - [ ] **PRESET-02**: Five locked genre presets ship — Swiss/International, Humanist, Editorial, Corporate-Classic, Minimal-Mono — each a concrete, quantified token delta from `Theme.default()` (scale-contrast ratio, leading, rule weights, radius, spacing rhythm/density, color-role usage).
 - [ ] **PRESET-03**: All preset genre token tables and dispatch live only in the new `lib/rendro/theme/presets.ex`; `theme.ex` gains at most a thin public `preset/2` delegation, keeping the `theme_industry_guard_test.exs` tripwire green (forbidden-word list never edited).
-- [ ] **PRESET-04**: Every preset composes uniformly with light/dark and any caller accent without introducing nondeterminism — preset derivation adds no per-draw float math, and the un-themed/`default()` render stays byte-identical to prior goldens.
-- [ ] **PRESET-05**: A preset referencing a font role that is not registered raises the existing typed `FontRegistry` error (no silent substitution).
+- [x] **PRESET-04**: Every preset composes uniformly with light/dark and any caller accent without introducing nondeterminism — preset derivation adds no per-draw float math, and the un-themed/`default()` render stays byte-identical to prior goldens.
+- [x] **PRESET-05**: A preset referencing a font role that is not registered raises the existing typed `FontRegistry` error (no silent substitution).
 - [ ] **PRESET-06** *(P2 / ship-if-time)*: A Brutalist preset ships (`radius: none`, `rules.thick` motif, steepest display:body contrast in the set) kept within business-document legibility.
 
 ### Curated Fonts (FONT)
@@ -28,7 +28,7 @@
 - [ ] **FONT-01**: Four curated open-license fonts — a grotesque, a humanist sans, a text serif, a mono — are vendored as static TrueType (glyf/loca) builds under `priv/fonts/` so flagship presets render out of the box.
 - [ ] **FONT-02**: Each vendored font carries a delimited `NOTICE` attribution block with a pinned upstream version; every license is verified redistributable inside a Hex package (SIL OFL 1.1 / Apache-2.0 class), with RFN/embedding constraints respected.
 - [ ] **FONT-03**: `priv/fonts/` is added to the `mix.exs` `package.files` allowlist and its inclusion is proven by a positive tarball-content test (fonts actually ship to Hex consumers).
-- [ ] **FONT-04**: Curated fonts register into `FontRegistry` under logical genre roles through an explicit `Rendro.Theme.Presets.register_fonts/2` bridge that is a caller step, never auto-invoked inside recipe `document/2` (Theme stays registry-pure).
+- [x] **FONT-04**: Curated fonts register into `FontRegistry` under logical genre roles through an explicit `Rendro.Theme.Presets.register_fonts/2` bridge that is a caller step, never auto-invoked inside recipe `document/2` (Theme stays registry-pure).
 - [ ] **FONT-05**: Font subsetting stays deterministic at catalog scale — glyph sets are sorted/deduped at the call site (or defensively in `subset/2`), proven by a double-subset byte-identity determinism test per vendored font.
 
 ### Carryover Polish (POLISH) — lands before dark-mode catalog generation
