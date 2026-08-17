@@ -52,6 +52,17 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
   defp assert_pinned_pdfium! do
     pin = File.read!("priv/pdfium_pin.json") |> JSON.decode!()
 
+    assert {:ok, executable} = Pdfium.executable()
+
+    executable_sha256 =
+      executable
+      |> File.read!()
+      |> then(&:crypto.hash(:sha256, &1))
+      |> Base.encode16(case: :lower)
+
+    assert executable_sha256 == pin["sha256"],
+           "raster snapshots require the project-pinned PDFium binary digest"
+
     assert {:ok, version} = Pdfium.version()
     assert version == pin["version"], "raster snapshots require the project-pinned PDFium version"
   end

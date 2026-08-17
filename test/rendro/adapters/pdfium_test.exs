@@ -3,6 +3,16 @@ defmodule Rendro.Adapters.PdfiumTest do
 
   alias Rendro.Adapters.Pdfium
 
+  test "executable/0 exposes the configured PDFium binary" do
+    Application.put_env(:rendro, :pdfium_cli_executable_finder, fn _ -> "/usr/bin/echo" end)
+
+    on_exit(fn ->
+      Application.delete_env(:rendro, :pdfium_cli_executable_finder)
+    end)
+
+    assert Pdfium.executable() == {:ok, "/usr/bin/echo"}
+  end
+
   test "returns missing executable when pdfium-cli is absent" do
     Application.put_env(:rendro, :pdfium_cli_executable_finder, fn _ -> nil end)
 

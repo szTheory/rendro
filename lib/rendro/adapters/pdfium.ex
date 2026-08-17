@@ -15,6 +15,14 @@ defmodule Rendro.Adapters.Pdfium do
         }
 
   @doc """
+  Returns the resolved pdfium-cli executable path.
+
+  This is provided for provenance checks around optional PDFium-based evidence.
+  """
+  @spec executable() :: {:ok, String.t()} | {:error, term()}
+  def executable, do: find_executable()
+
+  @doc """
   Returns PDF metadata from `pdfium info`.
 
   On success returns `{:ok, metadata_map}` with string keys (for example `"PDF Version"`).
