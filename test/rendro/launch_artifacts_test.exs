@@ -98,8 +98,13 @@ defmodule Rendro.LaunchArtifactsTest do
       # "Implementation Sprint" rows.
       invoice = Rendro.LaunchArtifacts.source_document_for(%{id: "invoice"})
       cells = invoice |> collect_tables() |> Enum.flat_map(& &1.rows) |> List.flatten()
-      assert Enum.any?(cells, &(is_binary(&1) and &1 =~ "Growth tier monthly platform service"))
-      refute Enum.any?(cells, &(is_binary(&1) and &1 =~ "Implementation Sprint"))
+
+      assert Enum.any?(
+               cells,
+               &(table_cell_text(&1) =~ "Growth tier monthly platform service")
+             )
+
+      refute Enum.any?(cells, &(table_cell_text(&1) =~ "Implementation Sprint"))
 
       # Certificate body text comes from the realistic fixture recipient/body.
       certificate = Rendro.LaunchArtifacts.source_document_for(%{id: "certificate"})
@@ -226,4 +231,12 @@ defmodule Rendro.LaunchArtifactsTest do
     do: [content]
 
   defp collect_texts_from_cell(_other), do: []
+
+  # D-06 provenance tests intentionally accept only the two table-cell shapes
+  # Rendro emits: legacy literal strings and semantic Block/Text cells.
+  defp table_cell_text(cell) when is_binary(cell), do: cell
+
+  defp table_cell_text(%Rendro.Block{content: %Rendro.Text{content: content}}), do: content
+
+  defp table_cell_text(_other), do: ""
 end

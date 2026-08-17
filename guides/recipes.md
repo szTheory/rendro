@@ -20,8 +20,8 @@ Source PDFs and the self-rendered manual are byte-checked by the required docs c
 
 Standard invoice from Elixir data through the canonical Invoice recipe.
 
-- Source PDF SHA-256: `75b4a52522ae2e6e47a23e1bb29a9e18ca0092a9c76935185cbad4873ab3ae64`
-- PNG SHA-256: `b95aceb15c479874e0b2170f568031c159bb0b73d6a1fd05d5f66f70b4e2c4a8`
+- Source PDF SHA-256: `77ab05206c06e2d593d299ead319175328b3e5482d99a2c0abac52f7311b6804`
+- PNG SHA-256: `6e46e7605a2fb0d8f7fd06ff4194e355f8d672f0100fecaf682080926539d626`
 
 ### Branded Invoice
 
@@ -65,8 +65,8 @@ Landscape certificate with a Path-backed, geometry-derived border frame.
 
 Payslip with earnings, deductions, year-to-date figures, and a reconciled net pay.
 
-- Source PDF SHA-256: `19a1813b36fde337a3d7e941fca5c83fb8584540a2b1211fb801e8ae66814d9e`
-- PNG SHA-256: `44ee6ec59d7b0593c75175203be2b31745cec5d6e5e73180293c27dd665d0e26`
+- Source PDF SHA-256: `5aa06d26d40e9ab8a9c06c1fef595c7f3adfa94d900e2eac92f2c1b803b0c1e3`
+- PNG SHA-256: `e56136b7f24d7da25c18e3de2dd4e25a52aacdc69d0263144990e8615e8c3e84`
 
 ### Ticket
 
@@ -74,8 +74,8 @@ Payslip with earnings, deductions, year-to-date figures, and a reconciled net pa
 
 Event ticket with a placement grid and a quotable, human-readable reference code.
 
-- Source PDF SHA-256: `37c617953b5562baf2ceefdefe54af04756bb0c937d0e4902dd889299246b0f9`
-- PNG SHA-256: `336fa3629eb5cb735a7ee2fd8dba3a903a13683f7efa2190afd46439b4b21496`
+- Source PDF SHA-256: `e147f01a6529b1ce98581b8fc1c606e56408f069e445eca152059b3de7b826cd`
+- PNG SHA-256: `6ebba79147efa6a94ebfff046308eff5da9db6e3e4731210610062e063d4c928`
 
 ### Invoice (Dark)
 
@@ -83,8 +83,8 @@ Event ticket with a placement grid and a quotable, human-readable reference code
 
 Invoice in dark mode via Theme.dark/1 - screen-oriented, not print-recommended.
 
-- Source PDF SHA-256: `40d79ddfc79b3ae7bec6a9036c2543122e835a7ef517ec8ec9ea767e74e14629`
-- PNG SHA-256: `29e9dcd8fb21c89a39d0fc67246895da0834eba9ee32dd1758c201b774a1cc57`
+- Source PDF SHA-256: `8f08b3e1fe69c6d06d91189eee1a4574942076cfa190b1e8338959f45b3adc1d`
+- PNG SHA-256: `cae4ded56bdfa0b9414cfdfbd72329a64659876846f75eebf16c923db771c2f2`
 
 ### Certificate (Dark)
 
@@ -101,8 +101,8 @@ Certificate in dark mode via Theme.dark/1 - screen-oriented, not for print.
 
 Ticket in dark mode via Theme.dark/1 - screen-oriented, not print-recommended.
 
-- Source PDF SHA-256: `2806d73e8f1ae1dea5e90d9a1b571b0684369207eca636d9de7992137e4a90c4`
-- PNG SHA-256: `ff10a3283f349ec69dfe57531cb3c45b44b34366d9993d35a432ac58b3dc7771`
+- Source PDF SHA-256: `b663620145f1daf2b45ebbbe6314af38fbb2cd030b3fb6023caa401db9deba39`
+- PNG SHA-256: `de76ebd8ebdfe1a5f68e36da6fc413cd0371a953682671fb39fc5a7dd46a67c0`
 
 ### Invoice (Branded Accent)
 
@@ -110,15 +110,15 @@ Ticket in dark mode via Theme.dark/1 - screen-oriented, not print-recommended.
 
 Invoice themed via from_brand(accent: "#0E7C76") - accent-only, no assets.
 
-- Source PDF SHA-256: `af285aeacdb28f024cf749b93a86a7f35dd82efc5942b2083411c1790c2431b5`
-- PNG SHA-256: `764d0cc841d7c429e216011d614b14dce2de144c888165d33c7a1bb87db2f233`
+- Source PDF SHA-256: `10c1f38f3bb59c466957feb998cbdcd4193e1261e28532b2f7b4f413eb00d567`
+- PNG SHA-256: `76d669aea32fd212d4ff81e87c14dd0a2232707da401e428ee30a41f90a24bdd`
 
 
 ## Self-Rendered Manual
 
 Rendro also renders its own compact launch manual: [manual.pdf](assets/rendro/manual.pdf).
 
-SHA-256: `08c8b11b5db10263d1e16237832088d9d6e0a5429cb0b686baeb0cf516cbc28b`
+SHA-256: `107c047878308448d2dec7f5022c440ebf73054efe133749014a856ef4f77be6`
 <!-- rendro-recipe-gallery-end -->
 
 ## Realistic Example Library
