@@ -45,7 +45,7 @@
 - [ ] **CATALOG-02**: The catalog grid is bounded by an explicit, machine-tested combinatorial row-count budget/ceiling (curated `{brand × preset}` pairs per domain, never the full cross product), locked during catalog-phase planning against CI/tarball cost.
 - [ ] **CATALOG-03**: Catalog artifacts are organized by-domain and brand-tagged, populating the already-reserved `preset`/`theme`/`mode` manifest keys (no schema migration).
 - [ ] **CATALOG-04**: The Milestone-A rubric becomes a standing ratchet — `priv/quality/rubric_scores.json` is extended additively (`brand`/`preset`/`mode` fields), every catalog cell is scored or explicitly flagged unscored, thresholds are enforced, and a fail-loud coverage guard prevents new/changed cells from silently shipping unscored or stale. Scoring stays human (flagship-subset sign-off, not auto-scored, not 100%-grid-gated).
-- [ ] **CATALOG-05**: Additional example brands are added as data tuples under `priv/examples/<domain>/` (never modules) to supply the catalog's brand variety, preserving the brands-as-data boundary.
+- [x] **CATALOG-05**: Additional example brands are added as data tuples under `priv/examples/<domain>/` (never modules) to supply the catalog's brand variety, preserving the brands-as-data boundary.
 
 ### Static Configurator & Codegen (CONFIG)
 

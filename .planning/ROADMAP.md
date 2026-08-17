@@ -93,13 +93,13 @@
   4. Referencing an unregistered preset font role raises the existing typed `FontRegistry` error (no silent substitution), and a double-subset determinism test proves byte-identical subsetting output for every vendored font.
   5. At least one additional example brand exists per domain family under `priv/examples/<domain>/` as a data tuple (never a module), and the un-themed/`default()` render stays byte-identical to prior goldens (zero per-draw float math in preset derivation).
 
-**Plans**: 1/10 plans executed
+**Plans**: 2/10 plans executed
 
 Plans:
 **Wave 1**
 
 - [x] 125-01-PLAN.md — Trace one real Swiss invoice through strict preset construction, explicit registration, and real embedded fonts.
-- [ ] 125-07-PLAN.md — Establish the generic brand schema with Invoice and Payslip fixture pairs.
+- [x] 125-07-PLAN.md — Establish the generic brand schema with Invoice and Payslip fixture pairs.
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -196,7 +196,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 125. Foundation — Curated fonts, style-genre presets & brand fixtures | v2.12 | 1/10 | In Progress|  |
+| 125. Foundation — Curated fonts, style-genre presets & brand fixtures | v2.12 | 2/10 | In Progress|  |
 | 126. Carryover polish — dark-mode legibility, hierarchy & golden depth | v2.12 | 0/TBD | Not started | - |
 | 127. Public example catalog & quality ratchet | v2.12 | 0/TBD | Not started | - |
 | 128. Static configurator, theme codegen & Livebook | v2.12 | 0/TBD | Not started | - |

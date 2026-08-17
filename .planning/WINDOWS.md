@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 4
+open_count: 6
 waived_count: 0
 fixed_count: 3
-total_count: 7
-last_updated: 2026-07-29T01:19:32.330Z
+total_count: 9
+last_updated: 2026-08-17T00:39:41.170Z
 ---
 
 # Broken Windows Ledger
@@ -22,6 +22,8 @@ last_updated: 2026-07-29T01:19:32.330Z
 | 5 | 123 | deviation | test/docs_contract/dx_local_reproducibility_claims_test.exs |  | 2 pre-existing test failures: File.Error reading .planning/phases/113-dx-local-reproducibility-validation/113-UAT.md and 113-METRICS.md (missing from this working tree's partial phase-113 planning artifacts) -- unrelated to phase 123 rubric/gallery/theming work. See 123-05 deferred-items.md item 2. | fixed |  | 2026-07-28T20:53:45.778Z | 2026-07-29T01:19:32.243Z |
 | 6 | 123 | deviation | lib/rendro/recipes/ticket.ex |  | mix dialyzer fails on pre-existing lib/rendro/recipes/ticket.ex contract errors (no_return on document/1,2 and sections/1,2; Rendro.Recipes.Background.emit?/1 contract mismatch) -- not touched by 123-05's commit; plausibly related to the Ticket hierarchy-inversion regression already recorded honestly as passed:false (WINDOWS id 2) but a dialyzer fix is a separate lib/-touching change outside this plan's D-05 Commit 3 isolation scope. See 123-05 deferred-items.md item 3. | fixed |  | 2026-07-28T20:53:45.848Z | 2026-07-29T01:19:32.330Z |
 | 7 | 123 | deviation | priv/pdfium_pin.json |  | mix rendro.launch_artifacts.check (part of ci.advisory) fails: pdfium-cli v0.11.0 binary not installed/on PATH in this execution environment -- environment/tooling gap, not a code or manifest defect; not auto-installed per the executor's external-binary caution. See 123-05 deferred-items.md item 4. | open |  | 2026-07-28T20:53:45.917Z |  |
+| 8 | 125 | deviation | test/docs_contract/examples_schema_contract_test.exs |  | SVG external-reference assertion excludes only real external asset references, not the XML namespace | open |  | 2026-08-17T00:39:41.106Z |  |
+| 9 | 125 | deviation | priv/schemas/examples.schema.json |  | Payslip net_pay_ytd is validated as a decimal string for exact YTD reconciliation | open |  | 2026-08-17T00:39:41.170Z |  |
 
 ````json
 [
@@ -107,6 +109,30 @@ last_updated: 2026-07-29T01:19:32.330Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-07-28T20:53:45.917Z",
+    "resolved_at": null
+  },
+  {
+    "id": 8,
+    "kind": "deviation",
+    "phase": "125",
+    "file": "test/docs_contract/examples_schema_contract_test.exs",
+    "line": null,
+    "description": "SVG external-reference assertion excludes only real external asset references, not the XML namespace",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-17T00:39:41.106Z",
+    "resolved_at": null
+  },
+  {
+    "id": 9,
+    "kind": "deviation",
+    "phase": "125",
+    "file": "priv/schemas/examples.schema.json",
+    "line": null,
+    "description": "Payslip net_pay_ytd is validated as a decimal string for exact YTD reconciliation",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-17T00:39:41.170Z",
     "resolved_at": null
   }
 ]
