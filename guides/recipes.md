@@ -56,8 +56,8 @@ Itemized sales receipt with subtotal, tax, and total through the Receipt recipe.
 
 Landscape certificate with a Path-backed, geometry-derived border frame.
 
-- Source PDF SHA-256: `68b35b1f80b9121fa23dd0737f473b37aa8f5647a4243fcfb7ddddb71a1e5c82`
-- PNG SHA-256: `476a251c30890bf15c3fdc5b7a7e17999abcc98060307ea761d043a846ef4555`
+- Source PDF SHA-256: `4f41898b232ee078e20d89ae3698d4d709a612b24efc53c37b40e957e559d682`
+- PNG SHA-256: `25f3c8c7218cd98b558d60a4556ad5be98ced6776f56a25251f04f2b6bbb232c`
 
 ### Payslip
 
@@ -92,8 +92,8 @@ Invoice in dark mode via Theme.dark/1 - screen-oriented, not print-recommended.
 
 Certificate in dark mode via Theme.dark/1 - screen-oriented, not for print.
 
-- Source PDF SHA-256: `01e78fa1960986b5a7691d24aa2dac3b0b6aba10d98391576ff8beda8c34cf85`
-- PNG SHA-256: `095cfdc71bebd46237f645af71fc1900874387b7777d051caa59c25e472bf53b`
+- Source PDF SHA-256: `88ca30f44b02c5836f6c848712486d3d06ad28f8347ad9c8603ab92cf26d295e`
+- PNG SHA-256: `a7cf6d31fd0afebd7a73070d10c0d03849d385a08097ef87b9537e64288cf1dd`
 
 ### Ticket (Dark)
 
@@ -118,7 +118,7 @@ Invoice themed via from_brand(accent: "#0E7C76") - accent-only, no assets.
 
 Rendro also renders its own compact launch manual: [manual.pdf](assets/rendro/manual.pdf).
 
-SHA-256: `06eba8bd60b8caad72e142d54b4a1bc6f5c91351d32cbc3edede42608a7d532b`
+SHA-256: `08c8b11b5db10263d1e16237832088d9d6e0a5429cb0b686baeb0cf516cbc28b`
 <!-- rendro-recipe-gallery-end -->
 
 ## Realistic Example Library
