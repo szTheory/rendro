@@ -11,6 +11,12 @@ defmodule Rendro.Test.HexBuildCacheTest do
       start_supervised(HexBuildCache)
     end
 
+    on_exit(fn ->
+      # This test deliberately stores a synthetic result. Clear it so later
+      # package contracts always invoke the real Hex build runner.
+      Agent.update(HexBuildCache, fn _ -> nil end)
+    end)
+
     :ok
   end
 

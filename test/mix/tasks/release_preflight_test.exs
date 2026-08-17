@@ -282,7 +282,11 @@ defmodule Mix.Tasks.Release.PreflightTest do
           end
         )
 
-        File.touch!("rendro-#{version}.tar")
+        tarball = "rendro-#{version}.tar"
+
+        # Do not replace a real package archive built by an async package
+        # contract while this command-runner fixture is exercising unpacking.
+        unless File.exists?(tarball), do: File.touch!(tarball)
       end
 
       Map.fetch!(responses, {command, args})

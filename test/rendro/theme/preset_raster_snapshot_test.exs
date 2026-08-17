@@ -40,7 +40,9 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
 
   defp assert_complete_matrix_contract! do
     row_ids = Enum.map(@rows, &elem(&1, 0))
-    reference_paths = Enum.map(@rows, fn {_id, genre, mode, _recipe} -> reference_path(genre, mode) end)
+
+    reference_paths =
+      Enum.map(@rows, fn {_id, genre, mode, _recipe} -> reference_path(genre, mode) end)
 
     assert length(@rows) == 12
     assert length(Enum.uniq(row_ids)) == 12
