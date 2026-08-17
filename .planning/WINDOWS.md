@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 9
+open_count: 6
 waived_count: 0
-fixed_count: 3
+fixed_count: 6
 total_count: 12
-last_updated: 2026-08-17T01:25:59.289Z
+last_updated: 2026-08-17T05:59:22.217Z
 ---
 
 # Broken Windows Ledger
@@ -15,9 +15,9 @@ last_updated: 2026-08-17T01:25:59.289Z
 
 | id | phase | kind | file | line | description | status | reason | recorded_at | resolved_at |
 |----|-------|------|------|------|-------------|--------|--------|-------------|-------------|
-| 1 | 123 | deviation | lib/rendro/recipes/invoice.ex |  | invoice_dark gallery row: item/qty/price table body cells render via bare strings (no per-cell color), so they inherit a fixed default black text color rather than colors.ink -- illegible against the dark background. Root cause: Rendro.Table cells accept Block or String, but Invoice.body_section builds plain-string rows. Fix requires wrapping cells in themed Block+Text without breaking the frozen INV-01 byte-identity golden -- deferred to a follow-up plan, not fixed in 123-03 (out of scope, risk to frozen golden). | open |  | 2026-07-28T19:39:59.602Z |  |
-| 2 | 123 | deviation | lib/rendro/recipes/ticket.ex |  | ticket/ticket_dark: the uniform themed type scale inverts the intended visual hierarchy -- the reference-code display anchor (scale.display, native 8pt) jumps to 21pt themed, now LARGER than the placement-grid title role (scale.title, native 26pt but 16.5pt themed) that the 2026-07-19 rubric actually scored as dominant. The reference code also now wraps awkwardly across 3 lines in its narrow stub column (AUR-8 / 8213- / GA). Flagged for the Plan 05 human sign-off -- not fixed in 123-03 (Q3's non-monotone role assignment is a locked Phase-122 decision; re-mapping is an architectural call, not a gallery-closure fix). | open |  | 2026-07-28T19:40:14.182Z |  |
-| 3 | 123 | deviation | lib/rendro/recipes/payslip.ex |  | payslip themed render: earnings/deductions table numeric cells (e.g. $4,200.00, $4,550.00) wrap mid-number onto a second line ($4,200.0 / 0) in the Current/YTD columns at the themed 10.5pt body scale + 1.35 leading -- a new typographic_craft awkward-break regression vs. the native 11pt no-theme render. Flagged for the Plan 05 human sign-off -- not fixed in 123-03 (column-width retuning is out of this plan's gallery-closure scope). | open |  | 2026-07-28T19:40:14.268Z |  |
+| 1 | 123 | deviation | lib/rendro/recipes/invoice.ex |  | Phase 126 wraps themed Invoice table cells with semantic ink while preserving nil-theme bytes. Focused Invoice tests, the deterministic preset matrix, exact pinned-PDFium swiss/corporate rows, and approved full-size review found dark table header/body values readable. | fixed | closure evidence: 126-01, 126-03 run 31997957937, 126-04 approval | 2026-07-28T19:39:59.602Z | 2026-08-17T05:59:21.526Z |
+| 2 | 123 | deviation | lib/rendro/recipes/ticket.ex |  | Phase 126 assigns themed Ticket placement/title/reference roles as display/title/caption. Focused Ticket tests, the deterministic preset matrix, exact pinned-PDFium editorial/minimal rows, and approved full-size review found placement dominant and the complete reference one-line, subordinate, and unclipped. | fixed | closure evidence: 126-01, 126-03 run 31997957937, 126-04 approval | 2026-07-28T19:40:14.182Z | 2026-08-17T05:59:21.869Z |
+| 3 | 123 | deviation | lib/rendro/recipes/payslip.ex |  | Phase 126 uses measured themed 61pt Current / 68pt YTD widths while preserving nil-theme bytes. Focused Payslip tests, the deterministic preset matrix, exact pinned-PDFium humanist/brutalist rows, and approved full-size review found money values unbroken, right-aligned, and unclipped. | fixed | closure evidence: 126-01, 126-03 run 31997957937, 126-04 approval | 2026-07-28T19:40:14.268Z | 2026-08-17T05:59:22.217Z |
 | 4 | 123 | lint-warning | lib/rendro/launch_artifacts.ex |  | mix format --check-formatted fails on 7 pre-existing files (lib/rendro/launch_artifacts.ex, test/docs_contract/theme_industry_guard_test.exs, test/docs_contract/theming_claims_test.exs, test/rendro/recipes/payslip_opts_threading_test.exs, test/rendro/recipes/themed_render_smoke_test.exs, test/rendro/recipes/certificate_typography_test.exs, test/rendro/recipes/theme_mode_background_golden_test.exs) -- last touched by phases 119/121/122/123-03/123-04, none by 123-05's rubric-score commit; blocks mix ci.fast's format-check gate. See 123-05 deferred-items.md item 1. | fixed |  | 2026-07-28T20:53:45.711Z | 2026-07-29T01:19:32.157Z |
 | 5 | 123 | deviation | test/docs_contract/dx_local_reproducibility_claims_test.exs |  | 2 pre-existing test failures: File.Error reading .planning/phases/113-dx-local-reproducibility-validation/113-UAT.md and 113-METRICS.md (missing from this working tree's partial phase-113 planning artifacts) -- unrelated to phase 123 rubric/gallery/theming work. See 123-05 deferred-items.md item 2. | fixed |  | 2026-07-28T20:53:45.778Z | 2026-07-29T01:19:32.243Z |
 | 6 | 123 | deviation | lib/rendro/recipes/ticket.ex |  | mix dialyzer fails on pre-existing lib/rendro/recipes/ticket.ex contract errors (no_return on document/1,2 and sections/1,2; Rendro.Recipes.Background.emit?/1 contract mismatch) -- not touched by 123-05's commit; plausibly related to the Ticket hierarchy-inversion regression already recorded honestly as passed:false (WINDOWS id 2) but a dialyzer fix is a separate lib/-touching change outside this plan's D-05 Commit 3 isolation scope. See 123-05 deferred-items.md item 3. | fixed |  | 2026-07-28T20:53:45.848Z | 2026-07-29T01:19:32.330Z |
@@ -36,11 +36,11 @@ last_updated: 2026-08-17T01:25:59.289Z
     "phase": "123",
     "file": "lib/rendro/recipes/invoice.ex",
     "line": null,
-    "description": "invoice_dark gallery row: item/qty/price table body cells render via bare strings (no per-cell color), so they inherit a fixed default black text color rather than colors.ink -- illegible against the dark background. Root cause: Rendro.Table cells accept Block or String, but Invoice.body_section builds plain-string rows. Fix requires wrapping cells in themed Block+Text without breaking the frozen INV-01 byte-identity golden -- deferred to a follow-up plan, not fixed in 123-03 (out of scope, risk to frozen golden).",
-    "status": "open",
-    "reason": "",
+    "description": "Phase 126 wraps themed Invoice table cells with semantic ink while preserving nil-theme bytes. Focused Invoice tests, the deterministic preset matrix, exact pinned-PDFium swiss/corporate rows, and approved full-size review found dark table header/body values readable.",
+    "status": "fixed",
+    "reason": "closure evidence: 126-01, 126-03 run 31997957937, 126-04 approval",
     "recorded_at": "2026-07-28T19:39:59.602Z",
-    "resolved_at": null
+    "resolved_at": "2026-08-17T05:59:21.526Z"
   },
   {
     "id": 2,
@@ -48,11 +48,11 @@ last_updated: 2026-08-17T01:25:59.289Z
     "phase": "123",
     "file": "lib/rendro/recipes/ticket.ex",
     "line": null,
-    "description": "ticket/ticket_dark: the uniform themed type scale inverts the intended visual hierarchy -- the reference-code display anchor (scale.display, native 8pt) jumps to 21pt themed, now LARGER than the placement-grid title role (scale.title, native 26pt but 16.5pt themed) that the 2026-07-19 rubric actually scored as dominant. The reference code also now wraps awkwardly across 3 lines in its narrow stub column (AUR-8 / 8213- / GA). Flagged for the Plan 05 human sign-off -- not fixed in 123-03 (Q3's non-monotone role assignment is a locked Phase-122 decision; re-mapping is an architectural call, not a gallery-closure fix).",
-    "status": "open",
-    "reason": "",
+    "description": "Phase 126 assigns themed Ticket placement/title/reference roles as display/title/caption. Focused Ticket tests, the deterministic preset matrix, exact pinned-PDFium editorial/minimal rows, and approved full-size review found placement dominant and the complete reference one-line, subordinate, and unclipped.",
+    "status": "fixed",
+    "reason": "closure evidence: 126-01, 126-03 run 31997957937, 126-04 approval",
     "recorded_at": "2026-07-28T19:40:14.182Z",
-    "resolved_at": null
+    "resolved_at": "2026-08-17T05:59:21.869Z"
   },
   {
     "id": 3,
@@ -60,11 +60,11 @@ last_updated: 2026-08-17T01:25:59.289Z
     "phase": "123",
     "file": "lib/rendro/recipes/payslip.ex",
     "line": null,
-    "description": "payslip themed render: earnings/deductions table numeric cells (e.g. $4,200.00, $4,550.00) wrap mid-number onto a second line ($4,200.0 / 0) in the Current/YTD columns at the themed 10.5pt body scale + 1.35 leading -- a new typographic_craft awkward-break regression vs. the native 11pt no-theme render. Flagged for the Plan 05 human sign-off -- not fixed in 123-03 (column-width retuning is out of this plan's gallery-closure scope).",
-    "status": "open",
-    "reason": "",
+    "description": "Phase 126 uses measured themed 61pt Current / 68pt YTD widths while preserving nil-theme bytes. Focused Payslip tests, the deterministic preset matrix, exact pinned-PDFium humanist/brutalist rows, and approved full-size review found money values unbroken, right-aligned, and unclipped.",
+    "status": "fixed",
+    "reason": "closure evidence: 126-01, 126-03 run 31997957937, 126-04 approval",
     "recorded_at": "2026-07-28T19:40:14.268Z",
-    "resolved_at": null
+    "resolved_at": "2026-08-17T05:59:22.217Z"
   },
   {
     "id": 4,

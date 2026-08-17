@@ -103,13 +103,13 @@
         "print_safety": true
       },
       "passed": true,
-      "recorded_at": "2026-07-28",
-      "signed_off_by": "qiksnare13",
-      "signed_off_at": "2026-07-28",
+  "recorded_at": "2026-08-17",
+  "signed_off_by": "phase-126-full-size-review",
+  "signed_off_at": "2026-08-17",
       "evidence_ref": "assets/rendro/gallery/invoice.png",
       "justifications": {
         "information_architecture": "Issuer letterhead, then a bounded Bill To/date/due/terms block, then the line-item table, then subtotal/tax/total — each zone bounded and ordered to match the reader's natural top-to-bottom scan (who's billing -> who's billed/when -> what for -> how much) with no backtracking.",
-        "content_hierarchy": "Re-measured against the themed default/0 raster blessed in 123-03 (glyph-height methodology, engine font metrics at 96dpi, visually confirmed): 'Total Due: $696.60' (display, 21pt themed) computes to 25.9px vs. 'INVOICE #INV-CMP-2026-001' (title, 16.5pt themed) at 20.4px — a 1.27 ratio. Total Due remains the single largest, accent-colored element on the page and the unambiguous focal point; the parties (issuer + Bill To) and totals are all present (Phase-115 DATA fix survived theming). Human sign-off 2026-07-28 confirmed dominance on the actual rendered raster — the 2026-07-19 native-scale numbers (24px/19px) no longer describe this render and are superseded here.",
+    "content_hierarchy": "The historical default/0 gallery score remains 5. Phase 126 additionally reviewed the exact pinned-PDFium swiss_invoice_light and corporate_classic_invoice_dark page-one rows at full readable size: the dark table header and body values were readable, while Total Due remains the bounded page focal point. This is a six-row repair review only, not a WCAG, PDF/UA, print-safety, or universal preset-quality claim.",
         "domain_fit": "Issuer address, invoice number, bill-to, due date, payment terms (Net 30), itemized qty/price table, and subtotal/tax/total breakdown together read as a real small-business invoice, not a toy layout.",
         "reader_affordances": "Item/Qty/Price column headers, consistent column alignment, and a clearly labeled subtotal/tax/total stack make the math easy to trace.",
         "typographic_craft": "Consistent 2-decimal money throughout (the prior $79.0 defect is gone); one item description wraps to a second line but wraps cleanly at a word boundary with no overlap or orphan.",
@@ -134,9 +134,9 @@
         "print_safety": true
       },
       "passed": true,
-      "recorded_at": "2026-07-28",
-      "signed_off_by": "qiksnare13",
-      "signed_off_at": "2026-07-28",
+  "recorded_at": "2026-08-17",
+  "signed_off_by": "phase-126-full-size-review",
+  "signed_off_at": "2026-08-17",
       "evidence_ref": "assets/rendro/gallery/statement.png",
       "justifications": {
         "information_architecture": "Account header, statement period, and opening balance are grouped, immediately followed by the boxed closing-balance summary, then the transaction ledger — matching the way a statement reader actually scans (bottom line first, then verify against detail).",
@@ -236,7 +236,7 @@
         "content_hierarchy": "Re-measured against the themed default/0 raster blessed in 123-03: 'NET PAY $3,292.50' (display, 21pt themed) computes to 25.9px vs. the 'Employer: Aurora Live / 18 Northgate Road...' header block (title, 16.5pt themed) at 20.4px — a 1.27 ratio. NET PAY remains unambiguously dominant in its boxed line. Human sign-off 2026-07-28 confirmed dominance on the actual rendered raster.",
         "domain_fit": "Reads as a conventional UK payslip: PAYE, National Insurance, pension, tax code, YTD columns.",
         "reader_affordances": "Header row reads 'YTD Deductions' with a clear space (a narrow spacer column separates the groups) instead of a 'YTDDeductions' collision.",
-        "typographic_craft": "Human sign-off 2026-07-28 confirmed an honest, open typographic-craft defect on the themed raster: the earnings/deductions table's Current/YTD numeric cells (e.g. '$4,200.00') wrap mid-number onto a second line ('$4,200.0' / '0') at the themed 10.5pt body scale + 1.35 leading — a real awkward-break regression vs. the native no-theme render. This holds the score at 4 (consistent throughout, but not 'zero awkward breaks') rather than 5; the defect is NOT silently fixed here and remains open as .planning/WINDOWS.md id 3, cited in priv/quality/SIGN-OFF.md.",
+    "typographic_craft": "Phase 126's exact pinned-PDFium humanist_payslip_dark and brutalist_payslip_dark page-one review found '$4,200.00' and '$25,200.00' unbroken, right-aligned, and unclipped after the measured themed-width repair. The score remains 4: this bounded fixture evidence resolves WINDOWS id 3 without claiming universal typography quality, accessibility, PDF/UA, or print safety.",
         "restraint_cohesion": "Restrained and cohesive."
       },
       "domain_md": "priv/examples/payslip/DOMAIN.md"
@@ -247,27 +247,27 @@
       "family": "ticket",
       "dimension_scores": {
         "information_architecture": 5,
-        "content_hierarchy": 3,
+    "content_hierarchy": 5,
         "domain_fit": 5,
         "reader_affordances": 4,
-        "typographic_craft": 3,
+    "typographic_craft": 4,
         "restraint_cohesion": 4
       },
       "gate_results": {
         "reading_order": true,
         "print_safety": true
       },
-      "passed": false,
-      "recorded_at": "2026-07-28",
-      "signed_off_by": "qiksnare13",
-      "signed_off_at": "2026-07-28",
+  "passed": true,
+  "recorded_at": "2026-08-17",
+  "signed_off_by": "phase-126-full-size-review",
+  "signed_off_at": "2026-08-17",
       "evidence_ref": "assets/rendro/gallery/ticket.png",
       "justifications": {
         "information_architecture": "Event header, the SECTION/ROW/SEAT/GATE locator group, and the perforated reference stub are each clearly grouped and ordered top-to-bottom the way a ticket is scanned at the door.",
-        "content_hierarchy": "HONEST FINDING (human sign-off 2026-07-28): the themed uniform scale inverts the intended hierarchy. The reference-code display anchor ('AUR-88213-GA', scale.display, native 8pt -> 21pt themed) now computes to 25.9px vs. the placement-grid values ('GA H 24 B', scale.title, native 26pt -> 16.5pt themed) at 20.4px — the reference code now visually dominates the placement-grid title that the 2026-07-19 rubric actually scored as the key fact (natively title was 3.25x display). This is recorded honestly as content_hierarchy: 3 — the reference-code display anchor dominates over the placement-grid title, not the intended dominant element — and is NOT flattened to pass. Remains open as .planning/WINDOWS.md id 2, cited in priv/quality/SIGN-OFF.md.",
+    "content_hierarchy": "Phase 126's exact pinned-PDFium editorial_ticket_dark and minimal_mono_ticket_dark page-one review found the repaired placement role dominant, with the complete one-line reference subordinate in both rows. This supports the recorded hierarchy 5 and resolves WINDOWS id 2 for these rows only; it does not claim universal Ticket quality, accessibility, PDF/UA, or print safety.",
         "domain_fit": "Perforated stub, reference number, non-transferable terms, and a section/row/seat/gate locator read as a real ticket.",
         "reader_affordances": "SECTION/ROW/SEAT/GATE labels sit directly above their values, and the perforation affordance makes the tear-off stub obvious.",
-        "typographic_craft": "HONEST FINDING (human sign-off 2026-07-28): the reference-code display anchor now wraps mid-token across 3 lines ('AUR-8' / '8213-' / 'GA') in its narrow stub column at the themed 21pt display scale — a real awkward-break defect, visually confirmed on the actual rendered raster. Recorded honestly as typographic_craft: 3, not silently fixed. Remains open as .planning/WINDOWS.md id 2, cited in priv/quality/SIGN-OFF.md.",
+    "typographic_craft": "The same bounded Phase 126 review found the complete reference one line and unclipped in both repaired rows. This supports craft 4, while intentionally stopping short of a universal typography or compliance claim.",
         "restraint_cohesion": "Native A6 sizing (297.64 x 419.53pt) replaces the prior A6-content-on-A4-canvas mismatch; the page is well-proportioned to its content with no decorative noise, though the terms footer leaves some blank space beneath it."
       },
       "domain_md": "priv/examples/ticket/DOMAIN.md"
