@@ -26,10 +26,21 @@ defmodule Rendro.DocsContract.ThemeIndustryGuardTest do
     for term <- forbidden, do: refute(source =~ term)
   end
 
-  test "theme.ex ships one theme + from_brand/2 only — no genre/preset machinery (CONTRACT-03 / D-02)" do
+  test "theme.ex allows exactly one narrow delegation and no other preset machinery (CONTRACT-03 / D-07)" do
     source = File.read!(@theme_source)
+    delegation = "def preset(genre, opts), do: Rendro.Theme.Presets.preset(genre, opts)"
 
-    for term <- ~w(preset catalog configurator genre), do: refute(source =~ term)
+    assert source =~ delegation
+    assert length(Regex.scan(~r/def preset\(/, source)) == 1
+
+    residual =
+      Regex.replace(
+        ~r/  @doc \"\"\"\n  Returns a fully resolved curated theme selection\..*?  def preset\(genre, opts\), do: Rendro\.Theme\.Presets\.preset\(genre, opts\)\n/s,
+        source,
+        ""
+      )
+
+    for term <- ~w(preset catalog configurator genre), do: refute(residual =~ term)
   end
 
   test "theme.ex exposes exactly the one-theme + from_brand/2 positive surface (CONTRACT-03)" do
@@ -37,5 +48,6 @@ defmodule Rendro.DocsContract.ThemeIndustryGuardTest do
 
     assert source =~ "def default"
     assert source =~ "def from_brand"
+    assert source =~ "def preset(genre, opts), do: Rendro.Theme.Presets.preset(genre, opts)"
   end
 end
