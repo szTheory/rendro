@@ -623,7 +623,15 @@ defmodule Rendro.Recipes.Ticket do
 
     content_w = pw - ml - mr
     band_w = content_w
-    band_h = band_w / @band_ratio
+    # Theme scales can make a realistic title/subtitle exceed the historical
+    # A6 ticket band. Reserve the minimum themed capacity here (rather than
+    # clipping at pagination) while preserving the no-theme ratio and the
+    # native A6 page size.
+    band_h =
+      case opts[:theme] do
+        nil -> band_w / @band_ratio
+        _theme -> max(band_w / @band_ratio, 250)
+      end
     stub_split = band_w * @stub_ratio
     stub_width = band_w - stub_split
 

@@ -4,7 +4,7 @@ defmodule Rendro.CatalogTest do
   alias Rendro.Catalog
 
   test "the default invoice catalog entry is a truthful deterministic source PDF" do
-    [spec] = Catalog.catalog_specs()
+    spec = Enum.find(Catalog.catalog_specs(), &(&1.id == "invoice--default--default--light"))
 
     assert spec.id == "invoice--default--default--light"
     assert spec.fixture_ref == "invoice/acme-phoenix-saas/invoice.json"

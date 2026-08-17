@@ -18,5 +18,11 @@
     "reference": "AUR-88213-GA"
   },
   "terms": "Non-transferable. Valid photo ID may be required at entry. No refunds or exchanges except as required by law. Present this reference at the gate for scanning.",
-  "brand": {"logo": null}
+  "brand": {
+    "logo": null,
+    "slug": "aurora-live",
+    "display_name": "Aurora Live",
+    "accent": "#C78600",
+    "recommended_preset": "brutalist"
+  }
 }

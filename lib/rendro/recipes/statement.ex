@@ -110,7 +110,10 @@ defmodule Rendro.Recipes.Statement do
   # mirroring the vertical-centering-estimate lever used for Certificate's
   # single-page fit-check (RESEARCH GT-3). 96pt clears the ~91.1pt need with
   # a small safety margin (mirrors @row_epsilon's spirit).
-  @themed_header_height 96
+  # Editorial's 30pt display role needs the full 112pt budget with realistic
+  # fixture account names. Keep this in the shared themed path so pagination's
+  # body-capacity calculation and the emitted template remain aligned.
+  @themed_header_height 112
 
   # Height of the closing-balance backdrop box appended at the bottom of the
   # header region (118-08). Drawn via the same zero-height overlay mechanic
