@@ -5,15 +5,15 @@ milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 126
 current_phase_name: Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth
 status: executing
-stopped_at: Completed 126-03-PLAN.md
-last_updated: "2026-08-17T05:51:58.947Z"
+stopped_at: Completed 126-04-PLAN.md
+last_updated: "2026-08-17T05:55:32.900Z"
 last_activity: 2026-08-16
 last_activity_desc: Phase 126 execution started
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 15
-  completed_plans: 13
+  completed_plans: 14
   percent: 20
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-16)
 ## Current Position
 
 Phase: 126 (Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-08-16 — Phase 126 execution started
 
@@ -73,8 +73,8 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-17T05:51:58.941Z
-Stopped at: Completed 126-03-PLAN.md
+Last session: 2026-08-17T05:55:32.863Z
+Stopped at: Completed 126-04-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -114,6 +114,7 @@ Resume file: None
 | Phase 126 P01 | 29m | 3 tasks | 8 files |
 | Phase 126 P02 | 9min | 3 tasks | 8 files |
 | Phase 126 P03 | 18m | 2 tasks | 8 files |
+| Phase 126 P04 | 3m | 1 tasks | 2 files |
 
 ## Operator Next Steps
 
@@ -134,3 +135,4 @@ Resume file: None
 - [Phase ?]: Preserve Payslip's payslip_sans fallback as its recipe-specific themed font bridge.
 - [Phase ?]: Keep only the legacy adapter comparison non-blocking; preset blessing, staging, manifest creation, and upload fail closed.
 - [Phase ?]: Accept raster artifacts only from one successful exact-SHA advisory-checks job plus manifest validation, not whole-workflow success.
+- [Phase ?]: [Phase 126]: Approve only the six exact pinned-PDFium rows after sequential native-size review; authorize isolated CI ref cleanup after committed closure evidence.
