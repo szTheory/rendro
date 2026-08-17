@@ -304,6 +304,7 @@ defmodule Rendro.Recipes.Ticket do
   defp main_section(data, opts) do
     colors = palette(opts)
     type = typography(opts)
+    roles = ticket_roles(opts, type)
     g = geometry(opts)
 
     # 118-08: the :main region is narrower now that the ticket defaults to
@@ -334,7 +335,7 @@ defmodule Rendro.Recipes.Ticket do
       Enum.map(data.placement, fn %{value: v} ->
         Rendro.block(
           Rendro.text(v,
-            size: type.scale.title,
+            size: roles.placement,
             font: type.fonts.body,
             color: colors.ink,
             line_height: type.leading,
@@ -390,7 +391,7 @@ defmodule Rendro.Recipes.Ticket do
           ),
           Rendro.block(
             Rendro.text(data.title,
-              size: type.scale.subtitle,
+              size: roles.title,
               font: type.fonts.heading,
               color: colors.ink,
               line_height: type.leading,
@@ -441,6 +442,7 @@ defmodule Rendro.Recipes.Ticket do
   defp stub_section(data, opts) do
     colors = palette(opts)
     type = typography(opts)
+    roles = ticket_roles(opts, type)
     lbl = Rendro.Recipes.Pagination.label_resolver(opts, @default_labels)
     g = geometry(opts)
 
@@ -480,7 +482,18 @@ defmodule Rendro.Recipes.Ticket do
       region: :stub,
       content:
         [perforation, code_box] ++
-          code_area_blocks(data, colors, type, lbl, image, box_x, box_size, text_x, avail_w)
+          code_area_blocks(
+            data,
+            colors,
+            type,
+            roles,
+            lbl,
+            image,
+            box_x,
+            box_size,
+            text_x,
+            avail_w
+          )
     )
   end
 
@@ -488,8 +501,8 @@ defmodule Rendro.Recipes.Ticket do
   # optional caption), never a faux barcode/QR stripe pattern. Reference
   # block(s) start at the SAME y as the box backdrop (height: 0), so they
   # overlay the box from its top edge.
-  defp code_area_blocks(data, colors, type, lbl, nil, _box_x, _box_size, text_x, avail_w) do
-    reference_blocks(data, colors, type, lbl, text_x, avail_w) ++
+  defp code_area_blocks(data, colors, type, roles, lbl, nil, _box_x, _box_size, text_x, avail_w) do
+    reference_blocks(data, colors, type, roles, lbl, text_x, avail_w) ++
       [present_code_caption(colors, type, lbl, text_x, avail_w)]
   end
 
@@ -499,17 +512,17 @@ defmodule Rendro.Recipes.Ticket do
   # clause) naturally advances the cursor past the box, so the
   # ALWAYS-VISIBLE reference (D-06) renders AFTER it -- below the image,
   # never overlaid on top of it.
-  defp code_area_blocks(data, colors, type, lbl, _image, box_x, box_size, text_x, avail_w) do
+  defp code_area_blocks(data, colors, type, roles, lbl, _image, box_x, box_size, text_x, avail_w) do
     image_block =
       Rendro.Component.image(:ticket_code, fit: {box_size, box_size})
       |> Map.put(:x, box_x)
 
-    [image_block | reference_blocks(data, colors, type, lbl, text_x, avail_w)]
+    [image_block | reference_blocks(data, colors, type, roles, lbl, text_x, avail_w)]
   end
 
   # D-06: the human-readable reference -- REQUIRED, ALWAYS renders, even
   # when a PNG is supplied. Upper-cased, with a small muted caption above.
-  defp reference_blocks(data, colors, type, lbl, text_x, avail_w) do
+  defp reference_blocks(data, colors, type, roles, lbl, text_x, avail_w) do
     caption_label = Map.get(data.code, :label) || lbl.(:reference)
     reference_text = String.upcase(data.code.reference)
 
@@ -528,10 +541,10 @@ defmodule Rendro.Recipes.Ticket do
         x: text_x,
         width: avail_w
       ),
-      # The reference code is the SOLE `display` anchor (D-01) — mono font.
+      # The reference code is a compact utility fact — mono font.
       Rendro.block(
         Rendro.text(reference_text,
-          size: type.scale.display,
+          size: roles.reference,
           font: type.fonts.mono,
           color: colors.ink,
           line_height: type.leading,
@@ -699,6 +712,16 @@ defmodule Rendro.Recipes.Ticket do
       end
 
     Map.merge(base, Keyword.get(opts, :typography, %{}))
+  end
+
+  defp ticket_roles(opts, type) do
+    case opts[:theme] do
+      nil ->
+        %{placement: type.scale.title, title: type.scale.subtitle, reference: type.scale.display}
+
+      _theme ->
+        %{placement: type.scale.display, title: type.scale.title, reference: type.scale.caption}
+    end
   end
 
   # ---------------------------------------------------------------------------
