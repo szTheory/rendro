@@ -3,8 +3,36 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
   use ExUnit.Case, async: true
 
   @schema_path "priv/schemas/examples.schema.json"
-  @original_invoice_sha256 "7368479dfc51b23a09be216f5496c1d209ec7dd543e972b3b367db6525cdafd1"
-  @original_payslip_sha256 "9924c3f434b323a2a8ff8f3c9df5427517fbb6d69c25ba87900e8f2a5d3dda05"
+  @original_fixture_sha256 %{
+    "priv/examples/certificate/summit-training-institute/certificate.json" =>
+      "f59c4d721f61152462c389e418148ccdb0bd9702703f9e9a482d9785d766bed4",
+    "priv/examples/invoice/acme-phoenix-saas/invoice.json" =>
+      "7368479dfc51b23a09be216f5496c1d209ec7dd543e972b3b367db6525cdafd1",
+    "priv/examples/payslip/aurora-live/payslip.json" =>
+      "9924c3f434b323a2a8ff8f3c9df5427517fbb6d69c25ba87900e8f2a5d3dda05",
+    "priv/examples/receipt/harbor-and-oak-cafe/receipt.json" =>
+      "64f7bc857d25b887e5d5381ccbef3ae4c1be16e484a9fe0cbfa7f11b53f474ed",
+    "priv/examples/statement/northwind-ledger-co/statement.json" =>
+      "f31fe677f47cbe20bf3b1280465d09cb896a70f0eb0fc230448e5d189f18df1e",
+    "priv/examples/ticket/aurora-live/ticket.json" =>
+      "af45c414e7bcd7641877478fd5e745c0ba140dee7417b8dbf5d0d0a9f6a9a715"
+  }
+
+  @expected_new_brands [
+    {"certificate", "aster-institute", "Aster Institute", "#1F4FB8", "swiss"},
+    {"certificate", "meridian-arts-fellowship", "Meridian Arts Fellowship", "#6E3CB8",
+     "editorial"},
+    {"invoice", "cedar-mutual", "Cedar Mutual", "#1F4FB8", "corporate_classic"},
+    {"invoice", "northline-logistics", "Northline Logistics", "#2C6BED", "swiss"},
+    {"payslip", "cedar-mutual", "Cedar Mutual", "#1F4FB8", "corporate_classic"},
+    {"payslip", "northline-logistics", "Northline Logistics", "#2C6BED", "swiss"},
+    {"receipt", "circuit-supply-co", "Circuit Supply Co.", "#2C6BED", "minimal_mono"},
+    {"receipt", "poppy-and-grain", "Poppy & Grain", "#147A4B", "humanist"},
+    {"statement", "aster-research-fund", "Aster Research Fund", "#6E3CB8", "editorial"},
+    {"statement", "signal-ledger", "Signal Ledger", "#0E7C76", "minimal_mono"},
+    {"ticket", "field-notes-conference", "Field Notes Conference", "#0E7C76", "minimal_mono"},
+    {"ticket", "the-letterpress-hall", "The Letterpress Hall", "#C24132", "editorial"}
+  ]
 
   defp examples_schema do
     @schema_path
@@ -92,8 +120,7 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
              )
     end
 
-    assert sha256("priv/examples/invoice/acme-phoenix-saas/invoice.json") ==
-             @original_invoice_sha256
+    assert_original_fixture_bytes!()
   end
 
   test "Payslip reuses the locked brands with matching marks and exact period and YTD arithmetic" do
@@ -125,7 +152,7 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
       assert_synthetic_fixture!(fixture)
     end
 
-    assert sha256("priv/examples/payslip/aurora-live/payslip.json") == @original_payslip_sha256
+    assert_original_fixture_bytes!()
   end
 
   test "Statement adds the locked Signal Ledger and Aster Research Fund fixtures with exact continuity" do
@@ -214,6 +241,72 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
     end
   end
 
+  test "Ticket adds the locked Field Notes Conference and The Letterpress Hall fixtures" do
+    assert ticket_paths() == [
+             "priv/examples/ticket/aurora-live/ticket.json",
+             "priv/examples/ticket/field-notes-conference/ticket.json",
+             "priv/examples/ticket/the-letterpress-hall/ticket.json"
+           ]
+
+    assert_brand_fixture!("ticket/field-notes-conference/ticket.json", %{
+      "slug" => "field-notes-conference",
+      "display_name" => "Field Notes Conference",
+      "accent" => "#0E7C76",
+      "recommended_preset" => "minimal_mono"
+    })
+
+    assert_brand_fixture!("ticket/the-letterpress-hall/ticket.json", %{
+      "slug" => "the-letterpress-hall",
+      "display_name" => "The Letterpress Hall",
+      "accent" => "#C24132",
+      "recommended_preset" => "editorial"
+    })
+  end
+
+  test "the closed six-domain corpus has two safe data-only additions per domain" do
+    expected_paths =
+      for {domain, slug, _display_name, _accent, _preset} <- @expected_new_brands do
+        "priv/examples/#{domain}/#{slug}/#{fixture_filename(domain)}"
+      end
+
+    assert Enum.sort(
+             Path.wildcard("priv/examples/**/*.json") -- Map.keys(@original_fixture_sha256)
+           ) ==
+             Enum.sort(expected_paths)
+
+    for domain <- fixture_domains() do
+      assert Path.wildcard("priv/examples/#{domain}/**/*.json") |> length() == 3
+    end
+
+    for {domain, slug, display_name, accent, recommended_preset} <- @expected_new_brands do
+      path = "#{domain}/#{slug}/#{fixture_filename(domain)}"
+
+      assert_brand_fixture!(path, %{
+        "slug" => slug,
+        "display_name" => display_name,
+        "accent" => accent,
+        "recommended_preset" => recommended_preset
+      })
+
+      path
+      |> Path.join("priv/examples")
+      |> File.read!()
+      |> JSON.decode!()
+      |> assert_synthetic_fixture!()
+    end
+
+    identities =
+      for path <- expected_paths do
+        fixture = path |> File.read!() |> JSON.decode!()
+        {Path.basename(Path.dirname(Path.dirname(path))), fixture["brand"]["slug"]}
+      end
+
+    assert length(identities) == 12
+    assert length(identities) == length(Enum.uniq(identities))
+    assert Path.wildcard("priv/examples/**/*.ex") == []
+    assert_original_fixture_bytes!()
+  end
+
   defp invoice_paths do
     Path.wildcard("priv/examples/invoice/**/*.json") |> Enum.sort()
   end
@@ -233,6 +326,19 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
   defp certificate_paths do
     Path.wildcard("priv/examples/certificate/**/*.json") |> Enum.sort()
   end
+
+  defp ticket_paths do
+    Path.wildcard("priv/examples/ticket/**/*.json") |> Enum.sort()
+  end
+
+  defp fixture_domains, do: ~w(certificate invoice payslip receipt statement ticket)
+
+  defp fixture_filename("certificate"), do: "certificate.json"
+  defp fixture_filename("invoice"), do: "invoice.json"
+  defp fixture_filename("payslip"), do: "payslip.json"
+  defp fixture_filename("receipt"), do: "receipt.json"
+  defp fixture_filename("statement"), do: "statement.json"
+  defp fixture_filename("ticket"), do: "ticket.json"
 
   defp assert_cross_domain_brand!(slug, accent, recommended_preset) do
     invoice_path = "priv/examples/invoice/#{slug}/invoice.json"
@@ -328,6 +434,12 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
     |> File.read!()
     |> then(&:crypto.hash(:sha256, &1))
     |> Base.encode16(case: :lower)
+  end
+
+  defp assert_original_fixture_bytes! do
+    for {path, expected_sha256} <- @original_fixture_sha256 do
+      assert sha256(path) == expected_sha256
+    end
   end
 
   describe "hex tarball contents" do
