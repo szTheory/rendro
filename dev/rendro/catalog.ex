@@ -573,6 +573,18 @@ defmodule Rendro.Catalog do
     do: %{"status" => "needs_work", "label" => "Scored — needs work"}
 
   defp apply_quality_projections(cells, rubric) do
+    if rubric["catalog_dispositions"] == [] do
+      # The initial pinned render establishes the hashes that reviewer-owned
+      # dispositions must bind. The read-only checker remains fail-closed until
+      # those records are deliberately added and a subsequent generation
+      # projects them back into the manifest.
+      {:ok, cells}
+    else
+      apply_bound_quality_projections(cells, rubric)
+    end
+  end
+
+  defp apply_bound_quality_projections(cells, rubric) do
     join_cells = Enum.map(cells, &Map.delete(&1, "quality"))
     errors = quality_contract_errors(%{"cells" => join_cells}, rubric)
 
