@@ -544,6 +544,7 @@
         "dark/1",
         "default/0",
         "from_brand/2",
+        "preset/2",
         "resolve/1"
       ],
       "tier": "adapter",

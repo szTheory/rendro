@@ -534,9 +534,30 @@ defmodule Rendro.Recipes.Receipt do
   # never clips on any page.
   @spec computed_header_height(map(), keyword()) :: number()
   defp computed_header_height(data, opts) do
+    base_height = themed_base_header_height(opts)
+
     case Map.get(data, :merchant) do
-      nil -> @default_header_height
-      _present -> @default_header_height + merchant_extra_height(opts)
+      nil -> base_height
+      _present -> base_height + merchant_extra_height(opts)
+    end
+  end
+
+  # No-theme Receipt geometry is frozen by byte-identities. A curated theme,
+  # however, can make the title/customer/date trio taller than the historical
+  # 48pt header (Humanist totals 49.3pt), so reserve its actual line budget
+  # before composition rather than allowing a deterministic overflow.
+  defp themed_base_header_height(opts) do
+    case opts[:theme] do
+      nil ->
+        @default_header_height
+
+      _theme ->
+        type = typography(opts)
+
+        themed_content_height =
+          (type.scale.subtitle + type.scale.body + type.scale.small) * type.leading
+
+        max(@default_header_height, themed_content_height + 2)
     end
   end
 
