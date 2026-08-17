@@ -157,6 +157,34 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
     end
   end
 
+  test "Receipt adds the locked Poppy and Grain and Circuit Supply Co fixtures with exact totals" do
+    assert receipt_paths() == [
+             "priv/examples/receipt/circuit-supply-co/receipt.json",
+             "priv/examples/receipt/harbor-and-oak-cafe/receipt.json",
+             "priv/examples/receipt/poppy-and-grain/receipt.json"
+           ]
+
+    assert_brand_fixture!("receipt/poppy-and-grain/receipt.json", %{
+      "slug" => "poppy-and-grain",
+      "display_name" => "Poppy & Grain",
+      "accent" => "#147A4B",
+      "recommended_preset" => "humanist"
+    })
+
+    assert_brand_fixture!("receipt/circuit-supply-co/receipt.json", %{
+      "slug" => "circuit-supply-co",
+      "display_name" => "Circuit Supply Co.",
+      "accent" => "#2C6BED",
+      "recommended_preset" => "minimal_mono"
+    })
+
+    for path <- receipt_paths() -- ["priv/examples/receipt/harbor-and-oak-cafe/receipt.json"] do
+      fixture = path |> File.read!() |> JSON.decode!()
+      assert_receipt_totals!(fixture)
+      assert_synthetic_fixture!(fixture)
+    end
+  end
+
   defp invoice_paths do
     Path.wildcard("priv/examples/invoice/**/*.json") |> Enum.sort()
   end
@@ -167,6 +195,10 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
 
   defp statement_paths do
     Path.wildcard("priv/examples/statement/**/*.json") |> Enum.sort()
+  end
+
+  defp receipt_paths do
+    Path.wildcard("priv/examples/receipt/**/*.json") |> Enum.sort()
   end
 
   defp assert_cross_domain_brand!(slug, accent, recommended_preset) do
@@ -206,6 +238,18 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
     assert Decimal.equal?(
              Decimal.add(Decimal.new(fixture["opening_balance"]), transactions),
              Decimal.new(fixture["closing_balance"])
+           )
+  end
+
+  defp assert_receipt_totals!(fixture) do
+    subtotal = decimal_sum(fixture["lines"], "amount")
+    totals = fixture["totals"]
+
+    assert Decimal.equal?(subtotal, Decimal.new(totals["subtotal"]))
+
+    assert Decimal.equal?(
+             Decimal.add(subtotal, Decimal.new(totals["tax"])),
+             Decimal.new(totals["total"])
            )
   end
 
