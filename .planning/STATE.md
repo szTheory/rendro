@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.12
 milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
-current_phase: 125
-current_phase_name: Foundation — Curated fonts, style-genre presets & brand fixtures
-status: verifying
-stopped_at: Completed 125-10-PLAN.md
-last_updated: "2026-08-17T01:42:47.554Z"
+current_phase: 126
+current_phase_name: Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth
+status: planning
+stopped_at: Phase 125 complete, ready to plan Phase 126
+last_updated: "2026-08-17T02:38:34.372Z"
 last_activity: 2026-08-16
-last_activity_desc: Phase 125 execution started
+last_activity_desc: Phase 125 complete, transitioned to Phase 126
 progress:
   total_phases: 5
   completed_phases: 1
@@ -21,23 +21,23 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-07-28)
+See: .planning/PROJECT.md (updated 2026-08-16)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 125 — Foundation — Curated fonts, style-genre presets & brand fixtures
+**Current focus:** Phase 126 — Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth
 
 ## Current Position
 
-Phase: 125 (Foundation — Curated fonts, style-genre presets & brand fixtures) — EXECUTING
-Plan: 10 of 10
-Status: Phase complete — ready for verification
-Last activity: 2026-08-16 — Phase 125 execution started
+Phase: 126 — Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-08-16 — Phase 125 complete, transitioned to Phase 126
 
 ## Roadmap Snapshot (v2.12, Phases 125-129) — IN PLANNING
 
 ```text
-[                                        ] 0% — 0/5 phases complete
-Phase 125 Foundation — fonts, presets & brand fixtures .... Not started
+[████████                                ] 20% — 1/5 phases complete
+Phase 125 Foundation — fonts, presets & brand fixtures .... Complete
 Phase 126 Carryover polish — dark/hierarchy/golden depth .. Not started
 Phase 127 Public example catalog & quality ratchet ........ Not started
 Phase 128 Static configurator, codegen & Livebook .......... Not started
@@ -50,11 +50,18 @@ Phase 129 Docs & manifest closure .......................... Not started
 
 v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives in `PROJECT.md` Key Decisions; the milestone archive is under `milestones/v2.11-*`.
 
+### Phase 125 delivered
+
+- Six strict genre presets and four provenance-bound curated fonts now render through explicit document-owned registration across all seven recipes.
+- Deterministic and pinned-PDFium advisory matrices share twelve stable light/dark row IDs; bounded human review passed with no new clipping or overflow observed.
+- Twelve safe data-only brand fixtures complete the three-per-domain source corpus for Phase 127.
+- CID widths now use glyph-ID metrics while layout retains codepoint metrics, fixing embedded-font overlap at the correct renderer boundary.
+
 ### Carryover resolved into Milestone C roadmap
 
 - **WINDOWS ids 1-3 (deferred v2.11 polish)** → mapped to Phase 126 (POLISH-01/02/03): invoice_dark table-body cells inherit default ink → illegible on dark bg (id 1); Ticket/ticket_dark themed uniform type scale inverts intended display/title hierarchy — locked Phase-122 outcome, honestly `passed:false` (id 2); payslip themed numeric cells wrap mid-number at 10.5pt/1.35 leading (id 3).
 - **Coverage depth (non-blocking)** → mapped to Phase 126 (POLISH-04/05): no dedicated `from_brand`/preset accent-op byte golden; dedicated `*_typography_test.exs` for only 3 of 7 recipes (other 4 on byte-identity + smoke).
-- **Tooling gap (unresolved, environment-only):** pdfium-cli v0.11.0 not on PATH → `mix rendro.launch_artifacts.check` advisory lane fails locally (not a code defect; does not block roadmap phases).
+- **Tooling note (environment-only):** pdfium-cli v0.11.0 is not globally on PATH, but the SHA-verified pinned wrapper/container route is proven and reproducible for advisory checks.
 
 ## Deferred Items
 
@@ -62,17 +69,18 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 |----------|------|--------|-------------|
 | Studio | Live server-rendered theme playground | Deferred to Milestone D (`SEED-005`) | v2.11 scoping |
 | Typography | Tabular figures / small-caps / OpenType features | Demand-gated (need new engine primitives) | v2.11 scoping |
+| Review UX | Present visual-review images full-size in a sequential slideshow/lightbox, not only as a dense contact sheet | Non-blocking tooling follow-up | Phase 125 UAT |
 
 ## Session Continuity
 
-Last session: 2026-08-17T01:42:47.547Z
-Stopped at: Completed 125-10-PLAN.md
+Last session: 2026-08-17T02:38:03Z
+Stopped at: Phase 125 complete, ready to plan Phase 126
 Resume file: None
 
 ## Next Steps
 
-1. `/gsd-plan-phase 125` — plan Phase 125 (Foundation — curated fonts, style-genre presets & brand fixtures).
-2. Continue in locked sequence: 125 → 126 → 127 → 128 → 129.
+1. `/gsd-plan-phase 126` — plan carryover polish now that preset foundations are complete.
+2. Continue in locked sequence: 126 → 127 → 128 → 129.
 
 ## Performance Metrics
 
@@ -106,23 +114,12 @@ Resume file: None
 
 ## Operator Next Steps
 
-- Plan Phase 125 with `/gsd-plan-phase 125`
+- Plan Phase 126 with `/gsd-plan-phase 126`
 
 ## Decisions
 
-- [Phase ?]: Theme.preset/2 delegates to private Presets; font registration stays explicit and document-owned.
-- [Phase ?]: Generic brand tuples use a complete metadata branch while legacy fixtures retain explicit logo:null compatibility.
-- [Phase ?]: Northline and Cedar use byte-identical local SVG marks across Invoice and Payslip for auditable identity reuse.
-- [Phase ?]: Curated roles use one unmodified static Regular face per family; registration remains explicit and document-owned.
-- [Phase ?]: Glyph inputs are sorted and deduplicated before subset dependency traversal.
-- [Phase ?]: Statement and Receipt fixture contracts assert exact three-fixture sets, safe SVGs, and Decimal arithmetic.
-- [Phase ?]: Complete Brutalist ships as a sixth canonical atom under the same strict constructor and role contract.
-- [Phase ?]: Theme retains exactly one narrow delegation; all genre grammar remains in the Presets sibling.
-- [Phase ?]: Certificate and Ticket fixture corpus closes with exact data-only brands, original-byte controls, and text-only Hex packaging.
-- [Phase ?]: Certificate resolves only Rendro-owned curated metric descriptors before explicit registration.
-- [Phase ?]: The deterministic preset matrix stays PDFium-independent and requires repeat-byte equality.
-- [Phase ?]: Preset raster references use the existing CI-only blessing guard and pinned PDFium version; review PNGs remain external and advisory.
-- [Phase ?]: Corporate-Classic, Minimal-Mono, and Brutalist share the identical pinned advisory evidence path.
-- [Phase ?]: Normal raster comparison requires twelve unique IDs and references; CI-only blessing may seed absent references.
-- [Phase ?]: Embedded CID /W tables use glyph-ID metrics while layout retains Unicode codepoint metrics.
-- [Phase ?]: Phase 125 preset review uses a pinned PDFium v0.11.0 advisory matrix and bounded human judgment only.
+- [Phase 125]: Keep `Theme.preset/2` as a narrow delegation; genre grammar and curated font descriptors live in the private Presets sibling, with explicit document-owned registration.
+- [Phase 125]: Ship one unmodified static Regular face per curated role with exact provenance/package proof and sorted, deduplicated subset inputs.
+- [Phase 125]: Keep the deterministic and pinned-PDFium advisory matrices separate while sharing the same twelve stable row IDs.
+- [Phase 125]: Keep brands as generic JSON plus safe local SVG data, with exact corpus, arithmetic, identity, and original-byte controls.
+- [Phase 125]: Use glyph-ID widths for embedded CID `/W` tables while retaining Unicode-codepoint metrics for layout.
