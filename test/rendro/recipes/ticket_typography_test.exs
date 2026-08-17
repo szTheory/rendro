@@ -70,4 +70,64 @@ defmodule Rendro.Recipes.TicketTypographyTest do
       assert {:ok, _built} = Build.run(doc)
     end
   end
+
+  describe "Phase 126 semantic typography contract" do
+    test "themed placement, title, and reference use the resolved hierarchy and roles" do
+      theme = Rendro.Theme.default()
+      sections = Ticket.sections(sample_data(), theme: theme)
+
+      assert %Rendro.Text{
+               size: placement_size,
+               font: placement_font,
+               line_height: placement_leading
+             } =
+               find_text(sections, "GA")
+
+      assert placement_size == theme.typography.scale.display
+      assert placement_font == theme.typography.fonts.body
+      assert placement_leading == theme.typography.leading
+
+      assert %Rendro.Text{size: title_size, font: title_font} =
+               find_text(sections, "Indie Night: The Lumen Set")
+
+      assert title_size == theme.typography.scale.title
+      assert title_font == theme.typography.fonts.heading
+
+      assert %Rendro.Text{size: reference_size, font: reference_font} =
+               find_text(sections, "AUR-88213-GA")
+
+      assert reference_size == theme.typography.scale.caption
+      assert reference_font == theme.typography.fonts.mono
+    end
+
+    test "the complete reference retains themed placement-first ordering and nil-theme history" do
+      theme = Rendro.Theme.default()
+
+      themed_override = %{
+        theme.typography
+        | leading: 1.7,
+          scale: %{theme.typography.scale | display: 31}
+      }
+
+      assert %Rendro.Text{size: 31, line_height: 1.7} =
+               Ticket.sections(sample_data(), theme: theme, typography: themed_override)
+               |> find_text("GA")
+
+      assert %Rendro.Text{size: 26} = Ticket.sections(sample_data()) |> find_text("GA")
+
+      assert %Rendro.Text{size: 16} =
+               Ticket.sections(sample_data()) |> find_text("Indie Night: The Lumen Set")
+
+      assert %Rendro.Text{size: 8} = Ticket.sections(sample_data()) |> find_text("AUR-88213-GA")
+      assert themed_override.scale.title == theme.typography.scale.title
+    end
+  end
+
+  defp find_text(sections, content), do: Enum.find(texts(sections), &(&1.content == content))
+  defp texts(value) when is_list(value), do: Enum.flat_map(value, &texts/1)
+  defp texts(%Rendro.Section{content: content}), do: texts(content)
+  defp texts(%Rendro.Block{content: content}), do: texts(content)
+  defp texts(%Rendro.Table{rows: rows, header: header}), do: texts([rows, header])
+  defp texts(%Rendro.Text{} = text), do: [text]
+  defp texts(_), do: []
 end

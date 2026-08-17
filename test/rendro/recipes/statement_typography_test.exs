@@ -81,4 +81,38 @@ defmodule Rendro.Recipes.StatementTypographyTest do
       assert {:ok, _built} = Build.run(doc)
     end
   end
+
+  describe "Phase 126 semantic typography contract" do
+    test "materializes heading role, scale, and leading by account content" do
+      theme = Rendro.Theme.default()
+
+      assert %Rendro.Text{size: size, font: font, line_height: leading} =
+               Statement.sections(sample_data(), theme: theme)
+               |> find_text("Acme Corp")
+
+      assert size == theme.typography.scale.title
+      assert font == theme.typography.fonts.heading
+      assert leading == theme.typography.leading
+    end
+
+    test "a complete nested typography override wins while untouched values remain materialized" do
+      theme = Rendro.Theme.default()
+      override = %{theme.typography | leading: 1.7, scale: %{theme.typography.scale | title: 31}}
+
+      assert %Rendro.Text{size: 31, line_height: 1.7} =
+               Statement.sections(sample_data(), theme: theme, typography: override)
+               |> find_text("Acme Corp")
+
+      assert override.scale.body == theme.typography.scale.body
+      assert override.fonts.mono == theme.typography.fonts.mono
+    end
+  end
+
+  defp find_text(sections, content), do: Enum.find(texts(sections), &(&1.content == content))
+  defp texts(value) when is_list(value), do: Enum.flat_map(value, &texts/1)
+  defp texts(%Rendro.Section{content: content}), do: texts(content)
+  defp texts(%Rendro.Block{content: content}), do: texts(content)
+  defp texts(%Rendro.Table{rows: rows, header: header}), do: texts([rows, header])
+  defp texts(%Rendro.Text{} = text), do: [text]
+  defp texts(_), do: []
 end

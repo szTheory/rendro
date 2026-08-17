@@ -129,4 +129,50 @@ defmodule Rendro.Recipes.CertificateTypographyTest do
                )
     end
   end
+
+  describe "Phase 126 semantic typography contract" do
+    test "materializes centered heading/body scale, roles, and leading" do
+      theme = Rendro.Theme.default()
+      sections = Certificate.sections(sample_data(), theme: theme)
+
+      assert %Rendro.Text{size: title_size, font: title_font, line_height: title_leading} =
+               find_text(sections, "Certificate of Completion")
+
+      assert title_size == theme.typography.scale.title
+      assert title_font == theme.typography.fonts.heading
+      assert title_leading == theme.typography.leading
+
+      assert %Rendro.Text{size: body_size, font: body_font, line_height: body_leading} =
+               find_text(sections, "For outstanding achievement and dedication.")
+
+      assert body_size == theme.typography.scale.body
+      assert body_font == theme.typography.fonts.body
+      assert body_leading == theme.typography.leading
+    end
+
+    test "a complete nested typography override wins without disturbing retained centered roles" do
+      theme = Rendro.Theme.default()
+
+      override = %{
+        theme.typography
+        | leading: 1.7,
+          scale: %{theme.typography.scale | title: 31}
+      }
+
+      assert %Rendro.Text{size: 31, line_height: 1.7} =
+               Certificate.sections(sample_data(), theme: theme, typography: override)
+               |> find_text("Certificate of Completion")
+
+      assert override.fonts.body == theme.typography.fonts.body
+      assert override.scale.body == theme.typography.scale.body
+    end
+  end
+
+  defp find_text(sections, content), do: Enum.find(texts(sections), &(&1.content == content))
+  defp texts(value) when is_list(value), do: Enum.flat_map(value, &texts/1)
+  defp texts(%Rendro.Section{content: content}), do: texts(content)
+  defp texts(%Rendro.Block{content: content}), do: texts(content)
+  defp texts(%Rendro.Table{rows: rows, header: header}), do: texts([rows, header])
+  defp texts(%Rendro.Text{} = text), do: [text]
+  defp texts(_), do: []
 end

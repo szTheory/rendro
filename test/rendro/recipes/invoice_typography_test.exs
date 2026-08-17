@@ -63,4 +63,45 @@ defmodule Rendro.Recipes.InvoiceTypographyTest do
       assert {:ok, _built} = Build.run(doc)
     end
   end
+
+  describe "Phase 126 semantic typography contract" do
+    test "materializes title/body roles, scale, and leading by semantic content" do
+      theme = Rendro.Theme.default()
+      sections = Invoice.sections(sample_data(), theme: theme)
+
+      assert %Rendro.Text{size: title_size, font: title_font, line_height: title_leading} =
+               find_text(sections, "INVOICE #INV-TYPO-01")
+
+      assert title_size == theme.typography.scale.title
+      assert title_font == theme.typography.fonts.mono
+      assert title_leading == theme.typography.leading
+
+      assert %Rendro.Text{size: body_size, font: body_font, line_height: body_leading} =
+               find_text(sections, "Date: 2026-04-30")
+
+      assert body_size == theme.typography.scale.body
+      assert body_font == theme.typography.fonts.body
+      assert body_leading == theme.typography.leading
+    end
+
+    test "a complete nested typography override wins without erasing retained values" do
+      theme = Rendro.Theme.default()
+      override = %{theme.typography | leading: 1.7, scale: %{theme.typography.scale | title: 31}}
+
+      assert %Rendro.Text{size: 31, line_height: 1.7} =
+               Invoice.sections(sample_data(), theme: theme, typography: override)
+               |> find_text("INVOICE #INV-TYPO-01")
+
+      assert override.scale.body == theme.typography.scale.body
+      assert override.fonts.body == theme.typography.fonts.body
+    end
+  end
+
+  defp find_text(sections, content), do: Enum.find(texts(sections), &(&1.content == content))
+  defp texts(value) when is_list(value), do: Enum.flat_map(value, &texts/1)
+  defp texts(%Rendro.Section{content: content}), do: texts(content)
+  defp texts(%Rendro.Block{content: content}), do: texts(content)
+  defp texts(%Rendro.Table{rows: rows, header: header}), do: texts([rows, header])
+  defp texts(%Rendro.Text{} = text), do: [text]
+  defp texts(_), do: []
 end
