@@ -1,0 +1,28 @@
+{
+  "fixture_id": "ticket_letterpress_hall_v1",
+  "family": "ticket",
+  "paper": "a6",
+  "issuer": {
+    "name": "The Letterpress Hall",
+    "venue": "Letterpress Hall, East Gallery"
+  },
+  "title": "Night of Small Editions",
+  "subtitle": "Doors 6:30 PM - Reading 7:15 PM - Thursday 24 September 2026",
+  "placement": [
+    {"label": "Section", "value": "Gallery"},
+    {"label": "Row", "value": "B"},
+    {"label": "Seat", "value": "07"},
+    {"label": "Entry", "value": "East"}
+  ],
+  "code": {
+    "reference": "TLH-SEP24-B07"
+  },
+  "terms": "Valid for one admission. Please arrive before the reading begins. This ticket may not be reproduced or resold. Present the reference at the East Gallery entry.",
+  "brand": {
+    "slug": "the-letterpress-hall",
+    "display_name": "The Letterpress Hall",
+    "accent": "#C24132",
+    "recommended_preset": "editorial",
+    "logo": "logo.svg"
+  }
+}

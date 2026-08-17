@@ -1,0 +1,28 @@
+{
+  "fixture_id": "ticket_field_notes_conference_v1",
+  "family": "ticket",
+  "paper": "a6",
+  "issuer": {
+    "name": "Field Notes Conference",
+    "venue": "Harbor Workshop Center"
+  },
+  "title": "Field Notes 2026: Systems in Practice",
+  "subtitle": "Check-in 8:30 AM - Program 9:15 AM - Friday 18 September 2026",
+  "placement": [
+    {"label": "Zone", "value": "C"},
+    {"label": "Row", "value": "4"},
+    {"label": "Seat", "value": "18"},
+    {"label": "Entry", "value": "North"}
+  ],
+  "code": {
+    "reference": "FNC-26-C4-18"
+  },
+  "terms": "Admits one registered attendee. Keep this reference available for check-in. Transfers must be completed before the program begins. Re-entry is permitted with a valid event badge.",
+  "brand": {
+    "slug": "field-notes-conference",
+    "display_name": "Field Notes Conference",
+    "accent": "#0E7C76",
+    "recommended_preset": "minimal_mono",
+    "logo": "logo.svg"
+  }
+}

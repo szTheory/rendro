@@ -288,8 +288,8 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
         "recommended_preset" => recommended_preset
       })
 
-      path
-      |> Path.join("priv/examples")
+      "priv/examples"
+      |> Path.join(path)
       |> File.read!()
       |> JSON.decode!()
       |> assert_synthetic_fixture!()
