@@ -23,9 +23,10 @@ defmodule Rendro.PDF.FontSubsetter do
          {:ok, hmtx} <- fetch_required_table(tables, "hmtx"),
          {:ok, index_to_loc_format} <- parse_index_to_loc_format(head),
          {:ok, num_glyphs} <- parse_num_glyphs(maxp),
+         :ok <- validate_glyph_ids_in_range(used_glyphs, num_glyphs),
          {:ok, number_of_h_metrics} <- parse_number_of_h_metrics(hhea),
          {:ok, offsets} <- parse_loca(loca, index_to_loc_format, num_glyphs),
-         {:ok, required_glyphs} <- resolve_dependencies(used_glyphs, offsets, glyf, num_glyphs),
+         {:ok, required_glyphs} <- resolve_dependencies(used_glyphs, offsets, glyf),
          max_used_glyph <- Enum.max([0 | required_glyphs]),
          new_num_glyphs <- max_used_glyph + 1 do
       {new_glyf, new_loca} =
@@ -54,6 +55,13 @@ defmodule Rendro.PDF.FontSubsetter do
 
   defp validate_glyph_ids(glyph_ids) do
     case Enum.find(glyph_ids, &(not is_integer(&1) or &1 < 0)) do
+      nil -> :ok
+      glyph_id -> {:error, {:invalid_glyph_id, glyph_id}}
+    end
+  end
+
+  defp validate_glyph_ids_in_range(glyph_ids, num_glyphs) do
+    case Enum.find(glyph_ids, &(&1 >= num_glyphs)) do
       nil -> :ok
       glyph_id -> {:error, {:invalid_glyph_id, glyph_id}}
     end
@@ -144,8 +152,8 @@ defmodule Rendro.PDF.FontSubsetter do
     end
   end
 
-  defp resolve_dependencies(used_glyphs, offsets, glyf, num_glyphs) do
-    initial = [0 | used_glyphs] |> Enum.filter(&(&1 < num_glyphs)) |> MapSet.new()
+  defp resolve_dependencies(used_glyphs, offsets, glyf) do
+    initial = [0 | used_glyphs] |> MapSet.new()
     {:ok, do_resolve_dependencies(MapSet.to_list(initial), offsets, glyf, initial)}
   end
 

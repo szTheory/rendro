@@ -50,6 +50,13 @@ defmodule Rendro.PDF.FontSubsetterTest do
     assert FontSubsetter.subset(bytes, [1, "2"]) == {:error, {:invalid_glyph_id, "2"}}
   end
 
+  test "rejects glyph IDs outside the source font range", %{font: bytes} do
+    num_glyphs = font_num_glyphs(bytes)
+
+    assert FontSubsetter.subset(bytes, [num_glyphs]) ==
+             {:error, {:invalid_glyph_id, num_glyphs}}
+  end
+
   test "normalizes caller glyph ordering and duplicates before dependency traversal" do
     source = File.read!("lib/rendro/pdf/font_subsetter.ex")
 
@@ -75,6 +82,34 @@ defmodule Rendro.PDF.FontSubsetterTest do
       assert {:ok, second} = FontSubsetter.subset(bytes, [])
       assert first == second
       assert {:ok, _} = FontParser.parse(first)
+    end
+  end
+
+  defp font_num_glyphs(
+         bytes =
+           <<_version::binary-size(4), num_tables::16, _header::binary-size(6),
+             directory::binary>>
+       ) do
+    maxp = find_table(bytes, directory, num_tables, "maxp")
+    <<_::binary-size(4), num_glyphs::16, _::binary>> = maxp
+    num_glyphs
+  end
+
+  defp find_table(bytes, directory, num_tables, tag) do
+    directory
+    |> binary_part(0, num_tables * 16)
+    |> do_find_table(bytes, tag)
+  end
+
+  defp do_find_table(
+         <<tag::binary-size(4), _checksum::32, offset::32, length::32, rest::binary>>,
+         bytes,
+         expected_tag
+       ) do
+    if tag == expected_tag do
+      binary_part(bytes, offset, length)
+    else
+      do_find_table(rest, bytes, expected_tag)
     end
   end
 end
