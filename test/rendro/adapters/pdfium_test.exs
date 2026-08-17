@@ -1,5 +1,5 @@
 defmodule Rendro.Adapters.PdfiumTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   alias Rendro.Adapters.Pdfium
 
@@ -14,6 +14,7 @@ defmodule Rendro.Adapters.PdfiumTest do
   end
 
   test "provenance_executable/0 accepts a separately pinned artifact for a command wrapper" do
+    clear_provenance_env_override()
     Application.put_env(:rendro, :pdfium_cli_executable_finder, fn _ -> "/tmp/pdfium-wrapper" end)
     Application.put_env(:rendro, :pdfium_cli_provenance_executable, "/tmp/pinned-pdfium-cli")
 
@@ -27,16 +28,18 @@ defmodule Rendro.Adapters.PdfiumTest do
   end
 
   test "provenance_executable/0 accepts the container runner environment override" do
+    prior_provenance_executable = System.get_env("RENDRO_PDFIUM_PROVENANCE_CLI")
     System.put_env("RENDRO_PDFIUM_PROVENANCE_CLI", "/tmp/pinned-pdfium-cli")
 
     on_exit(fn ->
-      System.delete_env("RENDRO_PDFIUM_PROVENANCE_CLI")
+      restore_env("RENDRO_PDFIUM_PROVENANCE_CLI", prior_provenance_executable)
     end)
 
     assert Pdfium.provenance_executable() == {:ok, "/tmp/pinned-pdfium-cli"}
   end
 
   test "provenance_executable/0 defaults to the executed binary" do
+    clear_provenance_env_override()
     Application.put_env(:rendro, :pdfium_cli_executable_finder, fn _ -> "/usr/bin/echo" end)
 
     on_exit(fn ->
@@ -127,5 +130,17 @@ defmodule Rendro.Adapters.PdfiumTest do
     end)
 
     assert Pdfium.render(<<1, 2, 3>>, pages: "1-10") == {:ok, ["ONE", "TWO", "TEN"]}
+  end
+
+  defp restore_env(name, nil), do: System.delete_env(name)
+  defp restore_env(name, value), do: System.put_env(name, value)
+
+  defp clear_provenance_env_override do
+    prior_provenance_executable = System.get_env("RENDRO_PDFIUM_PROVENANCE_CLI")
+    System.delete_env("RENDRO_PDFIUM_PROVENANCE_CLI")
+
+    on_exit(fn ->
+      restore_env("RENDRO_PDFIUM_PROVENANCE_CLI", prior_provenance_executable)
+    end)
   end
 end
