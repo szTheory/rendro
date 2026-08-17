@@ -77,6 +77,11 @@ defmodule Rendro.MixProject do
 
   defp aliases do
     [
+      # Mix discovers source tasks before compilation. These aliases compile the
+      # dev-only task modules first, keeping catalog tooling out of `lib/` and
+      # therefore out of the runtime package.
+      "rendro.catalog.gen": [&catalog_gen/1],
+      "rendro.catalog.check": [&catalog_check/1],
       ci: ["ci.fast", "ci.proofs"],
       "ci.fast": [
         "format --check-formatted",
@@ -108,6 +113,16 @@ defmodule Rendro.MixProject do
         "test --include quarantine --include live_pdf_tools --include live_signing --include raster_snapshot --slowest 10"
       ]
     ]
+  end
+
+  defp catalog_gen(args) do
+    Mix.Task.run("compile")
+    Mix.Tasks.Rendro.Catalog.Gen.run(args)
+  end
+
+  defp catalog_check(args) do
+    Mix.Task.run("compile")
+    Mix.Tasks.Rendro.Catalog.Check.run(args)
   end
 
   defp package do

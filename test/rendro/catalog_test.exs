@@ -23,7 +23,10 @@ defmodule Rendro.CatalogTest do
 
   test "catalog paths reject traversal before I/O" do
     assert_raise ArgumentError, ~r/unsafe catalog/, fn ->
-      Catalog.source_document_for(%{id: "invoice--default--default--light", fixture_ref: "../secret.json"})
+      Catalog.source_document_for(%{
+        id: "invoice--default--default--light",
+        fixture_ref: "../secret.json"
+      })
     end
   end
 
@@ -43,7 +46,11 @@ defmodule Rendro.CatalogTest do
     assert Catalog.catalog_contract_errors(specs) == []
     assert Enum.uniq(Enum.map(specs, & &1.png_path)) |> length() == 32
 
-    assert Enum.any?(Catalog.catalog_contract_errors(Enum.take(specs, 31)), &String.contains?(&1, "exactly 32"))
+    assert Enum.any?(
+             Catalog.catalog_contract_errors(Enum.take(specs, 31)),
+             &String.contains?(&1, "exactly 32")
+           )
+
     errors = Catalog.catalog_contract_errors(specs ++ [List.last(specs)])
     assert Enum.any?(errors, &String.contains?(&1, "exactly 32"))
     assert Enum.any?(errors, &String.contains?(&1, "ceiling"))
