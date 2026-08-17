@@ -1,0 +1,31 @@
+{
+  "fixture_id": "statement_aster_research_fund_v1",
+  "family": "statement",
+  "paper": "us_letter",
+  "currency": "USD",
+  "period": {
+    "from": "2026-06-01",
+    "to": "2026-06-30"
+  },
+  "account": {
+    "name": "Aster Research Fund — Grant Reserve ****6842"
+  },
+  "opening_balance": "92500.00",
+  "closing_balance": "161100.00",
+  "lines": [
+    {"date": "2026-06-01", "description": "Grant receipt — Applied materials initiative", "amount": "125000.00"},
+    {"date": "2026-06-04", "description": "Research award — Coastal sampling cohort", "amount": "-46000.00"},
+    {"date": "2026-06-11", "description": "Laboratory supplies — Spectral assay materials", "amount": "-8900.00"},
+    {"date": "2026-06-17", "description": "Field travel advance — Northern observatory", "amount": "-12000.00"},
+    {"date": "2026-06-24", "description": "Foundation contribution — Summer fellows", "amount": "18000.00"},
+    {"date": "2026-06-29", "description": "Archive and records stewardship", "amount": "-7500.00"}
+  ],
+  "summary": "6 transactions this period; opening 92500.00, closing 161100.00.",
+  "brand": {
+    "slug": "aster-research-fund",
+    "display_name": "Aster Research Fund",
+    "accent": "#6E3CB8",
+    "recommended_preset": "editorial",
+    "logo": "logo.svg"
+  }
+}

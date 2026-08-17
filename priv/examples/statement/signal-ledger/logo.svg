@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 48" role="img" aria-label="Signal Ledger geometric mark">
+  <g fill="#0E7C76">
+    <rect x="8" y="8" width="12" height="32" rx="1"/>
+    <rect x="26" y="8" width="4" height="32" rx="1"/>
+    <rect x="36" y="8" width="18" height="8" rx="1"/>
+    <rect x="36" y="20" width="18" height="8" rx="1"/>
+    <rect x="36" y="32" width="18" height="8" rx="1"/>
+    <path d="M64 12h24v8H72v8h16v8H64z"/>
+  </g>
+</svg>

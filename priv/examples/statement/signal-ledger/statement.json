@@ -1,0 +1,31 @@
+{
+  "fixture_id": "statement_signal_ledger_v1",
+  "family": "statement",
+  "paper": "us_letter",
+  "currency": "USD",
+  "period": {
+    "from": "2026-06-01",
+    "to": "2026-06-30"
+  },
+  "account": {
+    "name": "Signal Ledger — Operating Account ****2719"
+  },
+  "opening_balance": "18420.00",
+  "closing_balance": "25270.00",
+  "lines": [
+    {"date": "2026-06-02", "description": "Client deposit — June implementation retainer", "amount": "9600.00"},
+    {"date": "2026-06-05", "description": "ACH payment — Field Notes payroll service", "amount": "-1425.00"},
+    {"date": "2026-06-09", "description": "Card purchase — Data archive storage", "amount": "-660.00"},
+    {"date": "2026-06-14", "description": "Wire transfer — Studio workspace lease", "amount": "-3120.00"},
+    {"date": "2026-06-21", "description": "Client receipt — Reconciliation sprint", "amount": "2800.00"},
+    {"date": "2026-06-28", "description": "Service fee — Monthly account maintenance", "amount": "-345.00"}
+  ],
+  "summary": "6 transactions this period; opening 18420.00, closing 25270.00.",
+  "brand": {
+    "slug": "signal-ledger",
+    "display_name": "Signal Ledger",
+    "accent": "#0E7C76",
+    "recommended_preset": "minimal_mono",
+    "logo": "logo.svg"
+  }
+}

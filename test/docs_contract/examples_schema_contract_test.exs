@@ -149,7 +149,8 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
       "recommended_preset" => "editorial"
     })
 
-    for path <- statement_paths() -- ["priv/examples/statement/northwind-ledger-co/statement.json"] do
+    for path <-
+          statement_paths() -- ["priv/examples/statement/northwind-ledger-co/statement.json"] do
       fixture = path |> File.read!() |> JSON.decode!()
       assert_statement_continuity!(fixture)
       assert_synthetic_fixture!(fixture)
@@ -217,7 +218,10 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
   defp assert_synthetic_fixture!(fixture) do
     text = inspect(fixture)
     refute text =~ ~r/(?:password|api[_ -]?key|secret|https?:\/\/|\b\d{16}\b)/i
-    refute fixture["employee"]["id"] =~ ~r/^\d{3}-\d{2}-\d{4}$/
+
+    if employee_id = get_in(fixture, ["employee", "id"]) do
+      refute employee_id =~ ~r/^\d{3}-\d{2}-\d{4}$/
+    end
   end
 
   defp assert_brand_fixture!(relative_path, expected_brand) do
