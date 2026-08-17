@@ -182,8 +182,7 @@ jobs:
 
   advisory-checks:
     runs-on: ubuntu-latest
-    continue-on-error: true
-    # no 'needs:' -> graph-disconnected; failures cannot block engine merges
+    # no 'needs:' -> graph-disconnected; only the legacy adapter comparison is advisory
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -214,6 +213,9 @@ jobs:
         run: mix deps.get
 
       - name: Run Raster Snapshot Tests
+        # Legacy edge refs are intentionally compare-only during Phase 126 recovery.
+        # Preset evidence, staging, and upload below remain fail-closed.
+        continue-on-error: true
         env:
           MIX_RASTER_BLESS: "false"
         run: mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs

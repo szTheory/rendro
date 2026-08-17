@@ -183,6 +183,10 @@ defmodule Guardrails.RequiredChecksContractTest do
 
       assert advisory_block =~ "MIX_RASTER_BLESS: \"false\""
 
+      adapter_step = ci_step_block!(advisory_block, "Run Raster Snapshot Tests")
+      assert adapter_step =~ "continue-on-error: true"
+      assert adapter_step =~ "MIX_RASTER_BLESS: \"false\""
+
       assert advisory_block =~
                "mix test --include raster_snapshot test/rendro/theme/preset_raster_snapshot_test.exs"
 
@@ -276,11 +280,24 @@ defmodule Guardrails.RequiredChecksContractTest do
       end
     end
 
-    test "advisory-checks is graph-disconnected and non-blocking" do
+    test "advisory-checks is graph-disconnected with only adapter comparison non-blocking" do
       ci = File.read!(@ci_path)
       advisory_block = ci_job_block!(ci, "advisory-checks")
+      adapter_step = ci_step_block!(advisory_block, "Run Raster Snapshot Tests")
+      preset_step = ci_step_block!(advisory_block, "Run Preset Raster Snapshot Tests")
 
-      assert advisory_block =~ "continue-on-error: true"
+      staging_step =
+        ci_step_block!(advisory_block, "Stage Phase 126 preset raster blessing evidence")
+
+      upload_step =
+        ci_step_block!(advisory_block, "Upload Phase 126 preset raster blessing evidence")
+
+      refute advisory_block =~ ~r/^    continue-on-error:/m
+      assert adapter_step =~ "continue-on-error: true"
+      assert adapter_step =~ "MIX_RASTER_BLESS: \"false\""
+      refute preset_step =~ "continue-on-error"
+      refute staging_step =~ "continue-on-error"
+      refute upload_step =~ "continue-on-error"
 
       assert advisory_block =~
                "mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs"
@@ -366,6 +383,16 @@ defmodule Guardrails.RequiredChecksContractTest do
     case Regex.run(pattern, ci) do
       [block] -> block
       _ -> flunk("expected CI job block #{inspect(job_name)}")
+    end
+  end
+
+  defp ci_step_block!(job_block, step_name) do
+    escaped_step_name = Regex.escape(step_name)
+    pattern = ~r/^      - name: #{escaped_step_name}\n(?:(?!^      - name:).*(?:\n|$))*/m
+
+    case Regex.run(pattern, job_block) do
+      [block] -> block
+      _ -> flunk("expected CI step block #{inspect(step_name)}")
     end
   end
 end
