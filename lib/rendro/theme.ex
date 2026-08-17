@@ -7,7 +7,7 @@ defmodule Rendro.Theme do
   never reaches the deterministic render pipeline directly — recipes read token
   values from it (e.g. `theme.colors.ink`, `theme.typography.scale.body`).
 
-  Construct one of four ways:
+  Construct one of four core ways:
 
     * `default/0` — the built-in light theme.
     * `resolve/1` — deep-merge a partial `keyword`/`map`/`%Theme{}` onto the
@@ -182,11 +182,11 @@ defmodule Rendro.Theme do
   def default, do: %__MODULE__{}
 
   @doc """
-  Returns a fully resolved curated style-genre preset.
+  Returns a fully resolved curated theme selection.
 
-  `genre` must be a canonical preset atom and `opts` must include an `:accent`
-  color. Presets remain pure token values; register their required curated fonts
-  explicitly on the document with `Rendro.Theme.Presets.register_fonts/2`.
+  The first argument must be canonical and `opts` must include an `:accent`
+  color. The returned value is pure; register required curated fonts explicitly
+  on the document through the sibling module.
   """
   @spec preset(atom(), keyword()) :: t()
   def preset(genre, opts), do: Rendro.Theme.Presets.preset(genre, opts)

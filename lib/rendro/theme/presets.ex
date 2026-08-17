@@ -3,7 +3,7 @@ defmodule Rendro.Theme.Presets do
 
   alias Rendro.{Document, FontRegistry, Theme}
 
-  @canonical_genres [:swiss, :humanist, :editorial, :corporate_classic, :minimal_mono]
+  @canonical_genres [:swiss, :humanist, :editorial, :corporate_classic, :minimal_mono, :brutalist]
   @allowed_options [:accent, :on_accent, :mode, :density]
 
   @font_paths %{
@@ -29,10 +29,14 @@ defmodule Rendro.Theme.Presets do
 
     base = Theme.from_brand(colors)
 
+    tokens =
+      genre_tokens(genre)
+      |> Map.update(:colors, base.colors, &Map.merge(base.colors, &1))
+
     theme =
       base
       |> Map.from_struct()
-      |> Map.merge(genre_tokens(genre))
+      |> Map.merge(tokens)
       |> Map.put(:density, density)
       |> Theme.resolve()
 
@@ -85,9 +89,10 @@ defmodule Rendro.Theme.Presets do
 
   defp font_roles(:corporate_classic), do: [:rendro_preset_text_serif, :rendro_preset_mono]
   defp font_roles(:minimal_mono), do: [:rendro_preset_mono, :rendro_preset_grotesque]
+  defp font_roles(:brutalist), do: [:rendro_preset_grotesque, :rendro_preset_mono]
 
-  defp genre_tokens(:swiss) do
-    %{
+  @genre_tokens %{
+    swiss: %{
       typography: %{
         fonts: %{
           heading: :rendro_preset_grotesque,
@@ -100,8 +105,84 @@ defmodule Rendro.Theme.Presets do
       spacing: %{unit: 6, tight: 4, normal: 8, loose: 12, section: 24},
       rules: %{hairline: 0.5, thin: 1, thick: 2},
       radius: %{none: 0, sm: 1, md: 2}
+    },
+    humanist: %{
+      colors: %{muted: {101, 91, 78}, surface: {247, 243, 234}, rule: {205, 194, 174}},
+      typography: %{
+        fonts: %{
+          heading: :rendro_preset_humanist_sans,
+          body: :rendro_preset_humanist_sans,
+          mono: :rendro_preset_mono
+        },
+        scale: %{display: 22, title: 17, subtitle: 13.5, body: 11, small: 9.5, caption: 8.5},
+        leading: 1.45
+      },
+      spacing: %{unit: 6, tight: 5, normal: 10, loose: 16, section: 28},
+      rules: %{hairline: 0.5, thin: 0.75, thick: 1.5},
+      radius: %{none: 0, sm: 3, md: 6}
+    },
+    editorial: %{
+      typography: %{
+        fonts: %{
+          heading: :rendro_preset_text_serif,
+          body: :rendro_preset_humanist_sans,
+          mono: :rendro_preset_mono
+        },
+        scale: %{display: 30, title: 18, subtitle: 13, body: 10, small: 8.5, caption: 7.5},
+        leading: 1.42
+      },
+      spacing: %{unit: 7, tight: 4, normal: 9, loose: 14, section: 32},
+      rules: %{hairline: 0.5, thin: 1, thick: 2},
+      radius: %{none: 0, sm: 1, md: 2}
+    },
+    corporate_classic: %{
+      colors: %{muted: {78, 89, 105}, surface: {244, 246, 248}, rule: {143, 154, 169}},
+      typography: %{
+        fonts: %{
+          heading: :rendro_preset_text_serif,
+          body: :rendro_preset_text_serif,
+          mono: :rendro_preset_mono
+        },
+        scale: %{display: 18, title: 14, subtitle: 12, body: 10, small: 9, caption: 8},
+        leading: 1.3
+      },
+      spacing: %{unit: 6, tight: 4, normal: 8, loose: 12, section: 24},
+      rules: %{hairline: 0.5, thin: 1, thick: 2.5},
+      radius: %{none: 0, sm: 0, md: 0}
+    },
+    minimal_mono: %{
+      colors: %{muted: {96, 96, 96}, surface: {248, 248, 248}, rule: {184, 184, 184}},
+      typography: %{
+        fonts: %{
+          heading: :rendro_preset_mono,
+          body: :rendro_preset_grotesque,
+          mono: :rendro_preset_mono
+        },
+        scale: %{display: 16, title: 13, subtitle: 11, body: 9.5, small: 8.5, caption: 8},
+        leading: 1.25
+      },
+      spacing: %{unit: 4, tight: 3, normal: 6, loose: 10, section: 20},
+      rules: %{hairline: 0.5, thin: 0.75, thick: 1.5},
+      radius: %{none: 0, sm: 0, md: 0}
+    },
+    brutalist: %{
+      colors: %{surface: {238, 238, 238}, rule: {16, 24, 39}},
+      typography: %{
+        fonts: %{
+          heading: :rendro_preset_grotesque,
+          body: :rendro_preset_grotesque,
+          mono: :rendro_preset_mono
+        },
+        scale: %{display: 34, title: 20, subtitle: 13, body: 10, small: 9, caption: 8},
+        leading: 1.2
+      },
+      spacing: %{unit: 8, tight: 4, normal: 8, loose: 12, section: 24},
+      rules: %{hairline: 1, thin: 2, thick: 3},
+      radius: %{none: 0, sm: 0, md: 0}
     }
-  end
+  }
+
+  defp genre_tokens(genre), do: Map.fetch!(@genre_tokens, genre)
 
   defp validate_genre!(genre) when genre in @canonical_genres, do: :ok
 
