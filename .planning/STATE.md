@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v2.12
 milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 127
-current_phase_name: Public example catalog & quality ratchet
+current_phase_name: public-example-catalog-quality-ratchet
 status: executing
-stopped_at: Phase 127 context gathered
-last_updated: "2026-08-17T22:41:35.924Z"
+stopped_at: Completed 127-01-PLAN.md
+last_updated: "2026-08-17T22:52:18.540Z"
 last_activity: 2026-08-17
-last_activity_desc: Phase 126 complete, transitioned to Phase 127
+last_activity_desc: Phase 127 execution started
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 20
-  completed_plans: 15
+  completed_plans: 16
   percent: 40
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-16)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 126 — Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth
+**Current focus:** Phase 127 — public-example-catalog-quality-ratchet
 
 ## Current Position
 
-Phase: 127 — Public example catalog & quality ratchet
-Plan: Not started
+Phase: 127 (public-example-catalog-quality-ratchet) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-08-17 — Phase 126 complete, transitioned to Phase 127
+Last activity: 2026-08-17 — Phase 127 execution started
 
 ## Roadmap Snapshot (v2.12, Phases 125-129) — IN PLANNING
 
@@ -73,9 +73,9 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-17T20:52:43.092Z
-Stopped at: Phase 127 context gathered
-Resume file: .planning/phases/127-public-example-catalog-quality-ratchet/127-CONTEXT.md
+Last session: 2026-08-17T22:52:18.491Z
+Stopped at: Completed 127-01-PLAN.md
+Resume file: None
 
 ## Next Steps
 
@@ -116,6 +116,7 @@ Resume file: .planning/phases/127-public-example-catalog-quality-ratchet/127-CON
 | Phase 126 P03 | 18m | 2 tasks | 8 files |
 | Phase 126 P04 | 3m | 1 tasks | 2 files |
 | Phase 126 P05 | 25m | 2 tasks | 5 files |
+| Phase 127 P01 | 25m | 3 tasks | 8 files |
 
 ## Operator Next Steps
 
@@ -139,3 +140,4 @@ Resume file: .planning/phases/127-public-example-catalog-quality-ratchet/127-CON
 - [Phase ?]: [Phase 126]: Approve only the six exact pinned-PDFium rows after sequential native-size review; authorize isolated CI ref cleanup after committed closure evidence.
 - [Phase ?]: Close only the three named WINDOWS rows from deterministic, pinned, and approved human evidence.
 - [Phase ?]: Delete each recorded isolated CI evidence ref only after its exact SHA, committed approval, and scoped artifact gates pass.
+- [Phase ?]: Keep the catalog as an explicit, ordered 32-row dev/test registry with separate generation and checking operations.
