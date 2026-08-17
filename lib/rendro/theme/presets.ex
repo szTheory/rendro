@@ -68,6 +68,15 @@ defmodule Rendro.Theme.Presets do
     end
   end
 
+  @doc false
+  @spec register_metric_fonts(Document.t(), [atom()]) :: Document.t()
+  def register_metric_fonts(%Document{} = document, roles) when is_list(roles) do
+    roles
+    |> Enum.filter(&(&1 in @curated_roles))
+    |> Enum.uniq()
+    |> Enum.reduce(document, &register_font(&2, &1))
+  end
+
   defp register_font(document, role) do
     expected = descriptor(role)
 

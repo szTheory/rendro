@@ -24,6 +24,7 @@ defmodule Rendro.Recipes.StatementTypographyTest do
 
   alias Rendro.Pipeline.Build
   alias Rendro.Recipes.Statement
+  alias Rendro.Theme.Presets
 
   defp sample_data do
     %{
@@ -48,6 +49,18 @@ defmodule Rendro.Recipes.StatementTypographyTest do
   end
 
   describe "TYPE-02 raise-path (unregistered font role → typed error, never silent Helvetica)" do
+    test "a curated body role composes for metric measurement but still requires the explicit bridge" do
+      theme = Rendro.Theme.preset(:swiss, accent: "#2C6BED")
+      document = Statement.document(sample_data(), theme: theme)
+
+      assert {:error, {:unknown_text_font, :rendro_preset_grotesque}} = Build.run(document)
+
+      assert {:ok, _} =
+               document
+               |> Presets.register_fonts(:swiss)
+               |> Build.run()
+    end
+
     test "an unregistered fonts.heading atom surfaces {:unknown_text_font, :no_such_font} from Build.run/1" do
       theme = theme_with_bad_font(:heading, :no_such_font)
       doc = Statement.document(sample_data(), theme: theme)

@@ -539,7 +539,13 @@ defmodule Rendro.Recipes.Statement do
 
     # D-09: measure all rows at the body region width using the engine's OWN
     # font metrics so chunking uses real heights, not recipe-local estimates.
-    doc_for_measure = Rendro.Document.new()
+    # Curated roles are intentionally registered only by the explicit bridge on
+    # the returned document. The ephemeral measurement document needs their
+    # metrics, however, so register only known curated roles here; unknown roles
+    # still surface as the typed render-time failure on the returned document.
+    doc_for_measure =
+      Rendro.Document.new()
+      |> Rendro.Theme.Presets.register_metric_fonts(Map.values(type.fonts))
 
     {header_h, row_heights} =
       Rendro.measure_rows(formatted_rows, @content_width, doc_for_measure, table_opts)
