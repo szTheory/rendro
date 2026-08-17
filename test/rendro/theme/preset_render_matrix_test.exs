@@ -172,8 +172,7 @@ defmodule Rendro.Theme.PresetRenderMatrixTest do
         opening_balance: Decimal.new("100.00"),
         lines: [%{date: ~D[2026-07-05], description: "Payment", amount: Decimal.new("-25.00")}]
       },
-      theme: theme,
-      typography: %{fonts: %{heading: :default, body: :default, mono: :default}}
+      theme: theme
     )
   end
 
@@ -208,10 +207,6 @@ defmodule Rendro.Theme.PresetRenderMatrixTest do
     assert {:error, %Rendro.Error{reason: {:unknown_text_font, :payslip_sans}}} =
              Rendro.render(missing_fallback, deterministic: true),
            "#{id} must preserve the typed omission failure"
-  end
-
-  defp assert_omission_failure!(document, :statement, _id) do
-    assert {:ok, _} = Rendro.render(document, deterministic: true)
   end
 
   defp assert_omission_failure!(document, _recipe, id) do
