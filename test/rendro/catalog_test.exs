@@ -48,4 +48,11 @@ defmodule Rendro.CatalogTest do
     assert Enum.any?(errors, &String.contains?(&1, "exactly 32"))
     assert Enum.any?(errors, &String.contains?(&1, "ceiling"))
   end
+
+  test "static catalog checks are read-only and report a missing manifest" do
+    before = File.read!(__ENV__.file)
+    assert [error] = Catalog.static_contract_errors()
+    assert error =~ "missing catalog manifest"
+    assert File.read!(__ENV__.file) == before
+  end
 end
