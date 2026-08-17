@@ -76,6 +76,54 @@ defmodule Rendro.Recipes.InvoiceTest do
     end
   end
 
+  describe "themed table cells" do
+    test "uses resolved semantic ink for every header and body cell" do
+      theme = Rendro.Theme.preset(:editorial, :dark)
+      colors = Rendro.Theme.resolve(theme).colors
+      ink = colors.ink
+      [_, body, _] = Invoice.sections(sample_data(), theme: theme)
+
+      tables = Enum.filter(body.content, &is_struct(&1.content, Rendro.Table))
+
+      assert [%Rendro.Block{content: %Rendro.Table{header: header, rows: rows}}] = tables
+
+      for cell <- header ++ List.flatten(rows) do
+        assert %Rendro.Block{content: %Rendro.Text{color: ^ink}} = cell
+      end
+    end
+
+    test "explicit palette override wins for themed table cells" do
+      [_, body, _] =
+        Invoice.sections(sample_data(),
+          theme: Rendro.Theme.preset(:editorial, :dark),
+          palette: %{ink: {1, 2, 3}}
+        )
+
+      [%Rendro.Block{content: %Rendro.Table{header: [header | _], rows: [[body_cell | _] | _]}}] =
+        Enum.filter(body.content, &is_struct(&1.content, Rendro.Table))
+
+      assert %Rendro.Block{content: %Rendro.Text{color: {1, 2, 3}}} = header
+      assert %Rendro.Block{content: %Rendro.Text{color: {1, 2, 3}}} = body_cell
+    end
+
+    test "nil-theme tables retain literal string cells for empty, single, and equal rows" do
+      for items <- [
+            [],
+            [%{name: "Single", qty: 1, price: 10}],
+            [%{name: "Same", qty: 1, price: 10}, %{name: "Same", qty: 1, price: 10}]
+          ] do
+        [_, body, _] = Invoice.sections(%{sample_data() | items: items})
+
+        [%Rendro.Block{content: %Rendro.Table{header: header, rows: rows}}] =
+          Enum.filter(body.content, &is_struct(&1.content, Rendro.Table))
+
+        assert Enum.all?(header, &is_binary/1)
+        assert Enum.all?(List.flatten(rows), &is_binary/1)
+        assert Enum.map(rows, &hd/1) == Enum.map(items, & &1.name)
+      end
+    end
+  end
+
   describe "document/2" do
     test "returns a %Rendro.Document{} struct" do
       doc = Invoice.document(sample_data())
