@@ -47,7 +47,7 @@ defmodule Rendro.Recipes.InvoiceTypographyTest do
     test "an unregistered fonts.mono atom is rejected before table measurement" do
       theme = theme_with_bad_font(:mono, :no_such_font)
 
-      assert_raise ArgumentError, ~r/:font_registry.*no_such_font/s, fn ->
+      assert_raise ArgumentError, ~r/no_such_font.*:font_registry/s, fn ->
         Invoice.document(sample_data(), theme: theme)
       end
     end
@@ -55,7 +55,7 @@ defmodule Rendro.Recipes.InvoiceTypographyTest do
     test "an unregistered fonts.body atom is rejected before table measurement" do
       theme = theme_with_bad_font(:body, :no_such_font)
 
-      assert_raise ArgumentError, ~r/:font_registry.*no_such_font/s, fn ->
+      assert_raise ArgumentError, ~r/no_such_font.*:font_registry/s, fn ->
         Invoice.document(sample_data(), theme: theme)
       end
     end
@@ -119,7 +119,7 @@ defmodule Rendro.Recipes.InvoiceTypographyTest do
     test "rejects an unregistered custom body font before table measurement" do
       theme = theme_with_bad_font(:body, :unregistered_invoice_body)
 
-      assert_raise ArgumentError, ~r/:font_registry.*unregistered_invoice_body/s, fn ->
+      assert_raise ArgumentError, ~r/unregistered_invoice_body.*:font_registry/s, fn ->
         Invoice.document(sample_data(), theme: theme)
       end
     end
