@@ -310,7 +310,9 @@ defmodule Rendro.Recipes.Invoice do
     # metrics (D-09) — avoids recipe-local estimates that cause
     # :content_overflow. A single-page toy call (2 items) fits well within
     # capacity and yields exactly one, byte-identical table block below.
-    doc_for_measure = Rendro.Document.new()
+    doc_for_measure =
+      Rendro.Document.new()
+      |> Rendro.Theme.Presets.register_metric_fonts(Map.values(type.fonts))
 
     {header_h, row_heights} =
       Rendro.measure_rows(rows, @content_width, doc_for_measure, table_opts)
