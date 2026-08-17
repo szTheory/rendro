@@ -128,12 +128,44 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
     assert sha256("priv/examples/payslip/aurora-live/payslip.json") == @original_payslip_sha256
   end
 
+  test "Statement adds the locked Signal Ledger and Aster Research Fund fixtures with exact continuity" do
+    assert statement_paths() == [
+             "priv/examples/statement/aster-research-fund/statement.json",
+             "priv/examples/statement/northwind-ledger-co/statement.json",
+             "priv/examples/statement/signal-ledger/statement.json"
+           ]
+
+    assert_brand_fixture!("statement/signal-ledger/statement.json", %{
+      "slug" => "signal-ledger",
+      "display_name" => "Signal Ledger",
+      "accent" => "#0E7C76",
+      "recommended_preset" => "minimal_mono"
+    })
+
+    assert_brand_fixture!("statement/aster-research-fund/statement.json", %{
+      "slug" => "aster-research-fund",
+      "display_name" => "Aster Research Fund",
+      "accent" => "#6E3CB8",
+      "recommended_preset" => "editorial"
+    })
+
+    for path <- statement_paths() -- ["priv/examples/statement/northwind-ledger-co/statement.json"] do
+      fixture = path |> File.read!() |> JSON.decode!()
+      assert_statement_continuity!(fixture)
+      assert_synthetic_fixture!(fixture)
+    end
+  end
+
   defp invoice_paths do
     Path.wildcard("priv/examples/invoice/**/*.json") |> Enum.sort()
   end
 
   defp payslip_paths do
     Path.wildcard("priv/examples/payslip/**/*.json") |> Enum.sort()
+  end
+
+  defp statement_paths do
+    Path.wildcard("priv/examples/statement/**/*.json") |> Enum.sort()
   end
 
   defp assert_cross_domain_brand!(slug, accent, recommended_preset) do
@@ -164,6 +196,15 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
     assert Decimal.equal?(
              Decimal.sub(gross_ytd, deductions_ytd),
              Decimal.new(fixture["net_pay_ytd"])
+           )
+  end
+
+  defp assert_statement_continuity!(fixture) do
+    transactions = decimal_sum(fixture["lines"], "amount")
+
+    assert Decimal.equal?(
+             Decimal.add(Decimal.new(fixture["opening_balance"]), transactions),
+             Decimal.new(fixture["closing_balance"])
            )
   end
 
