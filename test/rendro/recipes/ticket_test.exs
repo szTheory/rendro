@@ -270,6 +270,48 @@ defmodule Rendro.Recipes.TicketTest do
     end
   end
 
+  describe "themed hierarchy (POLISH-02)" do
+    @genres [:swiss, :humanist, :editorial, :corporate_classic, :minimal_mono, :brutalist]
+
+    test "every supplied default or preset theme keeps placement above title above reference" do
+      themes =
+        [
+          {:default, Rendro.Theme.default()}
+          | Enum.map(@genres, &{&1, Rendro.Theme.preset(&1, accent: "#2C6BED")})
+        ]
+
+      for {name, theme} <- themes do
+        sections = Ticket.sections(fixture_data(), theme: theme, page_size: :a4)
+        main = Enum.find(sections, &(&1.region == :main))
+        stub = Enum.find(sections, &(&1.region == :stub))
+        texts = Map.merge(text_sizes(main), text_sizes(stub))
+
+        placement = Map.fetch!(texts, "GA")
+        title = Map.fetch!(texts, "Indie Night: The Lumen Set")
+        reference = Map.fetch!(texts, "AUR-88213-GA")
+
+        assert placement > title and title > reference,
+               "#{name} must keep placement > title > reference, got #{inspect({placement, title, reference})}"
+      end
+    end
+
+    test "a caller typography override remains authoritative after themed role selection" do
+      scale = %{display: 30, title: 20, subtitle: 15, body: 10, small: 9, caption: 8}
+
+      sections =
+        Ticket.sections(fixture_data(),
+          theme: Rendro.Theme.default(),
+          typography: %{scale: scale}
+        )
+
+      texts = Enum.reduce(sections, %{}, &Map.merge(&2, text_sizes(&1)))
+
+      assert texts["GA"] == 30
+      assert texts["Indie Night: The Lumen Set"] == 20
+      assert texts["AUR-88213-GA"] == 8
+    end
+  end
+
   # ---------------------------------------------------------------------------
   # Stub composition: code box, reference, perforation, PNG fit-contain,
   # overflow, byte-identity (Task 3)
@@ -425,4 +467,23 @@ defmodule Rendro.Recipes.TicketTest do
   defp collect_from_cell_content(%Rendro.Block{} = block), do: collect_from_block(block)
   defp collect_from_cell_content(%Rendro.Text{size: size}), do: [size]
   defp collect_from_cell_content(_other), do: []
+
+  defp text_sizes(%Rendro.Section{content: content}) do
+    content
+    |> Enum.flat_map(&texts_from_block/1)
+    |> Map.new()
+  end
+
+  defp texts_from_block(%Rendro.Block{content: %Rendro.Text{content: content, size: size}}),
+    do: [{content, size}]
+
+  defp texts_from_block(%Rendro.Block{content: %Rendro.Table{} = table}) do
+    ((table.header || []) ++ List.flatten(table.rows))
+    |> Enum.flat_map(fn
+      %Rendro.Block{} = block -> texts_from_block(block)
+      _ -> []
+    end)
+  end
+
+  defp texts_from_block(_other), do: []
 end
