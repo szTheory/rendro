@@ -23,6 +23,7 @@ defmodule Rendro.CatalogRasterReviewTest do
   @tag raster_snapshot: true
   test "writes only the twelve flagship page ones and bounded multipage proof to the caller review directory" do
     review_dir = System.fetch_env!(@review_dir_env)
+    File.mkdir_p!(review_dir)
     manifest = Rendro.Catalog.read_manifest!()
     cells_by_id = Map.new(manifest["cells"], &{&1["id"], &1})
 
