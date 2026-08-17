@@ -55,7 +55,9 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
              brutalist: 2
            }
 
-    assert Enum.all?(reference_paths, &File.regular?/1)
+    unless raster_blessing?() do
+      assert Enum.all?(reference_paths, &File.regular?/1)
+    end
   end
 
   defp assert_pinned_pdfium! do
@@ -69,7 +71,7 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
     reference_path = reference_path(genre, mode)
     actual_hash = Base.encode16(:crypto.hash(:sha256, png), case: :lower)
 
-    if System.get_env("MIX_RASTER_BLESS") == "true" do
+    if raster_blessing?() do
       if System.get_env("GITHUB_ACTIONS") != "true" do
         raise """
         MIX_RASTER_BLESS=true must only run in the pinned CI container.
@@ -86,6 +88,8 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
              "pinned PDFium page-one hash mismatch for #{genre}/#{mode}; review the advisory raster in the bounded caller-provided directory before updating the reference"
     end
   end
+
+  defp raster_blessing?, do: System.get_env("MIX_RASTER_BLESS") == "true"
 
   defp reference_path(genre, mode),
     do: Path.join(["priv", "raster_refs", "presets", Atom.to_string(genre), "#{mode}.sha256"])
