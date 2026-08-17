@@ -86,8 +86,8 @@ defmodule Rendro.PDF.FontSubsetterTest do
   end
 
   defp font_num_glyphs(
-         <<_version::binary-size(4), num_tables::16, _header::binary-size(6),
-           directory::binary>> = bytes
+         <<_version::binary-size(4), num_tables::16, _header::binary-size(6), directory::binary>> =
+           bytes
        ) do
     maxp = find_table(bytes, directory, num_tables, "maxp")
     <<_::binary-size(4), num_glyphs::16, _::binary>> = maxp
