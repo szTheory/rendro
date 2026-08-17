@@ -116,7 +116,7 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
 
     assert svg =~ "<svg"
     refute svg =~ ~r/<(?:script|image|foreignObject)\b/i
-    refute svg =~ ~r/(?:https?:|url\(|(?:linear|radial)Gradient|<filter\b)/i
+    refute svg =~ ~r/(?:href\s*=|url\(|(?:linear|radial)Gradient|<filter\b)/i
     refute svg =~ ~r/<text\b/i
     assert length(Regex.scan(~r/#[0-9A-Fa-f]{6}\b/, svg)) == 1
   end

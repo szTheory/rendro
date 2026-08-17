@@ -15,9 +15,35 @@
     "currency": { "type": "string" },
     "brand": {
       "type": "object",
-      "properties": {
-        "logo": { "type": ["string", "null"] }
-      },
+      "oneOf": [
+        {
+          "$comment": "Legacy fixtures retain their intentionally empty logo slot until they gain a complete generic identity tuple.",
+          "required": ["logo"],
+          "properties": {
+            "logo": { "const": null }
+          }
+        },
+        {
+          "$comment": "Brand fixture metadata remains generic data, not a domain model.",
+          "required": ["slug", "display_name", "accent", "recommended_preset", "logo"],
+          "properties": {
+            "slug": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "display_name": { "type": "string", "minLength": 1 },
+            "accent": { "type": "string", "pattern": "^#[0-9A-F]{6}$" },
+            "recommended_preset": {
+              "type": "string",
+              "enum": ["swiss", "humanist", "editorial", "corporate_classic", "minimal_mono"]
+            },
+            "logo": {
+              "type": "string",
+              "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9][A-Za-z0-9._/-]*\\.svg$"
+            }
+          }
+        }
+      ],
       "additionalProperties": true
     }
   },

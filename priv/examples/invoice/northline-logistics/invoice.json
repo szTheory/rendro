@@ -1,0 +1,44 @@
+{
+  "fixture_id": "invoice_northline_logistics_v1",
+  "family": "invoice",
+  "paper": "us_letter",
+  "currency": "USD",
+  "issuer": {
+    "name": "Northline Logistics",
+    "street": "84 Freightway Avenue",
+    "city": "Columbus",
+    "region": "OH",
+    "postal_code": "43215",
+    "country": "US"
+  },
+  "customer": {
+    "name": "Morrow Field Supply",
+    "street": "16 Orchard Exchange",
+    "city": "Madison",
+    "region": "WI",
+    "postal_code": "53703",
+    "country": "US"
+  },
+  "invoice": {
+    "id": "NL-2026-0418",
+    "date": "2026-07-18",
+    "due_date": "2026-08-17",
+    "terms": "Net 30"
+  },
+  "items": [
+    {"name": "Regional freight lane", "description": "Two scheduled pallet collections and deliveries", "qty": 2, "price": "148.50"},
+    {"name": "Dock appointment coordination", "description": "Receiving-window booking and confirmation", "qty": 1, "price": "450.00"}
+  ],
+  "totals": {
+    "subtotal": "747.00",
+    "tax": "59.76",
+    "total": "806.76"
+  },
+  "brand": {
+    "slug": "northline-logistics",
+    "display_name": "Northline Logistics",
+    "accent": "#2C6BED",
+    "recommended_preset": "swiss",
+    "logo": "logo.svg"
+  }
+}

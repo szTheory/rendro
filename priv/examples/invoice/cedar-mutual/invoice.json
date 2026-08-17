@@ -1,0 +1,44 @@
+{
+  "fixture_id": "invoice_cedar_mutual_v1",
+  "family": "invoice",
+  "paper": "us_letter",
+  "currency": "USD",
+  "issuer": {
+    "name": "Cedar Mutual",
+    "street": "31 Grove Circle",
+    "city": "Burlington",
+    "region": "VT",
+    "postal_code": "05401",
+    "country": "US"
+  },
+  "customer": {
+    "name": "Harborlight Cooperative",
+    "street": "210 Market Slip",
+    "city": "Portland",
+    "region": "ME",
+    "postal_code": "04101",
+    "country": "US"
+  },
+  "invoice": {
+    "id": "CM-2026-0731",
+    "date": "2026-07-31",
+    "due_date": "2026-08-30",
+    "terms": "Net 30"
+  },
+  "items": [
+    {"name": "Member coverage review", "description": "Quarterly benefit review for three departments", "qty": 3, "price": "275.00"},
+    {"name": "Claims readiness workshop", "description": "Facilitated tabletop session for finance leads", "qty": 1, "price": "180.00"}
+  ],
+  "totals": {
+    "subtotal": "1005.00",
+    "tax": "50.25",
+    "total": "1055.25"
+  },
+  "brand": {
+    "slug": "cedar-mutual",
+    "display_name": "Cedar Mutual",
+    "accent": "#1F4FB8",
+    "recommended_preset": "corporate_classic",
+    "logo": "logo.svg"
+  }
+}
