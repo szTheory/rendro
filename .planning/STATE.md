@@ -5,15 +5,15 @@ milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 126
 current_phase_name: Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth
 status: executing
-stopped_at: Phase 126 context gathered
-last_updated: "2026-08-17T03:55:10.174Z"
+stopped_at: Completed 126-01-PLAN.md
+last_updated: "2026-08-17T04:45:17.862Z"
 last_activity: 2026-08-16
 last_activity_desc: Phase 126 execution started
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 15
-  completed_plans: 10
+  completed_plans: 11
   percent: 20
 ---
 
@@ -29,8 +29,8 @@ See: .planning/PROJECT.md (updated 2026-08-16)
 ## Current Position
 
 Phase: 126 (Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth) — EXECUTING
-Plan: 1 of 5
-Status: Executing Phase 126
+Plan: 2 of 5
+Status: Ready to execute
 Last activity: 2026-08-16 — Phase 126 execution started
 
 ## Roadmap Snapshot (v2.12, Phases 125-129) — IN PLANNING
@@ -73,9 +73,9 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-17T02:44:43.410Z
-Stopped at: Phase 126 context gathered
-Resume file: .planning/phases/126-carryover-polish-dark-mode-legibility-hierarchy-decision-gol/126-CONTEXT.md
+Last session: 2026-08-17T04:45:17.819Z
+Stopped at: Completed 126-01-PLAN.md
+Resume file: None
 
 ## Next Steps
 
@@ -111,6 +111,7 @@ Resume file: .planning/phases/126-carryover-polish-dark-mode-legibility-hierarch
 | Phase 125 P05 | 8min | 1 tasks | 7 files |
 | Phase 125 P06 | 3min | 1 tasks | 7 files |
 | Phase 125-foundation-curated-fonts-style-genre-presets-brand-fixtures P10 | 15min | 2 tasks | 26 files |
+| Phase 126 P01 | 29m | 3 tasks | 8 files |
 
 ## Operator Next Steps
 
@@ -123,3 +124,6 @@ Resume file: .planning/phases/126-carryover-polish-dark-mode-legibility-hierarch
 - [Phase 125]: Keep the deterministic and pinned-PDFium advisory matrices separate while sharing the same twelve stable row IDs.
 - [Phase 125]: Keep brands as generic JSON plus safe local SVG data, with exact corpus, arithmetic, identity, and original-byte controls.
 - [Phase 125]: Use glyph-ID widths for embedded CID `/W` tables while retaining Unicode-codepoint metrics for layout.
+- [Phase ?]: Keep nil-theme table strings and Payslip widths literal; apply visual repairs only when a theme is supplied.
+- [Phase ?]: Use display/title/caption for themed Ticket placement/title/reference while retaining historical nil-theme roles.
+- [Phase ?]: Use 61pt Current and 68pt YTD themed Payslip widths, proven by Humanist one-point controls.

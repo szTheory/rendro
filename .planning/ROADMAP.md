@@ -142,12 +142,12 @@ Plans:
   4. A dedicated byte-identity golden exercises `from_brand`/preset accent-op combinations (not just the single original `from_brand` call site).
   5. All 7 recipes (not just 3) have dedicated typography-test coverage of the materialized type scale, closing the byte-identity-plus-smoke-only gap on the remaining 4.
 
-**Plans**: 5 plans
+**Plans**: 1/5 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 126-01-PLAN.md — Repair themed Invoice ink, Ticket hierarchy/reference fit, and Payslip atomic money cells while preserving nil-theme bytes.
+- [x] 126-01-PLAN.md — Repair themed Invoice ink, Ticket hierarchy/reference fit, and Payslip atomic money cells while preserving nil-theme bytes.
 - [ ] 126-02-PLAN.md — Add the bounded preset/accent byte golden and semantic typography contracts for all seven recipes.
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -216,7 +216,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 125. Foundation — Curated fonts, style-genre presets & brand fixtures | v2.12 | 10/10 | Complete    | 2026-08-16 |
-| 126. Carryover polish — dark-mode legibility, hierarchy & golden depth | v2.12 | 0/TBD | Not started | - |
+| 126. Carryover polish — dark-mode legibility, hierarchy & golden depth | v2.12 | 1/5 | In Progress|  |
 | 127. Public example catalog & quality ratchet | v2.12 | 0/TBD | Not started | - |
 | 128. Static configurator, theme codegen & Livebook | v2.12 | 0/TBD | Not started | - |
 | 129. Docs & manifest closure | v2.12 | 0/TBD | Not started | - |
