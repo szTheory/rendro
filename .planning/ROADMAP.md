@@ -145,11 +145,23 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 126-01-PLAN.md — Repair themed Invoice ink, Ticket hierarchy/reference fit, and Payslip atomic money cells while preserving nil-theme bytes.
 - [ ] 126-02-PLAN.md — Add the bounded preset/accent byte golden and semantic typography contracts for all seven recipes.
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 126-03-PLAN.md — Refresh only affected pinned-PDFium hashes and produce full-size row-addressable review images.
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 126-04-PLAN.md — Review all affected rows sequentially at full size and record a bounded human disposition.
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 126-05-PLAN.md — Reconcile quality/WINDOWS evidence and run the complete deterministic phase gate.
+
 **UI hint**: no — recipe/render-path bug fixes and test-depth work, no browser-rendered surface
 
 ### Phase 127: Public example catalog & quality ratchet

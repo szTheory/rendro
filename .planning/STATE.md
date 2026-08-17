@@ -4,15 +4,15 @@ milestone: v2.12
 milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 126
 current_phase_name: Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth
-status: planning
+status: executing
 stopped_at: Phase 126 context gathered
-last_updated: "2026-08-17T02:44:43.416Z"
+last_updated: "2026-08-17T03:54:05.043Z"
 last_activity: 2026-08-16
 last_activity_desc: Phase 125 complete, transitioned to Phase 126
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 10
+  total_plans: 15
   completed_plans: 10
   percent: 20
 ---
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-08-16)
 
 Phase: 126 — Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth
 Plan: Not started
-Status: Ready to plan
+Status: Ready to execute
 Last activity: 2026-08-16 — Phase 125 complete, transitioned to Phase 126
 
 ## Roadmap Snapshot (v2.12, Phases 125-129) — IN PLANNING
