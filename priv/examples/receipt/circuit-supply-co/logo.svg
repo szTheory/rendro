@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 48" role="img" aria-label="Circuit Supply Co geometric mark">
+  <g fill="#2C6BED">
+    <rect x="10" y="10" width="10" height="10" rx="1"/>
+    <rect x="38" y="10" width="10" height="10" rx="1"/>
+    <rect x="66" y="10" width="10" height="10" rx="1"/>
+    <rect x="24" y="28" width="10" height="10" rx="1"/>
+    <rect x="52" y="28" width="10" height="10" rx="1"/>
+    <path d="M20 15h18v4H20zm28 0h18v4H48zM29 20h4v8h-4zm28 0h4v8h-4z"/>
+  </g>
+</svg>

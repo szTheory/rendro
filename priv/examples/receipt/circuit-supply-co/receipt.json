@@ -1,0 +1,35 @@
+{
+  "fixture_id": "receipt_circuit_supply_co_v1",
+  "family": "receipt",
+  "paper": "a5",
+  "currency": "USD",
+  "title": "Parts Counter Receipt",
+  "date": "2026-06-20",
+  "merchant": {
+    "name": "Circuit Supply Co.",
+    "street": "77 Relay Avenue",
+    "city": "Providence",
+    "region": "RI",
+    "postal_code": "02903"
+  },
+  "customer": {
+    "name": "Workshop Counter Sale"
+  },
+  "lines": [
+    {"description": "Solderless Breadboard, Full Size", "amount": "12.50"},
+    {"description": "Jumper Wire Kit, 140 Piece", "amount": "18.00"},
+    {"description": "Precision Resistor Assortment", "amount": "6.75"}
+  ],
+  "totals": {
+    "subtotal": "37.25",
+    "tax": "2.98",
+    "total": "40.23"
+  },
+  "brand": {
+    "slug": "circuit-supply-co",
+    "display_name": "Circuit Supply Co.",
+    "accent": "#2C6BED",
+    "recommended_preset": "minimal_mono",
+    "logo": "logo.svg"
+  }
+}

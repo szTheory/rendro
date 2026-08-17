@@ -1,0 +1,36 @@
+{
+  "fixture_id": "receipt_poppy_and_grain_v1",
+  "family": "receipt",
+  "paper": "a5",
+  "currency": "USD",
+  "title": "Sales Receipt",
+  "date": "2026-06-18",
+  "merchant": {
+    "name": "Poppy & Grain",
+    "street": "18 Market Lane",
+    "city": "Burlington",
+    "region": "VT",
+    "postal_code": "05401"
+  },
+  "customer": {
+    "name": "Walk-in Guest"
+  },
+  "lines": [
+    {"description": "Cardamom Oat Latte", "amount": "7.00"},
+    {"description": "Sourdough Morning Bun", "amount": "5.50"},
+    {"description": "Garden Grain Bowl", "amount": "14.00"},
+    {"description": "Sparkling Rhubarb Tonic", "amount": "3.50"}
+  ],
+  "totals": {
+    "subtotal": "30.00",
+    "tax": "2.40",
+    "total": "32.40"
+  },
+  "brand": {
+    "slug": "poppy-and-grain",
+    "display_name": "Poppy & Grain",
+    "accent": "#147A4B",
+    "recommended_preset": "humanist",
+    "logo": "logo.svg"
+  }
+}

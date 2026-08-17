@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 48" role="img" aria-label="Poppy and Grain geometric mark">
+  <g fill="#147A4B">
+    <circle cx="27" cy="19" r="8"/>
+    <circle cx="43" cy="19" r="8"/>
+    <circle cx="35" cy="32" r="8"/>
+    <path d="M65 8c12 8 12 24 0 32h-6c8-8 8-16 0-24z"/>
+    <path d="M77 8c12 8 12 24 0 32h-6c8-8 8-16 0-24z"/>
+  </g>
+</svg>
