@@ -21,6 +21,7 @@ defmodule Rendro.Recipes.InvoiceTypographyTest do
 
   alias Rendro.Pipeline.Build
   alias Rendro.Recipes.Invoice
+  alias Rendro.TestSupport.FontFixture
 
   defp sample_data do
     %{
@@ -42,19 +43,21 @@ defmodule Rendro.Recipes.InvoiceTypographyTest do
     %{theme | typography: typography}
   end
 
-  describe "TYPE-02 raise-path (unregistered font role → typed error, never silent Helvetica)" do
-    test "an unregistered fonts.mono atom surfaces {:unknown_text_font, :no_such_font} from Build.run/1" do
+  describe "TYPE-02 raise-path (unregistered font role → actionable error, never silent Helvetica)" do
+    test "an unregistered fonts.mono atom is rejected before table measurement" do
       theme = theme_with_bad_font(:mono, :no_such_font)
-      doc = Invoice.document(sample_data(), theme: theme)
 
-      assert {:error, {:unknown_text_font, :no_such_font}} = Build.run(doc)
+      assert_raise ArgumentError, ~r/:font_registry.*no_such_font/s, fn ->
+        Invoice.document(sample_data(), theme: theme)
+      end
     end
 
-    test "an unregistered fonts.body atom surfaces {:unknown_text_font, :no_such_font} from Build.run/1" do
+    test "an unregistered fonts.body atom is rejected before table measurement" do
       theme = theme_with_bad_font(:body, :no_such_font)
-      doc = Invoice.document(sample_data(), theme: theme)
 
-      assert {:error, {:unknown_text_font, :no_such_font}} = Build.run(doc)
+      assert_raise ArgumentError, ~r/:font_registry.*no_such_font/s, fn ->
+        Invoice.document(sample_data(), theme: theme)
+      end
     end
 
     test "the default theme (all :default fonts, registered) builds cleanly — no false raise" do
@@ -94,6 +97,31 @@ defmodule Rendro.Recipes.InvoiceTypographyTest do
 
       assert override.scale.body == theme.typography.scale.body
       assert override.fonts.body == theme.typography.fonts.body
+    end
+
+    test "measures and renders a registered custom body font with the same registry" do
+      %{bytes: bytes} = FontFixture.supported_font()
+
+      registry =
+        Rendro.FontRegistry.new()
+        |> Rendro.FontRegistry.register_embedded(:invoice_body, {:binary, bytes})
+
+      theme = Rendro.Theme.default()
+      typography = %{theme.typography | fonts: %{theme.typography.fonts | body: :invoice_body}}
+      custom_theme = %{theme | typography: typography}
+
+      document = Invoice.document(sample_data(), theme: custom_theme, font_registry: registry)
+
+      assert Map.has_key?(document.font_registry.fonts, :invoice_body)
+      assert {:ok, _built} = Build.run(document)
+    end
+
+    test "rejects an unregistered custom body font before table measurement" do
+      theme = theme_with_bad_font(:body, :unregistered_invoice_body)
+
+      assert_raise ArgumentError, ~r/:font_registry.*unregistered_invoice_body/s, fn ->
+        Invoice.document(sample_data(), theme: theme)
+      end
     end
   end
 

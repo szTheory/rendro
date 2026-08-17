@@ -208,6 +208,10 @@ defmodule Rendro.Recipes.Invoice do
   Uses `page_template/1` and `sections/2` internally, then chains them
   through `Rendro.Document.new/0 |> add_template |> set_template |> add_section`.
 
+  Pass `font_registry: registry` when typography uses a custom logical font
+  role. The registry is used for both table measurement and the returned
+  document, ensuring pagination uses the same font metrics as rendering.
+
   ## Examples
 
       iex> data = %{id: "INV-001", date: ~D[2026-01-15], items: []}
@@ -229,6 +233,7 @@ defmodule Rendro.Recipes.Invoice do
 
     base_doc =
       Rendro.Document.new()
+      |> put_font_registry(opts)
       |> Rendro.Document.add_template(template)
       |> Rendro.Document.set_template(template.name)
 
@@ -318,18 +323,17 @@ defmodule Rendro.Recipes.Invoice do
     # metrics (D-09) — avoids recipe-local estimates that cause
     # :content_overflow. A single-page toy call (2 items) fits well within
     # capacity and yields exactly one, byte-identical table block below.
-    measure_type = measurement_type(type)
-
     doc_for_measure =
-      Rendro.Document.new()
-      |> Rendro.Theme.Presets.register_metric_fonts(Map.values(measure_type.fonts))
+      opts
+      |> measurement_document(type)
+      |> Rendro.Theme.Presets.register_metric_fonts(Map.values(type.fonts))
 
     {header_h, row_heights} =
       Rendro.measure_rows(
-        Enum.map(formatted_rows, &table_row(&1, theme, colors, measure_type)),
+        Enum.map(formatted_rows, &table_row(&1, theme, colors, type)),
         @content_width,
         doc_for_measure,
-        table_opts_for_measure(header, theme, colors, measure_type)
+        table_opts_for_measure(header, theme, colors, type)
       )
 
     # 118-08: resolve the SAME header height page_template/1 uses for this
@@ -381,13 +385,44 @@ defmodule Rendro.Recipes.Invoice do
     [header: table_row(header, theme, colors, type), columns: @table_columns]
   end
 
-  defp measurement_type(type) do
-    fonts =
-      Map.new(type.fonts, fn {role, font} ->
-        {role, if(font in @curated_metric_fonts, do: font, else: :default)}
-      end)
+  defp put_font_registry(document, opts) do
+    registry = font_registry(opts)
+    %{document | font_registry: registry, default_font: registry.default_font}
+  end
 
-    %{type | fonts: fonts}
+  defp measurement_document(opts, type) do
+    registry = font_registry(opts)
+    validate_measurement_fonts!(registry, type.fonts)
+    %{Rendro.Document.new() | font_registry: registry, default_font: registry.default_font}
+  end
+
+  defp font_registry(opts) do
+    case Keyword.get(opts, :font_registry) do
+      nil ->
+        Rendro.FontRegistry.new()
+
+      %Rendro.FontRegistry{} = registry ->
+        registry
+
+      invalid ->
+        raise ArgumentError,
+              "Invoice :font_registry must be a %Rendro.FontRegistry{}, got: #{inspect(invalid)}"
+    end
+  end
+
+  defp validate_measurement_fonts!(registry, fonts) do
+    fonts
+    |> Map.values()
+    |> Enum.uniq()
+    |> Enum.reject(&(&1 == :default or &1 in @curated_metric_fonts))
+    |> Enum.each(fn role ->
+      if Rendro.FontRegistry.fetch(registry, role) == :error do
+        raise ArgumentError,
+              "Invoice typography font #{inspect(role)} is not registered in :font_registry. " <>
+                "Register the font before calling Invoice.document/2 so table measurement " <>
+                "uses the same metrics as rendering."
+      end
+    end)
   end
 
   # Conservative reserved height for the totals block, used only to bias
