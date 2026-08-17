@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - 'gsd/phase-126-raster-bless-*'
+      - 'gsd/phase-127-catalog-bless-*'
   pull_request:
     branches:
       - main
@@ -226,6 +227,49 @@ jobs:
           RENDRO_PRESET_RASTER_REVIEW_DIR: ${{ runner.temp }}/rendro_phase126_review
         run: mix test --include raster_snapshot test/rendro/theme/preset_raster_snapshot_test.exs
 
+      - name: Generate and review Phase 127 catalog evidence
+        if: github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-127-catalog-bless-')
+        env:
+          RENDRO_CATALOG_REVIEW_DIR: ${{ runner.temp }}/rendro_phase127_review
+        run: |
+          [[ "${GITHUB_REF_NAME}" =~ ^gsd/phase-127-catalog-bless-[0-9a-f]{12}$ ]]
+          mix rendro.catalog.gen
+          mix test --include raster_snapshot test/rendro/catalog_raster_review_test.exs
+
+      - name: Stage Phase 127 catalog blessing evidence
+        if: github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-127-catalog-bless-')
+        env:
+          ARTIFACT_DIR: ${{ runner.temp }}/phase127_catalog_bless
+          REVIEW_DIR: ${{ runner.temp }}/rendro_phase127_review
+        run: |
+          [[ "${GITHUB_REF_NAME}" =~ ^gsd/phase-127-catalog-bless-[0-9a-f]{12}$ ]]
+          test "$(find assets/rendro/catalog -type f -name '*.png' | wc -l | tr -d ' ')" = "32"
+          test "$(find "$REVIEW_DIR" -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = "16"
+          test -f "$REVIEW_DIR/invoice_line_items_60_plus_page_first.png"
+          test -f "$REVIEW_DIR/invoice_line_items_60_plus_page_final.png"
+          test -f "$REVIEW_DIR/statement_line_items_60_plus_page_first.png"
+          test -f "$REVIEW_DIR/statement_line_items_60_plus_page_final.png"
+          mkdir -p "$ARTIFACT_DIR/assets/rendro" "$ARTIFACT_DIR/review"
+          cp assets/rendro/catalog.json "$ARTIFACT_DIR/assets/rendro/catalog.json"
+          cp -R assets/rendro/catalog "$ARTIFACT_DIR/assets/rendro/catalog"
+          find "$REVIEW_DIR" -maxdepth 1 -type f -name '*.png' -print0 | sort -z | xargs -0 -I{} cp "{}" "$ARTIFACT_DIR/review/"
+          {
+            echo "GITHUB_SHA=${GITHUB_SHA}"
+            echo "GITHUB_RUN_ID=${GITHUB_RUN_ID}"
+            echo "PDFIUM_VERSION=$(jq -r '.version' priv/pdfium_pin.json)"
+            echo "PDFIUM_SHA256=$(jq -r '.sha256' priv/pdfium_pin.json)"
+            echo "PAYLOAD_PATHS:"
+            (cd "$ARTIFACT_DIR" && find assets review -type f | sort)
+          } > "$ARTIFACT_DIR/manifest.txt"
+
+      - name: Upload Phase 127 catalog blessing evidence
+        if: github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-127-catalog-bless-')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: phase-127-catalog-bless
+          path: ${{ runner.temp }}/phase127_catalog_bless
+          if-no-files-found: error
+
       - name: Stage Phase 126 preset raster blessing evidence
         if: github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-126-raster-bless-')
         env:
@@ -270,6 +314,9 @@ jobs:
 
       - name: Check Launch Artifacts
         run: mix rendro.launch_artifacts.check
+
+      - name: Check Catalog Artifacts
+        run: mix rendro.catalog.check
 
       - name: Check Comparison Evidence
         run: mix rendro.comparison.check

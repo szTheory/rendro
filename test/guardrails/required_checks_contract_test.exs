@@ -181,7 +181,10 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert advisory_block =~ guard
       assert advisory_block =~ "mix rendro.catalog.gen"
       assert advisory_block =~ "mix rendro.catalog.check"
-      assert advisory_block =~ "RENDRO_CATALOG_REVIEW_DIR: ${{ runner.temp }}/rendro_phase127_review"
+
+      assert advisory_block =~
+               "RENDRO_CATALOG_REVIEW_DIR: ${{ runner.temp }}/rendro_phase127_review"
+
       assert advisory_block =~ "name: phase-127-catalog-bless"
       assert advisory_block =~ "if-no-files-found: error"
       assert advisory_block =~ "GITHUB_SHA=${GITHUB_SHA}"
