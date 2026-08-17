@@ -297,7 +297,6 @@ defmodule Rendro.Recipes.Certificate do
   # Private section builders
   # ---------------------------------------------------------------------------
 
-  @line_height 1.2
   # Body paragraph measure — a fraction of the body region width so the
   # paragraph never runs edge-to-edge (118-06-FINDINGS.md certificate gap).
   @body_measure_fraction 0.68
@@ -360,8 +359,9 @@ defmodule Rendro.Recipes.Certificate do
     body_lines = if body_full_w <= 0, do: 1, else: max(1, ceil(body_full_w / body_measure_w))
 
     content_height_estimate =
-      line_h(title_size) + line_h(subtitle_size) + line_h(recipient_size) +
-        body_lines * line_h(body_size) + line_h(meta_size) + line_h(meta_size)
+      line_h(title_size, type.leading) + line_h(subtitle_size, type.leading) +
+        line_h(recipient_size, type.leading) + body_lines * line_h(body_size, type.leading) +
+        line_h(meta_size, type.leading) + line_h(meta_size, type.leading)
 
     top_spacer_h = max((region_h - content_height_estimate) / 2, 0)
 
@@ -400,7 +400,7 @@ defmodule Rendro.Recipes.Certificate do
     )
   end
 
-  defp line_h(size), do: size * @line_height
+  defp line_h(size, leading), do: size * leading
 
   # Horizontally centers a single line of text within the body region by
   # measuring its exact rendered width against the font resolved from the SAME
@@ -540,7 +540,7 @@ defmodule Rendro.Recipes.Certificate do
   # three font roles default to `:default` (the always-registered
   # Helvetica-compatible built-in, which normalizes identically to today's
   # implicit `"Helvetica"` — Certificate never calls put_default_font, so this
-  # is byte-identical). `leading` == the former @line_height 1.2 == the %Text{}
+  # is byte-identical). `leading` == 1.2 == the %Text{}
   # struct default. When a `:theme` is supplied the base becomes
   # `Rendro.Theme.resolve(theme).typography`. The final `Map.merge` keeps an
   # explicit `:typography` opt as the winning override layer (mirrors :palette).

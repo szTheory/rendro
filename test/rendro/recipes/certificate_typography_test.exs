@@ -85,6 +85,19 @@ defmodule Rendro.Recipes.CertificateTypographyTest do
   end
 
   describe "Phase 125 curated metric compatibility" do
+    test "a Humanist Certificate uses its resolved leading for vertical centering" do
+      theme = Rendro.Theme.preset(:humanist, accent: "#2C6BED")
+      legacy_leading_theme = %{theme | typography: %{theme.typography | leading: 1.2}}
+
+      assert [humanist_body | _] = Certificate.sections(sample_data(), theme: theme)
+      assert [legacy_body | _] = Certificate.sections(sample_data(), theme: legacy_leading_theme)
+
+      [humanist_spacer | _] = humanist_body.content
+      [legacy_spacer | _] = legacy_body.content
+
+      assert humanist_spacer.height < legacy_spacer.height
+    end
+
     test "every curated Certificate role composes before registration and renders after the explicit bridge" do
       for genre <- [:swiss, :humanist, :editorial, :corporate_classic, :minimal_mono, :brutalist] do
         theme = Rendro.Theme.preset(genre, accent: "#2C6BED")
