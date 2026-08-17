@@ -23,6 +23,7 @@ defmodule Rendro.Recipes.CertificateTypographyTest do
   use ExUnit.Case, async: true
 
   alias Rendro.Recipes.Certificate
+  alias Rendro.Theme.Presets
 
   defp sample_data do
     %{
@@ -79,6 +80,25 @@ defmodule Rendro.Recipes.CertificateTypographyTest do
         Certificate.sections(sample_data(),
           typography: %{fonts: %{heading: :default, body: :another_bad_font, mono: :default}}
         )
+      end
+    end
+  end
+
+  describe "Phase 125 curated metric compatibility" do
+    test "every curated Certificate role composes before registration and renders after the explicit bridge" do
+      for genre <- [:swiss, :humanist, :editorial, :corporate_classic, :minimal_mono, :brutalist] do
+        theme = Rendro.Theme.preset(genre, accent: "#2C6BED")
+        document = Certificate.document(sample_data(), theme: theme)
+
+        assert {:error, %Rendro.Error{reason: {:unknown_text_font, _role}}} =
+                 Rendro.render(document, deterministic: true)
+
+        assert {:ok, pdf} =
+                 document
+                 |> Presets.register_fonts(genre)
+                 |> Rendro.render(deterministic: true)
+
+        assert byte_size(pdf) > 0
       end
     end
   end

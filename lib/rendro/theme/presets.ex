@@ -12,6 +12,7 @@ defmodule Rendro.Theme.Presets do
     rendro_preset_text_serif: "priv/fonts/source-serif-4/SourceSerif4-Regular.ttf",
     rendro_preset_mono: "priv/fonts/jetbrains-mono/JetBrainsMono-Regular.ttf"
   }
+  @curated_roles Map.keys(@font_paths)
 
   @spec preset(atom(), keyword()) :: Theme.t()
   def preset(genre, opts) do
@@ -50,6 +51,21 @@ defmodule Rendro.Theme.Presets do
     genre
     |> font_roles()
     |> Enum.reduce(document, &register_font(&2, &1))
+  end
+
+  @doc false
+  @spec metric_font!(atom()) :: Rendro.PDF.Font.t()
+  def metric_font!(role) when role in @curated_roles do
+    document = Document.new() |> Document.register_embedded_font(role, {:path, font_path(role)})
+
+    case FontRegistry.resolve_pdf_font(document.font_registry, role, :default) do
+      {:ok, font} ->
+        font
+
+      {:error, reason} ->
+        raise ArgumentError,
+              "could not preflight curated metric font #{inspect(role)}: #{inspect(reason)}"
+    end
   end
 
   defp register_font(document, role) do

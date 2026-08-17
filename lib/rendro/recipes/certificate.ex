@@ -52,6 +52,8 @@ defmodule Rendro.Recipes.Certificate do
   """
   @moduledoc tags: [:adapter]
 
+  alias Rendro.Theme.Presets
+
   # Non-dimensional defaults only — NO geometry constants.
   # All x/y/width/height values are computed at runtime from PageSize.resolve/2.
   @default_page_size :a4
@@ -458,9 +460,18 @@ defmodule Rendro.Recipes.Certificate do
   # role (e.g. an embedded font named via a `:typography` override) cannot be
   # correctly centered against Helvetica metrics and would silently de-center;
   # rather than emit wrong geometry we raise honestly (errors-as-product).
-  # Resolving embedded-font metrics at compose time needs new plumbing (deferred).
   defp centering_measure_font(role) when role == :default or role == "Helvetica" do
     Rendro.PDF.Font.helvetica()
+  end
+
+  defp centering_measure_font(role)
+       when role in [
+              :rendro_preset_grotesque,
+              :rendro_preset_humanist_sans,
+              :rendro_preset_text_serif,
+              :rendro_preset_mono
+            ] do
+    Presets.metric_font!(role)
   end
 
   defp centering_measure_font(role) do
