@@ -2,6 +2,7 @@ defmodule Rendro.CatalogTest do
   use ExUnit.Case, async: true
 
   alias Rendro.Catalog
+  alias Rendro.Test.EdgeFixtures
 
   test "the default invoice catalog entry is a truthful deterministic source PDF" do
     spec = Enum.find(Catalog.catalog_specs(), &(&1.id == "invoice--default--default--light"))
@@ -76,5 +77,15 @@ defmodule Rendro.CatalogTest do
     before = File.read!(__ENV__.file)
     assert Catalog.static_contract_errors() == []
     assert File.read!(__ENV__.file) == before
+  end
+
+  test "page count excludes the PDF Pages tree and recognizes multiple physical pages" do
+    spec = Enum.find(Catalog.catalog_specs(), &(&1.id == "invoice--default--default--light"))
+    assert {:ok, single_page_pdf} = Catalog.render_source_pdf(spec)
+    assert Catalog.page_count(single_page_pdf) == 1
+
+    multi_page_document = EdgeFixtures.document(:invoice, :line_items_60_plus)
+    assert {:ok, multi_page_pdf} = Rendro.render(multi_page_document, deterministic: true)
+    assert Catalog.page_count(multi_page_pdf) > 1
   end
 end

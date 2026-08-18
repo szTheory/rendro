@@ -134,6 +134,9 @@ defmodule Rendro.Catalog do
     |> Rendro.render(deterministic: true)
   end
 
+  @spec page_count(binary()) :: non_neg_integer()
+  def page_count(pdf) when is_binary(pdf), do: Regex.scan(~r{/Type\s*/Page\b}, pdf) |> length()
+
   @spec generate(keyword()) :: :ok | {:error, term()}
   def generate(opts \\ []) do
     with_pdfium(opts, fn ->
@@ -309,7 +312,7 @@ defmodule Rendro.Catalog do
            {:ok, [png]} <- Rendro.Adapters.Pdfium.render(pdf, dpi: @dpi, pages: "1"),
            :ok <- File.mkdir_p(Path.dirname(spec.png_path)),
            :ok <- File.write(spec.png_path, png) do
-        {width, height} = png_dimensions(png)
+        {:ok, {width, height}} = png_dimensions(png)
 
         {:ok,
          Map.merge(stringify_spec(spec), %{
@@ -616,12 +619,13 @@ defmodule Rendro.Catalog do
 
   defp encode_manifest(manifest), do: Jason.encode!(manifest, pretty: true)
   defp sha256(binary), do: :crypto.hash(:sha256, binary) |> Base.encode16(case: :lower)
-  defp page_count(pdf), do: :binary.matches(pdf, "/Type /Page") |> length()
 
   defp png_dimensions(
          <<137, 80, 78, 71, 13, 10, 26, 10, _::binary-size(8), width::32, height::32, _::binary>>
        ),
-       do: {width, height}
+       do: {:ok, {width, height}}
+
+  defp png_dimensions(_), do: :error
 
   defp read_pdfium_pin, do: @pdfium_pin_path |> File.read!() |> JSON.decode!()
 
