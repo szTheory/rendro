@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.12
 milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
-current_phase: 127
-current_phase_name: public-example-catalog-quality-ratchet
-status: verifying
-stopped_at: Completed 127-05-PLAN.md
-last_updated: "2026-08-18T01:40:36.381Z"
+current_phase: 128
+current_phase_name: Static configurator, theme codegen & Livebook
+status: planning
+stopped_at: Phase 127 verified and complete
+last_updated: "2026-08-18T02:11:32.803Z"
 last_activity: 2026-08-17
-last_activity_desc: Phase 127 execution started
+last_activity_desc: Phase 127 complete, transitioned to Phase 128
 progress:
   total_phases: 5
   completed_phases: 3
@@ -24,22 +24,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-16)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 127 — public-example-catalog-quality-ratchet
+**Current focus:** Phase 128 — static configurator, theme codegen & Livebook
 
 ## Current Position
 
-Phase: 127 (public-example-catalog-quality-ratchet) — EXECUTING
-Plan: 5 of 5
-Status: Phase complete — ready for verification
-Last activity: 2026-08-17 — Phase 127 execution started
+Phase: 128 — Static configurator, theme codegen & Livebook
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-08-17 — Phase 127 complete, transitioned to Phase 128
 
-## Roadmap Snapshot (v2.12, Phases 125-129) — IN PLANNING
+## Roadmap Snapshot (v2.12, Phases 125-129) — IN PROGRESS
 
 ```text
-[████████                                ] 20% — 1/5 phases complete
+[████████████████████████                ] 60% — 3/5 phases complete
 Phase 125 Foundation — fonts, presets & brand fixtures .... Complete
-Phase 126 Carryover polish — dark/hierarchy/golden depth .. Not started
-Phase 127 Public example catalog & quality ratchet ........ Not started
+Phase 126 Carryover polish — dark/hierarchy/golden depth .. Complete
+Phase 127 Public example catalog & quality ratchet ........ Complete
 Phase 128 Static configurator, codegen & Livebook .......... Not started
 Phase 129 Docs & manifest closure .......................... Not started
 ```
@@ -56,6 +56,12 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 - Deterministic and pinned-PDFium advisory matrices share twelve stable light/dark row IDs; bounded human review passed with no new clipping or overflow observed.
 - Twelve safe data-only brand fixtures complete the three-per-domain source corpus for Phase 127.
 - CID widths now use glyph-ID metrics while layout retains codepoint metrics, fixing embedded-font overlap at the correct renderer boundary.
+
+### Phases 126–127 delivered
+
+- Phase 126 closed the inherited dark-mode legibility, Ticket hierarchy, Payslip numeric-wrap, accent-golden, and typography-depth gaps before catalog generation.
+- Phase 127 shipped the separate, bounded 32-cell public catalog with deterministic source/artifact checks, a pinned advisory raster lane, exact 12 scored-false / 20 reasoned-unscored coverage, and fail-closed promotion provenance.
+- Jon's provisional review remains deliberately conservative: all twelve flagships are `needs_work`; the Poppy & Grain dark Receipt contrast concern is retained for a future high-fidelity visual ratchet.
 
 ### Carryover resolved into Milestone C roadmap
 
@@ -74,13 +80,13 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 ## Session Continuity
 
 Last session: 2026-08-18T01:40:36.369Z
-Stopped at: Completed 127-05-PLAN.md
+Stopped at: Phase 127 verified and complete
 Resume file: None
 
 ## Next Steps
 
-1. `/gsd-plan-phase 126` — plan carryover polish now that preset foundations are complete.
-2. Continue in locked sequence: 126 → 127 → 128 → 129.
+1. `/gsd-plan-phase 128` — plan the static configurator, canonical snippet/codegen seam, and Livebook surface over the verified catalog.
+2. Continue in locked sequence: 128 → 129.
 
 ## Performance Metrics
 
@@ -124,7 +130,7 @@ Resume file: None
 
 ## Operator Next Steps
 
-- Plan Phase 126 with `/gsd-plan-phase 126`
+- Plan Phase 128 with `/gsd-plan-phase 128`
 
 ## Decisions
 
