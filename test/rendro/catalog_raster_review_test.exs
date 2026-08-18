@@ -46,9 +46,10 @@ defmodule Rendro.CatalogRasterReviewTest do
       document = EdgeFixtures.document(family, :line_items_60_plus)
       assert {:ok, pdf} = Rendro.render(document, deterministic: true)
       assert page_count(pdf) > 1
-      last_page = page_count(pdf)
-      assert {:ok, [first]} = Pdfium.render(pdf, dpi: 96, pages: "1")
-      assert {:ok, [last]} = Pdfium.render(pdf, dpi: 96, pages: Integer.to_string(last_page))
+      assert {:ok, pages} = Pdfium.render(pdf, dpi: 96)
+      assert length(pages) > 1
+      first = hd(pages)
+      last = List.last(pages)
       File.write!(Path.join(review_dir, "#{prefix}_line_items_60_plus_page_first.png"), first)
       File.write!(Path.join(review_dir, "#{prefix}_line_items_60_plus_page_final.png"), last)
     end
