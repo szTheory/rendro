@@ -109,4 +109,56 @@ defmodule Rendro.CatalogTest do
     assert Catalog.artifact_contract_errors(missing)
            |> Enum.any?(&String.contains?(&1, "#{first["id"]}: PNG missing"))
   end
+
+  test "required catalog check invokes artifact validation for every committed PNG guard" do
+    manifest = Catalog.read_manifest!()
+    [first | rest] = manifest["cells"]
+
+    assert_check_error(
+      put_in(manifest, ["cells"], [
+        %{first | "png_path" => "assets/rendro/catalog/missing.png"} | rest
+      ]),
+      "#{first["id"]}: PNG missing"
+    )
+
+    assert_check_error(
+      put_in(manifest, ["cells"], [%{first | "png_sha256" => String.duplicate("0", 64)} | rest]),
+      "#{first["id"]}: PNG hash drift"
+    )
+
+    assert_check_error(
+      put_in(manifest, ["cells"], [%{first | "width_px" => first["width_px"] + 1} | rest]),
+      "#{first["id"]}: PNG width drift"
+    )
+
+    assert_check_error(
+      put_in(manifest, ["cells"], [%{first | "height_px" => first["height_px"] + 1} | rest]),
+      "#{first["id"]}: PNG height drift"
+    )
+  end
+
+  defp assert_check_error(manifest, expected_error) do
+    assert {:error, errors} = Catalog.check(manifest: manifest, rubric: rebind_rubric(manifest))
+    assert Enum.any?(errors, &String.contains?(&1, expected_error))
+  end
+
+  defp rebind_rubric(manifest) do
+    [first | _] = manifest["cells"]
+    rubric = JSON.decode!(File.read!("priv/quality/rubric_scores.json"))
+
+    dispositions =
+      Enum.map(rubric["catalog_dispositions"], fn disposition ->
+        if disposition["catalog_id"] == first["id"] do
+          Map.merge(disposition, %{
+            "evidence_ref" => first["png_path"],
+            "png_sha256" => first["png_sha256"],
+            "source_pdf_sha256" => first["source_pdf_sha256"]
+          })
+        else
+          disposition
+        end
+      end)
+
+    %{rubric | "catalog_dispositions" => dispositions}
+  end
 end

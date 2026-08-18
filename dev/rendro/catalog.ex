@@ -157,12 +157,17 @@ defmodule Rendro.Catalog do
   @spec check(keyword()) :: :ok | {:error, [String.t()]}
   def check(opts \\ []) do
     with_pdfium(opts, fn ->
-      errors = static_contract_errors()
+      manifest = Keyword.get(opts, :manifest)
+      rubric = Keyword.get(opts, :rubric, read_rubric_scores())
+
+      errors =
+        if manifest,
+          do: static_contract_errors(manifest, rubric),
+          else: static_contract_errors(read_manifest!(), rubric)
 
       errors =
         if errors == [] do
-          manifest = read_manifest!()
-          errors ++ rendered_contract_errors(manifest)
+          errors ++ rendered_contract_errors(manifest || read_manifest!())
         else
           errors
         end
@@ -179,10 +184,14 @@ defmodule Rendro.Catalog do
   end
 
   @spec static_contract_errors(map()) :: [String.t()]
-  def static_contract_errors(manifest) when is_map(manifest) do
+  def static_contract_errors(manifest) when is_map(manifest),
+    do: static_contract_errors(manifest, read_rubric_scores())
+
+  @spec static_contract_errors(map(), map()) :: [String.t()]
+  def static_contract_errors(manifest, rubric) when is_map(manifest) and is_map(rubric) do
     manifest_shape_errors(manifest) ++
       catalog_contract_errors(catalog_specs()) ++
-      quality_contract_errors(manifest, read_rubric_scores())
+      quality_contract_errors(manifest, rubric)
   end
 
   @spec artifact_contract_errors(map()) :: [String.t()]
