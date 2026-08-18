@@ -22,7 +22,7 @@ key-decisions:
   - "Use the exact SHA-verified Linux PDFium advisory job rather than treating a macOS ARM execution failure as equivalent evidence."
   - "Delete all nine Phase 127 isolated evidence refs only after full-SHA verification and advisory closure."
 requirements-completed: [CATALOG-01, CATALOG-02, CATALOG-03, CATALOG-04]
-duration: 0m
+duration: 30m
 completed: 2026-08-18
 status: complete
 ---
