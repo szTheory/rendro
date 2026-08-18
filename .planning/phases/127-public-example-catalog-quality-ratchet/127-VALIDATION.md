@@ -1,7 +1,7 @@
 ---
 phase: 127
 slug: public-example-catalog-quality-ratchet
-status: complete
+status: validated
 nyquist_compliant: true
 wave_0_complete: true
 created: 2026-08-17
@@ -48,6 +48,8 @@ created: 2026-08-17
 | 127-04-01 | 04 | 4 | CATALOG-04 | T-127-02, T-127-04 | Twelve full-size human rubric records plus bounded multipage verdict | manual procedural | committed `127-04-SUMMARY.md` and exact 16-image advisory artifact | ✅ | ✅ green |
 | 127-05-01 | 05 | 5 | CATALOG-04 | T-127-02, T-127-04 | Exact 12 scored/20 unscored transcription and final projection | schema + contract | `mix test test/docs_contract/catalog_quality_contract_test.exs test/docs_contract/rubric_manifest_contract_test.exs --max-failures 1` | ✅ | ✅ green |
 | 127-05-02 | 05 | 5 | CATALOG-01, CATALOG-02, CATALOG-03, CATALOG-04 | T-127-01, T-127-02, T-127-03, T-127-04, T-127-05 | Full source/security/package/CI closure including all-cell exact/null D-10 `preview_copy` audit and mutation coverage | full deterministic + advisory | `mix test`; `mix ci.fast`; exact pinned advisory job `95565301370`; D-10/D-25 jq audit | ✅ | ✅ green |
+| 127-POST-01 | post-review | post | CATALOG-01, CATALOG-03 | T-127-01, T-127-02, T-127-04 | Exact physical-page counting plus mandatory PNG path, existence, SHA-256, width, and height validation through `Catalog.check/1` | integration + mutation | `mix test test/rendro/catalog_test.exs --max-failures 1`; `mix rendro.catalog.check` | ✅ | ✅ green |
+| 127-GAP-01 | verification-gap | post | CATALOG-04 | T-127-02, T-127-04 | Any `passed:true` promotion requires both prior-evidence provenance and a concrete behavioral-resolution reference in runtime and schema contracts | schema + public-check mutation | `mix test test/rendro/catalog_test.exs test/docs_contract/catalog_quality_contract_test.exs test/docs_contract/rubric_manifest_contract_test.exs --max-failures 1` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -93,3 +95,13 @@ created: 2026-08-17
 - [x] `nyquist_compliant: true` is set in frontmatter.
 
 **Approval:** complete — deterministic checks and the separate exact-SHA pinned-PDFium advisory job are both recorded; human review remains bounded to its named images.
+
+## Validation Audit 2026-08-18
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 0 |
+| Resolved | 0 |
+| Escalated | 0 |
+
+Post-execution review and goal verification added three trust-boundary regressions without introducing a new coverage gap: exact `/Page` counting, end-to-end committed-PNG integrity, and fail-closed false-to-true promotion provenance. CATALOG-01 through CATALOG-04 remain automated except for the deliberately human-owned visual judgments and bounded multipage inspection listed above.
