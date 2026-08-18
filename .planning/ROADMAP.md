@@ -176,11 +176,11 @@ Plans:
   3. Every generated catalog row populates the already-reserved `preset`/`theme`/`mode` manifest keys (no schema migration) and is organized on disk by domain, brand-tagged.
   4. `priv/quality/rubric_scores.json` carries a scored or explicitly-flagged-unscored entry for every catalog cell, a fail-loud coverage guard blocks new/changed cells from shipping silently unscored, and no existing `passed:false` entry (e.g. Ticket) is ever flipped to `true` without addressing its underlying defect.
 
-**Plans**: 2/5 plans executed
+**Plans**: 3/5 plans executed
 
 - [x] 127-01-PLAN.md
 - [x] 127-02-PLAN.md
-- [ ] 127-03-PLAN.md
+- [x] 127-03-PLAN.md
 - [ ] 127-04-PLAN.md
 - [ ] 127-05-PLAN.md
 
@@ -224,7 +224,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 125. Foundation — Curated fonts, style-genre presets & brand fixtures | v2.12 | 10/10 | Complete    | 2026-08-16 |
 | 126. Carryover polish — dark-mode legibility, hierarchy & golden depth | v2.12 | 5/5 | Complete    | 2026-08-17 |
-| 127. Public example catalog & quality ratchet | v2.12 | 2/5 | In Progress|  |
+| 127. Public example catalog & quality ratchet | v2.12 | 3/5 | In Progress|  |
 | 128. Static configurator, theme codegen & Livebook | v2.12 | 0/TBD | Not started | - |
 | 129. Docs & manifest closure | v2.12 | 0/TBD | Not started | - |
 
