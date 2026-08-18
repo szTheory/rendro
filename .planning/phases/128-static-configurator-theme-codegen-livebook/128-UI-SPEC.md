@@ -1,10 +1,11 @@
 ---
 phase: 128
 slug: static-configurator-theme-codegen-livebook
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-08-18
+reviewed_at: 2026-08-18T00:00:00-04:00
 ---
 
 # Phase 128 — UI Design Contract
@@ -74,6 +75,7 @@ Accent reserved for: the `Copy Elixir snippet` button, the selected state of eac
 
 ## Layout & Interaction Contract
 
+- The preview/output panel is the primary visual anchor. Its selected document raster draws attention first, followed by the factual nearest-preview or boundary disclosure, then the configuration controls and copyable snippet. Preserve this hierarchy in both two-column and stacked layouts.
 - Render a single, centered page at `--rendro-grid-app-max` (1280px) with 24px horizontal gutters. Use a two-column grid at 900px and above: a 320px configuration panel beside the preview/output panel. Below 900px, stack configuration, preview, disclosure, then snippet in that order.
 - Use native `<label>` + `<select>` controls for document family, preset, accent, and mode. Expose only values in the catalog manifest: six families, six presets, the seven curated hex accents, and light/dark. Do not supply arbitrary color entry or an open picker.
 - Each selection change updates the query string with `family`, `preset`, `accent`, and `mode` using `history.replaceState`; reload restores the same valid selection. Validate every URL value against the manifest enum before applying it. Invalid, unknown, duplicate, or malformed values are ignored and the page falls back deterministically to the first catalog cell ordered by manifest position. Never insert URL values with `innerHTML`; use `textContent`, safe `setAttribute`, and constructed DOM nodes only.
@@ -103,18 +105,32 @@ Accent reserved for: the `Copy Elixir snippet` button, the selected state of eac
 
 ## UI Considerations
 
-Applicable state considerations resolved: 8 covered, 0 backstop, 0 unresolved.
+Probe-confirmed element kinds:
 
-| Category | Element(s) | Status | Resolution / Reason |
-|----------|------------|--------|---------------------|
-| empty | Preview result | ✅ covered | No exact catalog match renders the documented empty-state heading/body; the existing snippet remains unavailable until a valid match resolves. |
-| loading | Catalog manifest and preview image | ✅ covered | The page shows `Loading catalog previews…` while its local manifest and selected image are pending. |
-| error | Catalog manifest, preview image, clipboard action | ✅ covered | A load or copy failure renders the documented error message, preserves valid picker values and snippet text where available, and provides retry through reload/copy again. |
-| partial | Four picker controls | ✅ covered | Before a complete valid four-part selection, controls use the deterministic manifest-first fallback; no partial URL value is rendered as trusted display text. |
-| overflow | Snippet, preview caption, catalog metadata | ✅ covered | Snippets scroll horizontally in their code container; captions and metadata wrap at word boundaries; preview images scale down to their panel width without cropping. |
-| long-text | Labels, generated snippet, manifest-provided caption/disclosure | ✅ covered | Picker labels and notices wrap; the code block scrolls; manifest text is inserted only with safe DOM APIs. |
-| populated | Preview result | ✅ covered | A resolved result displays one manifest-backed raster, its exact caption/alt metadata, factual preview relationship notice when needed, and a canonical copyable snippet. |
-| zero-one-many | Manifest result candidates | ✅ covered | The UI presents exactly one resolved preview. Zero candidates show the empty state; one candidate is shown directly; multiple exact candidates resolve by manifest order and are not presented as an unbounded gallery. |
+- E1 Configuration panel: `form`, `interactive-control`
+- E2 Preview/output panel: `media`, `static-content`
+- E3 Snippet and copy action: `interactive-control`, `static-content`
+- E4 Notices and metadata: `static-content`
+
+Applicable state considerations resolved: 15 covered, 0 backstop, 0 unresolved.
+
+| Element | Category | Status | Resolution / Reason |
+|---------|----------|--------|---------------------|
+| E1 | empty | ✅ covered | Valid manifests initialize all four controls to the deterministic first catalog cell; if the manifest is absent, controls are disabled and the error state is shown rather than presenting an unfilled form. |
+| E1 | loading | ✅ covered | While the local manifest loads, the page shows `Loading catalog previews…` and keeps the four controls disabled. |
+| E1 | error | ✅ covered | Manifest failure shows the documented error message and reload recovery action; unavailable controls remain disabled. |
+| E1 | partial | ✅ covered | Missing, malformed, duplicate, or incomplete query values fall back deterministically by manifest order; partial URL state is never rendered as trusted display text. |
+| E1 | long-text | ✅ covered | Picker labels wrap without clipping; native select values remain fully available to assistive technology. |
+| E2 | empty | ✅ covered | No exact catalog match renders the documented empty-state heading/body; the snippet remains unavailable until a valid match resolves. |
+| E2 | loading | ✅ covered | The page shows `Loading catalog previews…` while the local manifest or selected preview image is pending. |
+| E2 | error | ✅ covered | Manifest or image failure renders the documented error message and reload recovery action without fabricating a preview. |
+| E2 | populated | ✅ covered | A resolved result displays one manifest-backed raster, exact caption/alt metadata, factual relationship notice when needed, and the canonical snippet. |
+| E2 | overflow | ✅ covered | Preview images scale down to panel width without cropping; captions and metadata wrap at word boundaries. |
+| E2 | long-text | ✅ covered | Captions, metadata, and disclosures wrap and reflow without truncating scope-boundary claims. |
+| E3 | overflow | ✅ covered | Generated code scrolls horizontally inside its code container without expanding the page grid. |
+| E3 | long-text | ✅ covered | Generated snippets are never visually or semantically truncated; the complete selectable text remains copyable. |
+| E4 | overflow | ✅ covered | Notices and metadata wrap within the available panel width and do not overlap adjacent controls or the preview. |
+| E4 | long-text | ✅ covered | Manifest-provided notices and disclosures reflow in full; no ellipsis may hide factual or scope-boundary language. |
 
 ---
 
@@ -128,11 +144,11 @@ Applicable state considerations resolved: 8 covered, 0 backstop, 0 unresolved.
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS — focal hierarchy clarified after non-blocking checker recommendation
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved by `gsd-ui-checker`; UI consideration kinds and explicit resolutions confirmed by user on 2026-08-18.
