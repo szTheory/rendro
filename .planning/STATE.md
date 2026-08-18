@@ -5,15 +5,15 @@ milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 127
 current_phase_name: public-example-catalog-quality-ratchet
 status: executing
-stopped_at: Completed 127-03-PLAN.md
-last_updated: "2026-08-18T00:41:00.307Z"
+stopped_at: Completed 127-04-PLAN.md
+last_updated: "2026-08-18T01:17:47.079Z"
 last_activity: 2026-08-17
 last_activity_desc: Phase 127 execution started
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 20
-  completed_plans: 18
+  completed_plans: 19
   percent: 40
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-16)
 ## Current Position
 
 Phase: 127 (public-example-catalog-quality-ratchet) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-08-17 — Phase 127 execution started
 
@@ -73,8 +73,8 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-18T00:41:00.298Z
-Stopped at: Completed 127-03-PLAN.md
+Last session: 2026-08-18T01:17:47.071Z
+Stopped at: Completed 127-04-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -119,6 +119,7 @@ Resume file: None
 | Phase 127 P01 | 25m | 3 tasks | 8 files |
 | Phase 127 P02 | 24m | 2 tasks | 7 files |
 | Phase 127 P03 | 1h | 2 tasks | 40 files |
+| Phase 127-public-example-catalog-quality-ratchet P04 | 0m | 1 tasks | 1 files |
 
 ## Operator Next Steps
 
@@ -145,3 +146,5 @@ Resume file: None
 - [Phase ?]: Keep the catalog as an explicit, ordered 32-row dev/test registry with separate generation and checking operations.
 - [Phase ?]: Keep preview_copy page-count-derived and boundary_disclosure mode-derived, independently of reviewer quality.
 - [Phase ?]: Keep catalog quality as a reviewer-owned, exact one-to-one relation with only three derived consumer labels.
+- [Phase ?]: Record Jon's provisional review conservatively: all twelve cells are scored false rather than promoted to passing.
+- [Phase ?]: Treat dark previews as screen-oriented only, so their print-safety gates remain false without making accessibility or compliance claims.
