@@ -11,6 +11,7 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
   @manifest_path "priv/quality/rubric_scores.json"
   @schema_path "priv/schemas/rubric_scores.schema.json"
   @gallery_manifest_path "assets/rendro/artifacts.json"
+  @catalog_manifest_path "assets/rendro/catalog.json"
 
   defp manifest do
     @manifest_path
@@ -83,7 +84,32 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
            ]
 
     assert length(m["catalog_dispositions"]) == 32
-    assert Enum.all?(m["catalog_dispositions"], &(&1["review_status"] == "unscored"))
+    assert Enum.count(m["catalog_dispositions"], &(&1["review_status"] == "scored")) == 12
+    assert Enum.count(m["catalog_dispositions"], &(&1["review_status"] == "unscored")) == 20
+  end
+
+  test "Phase 127 flagship dispositions recompute false and project needs_work in catalog order" do
+    dispositions = manifest()["catalog_dispositions"]
+    catalog = @catalog_manifest_path |> File.read!() |> JSON.decode!()
+
+    for disposition <- dispositions, disposition["review_status"] == "scored" do
+      refute disposition["passed"]
+
+      assert disposition["passed"] ==
+               passed?(disposition["dimension_scores"], disposition["gate_results"])
+    end
+
+    assert Enum.map(catalog["cells"], & &1["id"]) == Enum.map(dispositions, & &1["catalog_id"])
+
+    for {cell, disposition} <- Enum.zip(catalog["cells"], dispositions) do
+      expected =
+        case disposition["review_status"] do
+          "unscored" -> %{"status" => "unscored", "label" => "Not yet scored"}
+          "scored" -> %{"status" => "needs_work", "label" => "Scored — needs work"}
+        end
+
+      assert cell["quality"] == expected
+    end
   end
 
   test "threshold-arithmetic correctness, not the subjective score" do

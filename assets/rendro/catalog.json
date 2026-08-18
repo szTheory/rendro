@@ -106,8 +106,8 @@
       "preset": "corporate-classic",
       "preview_copy": "Preview: page 1 of 2",
       "quality": {
-        "label": "Not yet scored",
-        "status": "unscored"
+        "label": "Scored — needs work",
+        "status": "needs_work"
       },
       "recipe_module": "Elixir.Rendro.Recipes.Invoice",
       "renderer_kind": "pdfium-render",
@@ -135,8 +135,8 @@
       "preset": "corporate-classic",
       "preview_copy": "Preview: page 1 of 2",
       "quality": {
-        "label": "Not yet scored",
-        "status": "unscored"
+        "label": "Scored — needs work",
+        "status": "needs_work"
       },
       "recipe_module": "Elixir.Rendro.Recipes.Invoice",
       "renderer_kind": "pdfium-render",
@@ -193,8 +193,8 @@
       "preset": "minimal-mono",
       "preview_copy": "Preview: page 1 of 2",
       "quality": {
-        "label": "Not yet scored",
-        "status": "unscored"
+        "label": "Scored — needs work",
+        "status": "needs_work"
       },
       "recipe_module": "Elixir.Rendro.Recipes.Statement",
       "renderer_kind": "pdfium-render",
@@ -222,8 +222,8 @@
       "preset": "minimal-mono",
       "preview_copy": "Preview: page 1 of 2",
       "quality": {
-        "label": "Not yet scored",
-        "status": "unscored"
+        "label": "Scored — needs work",
+        "status": "needs_work"
       },
       "recipe_module": "Elixir.Rendro.Recipes.Statement",
       "renderer_kind": "pdfium-render",
@@ -338,8 +338,8 @@
       "preset": "humanist",
       "preview_copy": "Preview: page 1 of 2",
       "quality": {
-        "label": "Not yet scored",
-        "status": "unscored"
+        "label": "Scored — needs work",
+        "status": "needs_work"
       },
       "recipe_module": "Elixir.Rendro.Recipes.Receipt",
       "renderer_kind": "pdfium-render",
@@ -367,8 +367,8 @@
       "preset": "humanist",
       "preview_copy": "Preview: page 1 of 2",
       "quality": {
-        "label": "Not yet scored",
-        "status": "unscored"
+        "label": "Scored — needs work",
+        "status": "needs_work"
       },
       "recipe_module": "Elixir.Rendro.Recipes.Receipt",
       "renderer_kind": "pdfium-render",
@@ -541,8 +541,8 @@
       "preset": "editorial",
       "preview_copy": "Preview: page 1 of 2",
       "quality": {
-        "label": "Not yet scored",
-        "status": "unscored"
+        "label": "Scored — needs work",
+        "status": "needs_work"
       },
       "recipe_module": "Elixir.Rendro.Recipes.Certificate",
       "renderer_kind": "pdfium-render",
@@ -570,8 +570,8 @@
       "preset": "editorial",
       "preview_copy": "Preview: page 1 of 2",
       "quality": {
-        "label": "Not yet scored",
-        "status": "unscored"
+        "label": "Scored — needs work",
+        "status": "needs_work"
       },
       "recipe_module": "Elixir.Rendro.Recipes.Certificate",
       "renderer_kind": "pdfium-render",
@@ -628,8 +628,8 @@
       "preset": "swiss",
       "preview_copy": "Preview: page 1 of 2",
       "quality": {
-        "label": "Not yet scored",
-        "status": "unscored"
+        "label": "Scored — needs work",
+        "status": "needs_work"
       },
       "recipe_module": "Elixir.Rendro.Recipes.Payslip",
       "renderer_kind": "pdfium-render",
@@ -657,8 +657,8 @@
       "preset": "swiss",
       "preview_copy": "Preview: page 1 of 2",
       "quality": {
-        "label": "Not yet scored",
-        "status": "unscored"
+        "label": "Scored — needs work",
+        "status": "needs_work"
       },
       "recipe_module": "Elixir.Rendro.Recipes.Payslip",
       "renderer_kind": "pdfium-render",
@@ -889,8 +889,8 @@
       "preset": "brutalist",
       "preview_copy": "Preview: page 1 of 2",
       "quality": {
-        "label": "Not yet scored",
-        "status": "unscored"
+        "label": "Scored — needs work",
+        "status": "needs_work"
       },
       "recipe_module": "Elixir.Rendro.Recipes.Ticket",
       "renderer_kind": "pdfium-render",
@@ -918,8 +918,8 @@
       "preset": "brutalist",
       "preview_copy": "Preview: page 1 of 2",
       "quality": {
-        "label": "Not yet scored",
-        "status": "unscored"
+        "label": "Scored — needs work",
+        "status": "needs_work"
       },
       "recipe_module": "Elixir.Rendro.Recipes.Ticket",
       "renderer_kind": "pdfium-render",
