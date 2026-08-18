@@ -185,6 +185,14 @@ defmodule Rendro.Catalog do
       quality_contract_errors(manifest, read_rubric_scores())
   end
 
+  @spec artifact_contract_errors(map()) :: [String.t()]
+  def artifact_contract_errors(%{"cells" => cells}) when is_list(cells) do
+    Enum.flat_map(cells, &artifact_contract_errors_for_cell/1)
+  end
+
+  def artifact_contract_errors(_manifest),
+    do: ["catalog manifest cells are required for artifact checks"]
+
   @spec quality_contract_errors(map(), map()) :: [String.t()]
   def quality_contract_errors(%{"cells" => cells}, %{"catalog_dispositions" => dispositions})
       when is_list(cells) and is_list(dispositions) do
@@ -356,26 +364,77 @@ defmodule Rendro.Catalog do
   defp rendered_contract_errors(manifest) do
     cells = Map.new(manifest["cells"], &{&1["id"], &1})
 
-    Enum.flat_map(catalog_specs(), fn spec ->
-      case {cells[spec.id], render_source_pdf(spec)} do
-        {nil, _} ->
-          ["catalog #{spec.id}: manifest cell missing; run mix rendro.catalog.gen"]
+    artifact_contract_errors(manifest) ++
+      Enum.flat_map(catalog_specs(), fn spec ->
+        case {cells[spec.id], render_source_pdf(spec)} do
+          {nil, _} ->
+            ["catalog #{spec.id}: manifest cell missing; run mix rendro.catalog.gen"]
 
-        {cell, {:ok, pdf}} ->
-          []
-          |> add_unless(
-            cell["source_pdf_sha256"] == sha256(pdf),
-            "catalog #{spec.id}: source PDF hash drift; run mix rendro.catalog.gen"
-          )
-          |> add_unless(
-            cell["page_count"] == page_count(pdf),
-            "catalog #{spec.id}: page count drift; inspect the recipe before regenerating"
-          )
+          {cell, {:ok, pdf}} ->
+            []
+            |> add_unless(
+              cell["source_pdf_sha256"] == sha256(pdf),
+              "catalog #{spec.id}: source PDF hash drift; run mix rendro.catalog.gen"
+            )
+            |> add_unless(
+              cell["page_count"] == page_count(pdf),
+              "catalog #{spec.id}: page count drift; inspect the recipe before regenerating"
+            )
 
-        {_cell, {:error, reason}} ->
-          ["catalog #{spec.id}: source PDF render failed: #{inspect(reason)}"]
-      end
-    end)
+          {_cell, {:error, reason}} ->
+            ["catalog #{spec.id}: source PDF render failed: #{inspect(reason)}"]
+        end
+      end)
+  end
+
+  defp artifact_contract_errors_for_cell(%{"id" => id, "png_path" => path} = cell)
+       when is_binary(path) do
+    case Path.safe_relative(path) do
+      {:ok, _safe_path} -> png_file_contract_errors(id, path, cell)
+      :error -> ["catalog #{id}: unsafe PNG path; regenerate the catalog manifest"]
+    end
+  end
+
+  defp artifact_contract_errors_for_cell(%{"id" => id}),
+    do: ["catalog #{id}: PNG path missing; regenerate the catalog manifest"]
+
+  defp artifact_contract_errors_for_cell(_cell),
+    do: ["catalog artifact cell is malformed; regenerate the catalog manifest"]
+
+  defp png_file_contract_errors(id, path, cell) do
+    case File.read(path) do
+      {:ok, png} ->
+        []
+        |> add_unless(
+          sha256(png) == cell["png_sha256"],
+          "catalog #{id}: PNG hash drift; run mix rendro.catalog.gen"
+        )
+        |> Kernel.++(png_dimension_errors(id, png, cell))
+
+      {:error, :enoent} ->
+        ["catalog #{id}: PNG missing at #{path}; run mix rendro.catalog.gen"]
+
+      {:error, reason} ->
+        ["catalog #{id}: PNG unreadable at #{path}: #{inspect(reason)}"]
+    end
+  end
+
+  defp png_dimension_errors(id, png, cell) do
+    case png_dimensions(png) do
+      {:ok, {width, height}} ->
+        []
+        |> add_unless(
+          width == cell["width_px"],
+          "catalog #{id}: PNG width drift; run mix rendro.catalog.gen"
+        )
+        |> add_unless(
+          height == cell["height_px"],
+          "catalog #{id}: PNG height drift; run mix rendro.catalog.gen"
+        )
+
+      :error ->
+        ["catalog #{id}: PNG dimensions are unreadable; regenerate the catalog artifact"]
+    end
   end
 
   defp cell_shape_errors(cell) when is_map(cell) do

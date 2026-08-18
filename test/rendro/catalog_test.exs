@@ -88,4 +88,25 @@ defmodule Rendro.CatalogTest do
     assert {:ok, multi_page_pdf} = Rendro.render(multi_page_document, deterministic: true)
     assert Catalog.page_count(multi_page_pdf) > 1
   end
+
+  test "artifact checks fail for missing files and hash drift without rasterizing PDFs" do
+    manifest = Catalog.read_manifest!()
+    assert Catalog.artifact_contract_errors(manifest) == []
+
+    [first | rest] = manifest["cells"]
+
+    hash_drift =
+      put_in(manifest, ["cells"], [%{first | "png_sha256" => String.duplicate("0", 64)} | rest])
+
+    assert Catalog.artifact_contract_errors(hash_drift)
+           |> Enum.any?(&String.contains?(&1, "#{first["id"]}: PNG hash drift"))
+
+    missing =
+      put_in(manifest, ["cells"], [
+        %{first | "png_path" => "assets/rendro/catalog/missing.png"} | rest
+      ])
+
+    assert Catalog.artifact_contract_errors(missing)
+           |> Enum.any?(&String.contains?(&1, "#{first["id"]}: PNG missing"))
+  end
 end
