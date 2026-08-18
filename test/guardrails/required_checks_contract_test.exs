@@ -181,6 +181,12 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert advisory_block =~ guard
       assert advisory_block =~ "mix rendro.catalog.gen"
       assert advisory_block =~ "mix rendro.catalog.check"
+      assert advisory_block =~ "mix rendro.catalog.check"
+
+      assert advisory_block =~
+               "Skipping catalog check only for the initial isolated hash-capture run."
+
+      assert advisory_block =~ "! -f assets/rendro/catalog.json"
 
       assert advisory_block =~
                "RENDRO_CATALOG_REVIEW_DIR: ${{ runner.temp }}/rendro_phase127_review"
