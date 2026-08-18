@@ -72,10 +72,9 @@ defmodule Rendro.CatalogTest do
     assert aurora.accent == "#C78600"
   end
 
-  test "static catalog checks are read-only and report a missing manifest" do
+  test "static catalog checks are read-only against the committed manifest" do
     before = File.read!(__ENV__.file)
-    assert [error] = Catalog.static_contract_errors()
-    assert error =~ "missing catalog manifest"
+    assert Catalog.static_contract_errors() == []
     assert File.read!(__ENV__.file) == before
   end
 end
