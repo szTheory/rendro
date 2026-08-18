@@ -317,7 +317,8 @@ jobs:
 
       - name: Check Catalog Artifacts
         run: |
-          if [[ "${GITHUB_EVENT_NAME}" == "push" && "${GITHUB_REF_NAME}" == gsd/phase-127-catalog-bless-* && ! -f assets/rendro/catalog.json ]]; then
+          disposition_count="$(jq -er '.catalog_dispositions | length' priv/quality/rubric_scores.json)"
+          if [[ "${GITHUB_EVENT_NAME}" == "push" && "${GITHUB_REF_NAME}" == gsd/phase-127-catalog-bless-* && "${disposition_count}" -lt 32 ]]; then
             echo "Skipping catalog check only for the initial isolated hash-capture run."
           else
             mix rendro.catalog.check

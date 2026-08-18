@@ -186,7 +186,10 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert advisory_block =~
                "Skipping catalog check only for the initial isolated hash-capture run."
 
-      assert advisory_block =~ "! -f assets/rendro/catalog.json"
+      assert advisory_block =~
+               "jq -er '.catalog_dispositions | length' priv/quality/rubric_scores.json"
+
+      assert advisory_block =~ "\"${disposition_count}\" -lt 32"
 
       assert advisory_block =~
                "RENDRO_CATALOG_REVIEW_DIR: ${{ runner.temp }}/rendro_phase127_review"
