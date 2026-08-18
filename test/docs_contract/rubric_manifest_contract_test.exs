@@ -73,8 +73,17 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
     assert length(m["scores"]) == 6,
            "catalog review records must not replace or rewrite the six legacy gallery scores"
 
-    assert m["catalog_dispositions"] == [],
-           "Plan 127-02 defines the additive review schema only; no catalog artifacts are pinned yet"
+    assert Enum.map(m["scores"], & &1["demo_id"]) == [
+             "invoice-acme-phoenix-saas",
+             "statement-northwind-ledger-co",
+             "receipt-harbor-and-oak-cafe",
+             "certificate-summit-training-institute",
+             "payslip-aurora-live",
+             "ticket-aurora-live"
+           ]
+
+    assert length(m["catalog_dispositions"]) == 32
+    assert Enum.all?(m["catalog_dispositions"], &(&1["review_status"] == "unscored"))
   end
 
   test "threshold-arithmetic correctness, not the subjective score" do
