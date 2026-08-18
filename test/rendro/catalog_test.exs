@@ -137,6 +137,43 @@ defmodule Rendro.CatalogTest do
     )
   end
 
+  test "required catalog check rejects passed catalog dispositions without closure evidence" do
+    manifest = Catalog.read_manifest!()
+    rubric = JSON.decode!(File.read!("priv/quality/rubric_scores.json"))
+    promoted = passing_disposition(rubric)
+
+    promoted_manifest =
+      put_in(
+        manifest,
+        ["cells"],
+        Enum.map(manifest["cells"], fn cell ->
+          if cell["id"] == promoted["catalog_id"] do
+            Map.put(cell, "quality", %{
+              "status" => "passes",
+              "label" => "Scored — passes current rubric"
+            })
+          else
+            cell
+          end
+        end)
+      )
+
+    for {field, expected_error} <- [
+          {"supersedes_evidence_ref", "concrete prior or superseded evidence reference"},
+          {"resolution_ref", "non-empty behavioral resolution_ref"}
+        ] do
+      mutated_rubric =
+        put_in(
+          rubric,
+          ["catalog_dispositions"],
+          replace_disposition(rubric["catalog_dispositions"], Map.delete(promoted, field))
+        )
+
+      assert {:error, errors} = Catalog.check(manifest: promoted_manifest, rubric: mutated_rubric)
+      assert Enum.any?(errors, &String.contains?(&1, expected_error))
+    end
+  end
+
   defp assert_check_error(manifest, expected_error) do
     assert {:error, errors} = Catalog.check(manifest: manifest, rubric: rebind_rubric(manifest))
     assert Enum.any?(errors, &String.contains?(&1, expected_error))
@@ -160,5 +197,32 @@ defmodule Rendro.CatalogTest do
       end)
 
     %{rubric | "catalog_dispositions" => dispositions}
+  end
+
+  defp passing_disposition(rubric) do
+    rubric["catalog_dispositions"]
+    |> Enum.find(&(&1["review_status"] == "scored"))
+    |> Map.merge(%{
+      "dimension_scores" => %{
+        "information_architecture" => 5,
+        "content_hierarchy" => 5,
+        "domain_fit" => 5,
+        "reader_affordances" => 5,
+        "typographic_craft" => 5,
+        "restraint_cohesion" => 5
+      },
+      "gate_results" => %{"reading_order" => true, "print_safety" => true},
+      "passed" => true,
+      "supersedes_evidence_ref" => "priv/quality/rubric_scores.json#catalog-dispositions",
+      "resolution_ref" => "priv/quality/rubric_scores.json#catalog-dispositions"
+    })
+  end
+
+  defp replace_disposition(dispositions, replacement) do
+    Enum.map(dispositions, fn disposition ->
+      if disposition["catalog_id"] == replacement["catalog_id"],
+        do: replacement,
+        else: disposition
+    end)
   end
 end

@@ -59,6 +59,40 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
            "#{@manifest_path} failed validation against #{@schema_path}"
   end
 
+  test "schema rejects passed catalog dispositions missing promotion closure references" do
+    m = manifest()
+
+    promoted =
+      m["catalog_dispositions"]
+      |> Enum.find(&(&1["review_status"] == "scored"))
+      |> Map.merge(%{
+        "dimension_scores" => %{
+          "information_architecture" => 5,
+          "content_hierarchy" => 5,
+          "domain_fit" => 5,
+          "reader_affordances" => 5,
+          "typographic_craft" => 5,
+          "restraint_cohesion" => 5
+        },
+        "gate_results" => %{"reading_order" => true, "print_safety" => true},
+        "passed" => true,
+        "supersedes_evidence_ref" => "priv/quality/rubric_scores.json#catalog-dispositions",
+        "resolution_ref" => "priv/quality/rubric_scores.json#catalog-dispositions"
+      })
+
+    for field <- ["supersedes_evidence_ref", "resolution_ref"] do
+      mutated =
+        put_in(
+          m,
+          ["catalog_dispositions"],
+          replace_catalog_disposition(m["catalog_dispositions"], Map.delete(promoted, field))
+        )
+
+      refute match?({:ok, _}, JSV.validate(mutated, rubric_schema())),
+             "passed:true catalog disposition missing #{field} must fail schema validation"
+    end
+  end
+
   test "structural enumeration: 6 dimensions, 2 gates, hierarchy/core thresholds" do
     m = manifest()
 
@@ -235,5 +269,13 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
     assert MapSet.size(Rendro.EdgeMatrixTest.stress_fixture_ids()) == 62,
            "disjointness must not pass vacuously — the imported stress-fixture set " <>
              "must be the full 62 :applies cells"
+  end
+
+  defp replace_catalog_disposition(dispositions, replacement) do
+    Enum.map(dispositions, fn disposition ->
+      if disposition["catalog_id"] == replacement["catalog_id"],
+        do: replacement,
+        else: disposition
+    end)
   end
 end

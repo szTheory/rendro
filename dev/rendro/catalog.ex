@@ -580,7 +580,25 @@ defmodule Rendro.Catalog do
       "catalog #{id}: source PDF hash is stale; deliberately rebind this artifact"
     )
     |> Kernel.++(review_status_errors(id, disposition))
+    |> Kernel.++(promotion_evidence_errors(id, disposition))
   end
+
+  defp promotion_evidence_errors(id, %{"passed" => true} = disposition) do
+    cond do
+      not concrete?(disposition["supersedes_evidence_ref"]) ->
+        [
+          "catalog #{id}: passed disposition needs a concrete prior or superseded evidence reference"
+        ]
+
+      not concrete?(disposition["resolution_ref"]) ->
+        ["catalog #{id}: passed disposition needs a non-empty behavioral resolution_ref"]
+
+      true ->
+        []
+    end
+  end
+
+  defp promotion_evidence_errors(_id, _disposition), do: []
 
   defp review_status_errors(id, %{"review_status" => "unscored", "reason" => reason})
        when is_binary(reason) do

@@ -188,6 +188,16 @@
         {
           "if": { "required": ["supersedes_evidence_ref"] },
           "then": { "required": ["resolution_ref"] }
+        },
+        {
+          "if": {
+            "properties": {
+              "review_status": { "const": "scored" },
+              "passed": { "const": true }
+            },
+            "required": ["review_status", "passed"]
+          },
+          "then": { "required": ["supersedes_evidence_ref", "resolution_ref"] }
         }
       ],
       "additionalProperties": false
