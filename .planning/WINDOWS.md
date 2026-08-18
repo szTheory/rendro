@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 6
+open_count: 7
 waived_count: 0
 fixed_count: 6
-total_count: 12
-last_updated: 2026-08-17T05:59:22.217Z
+total_count: 13
+last_updated: 2026-08-18T01:41:06.678Z
 ---
 
 # Broken Windows Ledger
@@ -27,6 +27,7 @@ last_updated: 2026-08-17T05:59:22.217Z
 | 10 | 125 | deviation | test/docs_contract/examples_schema_contract_test.exs |  | Made the synthetic-fixture helper family-safe for Statement coverage | open |  | 2026-08-17T00:49:04.416Z |  |
 | 11 | 125 | deviation | test/rendro/theme/preset_raster_snapshot_test.exs |  | Guarded blessing bypasses only normal-run reference-existence assertion while seeding missing references. | open |  | 2026-08-17T01:25:59.222Z |  |
 | 12 | 125 | deviation | test/rendro/theme/preset_raster_snapshot_test.exs |  | ARM host uses a temporary x86 container wrapper for the exact SHA-verified pinned PDFium binary. | open |  | 2026-08-17T01:25:59.289Z |  |
+| 13 | 127 | deviation | priv/pdfium_pin.json |  | Used the exact SHA-verified GitHub advisory lane because the pinned Linux PDFium binary cannot execute on the macOS ARM executor. | open |  | 2026-08-18T01:41:06.678Z |  |
 
 ````json
 [
@@ -172,6 +173,18 @@ last_updated: 2026-08-17T05:59:22.217Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-17T01:25:59.289Z",
+    "resolved_at": null
+  },
+  {
+    "id": 13,
+    "kind": "deviation",
+    "phase": "127",
+    "file": "priv/pdfium_pin.json",
+    "line": null,
+    "description": "Used the exact SHA-verified GitHub advisory lane because the pinned Linux PDFium binary cannot execute on the macOS ARM executor.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-18T01:41:06.678Z",
     "resolved_at": null
   }
 ]
