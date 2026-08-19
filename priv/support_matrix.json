@@ -629,6 +629,26 @@
         "wcag_contrast_claim": "unsupported",
         "gui_viewer_visual_fidelity_claim": "unsupported"
       }
+    },
+    "presets": {
+      "status": "supported",
+      "capabilities": {
+        "strict_six_preset_constructors": "supported",
+        "deterministic_rendering": "supported",
+        "explicit_font_registration": "supported",
+        "bounded_catalog_previews": "supported",
+        "canonical_snippet_and_codegen": "supported",
+        "focused_livebook_example": "supported"
+      },
+      "boundaries": {
+        "design_quality_guarantee": "unsupported",
+        "accessibility_pdf_ua_guarantee": "unsupported",
+        "wcag_contrast_guarantee": "unsupported",
+        "print_safety_guarantee": "unsupported",
+        "universal_viewer_fidelity_guarantee": "unsupported",
+        "exhaustive_catalog_coverage": "unsupported",
+        "live_arbitrary_preview": "unsupported"
+      }
     }
   }
 }
