@@ -51,9 +51,9 @@
 
 - [ ] **CONFIG-01**: A static client-side configurator (`assets/rendro/configurator/`, HTML/CSS/vanilla JS, zero server/DB/build step) offers preset + accent + mode + document-family pickers over the pre-rendered catalog, served through the existing ExDoc `docs: [assets: ...]` copy-through with no new CI surface.
 - [ ] **CONFIG-02**: The configurator snaps an accent selection to the nearest pre-rendered catalog preview via an exact-match lookup against a closed, curated accent palette, and transparently discloses "nearest preview vs. your exact copied code" (no fuzzy color-distance approximation).
-- [ ] **CONFIG-03**: The configurator provides one-click copy of a `Rendro.Theme.preset(...)` + recipe-usage snippet with explicit success feedback.
+- [x] **CONFIG-03**: The configurator provides one-click copy of a `Rendro.Theme.preset(...)` + recipe-usage snippet with explicit success feedback.
 - [ ] **CONFIG-04**: Configurator state (preset, accent, mode, family) is encoded in the URL query string — shareable, deep-linkable per cell, and restored deterministically on load; no XSS-unsafe interpolation of URL state into the DOM.
-- [ ] **CONFIG-05**: `mix rendro.gen.theme <preset> --accent "#…"` generates a materialized theme module modeled on `mix brand.gen` (opts → generated file), with a `--check` drift gate that re-derives and byte-compares; it shares one canonical snippet-format template with the configurator's copy button (never two independent implementations that can drift).
+- [x] **CONFIG-05**: `mix rendro.gen.theme <preset> --accent "#…"` generates a materialized theme module modeled on `mix brand.gen` (opts → generated file), with a `--check` drift gate that re-derives and byte-compares; it shares one canonical snippet-format template with the configurator's copy button (never two independent implementations that can drift).
 - [ ] **CONFIG-06** *(P2)*: The existing Livebook is extended as a third tinkerer surface into the same `Theme.preset/2` vocabulary.
 
 ### Docs & Manifest Closure (DOCS)

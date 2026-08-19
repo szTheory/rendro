@@ -5,10 +5,10 @@ milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 128
 current_phase_name: Static configurator, theme codegen & Livebook
 status: executing
-stopped_at: Phase 128 context gathered
-last_updated: "2026-08-19T01:09:59.117Z"
-last_activity: 2026-08-17
-last_activity_desc: Phase 127 complete, transitioned to Phase 128
+stopped_at: Completed 128-01-PLAN.md
+last_updated: "2026-08-19T01:17:38.691Z"
+last_activity: 2026-08-18
+last_activity_desc: Phase 128 execution started
 progress:
   total_phases: 5
   completed_phases: 3
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-16)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 128 — static configurator, theme codegen & Livebook
+**Current focus:** Phase 128 — Static configurator, theme codegen & Livebook
 
 ## Current Position
 
-Phase: 128 — Static configurator, theme codegen & Livebook
-Plan: Not started
+Phase: 128 (Static configurator, theme codegen & Livebook) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-08-17 — Phase 127 complete, transitioned to Phase 128
+Last activity: 2026-08-18 — Phase 128 execution started
 
 ## Roadmap Snapshot (v2.12, Phases 125-129) — IN PROGRESS
 
@@ -79,9 +79,9 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-19T00:32:05.566Z
-Stopped at: Phase 128 context gathered
-Resume file: .planning/phases/128-static-configurator-theme-codegen-livebook/128-CONTEXT.md
+Last session: 2026-08-19T01:17:38.683Z
+Stopped at: Completed 128-01-PLAN.md
+Resume file: None
 
 ## Next Steps
 
@@ -127,6 +127,7 @@ Resume file: .planning/phases/128-static-configurator-theme-codegen-livebook/128
 | Phase 127 P03 | 1h | 2 tasks | 40 files |
 | Phase 127-public-example-catalog-quality-ratchet P04 | 0m | 1 tasks | 1 files |
 | Phase 127-public-example-catalog-quality-ratchet P05 | 30m | 2 tasks | 6 files |
+| Phase 128-static-configurator-theme-codegen-livebook P01 | 18min | 2 tasks | 5 files |
 
 ## Operator Next Steps
 
@@ -158,3 +159,5 @@ Resume file: .planning/phases/128-static-configurator-theme-codegen-livebook/128
 - [Phase ?]: Keep all twelve provisional human verdicts false and project them as needs_work.
 - [Phase ?]: Use the exact SHA-verified Linux PDFium advisory job rather than treating a macOS ARM execution failure as equivalent evidence.
 - [Phase ?]: Delete all nine Phase 127 isolated evidence refs only after full-SHA verification and advisory closure.
+- [Phase ?]: Keep the configurator index as a closed 6 × 6 × 7 × 2 formatter-owned source model with trusted internal evaluation only.
+- [Phase ?]: Use mix rendro.configurator.gen as the explicit deterministic generation and read-only drift-check seam.
