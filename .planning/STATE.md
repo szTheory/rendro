@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v2.12
 milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
-current_phase: 129
-status: completed
-stopped_at: Phase 129 verified; milestone audit pending
-last_updated: "2026-08-19T18:20:00Z"
+status: Awaiting next milestone
+stopped_at: Milestone v2.12 archived; planning next milestone
+last_updated: "2026-08-19T23:16:49.455Z"
 last_activity: 2026-08-19
-last_activity_desc: Phase 129 complete
+last_activity_desc: Milestone v2.12 completed and archived
 progress:
   total_phases: 5
   completed_phases: 5
   total_plans: 29
   completed_plans: 29
   percent: 100
+current_phase: 129
 current_phase_name: docs-manifest-closure
 ---
 
@@ -21,19 +21,19 @@ current_phase_name: docs-manifest-closure
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-08-16)
+See: .planning/PROJECT.md (updated 2026-08-19)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** v2.12 milestone audit and closure
+**Current focus:** Define the next milestone from current adopter demand
 
 ## Current Position
 
-Phase: 129
-Plan: Not started
-Status: All phases complete
-Last activity: 2026-08-19 — Phase 129 complete
+Phase: Milestone v2.12 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-08-19 — Milestone v2.12 completed and archived
 
-## Roadmap Snapshot (v2.12, Phases 125-129) — IMPLEMENTATION COMPLETE
+## Roadmap Snapshot (v2.12, Phases 125-129) — SHIPPED 2026-08-19
 
 ```text
 [████████████████████████████████████████] 100% — 5/5 phases complete
@@ -48,7 +48,7 @@ Phase 129 Docs & manifest closure .......................... Complete
 
 ## Accumulated Context
 
-v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives in `PROJECT.md` Key Decisions; the milestone archive is under `milestones/v2.11-*`.
+v2.12 shipped and archived (Phases 125-129, 2026-08-19). Full decision context lives in `PROJECT.md`; the detailed roadmap, requirements, audit, and phase artifacts are under `milestones/v2.12-*`.
 
 ### Phase 125 delivered
 
@@ -69,7 +69,7 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 - Phase 129 closed the public claim surface with a proof-backed preset support row, canonical presets guide, README/HexDocs/package routing, regenerated public API manifest, and one fail-loud 27th docs lane wired atomically into required-check guardrails.
 - Final Phase 129 verification passed 17/17 must-haves; code review is clean, Nyquist coverage is complete, all 11 security threats are closed (including two documented low-risk acceptances), all 27 docs lanes pass, and `mix ci.fast` is green.
 
-### Carryover resolved into Milestone C roadmap
+### Carryover resolved in v2.12
 
 - **WINDOWS ids 1-3 (deferred v2.11 polish)** → mapped to Phase 126 (POLISH-01/02/03): invoice_dark table-body cells inherit default ink → illegible on dark bg (id 1); Ticket/ticket_dark themed uniform type scale inverts intended display/title hierarchy — locked Phase-122 outcome, honestly `passed:false` (id 2); payslip themed numeric cells wrap mid-number at 10.5pt/1.35 leading (id 3).
 - **Coverage depth (non-blocking)** → mapped to Phase 126 (POLISH-04/05): no dedicated `from_brand`/preset accent-op byte golden; dedicated `*_typography_test.exs` for only 3 of 7 recipes (other 4 on byte-identity + smoke).
@@ -85,14 +85,14 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-19T18:20:00Z
-Stopped at: Phase 129 verified; milestone audit pending
+Last session: 2026-08-19T23:16:49Z
+Stopped at: Milestone v2.12 archived; planning next milestone
 Resume file: None
 
 ## Next Steps
 
-1. `/gsd-audit-milestone` — verify v2.12 end to end against its original intent and all 28 requirements.
-2. If the audit passes, `/gsd-complete-milestone` to archive v2.12 and prepare the next milestone/release step.
+1. `/gsd-new-milestone` — define the next demand-driven milestone and its requirements.
+2. Keep Rendro Studio (`SEED-005`) deferred unless adoption evidence justifies a live server-backed surface.
 
 ## Performance Metrics
 
@@ -143,7 +143,7 @@ Resume file: None
 
 ## Operator Next Steps
 
-- Plan Phase 128 with `/gsd-plan-phase 128`
+- Start the next milestone with /gsd-new-milestone
 
 ## Decisions
 

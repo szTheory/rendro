@@ -1,5 +1,33 @@
 # Milestones
 
+## v2.12 Style-Genre Presets, Public Catalog & Static Configurator (Shipped: 2026-08-19)
+
+**Delivered:** Turnkey deterministic document styling through six genre presets and curated fonts, a bounded public catalog and quality ratchet, and a zero-server browse → pick → copy/codegen adoption path.
+
+**Phases completed:** 125-129 (5 phases, 29 plans, 53 tasks)
+
+**Verification:** `verified_closeout` — 28/28 requirements satisfied; 5/5 phases verified and Nyquist-compliant; 9/9 integrations wired; 5/5 E2E flows complete; milestone audit `passed`.
+
+**Key accomplishments:**
+
+- Shipped six source-confined genre presets backed by four provenance-bound open-license fonts, explicit document-owned registration, deterministic subsetting, and a twelve-row render matrix.
+- Closed inherited dark-mode legibility, Ticket hierarchy, Payslip numeric-wrap, accent-golden, and seven-recipe typography-depth gaps before catalog generation.
+- Added twelve safe data-only brands and a bounded 32-cell public catalog with deterministic artifacts, separate pinned-PDFium evidence, and fail-closed quality dispositions.
+- Delivered a zero-server static configurator with canonical URL state, exact/representative/unavailable preview disclosure, safe clipboard feedback, and no product Node/runtime dependency.
+- Unified configurator, `mix rendro.gen.theme --check`, and Livebook output behind one formatter-owned Elixir source model, with pinned Chromium and fresh-consumer gates.
+- Published proof-backed preset discovery across checkout, Hex, and ExDoc with a truthful `theming.presets` support row and a 27th deterministic docs-contract lane.
+
+**Stats:**
+- 307 files changed (+26,752 / −551) from `v2.11` through closeout
+- 65,184 lines of Elixir across `lib/`, `dev/`, and `test/` at ship
+- 248 commits over 23 calendar days (2026-07-28 → 2026-08-19)
+
+**Git range:** `feat(125-01)` (`ebde2bc`) → `feat(129-03)` (`b50384a`)
+
+**What's next:** Define the next milestone from current demand. Rendro Studio (`SEED-005`) remains an explicit optional/deferred candidate; it is not implied by v2.12.
+
+---
+
 ## v2.11 Document Theming & Design-Token System (Shipped: 2026-07-28)
 
 **Phases completed:** 6 phases (119-124), 21 plans. Additive minor (hex `1.2.0` intent). Milestone B of the "Happy-Path Home Runs" program (`SEED-003`).

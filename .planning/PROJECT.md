@@ -8,31 +8,34 @@ Rendro is a pure-Elixir, Phoenix-first PDF and document generation library for t
 
 Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
 
-## Current Milestone: v2.12 Style-Genre Presets, Public Catalog & Static Configurator
+## Latest Milestone: v2.12 Style-Genre Presets, Public Catalog & Static Configurator
 
-**Goal:** Make great-looking branded documents turnkey — pick a design *style* + plug in palette/logo — and show it all off as a public by-domain example catalog that doubles as a standing quality ratchet.
+**Shipped:** 2026-08-19. v2.12 makes branded business documents turnkey through six deterministic style-genre presets, four curated embedded fonts, a bounded public catalog and honest quality ratchet, and a zero-server configurator/codegen/Livebook path.
 
-> Milestone C of the 4-milestone "Happy-Path Home Runs" program (A realistic examples → B theming → **C presets+catalog** → D optional Studio). Additive minor (hex `1.3.0` intent; hex release is a separate tag step). Builds directly on the shipped `Rendro.Theme` contract (v2.11 / `SEED-003`). Phases continue global numbering (from 125). Source seed: `SEED-004`.
+All 28 requirements passed across phases 125-129. The milestone audit passed with 5/5 phases verified and Nyquist-compliant, 9/9 integrations wired, and 5/5 E2E flows complete. Deterministic evidence remains separate from pinned-PDFium/Chromium advisory evidence, and public claims remain bounded away from design-quality, accessibility, PDF/UA, WCAG, print-safety, and universal-viewer guarantees.
 
-**Target features:**
-- **PRESET-01** — Style-genre presets (Swiss/Humanist/Editorial/Corporate-Classic/Minimal-Mono, + Brutalist if time) as `%Rendro.Theme{}` values via `Theme.preset(:editorial, accent:, mode:)`, composing with the unbranded default + light/dark uniformly.
-- **PRESET-02** — Curated open-license preset fonts in `priv/fonts/` (a grotesque, a humanist sans, a text serif, a mono) so flagship presets render out of the box; an unregistered font role raises the existing typed error (no silent substitution).
-- **CATALOG-01** — Public example catalog (domain × 2–3 example brands/presets × light/dark + unbranded default) as deterministic hash-checked artifacts (extends `mix rendro.launch_artifacts.gen`), organized by-domain/brand-tagged, doubling as the Milestone-A rubric quality ratchet.
-- **CONFIG-01** — Static client-side configurator (browse → pick preset+accent → nearest pre-rendered preview → one-click copy snippet, URL-query state, no server/DB) + `mix rendro.gen.theme <preset> --accent` codegen task (models `mix brand.gen`, `--check` drift gate); extend the Livebook as a third tinkerer surface.
+**Archive:** `milestones/v2.12-ROADMAP.md`, `milestones/v2.12-REQUIREMENTS.md`, `milestones/v2.12-MILESTONE-AUDIT.md`, and `milestones/v2.12-phases/`.
 
-**Folded-in carryover (from v2.11):** the three deferred dark-mode/hierarchy polish items — invoice_dark table-body legibility (WINDOWS id 1), Ticket themed display/title hierarchy inversion (id 2, a locked Phase-122 outcome), payslip themed numeric-cell wrap (id 3) — plus a dedicated `from_brand` accent-op byte golden and typography-test depth for the 4 recipes currently on byte-identity + smoke coverage. These directly affect catalog quality (dark tiles in the ratchet must look right).
+## Next Milestone Goals
 
-**Boundary preserved:** design systems = code (`lib/rendro/theme*`), example brands = data (`priv/examples/`) — a brand is never a module. Live server-rendered Studio stays deferred to Milestone D (`SEED-005`).
+No next milestone scope is committed. Start from current adopter demand with `$gsd-new-milestone`; preserve pure core, deterministic/advisory lane separation, and documentation-as-contract. Rendro Studio (`SEED-005`) remains optional and explicitly deferred because the shipped static configurator already covers the common zero-server path.
 
 ## Current State
 
-**Phase 129 (Docs & manifest closure) complete 2026-08-19 — final v2.12 implementation phase** — the preset/catalog/configurator journey now closes through one proof-backed public claim surface: a canonical outcome-first presets guide, README and HexDocs/package routes, a `theming.presets` support row with explicit non-guarantees, and a regenerated public API manifest containing `Theme.preset/2`. A dedicated fail-loud preset claims contract is the 27th deterministic docs lane and remains atomically aligned with CI guardrails. Independent verification passed 17/17 must-haves; review is clean, Nyquist coverage is complete, all 11 modeled threats are closed, all 27 docs lanes pass, and `mix ci.fast` is green. All five v2.12 phases are implemented; milestone audit is next.
+**v2.12 shipped 2026-08-19.** Rendro now offers six deterministic preset directions, curated font packaging, a bounded 32-cell public catalog, a static shareable configurator, canonical theme-module generation, and an aligned Livebook/docs path. Closeout verification passed 110 focused tests and `mix ci.fast` (1,821 tests, 0 failures; Credo and Dialyzer clean). Current focus is planning the next milestone.
+
+<details>
+<summary>v2.12 phase-by-phase completion context</summary>
+
+**Phase 129 (Docs & manifest closure) complete 2026-08-19 — final v2.12 implementation phase** — the preset/catalog/configurator journey now closes through one proof-backed public claim surface: a canonical outcome-first presets guide, README and HexDocs/package routes, a `theming.presets` support row with explicit non-guarantees, and a regenerated public API manifest containing `Theme.preset/2`. A dedicated fail-loud preset claims contract is the 27th deterministic docs lane and remains atomically aligned with CI guardrails. Independent verification passed 17/17 must-haves; review is clean, Nyquist coverage is complete, all 11 modeled threats are closed, all 27 docs lanes pass, and `mix ci.fast` is green. All five v2.12 phases and the milestone audit are complete.
 
 **Phases 127–128 complete 2026-08-17–18** — Phase 127 shipped the bounded 32-cell public example catalog and honest quality ratchet with deterministic artifacts kept separate from advisory raster evidence. Phase 128 layered a static, URL-shareable configurator over that catalog, one canonical copy/codegen snippet seam, `mix rendro.gen.theme --check`, and the Livebook route, while preserving the zero-server/zero-runtime-dependency boundary and clearly distinguishing nearest preview from exact copied code.
 
 **Phase 126 (Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth) complete 2026-08-17** — the three deferred v2.11 visual defects are fixed and evidence-backed: themed Invoice table cells use semantic ink, Ticket restores placement-first hierarchy with an intact subordinate reference, and Payslip Current/YTD amounts remain atomic. A bounded three-row accent golden and dedicated typography contracts now cover all seven recipes. Six exact-SHA pinned-PDFium images received full-size sequential review; WINDOWS ids 1–3 and the matching quality records are closed without widening the claim to WCAG, PDF/UA, print safety, or universal design quality. Post-review pagination and custom-font measurement fixes are covered by refreshed deterministic Invoice goldens. Final verification passed 5/5 must-haves, 1,764 tests, `mix ci.fast`, and a clean standard-depth code review.
 
 **Phase 125 (Foundation — Curated fonts, style-genre presets & brand fixtures) complete 2026-08-16** — `Rendro.Theme.preset/2` now provides six strict, source-confined genre presets backed by four pinned open-license static TrueType faces and explicit document-owned font registration. All seven recipes participate in a deterministic 12-row light/dark render matrix; a separate SHA-pinned PDFium v0.11.0 lane carries the matching advisory raster evidence. Certificate measurement now uses the exact curated face later embedded, CID `/W` tables use glyph-ID metrics, and the six-domain example corpus gained exactly twelve safe data-only brand fixtures. Full deterministic CI passed, and bounded human review approved all twelve page-one renders without widening the claim to design quality, accessibility, PDF/UA, WCAG, or print safety.
+
+</details>
 
 **Shipped milestone:** v2.11 Document Theming & Design-Token System — **SHIPPED 2026-07-28** (Phases 119-124, all 6 verified `passed`; milestone audit `passed` — 21/21 requirements, integration WIRED, 4/4 E2E flows, all phases `nyquist_compliant`). Delivered `SEED-003` (Milestone B of the Happy-Path program): the public, deterministic `Rendro.Theme` contract (semantic color roles + materialized type scale + optional spacing/rules/radius/density) on the adapter/Evolving tier, `theme:` threaded through all 7 recipes' 3-rung pattern, role-derived `mode: :light | :dark` via a repeating full-page `:background` region (dark bounded honestly as screen-oriented), a strong unbranded `Theme.default/0` that clears the Milestone-A reader-quality rubric (closing the Phase-118 SHOW-01 gap in the honest DATA-first order with human sign-off), orthogonal `brand:`/`from_brand/2` plumbing, the 11-row hash-checked S6 gallery, `guides/theming.md`, and a green `mix ci.fast` (1697 tests, 0 failures; dialyzer 0). The un-themed call reproduces v2.10 bytes exactly (PLUMB-03 central regression guard). Additive minor (hex `1.2.0` intent; hex release is a separate tag step). Known carryover: WINDOWS ids 1-3 (Ticket hierarchy inversion + two dark-mode polish items) deferred to follow-up / Milestone C. Archived under `milestones/v2.11-*`. Next: Milestone C (`SEED-004`).
 
@@ -126,7 +129,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 **Foundation Already Shipped:** v1.3 release readiness, v1.2 typography/assets truth, v1.1 layout-authoring maturity, and v1.0 deterministic core rendering.
 
-## Latest Milestone: C1 CI/CD Performance & Reliability
+## Infrastructure Milestone: C1 CI/CD Performance & Reliability
 
 > Non-version infra milestone (like B1) — pipeline/tooling work, **no library/`lib/` changes, no Hex release.** Phases continue global numbering (108–113). Source brief: `milestones/C1-AUDIT-BRIEF.md`.
 
@@ -160,7 +163,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Validated
 
-- ✓ Phase 125 shipped the v2.12 foundation: six strict style-genre presets, four provenance-bound curated fonts with explicit document-owned registration, deterministic subsetting and 12-row render proof, pinned advisory raster evidence with human sign-off, and twelve safe data-only brand additions across six domains. Requirements PRESET-01..06, FONT-01..05, and CATALOG-05 are satisfied. — Phase 125
+- ✓ Rendro v2.12 shipped Style-Genre Presets, Public Catalog & Static Configurator (`SEED-004`): six strict genre presets, four provenance-bound curated fonts, twelve safe data-only brands, closure of all inherited v2.11 polish gaps, a bounded 32-cell deterministic catalog with honest quality dispositions, a zero-server URL-shareable configurator, canonical copy/codegen/Livebook source, and proof-backed checkout/Hex/ExDoc discovery. All 28 requirements satisfied; milestone audit `passed`. Shipped 2026-08-19 and archived under `milestones/v2.12-*`. — v2.12
 - ✓ Rendro v2.11 shipped Document Theming & Design-Token System (Milestone B / `SEED-003`): the public, deterministic `Rendro.Theme` contract on the adapter/Evolving tier (semantic color roles + materialized type scale + optional spacing/rules/radius/density), `theme:` threaded through all 7 recipes, role-derived `mode: :light | :dark` via a repeating full-page `:background` region (dark bounded as screen-oriented, no print/PDF-UA claim), a strong unbranded `Theme.default/0` that clears the Milestone-A rubric (Phase-118 SHOW-01 gap closed honestly, DATA-first, with human sign-off), orthogonal `brand:`/`from_brand/2`, the 11-row hash-checked gallery, and `guides/theming.md`. Un-themed calls reproduce v2.10 bytes exactly (PLUMB-03). All 21 requirements satisfied; milestone audit `passed`. Known carryover deferred to follow-up/Milestone C: WINDOWS ids 1-3 (Ticket hierarchy inversion + two dark-mode polish items). Shipped 2026-07-28 and archived under `milestones/v2.11-*`. — v2.11
 - ✓ Rendro v2.10 shipped Realistic Business-Document Examples & Anatomy (Milestone A / `SEED-002`): realistic `priv/examples/` fixture library + `@moduledoc false` loaders, an additive Invoice anatomy upgrade with `Rendro.Format` promoted to the public adapter tier + `cell_align: :right`, new Payslip & Ticket families, a family × edge-case stress matrix (hash-checked goldens), and rubric-gated demos + gallery/docs closure. All requirements satisfied; PR #3 squash-merged to `main`. Known carryover: Phase-118 SHOW-01 (six demos honestly scored below the reader-quality rubric) — folded into v2.11 scope. Shipped 2026-07-19 and archived under `milestones/v2.10-*`. — v2.10
 - ✓ Rendro C1 shipped CI/CD Performance & Reliability: split fast/proof/advisory lanes, precise BEAM caches, stable `ci-success` required gate, scoped local reproduction commands, supply-chain/release hardening, and before/after validation evidence from three green remote `ci.yml` runs. All 30 requirements satisfied; milestone audit `passed`. Shipped 2026-07-11 and archived in `milestones/C1-ROADMAP.md` / `milestones/C1-REQUIREMENTS.md` / `milestones/C1-MILESTONE-AUDIT.md`. — C1
@@ -189,8 +192,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-- **v2.12 Style-Genre Presets, Public Catalog & Static Configurator (`SEED-004`, Milestone C) — IMPLEMENTATION COMPLETE:** All five phases and all 28 mapped requirements are implemented; the independent Phase 129 verifier passed 17/17 must-haves. The milestone audit/archival gate remains before declaring v2.12 shipped. Live Studio remains deferred to Milestone D (`SEED-005`).
-- **Folded v2.11 carryover is closed:** invoice_dark table-body legibility (WINDOWS id 1), Ticket themed display/title hierarchy inversion (id 2), payslip themed numeric-cell wrap (id 3), the dedicated `from_brand`/preset accent golden, and seven-recipe typography depth were verified in Phase 126.
+(None — define fresh requirements through `$gsd-new-milestone`.)
 
 ### Out of Scope
 
@@ -205,6 +207,8 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 Rendro has now shipped four authored PDF surfaces inside one deterministic pipeline (static content v1.0-v1.2, interactive forms v1.8, document-level embedded files v1.9, curated link annotations v1.9) and one full trust-sensitive stack as artifact-first or optional-adapter seams: protection through `Rendro.Protect` (v1.10), unsigned signature preparation through `Rendro.Sign.prepare/2` (v2.0), cryptographic signing through `Rendro.Sign.sign/2` plus first-party optional runtime adapters (v2.1), and long-lived signature augmentation through `Rendro.Sign.augment/2` plus a dedicated long-lived-live-proof CI lane (v2.2). It now also has batteries-included Phoenix document workflows (v2.4), a public 1.0 API/release contract (v2.5), quiet public discovery proof surfaces (v2.6), and section-aware report/duplex ergonomics with pinned browser-family advisory observations (v2.7). All of this lands without widening the core rendering contract or the deterministic `build → compose → measure → paginate → render → validate` pipeline.
 
 As of v2.7 (2026-06-13), public claims are bounded by checked proof artifacts: per-viewer rows are terminal (`supported` or `explicit_deferral`), raster evidence remains distinct from GUI-viewer proof, visual launch assets and the manual are hash-checked, comparison claims are tied to committed benchmark results, the Livebook tutorial is CI-executed in an advisory lane, and PDF.js observations are explicitly pinned/advisory rather than support-matrix promotion. Global text shaping remains conditional until `ADOPTION.md` shows demand that justifies the core investment.
+
+As of v2.12 (2026-08-19), the Happy-Path program's realistic examples, theming, presets, catalog, and static configurator are shipped. The 32-cell catalog is intentionally bounded; twelve flagship cells remain conservatively labeled `needs_work`, dark output remains screen-oriented, and the optional live Studio is deferred rather than implied. The public Hex package still has no required server, database, browser runtime, or Node build dependency.
 
 ## Constraints
 
@@ -281,6 +285,10 @@ As of v2.7 (2026-06-13), public claims are bounded by checked proof artifacts: p
 | Keep deterministic preset rendering and pinned-PDFium raster review as separate evidence lanes over the same twelve stable row IDs | Raster evidence informs bounded visual judgment without becoming a deterministic or universal-quality claim | ✓ Shipped in Phase 125 (v2.12) |
 | Model example brands only as generic JSON plus safe local SVG data, with exact corpus and original-byte controls | Supplies catalog variety without creating brand modules or recipe-specific branches | ✓ Shipped in Phase 125 (v2.12) |
 | Serialize embedded CID widths from glyph-ID metrics while retaining Unicode-codepoint metrics for layout | Aligns PDF Identity-H output with emitted glyph IDs and prevents overlapping curated-font text | ✓ Shipped in Phase 125 (v2.12) |
+| Keep the public catalog as an explicit ordered 32-row registry with separate generation/checking and reviewer-owned quality dispositions | Bounds artifact cost and prevents deterministic hashes from being mistaken for subjective design approval | ✓ Shipped in Phase 127 (v2.12) |
+| Keep requested code identity separate from representative preview identity in the static configurator | A nearest preview must never rewrite or misrepresent the exact preset/accent/mode/family code the user selected | ✓ Shipped in Phase 128 (v2.12) |
+| Use one closed formatter-owned source model for configurator copy, generated theme modules, and the Livebook | Eliminates three-way snippet drift while keeping evaluation limited to trusted internally generated source | ✓ Shipped in Phase 128 (v2.12) |
+| Publish presets as supported capabilities with independent unsupported guarantees and a fail-loud 27th docs lane | Makes the adoption path discoverable without promoting design quality, accessibility, print, or universal-viewer claims | ✓ Shipped in Phase 129 (v2.12) |
 
 ## Archived Milestone Context
 
@@ -345,4 +353,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-17 after Phase 126 — carryover visual defects, accent golden coverage, and seven-recipe typography depth are verified; Phase 127 catalog and quality-ratchet work is next.*
+*Last updated: 2026-08-19 after v2.12 milestone completion.*
