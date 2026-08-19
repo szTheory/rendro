@@ -248,6 +248,23 @@ defmodule Rendro.DocsContract.PresetsClaimsTest do
       assert theming =~ "on_accent"
     end
 
+    test "the guide keeps the locked preview, dark-output, and quality-state disclosures visible" do
+      guide = File.read!("guides/presets.md")
+
+      assert guide =~ "exact, representative-accent, or\nunavailable"
+
+      assert guide =~
+               "**Screen-oriented; not a print, accessibility,\nPDF/UA, or WCAG claim.**"
+
+      for label <- [
+            "**Scored —\npasses current rubric**",
+            "**Scored — needs work**",
+            "**Not yet scored**"
+          ] do
+        assert guide =~ label, "expected visible quality label #{inspect(label)}"
+      end
+    end
+
     test "ExDoc and the Hex package register only the public preset asset graph" do
       mixfile = File.read!("mix.exs")
 
