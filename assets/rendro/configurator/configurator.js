@@ -35,10 +35,11 @@
 
   const optionsAreValid = (options) => ["families", "presets", "accents", "modes"].every((name) => Array.isArray(options[name]) && options[name].every((option) => option && typeof option.label === "string" && (name === "accents" ? validAccent(option.value) : validSlug(option.value))));
   const indexIsValid = (candidate) => candidate && candidate.schema_version === 1 && optionsAreValid(candidate.options) && Array.isArray(candidate.records) && candidate.records.length > 0 && candidate.records.every((record) => validSlug(record.family) && validSlug(record.preset) && validAccent(record.accent) && (record.mode === "light" || record.mode === "dark") && typeof record.snippet === "string");
-  const catalogIsValid = (candidate) => candidate && Array.isArray(candidate.cells) && candidate.cells.every((cell) => validSlug(cell.family) && validSlug(cell.preset) && validAccent(cell.accent) && (cell.mode === "light" || cell.mode === "dark") && validateSafeCatalogPath(cell.png_path) && typeof cell.alt === "string" && typeof cell.caption === "string");
+  const catalogCellIsValid = (cell) => validSlug(cell.family) && ((cell.preset === null && cell.accent === null && cell.mode === "light") || (validSlug(cell.preset) && validAccent(cell.accent) && (cell.mode === "light" || cell.mode === "dark"))) && validateSafeCatalogPath(cell.png_path) && typeof cell.alt === "string" && typeof cell.caption === "string";
+  const catalogIsValid = (candidate) => candidate && Array.isArray(candidate.cells) && candidate.cells.every(catalogCellIsValid);
 
   const allowedValues = (name) => new Set(index.options[name].map((option) => option.value));
-  const catalogUsesClosedEnums = () => catalog.cells.every((cell) => allowedValues("families").has(cell.family) && allowedValues("presets").has(cell.preset) && allowedValues("accents").has(cell.accent) && allowedValues("modes").has(cell.mode));
+  const catalogUsesClosedEnums = () => catalog.cells.filter((cell) => cell.preset !== null).every((cell) => allowedValues("families").has(cell.family) && allowedValues("presets").has(cell.preset) && allowedValues("accents").has(cell.accent) && allowedValues("modes").has(cell.mode));
   const firstSelectableState = () => {
     const cell = catalog.cells.find((candidate) => allowedValues("families").has(candidate.family) && allowedValues("presets").has(candidate.preset) && allowedValues("accents").has(candidate.accent) && allowedValues("modes").has(candidate.mode));
     return cell ? { family: cell.family, preset: cell.preset, accent: cell.accent, mode: cell.mode } : FALLBACK;

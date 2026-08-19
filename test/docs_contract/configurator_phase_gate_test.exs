@@ -53,6 +53,10 @@ defmodule Rendro.DocsContract.ConfiguratorPhaseGateTest do
 
       if Enum.all?(~w(family preset accent mode), &is_binary(cell[&1])) do
         assert MapSet.member?(selection_keys, selection_key(cell))
+      else
+        assert cell["preset"] == nil
+        assert cell["accent"] == nil
+        assert cell["mode"] == "light"
       end
     end
   end
@@ -63,6 +67,9 @@ defmodule Rendro.DocsContract.ConfiguratorPhaseGateTest do
 
     assert javascript =~ "fetch(\"index.json\")"
     assert javascript =~ "fetch(\"../catalog.json\")"
+    assert javascript =~ "catalogCellIsValid"
+    assert javascript =~ "cell.preset === null && cell.accent === null && cell.mode === \"light\""
+    assert javascript =~ "catalog.cells.filter((cell) => cell.preset !== null)"
     assert javascript =~ "snippetCode.textContent = record.snippet"
     assert javascript =~ "navigator.clipboard.writeText(visibleCodeText)"
     refute javascript =~ "Rendro.Theme.preset("
