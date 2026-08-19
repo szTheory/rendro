@@ -199,7 +199,13 @@ Plans:
   4. `mix rendro.gen.theme <preset> --accent "#…"` writes a generated theme module and `--check` fails loudly on drift; the generated snippet and the configurator's copy button provably share one canonical template (a compile-round-trip test covers the full producible preset × mode × accent enum).
   5. The existing Livebook exercises `Theme.preset/2` live as a third tinkerer surface alongside the configurator and `mix rendro.gen.theme`.
 
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 128-01-PLAN.md — Establish the canonical packaged formatter and deterministic 504-record configurator index.
+- [ ] 128-02-PLAN.md — Ship the safe application-owned theme generator and read-only drift gate.
+- [ ] 128-03-PLAN.md — Build the truthful static configurator, four-key URL contract, and exact clipboard path.
+- [ ] 128-04-PLAN.md — Extend the existing Livebook with one formatter-owned preset render and bounded proof.
 **UI hint**: yes — a real static HTML/CSS/vanilla-JS browser surface (distinct from this project's PDF-domain "theme"/"page"/"layout" terms that otherwise false-positive the UI gate on recipe phases)
 
 ### Phase 129: Docs & manifest closure
