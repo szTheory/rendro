@@ -5,15 +5,15 @@ milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 128
 current_phase_name: Static configurator, theme codegen & Livebook
 status: executing
-stopped_at: Completed 128-03-PLAN.md
-last_updated: "2026-08-19T01:34:42.446Z"
+stopped_at: Completed 128-04-PLAN.md
+last_updated: "2026-08-19T01:38:30.748Z"
 last_activity: 2026-08-18
 last_activity_desc: Phase 128 execution started
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 25
-  completed_plans: 23
+  completed_plans: 24
   percent: 60
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-16)
 ## Current Position
 
 Phase: 128 (Static configurator, theme codegen & Livebook) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-08-18 — Phase 128 execution started
 
@@ -79,8 +79,8 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-19T01:34:42.434Z
-Stopped at: Completed 128-03-PLAN.md
+Last session: 2026-08-19T01:38:30.740Z
+Stopped at: Completed 128-04-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -130,6 +130,7 @@ Resume file: None
 | Phase 128-static-configurator-theme-codegen-livebook P01 | 18min | 2 tasks | 5 files |
 | Phase 128 P02 | 7min | 2 tasks | 2 files |
 | Phase 128 P03 | 15min | 2 tasks | 5 files |
+| Phase 128-static-configurator-theme-codegen-livebook P04 | 7min | 2 tasks | 2 files |
 
 ## Operator Next Steps
 
@@ -168,3 +169,5 @@ Resume file: None
 - [Phase ?]: Keep requested code identity separate from derived catalog preview identity; representative previews never rewrite selected source values.
 - [Phase ?]: Reject malformed, duplicate, partial, and unknown query state atomically, then serialize only the four canonical keys.
 - [Phase ?]: Copy exactly the visible committed formatter string and report Clipboard success only after its promise resolves.
+- [Phase ?]: Keep the Livebook to one exact formatter-owned Invoice/Swiss/#2C6BED/light render with explicit document-first font registration and separate themed byte evidence.
+- [Phase ?]: Treat presets as working starting points and dark-mode experiments as screen-oriented without visual-quality or compliance guarantees.

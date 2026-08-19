@@ -54,7 +54,7 @@
 - [x] **CONFIG-03**: The configurator provides one-click copy of a `Rendro.Theme.preset(...)` + recipe-usage snippet with explicit success feedback.
 - [x] **CONFIG-04**: Configurator state (preset, accent, mode, family) is encoded in the URL query string — shareable, deep-linkable per cell, and restored deterministically on load; no XSS-unsafe interpolation of URL state into the DOM.
 - [x] **CONFIG-05**: `mix rendro.gen.theme <preset> --accent "#…"` generates a materialized theme module modeled on `mix brand.gen` (opts → generated file), with a `--check` drift gate that re-derives and byte-compares; it shares one canonical snippet-format template with the configurator's copy button (never two independent implementations that can drift).
-- [ ] **CONFIG-06** *(P2)*: The existing Livebook is extended as a third tinkerer surface into the same `Theme.preset/2` vocabulary.
+- [x] **CONFIG-06** *(P2)*: The existing Livebook is extended as a third tinkerer surface into the same `Theme.preset/2` vocabulary.
 
 ### Docs & Manifest Closure (DOCS)
 
