@@ -40,4 +40,17 @@ defmodule Rendro.Test.HexBuildCacheTest do
 
     refute_received :runner_called_unexpectedly
   end
+
+  test "archive paths are unique across separate BEAM VMs" do
+    elixir = System.find_executable("elixir") || flunk("could not find elixir executable")
+    ebin = Path.join([Mix.Project.build_path(), "lib", "rendro", "ebin"])
+    args = ["-pa", ebin, "-e", "IO.write(Rendro.Test.HexBuildCache.archive_path())"]
+
+    {first_path, 0} = System.cmd(elixir, args)
+    {second_path, 0} = System.cmd(elixir, args)
+
+    assert first_path != second_path
+    assert first_path =~ ~r/rendro-hex-build-\d+-[A-Za-z0-9_-]{16}\.tar$/
+    assert second_path =~ ~r/rendro-hex-build-\d+-[A-Za-z0-9_-]{16}\.tar$/
+  end
 end

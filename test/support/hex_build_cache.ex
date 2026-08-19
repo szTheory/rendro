@@ -44,16 +44,22 @@ defmodule Rendro.Test.HexBuildCache do
   """
   def tarball_path!, do: package_build!().tarball_path
 
+  @doc false
+  def archive_path do
+    suffix = Base.url_encode64(:crypto.strong_rand_bytes(12), padding: false)
+
+    Path.join(
+      System.tmp_dir!(),
+      "rendro-hex-build-#{System.unique_integer([:positive, :monotonic])}-#{suffix}.tar"
+    )
+  end
+
   defp package_build! do
     Agent.get_and_update(
       __MODULE__,
       fn
         nil ->
-          tarball_path =
-            Path.join(
-              System.tmp_dir!(),
-              "rendro-hex-build-#{System.unique_integer([:positive, :monotonic])}.tar"
-            )
+          tarball_path = archive_path()
 
           result =
             System.cmd("mix", ["hex.build", "--output", tarball_path],
