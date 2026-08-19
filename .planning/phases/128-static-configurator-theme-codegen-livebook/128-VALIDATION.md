@@ -31,7 +31,8 @@ created: 2026-08-18
 
 - **After every task commit:** Run the narrowest mapped ExUnit command below plus `mix format --check-formatted`
 - **After every plan wave:** Run `mix test`
-- **Wave 3 / Plan 05 final gate:** After Plans 02, 03, and 04 complete, run `mix ci.fast`, `mix rendro.livebook.check`, `mix rendro.configurator.gen --check`, and the direct static-file smoke contract; all must be green before the browser/assistive-technology checkpoint
+- **Wave 3 / Plan 05 task feedback:** After Plans 02, 03, and 04 complete, run the direct static-file smoke contract, `mix rendro.configurator.gen --check`, and `mix rendro.livebook.check` within the approximately 60-second task-level target
+- **Wave 3 / Plan 05 terminal gate:** After focused task feedback passes, run `mix ci.fast` as the separately timed approximately 180-second terminal gate; it must be green before the browser/assistive-technology/generator-DX checkpoint and does not count toward task-level feedback latency
 - **Before `$gsd-verify-work`:** Confirm Plan 05's automated gate and explicit manual checkpoint are complete
 - **Max feedback latency:** 60 seconds for task-level checks
 
@@ -47,7 +48,8 @@ created: 2026-08-18
 | Assigned by planner | TBD | TBD | CONFIG-04 | T-128-01 | Query input is validated atomically and DOM construction avoids unsafe HTML sinks | static JS contract | `mix test test/docs_contract/configurator_static_contract_test.exs` | ❌ W0 | ⬜ pending |
 | Assigned by planner | TBD | TBD | CONFIG-05 | T-128-03 / T-128-04 | Generator rejects unsafe aliases/paths and `--check` never writes | unit + Mix task integration | `mix test test/rendro/theme/snippet_test.exs test/mix/tasks/rendro_gen_theme_test.exs` | ❌ W0 | ⬜ pending |
 | Assigned by planner | TBD | TBD | CONFIG-06 | T-128-05 | Notebook remains no-server and evaluates only the marked, formatter-owned preset path | notebook source + integration | `mix test test/mix/tasks/rendro_livebook_check_test.exs && mix rendro.livebook.check` | ✅ extend existing | ⬜ pending |
-| 128-05-01 | 05 | 3 | CONFIG-01..06 | T-128-06 / T-128-07 | All three consumers integrate with the canonical formatter; committed index drift, Livebook execution, full CI, and direct static-file topology are proven after Wave 2 | integration + static-file smoke | `mix test test/docs_contract/configurator_phase_gate_test.exs --max-failures 1 && mix rendro.configurator.gen --check && mix rendro.livebook.check && mix ci.fast` | ❌ W0 | ⬜ pending |
+| 128-05-01 | 05 | 3 | CONFIG-01..06 | T-128-06 / T-128-07 | All three consumers integrate with the canonical formatter; committed index drift, Livebook execution, and direct static-file topology provide focused feedback after Wave 2 | integration + static-file smoke | `mix test test/docs_contract/configurator_phase_gate_test.exs --max-failures 1 && mix rendro.configurator.gen --check && mix rendro.livebook.check` | ❌ W0 | ⬜ pending |
+| 128-05-terminal | 05 | 3 | CONFIG-01..06 | T-128-06 | Complete deterministic CI passes after focused feedback and before manual acceptance | terminal integration gate | `mix ci.fast` (~180 seconds; excluded from task-level latency) | existing alias | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -72,7 +74,7 @@ created: 2026-08-18
 | Keyboard, focus, native control, and screen-reader status flow is understandable | CONFIG-01, CONFIG-04 | Automated markup checks cannot establish the full assistive-technology experience | Complete family/preset/accent/mode selection and copy using keyboard only; then verify labels, live-region announcements, copy failure recovery, and focus order with VoiceOver or NVDA |
 | Generated module feels conventional in a fresh consumer project | CONFIG-05 | Compilation proves correctness but not the end-to-end prompt/error ergonomics | In a disposable Mix project, run default, override, conflict, `--force`, and `--check` paths; confirm every failure explains what/where/why/next and no unexpected file is written |
 
-Plan 05 owns these manual gates after its automated commands pass. The executor may gather browser screenshots or accessibility-tree evidence where safe, but visual hierarchy and screen-reader comprehension remain human judgments and require the blocking checkpoint in `128-05-PLAN.md`.
+Plan 05 owns these manual gates after its focused automated command and separate terminal `mix ci.fast` gate pass. The executor may gather browser screenshots or accessibility-tree evidence where safe, but visual hierarchy, screen-reader comprehension, and fresh-consumer generator ergonomics remain human judgments and require the blocking checkpoint in `128-05-PLAN.md`.
 
 ---
 
