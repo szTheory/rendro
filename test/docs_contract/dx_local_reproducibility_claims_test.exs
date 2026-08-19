@@ -41,7 +41,10 @@ defmodule Rendro.DocsContract.DxLocalReproducibilityClaimsTest do
     assert workflow =~ "ci-success:"
     assert workflow =~ "needs: [test, configurator-browser, integration-proofs]"
     assert workflow =~ "configurator-browser:"
-    assert workflow =~ "mcr.microsoft.com/playwright:v1.62.0-noble@sha256:baed2032d533817f3dbe6425de795788430ba345e819a1201337009ba17c9d07"
+
+    assert workflow =~
+             "mcr.microsoft.com/playwright:v1.62.0-noble@sha256:baed2032d533817f3dbe6425de795788430ba345e819a1201337009ba17c9d07"
+
     assert workflow =~ "node-version: '22.14.0'"
     assert workflow =~ "retention-days: 14"
   end

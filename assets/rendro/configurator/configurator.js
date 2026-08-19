@@ -115,6 +115,8 @@
     const visibleCodeText = snippetCode.textContent;
     try {
       await navigator.clipboard.writeText(visibleCodeText);
+      error.replaceChildren();
+      error.hidden = true;
       copyButton.textContent = "Snippet copied";
       setStatus("Snippet copied");
       window.setTimeout(() => { copyButton.textContent = "Copy Elixir snippet"; }, 2000);
