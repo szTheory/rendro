@@ -1,9 +1,9 @@
 ---
 phase: 126
 slug: carryover-polish-dark-mode-legibility-hierarchy-decision-gol
-status: complete
+status: validated
 nyquist_compliant: true
-wave_0_complete: false
+wave_0_complete: true
 created: 2026-08-16
 ---
 
@@ -85,3 +85,13 @@ created: 2026-08-16
 - [x] `nyquist_compliant: true` is set after validation coverage is implemented and audited.
 
 **Approval:** complete — all eleven task rows are green; deterministic and advisory evidence remain explicitly separate.
+
+## Validation Audit 2026-08-19
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 0 |
+| Resolved | 0 |
+| Escalated | 0 |
+
+Evidence: all eleven task bindings are green, all five requirements are satisfied, and `126-VERIFICATION.md` records a passing 5/5 phase verdict while preserving the deterministic/advisory lane boundary.

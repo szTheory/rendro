@@ -1,6 +1,8 @@
 ---
 id: SEED-005
-status: dormant
+status: deferred
+deferred_at: v2.12-closeout
+disposition: Retained as optional future work; the shipped static configurator covers the common zero-server path.
 planted: 2026-07-10
 planted_during: C1 (post-archive, awaiting next milestone)
 trigger_when: any milestone considering an interactive/admin/dev UI, a theme playground, LiveView tooling, or theming developer-experience — part of the Happy-Path program (optional; needs SEED-003/004; surface whenever an interactive theme/preview UI is considered)

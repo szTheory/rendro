@@ -1,6 +1,8 @@
 ---
 id: SEED-004
-status: dormant
+status: complete
+completed_as: v2.12
+completed: 2026-08-19
 planted: 2026-07-10
 planted_during: C1 (post-archive, awaiting next milestone)
 trigger_when: any milestone touching style presets, the public example catalog, a theme/brand configurator, or design polish — part of the Happy-Path program (needs SEED-003's theme contract; surface whenever presets/catalog/configurator scope arises)

@@ -1,6 +1,8 @@
 ---
 id: SEED-002
-status: dormant
+status: complete
+completed_as: v2.10
+completed: 2026-07-19
 planted: 2026-07-10
 planted_during: C1 (post-archive, awaiting next milestone)
 trigger_when: next product/feature milestone — the "toy → production" home run for business documents
