@@ -202,11 +202,20 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 128-01-PLAN.md — Establish the canonical packaged formatter and deterministic 504-record configurator index.
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 128-02-PLAN.md — Ship the safe application-owned theme generator and read-only drift gate.
 - [ ] 128-03-PLAN.md — Build the truthful static configurator, four-key URL contract, and exact clipboard path.
 - [ ] 128-04-PLAN.md — Extend the existing Livebook with one formatter-owned preset render and bounded proof.
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 128-05-PLAN.md — Run the complete post-integration static, CI, Livebook, drift, browser, and assistive-technology gates.
+
 **UI hint**: yes — a real static HTML/CSS/vanilla-JS browser surface (distinct from this project's PDF-domain "theme"/"page"/"layout" terms that otherwise false-positive the UI gate on recipe phases)
 
 ### Phase 129: Docs & manifest closure
