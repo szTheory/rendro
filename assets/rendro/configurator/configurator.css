@@ -1,0 +1,55 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--rendro-bg-page);
+  color: var(--rendro-text-primary);
+  font-family: var(--rendro-font-sans);
+  font-size: var(--rendro-font-size-body);
+  line-height: var(--rendro-line-body);
+}
+
+::selection { background: var(--rendro-selection-bg); }
+
+.configurator-page {
+  width: min(100%, var(--rendro-grid-app-max));
+  margin: 0 auto;
+  padding: var(--rendro-space-12) var(--rendro-space-6);
+}
+
+.configurator-intro { max-width: 720px; margin-bottom: var(--rendro-space-8); }
+.eyebrow { color: var(--rendro-text-muted); font-size: var(--rendro-font-size-caption); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+h1, h2, p { margin-top: 0; }
+h1 { font-size: var(--rendro-font-size-h1); line-height: var(--rendro-line-h1); font-weight: 600; }
+h2 { font-size: var(--rendro-font-size-h3); line-height: var(--rendro-line-h3); font-weight: 600; }
+
+.configurator-layout { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: var(--rendro-space-8); align-items: start; }
+.configurator-controls, .configurator-output { background: var(--rendro-bg-surface); border: var(--rendro-border-width-1) solid var(--rendro-border-default); border-radius: var(--rendro-radius-panel); box-shadow: var(--rendro-shadow-card); padding: var(--rendro-space-6); }
+.control-group { display: grid; gap: var(--rendro-space-2); margin-bottom: var(--rendro-space-4); }
+label { color: var(--rendro-text-secondary); font-size: var(--rendro-font-size-body-s); font-weight: 600; }
+select, button { width: 100%; min-height: 44px; border-radius: var(--rendro-radius-control); border: var(--rendro-border-width-1) solid var(--rendro-border-strong); font: inherit; }
+select { background: var(--rendro-bg-surface); color: var(--rendro-text-primary); padding: 0 var(--rendro-space-3); }
+button { cursor: pointer; background: var(--rendro-action-primary-bg); color: var(--rendro-action-primary-text); font-weight: 600; padding: 0 var(--rendro-space-4); transition: background var(--rendro-motion-micro) var(--rendro-easing); }
+button:hover:not(:disabled) { background: var(--rendro-action-primary-bg-hover); }
+select:disabled, button:disabled { cursor: not-allowed; opacity: var(--rendro-disabled-opacity); }
+:focus-visible { outline: var(--rendro-focus-ring-width) solid var(--rendro-focus-ring); outline-offset: var(--rendro-focus-ring-offset); }
+
+.status, .disclosure, .error { margin: 0 0 var(--rendro-space-4); padding: var(--rendro-space-3); border-radius: var(--rendro-radius-control); overflow-wrap: anywhere; }
+.status { background: var(--rendro-feedback-info-bg); color: var(--rendro-feedback-info); }
+.disclosure { background: var(--rendro-feedback-warning-bg); color: var(--rendro-text-secondary); }
+.error { background: var(--rendro-feedback-error-bg); border: var(--rendro-border-width-1) solid var(--rendro-feedback-error); color: var(--rendro-feedback-error); }
+.preview { min-height: 44px; margin-bottom: var(--rendro-space-4); }
+.preview figure { margin: 0; }
+.preview img { display: block; width: auto; max-width: 100%; height: auto; max-height: 68vh; margin: 0 auto; border: var(--rendro-border-width-1) solid var(--rendro-border-default); border-radius: var(--rendro-radius-document); }
+.preview figcaption { color: var(--rendro-text-muted); font-size: var(--rendro-font-size-caption); line-height: var(--rendro-line-caption); margin-top: var(--rendro-space-2); overflow-wrap: anywhere; }
+.snippet-section { margin-top: var(--rendro-space-6); }
+pre { margin: 0 0 var(--rendro-space-4); padding: var(--rendro-space-4); overflow-x: auto; border-radius: var(--rendro-radius-code); background: var(--rendro-bg-code); color: var(--rendro-text-primary); font-family: var(--rendro-font-mono); font-size: 14px; line-height: 1.57; white-space: pre; }
+
+@media (max-width: 899px) {
+  .configurator-page { padding-top: var(--rendro-space-6); }
+  .configurator-layout { grid-template-columns: 1fr; gap: var(--rendro-space-6); }
+  .configurator-controls { order: 1; }
+  .configurator-output { order: 2; }
+}
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0ms !important; scroll-behavior: auto !important; } }

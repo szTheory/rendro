@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rendro theme configurator</title>
+    <link rel="stylesheet" href="../../../brand/tokens/tokens.css" />
+    <link rel="stylesheet" href="configurator.css" />
+  </head>
+  <body>
+    <main class="configurator-page">
+      <header class="configurator-intro">
+        <p class="eyebrow">Rendro themes</p>
+        <h1>Choose a documented theme starting point</h1>
+        <p>
+          Select a closed configuration, inspect its bounded catalog relationship, and copy the
+          formatter-owned Elixir source.
+        </p>
+      </header>
+
+      <div class="configurator-layout">
+        <section class="configurator-controls" aria-labelledby="configuration-heading">
+          <h2 id="configuration-heading">Configuration</h2>
+          <form id="configurator-form">
+            <div class="control-group">
+              <label for="family">Document family</label>
+              <select id="family" name="family" disabled></select>
+            </div>
+            <div class="control-group">
+              <label for="preset">Preset</label>
+              <select id="preset" name="preset" disabled></select>
+            </div>
+            <div class="control-group">
+              <label for="accent">Accent</label>
+              <select id="accent" name="accent" disabled></select>
+            </div>
+            <div class="control-group">
+              <label for="mode">Document mode</label>
+              <select id="mode" name="mode" disabled></select>
+            </div>
+          </form>
+        </section>
+
+        <section class="configurator-output" aria-labelledby="preview-heading">
+          <h2 id="preview-heading">Catalog preview</h2>
+          <p id="status" class="status" aria-live="polite">Loading catalog previews…</p>
+          <div id="error" class="error" role="alert" hidden></div>
+          <div id="preview" class="preview" aria-live="polite"></div>
+          <div id="disclosure" class="disclosure"></div>
+          <section class="snippet-section" aria-labelledby="snippet-heading">
+            <h2 id="snippet-heading">Elixir snippet</h2>
+            <pre id="snippet" tabindex="0"><code id="snippet-code"></code></pre>
+            <button id="copy-snippet" type="button" disabled>Copy Elixir snippet</button>
+          </section>
+        </section>
+      </div>
+    </main>
+    <script src="configurator.js"></script>
+  </body>
+</html>
