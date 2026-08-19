@@ -2,6 +2,7 @@ defmodule Mix.Tasks.RendroLivebookCheckTest do
   use ExUnit.Case, async: false
 
   alias Mix.Tasks.Rendro.Livebook.Check
+  alias Rendro.Theme.Snippet
 
   setup do
     Application.delete_env(:rendro, :livebook_converter)
@@ -83,6 +84,30 @@ defmodule Mix.Tasks.RendroLivebookCheckTest do
     assert notebook =~ "Kino.Download.new"
     assert notebook =~ "%PDF-"
     refute notebook =~ "benchmark"
+  end
+
+  test "production notebook contains one exact canonical themed invoice path and linked proof" do
+    notebook = File.read!("guides/livebook/first_invoice.livemd")
+
+    assert length(Regex.scan(~r/^## Apply a preset$/m, notebook)) == 1
+
+    [_, canonical_block] =
+      Regex.run(
+        ~r/# rendro-theme-snippet:start\n(?<snippet>.*?)# rendro-theme-snippet:end/s,
+        notebook
+      )
+
+    assert canonical_block == Snippet.usage_snippet("invoice", "swiss", "#2C6BED", "light")
+
+    assert length(
+             Regex.scan(~r/Rendro\.render\(themed_document, deterministic: true\)/, notebook)
+           ) == 1
+
+    assert notebook =~ "binary_part(themed_pdf, 0, 5) != \"%PDF-\""
+    assert notebook =~ "byte_size(themed_pdf)"
+    assert notebook =~ "themed_sha256"
+    assert notebook =~ "Base.encode64(themed_pdf)"
+    assert notebook =~ "fn -> themed_pdf end"
   end
 
   test "task source does not start a Livebook server" do

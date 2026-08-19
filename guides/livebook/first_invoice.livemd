@@ -70,6 +70,61 @@ sha256 = :crypto.hash(:sha256, pdf) |> Base.encode16(case: :lower)
 }
 ```
 
+## Apply a preset
+
+This exact Invoice/Swiss/`#2C6BED`/light path uses the same invoice data and keeps
+font registration explicit. To try another canonical choice, edit the
+`preset`, accent, and mode values below. Presets are working starting points,
+not a design-quality, accessibility, PDF/UA, WCAG, or print guarantee. A
+dark-mode experiment is screen-oriented; it is not a print, accessibility,
+PDF/UA, or WCAG claim.
+
+```elixir
+# rendro-theme-snippet:start
+preset = :swiss
+
+theme =
+  Rendro.Theme.preset(preset, accent: {44, 107, 237}, mode: :light)
+
+document =
+  invoice
+  |> Rendro.Recipes.Invoice.document(theme: theme)
+  |> Rendro.Theme.Presets.register_fonts(preset)
+# rendro-theme-snippet:end
+```
+
+```elixir
+themed_document = document
+{:ok, themed_pdf} = Rendro.render(themed_document, deterministic: true)
+
+if binary_part(themed_pdf, 0, 5) != "%PDF-" do
+  raise "expected Rendro to render a themed PDF"
+end
+
+themed_sha256 = :crypto.hash(:sha256, themed_pdf) |> Base.encode16(case: :lower)
+
+%{
+  bytes: byte_size(themed_pdf),
+  sha256: themed_sha256
+}
+```
+
+```elixir
+themed_encoded = Base.encode64(themed_pdf)
+
+Kino.HTML.new("""
+<iframe
+  title="Rendro themed invoice PDF preview"
+  src="data:application/pdf;base64,#{themed_encoded}"
+  style="width: 100%; height: 640px; border: 1px solid #d1d5db;">
+</iframe>
+""")
+```
+
+```elixir
+Kino.Download.new(fn -> themed_pdf end, filename: "rendro-invoice-swiss.pdf")
+```
+
 ## Preview
 
 ```elixir
