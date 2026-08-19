@@ -82,6 +82,7 @@ defmodule Rendro.MixProject do
       # therefore out of the runtime package.
       "rendro.catalog.gen": [&catalog_gen/1],
       "rendro.catalog.check": [&catalog_check/1],
+      "rendro.configurator.gen": [&configurator_gen/1],
       ci: ["ci.fast", "ci.proofs"],
       "ci.fast": [
         "format --check-formatted",
@@ -123,6 +124,11 @@ defmodule Rendro.MixProject do
   defp catalog_check(args) do
     Mix.Task.run("compile")
     Mix.Tasks.Rendro.Catalog.Check.run(args)
+  end
+
+  defp configurator_gen(args) do
+    Mix.Task.run("compile")
+    Mix.Tasks.Rendro.Configurator.Gen.run(args)
   end
 
   defp package do
