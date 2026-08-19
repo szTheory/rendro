@@ -26,6 +26,9 @@ defmodule Mix.Tasks.RendroGenThemeTest do
 
       assert [{Rendro.RendroTheme, _}] = Code.compile_string(source)
 
+      # The generated module exists only after Code.compile_string/1 above, so a
+      # direct remote call would create a compile-time undefined-module warning.
+      # credo:disable-for-next-line Credo.Check.Refactor.Apply
       assert apply(Rendro.RendroTheme, :theme, []) ==
                Rendro.Theme.preset(:swiss, accent: {44, 107, 237}, mode: :light)
     end)
