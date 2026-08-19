@@ -1,6 +1,8 @@
 defmodule Mix.Tasks.RendroGenThemeFreshConsumerTest do
   use ExUnit.Case, async: false
 
+  @command_timeout 60_000
+
   test "a fresh local-path consumer discovers, compiles, and audits the generator contract" do
     root = File.cwd!()
 
@@ -48,7 +50,7 @@ defmodule Mix.Tasks.RendroGenThemeFreshConsumerTest do
       before_conflict = tree(consumer)
 
       {conflict, 0} =
-        run!(
+        run_conflict!(
           consumer,
           [
             "rendro.gen.theme",
@@ -154,16 +156,50 @@ defmodule Mix.Tasks.RendroGenThemeFreshConsumerTest do
     source =
       "Code.ensure_loaded!(Mix.Tasks.Rendro.Gen.Theme); Mix.Task.run(\"rendro.gen.theme\", #{inspect(task_args)})"
 
-    System.cmd("mix", ["run", "--no-start", "-e", source],
-      cd: cwd,
-      stderr_to_stdout: true
-    )
+    run_command!(cwd, ["run", "--no-start", "-e", source])
   end
 
-  defp run!(cwd, args) do
-    {output, status} = System.cmd("mix", args, cd: cwd, stderr_to_stdout: true)
+  defp run!(cwd, args), do: run_command!(cwd, args)
 
-    {output, status}
+  defp run_conflict!(cwd, task_args) do
+    source =
+      """
+      Mix.shell(Mix.Shell.Process)
+      Code.ensure_loaded!(Mix.Tasks.Rendro.Gen.Theme)
+      send(self(), {:mix_shell_input, :yes?, false})
+      Mix.Task.run("rendro.gen.theme", #{inspect(task_args)})
+
+      Stream.repeatedly(fn ->
+        receive do
+          {:mix_shell, _level, payload} -> IO.iodata_to_binary(payload)
+        after
+          0 -> :done
+        end
+      end)
+      |> Enum.take_while(&(&1 != :done))
+      |> Enum.each(&IO.write/1)
+      """
+
+    run_command!(cwd, ["run", "--no-start", "-e", source])
+  end
+
+  defp run_command!(cwd, args) do
+    task =
+      Task.async(fn ->
+        System.cmd("mix", args,
+          cd: cwd,
+          stderr_to_stdout: true
+        )
+      end)
+
+    case Task.yield(task, @command_timeout) do
+      {:ok, result} ->
+        result
+
+      nil ->
+        Task.shutdown(task, :brutal_kill)
+        raise "mix command timed out after #{@command_timeout}ms: mix #{Enum.join(args, " ")}"
+    end
   end
 
   defp tree(root) do
