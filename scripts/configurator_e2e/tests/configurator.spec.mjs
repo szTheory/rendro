@@ -2,9 +2,9 @@ import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
 const state = "family=invoice&preset=swiss&accent=%232C6BED&mode=light";
-const noExternal = (page) => {
+const noExternal = (page, expectedConsoleErrors = []) => {
   const failures = [];
-  page.on("console", (message) => message.type() === "error" && failures.push(`console: ${message.text()}`));
+  page.on("console", (message) => message.type() === "error" && !expectedConsoleErrors.includes(message.text()) && failures.push(`console: ${message.text()}`));
   page.on("pageerror", (error) => failures.push(`page: ${error.message}`));
   page.on("request", (request) => !request.url().startsWith("http://127.0.0.1:4174/") && failures.push(`external: ${request.url()}`));
   return () => expect(failures).toEqual([]);
@@ -61,6 +61,95 @@ test("exact, representative, none, failures, keyboard, and motion keep requested
   await scan(page);
   finish();
 });
+
+test("clipboard rejection retains exact source and a successful retry clears its actionable alert", async ({ page }) => {
+  const finish = noExternal(page);
+  await page.addInitScript(() => {
+    let attempts = 0;
+    window.__rendroCopiedSources = [];
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (source) => {
+          window.__rendroCopiedSources.push(source);
+          attempts += 1;
+          if (attempts === 1) throw new DOMException("rejected", "NotAllowedError");
+        }
+      }
+    });
+  });
+  await visit(page);
+  const source = await page.locator("#snippet-code").textContent();
+
+  await page.locator("#copy-snippet").click();
+  await expect(page.locator("#snippet-code")).toHaveText(source);
+  await expect(page.locator("#copy-snippet")).toBeEnabled();
+  await expect(page.locator("#error[role=alert]")).toBeVisible();
+  await expect(page.locator("#error")).toContainText("Reload this documentation page and try again.");
+  await expect(page.locator("#status")).toHaveText("Snippet could not be copied. Select the visible source and try again.");
+
+  await page.locator("#copy-snippet").click();
+  await expect(page.locator("#copy-snippet")).toHaveText("Snippet copied");
+  await expect(page.locator("#status")).toHaveText("Snippet copied");
+  await expect(page.locator("#error[role=alert]")).toBeHidden();
+  expect(await page.evaluate(() => window.__rendroCopiedSources)).toEqual([source, source]);
+  await expect(page.locator("#copy-snippet")).toBeFocused();
+  await expect(page.locator("#copy-snippet")).toBeEnabled();
+  finish();
+});
+
+test("selected preview-image failure clears fabricated content and reload restores it", async ({ page }) => {
+  const finish = noExternal(page, ["Failed to load resource: net::ERR_FAILED"]);
+  const selectedPng = "**/catalog/invoice/northline-logistics/swiss-light.png";
+  let failures = 0;
+  await page.route(selectedPng, async (route) => {
+    failures += 1;
+    await route.abort("failed");
+  });
+  await page.goto(`?${state}`);
+  await expect(page.locator("#error[role=alert]")).toBeVisible();
+  await expect(page.locator("#error")).toContainText("Reload this documentation page and try again.");
+  await expect(page.locator("#status")).toHaveText("Catalog previews are unavailable.");
+  await expect(page.locator("#preview img")).toHaveCount(0);
+  await expect(page.locator("#snippet-code")).toBeEmpty();
+  for (const control of ["#family", "#preset", "#accent", "#mode", "#copy-snippet"]) {
+    await expect(page.locator(control)).toBeDisabled();
+  }
+  expect(failures).toBe(1);
+
+  await page.unroute(selectedPng);
+  await page.reload();
+  await expect(page.locator("#preview img")).toHaveCount(1);
+  await expect(page.locator("#error[role=alert]")).toBeHidden();
+  await expect(page.locator("#snippet-code")).not.toBeEmpty();
+  await expect(page.locator("#status")).toHaveText("Exact pre-rendered swiss · #2C6BED · light preview.");
+  for (const control of ["#family", "#preset", "#accent", "#mode", "#copy-snippet"]) {
+    await expect(page.locator(control)).toBeEnabled();
+  }
+  finish();
+});
+
+for (const [name, colorScheme, query, expectedBackground, expectedMode] of [
+  ["dark chrome with a light document", "dark", state, "rgb(27, 23, 19)", "light"],
+  ["light chrome with a dark document", "light", "family=invoice&preset=swiss&accent=%232C6BED&mode=dark", "rgb(247, 243, 234)", "dark"]
+]) {
+  test(`browser chrome and document mode remain independent: ${name}`, async ({ page }) => {
+    const finish = noExternal(page);
+    await page.emulateMedia({ colorScheme });
+    await visit(page, query);
+    await expect(page.locator("body")).toHaveCSS("background-color", expectedBackground);
+    await expect(page.locator("#mode")).toHaveValue(expectedMode);
+    await expect(page).toHaveURL(new RegExp(`mode=${expectedMode}`));
+    await expect(page.locator("#snippet-code")).toContainText(`mode: :${expectedMode}`);
+    await expect(page.locator("#preview img")).toHaveAttribute("src", new RegExp(`swiss-${expectedMode}\\.png`));
+    if (expectedMode === "dark") {
+      await expect(page.locator("#disclosure")).toContainText("Screen-oriented");
+    } else {
+      await expect(page.locator("#status")).toHaveText("Exact pre-rendered swiss · #2C6BED · light preview.");
+    }
+    finish();
+  });
+}
 
 for (const [name, viewport, colorScheme, query] of [
   ["desktop-light-exact", { width: 1280, height: 900 }, "light", state],
