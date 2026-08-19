@@ -2,9 +2,9 @@
 phase: 129
 slug: docs-manifest-closure
 # status lifecycle: draft (seeded by plan-phase) → validated (set by validate-phase §6)
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: validated
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-08-19
 ---
 
@@ -39,10 +39,10 @@ created: 2026-08-19
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 129-01-01 | 01 | 1 | DOCS-01 | — | Public claims fail closed on missing proof, forbidden guarantees, broken links, or omitted package assets. | semantic/integration contract | `mix test test/docs_contract/presets_claims_test.exs` | ❌ W0 | ⬜ pending |
-| 129-02-01 | 02 | 2 | DOCS-01 | — | Guide and README expose only formatter-owned code and evidence-bounded copy. | executable docs contract | `mix test test/docs_contract/presets_claims_test.exs test/docs_contract/theming_claims_test.exs` | ❌ W0 | ⬜ pending |
-| 129-03-01 | 03 | 3 | DOCS-01 | — | API/support/guardrail manifests agree with generated code and the 27-lane registry. | deterministic manifest/guardrail contract | `mix test test/docs_contract/public_api_contract_test.exs test/docs_contract/presets_claims_test.exs test/guardrails/required_checks_contract_test.exs` | Mixed: existing + ❌ W0 | ⬜ pending |
-| 129-03-02 | 03 | 3 | DOCS-01 | — | Source, Hex tarball, and generated ExDoc paths resolve while private assets remain excluded. | package/docs integration | `mix test test/docs_contract/presets_claims_test.exs && mix docs --warnings-as-errors` | ❌ W0 | ⬜ pending |
+| 129-01-01 | 01 | 1 | DOCS-01 | — | Public claims fail closed on missing proof, forbidden guarantees, broken links, or omitted package assets. | semantic/integration contract | `mix test test/docs_contract/presets_claims_test.exs` | ✅ | ✅ green |
+| 129-02-01 | 02 | 2 | DOCS-01 | — | Guide and README expose only formatter-owned code and evidence-bounded copy, including preview, screen-output, and quality-label disclosures. | executable docs contract | `mix test test/docs_contract/presets_claims_test.exs test/docs_contract/theming_claims_test.exs` | ✅ | ✅ green |
+| 129-03-01 | 03 | 3 | DOCS-01 | — | API/support/guardrail manifests agree with generated code and the 27-lane registry. | deterministic manifest/guardrail contract | `mix test test/docs_contract/public_api_contract_test.exs test/docs_contract/presets_claims_test.exs test/guardrails/required_checks_contract_test.exs` | ✅ | ✅ green |
+| 129-03-02 | 03 | 3 | DOCS-01 | — | Source, Hex tarball, and generated ExDoc paths resolve while private assets remain excluded. | package/docs integration | `mix test test/docs_contract/presets_claims_test.exs && mix docs --warnings-as-errors` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -50,8 +50,8 @@ created: 2026-08-19
 
 ## Wave 0 Requirements
 
-- [ ] `test/docs_contract/presets_claims_test.exs` — cross-surface required/forbidden language, formatter snippet parity, proof-backed support row, mutation teeth, and source/tarball/ExDoc link checks for DOCS-01.
-- [ ] Extend the existing package-content assertions through the new lane or the closest established tarball contract so the required public catalog/configurator/token payload is positively asserted and private exclusions remain intact.
+- [x] `test/docs_contract/presets_claims_test.exs` — cross-surface required/forbidden language, formatter snippet parity, proof-backed support row, mutation teeth, visible preview/output/quality disclosures, and source/tarball/ExDoc link checks for DOCS-01.
+- [x] Package-content assertions positively cover the public catalog/configurator/token payload and retain private evidence exclusions; the shared Hex archive cache is isolated across concurrent BEAM VMs.
 
 ---
 
@@ -63,11 +63,21 @@ All phase behaviors should have automated verification. Human prose review may s
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verification or Wave 0 dependencies.
-- [ ] Sampling continuity: no three consecutive tasks without automated verification.
-- [ ] Wave 0 covers all missing references.
-- [ ] No watch-mode flags.
-- [ ] Feedback latency stays within the limits above.
-- [ ] `nyquist_compliant: true` is set after validation evidence exists.
+- [x] All tasks have `<automated>` verification or completed Wave 0 dependencies.
+- [x] Sampling continuity: no three consecutive tasks without automated verification.
+- [x] Wave 0 covers all missing references.
+- [x] No watch-mode flags.
+- [x] Feedback latency stays within the limits above.
+- [x] `nyquist_compliant: true` is set after validation evidence exists.
 
-**Approval:** pending
+**Approval:** validated — 2026-08-19
+
+## Validation Audit 2026-08-19
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 1 |
+| Resolved | 1 |
+| Escalated | 0 |
+
+Evidence: the 60-test Phase 129 focus set, all 27 deterministic docs lanes, and `mix ci.fast` pass from the audited HEAD. The added contract locks the exact/representative/unavailable preview states, screen-oriented dark-output boundary, and all three quality labels.
