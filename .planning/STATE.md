@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v2.12
 milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
-current_phase: 128
-current_phase_name: Static configurator, theme codegen & Livebook
-status: executing
+current_phase: 129
+current_phase_name: Docs & manifest closure
+status: planning
 stopped_at: Completed 128-04-PLAN.md
-last_updated: "2026-08-19T01:38:30.748Z"
+last_updated: "2026-08-19T03:06:27.476Z"
 last_activity: 2026-08-18
-last_activity_desc: Phase 128 execution started
+last_activity_desc: Phase 128 complete, transitioned to Phase 129
 progress:
   total_phases: 5
-  completed_phases: 3
-  total_plans: 25
-  completed_plans: 24
-  percent: 60
+  completed_phases: 4
+  total_plans: 26
+  completed_plans: 26
+  percent: 80
 ---
 
 # Project State
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-08-16)
 
 ## Current Position
 
-Phase: 128 (Static configurator, theme codegen & Livebook) — EXECUTING
-Plan: 5 of 5
-Status: Ready to execute
-Last activity: 2026-08-18 — Phase 128 execution started
+Phase: 129 — Docs & manifest closure
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-08-18 — Phase 128 complete, transitioned to Phase 129
 
 ## Roadmap Snapshot (v2.12, Phases 125-129) — IN PROGRESS
 

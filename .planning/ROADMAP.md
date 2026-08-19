@@ -20,7 +20,7 @@
 - [x] **Phase 125: Foundation — Curated fonts, style-genre presets & brand fixtures** - `Theme.preset/2` ships 5 (6 if time allows) locked genre presets backed by 4 curated open-license embedded fonts, plus additional example-brand fixture data to seed catalog variety (completed 2026-08-16)
 - [x] **Phase 126: Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth** - closes the 3 deferred v2.11 WINDOWS defects and deepens golden/typography-test coverage before any dark-mode catalog cell is generated (completed 2026-08-17)
 - [x] **Phase 127: Public example catalog & quality ratchet** - a bounded, hash-checked domain × brand × preset × mode catalog with a fail-loud rubric-scoring coverage guard, as a new sibling of the existing launch gallery (completed 2026-08-17)
-- [ ] **Phase 128: Static configurator, theme codegen & Livebook** - a zero-server browse → pick → copy configurator riding the catalog, `mix rendro.gen.theme --check`, and the Livebook as a third tinkerer surface
+- [x] **Phase 128: Static configurator, theme codegen & Livebook** - a zero-server browse → pick → copy configurator riding the catalog, `mix rendro.gen.theme --check`, and the Livebook as a third tinkerer surface (completed 2026-08-18)
 - [ ] **Phase 129: Docs & manifest closure** - a proof-backed `theming.presets` support-matrix row, a presets guide, and no-overclaim docs-contract coverage for every new public surface
 
 <details>
@@ -244,7 +244,7 @@ Plans:
 | 125. Foundation — Curated fonts, style-genre presets & brand fixtures | v2.12 | 10/10 | Complete    | 2026-08-16 |
 | 126. Carryover polish — dark-mode legibility, hierarchy & golden depth | v2.12 | 5/5 | Complete    | 2026-08-17 |
 | 127. Public example catalog & quality ratchet | v2.12 | 5/5 | Complete    | 2026-08-17 |
-| 128. Static configurator, theme codegen & Livebook | v2.12 | 6/6 | In Progress|  |
+| 128. Static configurator, theme codegen & Livebook | v2.12 | 6/6 | Complete    | 2026-08-18 |
 | 129. Docs & manifest closure | v2.12 | 0/TBD | Not started | - |
 
 ## Current Focus
