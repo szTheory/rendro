@@ -142,9 +142,9 @@ Recommended capability keys: strict_six_preset_constructors, deterministic_rende
 
 ### Pattern 3: Package plus ExDoc link closure
 
-Test three contexts separately: repository Markdown, Hex tarball, and generated ExDoc. mix.exs copies assets into docs, but package files currently include only launch assets and deliberately omit catalog/configurator. The configurator entrypoint also requires brand/tokens/tokens.css, and its generator task documents that brand assets are not currently in the tarball. [VERIFIED: codebase grep]
+Test three contexts separately: repository Markdown, Hex tarball, and generated ExDoc. A measured docs build copies assets/rendro/configurator and assets/rendro/catalog into the generated output, but does not copy brand/tokens/tokens.css because mix.exs maps only assets. The static entrypoint imports that missing stylesheet. [VERIFIED: local ExDoc build]
 
-Plan consequence: add narrowly scoped package inclusions for public configurator/catalog payload and required stylesheet, while retaining exclusions for priv/quality, support matrix, private schemas, and test-only raster material. Reuse HexBuildCache/tarball assertions. This closes D-22; verify exact ExDoc-relative syntax during implementation. [VERIFIED: codebase grep]
+Plan consequence: add narrowly scoped package inclusions for assets/rendro/catalog, assets/rendro/catalog.json, assets/rendro/configurator, and brand/tokens/tokens.css. Keep guides (which already covers the preset guide and Livebook) and the existing launch assets. Do not ship brand/tokens/tokens.json, brand/tokens/tailwind.tokens.js, the broader brand directory, priv/quality, support matrix, guardrails, private schemas, or test-only raster material. Reuse HexBuildCache/tarball assertions. [VERIFIED: local Hex build]
 
 ### Anti-Patterns to Avoid
 
@@ -197,16 +197,37 @@ Source: scripts/verify_docs.exs lane pattern. [VERIFIED: codebase grep]
 
 | # | Claim | Section | Risk if Wrong |
 |---|-------|---------|---------------|
-| A1 | Generated ExDoc output can be inspected from a stable temporary path in tests. | Package + ExDoc closure | Select test setup after verifying actual output layout; do not hard-code beforehand. [ASSUMED] |
+| — | None. All prior link and package assumptions were resolved by local ExDoc and Hex builds. [VERIFIED: local builds] | — | — |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. Exact link syntax across source, Hex, and ExDoc.
-   - Known: D-22 requires all three and current configurator paths are checkout-relative. [VERIFIED: codebase grep]
-   - Recommendation: build docs to a temporary output dir in a focused test and choose syntax from that evidence. [ASSUMED]
-2. Minimal package path list.
-   - Known: HTML needs CSS, JS, index JSON, catalog JSON/raster paths, and shared tokens CSS. [VERIFIED: codebase grep]
-   - Recommendation: establish exact tarball list with positive and retained-private-negative assertions. [VERIFIED: codebase grep]
+### Exact source, tarball, and ExDoc link syntax
+
+Measured command: mix docs --output /tmp/rendro-phase129-research.DZGcLt/docs-live. The generated tree contained assets/rendro/configurator/index.html, its CSS/JS/index JSON, assets/rendro/catalog.json, and all 32 catalog PNGs. README source links to guides/branding.md and guides/livebook/first_invoice.livemd were rendered as branding.html and first_invoice.html, respectively. A probe extra confirmed that a guide-local link to livebook/first_invoice.livemd becomes first_invoice.html. [VERIFIED: local ExDoc build]
+
+Use these exact Markdown paths:
+
+- README → preset guide: guides/presets.md. ExDoc rewrites it to presets.html. [VERIFIED: local ExDoc build]
+- README → configurator: assets/rendro/configurator/index.html. It resolves from repository root and the generated README page; the asset is copied to that same generated location. [VERIFIED: local ExDoc build]
+- presets guide → Livebook: livebook/first_invoice.livemd. It resolves from guides/ in source and ExDoc rewrites it to first_invoice.html. [VERIFIED: local ExDoc build]
+- presets guide → configurator: https://hexdocs.pm/rendro/assets/rendro/configurator/index.html. A single relative asset URL cannot work in both locations: assets/rendro/... is correct from generated presets.html but resolves to guides/assets/... in source, while ../assets/rendro/... is correct in source but resolves outside the generated docs root. The absolute HexDocs asset URL is the only one-link, three-context route without an extra docs application, copied redirect, or custom ExDoc output layout. [VERIFIED: local ExDoc build]
+
+Required plan change: add a focused docs-contract test that (1) asserts the Markdown source paths above, (2) builds docs to a temporary output directory and checks presets.html plus copied assets, and (3) checks the absolute configurator route. Do not try to make ExDoc emit extras below a guides/ directory: a probe using filename guides/link_probe failed because ExDoc does not create that output directory. [VERIFIED: local ExDoc build]
+
+### Exact smallest public package allowlist
+
+Measured command: MIX_DEPS_PATH=/Users/jon/projects/rendro/deps MIX_BUILD_PATH=/Users/jon/projects/rendro/_build/dev mix hex.build in a disposable source copy, followed by tar -xOf rendro-1.0.0.tar contents.tar.gz | tar -tzf -. The current tarball includes guides/livebook/first_invoice.livemd but excludes all configurator files, catalog.json, all 32 catalog PNGs, and brand/tokens/tokens.css. It also excludes priv/quality/rubric_scores.json, priv/support_matrix.json, and priv/guardrails/required_status_checks.json. [VERIFIED: local Hex build]
+
+Add only these package-file entries:
+
+- assets/rendro/catalog
+- assets/rendro/catalog.json
+- assets/rendro/configurator
+- brand/tokens/tokens.css
+
+Keep existing guides, README.md, mix.exs, assets/rendro/artifacts.json, assets/rendro/gallery, and assets/rendro/manual.pdf entries. The four additions cover every transitive static dependency: configurator/index.html imports configurator.css, configurator.js, and ../../../brand/tokens/tokens.css; configurator.js fetches index.json and ../catalog.json; catalog cells point to the 32 PNGs below assets/rendro/catalog. [VERIFIED: codebase grep]
+
+Must not ship: brand/tokens/tokens.json, brand/tokens/tailwind.tokens.js, broader brand assets, priv/quality, priv/support_matrix.json, priv/guardrails, private schemas, or test/advisory raster evidence. Add tarball positive assertions for the four additions and negative assertions for those exclusions; retain the existing public launch-asset assertions. [VERIFIED: local Hex build]
 
 ## Environment Availability
 
