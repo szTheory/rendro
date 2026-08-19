@@ -207,6 +207,8 @@ defmodule Mix.Tasks.Rendro.Gen.Theme do
   defp optional_switch(_flag, value, value), do: ""
   defp optional_switch(flag, value, _default), do: " #{flag} #{value}"
 
+  @dialyzer {:no_return, fail!: 3}
+  @dialyzer {:no_return, fail!: 4}
   defp fail!(resource, value, reason, config \\ nil) do
     rerun =
       if config,
