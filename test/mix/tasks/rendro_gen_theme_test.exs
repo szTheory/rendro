@@ -76,6 +76,59 @@ defmodule Mix.Tasks.RendroGenThemeTest do
     refute source =~ "Module.concat"
   end
 
+  test "uses Mix conflict handling and keeps check mode read-only" do
+    with_tmp_dir(fn tmp_dir ->
+      args = ["swiss", "--accent", "#2C6BED", "--out", "lib/generated_theme.ex"]
+      path = Path.join(tmp_dir, "lib/generated_theme.ex")
+
+      Theme.run(args)
+      generated = File.read!(path)
+
+      Theme.run(args)
+      assert File.read!(path) == generated
+
+      File.write!(path, "# detached application policy\n")
+      send(self(), {:mix_shell_input, :yes?, false})
+      Theme.run(args)
+      assert File.read!(path) == "# detached application policy\n"
+
+      Theme.run(args ++ ["--force"])
+      assert File.read!(path) == generated
+
+      before_equal = File.stat!(path)
+      {messages, :ok} = capture_shell_messages(fn -> Theme.run(args ++ ["--check"]) end)
+      assert Enum.join(messages, "\n") =~ "--check: OK"
+      assert File.read!(path) == generated
+      assert File.stat!(path).mtime == before_equal.mtime
+
+      File.write!(path, "# drift\n")
+      before_drift = File.stat!(path)
+      drift_error = assert_raise Mix.Error, fn -> Theme.run(args ++ ["--check"]) end
+      assert drift_error.message =~ "bytes differ"
+      assert drift_error.message =~ "Next: mix rendro.gen.theme"
+      assert File.read!(path) == "# drift\n"
+      assert File.stat!(path).mtime == before_drift.mtime
+
+      missing_path = Path.join(tmp_dir, "missing/nested/theme.ex")
+
+      missing_error =
+        assert_raise Mix.Error, fn ->
+          Theme.run([
+            "swiss",
+            "--accent",
+            "#2C6BED",
+            "--out",
+            "missing/nested/theme.ex",
+            "--check"
+          ])
+        end
+
+      assert missing_error.message =~ "file is missing"
+      refute File.exists?(missing_path)
+      refute File.exists?(Path.dirname(missing_path))
+    end)
+  end
+
   defp with_tmp_dir(fun) do
     tmp_dir =
       Path.join(System.tmp_dir!(), "rendro-gen-theme-#{System.unique_integer([:positive])}")
