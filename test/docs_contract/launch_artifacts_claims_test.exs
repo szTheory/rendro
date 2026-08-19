@@ -141,10 +141,10 @@ defmodule Rendro.DocsContract.LaunchArtifactsClaimsTest do
   end
 
   test "hex package includes public launch assets" do
-    tarball = "rendro-#{Mix.Project.config()[:version]}.tar"
+    tarball = Rendro.Test.HexBuildCache.tarball_path!()
 
     {output, 0} = Rendro.Test.HexBuildCache.get_build_output()
-    assert output =~ tarball
+    assert output =~ Path.basename(tarball)
     assert File.exists?(tarball)
 
     list_cmd = "tar -xOf #{tarball} contents.tar.gz | tar -tzf -"

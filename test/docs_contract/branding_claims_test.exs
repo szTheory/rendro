@@ -40,10 +40,10 @@ defmodule Rendro.DocsContract.BrandingClaimsTest do
 
   describe "hex tarball contents" do
     test "built tarball includes branded assets and NOTICE" do
-      tarball = "rendro-#{Mix.Project.config()[:version]}.tar"
+      tarball = Rendro.Test.HexBuildCache.tarball_path!()
 
       {output, 0} = Rendro.Test.HexBuildCache.get_build_output()
-      assert output =~ tarball
+      assert output =~ Path.basename(tarball)
       assert File.exists?(tarball)
 
       list_cmd = "tar -xOf #{tarball} contents.tar.gz | tar -tzf -"
@@ -60,10 +60,10 @@ defmodule Rendro.DocsContract.BrandingClaimsTest do
     end
 
     test "built tarball excludes operator-only priv paths" do
-      tarball = "rendro-#{Mix.Project.config()[:version]}.tar"
+      tarball = Rendro.Test.HexBuildCache.tarball_path!()
 
       {output, 0} = Rendro.Test.HexBuildCache.get_build_output()
-      assert output =~ tarball
+      assert output =~ Path.basename(tarball)
       assert File.exists?(tarball)
 
       list_cmd = "tar -xOf #{tarball} contents.tar.gz | tar -tzf -"

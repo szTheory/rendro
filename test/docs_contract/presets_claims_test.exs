@@ -72,9 +72,9 @@ defmodule Rendro.DocsContract.PresetsClaimsTest do
   end
 
   defp hex_contents! do
-    tarball = "rendro-#{Mix.Project.config()[:version]}.tar"
+    tarball = HexBuildCache.tarball_path!()
     {output, 0} = HexBuildCache.get_build_output()
-    assert output =~ tarball
+    assert output =~ Path.basename(tarball)
     assert File.exists?(tarball)
 
     {contents, 0} =

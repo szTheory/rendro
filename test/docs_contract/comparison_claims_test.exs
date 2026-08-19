@@ -167,10 +167,10 @@ defmodule Rendro.DocsContract.ComparisonClaimsTest do
   end
 
   test "hex package includes comparison guide, notebook, manifest, and raw artifacts" do
-    tarball = "rendro-#{Mix.Project.config()[:version]}.tar"
+    tarball = Rendro.Test.HexBuildCache.tarball_path!()
 
     {output, 0} = Rendro.Test.HexBuildCache.get_build_output()
-    assert output =~ tarball
+    assert output =~ Path.basename(tarball)
     assert File.exists?(tarball)
 
     list_cmd = "tar -xOf #{tarball} contents.tar.gz | tar -tzf -"

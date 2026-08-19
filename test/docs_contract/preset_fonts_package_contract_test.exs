@@ -9,9 +9,9 @@ defmodule Rendro.DocsContract.PresetFontsPackageContractTest do
   ]
 
   test "built Hex archive includes all curated faces and NOTICE" do
-    tarball = "rendro-#{Mix.Project.config()[:version]}.tar"
+    tarball = Rendro.Test.HexBuildCache.tarball_path!()
     {output, 0} = Rendro.Test.HexBuildCache.get_build_output()
-    assert output =~ tarball
+    assert output =~ Path.basename(tarball)
     assert File.exists?(tarball)
 
     {contents, 0} = System.cmd("sh", ["-c", "tar -xOf #{tarball} contents.tar.gz | tar -tzf -"])

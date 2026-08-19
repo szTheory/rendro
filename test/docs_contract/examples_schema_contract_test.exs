@@ -444,10 +444,10 @@ defmodule Rendro.DocsContract.ExamplesSchemaContractTest do
 
   describe "hex tarball contents" do
     test "priv/examples/ ships in the built tarball and every entry is text-only" do
-      tarball = "rendro-#{Mix.Project.config()[:version]}.tar"
+      tarball = Rendro.Test.HexBuildCache.tarball_path!()
 
       {output, 0} = Rendro.Test.HexBuildCache.get_build_output()
-      assert output =~ tarball
+      assert output =~ Path.basename(tarball)
       assert File.exists?(tarball)
 
       list_cmd = "tar -xOf #{tarball} contents.tar.gz | tar -tzf -"
