@@ -203,5 +203,15 @@ defmodule Rendro.DocsContract.PresetsClaimsTest do
       assert theming =~ "from_brand/2"
       assert theming =~ "on_accent"
     end
+
+    test "ExDoc and the Hex package register only the public preset asset graph" do
+      mixfile = File.read!("mix.exs")
+
+      assert mixfile =~ "guides/presets.md"
+      assert mixfile =~ "assets/rendro/catalog"
+      assert mixfile =~ "assets/rendro/catalog.json"
+      assert mixfile =~ "assets/rendro/configurator"
+      assert mixfile =~ "brand/tokens/tokens.css"
+    end
   end
 end
