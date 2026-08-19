@@ -1,20 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.12
-milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
-status: Awaiting next milestone
-stopped_at: Milestone v2.12 archived; planning next milestone
-last_updated: "2026-08-19T23:16:49.455Z"
+milestone: v2.13
+milestone_name: Quality Ratchet & Adoption Readiness
+status: planning
+last_updated: "2026-08-19T23:30:44.223Z"
 last_activity: 2026-08-19
-last_activity_desc: Milestone v2.12 completed and archived
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 29
-  completed_plans: 29
-  percent: 100
-current_phase: 129
-current_phase_name: docs-manifest-closure
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -28,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 ## Current Position
 
-Phase: Milestone v2.12 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-08-19 — Milestone v2.12 completed and archived
+Status: Defining requirements
+Last activity: 2026-08-19 — Milestone v2.13 started
 
 ## Roadmap Snapshot (v2.12, Phases 125-129) — SHIPPED 2026-08-19
 

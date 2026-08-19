@@ -8,6 +8,16 @@ Rendro is a pure-Elixir, Phoenix-first PDF and document generation library for t
 
 Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
 
+## Current Milestone: v2.13 Quality Ratchet & Adoption Readiness
+
+**Goal:** Strengthen Rendro's existing product and evaluation experience using current quality and adoption evidence, without expanding the core feature surface.
+
+**Target features:**
+- Improve the 12 catalog cells currently marked `needs_work`, with deterministic artifacts and bounded human review proving the revised results.
+- Refresh adoption evidence and record an explicit hold, accumulating, or trigger decision for each demand gate.
+- Validate the complete Phoenix newcomer journey from discovery and installation through customized, verified output.
+- Add visual-review tooling or planning cleanup only where it directly enables those outcomes.
+
 ## Latest Milestone: v2.12 Style-Genre Presets, Public Catalog & Static Configurator
 
 **Shipped:** 2026-08-19. v2.12 makes branded business documents turnkey through six deterministic style-genre presets, four curated embedded fonts, a bounded public catalog and honest quality ratchet, and a zero-server configurator/codegen/Livebook path.
@@ -16,13 +26,9 @@ All 28 requirements passed across phases 125-129. The milestone audit passed wit
 
 **Archive:** `milestones/v2.12-ROADMAP.md`, `milestones/v2.12-REQUIREMENTS.md`, `milestones/v2.12-MILESTONE-AUDIT.md`, and `milestones/v2.12-phases/`.
 
-## Next Milestone Goals
-
-No next milestone scope is committed. Start from current adopter demand with `$gsd-new-milestone`; preserve pure core, deterministic/advisory lane separation, and documentation-as-contract. Rendro Studio (`SEED-005`) remains optional and explicitly deferred because the shipped static configurator already covers the common zero-server path.
-
 ## Current State
 
-**v2.12 shipped 2026-08-19.** Rendro now offers six deterministic preset directions, curated font packaging, a bounded 32-cell public catalog, a static shareable configurator, canonical theme-module generation, and an aligned Livebook/docs path. Closeout verification passed 110 focused tests and `mix ci.fast` (1,821 tests, 0 failures; Credo and Dialyzer clean). Current focus is planning the next milestone.
+**v2.13 started 2026-08-19.** Rendro is strengthening the shipped catalog and evaluator journey before considering another capability family. The milestone retains a quiet, pull-based adoption posture and keeps Studio, charts, and global text shaping out of scope unless refreshed evidence justifies a later milestone.
 
 <details>
 <summary>v2.12 phase-by-phase completion context</summary>
@@ -192,7 +198,9 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-(None — define fresh requirements through `$gsd-new-milestone`.)
+- [ ] Improve and re-review the 12 catalog cells currently classified as `needs_work`.
+- [ ] Refresh adoption evidence and record an explicit demand-gate decision.
+- [ ] Prove the Phoenix newcomer journey from discovery through customized, verified output.
 
 ### Out of Scope
 
@@ -353,4 +361,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-19 after v2.12 milestone completion.*
+*Last updated: 2026-08-19 after starting v2.13 Quality Ratchet & Adoption Readiness.*
