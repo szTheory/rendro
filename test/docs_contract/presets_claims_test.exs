@@ -157,4 +157,51 @@ defmodule Rendro.DocsContract.PresetsClaimsTest do
       refute Enum.all?(@boundary_keys, &Map.has_key?(missing_boundary["boundaries"], &1))
     end
   end
+
+  describe "preset discovery route" do
+    test "the guide offers six neutral directions and routes each adoption job to its existing surface" do
+      guide = File.read!("guides/presets.md")
+
+      chooser_rows =
+        Regex.scan(
+          ~r/^\| (Swiss|Humanist|Editorial|Corporate Classic|Minimal Mono|Brutalist) \|/m,
+          guide
+        )
+
+      assert length(chooser_rows) == 6
+
+      for preset <- ["Swiss", "Humanist", "Editorial", "Corporate Classic", "Minimal Mono", "Brutalist"] do
+        assert guide =~ "| #{preset} |"
+      end
+
+      assert guide =~ "Structural direction"
+      assert guide =~ "Font-role character"
+      assert guide =~ "Density / geometry"
+      assert guide =~ "Business-document fit"
+      assert guide =~ "mix rendro.gen.theme"
+      assert guide =~ "--check"
+      assert guide =~ "livebook/first_invoice.livemd"
+      assert guide =~ "theming.md"
+      assert guide =~ "branding.md"
+      assert guide =~ "api_stability.md"
+      assert guide =~ "https://hexdocs.pm/rendro/assets/rendro/configurator/index.html"
+      refute guide =~ ~r/\b(best|recommended|approved|certified) preset/i
+    end
+
+    test "README and theming provide compact outcome-named handoffs without replacing their focused jobs" do
+      readme = File.read!("README.md")
+      theming = File.read!("guides/theming.md")
+
+      assert readme =~ "guides/presets.md"
+      assert readme =~ "assets/rendro/configurator/index.html"
+      assert readme =~ "Choose a preset"
+      assert readme =~ "Static configurator"
+      assert readme =~ "First Invoice Livebook"
+
+      assert theming =~ "Presets"
+      assert theming =~ "presets.md"
+      assert theming =~ "from_brand/2"
+      assert theming =~ "on_accent"
+    end
+  end
 end
