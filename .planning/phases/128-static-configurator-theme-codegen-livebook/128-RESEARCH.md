@@ -264,12 +264,12 @@ Manifest order is the tie-breaker because `find` preserves input order. Values h
 |---|---|---|---|
 | A1 | A safe alias/path validator can be implemented without dynamic atoms and can conservatively reject unusual umbrella layouts. | Pitfall 3 | Task may need a narrower documented override/error route. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Exact index generation task name/location**
-   - What we know: it must be dev/docs-only, committed, and called by a deterministic existing lane.
-   - What's unclear: whether planners prefer a new `dev` Mix task or a test-only helper.
-   - Recommendation: use an explicit dev Mix task analogous to catalog generation, plus a read-only contract test; it preserves core purity and makes regeneration discoverable.
+1. **Exact index generation task name/location — RESOLVED**
+   - Selected contract: dev-only `Mix.Tasks.Rendro.Configurator.Gen` at `dev/mix/tasks/rendro/configurator/gen.ex`, invoked as `mix rendro.configurator.gen`.
+   - Committed output: the task deterministically writes `assets/rendro/configurator/index.json` from the packaged canonical formatter.
+   - Drift contract: `mix rendro.configurator.gen --check` is read-only and compares freshly derived bytes to the committed file byte-for-byte; equality exits successfully, while a missing or different file fails without creating directories, changing bytes, or changing mtime.
 
 ## Environment Availability
 

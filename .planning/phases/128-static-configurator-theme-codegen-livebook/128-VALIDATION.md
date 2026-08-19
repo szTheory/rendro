@@ -31,7 +31,8 @@ created: 2026-08-18
 
 - **After every task commit:** Run the narrowest mapped ExUnit command below plus `mix format --check-formatted`
 - **After every plan wave:** Run `mix test`
-- **Before `$gsd-verify-work`:** Run `mix ci.fast`, `mix rendro.livebook.check`, and the static-file smoke check; all must be green
+- **Wave 3 / Plan 05 final gate:** After Plans 02, 03, and 04 complete, run `mix ci.fast`, `mix rendro.livebook.check`, `mix rendro.configurator.gen --check`, and the direct static-file smoke contract; all must be green before the browser/assistive-technology checkpoint
+- **Before `$gsd-verify-work`:** Confirm Plan 05's automated gate and explicit manual checkpoint are complete
 - **Max feedback latency:** 60 seconds for task-level checks
 
 ---
@@ -46,6 +47,7 @@ created: 2026-08-18
 | Assigned by planner | TBD | TBD | CONFIG-04 | T-128-01 | Query input is validated atomically and DOM construction avoids unsafe HTML sinks | static JS contract | `mix test test/docs_contract/configurator_static_contract_test.exs` | ❌ W0 | ⬜ pending |
 | Assigned by planner | TBD | TBD | CONFIG-05 | T-128-03 / T-128-04 | Generator rejects unsafe aliases/paths and `--check` never writes | unit + Mix task integration | `mix test test/rendro/theme/snippet_test.exs test/mix/tasks/rendro_gen_theme_test.exs` | ❌ W0 | ⬜ pending |
 | Assigned by planner | TBD | TBD | CONFIG-06 | T-128-05 | Notebook remains no-server and evaluates only the marked, formatter-owned preset path | notebook source + integration | `mix test test/mix/tasks/rendro_livebook_check_test.exs && mix rendro.livebook.check` | ✅ extend existing | ⬜ pending |
+| 128-05-01 | 05 | 3 | CONFIG-01..06 | T-128-06 / T-128-07 | All three consumers integrate with the canonical formatter; committed index drift, Livebook execution, full CI, and direct static-file topology are proven after Wave 2 | integration + static-file smoke | `mix test test/docs_contract/configurator_phase_gate_test.exs --max-failures 1 && mix rendro.configurator.gen --check && mix rendro.livebook.check && mix ci.fast` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -58,6 +60,7 @@ created: 2026-08-18
 - [ ] `test/docs_contract/configurator_static_contract_test.exs` — static packaging, semantic/accessibility contract, safe DOM APIs, and no build/server dependency
 - [ ] `test/docs_contract/configurator_resolver_contract_test.exs` — exact/representative/none and atomic fallback cases against synthetic manifests
 - [ ] Extend `test/mix/tasks/rendro_livebook_check_test.exs` — exact shared snippet, themed render evidence, and explicit no-server/no-interactive exclusions
+- [ ] `test/docs_contract/configurator_phase_gate_test.exs` — Wave-3 direct-file integration smoke proving every shipped local asset/reference, both committed JSON inputs, canonical snippet provenance, and no required server/build/runtime dependency
 
 ---
 
@@ -68,6 +71,8 @@ created: 2026-08-18
 | Responsive visual hierarchy and natural-aspect preview remain legible in light, dark, and system modes | CONFIG-01, CONFIG-02 | Visual quality and browser rendering are not fully established by source-contract tests | Open the packaged configurator at narrow and wide viewports in current Chrome, Firefox, and Safari; inspect light/dark/system, exact/representative/none, loading/error, long-code overflow, and reduced-motion states against `128-UI-SPEC.md` |
 | Keyboard, focus, native control, and screen-reader status flow is understandable | CONFIG-01, CONFIG-04 | Automated markup checks cannot establish the full assistive-technology experience | Complete family/preset/accent/mode selection and copy using keyboard only; then verify labels, live-region announcements, copy failure recovery, and focus order with VoiceOver or NVDA |
 | Generated module feels conventional in a fresh consumer project | CONFIG-05 | Compilation proves correctness but not the end-to-end prompt/error ergonomics | In a disposable Mix project, run default, override, conflict, `--force`, and `--check` paths; confirm every failure explains what/where/why/next and no unexpected file is written |
+
+Plan 05 owns these manual gates after its automated commands pass. The executor may gather browser screenshots or accessibility-tree evidence where safe, but visual hierarchy and screen-reader comprehension remain human judgments and require the blocking checkpoint in `128-05-PLAN.md`.
 
 ---
 
