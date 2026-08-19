@@ -284,6 +284,53 @@
 - Model mix: predominantly opus (planning/execution/verification), sonnet for mechanical replication stages.
 - Notable: six re-audit passes converged the milestone to FULLY COMPLIANT (Nyquist all 6 phases, integration WIRED) before close — thorough but audit-heavy.
 
+## Milestone: v2.12 — Style-Genre Presets, Public Catalog & Static Configurator
+
+**Shipped:** 2026-08-19
+**Phases:** 5 (125-129) | **Plans:** 29 | **Tasks:** 53
+
+### What Was Built
+
+- Six deterministic style-genre presets backed by four provenance-bound open-license fonts, explicit document-owned registration, and separate deterministic/advisory render matrices.
+- The inherited v2.11 visual-polish fixes and deeper accent-golden and typography coverage across all seven recipes.
+- A bounded 32-cell public catalog with deterministic artifacts, explicit quality dispositions, and pinned-PDFium advisory evidence.
+- A zero-server static configurator with canonical shareable state, truthful preview disclosure, safe copy behavior, and no product Node/runtime dependency.
+- One formatter-owned Elixir source model shared by configurator output, `mix rendro.gen.theme --check`, and the Livebook path.
+- Proof-backed preset discovery across checkout, Hex, and ExDoc, guarded by the 27th deterministic docs-contract lane.
+
+### What Worked
+
+- Sequencing foundation → polish → catalog → configurator → docs prevented known visual defects from becoming the catalog baseline.
+- Keeping deterministic proof separate from PDFium/Chromium advisory proof made every release claim auditable without widening the required core lane.
+- Using one formatter as the copied-code source of truth eliminated drift among the browser, generator, and Livebook surfaces.
+- Conservative human-quality dispositions preserved the ratchet's credibility; no cell was promoted merely to make the catalog look complete.
+
+### What Was Inefficient
+
+- Generated milestone statistics undercounted tasks, so the closeout had to derive the authoritative 53-task count from canonical plan files.
+- Three completed phases retained stale Nyquist metadata, and the milestone audit had been written under a duplicated `v2.12-v2.12` filename; both needed reconciliation at close.
+- Linux-only Chromium screenshot evidence was technically valid but insufficiently documented for macOS operators until closeout.
+
+### Patterns Established
+
+- **Bounded registry over cross-product generation:** an explicit ordered catalog with a hard ceiling keeps public proof useful and reviewable.
+- **Requested identity stays distinct from preview identity:** representative previews never rewrite the exact theme code the user selected.
+- **Provenance is an exact reference:** fonts and advisory artifacts are bound to licenses, versions, hashes, and source jobs rather than informal attribution.
+- **Documentation claims are executable contracts:** new public vocabulary ships only with support-matrix and deterministic docs-lane coverage.
+
+### Key Lessons
+
+1. Closeout metadata should be updated in the same plan that establishes its evidence; stale validation state creates avoidable audit work even when the implementation is sound.
+2. Human-reviewed visual artifacts need an explicit platform and viewing recipe, not just hashes and generated files.
+3. A static adoption surface can satisfy most experimentation needs without prematurely committing core to a live application or server dependency.
+4. Quality ratchets remain trustworthy only when `needs_work` is treated as useful product information rather than a release embarrassment.
+
+### Cost Observations
+
+- 248 commits over 23 calendar days (2026-07-28 → 2026-08-19).
+- 307 files changed (+26,752 / −551) from v2.11 through closeout; 65,184 lines of Elixir across `lib/`, `dev/`, and `test/` at ship.
+- Final required verification: 12 doctests, 8 properties, and 1,821 tests with 0 failures; Credo and Dialyzer clean.
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -298,6 +345,7 @@
 | v2.5 | 5 (78-82) | 16 | Public 1.0 commitment: enforced API manifest, two-tier SemVer contract, hardened release gates, and proof-gated hex publish. |
 | v2.6 | 6 (83-88) | 32 | Quiet public discoverability: claim correction, visible proof artifacts, advisory raster/comparison/Livebook lanes, issue-only intake, and measurable demand-gated v2.7 criteria. |
 | C1 | 6 (108-113) | 18 | CI/CD reliability milestone: measure-first baseline, precise BEAM caching, stable `ci-success` required gate, deterministic/advisory lane separation, release-proof hardening, and remote p50/p95/cache validation. |
+| v2.12 | 5 (125-129) | 29 | Turnkey styling and adoption: bounded preset/catalog registries, deterministic/advisory proof separation, one formatter-owned code seam, and a static zero-server configurator. |
 
 ### Cumulative Quality
 
@@ -310,6 +358,7 @@
 | v2.4 | 2 (engine lanes unchanged; reference-app `example-phoenix` lane is advisory/isolated, never required) | 0 new (recipes are pure-core; no new runtime adapter or Hex dependency) |
 | v2.5 | 2 (engine lanes unchanged; release-proof hardened) | 0 new |
 | v2.6 | 2 (engine lanes unchanged; raster/comparison/Livebook/HexDocs remain advisory or separate) | 1 new optional adapter surface (`Rendro.Adapters.Pdfium.render/2`) |
+| v2.12 | 2 (engine lanes unchanged; PDFium/Chromium/configurator evidence remains advisory or isolated) | 0 new (presets, catalog, formatter, and generator preserve pure core and add no runtime dependency) |
 
 ### Top Lessons (Verified Across Milestones)
 
