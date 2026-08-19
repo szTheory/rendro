@@ -2,6 +2,7 @@
 
 ## Milestones
 
+- 📋 **v2.13 Quality Ratchet & Adoption Readiness** — Phases 130-131 (planned)
 - ✅ **v2.12 Style-Genre Presets, Public Catalog & Static Configurator** — Phases 125-129 (shipped 2026-08-19; [roadmap archive](milestones/v2.12-ROADMAP.md), [requirements](milestones/v2.12-REQUIREMENTS.md), [audit](milestones/v2.12-MILESTONE-AUDIT.md))
 - ✅ **v2.11 Document Theming & Design-Token System** — Phases 119-124 (shipped 2026-07-28; [archive](milestones/v2.11-ROADMAP.md))
 - ✅ **v2.10 Realistic Business-Document Examples & Anatomy** — Phases 114-118 (shipped 2026-07-19; [archive](milestones/v2.10-ROADMAP.md))
@@ -9,14 +10,46 @@
 - ✅ **B1 Brand System & Identity Lab** — Phases 101-107 (shipped 2026-06-14; [archive](milestones/B1-ROADMAP.md))
 - ✅ **v2.9 TOC & Document Navigation** — Phases 97-100 (shipped 2026-06-14; [archive](milestones/v2.9-ROADMAP.md))
 
-## Current
+## Phases
 
-Planning the next milestone. No phases or requirements are active.
+### 📋 v2.13 Quality Ratchet & Adoption Readiness (Phases 130-131)
 
-Start a fresh cycle with `$gsd-new-milestone`.
+**Milestone Goal:** Strengthen the shipped catalog and adoption experience with current, bounded evidence—repairing and honestly re-reviewing the twelve existing `needs_work` catalog cells, recording an explicit demand-gate decision, and proving one clean Phoenix newcomer path—without expanding Rendro's runtime dependencies, core capability families, catalog, recipes, or presets.
 
-## Deferred
+- [ ] **Phase 130: Catalog Quality & Evidence Ratchet** - Repair and re-review the exact twelve catalog cells through the existing deterministic and advisory evidence lanes.
+- [ ] **Phase 131: Adoption Snapshot & Phoenix Newcomer Proof** - Record a dated demand decision and prove the public Swiss/light Invoice path in a clean Phoenix application.
 
-- Rendro Studio (`SEED-005`) remains an optional, demand-driven live playground; v2.12's static configurator covers the common zero-server workflow.
-- OpenType tabular figures, small caps, and broader feature support remain demand-gated on new text-engine primitives.
-- Full-size sequential visual-review tooling remains a non-blocking operator-experience follow-up.
+## Phase Details
+
+### Phase 130: Catalog Quality & Evidence Ratchet
+
+**Goal**: The exact twelve catalog cells currently marked `needs_work` have targeted, evidence-bound quality improvements and a truthful current disposition, while the fixed 32-cell catalog remains deterministic and its advisory human-review boundary remains intact.
+**Depends on**: Nothing (first phase of the milestone; builds on the shipped v2.12 catalog, rubric, and pinned-raster evidence seams)
+**Requirements**: CATALOG-06, CATALOG-07, CATALOG-08, CATALOG-09
+**Success Criteria** (what must be TRUE):
+
+  1. A reviewer can inspect improved renders for each of the six named family/brand/preset combinations in both light and dark modes—the exact twelve current `needs_work` cells—without any new recipe, preset, or catalog entry appearing.
+  2. The Humanist dark Receipt visibly resolves its recorded reader-affordance, typographic-craft, and cohesion deficits, while its catalog record continues to communicate screen-oriented use and `print_safety: false`.
+  3. Maintainers can regenerate the complete fixed 32-cell catalog and have its existing deterministic artifact, hash, schema, and coverage checks accept the current generated output.
+  4. A human can review the twelve exact full-size pinned-raster outputs and find every disposition bound to the current catalog ID and reviewed artifact hashes; any cell that misses the frozen threshold remains `needs_work` rather than being promoted.
+**Plans**: TBD
+
+### Phase 131: Adoption Snapshot & Phoenix Newcomer Proof
+
+**Goal**: Maintainers have a dated, source-backed adoption decision and newcomers can independently go from Rendro’s public discovery path to a customized, verified Swiss/light Invoice PDF in a clean Phoenix application.
+**Depends on**: Phase 130 (the journey and public evidence consume the catalog's final truthful state)
+**Requirements**: SIGNAL-02, SIGNAL-03, SIGNAL-04, SIGNAL-05, JOURNEY-01, JOURNEY-02, JOURNEY-03, JOURNEY-04
+**Success Criteria** (what must be TRUE):
+
+  1. A maintainer can read one dated adoption-review entry containing the public Hex download source and raw totals, qualifying-demand issue review, and qualifying non-maintainer merged-contribution review; an unavailable source is recorded as unavailable rather than counted as zero.
+  2. The adoption ledger exposes an explicit `HOLD`, `ACCUMULATING`, or `TRIGGER` decision for downloads, demand, contributor activity, and their conjunctive composite gate, using the existing gate criteria without outreach, telemetry, or polling.
+  3. A newcomer in a clean Phoenix environment can follow public discovery material to install the public Rendro package, select the canonical Swiss/light Invoice, and customize it using the documented preset/configurator path without a repository checkout or warm dependency cache.
+  4. That clean Phoenix application responds through the optional Phoenix adapter with a successful `application/pdf` response whose bytes begin `%PDF-`, and the recorded journey states the exact versions, commands, results, and any repairs limited to existing handoffs.
+**Plans**: TBD
+
+## Progress
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 130. Catalog Quality & Evidence Ratchet | 0/TBD | Not started | - |
+| 131. Adoption Snapshot & Phoenix Newcomer Proof | 0/TBD | Not started | - |

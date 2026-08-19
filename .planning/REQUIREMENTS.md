@@ -55,28 +55,28 @@ Explicit exclusions for v2.13.
 
 ## Traceability
 
-Roadmap mapping is populated after phase approval.
+Roadmap mapping approved with the milestone roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CATALOG-06 | TBD | Pending |
-| CATALOG-07 | TBD | Pending |
-| CATALOG-08 | TBD | Pending |
-| CATALOG-09 | TBD | Pending |
-| SIGNAL-02 | TBD | Pending |
-| SIGNAL-03 | TBD | Pending |
-| SIGNAL-04 | TBD | Pending |
-| SIGNAL-05 | TBD | Pending |
-| JOURNEY-01 | TBD | Pending |
-| JOURNEY-02 | TBD | Pending |
-| JOURNEY-03 | TBD | Pending |
-| JOURNEY-04 | TBD | Pending |
+| CATALOG-06 | Phase 130 | Pending |
+| CATALOG-07 | Phase 130 | Pending |
+| CATALOG-08 | Phase 130 | Pending |
+| CATALOG-09 | Phase 130 | Pending |
+| SIGNAL-02 | Phase 131 | Pending |
+| SIGNAL-03 | Phase 131 | Pending |
+| SIGNAL-04 | Phase 131 | Pending |
+| SIGNAL-05 | Phase 131 | Pending |
+| JOURNEY-01 | Phase 131 | Pending |
+| JOURNEY-02 | Phase 131 | Pending |
+| JOURNEY-03 | Phase 131 | Pending |
+| JOURNEY-04 | Phase 131 | Pending |
 
 **Coverage:**
 - v2.13 requirements: 12 total
-- Mapped to phases: 0
-- Unmapped: 12
+- Mapped to phases: 12
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-08-19*
-*Last updated: 2026-08-19 after initial definition*
+*Last updated: 2026-08-19 after v2.13 roadmap approval*
