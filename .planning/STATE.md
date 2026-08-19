@@ -5,15 +5,15 @@ milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 128
 current_phase_name: Static configurator, theme codegen & Livebook
 status: executing
-stopped_at: Completed 128-02-PLAN.md
-last_updated: "2026-08-19T01:28:45.471Z"
+stopped_at: Completed 128-03-PLAN.md
+last_updated: "2026-08-19T01:34:42.446Z"
 last_activity: 2026-08-18
 last_activity_desc: Phase 128 execution started
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 25
-  completed_plans: 22
+  completed_plans: 23
   percent: 60
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-16)
 ## Current Position
 
 Phase: 128 (Static configurator, theme codegen & Livebook) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-08-18 — Phase 128 execution started
 
@@ -79,8 +79,8 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-19T01:28:45.463Z
-Stopped at: Completed 128-02-PLAN.md
+Last session: 2026-08-19T01:34:42.434Z
+Stopped at: Completed 128-03-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -129,6 +129,7 @@ Resume file: None
 | Phase 127-public-example-catalog-quality-ratchet P05 | 30m | 2 tasks | 6 files |
 | Phase 128-static-configurator-theme-codegen-livebook P01 | 18min | 2 tasks | 5 files |
 | Phase 128 P02 | 7min | 2 tasks | 2 files |
+| Phase 128 P03 | 15min | 2 tasks | 5 files |
 
 ## Operator Next Steps
 
@@ -164,3 +165,6 @@ Resume file: None
 - [Phase ?]: Use mix rendro.configurator.gen as the explicit deterministic generation and read-only drift-check seam.
 - [Phase ?]: Keep generated wrappers fixed at theme/0 and register_fonts/1 with no runtime override interface.
 - [Phase ?]: Use formatter-owned source plus Mix.Generator conflict semantics and byte-exact read-only checks.
+- [Phase ?]: Keep requested code identity separate from derived catalog preview identity; representative previews never rewrite selected source values.
+- [Phase ?]: Reject malformed, duplicate, partial, and unknown query state atomically, then serialize only the four canonical keys.
+- [Phase ?]: Copy exactly the visible committed formatter string and report Clipboard success only after its promise resolves.
