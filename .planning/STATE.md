@@ -5,15 +5,15 @@ milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 128
 current_phase_name: Static configurator, theme codegen & Livebook
 status: executing
-stopped_at: Completed 128-01-PLAN.md
-last_updated: "2026-08-19T01:18:26.123Z"
+stopped_at: Completed 128-02-PLAN.md
+last_updated: "2026-08-19T01:28:45.471Z"
 last_activity: 2026-08-18
 last_activity_desc: Phase 128 execution started
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 25
-  completed_plans: 21
+  completed_plans: 22
   percent: 60
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-16)
 ## Current Position
 
 Phase: 128 (Static configurator, theme codegen & Livebook) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-08-18 — Phase 128 execution started
 
@@ -79,8 +79,8 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-19T01:18:26.112Z
-Stopped at: Completed 128-01-PLAN.md
+Last session: 2026-08-19T01:28:45.463Z
+Stopped at: Completed 128-02-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -128,6 +128,7 @@ Resume file: None
 | Phase 127-public-example-catalog-quality-ratchet P04 | 0m | 1 tasks | 1 files |
 | Phase 127-public-example-catalog-quality-ratchet P05 | 30m | 2 tasks | 6 files |
 | Phase 128-static-configurator-theme-codegen-livebook P01 | 18min | 2 tasks | 5 files |
+| Phase 128 P02 | 7min | 2 tasks | 2 files |
 
 ## Operator Next Steps
 
@@ -161,3 +162,5 @@ Resume file: None
 - [Phase ?]: Delete all nine Phase 127 isolated evidence refs only after full-SHA verification and advisory closure.
 - [Phase ?]: Keep the configurator index as a closed 6 × 6 × 7 × 2 formatter-owned source model with trusted internal evaluation only.
 - [Phase ?]: Use mix rendro.configurator.gen as the explicit deterministic generation and read-only drift-check seam.
+- [Phase ?]: Keep generated wrappers fixed at theme/0 and register_fonts/1 with no runtime override interface.
+- [Phase ?]: Use formatter-owned source plus Mix.Generator conflict semantics and byte-exact read-only checks.

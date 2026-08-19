@@ -199,7 +199,7 @@ Plans:
   4. `mix rendro.gen.theme <preset> --accent "#…"` writes a generated theme module and `--check` fails loudly on drift; the generated snippet and the configurator's copy button provably share one canonical template (a compile-round-trip test covers the full producible preset × mode × accent enum).
   5. The existing Livebook exercises `Theme.preset/2` live as a third tinkerer surface alongside the configurator and `mix rendro.gen.theme`.
 
-**Plans**: 1/5 plans executed
+**Plans**: 2/5 plans executed
 
 Plans:
 **Wave 1**
@@ -208,7 +208,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 128-02-PLAN.md — Ship the safe application-owned theme generator and read-only drift gate.
+- [x] 128-02-PLAN.md — Ship the safe application-owned theme generator and read-only drift gate.
 - [ ] 128-03-PLAN.md — Build the truthful static configurator, four-key URL contract, and exact clipboard path.
 - [ ] 128-04-PLAN.md — Extend the existing Livebook with one formatter-owned preset render and bounded proof.
 
@@ -241,7 +241,7 @@ Plans:
 | 125. Foundation — Curated fonts, style-genre presets & brand fixtures | v2.12 | 10/10 | Complete    | 2026-08-16 |
 | 126. Carryover polish — dark-mode legibility, hierarchy & golden depth | v2.12 | 5/5 | Complete    | 2026-08-17 |
 | 127. Public example catalog & quality ratchet | v2.12 | 5/5 | Complete    | 2026-08-17 |
-| 128. Static configurator, theme codegen & Livebook | v2.12 | 1/5 | In Progress|  |
+| 128. Static configurator, theme codegen & Livebook | v2.12 | 2/5 | In Progress|  |
 | 129. Docs & manifest closure | v2.12 | 0/TBD | Not started | - |
 
 ## Current Focus
