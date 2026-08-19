@@ -68,9 +68,9 @@ status: complete
 
 ## Performance
 
-- **Duration:** 22 min
+- **Duration:** 32 min
 - **Started:** 2026-08-19T02:51:00Z
-- **Completed:** 2026-08-19T03:19:40Z
+- **Completed:** 2026-08-19T03:30:00Z
 - **Tasks:** 1
 - **Files modified:** 5
 
@@ -80,6 +80,7 @@ status: complete
 - Repaired the test-proven stale clipboard alert only after a successful Clipboard API resolution; failure feedback remains actionable until recovery.
 - Formatted the blocked docs-contract test, proved the exact fourteen-item Plan 05 inventory is its only historical-plan change, and passed the full deterministic CI lane.
 - Made the real fresh-consumer conflict subprocess noninteractive under a TTY by injecting its explicit `Mix.Shell.Process` decline response and bounding every child Mix command.
+- Corrected the first repair's task-argument forwarding, compiled the complete fresh dependency graph, and made temporary consumer roots collision-resistant.
 
 ## Verification
 
@@ -94,14 +95,14 @@ status: complete
 ## Task Commits
 
 1. **Task 1: Close the pinned-Chromium matrix and deterministic CI gaps** — `2c522a5` (test), `c02f39b` (feat)
-2. **Post-completion fix: Fresh-consumer conflict subprocess** — `5ee99ed` (fix)
+2. **Post-completion fix: Fresh-consumer conflict subprocess** — `5ee99ed` (fix), `545906f` (fix)
 
 ## Files Created/Modified
 
 - `scripts/configurator_e2e/tests/configurator.spec.mjs` — executes clipboard rejection/retry, PNG failure/reload, and cross-combination chrome/document evidence.
 - `assets/rendro/configurator/configurator.js` — clears the stale actionable copy alert after successful retry only.
 - `test/docs_contract/dx_local_reproducibility_claims_test.exs` — formatted deterministic CI wiring contract.
-- `test/mix/tasks/rendro_gen_theme_fresh_consumer_test.exs` — makes the child conflict prompt explicit and timeout-bounded without replacing real Mix task discovery.
+- `test/mix/tasks/rendro_gen_theme_fresh_consumer_test.exs` — makes the child conflict prompt explicit and timeout-bounded, compiles the complete fresh dependency graph, and exposes child failures without replacing real Mix task discovery.
 - `.planning/phases/128-static-configurator-theme-codegen-livebook/128-05-PLAN.md` — corrected only the historical `files_modified` inventory.
 
 ## Decisions Made
@@ -120,15 +121,23 @@ status: complete
 - **Files modified:** `test/mix/tasks/rendro_gen_theme_fresh_consumer_test.exs`
 - **Verification:** Focused non-TTY and pseudo-TTY runs passed, followed by pinned Chromium and `mix ci.fast`.
 
+**2. [Rule 1 - Bug] Repaired the first conflict subprocess fix**
+- **Found during:** Independent post-fix verification
+- **Issue:** The first repair passed the task name into `Mix.Task.run/2` as a second positional preset, causing a deterministic child status 1; its partial dependency compile could also leave the genuinely fresh consumer without transitive dependencies.
+- **Fix:** Pattern-matched away the task name, compiled all child dependencies, used a cryptographically random temporary-root suffix, and emitted captured child exception details before a nonzero exit.
+- **Files modified:** `test/mix/tasks/rendro_gen_theme_fresh_consumer_test.exs`
+- **Verification:** Two non-TTY focused runs and one BSD pseudo-TTY run passed, followed by pinned Chromium and `mix ci.fast`.
+
 ---
 
-**Total deviations:** 1 auto-fixed (Rule 1 bug fix).
+**Total deviations:** 2 auto-fixed (Rule 1 bug fixes).
 **Impact on plan:** Restores the completed fresh-consumer evidence under both local execution modes without changing the product task or claim boundary.
 
 ## Issues Encountered
 
 - The intentional aborted selected-PNG request emits Chromium's expected local console error; its test permits only that exact expected error while retaining the existing external-request and unexpected-error checks.
 - A first broad `Mix.Shell.Process` attempt also affected force writes; the final repair scopes it only to the conflict subprocess.
+- Independent verification caught the initial task-argument forwarding error; child diagnostics now report the complete exception rather than hiding it behind a truncated pattern-match failure.
 
 ## User Setup Required
 
@@ -140,7 +149,7 @@ The Phase 128 browser and terminal deterministic gates are green with no human c
 
 ## Self-Check: PASSED
 
-- Task commits `2c522a5`, `c02f39b`, and `5ee99ed` exist.
+- Task commits `2c522a5`, `c02f39b`, `5ee99ed`, and `545906f` exist.
 - All five modified task files and this summary exist on disk.
 
 ---
