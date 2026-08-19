@@ -6,6 +6,9 @@ pattern (`document/2` → `page_template/1` → `sections/2`). It performs no I/
 and touches no registry — it never reaches the deterministic render pipeline
 directly.
 
+For a complete preset choice and adoption route, see [Presets](presets.md).
+This guide stays focused on manual theme tokens and caller-owned brand inputs.
+
 ```elixir-schematic
 Rendro.Recipes.Invoice.document(data, theme: Rendro.Theme.from_brand(accent: "#0E7C76"))
 ```

@@ -34,29 +34,39 @@ embeds; it is not a global registration step.
 Rendro provides six strict preset constructors. They are starting directions,
 not a ranking or an approval of a document's final visual quality.
 
-| Preset | Direction | Useful for |
-| --- | --- | --- |
-| Swiss | compact grotesque structure | product and SaaS invoices |
-| Humanist | open humanist sans | readable service documents |
-| Editorial | text-serif emphasis | reports and correspondence |
-| Corporate Classic | formal serif-and-sans balance | traditional business records |
-| Minimal Mono | restrained monospace geometry | operational and technical artifacts |
-| Brutalist | high-contrast geometric treatment | deliberate, direct internal artifacts |
+| Preset | Structural direction | Font-role character | Density / geometry | Business-document fit |
+| --- | --- | --- | --- | --- |
+| Swiss | compact grid with direct hierarchy | grotesque headings with practical body copy | dense, aligned, and economical | product and SaaS invoices |
+| Humanist | open service-document structure | humanist sans roles with a readable rhythm | relaxed spacing with familiar forms | service summaries and client records |
+| Editorial | narrative report frame | text-serif emphasis with restrained supporting sans | measured columns and reading-led pacing | reports and correspondence |
+| Corporate Classic | formal record layout | serif-and-sans balance for established institutions | steady proportions and conventional grouping | traditional business records |
+| Minimal Mono | operational reference grid | restrained monospace roles | regular columns and deliberate geometry | operational and technical artifacts |
+| Brutalist | direct, high-contrast frame | geometric roles with blunt emphasis | assertive blocks and visible structure | deliberate internal artifacts |
 
 ## Continue by job
 
-- [Browse bounded previews](../assets/rendro/configurator/index.html) in the
-  static configurator, then copy the requested selection's canonical snippet.
-  A catalog preview is bounded evidence: it is not complete-document or
-  universal-viewer proof, and a representative accent preview is disclosed as
-  representative rather than your requested accent.
-- Generate an application-owned module with `mix rendro.gen.theme`, then use
-  `--check` to keep the committed source from drifting.
-- [Try a rendered invoice](livebook/first_invoice.livemd) to execute, inspect,
-  and download real bytes in Livebook.
+- [Browse bounded previews and copy a selection](https://hexdocs.pm/rendro/assets/rendro/configurator/index.html)
+  in the static configurator. It is the browse → pick → copy route, not a
+  second rendering tutorial. A catalog preview is bounded evidence: it is not
+  complete-document or universal-viewer proof, and a representative-accent
+  preview is disclosed as representative rather than your requested accent.
+- Generate an application-owned module with `mix rendro.gen.theme`, commit it,
+  then use `--check` to keep the committed source from drifting.
+- [Render, inspect, and download an invoice in Livebook](livebook/first_invoice.livemd)
+  to execute one real document and inspect its bytes.
 - See [Theming](theming.md) for manual tokens and `from_brand/2`, or
-  [API Stability and Support Boundaries](api_stability.md) for the support
-  contract.
+  [Branding](branding.md) for caller-owned logos and fonts.
+- Read [API Stability and Support Boundaries](api_stability.md) before turning
+  a supported capability into an operational or compliance assumption.
+
+## Read the evidence state
+
+The configurator describes a preview as exact, representative-accent, or
+unavailable. Copied code always names the requested selection. Dark output
+retains the visible boundary: **Screen-oriented; not a print, accessibility,
+PDF/UA, or WCAG claim.** Catalog quality labels are limited to **Scored —
+passes current rubric**, **Scored — needs work**, and **Not yet scored**. They
+are dispositions, not approval or certification.
 
 Deterministic bytes, bounded catalog previews, human quality dispositions, and
 documentation claims are separate evidence levels. A valid snippet vocabulary

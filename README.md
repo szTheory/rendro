@@ -16,6 +16,13 @@ Rendro is an open-source, Elixir-native PDF layout library for Phoenix teams tha
 - **Canonical recipes:** Use `document/2`, `page_template/1`, and `sections/2` escape hatches for invoices, statements, receipts, reports, certificates, payslips, and tickets.
 - **Operational proof:** Telemetry, diagnostics, support boundaries, and docs-contract checks keep public claims auditable.
 
+## Choose a preset
+
+Curated presets are strong starting points; adjust them for your document and
+review the result. [Choose a preset direction](guides/presets.md), [browse and
+copy a static configurator selection](assets/rendro/configurator/index.html),
+or [render an invoice in Livebook](guides/livebook/first_invoice.livemd).
+
 <!-- rendro-launch-artifacts-start -->
 ## Rendered Recipe Gallery
 
@@ -42,6 +49,8 @@ SHA-256: `107c047878308448d2dec7f5022c440ebf73054efe133749014a856ef4f77be6`
 
 ## Guides
 
+- [Choose a preset direction](guides/presets.md) — compare six neutral document directions, then follow the adoption route that fits your job.
+- [Static configurator](assets/rendro/configurator/index.html) — browse bounded catalog evidence and copy the requested selection's canonical Elixir.
 - [User Flows and Jobs To Be Done](guides/user_flows_and_jtbd.md) — the shortest path to understanding which Rendro workflow fits your SaaS use case.
 - [Branding](guides/branding.md) — register fonts and logo assets, then use the branded invoice recipe.
 - [Integrations](guides/integrations.md) — optional adapters for Phoenix ecosystem workflows such as Oban, Threadline, Mailglass, and signing.
