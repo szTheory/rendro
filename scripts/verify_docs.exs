@@ -41,7 +41,8 @@ lanes = [
    ["test", "test/docs_contract/rubric_manifest_contract_test.exs"]},
   {"Domain content contract lane", ["test", "test/docs_contract/domain_md_contract_test.exs"]},
   {"Accessibility overclaim tripwire lane",
-   ["test", "test/docs_contract/accessibility_overclaim_test.exs"]}
+   ["test", "test/docs_contract/accessibility_overclaim_test.exs"]},
+  {"Preset public-claims lane", ["test", "test/docs_contract/presets_claims_test.exs"]}
 ]
 
 # formatter: on
