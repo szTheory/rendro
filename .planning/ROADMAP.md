@@ -2,7 +2,7 @@
 
 ## Milestones
 
-- 🚧 **v2.12 Style-Genre Presets, Public Catalog & Static Configurator** — Phases 125-129 (planning; additive minor `1.3.0` intent, Milestone C of the Happy-Path program / `SEED-004`)
+- 🚧 **v2.12 Style-Genre Presets, Public Catalog & Static Configurator** — Phases 125-129 (implementation complete; milestone audit pending; additive minor `1.3.0` intent, Milestone C of the Happy-Path program / `SEED-004`)
 - ✅ **v2.11 Document Theming & Design-Token System** — Phases 119-124 (shipped 2026-07-28; additive minor `1.2.0`, Milestone B of the Happy-Path program / `SEED-003`)
 - ✅ **v2.10 Realistic Business-Document Examples & Anatomy** — Phases 114-118 (shipped 2026-07-19; additive minor `1.1.0`, Milestone A)
 - ✅ **C1 CI/CD Performance & Reliability** — Phases 108-113 (shipped 2026-07-11; non-version infra milestone, no Hex release)
@@ -11,7 +11,7 @@
 
 ## Phases
 
-### 🚧 v2.12 Style-Genre Presets, Public Catalog & Static Configurator (Phases 125-129) — PLANNING
+### 🚧 v2.12 Style-Genre Presets, Public Catalog & Static Configurator (Phases 125-129) — IMPLEMENTATION COMPLETE
 
 **Milestone Goal:** Make great-looking branded documents turnkey — pick a design *style* + plug in palette/logo — and show it all off as a public by-domain example catalog that doubles as a standing quality ratchet. Builds directly on the shipped v2.11 `Rendro.Theme` contract. Folds in the three deferred v2.11 dark-mode/hierarchy polish items (WINDOWS ids 1-3) so the catalog's dark cells and the reader-quality ratchet start from an honest baseline rather than baking a known-bad baseline into a standing artifact. Preset/genre/catalog/configurator vocabulary is structurally confined to new sibling modules/manifests (`lib/rendro/theme/presets.ex`, `Rendro.Catalog` + `assets/rendro/catalog.json`) — `theme.ex` and the existing 11-row `@gallery_specs` are never grown in place (the `theme_industry_guard_test.exs` tripwire). Zero new runtime dependencies; zero server/DB; no Node/npm in required CI or as a Hex runtime dep. Direction locked HIGH-confidence by research: every capability is pure composition over already-shipped machinery (`Theme.resolve/1`/`dark/1`, `FontRegistry`, `LaunchArtifacts`, ExDoc's asset copy-through, `mix brand.gen`'s `--check` idiom).
 
@@ -21,7 +21,7 @@
 - [x] **Phase 126: Carryover polish — dark-mode legibility, hierarchy decision & golden/typography depth** - closes the 3 deferred v2.11 WINDOWS defects and deepens golden/typography-test coverage before any dark-mode catalog cell is generated (completed 2026-08-17)
 - [x] **Phase 127: Public example catalog & quality ratchet** - a bounded, hash-checked domain × brand × preset × mode catalog with a fail-loud rubric-scoring coverage guard, as a new sibling of the existing launch gallery (completed 2026-08-17)
 - [x] **Phase 128: Static configurator, theme codegen & Livebook** - a zero-server browse → pick → copy configurator riding the catalog, `mix rendro.gen.theme --check`, and the Livebook as a third tinkerer surface (completed 2026-08-18)
-- [ ] **Phase 129: Docs & manifest closure** - a proof-backed `theming.presets` support-matrix row, a presets guide, and no-overclaim docs-contract coverage for every new public surface
+- [x] **Phase 129: Docs & manifest closure** - a proof-backed `theming.presets` support-matrix row, a presets guide, and no-overclaim docs-contract coverage for every new public surface (completed 2026-08-19)
 
 <details>
 <summary>✅ v2.11 Document Theming & Design-Token System (Phases 119-124) — SHIPPED 2026-07-28</summary>
@@ -258,11 +258,11 @@ Plans:
 | 126. Carryover polish — dark-mode legibility, hierarchy & golden depth | v2.12 | 5/5 | Complete    | 2026-08-17 |
 | 127. Public example catalog & quality ratchet | v2.12 | 5/5 | Complete    | 2026-08-17 |
 | 128. Static configurator, theme codegen & Livebook | v2.12 | 6/6 | Complete    | 2026-08-18 |
-| 129. Docs & manifest closure | v2.12 | 3/3 | In Progress|  |
+| 129. Docs & manifest closure | v2.12 | 3/3 | Complete    | 2026-08-19 |
 
 ## Current Focus
 
-🚧 **v2.12 Style-Genre Presets, Public Catalog & Static Configurator** (Phases 125-129) — planning. All 28 requirements mapped (100% coverage, each requirement in exactly one phase); ready to plan Phase 125 with `/gsd-plan-phase 125`.
+🚧 **v2.12 Style-Genre Presets, Public Catalog & Static Configurator** (Phases 125-129) — all 5 phases and 29 plans are complete. All 28 requirements remain mapped at 100%; Phase 129 independently verified 17/17 must-haves with no human-verification items. Ready for `/gsd-audit-milestone` before archival/release preparation.
 
 ## Planned Next — "Happy-Path Home Runs" program (dormant seeds)
 
@@ -276,7 +276,7 @@ See all seeds: `/gsd-capture --list-seeds`.
 |---|-----------|------|--------|
 | A | Realistic Business-Document Examples & Anatomy | `SEED-002` | ✅ shipped as v2.10 (Phases 114-118) |
 | B | Document Theming & Design-Token System (`Rendro.Theme`, light/dark, unbranded default) | `SEED-003` | ✅ shipped as v2.11 (Phases 119-124) |
-| C | Style-Genre Presets, Public Catalog & Static Configurator | `SEED-004` | 🚧 active — roadmap created (Phases 125-129) |
+| C | Style-Genre Presets, Public Catalog & Static Configurator | `SEED-004` | 🚧 implementation complete — milestone audit pending |
 | D | Rendro Studio: optional mountable theme playground (LiveView) | `SEED-005` *(optional)* | dormant |
 
 Dependency order: A → B → C → D. Each is a right-sized milestone; D is optional/deferrable.

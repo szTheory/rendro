@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v2.12
 milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 129
-current_phase_name: docs-manifest-closure
-status: verifying
-stopped_at: Completed 129-03-PLAN.md
-last_updated: "2026-08-19T16:31:46.056Z"
+status: completed
+stopped_at: Phase 129 verified; milestone audit pending
+last_updated: "2026-08-19T18:20:00Z"
 last_activity: 2026-08-19
-last_activity_desc: Phase 129 execution started
+last_activity_desc: Phase 129 complete
 progress:
   total_phases: 5
   completed_phases: 5
   total_plans: 29
   completed_plans: 29
   percent: 100
+current_phase_name: docs-manifest-closure
 ---
 
 # Project State
@@ -24,24 +24,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-16)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 129 — docs-manifest-closure
+**Current focus:** v2.12 milestone audit and closure
 
 ## Current Position
 
-Phase: 129 (docs-manifest-closure) — EXECUTING
-Plan: 3 of 3
-Status: Phase complete — ready for verification
-Last activity: 2026-08-19 — Phase 129 execution started
+Phase: 129
+Plan: Not started
+Status: All phases complete
+Last activity: 2026-08-19 — Phase 129 complete
 
-## Roadmap Snapshot (v2.12, Phases 125-129) — IN PROGRESS
+## Roadmap Snapshot (v2.12, Phases 125-129) — IMPLEMENTATION COMPLETE
 
 ```text
-[████████████████████████                ] 60% — 3/5 phases complete
+[████████████████████████████████████████] 100% — 5/5 phases complete
 Phase 125 Foundation — fonts, presets & brand fixtures .... Complete
 Phase 126 Carryover polish — dark/hierarchy/golden depth .. Complete
 Phase 127 Public example catalog & quality ratchet ........ Complete
-Phase 128 Static configurator, codegen & Livebook .......... Not started
-Phase 129 Docs & manifest closure .......................... Not started
+Phase 128 Static configurator, codegen & Livebook .......... Complete
+Phase 129 Docs & manifest closure .......................... Complete
 ```
 
 **Locked sequencing:** 125 (foundation) → 126 (polish, needs presets for POLISH-04) → 127 (catalog, needs polish landed first for honest dark cells) → 128 (configurator, needs catalog as data source) → 129 (docs closure, deliberately last).
@@ -63,6 +63,12 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 - Phase 127 shipped the separate, bounded 32-cell public catalog with deterministic source/artifact checks, a pinned advisory raster lane, exact 12 scored-false / 20 reasoned-unscored coverage, and fail-closed promotion provenance.
 - Jon's provisional review remains deliberately conservative: all twelve flagships are `needs_work`; the Poppy & Grain dark Receipt contrast concern is retained for a future high-fidelity visual ratchet.
 
+### Phases 128–129 delivered
+
+- Phase 128 shipped the zero-server configurator, URL-restored preset/accent/mode/family selection, nearest-preview disclosure, canonical copied snippet, drift-checking theme generator, and aligned Livebook journey without adding a runtime dependency.
+- Phase 129 closed the public claim surface with a proof-backed preset support row, canonical presets guide, README/HexDocs/package routing, regenerated public API manifest, and one fail-loud 27th docs lane wired atomically into required-check guardrails.
+- Final Phase 129 verification passed 17/17 must-haves; code review is clean, Nyquist coverage is complete, all 11 security threats are closed (including two documented low-risk acceptances), all 27 docs lanes pass, and `mix ci.fast` is green.
+
 ### Carryover resolved into Milestone C roadmap
 
 - **WINDOWS ids 1-3 (deferred v2.11 polish)** → mapped to Phase 126 (POLISH-01/02/03): invoice_dark table-body cells inherit default ink → illegible on dark bg (id 1); Ticket/ticket_dark themed uniform type scale inverts intended display/title hierarchy — locked Phase-122 outcome, honestly `passed:false` (id 2); payslip themed numeric cells wrap mid-number at 10.5pt/1.35 leading (id 3).
@@ -79,14 +85,14 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-19T16:31:46.045Z
-Stopped at: Completed 129-03-PLAN.md
+Last session: 2026-08-19T18:20:00Z
+Stopped at: Phase 129 verified; milestone audit pending
 Resume file: None
 
 ## Next Steps
 
-1. `/gsd-plan-phase 128` — plan the static configurator, canonical snippet/codegen seam, and Livebook surface over the verified catalog.
-2. Continue in locked sequence: 128 → 129.
+1. `/gsd-audit-milestone` — verify v2.12 end to end against its original intent and all 28 requirements.
+2. If the audit passes, `/gsd-complete-milestone` to archive v2.12 and prepare the next milestone/release step.
 
 ## Performance Metrics
 
