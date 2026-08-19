@@ -4,15 +4,15 @@ milestone: v2.12
 milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 129
 current_phase_name: Docs & manifest closure
-status: planning
+status: executing
 stopped_at: Phase 129 context gathered
-last_updated: "2026-08-19T15:30:59.789Z"
+last_updated: "2026-08-19T16:12:31.668Z"
 last_activity: 2026-08-18
 last_activity_desc: Phase 128 complete, transitioned to Phase 129
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 26
+  total_plans: 29
   completed_plans: 26
   percent: 80
 ---
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-08-16)
 
 Phase: 129 — Docs & manifest closure
 Plan: Not started
-Status: Ready to plan
+Status: Ready to execute
 Last activity: 2026-08-18 — Phase 128 complete, transitioned to Phase 129
 
 ## Roadmap Snapshot (v2.12, Phases 125-129) — IN PROGRESS
