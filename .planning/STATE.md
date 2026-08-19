@@ -5,8 +5,8 @@ milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 129
 current_phase_name: Docs & manifest closure
 status: planning
-stopped_at: Completed 128-04-PLAN.md
-last_updated: "2026-08-19T03:06:27.476Z"
+stopped_at: Phase 129 context gathered
+last_updated: "2026-08-19T15:30:59.789Z"
 last_activity: 2026-08-18
 last_activity_desc: Phase 128 complete, transitioned to Phase 129
 progress:
@@ -79,9 +79,9 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-19T01:38:30.740Z
-Stopped at: Completed 128-04-PLAN.md
-Resume file: None
+Last session: 2026-08-19T15:30:59.773Z
+Stopped at: Phase 129 context gathered
+Resume file: .planning/phases/129-docs-manifest-closure/129-CONTEXT.md
 
 ## Next Steps
 
