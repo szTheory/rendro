@@ -15,6 +15,7 @@ defmodule Mix.Tasks.Rendro.Gen.Theme do
   prompts for, or writes files. These are single-invocation guarantees; this task
   makes no parallel-writer or interruption-rollback claim.
   """
+  @moduledoc tags: [:adapter]
   @shortdoc "Generate a fixed, application-owned Rendro theme wrapper"
 
   use Mix.Task
