@@ -1,26 +1,44 @@
 ---
 phase: 128-static-configurator-theme-codegen-livebook
-verified: 2026-08-19T03:05:25Z
-status: passed
-score: 11/11 must-haves verified
+verified: 2026-08-19T03:22:21Z
+status: gaps_found
+score: 9/11 must-haves verified
 behavior_unverified: 0
 overrides_applied: 0
 re_verification:
-  previous_status: gaps_found
-  previous_score: 9/11
-  gaps_closed:
-    - "Pinned Chromium executes the full revised recovery and chrome/document-mode acceptance matrix."
-    - "The terminal deterministic mix ci.fast gate is formatter-clean and green."
-  gaps_remaining: []
-  regressions: []
+  previous_status: passed
+  previous_score: 11/11
+  gaps_closed: []
+  gaps_remaining:
+    - "Fresh-consumer conflict evidence exits successfully in both non-TTY and pseudo-TTY execution."
+    - "The terminal deterministic mix ci.fast gate is green."
+  regressions:
+    - "Commit 5ee99ed changed the fresh-consumer conflict child process, but the real local-path consumer test now exits 1 in both execution modes."
+gaps:
+  - truth: "A fresh local-path consumer completes the generator default/override/conflict/force/equal/different/missing audit without a TTY dependency."
+    status: failed
+    reason: "Both direct and pseudo-TTY runs fail at test/rendro_gen_theme_fresh_consumer_test.exs:52 because the conflict child returns exit 1 rather than the asserted 0. The child output consists of Rendro dependency compile warnings for unavailable optional modules (YamlElixir, JSV, Jason), so the queued false overwrite response is never proven by a successful real conflict command."
+    artifacts:
+      - path: "test/mix/tasks/rendro_gen_theme_fresh_consumer_test.exs"
+        issue: "run_conflict!/2 invokes mix run --no-start in a new consumer; its command exits 1 before the asserted skipped-conflict result."
+    missing:
+      - "Make the real consumer conflict subprocess compile/run successfully in the declared fresh environment, while retaining the explicit false overwrite response and bounded timeout; prove it in both non-TTY and pseudo-TTY modes."
+  - truth: "The complete deterministic mix ci.fast gate passes."
+    status: failed
+    reason: "mix ci.fast includes the failing fresh-consumer ExUnit test, so the terminal gate is red despite formatter checks and the other focused Phase-128 regressions passing."
+    artifacts:
+      - path: "test/mix/tasks/rendro_gen_theme_fresh_consumer_test.exs"
+        issue: "The test's conflict case fails with a MatchError on the expected {conflict, 0} result."
+    missing:
+      - "Close the fresh-consumer failure, then rerun mix ci.fast to a zero exit status."
 ---
 
 # Phase 128: Static Configurator, Theme Codegen & Livebook — Verification Report
 
 **Phase Goal:** Deliver a zero-server static configurator over the catalog, a safe `mix rendro.gen.theme` generator sharing canonical source, and the focused Livebook preset path; acceptance is zero-human through pinned Chromium and fresh-consumer automation.
-**Verified:** 2026-08-19T03:05:25Z
-**Status:** passed
-**Re-verification:** Yes — after gap closure
+**Verified:** 2026-08-19T03:22:21Z
+**Status:** gaps_found
+**Re-verification:** Yes — regression after prior pass
 
 ## Goal Achievement
 
@@ -28,81 +46,59 @@ re_verification:
 
 | # | Truth | Status | Evidence |
 | --- | --- | --- | --- |
-| 1 | One closed formatter owns configurator, generated-module, and Livebook source. | ✓ VERIFIED | `Rendro.Theme.Snippet` supplies the closed source vocabulary, `usage_snippet/4`, `module_source/4`, and deterministic JSON; focused tests passed. |
-| 2 | The committed index has 504 ordered, parseable, executable records with explicit font registration. | ✓ VERIFIED | `Snippet.records/0` enumerates 6×6×7×2; phase-gate/index tests and read-only drift check passed. |
-| 3 | The configurator is a safe zero-server static ExDoc asset surface. | ✓ VERIFIED | Direct-file contract, static asset graph, local manifests/raster paths, and safe DOM source checks passed; test-only Node stays isolated under `scripts/configurator_e2e/`. |
-| 4 | URL fallback/round-trip plus exact/representative/none lookup preserve canonical source identity. | ✓ VERIFIED | Resolver contracts and pinned Chromium tests pass against the shipped controller. |
-| 5 | Clipboard success and rejection/retry preserve the exact visible source and expose/clear factual feedback correctly. | ✓ VERIFIED | Pinned container test injects a first `writeText` rejection, checks polite status/actionable alert/source retention, then verifies successful retry, source identity, focus, and alert removal. |
-| 6 | Selected PNG failure/reload recovery removes fabricated content, disables controls, then restores the static page. | ✓ VERIFIED | Pinned container intercepts exactly the selected catalog PNG, asserts alert/status/disabled/cleared state, removes interception, reloads, and verifies restored image/source/controls. |
-| 7 | Browser chrome and document mode remain independent in both cross-combinations. | ✓ VERIFIED | Pinned Chromium runs dark-chrome/light-document and light-chrome/dark-document, asserting body chrome, query/control/snippet mode, preview raster, and disclosure. |
-| 8 | Responsive 899/900/mobile/desktop behavior, 44px target, overflow, reduced motion, scoped ARIA, axe, and seven Linux pixel baselines are covered. | ✓ VERIFIED | 13-test pinned suite includes two semantic/axe cases, seven `*-linux.png` baselines, and explicit 899/900/mobile assertions. |
-| 9 | `mix rendro.gen.theme` is safe in a fresh consumer for default, override, conflict, force, equal/different/missing check behavior. | ✓ VERIFIED | Focused fresh-consumer subprocess test passed, including recursive path/type/mtime/SHA-256 audit. |
-| 10 | The existing Livebook is the focused third canonical surface with no server/interactive expansion. | ✓ VERIFIED | Focused Livebook test and `mix rendro.livebook.check` passed; marked notebook block is formatter-linked. |
-| 11 | Terminal deterministic CI and truthful, bounded Chromium-only claims are intact. | ✓ VERIFIED | `mix ci.fast` passed; CI strictly aggregates `configurator-browser`; README/SUMMARY exclude cross-browser, AT, WCAG-certification, and aesthetic claims. |
+| 1 | One closed formatter owns configurator, generated-module, and Livebook source. | ✓ VERIFIED | Focused snippet/index regression passed. |
+| 2 | The committed index has 504 ordered, executable records with explicit font registration. | ✓ VERIFIED | Snippet/phase-gate regressions and `mix rendro.configurator.gen --check` passed. |
+| 3 | The configurator remains a safe zero-server static ExDoc asset surface. | ✓ VERIFIED | Focused static/phase-gate contracts passed; no product Node/runtime surface was added. |
+| 4 | URL fallback/round-trip and exact/representative/none preserve canonical source identity. | ✓ VERIFIED | Resolver contracts and the browser container suite passed. |
+| 5 | Clipboard success/rejection/retry and selected-PNG failure/reload recovery retain the required semantics. | ✓ VERIFIED | Exact pinned container run: 13/13 browser tests passed. |
+| 6 | Chrome/document mode cross-combinations, layout baselines, axe, ARIA, and responsive checks remain covered. | ✓ VERIFIED | Exact pinned container runs both cross-combinations and all seven Linux visual baselines. |
+| 7 | Safe CLI validation, generated wrapper behavior, and read-only drift checks work. | ✓ VERIFIED | Focused generator tests passed. |
+| 8 | Livebook is the focused, no-server third surface. | ✓ VERIFIED | Focused Livebook test plus `mix rendro.livebook.check` passed. |
+| 9 | Fresh consumer default/override/conflict/force/equal/different/missing behavior works without TTY dependence. | ✗ FAILED | Both direct and pseudo-TTY focused runs fail at the real conflict child before `{conflict, 0}` can be asserted. |
+| 10 | Strict browser CI aggregation and bounded Chromium-only claims remain wired. | ✓ VERIFIED | `.github/workflows/ci.yml` still requires graph-disconnected `configurator-browser` through `ci-success`; documented claims remain bounded. |
+| 11 | Terminal deterministic CI is green. | ✗ FAILED | `mix ci.fast` is red because it includes the failing fresh-consumer conflict test. |
 
-**Score:** 11/11 truths verified (0 present, behavior-unverified).
+**Score:** 9/11 truths verified (0 present, behavior-unverified).
 
-### Required Artifacts
+### Required Artifacts and Wiring
 
-| Artifact | Expected | Status | Details |
-| --- | --- | --- | --- |
-| `lib/rendro/theme/snippet.ex` and committed configurator index | Canonical formatter/index | ✓ VERIFIED | Substantive, wired, byte-equal, and focused-test proven. |
-| `lib/mix/tasks/rendro/gen/theme.ex` | Safe application-owned generator | ✓ VERIFIED | Delegates to formatter; fresh-consumer test proves create/check semantics. |
-| `assets/rendro/configurator/{index.html,configurator.js,configurator.css}` | Static configurator | ✓ VERIFIED | Direct-file and pinned Chromium tests execute shipped handlers. |
-| `scripts/configurator_e2e/` | Pinned Chromium evidence | ✓ VERIFIED | Locked Playwright/axe, localhost-only server, 13 container tests, seven Linux baselines, CI job. |
-| `test/mix/tasks/rendro_gen_theme_fresh_consumer_test.exs` | Real consumer proof | ✓ VERIFIED | Passed in focused regression run. |
-| `guides/livebook/first_invoice.livemd` | Focused Livebook path | ✓ VERIFIED | No-server execution and source-link tests passed. |
-| `test/docs_contract/dx_local_reproducibility_claims_test.exs` | CI aggregate contract | ✓ VERIFIED | Formatter-clean; focused test and full CI pass. |
-
-### Key Link Verification
-
-| From | To | Via | Status | Details |
-| --- | --- | --- | --- | --- |
-| Configurator generator | `Rendro.Theme.Snippet` | `Snippet.index_json/0` | ✓ WIRED | Drift check and phase-gate byte equality passed. |
-| Mix generator | `Rendro.Theme.Snippet` | `Snippet.module_source/4` | ✓ WIRED | Generator source and generated-wrapper tests verify it. |
-| Controller | index/catalog manifests | local fetch, closed resolver, selected record | ✓ WIRED | Direct-file and Chromium execution pass. |
-| Copy button | selected snippet | real clipboard handler | ✓ WIRED | Both successful and rejected/retry branches executed. |
-| Image handler | selected catalog PNG | failure then reload | ✓ WIRED | Browser test exercises shipped `error` handler and recovery. |
-| Browser job | `ci-success` | required `needs` aggregate | ✓ WIRED | Workflow and docs-contract test verify `configurator-browser` is strict aggregate input. |
-
-### Data-Flow Trace (Level 4)
-
-| Artifact | Data Variable | Source | Produces Real Data | Status |
-| --- | --- | --- | --- | --- |
-| Configurator | `index.records` / `catalog.cells` | committed local JSON files | Formatter-owned source and manifest-backed rasters | ✓ FLOWING |
-| Generated wrapper | generated module bytes | formatter source | Closed enum serialization | ✓ FLOWING |
-| Livebook | themed document/PDF | canonical snippet and recipe | `%PDF-`, byte evidence, preview/download | ✓ FLOWING |
+| Artifact / Link | Status | Details |
+| --- | --- | --- |
+| Formatter, index, configurator, generator, and Livebook source | ✓ VERIFIED | Existing substantive implementations and focused regression contracts remain wired and green. |
+| Pinned Playwright harness → shipped controller | ✓ VERIFIED | `npm run test:container --prefix scripts/configurator_e2e`: 13/13 passed in the exact pinned container. |
+| Fresh-consumer test → real child Mix conflict | ✗ FAILED | `run_conflict!/2` is wired to the child task, but fails with exit 1 due dependency compilation warnings instead of proving the expected skip path. |
+| CI aggregate → fresh-consumer test | ✗ FAILED | Strict wiring exists, but `mix ci.fast` consequently fails. |
 
 ### Behavioral Spot-Checks
 
 | Behavior | Command | Result | Status |
 | --- | --- | --- | --- |
-| Full pinned browser/recovery matrix | `npm run test:container --prefix scripts/configurator_e2e` | 13/13 passed in exact pinned Playwright container | ✓ PASS |
-| Core formatter/static/generator/Livebook/fresh-consumer regression set | focused ExUnit + drift + Livebook + format | exit 0 | ✓ PASS |
-| Terminal deterministic gate | `mix ci.fast` | exit 0 | ✓ PASS |
-
-### Probe Execution
-
-No Phase-128 probe scripts were declared or found; its required evidence is test/command based.
+| Fresh consumer, non-TTY | `mix test test/mix/tasks/rendro_gen_theme_fresh_consumer_test.exs --max-failures 1` | 1 failure / 23.6s; conflict child returned exit 1 | ✗ FAIL |
+| Fresh consumer, pseudo-TTY | `script -q /dev/null mix test test/mix/tasks/rendro_gen_theme_fresh_consumer_test.exs --max-failures 1` | 1 failure / 27.4s; same conflict child exit 1 | ✗ FAIL |
+| Pinned browser/zero-human UI matrix | `npm run test:container --prefix scripts/configurator_e2e` | 13/13 passed | ✓ PASS |
+| Other Phase-128 core contracts | focused 30-test ExUnit set + index drift + Livebook + format | exit 0 | ✓ PASS |
+| Terminal deterministic gate | `mix ci.fast` | failed through fresh-consumer test | ✗ FAIL |
 
 ### Requirements Coverage
 
-| Requirement | Source Plans | Status | Evidence |
-| --- | --- | --- | --- |
-| CONFIG-01 | 03, 05, 06 | ✓ SATISFIED | Static direct-file graph and all specified pinned Chromium states pass. |
-| CONFIG-02 | 03, 05, 06 | ✓ SATISFIED | Exact/representative/none plus selected-preview failure/recovery execute. |
-| CONFIG-03 | 01, 03, 05, 06 | ✓ SATISFIED | Canonical source plus copy success and rejection/retry identity proof pass. |
-| CONFIG-04 | 03, 05 | ✓ SATISFIED | Atomic canonical URL fallback/round-trip is exercised. |
-| CONFIG-05 | 01, 02, 05, 06 | ✓ SATISFIED | Formatter/codegen/fresh-consumer and clean terminal CI proof pass. |
-| CONFIG-06 | 04, 05 | ✓ SATISFIED | No-server focused Livebook proof passes. |
+| Requirement | Status | Evidence |
+| --- | --- | --- |
+| CONFIG-01 | ✓ SATISFIED | Static direct-file graph and complete pinned Chromium matrix pass. |
+| CONFIG-02 | ✓ SATISFIED | Exact/representative/none and image recovery execute in pinned Chromium. |
+| CONFIG-03 | ✓ SATISFIED | Canonical source and copy success/rejection/retry identity proof pass. |
+| CONFIG-04 | ✓ SATISFIED | Atomic canonical URL fallback/round-trip remains exercised. |
+| CONFIG-05 | ✗ BLOCKED | The claimed fresh-consumer subprocess contract and required terminal CI are currently red. |
+| CONFIG-06 | ✓ SATISFIED | No-server focused Livebook proof passes. |
 
-No requirements are orphaned. No blocker debt markers were found in Phase-128 implementation files. Plan 05's corrected fourteen-file historical inventory matches the delivered Wave-3 footprint.
+No Phase-128 requirement is orphaned. The claim boundary is still honest—pinned Chromium only, no cross-browser/AT/WCAG/aesthetic certification—but the zero-human gate cannot pass while its required fresh-consumer proof is red.
 
-### Claim Boundaries
+### Gaps Summary
 
-This passed verdict is limited to the enumerated behavior in the pinned Chromium container and the local deterministic test/CI commands. It does not claim Firefox/Safari parity, VoiceOver/NVDA comprehension, WCAG certification, aesthetic quality, a product Node runtime/build dependency, or remote branch-protection configuration.
+Commit `5ee99ed` correctly scopes `Mix.Shell.Process` and injects a false response, but its child `mix run --no-start` command exits with dependency compilation failures before exercising the completed conflict result. This is reproducible both without a TTY and through a pseudo-TTY. The bounded timeout prevents a hang; it does not make the success claim true.
+
+The pinning/browser surface remains green. The sole root cause is the fresh-consumer conflict command's nonzero exit, which also makes `mix ci.fast` fail. No later phase explicitly defers this proof, so it remains a blocking gap.
 
 ---
 
-_Verified: 2026-08-19T03:05:25Z_
+_Verified: 2026-08-19T03:22:21Z_
 _Verifier: the agent (gsd-verifier)_
