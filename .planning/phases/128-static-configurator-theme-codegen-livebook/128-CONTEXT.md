@@ -13,7 +13,7 @@ Phase 128 delivers three coherent tinkerer surfaces over the shipped preset and 
 2. `mix rendro.gen.theme`, which writes a safe, committed application-owned theme module and verifies it with a read-only `--check` drift gate; and
 3. one focused preset path in the existing first-invoice Livebook.
 
-All three surfaces share one Elixir-owned source formatter. The phase does not add live PDF rendering, a server, database, account/persistence model, Node/npm build, arbitrary token editor, fuzzy color matching, new catalog cells, new Theme fields, automatic font substitution, or design-quality/accessibility/PDF-UA/WCAG/print-safety claims.
+All three surfaces share one Elixir-owned source formatter. The product does not add live PDF rendering, a server, database, account/persistence model, Node/npm build, arbitrary token editor, fuzzy color matching, new catalog cells, new Theme fields, automatic font substitution, or design-quality/accessibility/PDF-UA/WCAG/print-safety claims. A test-only pinned Chromium/Playwright harness is authorized in required CI; it is not a product build, runtime, or Hex dependency.
 
 </domain>
 
@@ -24,7 +24,7 @@ The approved `128-UI-SPEC.md` has no numbered `## Requirements` list; it instead
 
 **In scope:** static HTML/CSS/vanilla JS; existing Rendro tokens; native labeled controls; bounded manifest-backed raster preview; visible canonical Elixir snippet; Clipboard API feedback; strict query validation; light/dark/system-safe chrome; responsive two-column/stacked layout; loading, empty, error, overflow, and long-text states.
 
-**Out of scope:** shadcn or another component library; React/Vite/Node; arbitrary color input; live PDF generation; form submission or persistence; server calls; hidden scope-boundary copy; unsafe URL-to-DOM interpolation; compliance or universal quality claims.
+**Out of scope:** shadcn or another component library; React/Vite/Node product architecture; arbitrary color input; live PDF generation; form submission or persistence; server calls; hidden scope-boundary copy; unsafe URL-to-DOM interpolation; compliance or universal quality claims. Test-only Node/Playwright in the isolated CI harness is in scope.
 
 </spec_lock>
 

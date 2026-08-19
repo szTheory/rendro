@@ -181,6 +181,40 @@ jobs:
           mix deps.get
           mix test
 
+  configurator-browser:
+    # no `needs:` -> graph-disconnected required static-browser gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.0-noble@sha256:baed2032d533817f3dbe6425de795788430ba345e819a1201337009ba17c9d07
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Setup Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: '22.14.0'
+          cache: 'npm'
+          cache-dependency-path: scripts/configurator_e2e/package-lock.json
+
+      - name: Install locked browser test dependencies
+        run: npm ci --prefix scripts/configurator_e2e
+
+      - name: Run pinned Chromium configurator suite
+        run: npm test --prefix scripts/configurator_e2e
+
+      - name: Upload browser evidence on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: configurator-browser-evidence
+          path: |
+            scripts/configurator_e2e/test-results
+            scripts/configurator_e2e/playwright-report
+          if-no-files-found: ignore
+          retention-days: 14
+
   advisory-checks:
     runs-on: ubuntu-latest
     # no 'needs:' -> graph-disconnected; only the legacy adapter comparison is advisory
@@ -429,12 +463,12 @@ jobs:
 
   ci-success:
     if: always()
-    needs: [test, integration-proofs]
+    needs: [test, configurator-browser, integration-proofs]
     runs-on: ubuntu-latest
     steps:
       - name: Enforce strict checks
-        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
         run: exit 1
       - name: Pass
-        if: ${{ !(contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')) }}
+        if: ${{ !(contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')) }}
         run: exit 0

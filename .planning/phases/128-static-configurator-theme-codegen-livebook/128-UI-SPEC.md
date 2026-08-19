@@ -27,6 +27,10 @@ reviewed_at: 2026-08-18T00:00:00-04:00
 
 The phase is not React, Next.js, or Vite; `components.json` and shadcn are not applicable. The configurator must inherit the existing explicit light/dark token behavior, including OS preference when no `data-theme` override is set.
 
+## Automated Evidence Boundary
+
+The required test-only Playwright lane uses pinned Chromium, accessibility-tree snapshots, enumerated axe checks, and pinned-container pixel baselines. It proves the specified delivered behavior, not Firefox/Safari parity, VoiceOver/NVDA comprehension, WCAG certification, or aesthetic quality.
+
 ---
 
 ## Spacing Scale

@@ -1,0 +1,16 @@
+{
+  "name": "rendro-configurator-e2e",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:update-snapshots": "playwright test --update-snapshots",
+    "test:container": "docker run --rm -v \"$PWD/../..:/work\" -w /work/scripts/configurator_e2e mcr.microsoft.com/playwright:v1.62.0-noble@sha256:baed2032d533817f3dbe6425de795788430ba345e819a1201337009ba17c9d07 bash -lc 'npm ci && npm test'",
+    "test:container:update-snapshots": "docker run --rm -v \"$PWD/../..:/work\" -w /work/scripts/configurator_e2e mcr.microsoft.com/playwright:v1.62.0-noble@sha256:baed2032d533817f3dbe6425de795788430ba345e819a1201337009ba17c9d07 bash -lc 'npm ci && npm run test:update-snapshots'"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.62.0"
+  }
+}

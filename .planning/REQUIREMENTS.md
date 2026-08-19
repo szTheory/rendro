@@ -8,7 +8,7 @@
 > - Preset/genre/catalog/configurator vocabulary MUST NOT appear in `lib/rendro/theme.ex` (the `theme_industry_guard_test.exs` tripwire). Presets live in a new `lib/rendro/theme/presets.ex`.
 > - New sibling module/manifest, never grow the existing one in place (`Rendro.Catalog` separate from `Rendro.LaunchArtifacts`).
 > - Design systems = code (`lib/rendro/theme*`); example brands = data (`priv/examples/`) — a brand is never a module.
-> - Zero new runtime dependencies; zero server/DB; no Node/npm in required CI or as a Hex runtime dep.
+> - Zero new runtime dependencies; zero server/DB; no Node/npm in the product, Hex payload, or product build. A pinned, test-only Node/Playwright lane is required in CI for the static configurator and remains graph-disconnected from Elixir jobs.
 > - Byte-reproducibility preserved: no per-draw float math in preset derivation; deterministic font subsetting.
 > - No-overclaim: every new public claim gets a proof artifact + matching `support_matrix.json` row + docs-contract tripwire. No design-quality guarantee, no accessibility/print-safety claim on dark cells.
 
@@ -49,7 +49,7 @@
 
 ### Static Configurator & Codegen (CONFIG)
 
-- [x] **CONFIG-01**: A static client-side configurator (`assets/rendro/configurator/`, HTML/CSS/vanilla JS, zero server/DB/build step) offers preset + accent + mode + document-family pickers over the pre-rendered catalog, served through the existing ExDoc `docs: [assets: ...]` copy-through with no new CI surface.
+- [x] **CONFIG-01**: A static client-side configurator (`assets/rendro/configurator/`, HTML/CSS/vanilla JS, zero server/DB/build step) offers preset + accent + mode + document-family pickers over the pre-rendered catalog, served through the existing ExDoc `docs: [assets: ...]` copy-through. A pinned, test-only Chromium/Playwright CI lane verifies the delivered static surface without becoming a product dependency.
 - [x] **CONFIG-02**: The configurator snaps an accent selection to the nearest pre-rendered catalog preview via an exact-match lookup against a closed, curated accent palette, and transparently discloses "nearest preview vs. your exact copied code" (no fuzzy color-distance approximation).
 - [x] **CONFIG-03**: The configurator provides one-click copy of a `Rendro.Theme.preset(...)` + recipe-usage snippet with explicit success feedback.
 - [x] **CONFIG-04**: Configurator state (preset, accent, mode, family) is encoded in the URL query string — shareable, deep-linkable per cell, and restored deterministically on load; no XSS-unsafe interpolation of URL state into the DOM.
@@ -72,7 +72,7 @@
 - **New `%Rendro.Theme{}` struct fields** (4th rule weight, modular-scale formula, per-preset custom groups) — SEED-003 locked the field *shape* as a stable contract; genre distinctiveness comes from chosen *values*, not new fields.
 - **Auto-scoring the rubric** (LLM/heuristic assigning `dimension_scores`) — human sign-off is the one honest quality signal; automating it erodes it.
 - **Per-brand custom fonts in the public catalog** beyond the 4 curated open-license files — avoids tarball bloat and licensing traps; brand rows vary accent + preset + logo only.
-- **Server compute, databases, auth, or a Node/npm build step** anywhere in the configurator or required CI — the URL query string *is* the save mechanism.
+- **Server compute, databases, auth, or a Node/npm build step** anywhere in the configurator product or Hex payload — the URL query string *is* the save mechanism. Test-only Node/Playwright CI is permitted solely for automated static-browser verification.
 - **Growing `@gallery_specs` / `theme.ex` in place** for catalog/preset logic — new sibling module/manifest is a locked structural constraint.
 - **Any design-quality, accessibility, PDF/UA, print-safety, or WCAG claim** on presets, the catalog, or dark-mode cells.
 

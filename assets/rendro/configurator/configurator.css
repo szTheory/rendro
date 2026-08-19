@@ -35,7 +35,7 @@ select:disabled, button:disabled { cursor: not-allowed; opacity: var(--rendro-di
 :focus-visible { outline: var(--rendro-focus-ring-width) solid var(--rendro-focus-ring); outline-offset: var(--rendro-focus-ring-offset); }
 
 .status, .disclosure, .error { margin: 0 0 var(--rendro-space-4); padding: var(--rendro-space-3); border-radius: var(--rendro-radius-control); overflow-wrap: anywhere; }
-.status { background: var(--rendro-feedback-info-bg); color: var(--rendro-feedback-info); }
+.status { background: var(--rendro-feedback-info-bg); color: var(--rendro-text-primary); }
 .disclosure { background: var(--rendro-feedback-warning-bg); color: var(--rendro-text-secondary); }
 .error { background: var(--rendro-feedback-error-bg); border: var(--rendro-border-width-1) solid var(--rendro-feedback-error); color: var(--rendro-feedback-error); }
 .preview { min-height: 44px; margin-bottom: var(--rendro-space-4); }

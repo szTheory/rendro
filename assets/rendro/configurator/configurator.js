@@ -80,7 +80,11 @@
     caption.textContent = resolution.cell.caption;
     figure.append(image, caption);
     preview.append(figure);
-    if (resolution.cell.boundary_disclosure) disclosure.textContent = resolution.cell.boundary_disclosure;
+    if (resolution.kind === "representative") {
+      disclosure.textContent = `Preview: nearest available catalog example (${resolution.cell.accent}). Copied code uses your exact accent ${state.accent}.`;
+    } else if (resolution.cell.boundary_disclosure) {
+      disclosure.textContent = resolution.cell.boundary_disclosure;
+    }
   };
   const render = () => {
     const state = Object.fromEntries(Object.entries(controls).map(([key, control]) => [key, control.value]));
