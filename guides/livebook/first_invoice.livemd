@@ -76,8 +76,7 @@ This exact Invoice/Swiss/`#2C6BED`/light path uses the same invoice data and kee
 font registration explicit. To try another canonical choice, edit the
 `preset`, accent, and mode values below. Presets are working starting points,
 not a design-quality, accessibility, PDF/UA, WCAG, or print guarantee. A
-dark-mode experiment is screen-oriented; it is not a print, accessibility,
-PDF/UA, or WCAG claim.
+dark-mode experiment is screen-oriented. Screen-oriented; not a print, accessibility, PDF/UA, or WCAG claim.
 
 ```elixir
 # rendro-theme-snippet:start

@@ -110,6 +110,29 @@ defmodule Mix.Tasks.RendroLivebookCheckTest do
     assert notebook =~ "fn -> themed_pdf end"
   end
 
+  test "production notebook keeps preset teaching focused, screen-oriented, and no-server" do
+    notebook = File.read!("guides/livebook/first_invoice.livemd")
+
+    assert notebook =~ "edit the\n`preset`, accent, and mode values"
+    assert notebook =~ "Presets are working starting points"
+
+    assert notebook =~
+             "Screen-oriented; not a print, accessibility, PDF/UA, or WCAG claim."
+
+    for forbidden <- [
+          "Kino.Input",
+          "Kino.JS",
+          "fetch(",
+          "Livebook.Server",
+          "livebook server",
+          "all presets",
+          "all-presets",
+          "comparison grid"
+        ] do
+      refute notebook =~ forbidden
+    end
+  end
+
   test "task source does not start a Livebook server" do
     source = File.read!("lib/mix/tasks/rendro/livebook/check.ex")
 
