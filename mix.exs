@@ -138,8 +138,12 @@ defmodule Rendro.MixProject do
       files: ~w(
         lib
         assets/rendro/artifacts.json
+        assets/rendro/catalog
+        assets/rendro/catalog.json
+        assets/rendro/configurator
         assets/rendro/gallery
         assets/rendro/manual.pdf
+        brand/tokens/tokens.css
         priv/branded
         priv/examples
         priv/fonts
@@ -159,7 +163,10 @@ defmodule Rendro.MixProject do
   defp docs do
     [
       main: "readme",
-      assets: %{"assets" => "assets"},
+      assets: %{
+        "assets" => "assets",
+        [{"tokens.css", File.read!("brand/tokens/tokens.css")}] => "brand/tokens"
+      },
       before_closing_head_tag: &before_closing_head_tag/1,
       skip_undefined_reference_warnings_on: [
         "CHANGELOG.md",
@@ -190,6 +197,7 @@ defmodule Rendro.MixProject do
         "guides/integrations.md",
         "guides/branding.md",
         "guides/theming.md",
+        "guides/presets.md",
         "guides/api_stability.md",
         "guides/upgrading_to_1.0.md",
         "guides/viewer_evidence.md",
@@ -203,6 +211,7 @@ defmodule Rendro.MixProject do
         Guides: [
           "guides/branding.md",
           "guides/theming.md",
+          "guides/presets.md",
           "guides/integrations.md",
           "guides/user_flows_and_jtbd.md"
         ],

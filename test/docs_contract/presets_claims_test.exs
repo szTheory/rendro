@@ -1,6 +1,7 @@
 defmodule Rendro.DocsContract.PresetsClaimsTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
+  alias Rendro.Test.HexBuildCache
   alias Rendro.Theme.Snippet
 
   @capability_keys [
@@ -70,11 +71,37 @@ defmodule Rendro.DocsContract.PresetsClaimsTest do
     end
   end
 
+  defp hex_contents! do
+    tarball = "rendro-#{Mix.Project.config()[:version]}.tar"
+    {output, 0} = HexBuildCache.get_build_output()
+    assert output =~ tarball
+    assert File.exists?(tarball)
+
+    {contents, 0} =
+      System.cmd("sh", ["-c", "tar -xOf #{tarball} contents.tar.gz | tar -tzf -"],
+        stderr_to_stdout: true
+      )
+
+    String.split(contents, "\n", trim: true)
+  end
+
+  defp generated_docs_output do
+    output =
+      Path.join(System.tmp_dir!(), "rendro-presets-docs-#{System.unique_integer([:positive])}")
+
+    {log, 0} = System.cmd("mix", ["docs", "--output", output], stderr_to_stdout: true)
+    assert log =~ "Generating docs"
+    on_exit(fn -> File.rm_rf!(output) end)
+    output
+  end
+
   describe "tripwire integrity" do
     test "required key and forbidden-term lists are non-empty" do
       refute @capability_keys == [], "capability list must not be empty (guard would be vacuous)"
       refute @boundary_keys == [], "boundary list must not be empty (guard would be vacuous)"
-      refute @forbidden_terms == [], "forbidden-term list must not be empty (guard would be vacuous)"
+
+      refute @forbidden_terms == [],
+             "forbidden-term list must not be empty (guard would be vacuous)"
     end
 
     test "predicate fails when a boundary is promoted" do
@@ -117,6 +144,7 @@ defmodule Rendro.DocsContract.PresetsClaimsTest do
       assert document.__struct__ == Rendro.Document
       assert snippet =~ "Rendro.Theme.preset"
       assert snippet =~ "Rendro.Theme.Presets.register_fonts"
+
       assert index_of(snippet, "Rendro.Theme.preset") <
                index_of(snippet, "Rendro.Theme.Presets.register_fonts")
     end
@@ -149,9 +177,18 @@ defmodule Rendro.DocsContract.PresetsClaimsTest do
       refute promoted_boundary?(presets)
     end
 
-    test "removing a required capability or boundary fails the required-key predicates", %{presets: presets} do
-      missing_capability = put_in(presets, ["capabilities"], Map.delete(presets["capabilities"], hd(@capability_keys)))
-      missing_boundary = put_in(presets, ["boundaries"], Map.delete(presets["boundaries"], hd(@boundary_keys)))
+    test "removing a required capability or boundary fails the required-key predicates", %{
+      presets: presets
+    } do
+      missing_capability =
+        put_in(
+          presets,
+          ["capabilities"],
+          Map.delete(presets["capabilities"], hd(@capability_keys))
+        )
+
+      missing_boundary =
+        put_in(presets, ["boundaries"], Map.delete(presets["boundaries"], hd(@boundary_keys)))
 
       refute Enum.all?(@capability_keys, &Map.has_key?(missing_capability["capabilities"], &1))
       refute Enum.all?(@boundary_keys, &Map.has_key?(missing_boundary["boundaries"], &1))
@@ -170,7 +207,14 @@ defmodule Rendro.DocsContract.PresetsClaimsTest do
 
       assert length(chooser_rows) == 6
 
-      for preset <- ["Swiss", "Humanist", "Editorial", "Corporate Classic", "Minimal Mono", "Brutalist"] do
+      for preset <- [
+            "Swiss",
+            "Humanist",
+            "Editorial",
+            "Corporate Classic",
+            "Minimal Mono",
+            "Brutalist"
+          ] do
         assert guide =~ "| #{preset} |"
       end
 
@@ -212,6 +256,68 @@ defmodule Rendro.DocsContract.PresetsClaimsTest do
       assert mixfile =~ "assets/rendro/catalog.json"
       assert mixfile =~ "assets/rendro/configurator"
       assert mixfile =~ "brand/tokens/tokens.css"
+    end
+
+    test "source links, built Hex contents, and a unique ExDoc output carry the complete static graph" do
+      guide = File.read!("guides/presets.md")
+      readme = File.read!("README.md")
+      catalog = File.read!("assets/rendro/catalog.json") |> JSON.decode!()
+
+      assert readme =~ "guides/presets.md"
+      assert readme =~ "assets/rendro/configurator/index.html"
+      assert guide =~ "livebook/first_invoice.livemd"
+      assert guide =~ "https://hexdocs.pm/rendro/assets/rendro/configurator/index.html"
+
+      output = generated_docs_output()
+
+      for path <- [
+            "presets.html",
+            "first_invoice.html",
+            "assets/rendro/configurator/index.html",
+            "assets/rendro/configurator/configurator.css",
+            "assets/rendro/configurator/configurator.js",
+            "assets/rendro/configurator/index.json",
+            "assets/rendro/catalog.json",
+            "brand/tokens/tokens.css"
+          ] do
+        assert File.exists?(Path.join(output, path)), "expected generated ExDoc path #{path}"
+      end
+
+      png_paths = Enum.map(catalog["cells"], & &1["png_path"])
+      assert length(png_paths) == 32
+
+      for path <- png_paths do
+        assert File.exists?(Path.join(output, path)), "expected generated catalog image #{path}"
+      end
+
+      contents = hex_contents!()
+
+      for path <-
+            [
+              "guides/presets.md",
+              "guides/livebook/first_invoice.livemd",
+              "assets/rendro/catalog.json",
+              "assets/rendro/configurator/index.html",
+              "assets/rendro/configurator/configurator.css",
+              "assets/rendro/configurator/configurator.js",
+              "assets/rendro/configurator/index.json",
+              "brand/tokens/tokens.css"
+            ] ++ png_paths do
+        assert path in contents, "expected Hex package path #{path}"
+      end
+
+      for private_path <- [
+            "brand/tokens/tokens.json",
+            "brand/tokens/tailwind.tokens.js",
+            "brand/copy/VOICE.md",
+            "priv/quality/rubric_scores.json",
+            "priv/support_matrix.json",
+            "priv/guardrails/required_status_checks.json",
+            "priv/schemas/support_matrix.schema.json",
+            "test/docs_contract/presets_claims_test.exs"
+          ] do
+        refute private_path in contents, "private package path leaked: #{private_path}"
+      end
     end
   end
 end
