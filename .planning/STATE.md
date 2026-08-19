@@ -5,15 +5,15 @@ milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 129
 current_phase_name: docs-manifest-closure
 status: executing
-stopped_at: Completed 129-01-PLAN.md
-last_updated: "2026-08-19T16:19:32.550Z"
+stopped_at: Completed 129-02-PLAN.md
+last_updated: "2026-08-19T16:26:35.714Z"
 last_activity: 2026-08-19
 last_activity_desc: Phase 129 execution started
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 29
-  completed_plans: 27
+  completed_plans: 28
   percent: 80
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-16)
 ## Current Position
 
 Phase: 129 (docs-manifest-closure) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-08-19 — Phase 129 execution started
 
@@ -79,8 +79,8 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-19T16:19:32.536Z
-Stopped at: Completed 129-01-PLAN.md
+Last session: 2026-08-19T16:26:35.703Z
+Stopped at: Completed 129-02-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -132,6 +132,7 @@ Resume file: None
 | Phase 128 P03 | 15min | 2 tasks | 5 files |
 | Phase 128-static-configurator-theme-codegen-livebook P04 | 7min | 2 tasks | 2 files |
 | Phase 129 P01 | 8min | 1 tasks | 3 files |
+| Phase 129 P02 | 19min | 2 tasks | 5 files |
 
 ## Operator Next Steps
 
@@ -174,3 +175,5 @@ Resume file: None
 - [Phase ?]: Treat presets as working starting points and dark-mode experiments as screen-oriented without visual-quality or compliance guarantees.
 - [Phase ?]: Use the formatter-owned Invoice/Swiss/#2C6BED/light snippet as the sole canonical guide source.
 - [Phase ?]: Model presets as supported capabilities plus independently unsupported guarantees.
+- [Phase ?]: Keep presets as the canonical chooser while theming remains a focused manual-token/from_brand reference.
+- [Phase ?]: Use an absolute HexDocs configurator URL from the guide and narrow public asset allowlists for source, tarball, and generated-doc parity.
