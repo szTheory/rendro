@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v2.12
 milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 129
-current_phase_name: Docs & manifest closure
+current_phase_name: docs-manifest-closure
 status: executing
-stopped_at: Phase 129 context gathered
-last_updated: "2026-08-19T16:12:31.668Z"
-last_activity: 2026-08-18
-last_activity_desc: Phase 128 complete, transitioned to Phase 129
+stopped_at: Completed 129-01-PLAN.md
+last_updated: "2026-08-19T16:19:32.550Z"
+last_activity: 2026-08-19
+last_activity_desc: Phase 129 execution started
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 29
-  completed_plans: 26
+  completed_plans: 27
   percent: 80
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-16)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 128 — Static configurator, theme codegen & Livebook
+**Current focus:** Phase 129 — docs-manifest-closure
 
 ## Current Position
 
-Phase: 129 — Docs & manifest closure
-Plan: Not started
+Phase: 129 (docs-manifest-closure) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-08-18 — Phase 128 complete, transitioned to Phase 129
+Last activity: 2026-08-19 — Phase 129 execution started
 
 ## Roadmap Snapshot (v2.12, Phases 125-129) — IN PROGRESS
 
@@ -79,9 +79,9 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-19T15:30:59.773Z
-Stopped at: Phase 129 context gathered
-Resume file: .planning/phases/129-docs-manifest-closure/129-CONTEXT.md
+Last session: 2026-08-19T16:19:32.536Z
+Stopped at: Completed 129-01-PLAN.md
+Resume file: None
 
 ## Next Steps
 
@@ -131,6 +131,7 @@ Resume file: .planning/phases/129-docs-manifest-closure/129-CONTEXT.md
 | Phase 128 P02 | 7min | 2 tasks | 2 files |
 | Phase 128 P03 | 15min | 2 tasks | 5 files |
 | Phase 128-static-configurator-theme-codegen-livebook P04 | 7min | 2 tasks | 2 files |
+| Phase 129 P01 | 8min | 1 tasks | 3 files |
 
 ## Operator Next Steps
 
@@ -171,3 +172,5 @@ Resume file: .planning/phases/129-docs-manifest-closure/129-CONTEXT.md
 - [Phase ?]: Copy exactly the visible committed formatter string and report Clipboard success only after its promise resolves.
 - [Phase ?]: Keep the Livebook to one exact formatter-owned Invoice/Swiss/#2C6BED/light render with explicit document-first font registration and separate themed byte evidence.
 - [Phase ?]: Treat presets as working starting points and dark-mode experiments as screen-oriented without visual-quality or compliance guarantees.
+- [Phase ?]: Use the formatter-owned Invoice/Swiss/#2C6BED/light snippet as the sole canonical guide source.
+- [Phase ?]: Model presets as supported capabilities plus independently unsupported guarantees.

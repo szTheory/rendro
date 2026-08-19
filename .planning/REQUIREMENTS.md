@@ -58,7 +58,7 @@
 
 ### Docs & Manifest Closure (DOCS)
 
-- [ ] **DOCS-01**: Public surfaces are reconciled with no overclaim — a proof-backed `theming.presets` row in `priv/support_matrix.json`, a presets guide (`guides/presets.md` or extended `guides/theming.md`), `priv/public_api.json` regenerated for `Theme.preset/2`, README/HexDocs wiring, and docs-contract + guardrails-lockstep extensions bounding catalog/configurator claim language (a "strong starting point," never a design-quality or accessibility guarantee).
+- [x] **DOCS-01**: Public surfaces are reconciled with no overclaim — a proof-backed `theming.presets` row in `priv/support_matrix.json`, a presets guide (`guides/presets.md` or extended `guides/theming.md`), `priv/public_api.json` regenerated for `Theme.preset/2`, README/HexDocs wiring, and docs-contract + guardrails-lockstep extensions bounding catalog/configurator claim language (a "strong starting point," never a design-quality or accessibility guarantee).
 
 ## Future Requirements (deferred)
 

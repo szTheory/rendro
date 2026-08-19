@@ -232,11 +232,11 @@ Plans:
   2. A presets guide (new `guides/presets.md` or an extended `guides/theming.md`) plus README/HexDocs wiring describe presets/catalog/configurator only as "a strong starting point," never a design-quality, accessibility, or print-safety guarantee.
   3. Docs-contract + guardrails-lockstep lanes (lane count, `required_checks_contract_test.exs` assertion, `priv/guardrails/required_status_checks.json`) are extended together, in the same commit, to bound catalog/configurator claim language, and `mix ci.fast` runs green end-to-end.
 
-**Plans**: 3 plans
+**Plans**: 1/3 plans executed
 
 **Wave 1**
 
-- [ ] 129-01-PLAN.md — Trace one canonical preset claim from formatter-owned source through the guide, support matrix, and fail-loud contract.
+- [x] 129-01-PLAN.md — Trace one canonical preset claim from formatter-owned source through the guide, support matrix, and fail-loud contract.
 
 **Wave 2** *(depends on Wave 1)*
 
@@ -245,6 +245,7 @@ Plans:
 **Wave 3** *(depends on Wave 2)*
 
 - [ ] 129-03-PLAN.md — Regenerate the API manifest, atomically register the 27th docs lane, and close the full deterministic CI gate.
+
 **UI hint**: no — docs/manifest reconciliation only
 
 ## Progress
@@ -257,7 +258,7 @@ Plans:
 | 126. Carryover polish — dark-mode legibility, hierarchy & golden depth | v2.12 | 5/5 | Complete    | 2026-08-17 |
 | 127. Public example catalog & quality ratchet | v2.12 | 5/5 | Complete    | 2026-08-17 |
 | 128. Static configurator, theme codegen & Livebook | v2.12 | 6/6 | Complete    | 2026-08-18 |
-| 129. Docs & manifest closure | v2.12 | 0/TBD | Not started | - |
+| 129. Docs & manifest closure | v2.12 | 1/3 | In Progress|  |
 
 ## Current Focus
 
