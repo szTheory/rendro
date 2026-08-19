@@ -38,12 +38,17 @@
   const catalogIsValid = (candidate) => candidate && Array.isArray(candidate.cells) && candidate.cells.every((cell) => validSlug(cell.family) && validSlug(cell.preset) && validAccent(cell.accent) && (cell.mode === "light" || cell.mode === "dark") && validateSafeCatalogPath(cell.png_path) && typeof cell.alt === "string" && typeof cell.caption === "string");
 
   const allowedValues = (name) => new Set(index.options[name].map((option) => option.value));
+  const catalogUsesClosedEnums = () => catalog.cells.every((cell) => allowedValues("families").has(cell.family) && allowedValues("presets").has(cell.preset) && allowedValues("accents").has(cell.accent) && allowedValues("modes").has(cell.mode));
+  const firstSelectableState = () => {
+    const cell = catalog.cells.find((candidate) => allowedValues("families").has(candidate.family) && allowedValues("presets").has(candidate.preset) && allowedValues("accents").has(candidate.accent) && allowedValues("modes").has(candidate.mode));
+    return cell ? { family: cell.family, preset: cell.preset, accent: cell.accent, mode: cell.mode } : FALLBACK;
+  };
   const readRequestedState = () => {
     const params = new URLSearchParams(window.location.search);
     const keys = ["family", "preset", "accent", "mode"];
     const state = Object.fromEntries(keys.map((key) => [key, params.getAll(key)]));
     const valid = state.family.length === 1 && state.preset.length === 1 && state.accent.length === 1 && state.mode.length === 1 && allowedValues("families").has(state.family[0]) && allowedValues("presets").has(state.preset[0]) && allowedValues("accents").has(state.accent[0]) && allowedValues("modes").has(state.mode[0]);
-    return valid ? Object.fromEntries(keys.map((key) => [key, state[key][0]])) : FALLBACK;
+    return valid ? Object.fromEntries(keys.map((key) => [key, state[key][0]])) : firstSelectableState();
   };
   const writeCanonicalUrl = (state) => {
     const params = new URLSearchParams();
@@ -119,7 +124,7 @@
     .then(async ([indexResponse, catalogResponse]) => {
       if (!indexResponse.ok || !catalogResponse.ok) throw new Error("catalog request failed");
       [index, catalog] = await Promise.all([indexResponse.json(), catalogResponse.json()]);
-      if (!indexIsValid(index) || !catalogIsValid(catalog)) throw new Error("catalog schema failed");
+      if (!indexIsValid(index) || !catalogIsValid(catalog) || !catalogUsesClosedEnums()) throw new Error("catalog schema failed");
       populate();
     })
     .catch(fail);
