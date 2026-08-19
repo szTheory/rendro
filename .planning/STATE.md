@@ -4,17 +4,17 @@ milestone: v2.12
 milestone_name: Style-Genre Presets, Public Catalog & Static Configurator
 current_phase: 129
 current_phase_name: docs-manifest-closure
-status: executing
-stopped_at: Completed 129-02-PLAN.md
-last_updated: "2026-08-19T16:26:35.714Z"
+status: verifying
+stopped_at: Completed 129-03-PLAN.md
+last_updated: "2026-08-19T16:31:46.056Z"
 last_activity: 2026-08-19
 last_activity_desc: Phase 129 execution started
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 29
-  completed_plans: 28
-  percent: 80
+  completed_plans: 29
+  percent: 100
 ---
 
 # Project State
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-08-16)
 
 Phase: 129 (docs-manifest-closure) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-08-19 — Phase 129 execution started
 
 ## Roadmap Snapshot (v2.12, Phases 125-129) — IN PROGRESS
@@ -79,8 +79,8 @@ v2.11 shipped and archived (Phases 119-124, 2026-07-28). Full decision log lives
 
 ## Session Continuity
 
-Last session: 2026-08-19T16:26:35.703Z
-Stopped at: Completed 129-02-PLAN.md
+Last session: 2026-08-19T16:31:46.045Z
+Stopped at: Completed 129-03-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -133,6 +133,7 @@ Resume file: None
 | Phase 128-static-configurator-theme-codegen-livebook P04 | 7min | 2 tasks | 2 files |
 | Phase 129 P01 | 8min | 1 tasks | 3 files |
 | Phase 129 P02 | 19min | 2 tasks | 5 files |
+| Phase 129 P03 | 5min | 2 tasks | 4 files |
 
 ## Operator Next Steps
 
@@ -177,3 +178,5 @@ Resume file: None
 - [Phase ?]: Model presets as supported capabilities plus independently unsupported guarantees.
 - [Phase ?]: Keep presets as the canonical chooser while theming remains a focused manual-token/from_brand reference.
 - [Phase ?]: Use an absolute HexDocs configurator URL from the guide and narrow public asset allowlists for source, tarball, and generated-doc parity.
+- [Phase ?]: Keep a byte-identical generated API manifest as explicit reconciliation evidence rather than hand-editing it.
+- [Phase ?]: Keep preset public claims as the 27th deterministic docs lane while ci-success remains the sole required context.
