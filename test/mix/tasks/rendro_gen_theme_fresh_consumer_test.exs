@@ -7,7 +7,11 @@ defmodule Mix.Tasks.RendroGenThemeFreshConsumerTest do
     root = File.cwd!()
 
     tmp =
-      Path.join(System.tmp_dir!(), "rendro-fresh-consumer-#{System.unique_integer([:positive])}")
+      Path.join(
+        System.tmp_dir!(),
+        "rendro-fresh-consumer-" <>
+          Base.url_encode64(:crypto.strong_rand_bytes(16), padding: false)
+      )
 
     consumer = Path.join(tmp, "consumer")
     File.mkdir_p!(tmp)
@@ -16,7 +20,7 @@ defmodule Mix.Tasks.RendroGenThemeFreshConsumerTest do
       run!(tmp, ["new", "consumer", "--sup"])
       add_local_dependency!(consumer, root)
       run!(consumer, ["deps.get"])
-      run!(consumer, ["deps.compile", "rendro"])
+      run!(consumer, ["deps.compile"])
       run!(consumer, ["compile"])
       baseline = tree(consumer)
 
@@ -49,7 +53,7 @@ defmodule Mix.Tasks.RendroGenThemeFreshConsumerTest do
       File.write!(explicit, "# detached policy\n")
       before_conflict = tree(consumer)
 
-      {conflict, 0} =
+      {conflict, conflict_status} =
         run_conflict!(
           consumer,
           [
@@ -63,6 +67,9 @@ defmodule Mix.Tasks.RendroGenThemeFreshConsumerTest do
             "lib/consumer/brand/theme.ex"
           ]
         )
+
+      assert conflict_status == 0,
+             "fresh-consumer conflict subprocess exited #{conflict_status}:\n#{conflict}"
 
       assert conflict =~ "Skipped lib/consumer/brand/theme.ex"
       assert File.read!(explicit) == "# detached policy\n"
@@ -156,18 +163,25 @@ defmodule Mix.Tasks.RendroGenThemeFreshConsumerTest do
     source =
       "Code.ensure_loaded!(Mix.Tasks.Rendro.Gen.Theme); Mix.Task.run(\"rendro.gen.theme\", #{inspect(task_args)})"
 
-    run_command!(cwd, ["run", "--no-start", "-e", source])
+    run_command!(cwd, ["run", "--no-start", "--no-compile", "--no-deps-check", "-e", source])
   end
 
   defp run!(cwd, args), do: run_command!(cwd, args)
 
-  defp run_conflict!(cwd, task_args) do
+  defp run_conflict!(cwd, ["rendro.gen.theme" | task_args]) do
     source =
       """
       Mix.shell(Mix.Shell.Process)
       Code.ensure_loaded!(Mix.Tasks.Rendro.Gen.Theme)
       send(self(), {:mix_shell_input, :yes?, false})
-      Mix.Task.run("rendro.gen.theme", #{inspect(task_args)})
+
+      result =
+        try do
+          Mix.Task.run("rendro.gen.theme", #{inspect(task_args)})
+          :ok
+        catch
+          kind, reason -> {:error, kind, reason, __STACKTRACE__}
+        end
 
       Stream.repeatedly(fn ->
         receive do
@@ -178,9 +192,16 @@ defmodule Mix.Tasks.RendroGenThemeFreshConsumerTest do
       end)
       |> Enum.take_while(&(&1 != :done))
       |> Enum.each(&IO.write/1)
+
+      case result do
+        :ok -> :ok
+        {:error, kind, reason, stacktrace} ->
+          IO.puts(:stderr, "rendro.gen.theme child failed:\n" <> Exception.format(kind, reason, stacktrace))
+          System.halt(1)
+      end
       """
 
-    run_command!(cwd, ["run", "--no-start", "-e", source])
+    run_command!(cwd, ["run", "--no-start", "--no-compile", "--no-deps-check", "-e", source])
   end
 
   defp run_command!(cwd, args) do
