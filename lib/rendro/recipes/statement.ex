@@ -339,7 +339,7 @@ defmodule Rendro.Recipes.Statement do
     # so the label+value blocks that follow it start at the same y and
     # visually overlay the drawn box.
     closing_backdrop =
-      Rendro.path([{:rect, 0, 0, @content_width, @closing_balance_band_h}],
+      Rendro.path([{:rect, 0, 0, @content_width, closing_balance_band_height(opts)}],
         fill: colors.surface,
         stroke: %{color: colors.rule, width: 0.75},
         x: 0,
@@ -427,6 +427,17 @@ defmodule Rendro.Recipes.Statement do
       {nil, _} -> @header_height
       {_theme, true} -> @catalog_themed_header_height
       {_theme, _} -> @themed_header_height
+    end
+  end
+
+  # Preserve the frozen no-theme band while allowing supplied themes to add
+  # their own compact whitespace token around the isolated closing amount.
+  # This is visual hierarchy, not a catalog-only composition; catalog_layout
+  # continues to affect header capacity only.
+  defp closing_balance_band_height(opts) do
+    case opts[:theme] do
+      nil -> @closing_balance_band_h
+      theme -> @closing_balance_band_h + Rendro.Theme.resolve(theme).spacing.tight
     end
   end
 
