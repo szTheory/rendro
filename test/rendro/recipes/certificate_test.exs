@@ -412,6 +412,30 @@ defmodule Rendro.Recipes.CertificateTest do
     end
   end
 
+  describe "Phase 130 Editorial ceremonial hierarchy" do
+    test "a supplied theme emits the recipient before its nearby credential at the resolved ranks" do
+      theme = Rendro.Theme.preset(:editorial, accent: "#2C6BED")
+      [body | _] = Certificate.sections(fixture_data(), theme: theme)
+
+      text_blocks = Enum.filter(body.content, &is_struct(&1.content, Rendro.Text))
+
+      recipient_index =
+        Enum.find_index(text_blocks, &(&1.content.content == fixture_data().recipient))
+
+      credential_index =
+        Enum.find_index(text_blocks, &(&1.content.content == fixture_data().title))
+
+      recipient = Enum.at(text_blocks, recipient_index).content
+      credential = Enum.at(text_blocks, credential_index).content
+
+      assert recipient_index < credential_index
+      assert credential_index == recipient_index + 1
+      assert recipient.size == theme.typography.scale.display
+      assert credential.size == theme.typography.scale.title
+      assert recipient.size > credential.size
+    end
+  end
+
   # ---------------------------------------------------------------------------
   # C20: validate_border! rejects invalid options
   # ---------------------------------------------------------------------------
