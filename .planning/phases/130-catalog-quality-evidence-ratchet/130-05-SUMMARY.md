@@ -191,6 +191,11 @@ None - Plan 05 transcribed the approved, complete records after the separately c
 
 None.
 
+## Self-Check: PASSED
+
+- Summary file exists and task commit `ec44cd7` exists in git history.
+- All twelve reconciliation-bound local review PNGs exist and their SHA-256 values match the approved reconciliation record.
+
 ## Next Phase Readiness
 
 Plan 06 may transcribe only these complete candidate-identity records into reviewer-owned evidence. It must retain the four light promotions, all other `needs_work` outcomes, and the explicit dark print-safety boundary.

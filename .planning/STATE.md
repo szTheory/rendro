@@ -5,15 +5,15 @@ milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 130
 current_phase_name: Catalog Quality & Evidence Ratchet
 status: executing
-stopped_at: Completed 130-09-PLAN.md
-last_updated: "2026-08-20T16:03:52.718Z"
+stopped_at: Completed 130-05-PLAN.md
+last_updated: "2026-08-20T23:35:32.254Z"
 last_activity: 2026-08-20
 last_activity_desc: Phase 130 execution started
 progress:
   total_phases: 2
   completed_phases: 0
   total_plans: 11
-  completed_plans: 6
+  completed_plans: 8
   percent: 0
 ---
 
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 130 (Catalog Quality & Evidence Ratchet) — EXECUTING
-Plan: 6 of 11
+Plan: 7 of 11
 Status: Ready to execute
 Last activity: 2026-08-20 — Phase 130 execution started
 
-Progress: [██████░░░░] 55%
+Progress: [███████░░░] 73%
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
@@ -64,6 +64,8 @@ Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Not started
 - [Phase ?]: Authorized exact two deterministic-only dark golden transitions in detached staging; this decision excludes launch artifacts, catalog scores, rubric evidence, and SIGN-OFF authority.
 - [Phase ?]: Accepted only the verified exact-SHA PDFium launch artifact into detached staging; quality review and publication remain separate gates.
 - [Phase ?]: Six changed light launch images were approved only through Jon's dated, hash-bound full-size records; dark and brand rows remain deterministic-only.
+- [Phase ?]: Plan 130-05 binds twelve human review records only through reconciliation SHA 1646eeb8875cc67d7d452d3f28bc2b0d6503f943a2a6775f7e256a3e51bb3f22.
+- [Phase ?]: Plan 130-05 promotes four light cells only; every dark cell remains needs_work while print_safety is false.
 
 ### Pending Todos
 
@@ -83,8 +85,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-20T16:03:52.709Z
-Stopped at: Completed 130-09-PLAN.md
+Last session: 2026-08-20T23:35:32.247Z
+Stopped at: Completed 130-05-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -102,3 +104,4 @@ Resume file: None
 | Phase 130 P07 | 4m | 3 tasks | 2 files |
 | Phase 130 P08 | 17m | 2 tasks | 17 files |
 | Phase 130-catalog-quality-evidence-ratchet P09 | 1m | 1 tasks | 1 files |
+| Phase 130 P05 | 32min | 1 tasks | 1 files |
