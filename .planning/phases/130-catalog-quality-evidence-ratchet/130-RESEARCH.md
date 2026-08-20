@@ -49,7 +49,7 @@ The implementation seam is already correctly shaped: `Rendro.Catalog.source_docu
 
 The primary structural defect is Receipt: it measures and emits raw string cells, whereas Invoice and Statement already materialize cells through `Rendro.Recipes.TableCell.content/5` / explicit themed text. Raw table strings take default black styling, producing the recorded Humanist-dark defect and making measurement/render parity impossible to prove at the recipe seam. Convert Receipt header and rows once into themed structured cells, pass those same cells to `Rendro.measure_rows/4` and `Rendro.table/2`, register metric fonts for the measurement document, and retain a literal-string nil-theme branch for byte identity. [VERIFIED: lib/rendro/recipes/receipt.ex; lib/rendro/recipes/invoice.ex; lib/rendro/recipes/statement.ex]
 
-**Primary recommendation:** implement six small, recipe-owned supplied-theme hierarchy repairs with focused no-theme/public-theme contracts; run six non-promotional checks; regenerate once; explicitly rebind the 12 changed unscored cells; then create exactly one hash-pinned 12-image advisory payload and record the human review.
+**Primary recommendation:** implement six recipe-owned supplied-theme hierarchy repairs with focused no-theme/public-theme contracts; run six non-promotional checks; render one dev-only candidate bundle outside canonical assets; derive its actual scored/unscored/stable identity diff; create exactly one hash-pinned 12-image advisory payload from that bundle; record human review; then transcribe current evidence and run canonical generation exactly once. The candidate seam never projects quality or mutates reviewer-owned records. [RESOLVED: checker revision 1]
 
 ## Architectural Responsibility Map
 
@@ -120,7 +120,7 @@ pinned PDFium page-one PNG --> PNG SHA-256 --> catalog.json
 | Certificate | `body_section/3`, `centered_line/…`, centering size calculations in `lib/rendro/recipes/certificate.ex` | Resolve recipient/credential rank once and feed those values to both emitted text and centering measurement. [VERIFIED: lib/rendro/recipes/certificate.ex] |
 | Payslip | `summary_section/2`, `body_section/2` in `lib/rendro/recipes/payslip.ex` | Retain the existing semantic surface/rule net-pay band, right alignment, and atomic money test; make its supplied-theme hierarchy sharper, not a new card. [VERIFIED: lib/rendro/recipes/payslip.ex] |
 | Ticket | `main_section/2`, `geometry/1`, `ticket_roles/2` in `lib/rendro/recipes/ticket.ex` | Placement stays the anchor and reference subordinate; retain only the existing `catalog_layout` band-height accommodation. [VERIFIED: lib/rendro/recipes/ticket.ex] |
-| Artifacts/evidence | `dev/rendro/catalog.ex`, `dev/mix/tasks/rendro/catalog/{gen,check}.ex` | Do not change literal order/count or weaken `quality_contract_errors/2`, `disposition_errors/2`, or `rubric_passed?/2`. [VERIFIED: dev/rendro/catalog.ex; dev/mix/tasks/rendro/catalog/*.ex] |
+| Artifacts/evidence | `dev/rendro/catalog.ex`, `dev/mix/tasks/rendro/catalog/{gen,check,candidate}.ex` | Add only a dev-only fixed-target candidate writer that omits quality projection and canonical writes. Do not change literal order/count or weaken `quality_contract_errors/2`, `disposition_errors/2`, or `rubric_passed?/2`. [VERIFIED seam: dev/rendro/catalog.ex; RESOLVED policy: checker revision 1] |
 | Final payload | `test/rendro/catalog_raster_review_test.exs`, `.github/workflows/ci.yml` | Split the exact 12-image final-review payload from the existing four-image multipage proof, then stage renderer version/SHA and catalog hashes together. [VERIFIED: test/rendro/catalog_raster_review_test.exs; .github/workflows/ci.yml] |
 | Evidence record | `priv/quality/rubric_scores.json`, `priv/quality/SIGN-OFF.md`, schema + doc contracts | Update only after observing the final payload; preserve 6 legacy scores, all 32 disposition rows, and thresholds. [VERIFIED: priv/quality/rubric_scores.json; priv/schemas/rubric_scores.schema.json; test/docs_contract/rubric_manifest_contract_test.exs] |
 
@@ -154,9 +154,9 @@ backdrop = Rendro.path([{:rect, 0, 0, width, height}],
 
 Source: [VERIFIED: lib/rendro/recipes/statement.ex; lib/rendro/recipes/payslip.ex]
 
-### Pattern 3: one writer, one checker, then reviewer-owned evidence
+### Pattern 3: candidate isolation, one canonical writer, one checker
 
-**What:** `mix rendro.catalog.gen` writes all assets/manifest, `mix rendro.catalog.check` reads and validates them, and final rubric/SIGN-OFF changes happen only after the pinned artifact exists.
+**What:** `mix rendro.catalog.candidate` writes one fixed-root, quality-free temp bundle for review; after review transcription, `mix rendro.catalog.gen` writes canonical assets exactly once and `mix rendro.catalog.check` validates them. Candidate generation never mutates rubric/SIGN-OFF or projects quality.
 
 **When to use:** full catalog regeneration and final closure. [VERIFIED: dev/rendro/catalog.ex; dev/mix/tasks/rendro/catalog/*.ex]
 
@@ -164,10 +164,10 @@ Source: [VERIFIED: lib/rendro/recipes/statement.ex; lib/rendro/recipes/payslip.e
 
 1. Add focused public-theme hierarchy/semantic tests beside each recipe plus untouched no-theme byte checks; do not edit `rubric_scores.json`, `SIGN-OFF.md`, or `catalog.json` yet. [VERIFIED: test/rendro/recipes/*_byte_identity_test.exs; 130-CONTEXT.md]
 2. Implement and validate one family pair at a time. Run deterministic recipe/cell tests and `mix rendro.catalog.check` only as diagnostic drift detection; if catalog hashes drift, do not regenerate yet. [VERIFIED: 130-CONTEXT.md; dev/rendro/catalog.ex]
-3. After all six pairs stabilize, add/adjust the phase-130 advisory staging/test boundary so final review has exactly twelve full-size images and a machine-readable identity manifest. Preserve the separate bounded Invoice/Statement multipage proof. [VERIFIED: test/rendro/catalog_raster_review_test.exs; 130-UI-SPEC.md]
-4. Run one `mix rendro.catalog.gen`, inspect the diff, then explicitly rebind each unscored mechanically changed row (new PNG/PDF hashes, date, and concrete reason) without changing it to `scored`. [VERIFIED: dev/rendro/catalog.ex; priv/schemas/rubric_scores.schema.json]
-5. Run deterministic check/schema/contracts. Produce one pinned payload from the resulting exact artifact identity. Stop and repair/re-run only the affected checkpoint if any ID, hash, renderer identity, or test is wrong. [VERIFIED: 130-CONTEXT.md; dev/rendro/catalog.ex]
-6. Perform sequential full-size human review; then update only the 12 scored dispositions and concise `SIGN-OFF.md` table. Re-run generation to project the reviewer-owned verdicts into `catalog.json`, then rerun all deterministic checks. [VERIFIED: dev/rendro/catalog.ex; priv/quality/SIGN-OFF.md]
+3. After all six pairs stabilize, add the exact twelve-image staging contract and the fixed-target dev-only candidate writer. Candidate output lives under `tmp/phase130-candidate`, contains no quality projection, and is atomically published only after all 32 identities validate; canonical assets and reviewer records remain byte-identical. [RESOLVED: checker revision 1]
+4. Run one pinned candidate batch and derive an ID-aligned three-way actual diff: changed scored rows are `review_required` metadata only, changed unscored rows are enumerated for later mechanical rebind, and byte-stable rows remain untouched. Never copy stale scores into candidate cells. [RESOLVED: checker revision 1]
+5. Produce one pinned twelve-image payload from the candidate manifest, keeping multipage proof separate. Stop and clean the exact temp roots if any ID, hash, renderer identity, cardinality, or test is wrong. [VERIFIED: 130-CONTEXT.md; RESOLVED seam: checker revision 1]
+6. Perform sequential full-size human review. Transcribe exactly twelve scored records plus only actual changed-unscored rebinds, then run `mix rendro.catalog.gen` exactly once. Accept canonical output only if all 32 PNG/PDF hashes and renderer identity reproduce the reviewed candidate, and then run all deterministic checks. [RESOLVED: checker revision 1]
 
 ## Don't Hand-Roll
 
@@ -205,7 +205,7 @@ The current raster test writes 12 flagship images plus four multipage proof imag
 
 Recipe-wide supplied-theme repair will likely alter more than the twelve scored flagship cells. Based on the literal registry, the expected explicitly re-bound unscored candidates are Swiss Invoice (2), Editorial Statement (2), Minimal-Mono Receipt (2), Swiss Certificate (2), Corporate-Classic Payslip (2), and Minimal-Mono + Editorial Ticket (4): 14 candidates? Re-evaluate against the generated hash diff; do not assume a count. [VERIFIED: dev/rendro/catalog.ex] [ASSUMED]
 
-**Correction for planning:** the registry actually yields 14 unscored themed candidates across those families (2 + 2 + 2 + 2 + 2 + 4), while 12 are scored. The plan must enumerate exact hash-diff IDs after the single generation rather than hard-code a predicted set. [VERIFIED: dev/rendro/catalog.ex]
+**Correction for planning:** the registry actually yields 14 unscored themed candidates across those families (2 + 2 + 2 + 2 + 2 + 4), while 12 are scored. The plan must enumerate exact hash-diff IDs from the candidate bundle rather than hard-code a predicted set. [VERIFIED: dev/rendro/catalog.ex; RESOLVED policy above]
 
 ### 7. False dark-mode claims
 
@@ -250,14 +250,10 @@ The CI payload must additionally capture `GITHUB_SHA`, run ID, PDFium version/SH
 |---|---|---|---|
 | A1 | All 14 unscored themed candidates will mechanically change. | Common Pitfalls | Some may have byte-stable output; the plan must use the actual post-generation diff and rebind only changed identities. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **How should the exact phase-130 CI branch be named?**
-   - What we know: CI currently permits/stages only `gsd/phase-127-catalog-bless-*`. [VERIFIED: .github/workflows/ci.yml]
-   - Recommendation: add a narrow phase-130 pattern that requires an immutable SHA suffix, reuses pinned installation, and emits a separately named artifact; do not broaden the normal PR lane.
-2. **Do all recipe-wide repair changes modify each predicted unscored counterpart?**
-   - What we know: 14 unscored supplied-theme cells share the six repaired family recipes. [VERIFIED: dev/rendro/catalog.ex]
-   - Recommendation: derive the list from the one full regeneration's source/PNG diff; record a concrete reason per changed row and leave byte-stable rows untouched.
+1. **RESOLVED — Exact phase-130 CI ref grammar:** the only accepted ref is `gsd/phase-130-catalog-review-<sha>`, where `<sha>` is exactly 40 lowercase hexadecimal characters and equals `GITHUB_SHA` byte-for-byte. CI enforces both `^gsd/phase-130-catalog-review-[0-9a-f]{40}$` and exact suffix equality before candidate generation. This phase-only route reuses the pinned install, emits separately named candidate/final/multipage artifacts, and does not change normal pull-request triggers or deterministic required checks.
+2. **RESOLVED — Actual-diff/rebind authority:** compare the ordered 32-cell candidate manifest to the committed canonical baseline by catalog ID and both PNG/source-PDF SHA values. Partition all IDs into changed-scored, changed-unscored, and byte-stable sets. Candidate output records changed scored rows only as `review_required` with prior/current identities and never carries their old scores as current. During final transcription, update exactly the twelve reviewed scored rows and only IDs in changed-unscored; retain unscored status with current hashes/date/concrete mechanical reason. Leave every byte-stable row unchanged. Canonical generation runs only after those records are current and must reproduce the candidate identities exactly.
 
 ## Environment Availability
 
@@ -295,7 +291,7 @@ The CI payload must additionally capture `GITHUB_SHA`, run ID, PDFium version/SH
 ### Sampling Rate
 
 - **Per recipe task:** its focused three-file test command, then `mix rendro.catalog.check` as a read-only drift signal. [VERIFIED: mix.exs; dev/mix/tasks/rendro/catalog/check.ex]
-- **After all six pairs:** one `mix rendro.catalog.gen`, then full deterministic catalog/doc-contract gate. [VERIFIED: dev/mix/tasks/rendro/catalog/gen.ex]
+- **After all six pairs:** one pinned `mix rendro.catalog.candidate` batch and candidate contract gate; canonical `mix rendro.catalog.gen` runs exactly once only after review transcription. [RESOLVED: checker revision 1]
 - **Before final evidence edit:** one CI pinned-PDFium payload; inspect every image at full size, canonical light then dark. [VERIFIED: 130-UI-SPEC.md]
 - **After final evidence edit:** regenerate projections and run full deterministic suite; advisory evidence remains a separate claim. [VERIFIED: dev/rendro/catalog.ex; AGENTS.md]
 
