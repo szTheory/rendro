@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 7
+open_count: 9
 waived_count: 0
 fixed_count: 6
-total_count: 13
-last_updated: 2026-08-18T01:41:06.678Z
+total_count: 15
+last_updated: 2026-08-20T15:34:07.633Z
 ---
 
 # Broken Windows Ledger
@@ -28,6 +28,8 @@ last_updated: 2026-08-18T01:41:06.678Z
 | 11 | 125 | deviation | test/rendro/theme/preset_raster_snapshot_test.exs |  | Guarded blessing bypasses only normal-run reference-existence assertion while seeding missing references. | open |  | 2026-08-17T01:25:59.222Z |  |
 | 12 | 125 | deviation | test/rendro/theme/preset_raster_snapshot_test.exs |  | ARM host uses a temporary x86 container wrapper for the exact SHA-verified pinned PDFium binary. | open |  | 2026-08-17T01:25:59.289Z |  |
 | 13 | 127 | deviation | priv/pdfium_pin.json |  | Used the exact SHA-verified GitHub advisory lane because the pinned Linux PDFium binary cannot execute on the macOS ARM executor. | open |  | 2026-08-18T01:41:06.678Z |  |
+| 14 | 130 | unrun-verify | tmp/phase130-launch-reconcile |  | Focused local Mix tests were unrun because the detached staging worktree has no dependency cache; exact-SHA CI artifact provenance was verified. | open |  | 2026-08-20T15:34:07.544Z |  |
+| 15 | 130 | deviation | tmp/phase130-launch-reconcile |  | Detached-worktree dependency cache unavailable; no packages were installed and only artifact/hash fences were used. | open |  | 2026-08-20T15:34:07.633Z |  |
 
 ````json
 [
@@ -185,6 +187,30 @@ last_updated: 2026-08-18T01:41:06.678Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-18T01:41:06.678Z",
+    "resolved_at": null
+  },
+  {
+    "id": 14,
+    "kind": "unrun-verify",
+    "phase": "130",
+    "file": "tmp/phase130-launch-reconcile",
+    "line": null,
+    "description": "Focused local Mix tests were unrun because the detached staging worktree has no dependency cache; exact-SHA CI artifact provenance was verified.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-20T15:34:07.544Z",
+    "resolved_at": null
+  },
+  {
+    "id": 15,
+    "kind": "deviation",
+    "phase": "130",
+    "file": "tmp/phase130-launch-reconcile",
+    "line": null,
+    "description": "Detached-worktree dependency cache unavailable; no packages were installed and only artifact/hash fences were used.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-20T15:34:07.633Z",
     "resolved_at": null
   }
 ]
