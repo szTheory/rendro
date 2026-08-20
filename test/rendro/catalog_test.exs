@@ -103,7 +103,8 @@ defmodule Rendro.CatalogTest do
                Catalog.read_manifest!(),
                rubric,
                "v0.11.0",
-               String.duplicate("a", 40)
+               String.duplicate("a", 40),
+               candidate_multipage_proofs()
              )
 
     changed = hd(manifest["cells"])
@@ -114,6 +115,15 @@ defmodule Rendro.CatalogTest do
     refute Map.has_key?(changed, "passed")
     refute Map.has_key?(changed, "dimension_scores")
     assert manifest["diff"]["changed_scored"] == [first["id"]]
+  end
+
+  test "candidate generation includes the separate four-image multipage proof collection" do
+    source = File.read!("dev/rendro/catalog.ex")
+
+    assert source =~ "build_multipage_proofs"
+    assert source =~ "\"multipage\" => multipage"
+    assert source =~ "invoice-line-items-60-plus-page-first"
+    assert source =~ "statement-line-items-60-plus-page-final"
   end
 
   test "the literal registry is the locked ordered 32-cell catalog" do
@@ -298,5 +308,23 @@ defmodule Rendro.CatalogTest do
         do: replacement,
         else: disposition
     end)
+  end
+
+  defp candidate_multipage_proofs do
+    for {family, page} <- [
+          {"invoice", "first"},
+          {"invoice", "final"},
+          {"statement", "first"},
+          {"statement", "final"}
+        ] do
+      %{
+        "id" => "#{family}-line-items-60-plus-page-#{page}",
+        "family" => family,
+        "page" => page,
+        "png_path" => "tmp/phase130-candidate/multipage/#{family}-#{page}.png",
+        "png_sha256" => String.duplicate("d", 64),
+        "source_pdf_sha256" => String.duplicate("e", 64)
+      }
+    end
   end
 end

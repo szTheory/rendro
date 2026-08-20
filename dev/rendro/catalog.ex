@@ -13,6 +13,12 @@ defmodule Rendro.Catalog do
   @canonical_manifest_staging_path "assets/rendro/catalog.json.staging"
   @candidate_root "tmp/phase130-candidate"
   @candidate_staging_root "tmp/phase130-candidate.staging"
+  @candidate_multipage_ids [
+    "invoice-line-items-60-plus-page-first",
+    "invoice-line-items-60-plus-page-final",
+    "statement-line-items-60-plus-page-first",
+    "statement-line-items-60-plus-page-final"
+  ]
   @dark_boundary_disclosure "Screen-oriented; not a print, accessibility, PDF/UA, or WCAG claim."
   # This list is intentionally literal and ordered. It is the only membership
   # source; fixture discovery may validate a row but must never add one.
@@ -187,13 +193,15 @@ defmodule Rendro.Catalog do
              {:ok, cells} <-
                build_cells(renderer_version, @candidate_staging_root, @candidate_root),
              :ok <- validate_candidate_staging(cells),
+             {:ok, multipage} <- build_multipage_proofs(),
              {:ok, manifest} <-
                candidate_manifest(
                  cells,
                  baseline,
                  read_rubric_scores(),
                  renderer_version,
-                 current_commit_sha!()
+                 current_commit_sha!(),
+                 multipage
                ),
              :ok <-
                File.write(
@@ -221,8 +229,19 @@ defmodule Rendro.Catalog do
   def candidate_manifest(cells, baseline, rubric, renderer_version, commit_sha)
       when is_list(cells) and is_map(baseline) and is_map(rubric) and is_binary(renderer_version) and
              is_binary(commit_sha) do
+    candidate_manifest(cells, baseline, rubric, renderer_version, commit_sha, [])
+  end
+
+  def candidate_manifest(_cells, _baseline, _rubric, _renderer_version, _commit_sha),
+    do: {:error, :invalid_candidate_manifest_input}
+
+  @doc false
+  def candidate_manifest(cells, baseline, rubric, renderer_version, commit_sha, multipage)
+      when is_list(cells) and is_map(baseline) and is_map(rubric) and is_binary(renderer_version) and
+             is_binary(commit_sha) and is_list(multipage) do
     with :ok <- valid_candidate_baseline(baseline),
          :ok <- valid_candidate_cells(cells),
+         :ok <- valid_candidate_multipage(multipage),
          true <- Regex.match?(~r/\A[0-9a-f]{40}\z/, commit_sha) do
       baseline_by_id = Map.new(baseline["cells"], &{&1["id"], &1})
       dispositions = Map.new(rubric["catalog_dispositions"] || [], &{&1["catalog_id"], &1})
@@ -273,6 +292,7 @@ defmodule Rendro.Catalog do
            "pin_sha256" => pin["sha256"]
          },
          "cells" => candidate_cells,
+         "multipage" => multipage,
          "diff" => Map.new(diff, fn {bucket, ids} -> {Atom.to_string(bucket), ids} end)
        }}
     else
@@ -281,7 +301,7 @@ defmodule Rendro.Catalog do
     end
   end
 
-  def candidate_manifest(_cells, _baseline, _rubric, _renderer_version, _commit_sha),
+  def candidate_manifest(_cells, _baseline, _rubric, _renderer_version, _commit_sha, _multipage),
     do: {:error, :invalid_candidate_manifest_input}
 
   @spec check(keyword()) :: :ok | {:error, [String.t()]}
@@ -905,6 +925,85 @@ defmodule Rendro.Catalog do
   end
 
   defp valid_candidate_cell?(_), do: false
+
+  defp valid_candidate_multipage(multipage) do
+    if Enum.map(multipage, & &1["id"]) == @candidate_multipage_ids and
+         Enum.all?(multipage, &valid_candidate_multipage_proof?/1) do
+      :ok
+    else
+      {:error, :invalid_candidate_multipage}
+    end
+  end
+
+  defp valid_candidate_multipage_proof?(%{
+         "id" => id,
+         "family" => family,
+         "page" => page,
+         "png_path" => path,
+         "png_sha256" => png_sha,
+         "source_pdf_sha256" => pdf_sha
+       }) do
+    id in @candidate_multipage_ids and family in ["invoice", "statement"] and
+      page in ["first", "final"] and String.starts_with?(path, @candidate_root <> "/") and
+      match?({:ok, _}, Path.safe_relative(path)) and sha256?(png_sha) and sha256?(pdf_sha)
+  end
+
+  defp valid_candidate_multipage_proof?(_), do: false
+
+  defp build_multipage_proofs do
+    for {family, page} <- [
+          {:invoice, "first"},
+          {:invoice, "final"},
+          {:statement, "first"},
+          {:statement, "final"}
+        ] do
+      with {:ok, pdf} <- Rendro.render(multipage_document(family), deterministic: true),
+           {:ok, pages} <- Rendro.Adapters.Pdfium.render(pdf, dpi: @dpi),
+           true <- length(pages) > 1,
+           png <- if(page == "first", do: hd(pages), else: List.last(pages)),
+           relative_path <- "multipage/#{family}-#{page}.png",
+           :ok <- File.mkdir_p(Path.join(@candidate_staging_root, "multipage")),
+           :ok <- File.write(Path.join(@candidate_staging_root, relative_path), png) do
+        {:ok,
+         %{
+           "id" => "#{family}-line-items-60-plus-page-#{page}",
+           "family" => Atom.to_string(family),
+           "page" => page,
+           "png_path" => Path.join(@candidate_root, relative_path),
+           "png_sha256" => sha256(png),
+           "source_pdf_sha256" => sha256(pdf)
+         }}
+      else
+        false -> {:error, {:multipage_not_rendered, family}}
+        {:error, reason} -> {:error, {family, reason}}
+      end
+    end
+    |> split_results()
+  end
+
+  defp multipage_document(:invoice) do
+    Rendro.Recipes.Invoice.document(%{
+      id: "INV-1001",
+      date: ~D[2026-01-15],
+      items: Enum.map(1..65, &%{name: "Line item #{&1}", qty: 1, price: 100})
+    })
+  end
+
+  defp multipage_document(:statement) do
+    Rendro.Recipes.Statement.document(%{
+      period: %{from: ~D[2026-01-01], to: ~D[2026-01-31]},
+      account: %{name: "Acme Corp"},
+      opening_balance: Decimal.new("1000.00"),
+      lines:
+        Enum.map(1..65, fn index ->
+          %{
+            date: ~D[2026-01-05],
+            description: "Line item #{index}",
+            amount: Decimal.new("100.00")
+          }
+        end)
+    })
+  end
 
   defp candidate_status(cell, baseline_cell, disposition) do
     if cell["png_sha256"] == baseline_cell["png_sha256"] and
