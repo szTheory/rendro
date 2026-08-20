@@ -369,8 +369,11 @@ defmodule Rendro.Recipes.Receipt do
 
   defp body_section(%{lines: lines} = data, opts) do
     fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
+    colors = palette(opts)
+    type = typography(opts)
+    theme = opts[:theme]
 
-    table_header = ["Description", "Amount"]
+    table_header = table_row(["Description", "Amount"], theme, colors, type)
     table_opts = [header: table_header, columns: @table_columns]
 
     # Format all rows as strings for measurement and display
@@ -379,12 +382,16 @@ defmodule Rendro.Recipes.Receipt do
         [desc, fmt_amount.(amt)]
       end)
 
+    rows = Enum.map(formatted_rows, &table_row(&1, theme, colors, type))
+
     # Measure all rows at the body region width using engine's own font metrics.
     # This avoids recipe-local estimates that cause :content_overflow (D-09).
-    doc_for_measure = Rendro.Document.new()
+    doc_for_measure =
+      Rendro.Document.new()
+      |> Rendro.Theme.Presets.register_metric_fonts(Map.values(type.fonts))
 
     {header_h, row_heights} =
-      Rendro.measure_rows(formatted_rows, @content_width, doc_for_measure, table_opts)
+      Rendro.measure_rows(rows, @content_width, doc_for_measure, table_opts)
 
     # 118-08: resolve the SAME header height page_template/1 uses for this
     # call so body capacity accounting matches the actual rendered header
@@ -404,7 +411,7 @@ defmodule Rendro.Recipes.Receipt do
     # Build rows_with_meta triples: [{fmt_row, height, nil}]
     # nil meta — Receipt has no per-row balance tracking.
     rows_with_meta =
-      Enum.zip(formatted_rows, row_heights)
+      Enum.zip(rows, row_heights)
       |> Enum.map(fn {fmt_row, height} -> {fmt_row, height, nil} end)
 
     pages = Rendro.Recipes.Pagination.chunk_rows_into_pages(rows_with_meta, effective_capacity)
@@ -420,7 +427,7 @@ defmodule Rendro.Recipes.Receipt do
       end)
 
     # Append totals block after the last table block (on the final page).
-    totals_blocks = build_totals_blocks(data, opts)
+    totals_blocks = totals_overlay(data, opts) ++ build_totals_blocks(data, opts)
     all_blocks = table_blocks ++ totals_blocks
 
     Rendro.section(
@@ -430,8 +437,19 @@ defmodule Rendro.Recipes.Receipt do
     )
   end
 
+  defp table_row(values, theme, colors, type) do
+    Enum.map(values, &Rendro.Recipes.TableCell.content(&1, theme, colors, type, :ink))
+  end
+
   defp footer_section(_data, opts) do
-    page_number_opts = Keyword.get(opts, :page_number_opts, [])
+    page_number_opts =
+      case opts[:theme] do
+        nil ->
+          Keyword.get(opts, :page_number_opts, [])
+
+        _theme ->
+          Keyword.put_new(Keyword.get(opts, :page_number_opts, []), :color, palette(opts).muted)
+      end
 
     Rendro.section(
       name: :receipt_footer,
@@ -507,6 +525,31 @@ defmodule Rendro.Recipes.Receipt do
   end
 
   defp build_totals_blocks(_data, _opts), do: []
+
+  # A themed receipt gets one restrained arithmetic surface/rule overlay. Its
+  # explicit zero layout height keeps the existing table/totals flow and the
+  # frozen nil-theme bytes intact while placing the arithmetic ladder on a
+  # single quiet visual ground.
+  defp totals_overlay(%{totals: totals}, opts) when is_map(totals) do
+    if is_nil(opts[:theme]) do
+      []
+    else
+      colors = palette(opts)
+
+      [
+        Rendro.path([{:rect, 0, 0, @content_width, 52}],
+          fill: colors.surface,
+          stroke: %{color: colors.rule, width: 0.5},
+          x: 0,
+          y: 0,
+          width: @content_width,
+          height: 0
+        )
+      ]
+    end
+  end
+
+  defp totals_overlay(_data, _opts), do: []
 
   defp maybe_append_totals_line(acc, _label, nil, _fmt), do: acc
 
