@@ -265,7 +265,9 @@ defmodule Rendro.Recipes.PayslipTest do
       theme = Rendro.Theme.preset(:swiss, accent: "#2C6BED")
       sections = Payslip.sections(fixture_data(), theme: theme)
       summary = Enum.find(sections, &(&1.region == :summary))
-      summary_region = Enum.find(Payslip.page_template(theme: theme).regions, &(&1.name == :summary))
+
+      summary_region =
+        Enum.find(Payslip.page_template(theme: theme).regions, &(&1.name == :summary))
 
       value_block =
         Enum.find(summary.content, fn block ->
