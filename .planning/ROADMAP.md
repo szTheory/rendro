@@ -33,13 +33,13 @@
   3. Maintainers can regenerate the complete fixed 32-cell catalog and have its existing deterministic artifact, hash, schema, and coverage checks accept the current generated output.
   4. A human can review the twelve exact full-size pinned-raster outputs and find every disposition bound to the current catalog ID and reviewed artifact hashes; any cell that misses the frozen threshold remains `needs_work` rather than being promoted.
 
-**Plans**: 1/6 plans executed
+**Plans**: 2/6 plans executed
 
 Plans:
 **Wave 1**
 
 - [x] 130-01-PLAN.md — Repair Humanist Receipt, Corporate-Classic Invoice, and Minimal-Mono Statement through public supplied-theme seams.
-- [ ] 130-02-PLAN.md — Repair Editorial Certificate, Swiss Payslip, and Brutalist Ticket while preserving genre geometry.
+- [x] 130-02-PLAN.md — Repair Editorial Certificate, Swiss Payslip, and Brutalist Ticket while preserving genre geometry.
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -75,5 +75,5 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 130. Catalog Quality & Evidence Ratchet | 1/6 | In Progress|  |
+| 130. Catalog Quality & Evidence Ratchet | 2/6 | In Progress|  |
 | 131. Adoption Snapshot & Phoenix Newcomer Proof | 0/TBD | Not started | - |

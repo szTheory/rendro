@@ -5,15 +5,15 @@ milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 130
 current_phase_name: Catalog Quality & Evidence Ratchet
 status: executing
-stopped_at: Completed 130-01-PLAN.md
-last_updated: "2026-08-20T01:03:13.244Z"
+stopped_at: Completed 130-02-PLAN.md
+last_updated: "2026-08-20T01:09:27.596Z"
 last_activity: 2026-08-19
 last_activity_desc: Phase 130 execution started
 progress:
   total_phases: 2
   completed_phases: 0
   total_plans: 6
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 130 (Catalog Quality & Evidence Ratchet) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-08-19 — Phase 130 execution started
 
-Progress: [██░░░░░░░░] 17%
+Progress: [███░░░░░░░] 33%
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
@@ -56,6 +56,9 @@ Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Not started
 - [Phase ?]: Receipt themes materialize one semantic table-cell set for both measurement and rendering while nil-theme bytes stay frozen.
 - [Phase ?]: Themed Invoice places an available due date beside Total Due only when the payment summary has a total.
 - [Phase ?]: Statement catalog_layout remains capacity-only; supplied-theme hierarchy is shared with ordinary public calls.
+- [Phase ?]: Public supplied themes carry Certificate, Payslip, and Ticket hierarchy; catalog_layout remains capacity-only.
+- [Phase ?]: Certificate centering and Payslip monetary alignment derive from the exact values emitted to render.
+- [Phase ?]: Ticket uses a public rectilinear placement rule while retaining placement > title > complete reference in both modes.
 
 ### Pending Todos
 
@@ -75,8 +78,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-20T01:03:13.239Z
-Stopped at: Completed 130-01-PLAN.md
+Last session: 2026-08-20T01:09:27.590Z
+Stopped at: Completed 130-02-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -89,3 +92,4 @@ Resume file: None
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 130 P01 | 11m 28s | 3 tasks | 7 files |
+| Phase 130 P02 | 4m | 3 tasks | 6 files |
