@@ -5,16 +5,16 @@ milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 130
 current_phase_name: Catalog Quality & Evidence Ratchet
 status: executing
-stopped_at: Completed 130-02-PLAN.md
-last_updated: "2026-08-20T01:49:30Z"
+stopped_at: Completed 130-03-PLAN.md
+last_updated: "2026-08-20T02:08:18.419Z"
 last_activity: 2026-08-19
 last_activity_desc: Phase 130 incomplete plan graph revised; next is 130-03
 progress:
   total_phases: 2
   completed_phases: 0
   total_plans: 11
-  completed_plans: 2
-  percent: 18
+  completed_plans: 3
+  percent: 0
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 130 (Catalog Quality & Evidence Ratchet) — EXECUTING
-Plan: 3 of 11
+Plan: 4 of 11
 Status: Ready to execute
 Last activity: 2026-08-19 — Phase 130 incomplete plan graph revised; next is 130-03
 
-Progress: [██░░░░░░░░] 18%
+Progress: [███░░░░░░░] 27%
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
@@ -59,6 +59,8 @@ Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Not started
 - [Phase ?]: Public supplied themes carry Certificate, Payslip, and Ticket hierarchy; catalog_layout remains capacity-only.
 - [Phase ?]: Certificate centering and Payslip monetary alignment derive from the exact values emitted to render.
 - [Phase ?]: Ticket uses a public rectilinear placement rule while retaining placement > title > complete reference in both modes.
+- [Phase ?]: Candidate classification is a pure, file-I/O-free boundary and does not read canonical catalog assets, mutate evidence, or project quality data.
+- [Phase ?]: Only gsd/phase-130-catalog-review-<40 lowercase hex equal to GITHUB_SHA may produce the advisory artifacts.
 
 ### Pending Todos
 
@@ -78,8 +80,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-20T01:09:27.590Z
-Stopped at: Completed 130-02-PLAN.md
+Last session: 2026-08-20T02:08:18.410Z
+Stopped at: Completed 130-03-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -93,3 +95,4 @@ Resume file: None
 |------|----------|-------|-------|
 | Phase 130 P01 | 11m 28s | 3 tasks | 7 files |
 | Phase 130 P02 | 4m | 3 tasks | 6 files |
+| Phase 130 P03 | 6m | 2 tasks | 5 files |
