@@ -1,0 +1,222 @@
+name: Phase 130 Candidate Evidence Route
+
+on:
+  push:
+    branches:
+      - 'gsd/phase130-candidate-route-*'
+
+concurrency:
+  group: phase130-candidate-evidence-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  candidate-evidence:
+    name: candidate-evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SOURCE_SHA: 411cdcafa5d3090f3d0ec144c0cba59d991ba99f
+      SOURCE_REF: gsd/phase130-candidate-route-411cdcafa5d3090f3d0ec144c0cba59d991ba99f
+      ROUTE_SHA: ${{ github.sha }}
+      ROUTE_REF: ${{ github.ref_name }}
+      CANDIDATE_ARTIFACT: phase-130-candidate-route-candidate
+      FINAL_ARTIFACT: phase-130-candidate-route-final
+      MULTIPAGE_ARTIFACT: phase-130-candidate-route-multipage
+
+    steps:
+      - name: Verify route identity before source checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${ROUTE_REF}" = "${SOURCE_REF}"
+          [[ "${ROUTE_SHA}" =~ ^[0-9a-f]{40}$ ]]
+          [[ "${SOURCE_SHA}" =~ ^[0-9a-f]{40}$ ]]
+
+      - name: Checkout route provenance
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: ${{ github.sha }}
+          path: route
+          fetch-depth: 1
+
+      - name: Verify route checkout provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C route rev-parse HEAD)" = "${ROUTE_SHA}"
+          test -f route/.github/workflows/phase130-candidate-evidence.yml
+
+      - name: Checkout exact rendered source
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: 411cdcafa5d3090f3d0ec144c0cba59d991ba99f
+          path: source
+          fetch-depth: 1
+
+      - name: Verify rendered-source provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C source rev-parse HEAD)" = "${SOURCE_SHA}"
+          test "$(git -C source status --porcelain)" = ""
+
+      - name: Setup Beam
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
+        with:
+          otp-version: '28'
+          elixir-version: '1.19.5'
+
+      - name: Install PDFium v0.11.0 and verify executable SHA
+        working-directory: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          PIN_VERSION="$(jq -er '.version' priv/pdfium_pin.json)"
+          PIN_SHA="$(jq -er '.sha256' priv/pdfium_pin.json)"
+          test "${PIN_VERSION}" = "v0.11.0"
+          [[ "${PIN_SHA}" =~ ^[0-9a-f]{64}$ ]]
+          curl -fsSL -o pdfium-cli \
+            "https://github.com/klippa-app/pdfium-cli/releases/download/${PIN_VERSION}/pdfium-webassembly-linux-amd64"
+          echo "${PIN_SHA}  pdfium-cli" | sha256sum --check
+          install -m 0755 pdfium-cli /usr/local/bin/pdfium-cli
+          test "$(sha256sum "$(command -v pdfium-cli)" | cut -d ' ' -f 1)" = "${PIN_SHA}"
+
+      - name: Install exact-source dependencies
+        working-directory: source
+        run: mix deps.get
+
+      - name: Generate exact-source candidate bundle
+        working-directory: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          mix rendro.catalog.candidate
+          test -f tmp/phase130-candidate/candidate-manifest.json
+
+      - name: Render tagged exact-source raster-review contracts
+        working-directory: source
+        env:
+          RENDRO_CATALOG_REVIEW_DIR: ${{ github.workspace }}/source/tmp/phase130-review
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected_sha="$(jq -er '.sha256' priv/pdfium_pin.json)"
+          actual_sha="$(sha256sum "$(command -v pdfium-cli)" | cut -d ' ' -f 1)"
+          test "${actual_sha}" = "${expected_sha}"
+          mix test --include raster_snapshot test/rendro/catalog_raster_review_test.exs
+
+      - name: Stage and verify separated candidate evidence inventories
+        working-directory: source
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          PIN_VERSION="$(jq -er '.version' priv/pdfium_pin.json)"
+          PIN_SHA="$(jq -er '.sha256' priv/pdfium_pin.json)"
+          EXECUTABLE_SHA="$(sha256sum "$(command -v pdfium-cli)" | cut -d ' ' -f 1)"
+          test "${PIN_VERSION}" = "v0.11.0"
+          test "${EXECUTABLE_SHA}" = "${PIN_SHA}"
+
+          manifest=tmp/phase130-candidate/candidate-manifest.json
+          final_dir=tmp/phase130-review/final
+          multipage_dir=tmp/phase130-review/multipage
+          test "$(find tmp/phase130-candidate -type f -name '*.png' ! -path 'tmp/phase130-candidate/multipage/*' | wc -l | tr -d ' ')" = "32"
+          test "$(find "${final_dir}" -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = "12"
+          test "$(find "${multipage_dir}" -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = "4"
+
+          jq -er --arg source "${SOURCE_SHA}" --arg version "${PIN_VERSION}" --arg sha "${PIN_SHA}" '
+            .candidate.commit_sha == $source and
+            .candidate.baseline_commit_sha == $source and
+            .candidate.renderer.version == $version and
+            .candidate.renderer.sha256 == $sha and
+            (.cells | length == 32) and
+            (.multipage | length == 4) and
+            ([.cells[] | .png_path] | length == 32) and
+            ([.cells[] | select((.png_path | startswith("tmp/phase130-candidate/")) | not or contains(".."))] | length == 0) and
+            ([.cells[] | select((.png_sha256 | test("^[0-9a-f]{64}$")) | not)] | length == 0) and
+            ([.multipage[] | select((.png_path | startswith("tmp/phase130-candidate/multipage/")) | not or contains(".."))] | length == 0) and
+            ([.multipage[] | select((.png_sha256 | test("^[0-9a-f]{64}$")) | not)] | length == 0)
+          ' "${manifest}" >/dev/null
+
+          jq -er --arg source "${SOURCE_SHA}" --arg sha "${PIN_SHA}" '
+            (.images | length == 12) and
+            ([.images[] | select(.commit_sha != $source or .renderer_sha256 != $sha or (.png_sha256 | test("^[0-9a-f]{64}$") | not))] | length == 0)
+          ' "${final_dir}/identity-manifest.json" >/dev/null
+
+          candidate_stage="${RUNNER_TEMP}/phase130-route-candidate"
+          final_stage="${RUNNER_TEMP}/phase130-route-final"
+          multipage_stage="${RUNNER_TEMP}/phase130-route-multipage"
+          rm -rf "${candidate_stage}" "${final_stage}" "${multipage_stage}"
+          mkdir -p "${candidate_stage}/pngs" "${final_stage}/pngs" "${multipage_stage}/pngs"
+
+          cp "${manifest}" "${candidate_stage}/candidate-manifest.json"
+          while IFS= read -r png_path; do
+            relative="${png_path#tmp/phase130-candidate/}"
+            test "${relative}" != "${png_path}"
+            case "${relative}" in
+              *..*) exit 1 ;;
+            esac
+            mkdir -p "${candidate_stage}/pngs/$(dirname "${relative}")"
+            cp "${png_path}" "${candidate_stage}/pngs/${relative}"
+          done < <(jq -er '.cells[].png_path' "${manifest}")
+
+          cp "${final_dir}/identity-manifest.json" "${final_stage}/identity-manifest.json"
+          find "${final_dir}" -maxdepth 1 -type f -name '*.png' -print0 | sort -z | xargs -0 -I{} cp "{}" "${final_stage}/pngs/"
+          jq '.multipage' "${manifest}" > "${multipage_stage}/identity-manifest.json"
+          find "${multipage_dir}" -maxdepth 1 -type f -name '*.png' -print0 | sort -z | xargs -0 -I{} cp "{}" "${multipage_stage}/pngs/"
+
+          write_provenance() {
+            local destination="$1"
+            local artifact_name="$2"
+            jq -n \
+              --arg route_sha "${ROUTE_SHA}" \
+              --arg route_ref "${ROUTE_REF}" \
+              --arg source_sha "${SOURCE_SHA}" \
+              --arg run_id "${GITHUB_RUN_ID}" \
+              --arg run_attempt "${GITHUB_RUN_ATTEMPT}" \
+              --arg job "${GITHUB_JOB}" \
+              --arg repository "${GITHUB_REPOSITORY}" \
+              --arg artifact "${artifact_name}" \
+              --arg pdfium_version "${PIN_VERSION}" \
+              --arg pdfium_pin_sha256 "${PIN_SHA}" \
+              --arg pdfium_executable_sha256 "${EXECUTABLE_SHA}" \
+              '{schema_version: 1, route: {sha: $route_sha, ref: $route_ref}, rendered_source: {sha: $source_sha}, run: {id: $run_id, attempt: $run_attempt, job: $job, repository: $repository}, artifact: {name: $artifact}, renderer: {name: "pdfium-cli", version: $pdfium_version, pin_sha256: $pdfium_pin_sha256, executable_sha256: $pdfium_executable_sha256}}' \
+              > "${destination}/provenance.json"
+          }
+
+          write_provenance "${candidate_stage}" "${CANDIDATE_ARTIFACT}"
+          write_provenance "${final_stage}" "${FINAL_ARTIFACT}"
+          write_provenance "${multipage_stage}" "${MULTIPAGE_ARTIFACT}"
+
+          for stage in "${candidate_stage}" "${final_stage}" "${multipage_stage}"; do
+            (cd "${stage}" && find . -type f ! -name inventory.sha256 -print0 | sort -z | xargs -0 sha256sum) > "${stage}/inventory.sha256"
+            (cd "${stage}" && sha256sum --check inventory.sha256)
+          done
+
+          test "$(find "${candidate_stage}/pngs" -type f -name '*.png' | wc -l | tr -d ' ')" = "32"
+          test "$(find "${final_stage}/pngs" -type f -name '*.png' | wc -l | tr -d ' ')" = "12"
+          test "$(find "${multipage_stage}/pngs" -type f -name '*.png' | wc -l | tr -d ' ')" = "4"
+
+      - name: Upload candidate bundle
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: phase-130-candidate-route-candidate
+          path: ${{ runner.temp }}/phase130-route-candidate
+          if-no-files-found: error
+
+      - name: Upload final review payload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: phase-130-candidate-route-final
+          path: ${{ runner.temp }}/phase130-route-final
+          if-no-files-found: error
+
+      - name: Upload multipage proof payload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: phase-130-candidate-route-multipage
+          path: ${{ runner.temp }}/phase130-route-multipage
+          if-no-files-found: error
