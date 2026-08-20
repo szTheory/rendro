@@ -432,6 +432,44 @@ defmodule Rendro.Recipes.InvoiceTest do
       assert total_block.content.size > minor_block.content.size
     end
 
+    test "130-01: Corporate-Classic themes keep the complete due date immediately after Total Due" do
+      data =
+        sample_data()
+        |> Map.put(:due_date, ~D[2026-05-30])
+        |> Map.put(:totals, %{
+          subtotal: Decimal.new("1100"),
+          tax: Decimal.new("88"),
+          total: Decimal.new("1188")
+        })
+
+      for mode <- [:light, :dark] do
+        theme = Rendro.Theme.preset(:corporate_classic, accent: "#2C6BED", mode: mode)
+        sections = Invoice.sections(data, theme: theme)
+        header = Enum.find(sections, &(&1.region == :header))
+        body = Enum.find(sections, &(&1.region == :body))
+
+        refute Enum.any?(header.content, fn
+                 %Rendro.Block{content: %Rendro.Text{content: "Due: 2026-05-30"}} -> true
+                 _ -> false
+               end)
+
+        payment_blocks =
+          Enum.filter(body.content, fn
+            %Rendro.Block{content: %Rendro.Text{content: content}} ->
+              String.starts_with?(content, "Total Due:") or content == "Due: 2026-05-30"
+
+            _ ->
+              false
+          end)
+
+        [total_due, due_date] = payment_blocks
+        assert total_due.content.size == theme.typography.scale.display
+        assert due_date.content.size == theme.typography.scale.body
+        assert total_due.content.size > due_date.content.size
+        assert due_date.content.color == theme.colors.muted
+      end
+    end
+
     test "118-08: a fully-populated invoice (issuer+customer+due_date+terms+totals) renders without :content_overflow" do
       data =
         sample_data()
