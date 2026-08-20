@@ -176,7 +176,9 @@ defmodule Rendro.Recipes.StatementTest do
 
       for mode <- [:light, :dark] do
         theme = Rendro.Theme.preset(:minimal_mono, accent: "#2C6BED", mode: mode)
-        public_header = Statement.sections(data, theme: theme) |> Enum.find(&(&1.region == :header))
+
+        public_header =
+          Statement.sections(data, theme: theme) |> Enum.find(&(&1.region == :header))
 
         catalog_header =
           Statement.sections(data, theme: theme, catalog_layout: true)
@@ -196,7 +198,13 @@ defmodule Rendro.Recipes.StatementTest do
 
         for header <- [public_header, catalog_header] do
           text_blocks = Enum.filter(header.content, &is_struct(&1.content, Rendro.Text))
-          closing = Enum.find(text_blocks, &(&1.content.content == Rendro.Format.money(expected_closing(3))))
+
+          closing =
+            Enum.find(
+              text_blocks,
+              &(&1.content.content == Rendro.Format.money(expected_closing(3)))
+            )
+
           label = Enum.find(text_blocks, &String.contains?(&1.content.content, "Closing balance"))
 
           assert closing.content.size == theme.typography.scale.display
