@@ -170,6 +170,41 @@ defmodule Rendro.Recipes.StatementTest do
       # A backdrop path block must be present (the boxed summary element).
       assert Enum.any?(header.content, &is_struct(&1.content, Rendro.Path))
     end
+
+    test "130-01: Minimal-Mono keeps the public closing-balance band full width with its exact rule hierarchy" do
+      data = fixture_data(3)
+
+      for mode <- [:light, :dark] do
+        theme = Rendro.Theme.preset(:minimal_mono, accent: "#2C6BED", mode: mode)
+        public_header = Statement.sections(data, theme: theme) |> Enum.find(&(&1.region == :header))
+
+        catalog_header =
+          Statement.sections(data, theme: theme, catalog_layout: true)
+          |> Enum.find(&(&1.region == :header))
+
+        assert %Rendro.Block{
+                 content: %Rendro.Path{
+                   ops: [{:rect, 0, 0, 451.28, band_height}],
+                   stroke: %{color: stroke, width: rule_width}
+                 },
+                 height: 0
+               } = Enum.find(public_header.content, &is_struct(&1.content, Rendro.Path))
+
+        assert stroke == theme.colors.rule
+        assert rule_width == theme.rules.thin
+        assert band_height == 40 + theme.spacing.tight
+
+        for header <- [public_header, catalog_header] do
+          text_blocks = Enum.filter(header.content, &is_struct(&1.content, Rendro.Text))
+          closing = Enum.find(text_blocks, &(&1.content.content == Rendro.Format.money(expected_closing(3))))
+          label = Enum.find(text_blocks, &String.contains?(&1.content.content, "Closing balance"))
+
+          assert closing.content.size == theme.typography.scale.display
+          assert closing.content.size > label.content.size
+          assert closing.content.font == theme.typography.fonts.mono
+        end
+      end
+    end
   end
 
   # ---------------------------------------------------------------------------
