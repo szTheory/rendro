@@ -1,10 +1,11 @@
 ---
 phase: 130
 slug: catalog-quality-evidence-ratchet
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-08-19
+reviewed_at: 2026-08-19
 ---
 
 # Phase 130 — UI Design Contract
@@ -139,25 +140,28 @@ Use concise, operational copy in the living brand voice. Evidence language descr
 
 ## UI Considerations
 
-Probe-confirmed elements:
+Probe-confirmed elements (authored kind overrides, because prose cue matching is intentionally lossy):
 
-- E1 Generated catalog page: `media`, `static-content`
+- E1 Generated catalog page: `static-content`
 - E2 Pinned full-size raster review sequence: `media`, `static-content`
 - E3 Hash-bound disposition/evidence record: `static-content`
 
-Applicable state considerations resolved: 7 covered, 0 backstop, 0 unresolved.
+Applicable state considerations resolved: 10 covered, 0 backstop, 0 unresolved.
 
 | Element | Category | Status | Resolution / Reason |
 |---------|----------|--------|---------------------|
-| E1 | populated | ✅ covered | Each of the twelve exact supplied-theme catalog cells has a fixed page-one artifact whose hierarchy follows the family contract above; no new cell or alternate marketing render may appear. |
 | E1 | overflow | ✅ covered | Preserve recipe-owned page geometry, pagination, Certificate landscape, Ticket A6, atomic money, and full text/reference integrity; do not crop, truncate, or replace overlong content with an ellipsis. |
 | E1 | long-text | ✅ covered | Long business content follows the existing recipe/pagination behavior. Complete Ticket reference and monetary values remain legible, whole, and semantically subordinate where specified. |
+| E2 | empty | ✅ covered | An absent image or incomplete twelve-image set stops final review fail-closed; the evidence-failure copy above is emitted and no disposition is promoted. |
+| E2 | loading | ✅ covered | There is no asynchronous review UI: final review begins only after the complete pinned-renderer payload and identity manifest exist, so a partially generated payload is never presented as reviewable. |
+| E2 | error | ✅ covered | Missing, changed, stale, renderer-unavailable, or renderer-mismatched raster evidence emits the evidence-failure state, stops the review flow, and retains the non-promoted disposition. |
 | E2 | populated | ✅ covered | Final advisory review is exactly twelve full-size, sequential page-one raster images in canonical light-then-dark family order; a contact sheet is index-only. |
-| E2 | error | ✅ covered | Missing, changed, stale, or renderer-mismatched raster evidence stops the review flow fail-closed and retains the current non-promoted disposition. |
 | E2 | overflow | ✅ covered | Full-size inspection is required; scaled contact sheets cannot stand in for the review surface. |
+| E2 | long-text | ✅ covered | Catalog IDs, renderer version/SHA, PNG hashes, complete source-PDF hashes, review justifications, and boundary disclosures remain complete beside or directly traceable from each full-size image. |
+| E3 | overflow | ✅ covered | Evidence records wrap or expand without clipping fields; canonical identifiers and scope-limiting disclosures remain machine- and human-readable. |
 | E3 | long-text | ✅ covered | IDs, hashes, renderer identity, justifications, and boundary disclosures remain complete and attributable; never truncate a scope-limiting statement or hash identity into ambiguity. |
 
-Loading, empty, partial, and zero/one/many states are not applicable: this phase introduces no asynchronously loaded interactive collection or form. The implementation still must report unavailable evidence through the failure state above rather than fabricating a populated review result.
+Form, navigation, and interactive-control states are not applicable: this phase introduces no asynchronously loaded product UI, form, or control. Media absence, incomplete generation, and evidence errors are handled explicitly above rather than being dismissed as non-interactive.
 
 ---
 
@@ -171,11 +175,11 @@ Loading, empty, partial, and zero/one/many states are not applicable: this phase
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: pending checker validation
-- [ ] Dimension 2 Visuals: pending checker validation
-- [ ] Dimension 3 Color: pending checker validation
-- [ ] Dimension 4 Typography: pending checker validation
-- [ ] Dimension 5 Spacing: pending checker validation
-- [ ] Dimension 6 Registry Safety: pending checker validation
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-08-19; 6/6 dimensions passed with no recommendations.
