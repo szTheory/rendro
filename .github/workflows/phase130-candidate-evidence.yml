@@ -135,9 +135,9 @@ jobs:
             (.cells | length == 32) and
             (.multipage | length == 4) and
             ([.cells[] | .png_path] | length == 32) and
-            ([.cells[] | select((.png_path | startswith("tmp/phase130-candidate/")) | not or contains(".."))] | length == 0) and
+            ([.cells[] | select((.png_path | startswith("tmp/phase130-candidate/")) | not or (.png_path | contains("..")))] | length == 0) and
             ([.cells[] | select((.png_sha256 | test("^[0-9a-f]{64}$")) | not)] | length == 0) and
-            ([.multipage[] | select((.png_path | startswith("tmp/phase130-candidate/multipage/")) | not or contains(".."))] | length == 0) and
+            ([.multipage[] | select((.png_path | startswith("tmp/phase130-candidate/multipage/")) | not or (.png_path | contains("..")))] | length == 0) and
             ([.multipage[] | select((.png_sha256 | test("^[0-9a-f]{64}$")) | not)] | length == 0)
           ' "${manifest}" >/dev/null
 
