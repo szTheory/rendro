@@ -3,6 +3,7 @@ defmodule Rendro.CatalogRasterReviewTest do
 
   alias Rendro.Adapters.Pdfium
   alias Rendro.CatalogReviewPayload
+  alias Rendro.CatalogReviewReconciliation
   alias Rendro.Test.EdgeFixtures
 
   @candidate_manifest_path "tmp/phase130-candidate/candidate-manifest.json"
@@ -54,9 +55,40 @@ defmodule Rendro.CatalogRasterReviewTest do
       Jason.encode!(%{"images" => final}, pretty: true) <> "\n"
     )
 
+    identity_manifest = %{"images" => final}
+
+    provenance = %{
+      "route" => %{
+        "sha" => System.get_env("GITHUB_SHA") || get_in(manifest, ["candidate", "commit_sha"]),
+        "ref" => System.get_env("GITHUB_REF") || "local-candidate-review"
+      },
+      "rendered_source" => %{"sha" => get_in(manifest, ["candidate", "commit_sha"])},
+      "run" => %{"id" => get_in(manifest, ["candidate", "run_id"])},
+      "renderer" => %{
+        "name" => "pdfium-cli",
+        "version" => get_in(manifest, ["candidate", "renderer", "version"]),
+        "pin_sha256" => get_in(manifest, ["candidate", "renderer", "sha256"]),
+        "executable_sha256" => get_in(manifest, ["candidate", "renderer", "sha256"])
+      }
+    }
+
+    assert {:ok, reconciliation} =
+             CatalogReviewReconciliation.reconcile(
+               manifest,
+               identity_manifest,
+               provenance,
+               final_dir
+             )
+
+    File.write!(
+      Path.join(final_dir, "local-identity-reconciliation.json"),
+      Jason.encode!(reconciliation, pretty: true) <> "\n"
+    )
+
     assert final_dir |> File.ls!() |> Enum.count(&String.ends_with?(&1, ".png")) == 12
     assert multipage_dir |> File.ls!() |> Enum.count(&String.ends_with?(&1, ".png")) == 4
     assert_final_bundle!(final_dir, final)
+    assert_reconciliation!(final_dir, final)
     assert_multipage_bundle!(multipage_dir, multipage)
   end
 
@@ -108,6 +140,25 @@ defmodule Rendro.CatalogRasterReviewTest do
       assert proof["commit_sha"] =~ ~r/\A[0-9a-f]{40}\z/
       assert proof["run_id"] =~ ~r/\A[A-Za-z0-9._-]+\z/
       assert proof["renderer_sha256"] =~ ~r/\A[0-9a-f]{64}\z/
+    end
+  end
+
+  defp assert_reconciliation!(final_dir, final) do
+    reconciliation =
+      final_dir
+      |> Path.join("local-identity-reconciliation.json")
+      |> File.read!()
+      |> JSON.decode!()
+
+    assert get_in(reconciliation, ["renderer", "adapter_kind"]) == "pdfium-render"
+    assert get_in(reconciliation, ["renderer", "executable_name"]) == "pdfium-cli"
+
+    assert Enum.map(reconciliation["bindings"], & &1["catalog_id"]) ==
+             Enum.map(final, & &1["catalog_id"])
+
+    for binding <- reconciliation["bindings"] do
+      assert {:ok, png} = File.read(binding["local_review_png_path"])
+      assert sha256(png) == binding["png_sha256"]
     end
   end
 
