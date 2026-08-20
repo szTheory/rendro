@@ -1,0 +1,161 @@
+name: Phase 130 Launch Artifact Route
+
+on:
+  push:
+    branches:
+      - gsd/diagnostic-launch-route-246374
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  launch-artifact-route:
+    name: Render source-pinned launch artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SOURCE_SHA: 2463749d2b877c4761f2b7bf3a25dd1e8673a9bd
+      PDFIUM_VERSION: v0.11.0
+      PDFIUM_SHA256: b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a
+      CERTIFICATE_DARK_OLD: df9703ee72be0fa78d2fab8f064ca93eb70b4699801372ff9c24513aa5c4cdb1
+      CERTIFICATE_DARK_NEW: acb99d40fc68d365d1c6b158e2cf335325563307e1828c90f39bd2a95aff07d1
+      STATEMENT_DARK_OLD: aca31620062efd25c21d74c855d9ba50e65777a35068afc86387efe415063ec9
+      STATEMENT_DARK_NEW: a971a8a7395ebbb3e1af9c54e236483c969a90b222af1a6fdedfccead587eab6
+      ARTIFACT_NAME: phase130-launch-artifact-${{ github.run_id }}-${{ github.run_attempt }}
+
+    steps:
+      - name: Checkout route provenance
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 1
+
+      - name: Verify route checkout provenance
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${GITHUB_SHA}"
+          test "$(git status --porcelain)" = ""
+
+      - name: Checkout pinned rendered source
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: 2463749d2b877c4761f2b7bf3a25dd1e8673a9bd
+          path: source
+          fetch-depth: 1
+
+      - name: Verify pinned source is pristine
+        run: |
+          set -euo pipefail
+          test "$(git -C source rev-parse HEAD)" = "${SOURCE_SHA}"
+          test "$(git -C source status --porcelain)" = ""
+          test "$(sha256sum source/priv/goldens/certificate/dark.sha256 | cut -d ' ' -f 1)" = "$(printf '%s\n' "${CERTIFICATE_DARK_OLD}" | sha256sum | cut -d ' ' -f 1)"
+          test "$(sha256sum source/priv/goldens/statement/dark.sha256 | cut -d ' ' -f 1)" = "$(printf '%s\n' "${STATEMENT_DARK_OLD}" | sha256sum | cut -d ' ' -f 1)"
+          test "$(tr -d '\n' < source/priv/goldens/certificate/dark.sha256)" = "${CERTIFICATE_DARK_OLD}"
+          test "$(tr -d '\n' < source/priv/goldens/statement/dark.sha256)" = "${STATEMENT_DARK_OLD}"
+
+      - name: Apply approved ephemeral golden inputs only
+        run: |
+          set -euo pipefail
+          printf '%s\n' "${CERTIFICATE_DARK_NEW}" > source/priv/goldens/certificate/dark.sha256
+          printf '%s\n' "${STATEMENT_DARK_NEW}" > source/priv/goldens/statement/dark.sha256
+          test "$(tr -d '\n' < source/priv/goldens/certificate/dark.sha256)" = "${CERTIFICATE_DARK_NEW}"
+          test "$(tr -d '\n' < source/priv/goldens/statement/dark.sha256)" = "${STATEMENT_DARK_NEW}"
+          git -C source diff --check
+          diff -u \
+            <(printf '%s\n' priv/goldens/certificate/dark.sha256 priv/goldens/statement/dark.sha256) \
+            <(git -C source diff --name-only)
+          git -C source diff --binary -- \
+            priv/goldens/certificate/dark.sha256 \
+            priv/goldens/statement/dark.sha256 > approved-input-diff.patch
+
+      - name: Setup Beam
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
+        with:
+          otp-version: '28'
+          elixir-version: '1.19.5'
+
+      - name: Install pinned PDFium
+        working-directory: source
+        run: |
+          set -euo pipefail
+          curl -fsSL -o pdfium-cli \
+            "https://github.com/klippa-app/pdfium-cli/releases/download/${PDFIUM_VERSION}/pdfium-webassembly-linux-amd64"
+          echo "${PDFIUM_SHA256}  pdfium-cli" | sha256sum --check
+          chmod +x pdfium-cli
+          mv pdfium-cli "$RUNNER_TEMP/pdfium-cli"
+          test "$(sha256sum "$RUNNER_TEMP/pdfium-cli" | cut -d ' ' -f 1)" = "${PDFIUM_SHA256}"
+          test "$(jq -r '.version' priv/pdfium_pin.json)" = "${PDFIUM_VERSION}"
+          test "$(jq -r '.sha256' priv/pdfium_pin.json)" = "${PDFIUM_SHA256}"
+
+      - name: Install source dependencies
+        working-directory: source
+        run: mix deps.get
+
+      - name: Generate and validate launch artifact family
+        working-directory: source
+        env:
+          RENDRO_PDFIUM_CLI: ${{ runner.temp }}/pdfium-cli
+        run: |
+          set -euo pipefail
+          mix rendro.launch_artifacts.gen --pdfium "$RENDRO_PDFIUM_CLI"
+          mix rendro.launch_artifacts.check --pdfium "$RENDRO_PDFIUM_CLI"
+          test "$(find assets/rendro/gallery -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = "11"
+          test -s assets/rendro/manual.pdf
+          test -s assets/rendro/artifacts.json
+
+      - name: Verify launch artifact source contracts
+        working-directory: source
+        run: |
+          set -euo pipefail
+          mix format --check-formatted
+          mix test test/docs_contract/launch_artifacts_claims_test.exs \
+            test/guardrails/required_checks_contract_test.exs
+
+      - name: Build complete provenance-bound artifact
+        run: |
+          set -euo pipefail
+          artifact_dir="$RUNNER_TEMP/${ARTIFACT_NAME}"
+          mkdir -p "$artifact_dir/source/assets/rendro" "$artifact_dir/source/guides"
+          cp -R source/assets/rendro/. "$artifact_dir/source/assets/rendro/"
+          cp source/README.md "$artifact_dir/source/README.md"
+          cp source/guides/recipes.md "$artifact_dir/source/guides/recipes.md"
+          cp source/priv/goldens/certificate/dark.sha256 "$artifact_dir/certificate-dark.sha256"
+          cp source/priv/goldens/statement/dark.sha256 "$artifact_dir/statement-dark.sha256"
+          cp approved-input-diff.patch "$artifact_dir/approved-input-diff.patch"
+          (
+            cd "$artifact_dir"
+            find source certificate-dark.sha256 statement-dark.sha256 approved-input-diff.patch -type f -print0 \
+              | sort -z \
+              | xargs -0 sha256sum
+          ) > "$artifact_dir/output-hashes.sha256"
+          jq -n \
+            --arg source_sha "${SOURCE_SHA}" \
+            --arg route_sha "${GITHUB_SHA}" \
+            --arg route_ref "${GITHUB_REF}" \
+            --arg run_id "${GITHUB_RUN_ID}" \
+            --arg run_attempt "${GITHUB_RUN_ATTEMPT}" \
+            --arg job "${GITHUB_JOB}" \
+            --arg artifact_name "${ARTIFACT_NAME}" \
+            --arg pdfium_version "${PDFIUM_VERSION}" \
+            --arg pdfium_sha256 "${PDFIUM_SHA256}" \
+            --arg certificate_dark_old "${CERTIFICATE_DARK_OLD}" \
+            --arg certificate_dark_new "${CERTIFICATE_DARK_NEW}" \
+            --arg statement_dark_old "${STATEMENT_DARK_OLD}" \
+            --arg statement_dark_new "${STATEMENT_DARK_NEW}" \
+            '{schema_version: 1, source: {sha: $source_sha}, route: {sha: $route_sha, ref: $route_ref}, github: {run_id: $run_id, run_attempt: $run_attempt, job: $job}, artifact: {name: $artifact_name}, renderer: {kind: "pdfium-cli", version: $pdfium_version, sha256: $pdfium_sha256}, approved_ephemeral_inputs: [{path: "priv/goldens/certificate/dark.sha256", old_sha256: $certificate_dark_old, new_sha256: $certificate_dark_new}, {path: "priv/goldens/statement/dark.sha256", old_sha256: $statement_dark_old, new_sha256: $statement_dark_new}], changed_paths: ["priv/goldens/certificate/dark.sha256", "priv/goldens/statement/dark.sha256"], output_hash_manifest: "output-hashes.sha256"}' \
+            > "$artifact_dir/provenance.json"
+          jq -e \
+            --arg source_sha "${SOURCE_SHA}" \
+            --arg route_sha "${GITHUB_SHA}" \
+            --arg artifact_name "${ARTIFACT_NAME}" \
+            '.source.sha == $source_sha and .route.sha == $route_sha and .artifact.name == $artifact_name and (.approved_ephemeral_inputs | length) == 2 and (.changed_paths | length) == 2' \
+            "$artifact_dir/provenance.json"
+          test "$(wc -l < "$artifact_dir/output-hashes.sha256" | tr -d ' ')" -ge 15
+
+      - name: Upload complete launch artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: phase130-launch-artifact-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/phase130-launch-artifact-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: error
+          retention-days: 14
