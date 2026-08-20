@@ -146,6 +146,51 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
     end
   end
 
+  test "Phase 130 transcribes the twelve reviewed catalog records with frozen dark boundaries" do
+    dispositions = manifest()["catalog_dispositions"]
+
+    expected = %{
+      "invoice--cedar-mutual--corporate-classic--light" => {"4/5/4/4/4/4", true},
+      "invoice--cedar-mutual--corporate-classic--dark" => {"4/5/4/3/3/3", false},
+      "statement--signal-ledger--minimal-mono--light" => {"5/5/4/4/4/5", true},
+      "statement--signal-ledger--minimal-mono--dark" => {"4/5/4/3/3/3", false},
+      "receipt--poppy-and-grain--humanist--light" => {"5/5/4/5/4/5", true},
+      "receipt--poppy-and-grain--humanist--dark" => {"5/5/4/5/4/5", false},
+      "certificate--meridian-arts-fellowship--editorial--light" => {"5/5/4/4/4/5", true},
+      "certificate--meridian-arts-fellowship--editorial--dark" => {"5/5/4/4/4/5", false},
+      "payslip--northline-logistics--swiss--light" => {"4/5/4/3/3/4", false},
+      "payslip--northline-logistics--swiss--dark" => {"4/5/4/2/3/3", false},
+      "ticket--aurora-live--brutalist--light" => {"4/5/4/3/3/4", false},
+      "ticket--aurora-live--brutalist--dark" => {"4/5/4/2/3/3", false}
+    }
+
+    scored = Enum.filter(dispositions, &(&1["review_status"] == "scored"))
+    assert MapSet.new(Enum.map(scored, & &1["catalog_id"])) == MapSet.new(Map.keys(expected))
+
+    for disposition <- scored do
+      {scores, expected_passed} = Map.fetch!(expected, disposition["catalog_id"])
+
+      assert disposition["dimension_scores"]
+             |> Map.take(~w(information_architecture content_hierarchy domain_fit reader_affordances typographic_craft restraint_cohesion))
+             |> then(fn dimensions ->
+               ~w(information_architecture content_hierarchy domain_fit reader_affordances typographic_craft restraint_cohesion)
+               |> Enum.map_join("/", &Integer.to_string(dimensions[&1]))
+             end) == scores
+
+      assert disposition["passed"] == expected_passed
+      assert disposition["passed"] == passed?(disposition["dimension_scores"], disposition["gate_results"])
+      assert disposition["signed_off_by"] == "Jon"
+      assert disposition["signed_off_at"] == "2026-08-20"
+      assert is_binary(disposition["supersedes_evidence_ref"])
+      assert is_binary(disposition["resolution_ref"])
+    end
+
+    for disposition <- scored, disposition["mode"] == "dark" do
+      refute disposition["passed"]
+      refute disposition["gate_results"]["print_safety"]
+    end
+  end
+
   test "threshold-arithmetic correctness, not the subjective score" do
     # Synthetic (not real) inputs — the near-miss cases below can't be expressed by the
     # real all-passing demo data, so this proves the arithmetic itself rejects each
