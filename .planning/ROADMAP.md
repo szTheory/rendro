@@ -32,14 +32,29 @@
   2. The Humanist dark Receipt visibly resolves its recorded reader-affordance, typographic-craft, and cohesion deficits, while its catalog record continues to communicate screen-oriented use and `print_safety: false`.
   3. Maintainers can regenerate the complete fixed 32-cell catalog and have its existing deterministic artifact, hash, schema, and coverage checks accept the current generated output.
   4. A human can review the twelve exact full-size pinned-raster outputs and find every disposition bound to the current catalog ID and reviewed artifact hashes; any cell that misses the frozen threshold remains `needs_work` rather than being promoted.
+
 **Plans**: 6 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 130-01-PLAN.md — Repair Humanist Receipt, Corporate-Classic Invoice, and Minimal-Mono Statement through public supplied-theme seams.
 - [ ] 130-02-PLAN.md — Repair Editorial Certificate, Swiss Payslip, and Brutalist Ticket while preserving genre geometry.
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 130-03-PLAN.md — Define the candidate-driven twelve-image payload and full-SHA-bound advisory CI route.
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 130-04-PLAN.md — Generate and gate one isolated 32-cell candidate bundle with an authoritative actual diff.
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 130-05-PLAN.md — Perform the exact twelve-image full-size human review against candidate identities.
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
 - [ ] 130-06-PLAN.md — Transcribe evidence, regenerate canonical output once, derive truthful projections, and close provenance.
 
 ### Phase 131: Adoption Snapshot & Phoenix Newcomer Proof
@@ -53,6 +68,7 @@ Plans:
   2. The adoption ledger exposes an explicit `HOLD`, `ACCUMULATING`, or `TRIGGER` decision for downloads, demand, contributor activity, and their conjunctive composite gate, using the existing gate criteria without outreach, telemetry, or polling.
   3. A newcomer in a clean Phoenix environment can follow public discovery material to install the public Rendro package, select the canonical Swiss/light Invoice, and customize it using the documented preset/configurator path without a repository checkout or warm dependency cache.
   4. That clean Phoenix application responds through the optional Phoenix adapter with a successful `application/pdf` response whose bytes begin `%PDF-`, and the recorded journey states the exact versions, commands, results, and any repairs limited to existing handoffs.
+
 **Plans**: TBD
 
 ## Progress
