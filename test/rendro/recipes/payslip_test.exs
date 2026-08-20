@@ -260,6 +260,29 @@ defmodule Rendro.Recipes.PayslipTest do
       assert {:ok, pdf} = Rendro.render(doc)
       assert pdf =~ "(TAKE HOME)"
     end
+
+    test "a supplied Swiss theme keeps the complete Net Pay amount right-aligned in its focal band" do
+      theme = Rendro.Theme.preset(:swiss, accent: "#2C6BED")
+      sections = Payslip.sections(fixture_data(), theme: theme)
+      summary = Enum.find(sections, &(&1.region == :summary))
+      summary_region = Enum.find(Payslip.page_template(theme: theme).regions, &(&1.name == :summary))
+
+      value_block =
+        Enum.find(summary.content, fn block ->
+          is_struct(block.content, Rendro.Text) and block.content.content == "$3,580.00"
+        end)
+
+      label_block =
+        Enum.find(summary.content, fn block ->
+          is_struct(block.content, Rendro.Text) and block.content.content == "NET PAY"
+        end)
+
+      assert value_block.content.size == theme.typography.scale.display
+      assert label_block.content.size == theme.typography.scale.body
+      assert value_block.content.size > label_block.content.size
+      assert value_block.x > 0
+      assert_in_delta value_block.x + value_block.width, summary_region.width, 0.01
+    end
   end
 
   # ---------------------------------------------------------------------------
