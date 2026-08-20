@@ -171,6 +171,32 @@ defmodule Guardrails.RequiredChecksContractTest do
   end
 
   describe "required/advisory CI separation" do
+    test "Phase 130 catalog review accepts only a full-SHA-bound candidate route" do
+      ci = File.read!(@ci_path)
+      advisory_block = ci_job_block!(ci, "advisory-checks")
+      test_block = ci_job_block!(ci, "test")
+
+      assert ci =~ "      - 'gsd/phase-130-catalog-review-*'"
+      assert advisory_block =~ "^gsd/phase-130-catalog-review-[0-9a-f]{40}$"
+      assert advisory_block =~ "${BASH_REMATCH[1]}" <> " == \"${GITHUB_SHA}\""
+      assert advisory_block =~ "mix rendro.catalog.candidate"
+
+      assert advisory_block =~
+               "mix test --include raster_snapshot test/rendro/catalog_raster_review_test.exs"
+
+      assert advisory_block =~ "priv/pdfium_pin.json"
+      assert advisory_block =~ "name: phase-130-catalog-candidate"
+      assert advisory_block =~ "name: phase-130-catalog-final"
+      assert advisory_block =~ "name: phase-130-catalog-multipage"
+      assert advisory_block =~ "tmp/phase130-candidate"
+      assert advisory_block =~ "tmp/phase130-review/final"
+      assert advisory_block =~ "tmp/phase130-review/multipage"
+
+      refute test_block =~ "phase-130-catalog-review"
+      refute test_block =~ "rendro.catalog.candidate"
+      refute test_block =~ "RENDRO_CATALOG_REVIEW_DIR"
+    end
+
     test "Phase 127 catalog blessing is isolated, bounded, and absent from required CI" do
       ci = File.read!(@ci_path)
       advisory_block = ci_job_block!(ci, "advisory-checks")
