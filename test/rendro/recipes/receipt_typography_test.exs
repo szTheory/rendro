@@ -65,6 +65,18 @@ defmodule Rendro.Recipes.ReceiptTypographyTest do
     assert byte_size(pdf) > 0
   end
 
+  test "Humanist receipt table cells use the exact semantic ink role in both target modes" do
+    for mode <- [:light, :dark] do
+      theme = Rendro.Theme.preset(:humanist, accent: "#2C6BED", mode: mode)
+      sections = Receipt.sections(sample_data(), theme: theme)
+
+      for content <- ["Description", "Amount", "Semantic typography review", "$250.00"] do
+        assert %Rendro.Text{color: color} = find_text(sections, content)
+        assert color == theme.colors.ink
+      end
+    end
+  end
+
   defp find_text(sections, content), do: Enum.find(texts(sections), &(&1.content == content))
   defp texts(value) when is_list(value), do: Enum.flat_map(value, &texts/1)
   defp texts(%Rendro.Section{content: content}), do: texts(content)

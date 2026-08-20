@@ -166,6 +166,39 @@ defmodule Rendro.Recipes.ReceiptTest do
       assert total_block.content.size > minor_block.content.size
     end
 
+    test "130-01: a public Humanist dark theme gives receipt cells ink, footer labels muted, and totals one restrained backdrop" do
+      data =
+        fixture_data(1)
+        |> Map.put(:totals, %{
+          subtotal: Decimal.new("10.00"),
+          tax: Decimal.new("0.80"),
+          total: Decimal.new("10.80")
+        })
+
+      theme = Rendro.Theme.preset(:humanist, accent: "#2C6BED", mode: :dark)
+      sections = Receipt.sections(data, theme: theme)
+      body = Enum.find(sections, &(&1.region == :body))
+      footer = Enum.find(sections, &(&1.region == :footer))
+
+      [table_block | _] = Enum.filter(body.content, &is_struct(&1.content, Rendro.Table))
+      [description_header, amount_header] = table_block.content.header
+      [description_cell, amount_cell] = hd(table_block.content.rows)
+
+      for cell <- [description_header, amount_header, description_cell, amount_cell] do
+        assert %Rendro.Block{content: %Rendro.Text{color: color}} = cell
+        assert color == theme.colors.ink
+      end
+
+      assert %Rendro.Block{content: %Rendro.Text{color: footer_color}} = hd(footer.content)
+      assert footer_color == theme.colors.muted
+
+      assert %Rendro.Block{content: %Rendro.Path{fill: fill, stroke: %{color: stroke}}, height: 0} =
+               Enum.find(body.content, &match?(%Rendro.Block{content: %Rendro.Path{}}, &1))
+
+      assert fill == theme.colors.surface
+      assert stroke == theme.colors.rule
+    end
+
     test "118-08: a receipt with :merchant (name + address) renders without :content_overflow" do
       data =
         fixture_data(4,
