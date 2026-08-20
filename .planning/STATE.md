@@ -5,15 +5,15 @@ milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 130
 current_phase_name: Catalog Quality & Evidence Ratchet
 status: executing
-stopped_at: Completed 130-08-PLAN.md
-last_updated: "2026-08-20T15:34:08.136Z"
+stopped_at: Completed 130-09-PLAN.md
+last_updated: "2026-08-20T16:03:52.718Z"
 last_activity: 2026-08-20
 last_activity_desc: Phase 130 execution started
 progress:
   total_phases: 2
   completed_phases: 0
   total_plans: 11
-  completed_plans: 5
+  completed_plans: 6
   percent: 0
 ---
 
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 130 (Catalog Quality & Evidence Ratchet) — EXECUTING
-Plan: 5 of 11
+Plan: 6 of 11
 Status: Ready to execute
 Last activity: 2026-08-20 — Phase 130 execution started
 
-Progress: [█████░░░░░] 45%
+Progress: [██████░░░░] 55%
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
@@ -63,6 +63,7 @@ Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Not started
 - [Phase ?]: Only gsd/phase-130-catalog-review-<40 lowercase hex equal to GITHUB_SHA may produce the advisory artifacts.
 - [Phase ?]: Authorized exact two deterministic-only dark golden transitions in detached staging; this decision excludes launch artifacts, catalog scores, rubric evidence, and SIGN-OFF authority.
 - [Phase ?]: Accepted only the verified exact-SHA PDFium launch artifact into detached staging; quality review and publication remain separate gates.
+- [Phase ?]: Six changed light launch images were approved only through Jon's dated, hash-bound full-size records; dark and brand rows remain deterministic-only.
 
 ### Pending Todos
 
@@ -82,8 +83,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-20T15:34:08.127Z
-Stopped at: Completed 130-08-PLAN.md
+Last session: 2026-08-20T16:03:52.709Z
+Stopped at: Completed 130-09-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -100,3 +101,4 @@ Resume file: None
 | Phase 130 P03 | 6m | 2 tasks | 5 files |
 | Phase 130 P07 | 4m | 3 tasks | 2 files |
 | Phase 130 P08 | 17m | 2 tasks | 17 files |
+| Phase 130-catalog-quality-evidence-ratchet P09 | 1m | 1 tasks | 1 files |
