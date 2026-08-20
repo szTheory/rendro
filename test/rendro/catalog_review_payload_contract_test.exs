@@ -1,7 +1,7 @@
 defmodule Rendro.CatalogReviewPayloadContractTest do
   use ExUnit.Case, async: true
 
-  alias Rendro.CatalogReviewPayload
+  alias Rendro.{Catalog, CatalogReviewPayload}
 
   @ids [
     "invoice--cedar-mutual--corporate-classic--light",
@@ -18,7 +18,7 @@ defmodule Rendro.CatalogReviewPayloadContractTest do
     "ticket--aurora-live--brutalist--dark"
   ]
 
-  test "classifies one complete candidate manifest into final and separate multipage payloads" do
+  test "extracts the fixed final payload from one complete 32-cell candidate manifest" do
     manifest = candidate_manifest()
     proofs = multipage_proofs()
 
@@ -105,7 +105,8 @@ defmodule Rendro.CatalogReviewPayloadContractTest do
         }
       },
       "cells" =>
-        Enum.map(@ids, fn id ->
+        Enum.map(Catalog.catalog_specs(), fn spec ->
+          id = spec.id
           [family, _brand, _preset, mode] = String.split(id, "--")
 
           %{

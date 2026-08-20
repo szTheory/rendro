@@ -29,13 +29,13 @@ defmodule Rendro.CatalogReviewPayload do
   def classify(%{"candidate" => candidate, "cells" => cells}, proofs)
       when is_map(candidate) and is_list(cells) and is_list(proofs) do
     with :ok <- validate_candidate(candidate),
-         :ok <- validate_cells(cells, candidate),
+         {:ok, final_cells} <- validate_cells(cells, candidate),
          :ok <- validate_proofs(proofs),
          false <-
            quality_bearing?(candidate) or quality_bearing?(cells) or quality_bearing?(proofs) do
       {:ok,
        %{
-         final: Enum.map(cells, &identity(&1, candidate)),
+         final: Enum.map(final_cells, &identity(&1, candidate)),
          multipage: Enum.map(proofs, &proof_identity(&1, candidate))
        }}
     else
@@ -63,19 +63,21 @@ defmodule Rendro.CatalogReviewPayload do
   defp validate_candidate(_candidate), do: {:error, :invalid_candidate_identity}
 
   defp validate_cells(cells, candidate) do
-    if Enum.map(cells, &Map.get(&1, "id")) == @final_ids and
-         Enum.all?(cells, &valid_final_cell?(&1, candidate)) do
-      :ok
+    final_cells = Enum.filter(cells, &(&1["id"] in @final_ids))
+
+    if Enum.map(cells, &Map.get(&1, "id")) == Enum.map(Rendro.Catalog.catalog_specs(), & &1.id) and
+         Enum.map(final_cells, &Map.get(&1, "id")) == @final_ids and
+         Enum.all?(cells, &valid_candidate_cell?(&1, candidate)) do
+      {:ok, final_cells}
     else
       {:error, :invalid_final_payload}
     end
   end
 
-  defp valid_final_cell?(cell, candidate) when is_map(cell) do
+  defp valid_candidate_cell?(cell, candidate) when is_map(cell) do
     id = cell["id"]
 
-    id in @final_ids and
-      cell["family"] == id |> String.split("--") |> hd() and
+    cell["family"] == id |> String.split("--") |> hd() and
       cell["mode"] == id |> String.split("--") |> List.last() and
       cell["page"] == 1 and
       safe_candidate_path?(cell["png_path"]) and
@@ -85,7 +87,7 @@ defmodule Rendro.CatalogReviewPayload do
       cell["renderer_sha256"] == get_in(candidate, ["renderer", "sha256"])
   end
 
-  defp valid_final_cell?(_cell, _candidate), do: false
+  defp valid_candidate_cell?(_cell, _candidate), do: false
 
   defp validate_proofs(proofs) do
     if Enum.map(proofs, &Map.get(&1, "id")) == @multipage_ids and
