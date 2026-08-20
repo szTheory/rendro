@@ -333,7 +333,7 @@ jobs:
           [[ "${GITHUB_REF_NAME}" =~ ^gsd/phase-130-catalog-review-([0-9a-f]{40})$ ]]
           [[ "${BASH_REMATCH[1]}" == "${GITHUB_SHA}" ]]
           test -f tmp/phase130-candidate/candidate-manifest.json
-          test "$(find tmp/phase130-candidate/catalog -type f -name '*.png' | wc -l | tr -d ' ')" = "32"
+          test "$(find tmp/phase130-candidate -type f -name '*.png' ! -path 'tmp/phase130-candidate/multipage/*' | wc -l | tr -d ' ')" = "32"
           mkdir -p "${ARTIFACT_DIR}"
           cp -R tmp/phase130-candidate/. "${ARTIFACT_DIR}/"
 

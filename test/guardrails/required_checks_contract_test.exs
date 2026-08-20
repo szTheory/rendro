@@ -192,6 +192,11 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert advisory_block =~ "tmp/phase130-review/final"
       assert advisory_block =~ "tmp/phase130-review/multipage"
 
+      assert advisory_block =~
+               "find tmp/phase130-candidate -type f -name '*.png' ! -path 'tmp/phase130-candidate/multipage/*'"
+
+      refute advisory_block =~ "tmp/phase130-candidate/catalog"
+
       refute test_block =~ "phase-130-catalog-review"
       refute test_block =~ "rendro.catalog.candidate"
       refute test_block =~ "RENDRO_CATALOG_REVIEW_DIR"
