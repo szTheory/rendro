@@ -11,8 +11,8 @@ Requirements for this milestone. Each maps to exactly one roadmap phase.
 
 ### Catalog Quality
 
-- [ ] **CATALOG-06**: Maintainer applies targeted visual-hierarchy improvements to all 12 currently scored `needs_work` catalog cells without adding recipes, presets, or catalog entries.
-- [ ] **CATALOG-07**: The Humanist dark Receipt specifically addresses its recorded reader-affordance, typographic-craft, and cohesion deficits while retaining its screen-oriented, non-print-safe boundary.
+- [x] **CATALOG-06**: Maintainer applies targeted visual-hierarchy improvements to all 12 currently scored `needs_work` catalog cells without adding recipes, presets, or catalog entries.
+- [x] **CATALOG-07**: The Humanist dark Receipt specifically addresses its recorded reader-affordance, typographic-craft, and cohesion deficits while retaining its screen-oriented, non-print-safe boundary.
 - [ ] **CATALOG-08**: The complete 32-cell catalog regenerates deterministically and passes the existing artifact, hash, schema, and coverage checks after the visual changes.
 - [ ] **CATALOG-09**: A human re-reviews all 12 current pinned-raster outputs at full size; each disposition is tied to the reviewed artifacts, and any cell that still misses a threshold remains honestly marked `needs_work`.
 
@@ -59,8 +59,8 @@ Roadmap mapping approved with the milestone roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CATALOG-06 | Phase 130 | Pending |
-| CATALOG-07 | Phase 130 | Pending |
+| CATALOG-06 | Phase 130 | Complete |
+| CATALOG-07 | Phase 130 | Complete |
 | CATALOG-08 | Phase 130 | Pending |
 | CATALOG-09 | Phase 130 | Pending |
 | SIGNAL-02 | Phase 131 | Pending |
@@ -73,6 +73,7 @@ Roadmap mapping approved with the milestone roadmap.
 | JOURNEY-04 | Phase 131 | Pending |
 
 **Coverage:**
+
 - v2.13 requirements: 12 total
 - Mapped to phases: 12
 - Unmapped: 0

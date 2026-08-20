@@ -4,16 +4,16 @@ milestone: v2.13
 milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 130
 current_phase_name: Catalog Quality & Evidence Ratchet
-status: planning
-stopped_at: Phase 130 UI-SPEC approved
-last_updated: "2026-08-20T00:09:42.874Z"
+status: executing
+stopped_at: Completed 130-01-PLAN.md
+last_updated: "2026-08-20T01:03:13.244Z"
 last_activity: 2026-08-19
-last_activity_desc: Approved v2.13 two-phase roadmap with all 12 requirements mapped
+last_activity_desc: Phase 130 execution started
 progress:
   total_phases: 2
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 6
+  completed_plans: 1
   percent: 0
 ---
 
@@ -24,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-19)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Plan Phase 130 — Catalog Quality & Evidence Ratchet
+**Current focus:** Phase 130 — Catalog Quality & Evidence Ratchet
 
 ## Current Position
 
-Phase: 130 of 131 (Catalog Quality & Evidence Ratchet)
-Plan: —
-Status: Ready to plan Phase 130
-Last activity: 2026-08-19 — Approved v2.13 two-phase roadmap with all 12 requirements mapped
+Phase: 130 (Catalog Quality & Evidence Ratchet) — EXECUTING
+Plan: 2 of 6
+Status: Ready to execute
+Last activity: 2026-08-19 — Phase 130 execution started
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██░░░░░░░░] 17%
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
@@ -53,6 +53,9 @@ Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Not started
 - Required deterministic checks remain separate from advisory PDFium/human/network evidence; dark catalog output remains screen-oriented and non-print-safe.
 - Phase 130 uses the existing catalog, rubric, hash, and pinned-raster machinery; no cell is promoted if its current evidence misses a threshold.
 - Phase 131 records a dated, read-only `HOLD`/`ACCUMULATING`/`TRIGGER` adoption decision and validates one clean Phoenix path through existing public surfaces only.
+- [Phase ?]: Receipt themes materialize one semantic table-cell set for both measurement and rendering while nil-theme bytes stay frozen.
+- [Phase ?]: Themed Invoice places an available due date beside Total Due only when the payment summary has a total.
+- [Phase ?]: Statement catalog_layout remains capacity-only; supplied-theme hierarchy is shared with ordinary public calls.
 
 ### Pending Todos
 
@@ -72,11 +75,17 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-20T00:09:42.869Z
-Stopped at: Phase 130 UI-SPEC approved
-Resume file: .planning/phases/130-catalog-quality-evidence-ratchet/130-UI-SPEC.md
+Last session: 2026-08-20T01:03:13.239Z
+Stopped at: Completed 130-01-PLAN.md
+Resume file: None
 
 ## Next Steps
 
 1. Run `$gsd-discuss-phase 130` to clarify the catalog-quality implementation approach.
 2. Or run `$gsd-plan-phase 130` to plan directly.
+
+## Performance Metrics
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 130 P01 | 11m 28s | 3 tasks | 7 files |
