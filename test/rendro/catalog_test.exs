@@ -53,9 +53,36 @@ defmodule Rendro.CatalogTest do
     refute File.exists?(staging_root)
   end
 
+  test "failed canonical generation leaves committed catalog and reviewer-owned evidence untouched" do
+    tracked_paths = [
+      "assets/rendro/catalog.json",
+      "priv/quality/rubric_scores.json",
+      "priv/quality/SIGN-OFF.md"
+    ]
+
+    before = Map.new(tracked_paths, &{&1, File.read!(&1)})
+
+    assert {:error, _reason} = Catalog.generate(pdfium: "/not/a/pdfium-cli")
+
+    assert before == Map.new(tracked_paths, &{&1, File.read!(&1)})
+    refute File.exists?("assets/rendro/catalog.staging")
+    refute File.exists?("assets/rendro/catalog.json.staging")
+  end
+
   test "candidate manifest classifies stale scored bindings without copying reviewer judgment" do
     [first | rest] = Catalog.read_manifest!()["cells"]
-    candidate = %{first | "png_sha256" => String.duplicate("c", 64)}
+
+    candidate_cells =
+      Enum.map([first | rest], fn cell ->
+        %{
+          cell
+          | "png_path" =>
+              String.replace(cell["png_path"], "assets/rendro", "tmp/phase130-candidate")
+        }
+      end)
+
+    [candidate | candidate_rest] = candidate_cells
+    candidate = %{candidate | "png_sha256" => String.duplicate("c", 64)}
 
     rubric = %{
       "catalog_dispositions" => [
@@ -72,7 +99,7 @@ defmodule Rendro.CatalogTest do
 
     assert {:ok, manifest} =
              Catalog.candidate_manifest(
-               [candidate | rest],
+               [candidate | candidate_rest],
                Catalog.read_manifest!(),
                rubric,
                "v0.11.0",

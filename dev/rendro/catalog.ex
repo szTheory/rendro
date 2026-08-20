@@ -8,6 +8,11 @@ defmodule Rendro.Catalog do
   @schema_version 1
   @renderer_kind "pdfium-render"
   @generated_by "mix rendro.catalog.gen"
+  @candidate_generated_by "mix rendro.catalog.candidate"
+  @canonical_staging_root "assets/rendro/catalog.staging"
+  @canonical_manifest_staging_path "assets/rendro/catalog.json.staging"
+  @candidate_root "tmp/phase130-candidate"
+  @candidate_staging_root "tmp/phase130-candidate.staging"
   @dark_boundary_disclosure "Screen-oriented; not a print, accessibility, PDF/UA, or WCAG claim."
   # This list is intentionally literal and ordered. It is the only membership
   # source; fixture discovery may validate a row but must never add one.
@@ -140,19 +145,144 @@ defmodule Rendro.Catalog do
   @spec generate(keyword()) :: :ok | {:error, term()}
   def generate(opts \\ []) do
     with_pdfium(opts, fn ->
-      with {:ok, renderer_version} <- Rendro.Adapters.Pdfium.version(),
-           :ok <- File.mkdir_p(@asset_root),
-           {:ok, cells} <- build_cells(renderer_version),
-           {:ok, cells} <- apply_quality_projections(cells, read_rubric_scores()),
-           :ok <-
-             File.write(
-               @manifest_path,
-               encode_manifest(build_manifest(cells, renderer_version)) <> "\n"
-             ) do
-        :ok
+      cleanup_canonical_staging()
+
+      result =
+        with {:ok, renderer_version} <- Rendro.Adapters.Pdfium.version(),
+             :ok <- File.mkdir_p(@canonical_staging_root),
+             {:ok, cells} <-
+               build_cells(renderer_version, @canonical_staging_root, @asset_root),
+             {:ok, cells} <- apply_quality_projections(cells, read_rubric_scores()),
+             :ok <-
+               File.write(
+                 @canonical_manifest_staging_path,
+                 encode_manifest(build_manifest(cells, renderer_version)) <> "\n"
+               ),
+             :ok <- publish_canonical_staging() do
+          :ok
+        end
+
+      case result do
+        :ok ->
+          :ok
+
+        {:error, _reason} = error ->
+          cleanup_canonical_staging()
+          error
       end
     end)
   end
+
+  @doc false
+  @spec generate_candidate(keyword()) :: :ok | {:error, term()}
+  def generate_candidate(opts \\ []) do
+    with_pdfium(opts, fn ->
+      cleanup_candidate()
+
+      result =
+        with {:ok, renderer_version} <- Rendro.Adapters.Pdfium.version(),
+             :ok <- File.mkdir_p(@candidate_staging_root),
+             baseline <- read_manifest!(),
+             :ok <- valid_candidate_baseline(baseline),
+             {:ok, cells} <-
+               build_cells(renderer_version, @candidate_staging_root, @candidate_root),
+             :ok <- validate_candidate_staging(cells),
+             {:ok, manifest} <-
+               candidate_manifest(
+                 cells,
+                 baseline,
+                 read_rubric_scores(),
+                 renderer_version,
+                 current_commit_sha!()
+               ),
+             :ok <-
+               File.write(
+                 Path.join(@candidate_staging_root, "candidate-manifest.json"),
+                 encode_manifest(manifest) <> "\n"
+               ),
+             :ok <- File.rename(@candidate_staging_root, @candidate_root) do
+          :ok
+        end
+
+      case result do
+        :ok ->
+          :ok
+
+        {:error, _reason} = error ->
+          cleanup_candidate()
+          error
+      end
+    end)
+  end
+
+  @doc false
+  @spec candidate_manifest([map()], map(), map(), String.t(), String.t()) ::
+          {:ok, map()} | {:error, term()}
+  def candidate_manifest(cells, baseline, rubric, renderer_version, commit_sha)
+      when is_list(cells) and is_map(baseline) and is_map(rubric) and is_binary(renderer_version) and
+             is_binary(commit_sha) do
+    with :ok <- valid_candidate_baseline(baseline),
+         :ok <- valid_candidate_cells(cells),
+         true <- Regex.match?(~r/\A[0-9a-f]{40}\z/, commit_sha) do
+      baseline_by_id = Map.new(baseline["cells"], &{&1["id"], &1})
+      dispositions = Map.new(rubric["catalog_dispositions"] || [], &{&1["catalog_id"], &1})
+      pin = read_pdfium_pin()
+
+      {candidate_cells, diff} =
+        Enum.map_reduce(
+          cells,
+          %{changed_scored: [], changed_unscored: [], byte_stable: []},
+          fn cell, acc ->
+            baseline_cell = Map.fetch!(baseline_by_id, cell["id"])
+
+            {status, bucket} =
+              candidate_status(cell, baseline_cell, dispositions[cell["id"]] || %{})
+
+            candidate_cell =
+              cell
+              |> Map.delete("quality")
+              |> Map.put("review_status", status)
+              |> Map.put("renderer_sha256", pin["sha256"])
+              |> maybe_put_candidate_hashes(status, baseline_cell)
+
+            {candidate_cell, Map.update!(acc, bucket, &(&1 ++ [cell["id"]]))}
+          end
+        )
+
+      {:ok,
+       %{
+         "schema_version" => @schema_version,
+         "generated_by" => @candidate_generated_by,
+         "candidate" => %{
+           "commit_sha" => commit_sha,
+           "baseline_commit_sha" => commit_sha,
+           "run_id" => System.get_env("GITHUB_RUN_ID") || "local-#{commit_sha}",
+           "renderer" => %{
+             "kind" => @renderer_kind,
+             "version" => renderer_version,
+             "dpi" => @dpi,
+             "pin_path" => @pdfium_pin_path,
+             "sha256" => pin["sha256"]
+           }
+         },
+         "renderer" => %{
+           "kind" => @renderer_kind,
+           "version" => renderer_version,
+           "dpi" => @dpi,
+           "pin_path" => @pdfium_pin_path,
+           "pin_sha256" => pin["sha256"]
+         },
+         "cells" => candidate_cells,
+         "diff" => Map.new(diff, fn {bucket, ids} -> {Atom.to_string(bucket), ids} end)
+       }}
+    else
+      false -> {:error, :invalid_candidate_identity}
+      {:error, _reason} = error -> error
+    end
+  end
+
+  def candidate_manifest(_cells, _baseline, _rubric, _renderer_version, _commit_sha),
+    do: {:error, :invalid_candidate_manifest_input}
 
   @spec check(keyword()) :: :ok | {:error, [String.t()]}
   def check(opts \\ []) do
@@ -322,13 +452,17 @@ defmodule Rendro.Catalog do
   defp recipe_module(:payslip), do: Rendro.Recipes.Payslip
   defp recipe_module(:ticket), do: Rendro.Recipes.Ticket
 
-  defp build_cells(renderer_version) do
+  defp build_cells(renderer_version, write_root, manifest_root) do
     catalog_specs()
     |> Enum.map(fn spec ->
+      relative_path = Path.relative_to(spec.png_path, @asset_root)
+      write_path = Path.join(write_root, relative_path)
+      spec = %{spec | png_path: Path.join(manifest_root, relative_path)}
+
       with {:ok, pdf} <- render_source_pdf(spec),
            {:ok, [png]} <- Rendro.Adapters.Pdfium.render(pdf, dpi: @dpi, pages: "1"),
-           :ok <- File.mkdir_p(Path.dirname(spec.png_path)),
-           :ok <- File.write(spec.png_path, png) do
+           :ok <- File.mkdir_p(Path.dirname(write_path)),
+           :ok <- File.write(write_path, png) do
         {:ok, {width, height}} = png_dimensions(png)
 
         {:ok,
@@ -721,6 +855,150 @@ defmodule Rendro.Catalog do
       {:error, reason}, _ -> {:halt, {:error, reason}}
     end)
   end
+
+  defp valid_candidate_baseline(%{"cells" => cells}) when is_list(cells) do
+    expected_ids = Enum.map(catalog_specs(), & &1.id)
+
+    if Enum.map(cells, & &1["id"]) == expected_ids and
+         Enum.all?(cells, &valid_candidate_baseline_cell?/1) do
+      :ok
+    else
+      {:error, :invalid_candidate_baseline}
+    end
+  end
+
+  defp valid_candidate_baseline(_), do: {:error, :invalid_candidate_baseline}
+
+  defp valid_candidate_baseline_cell?(%{
+         "png_path" => path,
+         "png_sha256" => png_sha,
+         "source_pdf_sha256" => pdf_sha
+       }) do
+    match?({:ok, _}, Path.safe_relative(path)) and sha256?(png_sha) and sha256?(pdf_sha)
+  end
+
+  defp valid_candidate_baseline_cell?(_), do: false
+
+  defp valid_candidate_cells(cells) do
+    expected_ids = Enum.map(catalog_specs(), & &1.id)
+
+    if Enum.map(cells, & &1["id"]) == expected_ids and
+         Enum.all?(cells, &valid_candidate_cell?/1) do
+      :ok
+    else
+      {:error, :invalid_candidate_cells}
+    end
+  end
+
+  defp valid_candidate_cell?(%{
+         "png_path" => path,
+         "png_sha256" => png_sha,
+         "source_pdf_sha256" => pdf_sha,
+         "width_px" => width,
+         "height_px" => height,
+         "page_count" => page_count
+       }) do
+    String.starts_with?(path, @candidate_root <> "/") and
+      match?({:ok, _}, Path.safe_relative(path)) and sha256?(png_sha) and sha256?(pdf_sha) and
+      is_integer(width) and width > 0 and is_integer(height) and height > 0 and
+      is_integer(page_count) and page_count > 0
+  end
+
+  defp valid_candidate_cell?(_), do: false
+
+  defp candidate_status(cell, baseline_cell, disposition) do
+    if cell["png_sha256"] == baseline_cell["png_sha256"] and
+         cell["source_pdf_sha256"] == baseline_cell["source_pdf_sha256"] do
+      {"byte_stable", :byte_stable}
+    else
+      if disposition["review_status"] == "scored",
+        do: {"review_required", :changed_scored},
+        else: {"changed_unscored", :changed_unscored}
+    end
+  end
+
+  defp validate_candidate_staging(cells) do
+    errors =
+      Enum.flat_map(cells, fn cell ->
+        staging_path =
+          String.replace_prefix(cell["png_path"], @candidate_root, @candidate_staging_root)
+
+        case File.read(staging_path) do
+          {:ok, png} ->
+            []
+            |> add_unless(
+              sha256(png) == cell["png_sha256"],
+              "candidate #{cell["id"]}: PNG hash drift"
+            )
+            |> add_unless(
+              png_dimensions(png) == {:ok, {cell["width_px"], cell["height_px"]}},
+              "candidate #{cell["id"]}: PNG dimensions drift"
+            )
+
+          {:error, reason} ->
+            ["candidate #{cell["id"]}: PNG staging read failed: #{inspect(reason)}"]
+        end
+      end)
+
+    if errors == [], do: :ok, else: {:error, errors}
+  end
+
+  defp maybe_put_candidate_hashes(cell, "byte_stable", _baseline), do: cell
+
+  defp maybe_put_candidate_hashes(cell, _status, baseline) do
+    cell
+    |> Map.put("prior_png_sha256", baseline["png_sha256"])
+    |> Map.put("candidate_png_sha256", cell["png_sha256"])
+    |> Map.put("prior_source_pdf_sha256", baseline["source_pdf_sha256"])
+    |> Map.put("candidate_source_pdf_sha256", cell["source_pdf_sha256"])
+  end
+
+  defp cleanup_candidate do
+    File.rm_rf!(@candidate_staging_root)
+    File.rm_rf!(@candidate_root)
+  end
+
+  defp cleanup_canonical_staging do
+    File.rm_rf!(@canonical_staging_root)
+    File.rm_rf!(@canonical_manifest_staging_path)
+  end
+
+  defp publish_canonical_staging do
+    catalog_backup = @asset_root <> ".previous"
+    manifest_backup = @manifest_path <> ".previous"
+
+    File.rm_rf!(catalog_backup)
+    File.rm_rf!(manifest_backup)
+
+    with :ok <- move_if_present(@asset_root, catalog_backup),
+         :ok <- move_if_present(@manifest_path, manifest_backup),
+         :ok <- File.rename(@canonical_staging_root, @asset_root),
+         :ok <- File.rename(@canonical_manifest_staging_path, @manifest_path) do
+      File.rm_rf!(catalog_backup)
+      File.rm_rf!(manifest_backup)
+      :ok
+    else
+      {:error, reason} ->
+        File.rm_rf!(@asset_root)
+        File.rm_rf!(@manifest_path)
+        move_if_present(catalog_backup, @asset_root)
+        move_if_present(manifest_backup, @manifest_path)
+        {:error, reason}
+    end
+  end
+
+  defp move_if_present(source, target) do
+    if File.exists?(source), do: File.rename(source, target), else: :ok
+  end
+
+  defp current_commit_sha! do
+    case System.cmd("git", ["rev-parse", "HEAD"], stderr_to_stdout: true) do
+      {sha, 0} -> String.trim(sha)
+      {reason, _} -> raise "candidate commit identity unavailable: #{String.trim(reason)}"
+    end
+  end
+
+  defp sha256?(value), do: is_binary(value) and Regex.match?(~r/\A[0-9a-f]{64}\z/, value)
 
   defp with_pdfium(opts, fun) do
     case Keyword.get(opts, :pdfium) do

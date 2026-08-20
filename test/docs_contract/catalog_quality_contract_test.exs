@@ -121,8 +121,11 @@ defmodule Rendro.DocsContract.CatalogQualityContractTest do
   test "candidate cells remain free of projected quality and reviewer sign-off fields" do
     source = File.read!("dev/rendro/catalog.ex")
 
-    assert source =~ "def generate_candidate(opts \\ [])"
-    assert source =~ "def candidate_manifest(cells, baseline, rubric, renderer_version, commit_sha)"
+    assert source =~ "def generate_candidate"
+
+    assert source =~
+             "def candidate_manifest(cells, baseline, rubric, renderer_version, commit_sha)"
+
     assert source =~ "\"review_required\""
     refute source =~ "apply_quality_projections(candidate"
   end
