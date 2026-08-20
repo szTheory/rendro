@@ -6,6 +6,7 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
   alias Rendro.Theme.Presets
 
   @review_dir_env "RENDRO_PRESET_RASTER_REVIEW_DIR"
+  @inventory_dir_env "RENDRO_PRESET_RASTER_INVENTORY_DIR"
   @rows Rendro.TestSupport.PresetRenderMatrix.rows()
 
   @tag raster_snapshot: true
@@ -13,16 +14,35 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
     assert_complete_matrix_contract!()
     assert_pinned_pdfium!()
 
-    for {id, genre, mode, recipe} <- @rows do
-      theme = Rendro.Theme.preset(genre, accent: "#2C6BED", mode: mode)
-      document = recipe |> document_for(theme) |> Presets.register_fonts(genre)
+    case inventory_directory() do
+      nil ->
+        for {id, genre, mode, recipe} <- @rows do
+          png = render_page_one!(genre, mode, recipe)
+          write_review_png(id, png)
+          assert_or_bless_page_one_hash(genre, mode, png)
+        end
 
-      assert {:ok, pdf} = Rendro.render(document, deterministic: true)
-      assert {:ok, [png]} = Pdfium.render(pdf, dpi: 150, pages: "1")
+      directory ->
+        mismatches =
+          for {id, genre, mode, recipe} <- @rows,
+              mismatch = inventory_mismatch(directory, id, genre, mode, recipe),
+              not is_nil(mismatch),
+              do: mismatch
 
-      write_review_png(id, png)
-      assert_or_bless_page_one_hash(genre, mode, png)
+        write_inventory_manifest(directory, mismatches)
+
+        assert mismatches == [],
+               "pinned PDFium preset raster mismatches: #{inspect(mismatches, pretty: true)}"
     end
+  end
+
+  defp render_page_one!(genre, mode, recipe) do
+    theme = Rendro.Theme.preset(genre, accent: "#2C6BED", mode: mode)
+    document = recipe |> document_for(theme) |> Presets.register_fonts(genre)
+
+    assert {:ok, pdf} = Rendro.render(document, deterministic: true)
+    assert {:ok, [png]} = Pdfium.render(pdf, dpi: 150, pages: "1")
+    png
   end
 
   defp assert_complete_matrix_contract! do
@@ -90,6 +110,62 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
   end
 
   defp raster_blessing?, do: System.get_env("MIX_RASTER_BLESS") == "true"
+
+  defp inventory_mismatch(directory, id, genre, mode, recipe) do
+    png = render_page_one!(genre, mode, recipe)
+    reference_path = reference_path(genre, mode)
+    expected_hash = reference_path |> File.read!() |> String.trim()
+    actual_hash = Base.encode16(:crypto.hash(:sha256, png), case: :lower)
+
+    if actual_hash == expected_hash do
+      nil
+    else
+      png_name = "#{id}_page_1.png"
+      File.write!(Path.join(directory, png_name), png)
+
+      %{
+        "id" => Atom.to_string(id),
+        "genre" => Atom.to_string(genre),
+        "mode" => Atom.to_string(mode),
+        "reference_path" => reference_path,
+        "expected_sha256" => expected_hash,
+        "actual_sha256" => actual_hash,
+        "png" => png_name
+      }
+    end
+  end
+
+  defp inventory_directory do
+    case System.get_env(@inventory_dir_env) do
+      nil ->
+        nil
+
+      "" ->
+        nil
+
+      directory ->
+        expanded_directory = Path.expand(directory)
+        project_root = File.cwd!() |> Path.expand()
+
+        if expanded_directory == project_root or
+             String.starts_with?(expanded_directory, project_root <> "/") do
+          raise ArgumentError, "#{@inventory_dir_env} must point outside the repository"
+        end
+
+        File.mkdir_p!(expanded_directory)
+        expanded_directory
+    end
+  end
+
+  defp write_inventory_manifest(directory, mismatches) do
+    manifest = %{
+      "schema_version" => 1,
+      "matrix_rows" => length(@rows),
+      "mismatches" => mismatches
+    }
+
+    File.write!(Path.join(directory, "preset-raster-mismatches.json"), JSON.encode!(manifest))
+  end
 
   defp reference_path(genre, mode),
     do: Path.join(["priv", "raster_refs", "presets", Atom.to_string(genre), "#{mode}.sha256"])

@@ -7,6 +7,7 @@ on:
       - 'gsd/phase-126-raster-bless-*'
       - 'gsd/phase-127-catalog-bless-*'
       - 'gsd/phase-130-catalog-review-*'
+      - 'gsd/diagnostic-preset-inventory-afd307'
   pull_request:
     branches:
       - main
@@ -257,10 +258,70 @@ jobs:
         run: mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs
 
       - name: Run Preset Raster Snapshot Tests
+        if: github.ref_name != 'gsd/diagnostic-preset-inventory-afd307'
         env:
           MIX_RASTER_BLESS: ${{ github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-126-raster-bless-') && 'true' || 'false' }}
           RENDRO_PRESET_RASTER_REVIEW_DIR: ${{ runner.temp }}/rendro_phase126_review
         run: mix test --include raster_snapshot test/rendro/theme/preset_raster_snapshot_test.exs
+
+      - name: Run complete preset raster drift inventory
+        if: github.event_name == 'push' && github.ref_name == 'gsd/diagnostic-preset-inventory-afd307'
+        env:
+          MIX_RASTER_BLESS: "false"
+          RENDRO_PRESET_RASTER_INVENTORY_DIR: ${{ runner.temp }}/preset_raster_drift_inventory
+        run: mix test --include raster_snapshot test/rendro/theme/preset_raster_snapshot_test.exs
+
+      - name: Stage complete preset raster drift inventory
+        if: always() && github.event_name == 'push' && github.ref_name == 'gsd/diagnostic-preset-inventory-afd307'
+        env:
+          INVENTORY_DIR: ${{ runner.temp }}/preset_raster_drift_inventory
+          ARTIFACT_DIR: ${{ runner.temp }}/preset_raster_drift_inventory_artifact
+        run: |
+          test -f "$INVENTORY_DIR/preset-raster-mismatches.json"
+          expected_sha="$(jq -r '.sha256' priv/pdfium_pin.json)"
+          actual_sha="$(sha256sum "$(command -v pdfium-cli)" | cut -d ' ' -f 1)"
+          test "$actual_sha" = "$expected_sha"
+          mkdir -p "$ARTIFACT_DIR/mismatches"
+          cp "$INVENTORY_DIR/preset-raster-mismatches.json" "$ARTIFACT_DIR/test-manifest.json"
+          jq -r '.mismatches[].png' "$INVENTORY_DIR/preset-raster-mismatches.json" | while read -r png; do
+            test -f "$INVENTORY_DIR/$png"
+            cp "$INVENTORY_DIR/$png" "$ARTIFACT_DIR/mismatches/$png"
+          done
+          mismatch_count="$(jq '.mismatches | length' "$INVENTORY_DIR/preset-raster-mismatches.json")"
+          png_count="$(find "$ARTIFACT_DIR/mismatches" -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')"
+          test "$png_count" = "$mismatch_count"
+          jq -n \
+            --slurpfile test_manifest "$INVENTORY_DIR/preset-raster-mismatches.json" \
+            --arg github_sha "$GITHUB_SHA" \
+            --arg github_run_id "$GITHUB_RUN_ID" \
+            --arg github_run_attempt "$GITHUB_RUN_ATTEMPT" \
+            --arg github_job "$GITHUB_JOB" \
+            --arg artifact_name "preset-raster-drift-inventory" \
+            --arg artifact_path "mismatches/" \
+            --arg run_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            --arg pdfium_version "$(pdfium-cli --version)" \
+            --arg pdfium_sha256 "$actual_sha" \
+            '{schema_version: 1, github: {sha: $github_sha, run_id: $github_run_id, run_attempt: $github_run_attempt, job: $github_job, run_url: $run_url}, artifact: {name: $artifact_name, path: $artifact_path}, pdfium: {version: $pdfium_version, sha256: $pdfium_sha256}, inventory: $test_manifest[0]}' \
+            > "$ARTIFACT_DIR/manifest.json"
+
+      - name: Upload complete preset raster drift inventory
+        if: always() && github.event_name == 'push' && github.ref_name == 'gsd/diagnostic-preset-inventory-afd307'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: preset-raster-drift-inventory
+          path: ${{ runner.temp }}/preset_raster_drift_inventory_artifact
+          if-no-files-found: error
+
+      - name: Fail on collected preset raster drift
+        if: always() && github.event_name == 'push' && github.ref_name == 'gsd/diagnostic-preset-inventory-afd307'
+        env:
+          MANIFEST: ${{ runner.temp }}/preset_raster_drift_inventory_artifact/manifest.json
+        run: |
+          test -f "$MANIFEST"
+          if jq -e '.inventory.mismatches | length > 0' "$MANIFEST" >/dev/null; then
+            echo "Preset raster drift inventory found mismatches; see artifact preset-raster-drift-inventory."
+            exit 1
+          fi
 
       - name: Generate and review Phase 127 catalog evidence
         if: github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-127-catalog-bless-')
