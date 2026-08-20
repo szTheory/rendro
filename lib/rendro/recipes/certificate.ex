@@ -369,29 +369,30 @@ defmodule Rendro.Recipes.Certificate do
     # typography — keep its literal size: 1, never seamed to a scale role.
     spacer = Rendro.block(Rendro.text("", size: 1), height: top_spacer_h)
 
-    content = [
-      spacer,
-      centered_line(data.title, title_size, region_w, colors, type, type.fonts.heading),
-      centered_line(
-        "This certifies that",
-        subtitle_size,
-        region_w,
-        colors,
-        type,
-        type.fonts.body
-      ),
-      centered_line(
-        data.recipient,
-        recipient_size,
-        region_w,
-        colors,
-        type,
-        type.fonts.heading
-      ),
+    title_line = centered_line(data.title, title_size, region_w, colors, type, type.fonts.heading)
+
+    recipient_line =
+      centered_line(data.recipient, recipient_size, region_w, colors, type, type.fonts.heading)
+
+    certification_line =
+      centered_line("This certifies that", subtitle_size, region_w, colors, type, type.fonts.body)
+
+    quiet_lines = [
       centered_paragraph(body_text, body_size, body_measure_w, region_w, colors, type),
       centered_line(fmt_date.(data.date), meta_size, region_w, colors, type, type.fonts.body),
       centered_line(seal_text, meta_size, region_w, colors, type, type.fonts.body)
     ]
+
+    # A supplied theme opts into the public ceremonial hierarchy: the recipient
+    # is the first and largest fact, followed immediately by the credential.
+    # The nil-theme sequence remains byte-for-byte unchanged by retaining its
+    # historic title/certification/recipient order.
+    content =
+      if Keyword.get(opts, :theme) do
+        [spacer, recipient_line, title_line, certification_line | quiet_lines]
+      else
+        [spacer, title_line, certification_line, recipient_line | quiet_lines]
+      end
 
     Rendro.section(
       name: :certificate_body,
