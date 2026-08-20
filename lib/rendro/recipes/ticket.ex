@@ -373,6 +373,27 @@ defmodule Rendro.Recipes.Ticket do
           ]
       end
 
+    # Public supplied themes bind the placement grid with one rectilinear
+    # rule. It reinforces the existing type-led rank without inventing a
+    # catalog-only visual branch; the catalog path may only change band
+    # capacity through geometry/1. The nil-theme path keeps its frozen bytes.
+    placement_rule_blocks =
+      case Keyword.get(opts, :theme) do
+        nil ->
+          []
+
+        theme ->
+          [
+            Rendro.path([{:move, 0, 0}, {:line, main_w, 0}],
+              stroke: %{color: colors.rule, width: Rendro.Theme.resolve(theme).rules.thick},
+              x: 0,
+              y: 0,
+              width: main_w,
+              height: 0
+            )
+          ]
+      end
+
     Rendro.section(
       name: :ticket_main,
       region: :main,
@@ -402,6 +423,7 @@ defmodule Rendro.Recipes.Ticket do
           )
         ] ++
           subtitle_blocks ++
+          placement_rule_blocks ++
           [Rendro.block(grid)]
     )
   end
