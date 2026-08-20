@@ -54,7 +54,7 @@ revised: 2026-08-20
 | 130-08-01 | 08 | 4 | CATALOG-06,07,08 | T-130-08A/C | Blocking pinned PDFium path or exact-SHA CI action | Pin provenance + gen/check + focused contracts | ⬜ pending |
 | 130-08-02 | 08 | 4 | CATALOG-06,07,08 | T-130-08B/C | Exact ten-change/stable-control staged diff and rollback | Diff JSON + launch checks + canonical fences | ⬜ pending |
 | 130-09-01 | 09 | 5 | CATALOG-06,07,09 | T-130-09A/B/C | Blocking six-light full-size launch review, no binary ownership | Six complete current decisions or blocked marker | ⬜ pending |
-| 130-04-01 | 04 | 6 | CATALOG-08,09 | T-130-04A/B/C/D | Fixed-target quality-free candidate seam and atomic cleanup | Catalog/quality contracts | ⬜ pending |
+| 130-04-01 | 04 | 6 | CATALOG-08,09 | T-130-04A/B/C/D | Compile-first fixed-target quality-free candidate seam, strict options, and atomic cleanup | Catalog/quality contracts + invalid-option command proves alias discovery before any publication | ⬜ pending |
 | 130-04-02 | 04 | 6 | CATALOG-08,09 | T-130-04A/D | Blocking exact-SHA pinned 32-cell candidate batch | Ref/run/pin + 32 candidate + 12 final + 4 multipage | ⬜ pending |
 | 130-04-03 | 04 | 6 | CATALOG-08,09 | T-130-04A/B/C/D | Exact actual-diff partition and canonical unchanged | Family/catalog tests + jq partition | ⬜ pending |
 | 130-05-01 | 05 | 7 | CATALOG-09 | T-130-05A/B/C | Blocking distinct twelve-cell full-size catalog review | Twelve complete records or blocked marker | ⬜ pending |
@@ -73,7 +73,7 @@ revised: 2026-08-20
 | Golden authorization and exact staging | 130-07-01/02/03 | Baseline and diff gates precede publication |
 | Launch fail-closed staging | 130-08-02 | Exact inventory/stable control/rollback record |
 | Six legacy current-image evidence | 130-09-01, 130-06-01 | Human summary precedes atomic transcription/publication |
-| Candidate generation and actual diff | 130-04-01 | Catalog/quality tests precede dev-only seam |
+| Candidate generation, task discovery, and actual diff | 130-04-01 | Catalog/quality tests plus `mix rendro.catalog.candidate --invalid-option` prove the `mix.exs` compile wrapper and strict parser before any publication |
 | Catalog threshold and reproduction closure | 130-10-01/02 | Mutation tests precede evidence projection and sole generation |
 
 `wave_0_complete` becomes true only after all listed automated contracts are green. Human checkpoints remain evidence prerequisites, never substitutes.
