@@ -33,7 +33,7 @@
   3. Maintainers can regenerate the complete fixed 32-cell catalog and have its existing deterministic artifact, hash, schema, and coverage checks accept the current generated output.
   4. A human can review the twelve exact full-size pinned-raster outputs and find every disposition bound to the current catalog ID and reviewed artifact hashes; any cell that misses the frozen threshold remains `needs_work` rather than being promoted.
 
-**Plans**: 2/8 plans executed
+**Plans**: 2/11 plans executed
 
 Plans:
 **Wave 1**
@@ -51,19 +51,31 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 130-08-PLAN.md — Generate/check the pinned launch family in staging and reauthorize the six changed light images full-size.
+- [ ] 130-08-PLAN.md — Generate/check and fence the pinned launch family entirely inside detached staging.
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 130-04-PLAN.md — Generate and gate one isolated 32-cell candidate bundle with an authoritative actual diff.
+- [ ] 130-09-PLAN.md — Reauthorize the six changed light launch images full-size without owning binaries.
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
-- [ ] 130-05-PLAN.md — Perform the separate exact twelve-image full-size catalog review against candidate identities.
+- [ ] 130-04-PLAN.md — Generate and gate one isolated 32-cell candidate bundle with an authoritative actual diff.
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
-- [ ] 130-06-PLAN.md — Publish reviewed golden/launch evidence, transcribe the separate catalog review, generate the canonical catalog once, and close provenance.
+- [ ] 130-05-PLAN.md — Perform the separate exact twelve-image full-size catalog review against candidate identities.
+
+**Wave 8** *(blocked on Wave 7 completion)*
+
+- [ ] 130-06-PLAN.md — Atomically publish the reviewed golden/launch mechanical batch and six legacy light records.
+
+**Wave 9** *(blocked on Wave 8 completion)*
+
+- [ ] 130-10-PLAN.md — Transcribe the twelve catalog records and run exactly one candidate-identical canonical catalog generation.
+
+**Wave 10** *(blocked on Wave 9 completion)*
+
+- [ ] 130-11-PLAN.md — Run final validation/source audits and fail-closed temporary-provenance cleanup.
 
 ### Phase 131: Adoption Snapshot & Phoenix Newcomer Proof
 
@@ -83,5 +95,5 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 130. Catalog Quality & Evidence Ratchet | 2/8 | In Progress|  |
+| 130. Catalog Quality & Evidence Ratchet | 2/11 | In Progress|  |
 | 131. Adoption Snapshot & Phoenix Newcomer Proof | 0/TBD | Not started | - |

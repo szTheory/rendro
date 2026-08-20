@@ -10,7 +10,7 @@ revised: 2026-08-20
 
 # Phase 130 — Validation Strategy
 
-> Deterministic checks are merge authority. Golden authorization, pinned launch generation, six-light launch review, catalog candidate generation, pinned catalog payload, and twelve-cell catalog review are distinct stages with distinct evidence authority.
+> Deterministic checks are merge authority. Golden authorization, pinned launch generation, six-light launch review, catalog candidate generation, pinned catalog payload, and twelve-cell catalog review remain distinct evidence stages.
 
 ## Test Infrastructure
 
@@ -18,83 +18,87 @@ revised: 2026-08-20
 |---|---|
 | Framework | ExUnit, Elixir 1.19.5 / OTP 28 |
 | Quick recipe command | Modified family's structural, typography, and byte-identity suites |
-| Golden command | Authorized staging bless: `MIX_GOLDEN_BLESS=true mix test test/rendro/recipes/theme_mode_background_golden_test.exs --max-failures 1`; then the same command without the environment variable |
-| Launch command | In detached staging: `mix rendro.launch_artifacts.gen --pdfium "$RENDRO_PHASE130_PDFIUM"` then `mix rendro.launch_artifacts.check --pdfium "$RENDRO_PHASE130_PDFIUM"`; PDFium v0.11.0/SHA `b1e7f3...160a` |
-| Launch contracts | `mix test test/rendro/launch_artifacts_test.exs test/docs_contract/launch_artifacts_claims_test.exs test/docs_contract/theming_claims_test.exs test/docs_contract/rubric_manifest_contract_test.exs --max-failures 1` |
-| Catalog candidate | `mix rendro.catalog.candidate` under pinned PDFium; fixed output `tmp/phase130-candidate` |
-| Pure catalog payload | `mix test test/rendro/catalog_review_payload_contract_test.exs --max-failures 1` — untagged, no PDFium |
-| Catalog advisory payload | `RENDRO_CATALOG_REVIEW_DIR="$PWD/tmp/phase130-review" mix test --include raster_snapshot test/rendro/catalog_raster_review_test.exs --max-failures 1` |
-| Full deterministic closure | Golden + launch/docs contracts + `mix rendro.catalog.check` + full `mix test --exclude quarantine --slowest 10` + `mix ci.fast` |
+| Golden command | Staged explicit bless followed by identical assert-only test |
+| Launch command | Detached staging gen/check with one PDFium v0.11.0 binary, SHA `b1e7f3...160a` |
+| Launch contracts | launch artifacts + launch claims + theming claims + rubric manifest contracts |
+| Catalog candidate | `mix rendro.catalog.candidate`; fixed temp root, quality-free actual diff |
+| Pure payload | untagged catalog review payload contract |
+| Catalog advisory payload | tagged raster snapshot against exact candidate identities |
+| Canonical catalog | exactly one `mix rendro.catalog.gen` after twelve-record transcription |
+| Full closure | golden + launch + recipes + catalog/schema/docs + full tests + ci.fast + package/API boundaries |
 
 ## Sampling and Ordering
 
-1. Completed Plans 01/02 retain their focused green tests; Plan 03 establishes the pure catalog payload/CI contract.
-2. Plan 07 stages exact HEAD, obtains exact two-golden authorization, blesses only in staging, and reruns assert-only.
-3. Plan 08 uses one exact pinned PDFium binary for launch gen/check, gates the exact ten-change batch and byte-stable branded invoice, then obtains six separate full-size light-image decisions. Nothing canonical publishes yet.
-4. Plans 04/05 create and review the separate exact twelve-image catalog payload. Launch images never enter it.
-5. Plan 06 separately transcribes/publishes the legacy launch family, then transcribes twelve catalog records and runs exactly one canonical `mix rendro.catalog.gen`; final checks prove all golden/launch/catalog/docs boundaries green.
+1. Completed 130-01/02 retain their focused green checks; 130-03 establishes the pure payload and full-SHA CI contract.
+2. 130-07 stages exact HEAD and obtains the first human gate: exact two-golden authorization.
+3. 130-08 obtains the second gate for exact pinned launch generation, then fences the generator-owned diff without review.
+4. 130-09 obtains the third gate: six changed light launch decisions, with no binary ownership.
+5. 130-04 obtains the fourth gate and creates the pinned 32-cell candidate; 130-05 obtains the fifth gate through the distinct twelve-image catalog review.
+6. 130-06 publishes one isolated 19-path launch/golden/evidence commit; 130-10 transcribes catalog evidence and runs the sole canonical generation; 130-11 validates and cleans exact temporary provenance.
 
 ## Per-Task Verification Map
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Evidence / secure behavior | Automated command or checkpoint evidence | Status |
 |---|---:|---:|---|---|---|---|---|
-| 130-01-01 | 01 | 1 | CATALOG-06,07 | T-130-01A/B/C | Receipt semantic cells share measure/render identity; nil-theme bytes frozen | Receipt structural/typography/byte command | ✅ complete |
-| 130-01-02 | 01 | 1 | CATALOG-06 | T-130-01A/C | Invoice public-theme Total Due/due-date hierarchy | Invoice structural/typography/byte command | ✅ complete |
-| 130-01-03 | 01 | 1 | CATALOG-06 | T-130-01A/C | Statement public-theme closing-balance hierarchy | Statement structural/typography/byte command | ✅ complete |
-| 130-02-01 | 02 | 1 | CATALOG-06 | T-130-02A/B/C | Certificate rank and centering share exact resolved sizes | Certificate structural/typography/byte command | ✅ complete |
-| 130-02-02 | 02 | 1 | CATALOG-06 | T-130-02A/B/C | Payslip Net Pay hierarchy and atomic money | Payslip structural/typography/byte command | ✅ complete |
-| 130-02-03 | 02 | 1 | CATALOG-06 | T-130-02A/B/C | Ticket placement-first hierarchy and complete reference | Ticket structural/typography/byte command | ✅ complete |
-| 130-03-01 | 03 | 2 | CATALOG-09 | T-130-03A/C | Exact 12-image catalog payload, separate four-image multipage proof, complete identities, no quality mutation | Pure payload contract + format check | ⬜ pending |
-| 130-03-02 | 03 | 2 | CATALOG-09 | T-130-03B/C | Full-40-SHA catalog advisory route remains non-required | Required-checks contract | ⬜ pending |
-| 130-07-01 | 07 | 3 | CATALOG-06,07,08 | T-130-07B/C | Exact-HEAD detached staging and canonical/evidence baseline fence | Worktree SHA equality + baseline JSON + main diff fence | ⬜ pending |
-| 130-07-02 | 07 | 3 | CATALOG-06,07,08 | T-130-07A/C | Blocking exact old/new Statement and Certificate golden authorization | Human selects `authorize-exact-two` or rejects; main refs remain old before approval | ⬜ pending |
-| 130-07-03 | 07 | 3 | CATALOG-06,07,08 | T-130-07A/B | Only authorized pair blessed in staging and assert-only green | Focused golden test + exact two-file staged diff | ⬜ pending |
-| 130-08-01 | 08 | 4 | CATALOG-06,07,08 | T-130-08A/D | Blocking exact pinned PDFium path or exact-SHA CI action; launch gen/check in staging | v0.11.0/SHA verification + gen/check + launch/docs/theming tests | ⬜ pending |
-| 130-08-02 | 08 | 4 | CATALOG-06,07,08 | T-130-08B/D | Exact ten changed PNGs, branded_invoice byte-stable, synchronized manifest/manual/docs/theming, no evidence/catalog writes | Launch check/contracts + exact diff fences | ⬜ pending |
-| 130-08-03 | 08 | 4 | CATALOG-06,07 | T-130-08C/D | Blocking six-light full-size review; dark/brand deterministic-only | Six complete current hash/provenance decisions or `launch review blocked` | ⬜ pending |
-| 130-04-01 | 04 | 5 | CATALOG-08,09 | T-130-04A/B/C/D | Fixed-target quality-free catalog candidate seam; atomic cleanup | Catalog and quality contracts | ⬜ pending |
-| 130-04-02 | 04 | 5 | CATALOG-08,09 | T-130-04A/D | Blocking exact-SHA pinned 32-cell catalog candidate batch | Exact ref/run/pin + 32 candidate + 12 final + 4 multipage | ⬜ pending |
-| 130-04-03 | 04 | 5 | CATALOG-08,09 | T-130-04A/B/C/D | Exact 32 order/hash/page/dimension and actual diff; canonical unchanged | Six-family + catalog contracts + jq partition | ⬜ pending |
-| 130-05-01 | 05 | 6 | CATALOG-09 | T-130-05A/B/C | Blocking distinct twelve-cell full-size catalog review | Twelve complete integer/boolean/hash/provenance records or `review blocked` | ⬜ pending |
-| 130-06-01 | 06 | 7 | CATALOG-06,07,08 | T-130-06A/B/C | Separate legacy launch transcription and atomic staged publication; authorized goldens | Golden + launch/docs/theming/rubric contracts; six legacy rows | ⬜ pending |
-| 130-06-02 | 06 | 7 | CATALOG-08,09 | T-130-06A/B/C | Exact catalog transcription, one canonical catalog generation, candidate equality | 12 catalog scored + catalog check/contracts | ⬜ pending |
-| 130-06-03 | 06 | 7 | CATALOG-06,07,08,09 | T-130-06A/B/C/D | Complete golden/launch/catalog/docs/source/security gate and exact cleanup | Pinned launch check + focused/full/ci.fast + cardinalities + validation flag | ⬜ pending |
+| 130-01-01 | 01 | 1 | CATALOG-06,07 | T-130-01A/B/C | Receipt measure/render semantic identity and frozen nil-theme bytes | Receipt focused suites | ✅ complete |
+| 130-01-02 | 01 | 1 | CATALOG-06 | T-130-01A/C | Invoice public-theme Total Due/due-date hierarchy | Invoice focused suites | ✅ complete |
+| 130-01-03 | 01 | 1 | CATALOG-06 | T-130-01A/C | Statement public-theme closing balance | Statement focused suites | ✅ complete |
+| 130-02-01 | 02 | 1 | CATALOG-06 | T-130-02A/B/C | Certificate rank and coupled centering | Certificate focused suites | ✅ complete |
+| 130-02-02 | 02 | 1 | CATALOG-06 | T-130-02A/B/C | Payslip Net Pay and atomic money | Payslip focused suites | ✅ complete |
+| 130-02-03 | 02 | 1 | CATALOG-06 | T-130-02A/B/C | Ticket placement-first hierarchy | Ticket focused suites | ✅ complete |
+| 130-03-01 | 03 | 2 | CATALOG-09 | T-130-03A/C | Exact 12-image payload, separate 4-image multipage proof, complete identity | Pure payload contract | ⬜ pending |
+| 130-03-02 | 03 | 2 | CATALOG-09 | T-130-03B/C | Full-40-SHA advisory route remains non-required | Required-checks contract | ⬜ pending |
+| 130-07-01 | 07 | 3 | CATALOG-06,07,08 | T-130-07B/C | Exact-HEAD detached worktree and baseline fence | SHA equality + baseline + main diff fence | ⬜ pending |
+| 130-07-02 | 07 | 3 | CATALOG-06,07,08 | T-130-07A/C | Blocking exact two-golden authorization | Human authorize/reject exact four hashes | ⬜ pending |
+| 130-07-03 | 07 | 3 | CATALOG-06,07,08 | T-130-07A/B | Only authorized goldens blessed in staging | Focused golden + exact two-file diff | ⬜ pending |
+| 130-08-01 | 08 | 4 | CATALOG-06,07,08 | T-130-08A/C | Blocking pinned PDFium path or exact-SHA CI action | Pin provenance + gen/check + focused contracts | ⬜ pending |
+| 130-08-02 | 08 | 4 | CATALOG-06,07,08 | T-130-08B/C | Exact ten-change/stable-control staged diff and rollback | Diff JSON + launch checks + canonical fences | ⬜ pending |
+| 130-09-01 | 09 | 5 | CATALOG-06,07,09 | T-130-09A/B/C | Blocking six-light full-size launch review, no binary ownership | Six complete current decisions or blocked marker | ⬜ pending |
+| 130-04-01 | 04 | 6 | CATALOG-08,09 | T-130-04A/B/C/D | Fixed-target quality-free candidate seam and atomic cleanup | Catalog/quality contracts | ⬜ pending |
+| 130-04-02 | 04 | 6 | CATALOG-08,09 | T-130-04A/D | Blocking exact-SHA pinned 32-cell candidate batch | Ref/run/pin + 32 candidate + 12 final + 4 multipage | ⬜ pending |
+| 130-04-03 | 04 | 6 | CATALOG-08,09 | T-130-04A/B/C/D | Exact actual-diff partition and canonical unchanged | Family/catalog tests + jq partition | ⬜ pending |
+| 130-05-01 | 05 | 7 | CATALOG-09 | T-130-05A/B/C | Blocking distinct twelve-cell full-size catalog review | Twelve complete records or blocked marker | ⬜ pending |
+| 130-06-01 | 06 | 8 | CATALOG-06,07,08 | T-130-06A/B/C | One 19-path reviewed launch publication commit and whole-commit rollback | Exact inventory + focused contracts + clean fences | ⬜ pending |
+| 130-10-01 | 10 | 9 | CATALOG-08,09 | T-130-10A/B | Exact catalog transcription and threshold/dark closure | 12 scored + mutation contracts | ⬜ pending |
+| 130-10-02 | 10 | 9 | CATALOG-08,09 | T-130-10B/C | Sole canonical generation and 32-cell candidate reproduction | generation_count 1 + catalog check/contracts | ⬜ pending |
+| 130-11-01 | 11 | 10 | CATALOG-06,07,08,09 | T-130-11A/C | Complete source/decision/UI/edge/prohibition and deterministic closure | Focused/full/ci.fast + live cardinalities | ⬜ pending |
+| 130-11-02 | 11 | 10 | CATALOG-06,07,08,09 | T-130-11A/B | Exact ref/worktree/candidate cleanup after durable closure | Absence gates + Nyquist flags | ⬜ pending |
 
 ## Wave 0 Ownership
 
-Completed recipe assertions remain owned by 130-01-01 through 130-02-03. Remaining test-first gaps are owned as follows:
-
 | Gap | Owning task | Proof created before behavior/publication |
 |---|---|---|
-| Candidate-driven twelve-image/multipage split | 130-03-01 | Untagged `Rendro.CatalogReviewPayloadContractTest` drives pure classification |
-| Full-SHA catalog route and deterministic/advisory separation | 130-03-02 | Guardrail assertions precede workflow change |
-| Golden authorization and exact staged diff | 130-07-01/02/03 | Existing Golden helper plus baseline/diff gate; no new production seam needed |
-| Launch fail-closed staging | 130-07-01, 130-08-02 | Detached worktree baseline and exact generated-path fence; no broad target/force flag |
-| Six legacy current-image evidence binding | 130-08-03, 130-06-01 | Human records precede rubric/SIGN-OFF publication; rubric contract closes current evidence refs |
-| Candidate-only catalog generation and actual-diff partition | 130-04-01 | Catalog/quality contract assertions precede dev-only seam |
+| Candidate-driven twelve-image/multipage split | 130-03-01 | Untagged pure classifier contract |
+| Full-SHA route and authority separation | 130-03-02 | Guardrail assertions precede workflow edit |
+| Golden authorization and exact staging | 130-07-01/02/03 | Baseline and diff gates precede publication |
+| Launch fail-closed staging | 130-08-02 | Exact inventory/stable control/rollback record |
+| Six legacy current-image evidence | 130-09-01, 130-06-01 | Human summary precedes atomic transcription/publication |
+| Candidate generation and actual diff | 130-04-01 | Catalog/quality tests precede dev-only seam |
+| Catalog threshold and reproduction closure | 130-10-01/02 | Mutation tests precede evidence projection and sole generation |
 
-`wave_0_complete` becomes true only when 130-03-01/02, 130-07-01/03, 130-08-02, and 130-04-01 have committed their automated contracts and pass green. Human checkpoints remain evidence prerequisites, not Wave 0 substitutes.
+`wave_0_complete` becomes true only after all listed automated contracts are green. Human checkpoints remain evidence prerequisites, never substitutes.
 
-## Manual / External Evidence
+## Manual / External Evidence — Five Gates
 
-| Task | Why non-automated | Required evidence |
-|---|---|---|
-| 130-07-02 | Golden baseline movement requires explicit human authority | Exact two old/new SHA pairs and affirmative authorization |
-| 130-08-01 | Pinned PDFium is unavailable locally | Exact absolute v0.11.0/SHA binary or exact-full-SHA CI ref/run/job/artifact provenance |
-| 130-08-03 | Six legacy passed rows cite changed light images | Six separate full-size current-hash decisions; no dark/brand quality inference |
-| 130-04-02 | Pinned catalog candidate run requires exact external identity | Full SHA/ref/run/pin plus complete candidate/final/multipage artifacts |
-| 130-05-01 | Catalog aesthetic hierarchy/craft are human judgments | Twelve separate full-size catalog records; every miss/dark remains needs_work |
+| Order | Task | Why non-automated | Required evidence |
+|---:|---|---|---|
+| 1 | 130-07-02 | Golden baseline movement needs explicit authority | Exact two old/new SHA pairs and authorization |
+| 2 | 130-08-01 | Exact pinned PDFium is externally supplied/triggered | Absolute binary or full-SHA CI ref/run/job/artifact provenance |
+| 3 | 130-09-01 | Six changed light legacy images need current reauthorization | Six full-size decisions; no dark/brand inference |
+| 4 | 130-04-02 | Pinned catalog candidate needs exact external identity | Full SHA/ref/run/pin and complete candidate/review artifacts |
+| 5 | 130-05-01 | Catalog hierarchy/craft are bounded human judgments | Twelve full-size catalog records; every miss/dark stays needs_work |
 
 ## Final Contract Checklist
 
-- [ ] Two authorized golden hashes pass assert-only.
-- [ ] Pinned launch gen/check is green; exactly ten PNGs changed and branded_invoice is byte-stable.
-- [ ] Six legacy launch records are current and separately human-authorized; dark/brand rows are deterministic-only.
-- [ ] Launch generation did not invoke or count as catalog generation.
-- [ ] Exact twelve-image catalog review remains a separate payload and evidence set.
-- [ ] Exactly one final canonical `mix rendro.catalog.gen` runs after catalog review transcription.
-- [ ] Launch/golden/catalog/docs contracts, full suite, and `mix ci.fast` are green.
-- [ ] No D-01..D-26, CATALOG-06..09, UI consideration, spec-less edge, prohibition, no-theme freeze, public/dependency/preset/catalog boundary, or deterministic/advisory separation is missing.
-- [ ] `nyquist_compliant: true` is set only after 130-06-03 evidence exists.
+- [ ] Five blocking-human gates occurred in the exact order above.
+- [ ] Two authorized goldens pass assert-only.
+- [ ] Pinned launch gen/check is green; exactly ten PNGs changed and branded_invoice is stable.
+- [ ] Six launch records are current and distinct from the twelve catalog records.
+- [ ] The 130-06 patch is exactly 19 paths, one task, one commit, with whole-commit rollback.
+- [ ] Exactly one final canonical catalog generation occurred after catalog transcription.
+- [ ] Canonical 32-cell identities reproduce the candidate and all checks pass.
+- [ ] All D-01..D-26, requirements, research constraints, ten UI states, eleven edge probes, and prohibitions are evidenced.
+- [ ] Temporary refs/paths are removed only after durable closure.
+- [ ] `nyquist_compliant: true` and `wave_0_complete: true` are set only after 130-11 evidence exists.
 
 **Approval:** pending execution evidence
