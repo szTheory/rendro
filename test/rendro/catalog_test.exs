@@ -42,6 +42,53 @@ defmodule Rendro.CatalogTest do
     end
   end
 
+  test "candidate generation fails closed and removes only its fixed temporary root" do
+    candidate_root = "tmp/phase130-candidate"
+    staging_root = "tmp/phase130-candidate.staging"
+    File.mkdir_p!(candidate_root)
+    File.write!(Path.join(candidate_root, "sentinel"), "candidate-only")
+
+    assert {:error, _reason} = Catalog.generate_candidate(pdfium: "/not/a/pdfium-cli")
+    refute File.exists?(candidate_root)
+    refute File.exists?(staging_root)
+  end
+
+  test "candidate manifest classifies stale scored bindings without copying reviewer judgment" do
+    [first | rest] = Catalog.read_manifest!()["cells"]
+    candidate = %{first | "png_sha256" => String.duplicate("c", 64)}
+
+    rubric = %{
+      "catalog_dispositions" => [
+        %{
+          "catalog_id" => first["id"],
+          "review_status" => "scored",
+          "png_sha256" => first["png_sha256"],
+          "source_pdf_sha256" => first["source_pdf_sha256"],
+          "passed" => true,
+          "dimension_scores" => %{"content_hierarchy" => 5}
+        }
+      ]
+    }
+
+    assert {:ok, manifest} =
+             Catalog.candidate_manifest(
+               [candidate | rest],
+               Catalog.read_manifest!(),
+               rubric,
+               "v0.11.0",
+               String.duplicate("a", 40)
+             )
+
+    changed = hd(manifest["cells"])
+    assert changed["review_status"] == "review_required"
+    assert changed["prior_png_sha256"] == first["png_sha256"]
+    assert changed["candidate_png_sha256"] == String.duplicate("c", 64)
+    refute Map.has_key?(changed, "quality")
+    refute Map.has_key?(changed, "passed")
+    refute Map.has_key?(changed, "dimension_scores")
+    assert manifest["diff"]["changed_scored"] == [first["id"]]
+  end
+
   test "the literal registry is the locked ordered 32-cell catalog" do
     expected_ids = ~w(
       invoice--default--default--light invoice--northline-logistics--swiss--light invoice--northline-logistics--swiss--dark invoice--cedar-mutual--corporate-classic--light invoice--cedar-mutual--corporate-classic--dark
