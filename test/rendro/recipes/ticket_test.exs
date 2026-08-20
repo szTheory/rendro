@@ -310,6 +310,47 @@ defmodule Rendro.Recipes.TicketTest do
       assert texts["Indie Night: The Lumen Set"] == 20
       assert texts["AUR-88213-GA"] == 8
     end
+
+    test "Brutalist public themes bind the placement grid with a hard rule without changing catalog rank" do
+      for mode <- [:light, :dark] do
+        theme = Rendro.Theme.preset(:brutalist, accent: "#2C6BED", mode: mode)
+
+        public_sections = Ticket.sections(fixture_data(), theme: theme)
+        catalog_sections = Ticket.sections(fixture_data(), theme: theme, catalog_layout: true)
+
+        public_main = Enum.find(public_sections, &(&1.region == :main))
+        catalog_main = Enum.find(catalog_sections, &(&1.region == :main))
+
+        public_sizes =
+          Map.merge(
+            text_sizes(public_main),
+            public_sections |> Enum.find(&(&1.region == :stub)) |> text_sizes()
+          )
+
+        catalog_sizes =
+          Map.merge(
+            text_sizes(catalog_main),
+            catalog_sections |> Enum.find(&(&1.region == :stub)) |> text_sizes()
+          )
+
+        assert public_sizes["GA"] > public_sizes["Indie Night: The Lumen Set"]
+        assert public_sizes["Indie Night: The Lumen Set"] > public_sizes["AUR-88213-GA"]
+        assert public_sizes == catalog_sizes
+
+        assert Enum.any?(public_main.content, fn
+                 %Rendro.Block{
+                   content: %Rendro.Path{
+                     ops: [{:move, 0, 0}, {:line, _width, 0}],
+                     stroke: %{color: color, width: width}
+                   }
+                 } ->
+                   color == theme.colors.rule and width == theme.rules.thick
+
+                 _other ->
+                   false
+               end)
+      end
+    end
   end
 
   # ---------------------------------------------------------------------------
