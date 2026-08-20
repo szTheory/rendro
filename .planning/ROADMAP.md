@@ -32,7 +32,14 @@
   2. The Humanist dark Receipt visibly resolves its recorded reader-affordance, typographic-craft, and cohesion deficits, while its catalog record continues to communicate screen-oriented use and `print_safety: false`.
   3. Maintainers can regenerate the complete fixed 32-cell catalog and have its existing deterministic artifact, hash, schema, and coverage checks accept the current generated output.
   4. A human can review the twelve exact full-size pinned-raster outputs and find every disposition bound to the current catalog ID and reviewed artifact hashes; any cell that misses the frozen threshold remains `needs_work` rather than being promoted.
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 130-01-PLAN.md — Repair Humanist Receipt, Corporate-Classic Invoice, and Minimal-Mono Statement through public supplied-theme seams.
+- [ ] 130-02-PLAN.md — Repair Editorial Certificate, Swiss Payslip, and Brutalist Ticket while preserving genre geometry.
+- [ ] 130-03-PLAN.md — Split the final advisory payload, regenerate the fixed catalog once, rebind actual changed unscored identities, and gate the candidate.
+- [ ] 130-04-PLAN.md — Obtain one exact pinned-PDFium payload and twelve current full-size human review records.
+- [ ] 130-05-PLAN.md — Transcribe reviewer evidence, derive truthful projections, run final gates, and close external provenance.
 
 ### Phase 131: Adoption Snapshot & Phoenix Newcomer Proof
 
@@ -51,5 +58,5 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 130. Catalog Quality & Evidence Ratchet | 0/TBD | Not started | - |
+| 130. Catalog Quality & Evidence Ratchet | 0/5 | Not started | - |
 | 131. Adoption Snapshot & Phoenix Newcomer Proof | 0/TBD | Not started | - |
