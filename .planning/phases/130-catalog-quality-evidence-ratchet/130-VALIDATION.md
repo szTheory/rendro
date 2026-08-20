@@ -19,8 +19,9 @@ revised: 2026-08-19
 | Framework | ExUnit, Elixir 1.19.5 / OTP 28 |
 | Quick recipe command | modified family's structural, typography, and byte-identity suites |
 | Candidate command | `mix rendro.catalog.candidate` under the pinned PDFium environment; fixed output `tmp/phase130-candidate` |
+| Pure payload contract | `mix test test/rendro/catalog_review_payload_contract_test.exs --max-failures 1` — untagged, no PDFium |
 | Full deterministic command | `mix test --exclude quarantine --slowest 10 && mix rendro.catalog.check` |
-| Advisory command | `RENDRO_CATALOG_REVIEW_DIR="$PWD/tmp/phase130-review" mix test --include raster_snapshot test/rendro/catalog_raster_review_test.exs` |
+| Advisory command | `RENDRO_CATALOG_REVIEW_DIR="$PWD/tmp/phase130-review" mix test --include raster_snapshot test/rendro/catalog_raster_review_test.exs --max-failures 1` — tagged, fixed candidate and pinned PDFium required |
 
 ## Sampling Rate
 
@@ -40,10 +41,10 @@ revised: 2026-08-19
 | 130-02-01 | 02 | 1 | CATALOG-06 | T-130-02A/B/C | Certificate rank and centering share exact resolved sizes | `mix test test/rendro/recipes/certificate_test.exs test/rendro/recipes/certificate_typography_test.exs test/rendro/recipes/certificate_byte_identity_test.exs --max-failures 1` | ✅ tests exist; assertions added by task | ⬜ pending |
 | 130-02-02 | 02 | 1 | CATALOG-06 | T-130-02A/B/C | Payslip Net Pay hierarchy and atomic money | `mix test test/rendro/recipes/payslip_test.exs test/rendro/recipes/payslip_typography_test.exs test/rendro/recipes/payslip_byte_identity_test.exs --max-failures 1` | ✅ tests exist; assertions added by task | ⬜ pending |
 | 130-02-03 | 02 | 1 | CATALOG-06 | T-130-02A/B/C | Ticket placement-first hierarchy and complete reference | `mix test test/rendro/recipes/ticket_test.exs test/rendro/recipes/ticket_typography_test.exs test/rendro/recipes/ticket_byte_identity_test.exs --max-failures 1` | ✅ tests exist; assertions added by task | ⬜ pending |
-| 130-03-01 | 03 | 2 | CATALOG-09 | T-130-03A/C | Candidate-manifest-driven exact twelve-image payload; multipage separate | `mix format --check-formatted test/rendro/catalog_raster_review_test.exs && mix test test/rendro/catalog_raster_review_test.exs --exclude raster_snapshot --max-failures 1` | ✅ file exists; candidate assertions added by task | ⬜ pending |
+| 130-03-01 | 03 | 2 | CATALOG-09 | T-130-03A/C | Pure candidate-manifest classification: literal ordered twelve-image payload, separate four-image multipage membership, complete identity, malformed-input rejection, no quality mutation | `mix format --check-formatted dev/rendro/catalog_review_payload.ex test/rendro/catalog_review_payload_contract_test.exs test/rendro/catalog_raster_review_test.exs && mix test test/rendro/catalog_review_payload_contract_test.exs --max-failures 1` | ❌ new dev seam and untagged contract created by task; tagged raster test already exists | ⬜ pending |
 | 130-03-02 | 03 | 2 | CATALOG-09 | T-130-03B/C | Full-40-SHA ref equality; advisory remains non-required | `mix test test/guardrails/required_checks_contract_test.exs --max-failures 1` | ✅ files exist; phase route assertions added by task | ⬜ pending |
 | 130-04-01 | 04 | 3 | CATALOG-08,09 | T-130-04A/B/C/D | Fixed-target quality-free candidate seam; atomic cleanup; canonical bytes unchanged | `mix test test/rendro/catalog_test.exs test/docs_contract/catalog_quality_contract_test.exs --max-failures 1` | ✅ source/tests exist; candidate task is created here | ⬜ pending |
-| 130-04-02 | 04 | 3 | CATALOG-08,09 | T-130-04A/D | Blocking exact-SHA authorization and pinned external batch provenance | Checkpoint evidence: approved full SHA/ref + successful job/run/pin + 32 candidate PNGs + 12 review PNGs | ❌ external artifacts absent until checkpoint | ⬜ pending |
+| 130-04-02 | 04 | 3 | CATALOG-08,09 | T-130-04A/D | Blocking exact-SHA authorization, pinned external batch provenance, and tagged PDFium realization of the pure payload contract | Checkpoint evidence: approved full SHA/ref + successful tagged `catalog_raster_review_test.exs` job/run/pin + 32 candidate PNGs + 12 final PNGs + 4 separate multipage PNGs | ❌ external artifacts absent until checkpoint | ⬜ pending |
 | 130-04-03 | 04 | 3 | CATALOG-08,09 | T-130-04A/B/C/D | Exact 32 order/hash/page/dimension and three-way actual diff; canonical/evidence unchanged | six-family focused command + catalog/contracts + `jq` complete diff partition from Plan 04 | ❌ candidate manifest absent until Task 2 | ⬜ pending |
 | 130-05-01 | 05 | 4 | CATALOG-09 | T-130-05A/B/C | Blocking full-size review; twelve exact integer/boolean/hash/provenance records | Checkpoint evidence: twelve complete records or `review blocked`; automated 12-image/unique-ID/candidate-count gate | ❌ review records absent until checkpoint | ⬜ pending |
 | 130-06-01 | 06 | 5 | CATALOG-08,09 | T-130-06A/B/C | Exact transcription, actual changed-unscored rebind, one canonical generation, candidate identity equality | `jq` 12 scored + `mix rendro.catalog.check` + catalog/quality/rubric contract tests | ✅ durable files/tests exist; current records added by task | ⬜ pending |
@@ -63,7 +64,7 @@ There is no separate prerequisite plan. Each gap is closed red-first by the earl
 | Certificate rank/centering coupling | 130-02-01 | Certificate structural assertion precedes hierarchy change |
 | Payslip Net Pay/atomic money hierarchy | 130-02-02 | Payslip structural assertion precedes hierarchy change |
 | Ticket placement/reference hierarchy | 130-02-03 | Ticket structural assertion precedes hierarchy change |
-| Candidate-driven twelve-image/multipage split | 130-03-01 | Raster payload contract precedes staging implementation |
+| Candidate-driven twelve-image/multipage split | 130-03-01 | Untagged `Rendro.CatalogReviewPayloadContractTest` drives `Rendro.CatalogReviewPayload.classify/2`: exact twelve/four membership, literal order, complete identities, malformed rejection, and no disposition/score mutation precede tagged staging |
 | Full-SHA phase-130 route and deterministic/advisory separation | 130-03-02 | Guardrail assertions precede CI change |
 | Candidate-only generation, stale-score representation, atomic cleanup, actual-diff partition | 130-04-01 | Catalog/quality contract assertions precede dev-only seam |
 
