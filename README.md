@@ -44,7 +44,7 @@ Source PDFs and the self-rendered manual are byte-checked by the required docs c
 
 Self-rendered manual: [manual.pdf](assets/rendro/manual.pdf)
 
-SHA-256: `107c047878308448d2dec7f5022c440ebf73054efe133749014a856ef4f77be6`
+SHA-256: `0597045e4410719efe6db27005245b2a35544282e765629d7b6f667c7c68020b`
 <!-- rendro-launch-artifacts-end -->
 
 ## Guides

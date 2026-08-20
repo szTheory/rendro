@@ -60,6 +60,31 @@ all presets, future fixtures, accessibility, PDF/UA, or print safety.
 
 ---
 
+## Phase 130 launch reauthorization · 2026-08-20
+
+Jon reviewed the six changed **light** launch images at full size after the accepted exact-SHA
+PDFium v0.11.0 CI artifact was reconciled in the detached staging worktree. The legacy
+`scores[]` values are retained without re-scoring; each record is now bound to its current PNG
+and source-PDF SHA-256 identities, reviewer, and date in `rubric_scores.json`.
+
+| Launch image | PNG SHA-256 | Source-PDF SHA-256 | Decision |
+|---|---|---|---|
+| Invoice | `6a7dfd0c963c2bfaddf2bf3e8dedc7f7deef3848a5d91478dae40cc310f49a47` | `8808fcf899c5ac5897e5fa1bf7316924edca275ce85f8ec3410f5576f3d5fc22` | Approved — Total Due, table, and pagination remain clear. |
+| Statement | `b0475e73540b93bcae88f925228a0c7fe31b17d25e1ccd154b62e699308cb31b` | `d3380c80468ce7a384ac2a54c2b2500a6b8f14b65c3751c12d6b7bf406e445d5` | Approved — closing balance and ledger remain readable. |
+| Receipt / Report | `38225439998b6944e309238894df7cf10bc4eef771164fd3018ee7837b89b122` | `67902b82dcf1bbd597490ce0d701a040a82604bd19dd1ce3ff53352b0a0b15ad` | Approved — total and line items remain clear. |
+| Certificate | `d6ad49a6829936a81d271df029dad36bf5d2ab62d7af6558e408eded2fad643e` | `9f004ab50efe37c45308ee51ff4dc90ffe252dba765e6c92c4604a0b9a2c0231` | Approved — recipient hierarchy and signatures remain coherent. |
+| Payslip | `bf764cd92cc9775fdd9f03901dba47de0c2108769dbaf4e02dcbc699586f4274` | `fe6943472202526c46647eb65275a3385e570b6d0fd8aee05d3ade4b5620425a` | Approved — net pay and deductions remain aligned. |
+| Ticket | `b67e1668a9c1cc659a5232220fbf07236f1c516d9dd9ef16662957f07346e990` | `d6dc6fa81d1a4884d4a47b7966d261e4da2adb9152c0085fd9c69ebd75324e91` | Approved — placement and reference remain clear. |
+
+This is a bounded launch reauthorization, not catalog evidence. `invoice_dark`,
+`certificate_dark`, `ticket_dark`, and `invoice_brand` remain deterministic-only; no
+`catalog_dispositions` entry changes and no print, accessibility, PDF/UA, WCAG, or GUI-viewer
+claim is added. Renderer provenance remains the accepted exact-SHA CI PDFium v0.11.0 artifact
+(`b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a`), because its Linux
+binary is not executable on this macOS host.
+
+---
+
 ## Phase 127 catalog flagship review · 2026-08-17
 
 Jon reviewed the twelve full-size catalog inputs in canonical family order, with each light cell
