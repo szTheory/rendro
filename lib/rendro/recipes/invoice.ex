@@ -283,7 +283,7 @@ defmodule Rendro.Recipes.Invoice do
       base_content
       |> maybe_prepend(Map.get(data, :issuer), &issuer_block(&1, colors, type))
       |> maybe_append(Map.get(data, :customer), &customer_block(&1, colors, type))
-      |> maybe_append(Map.get(data, :due_date), &due_date_block(&1, colors, type, fmt_date))
+      |> maybe_append(header_due_date(data, opts), &due_date_block(&1, colors, type, fmt_date))
       |> maybe_append(Map.get(data, :terms), &terms_block(&1, colors, type))
 
     Rendro.section(
@@ -574,8 +574,9 @@ defmodule Rendro.Recipes.Invoice do
   # `small` and `display` steps of the typography/1 seam (no-theme
   # literal-defaults preserve those exact values).
 
-  defp build_totals_blocks(%{totals: totals} = _data, opts) when is_map(totals) do
+  defp build_totals_blocks(%{totals: totals} = data, opts) when is_map(totals) do
     fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
+    fmt_date = Rendro.Recipes.Pagination.formatter(opts, :date, &Rendro.Format.date/1)
     colors = palette(opts)
     type = typography(opts)
 
@@ -625,7 +626,7 @@ defmodule Rendro.Recipes.Invoice do
           []
       end
 
-    minor_block ++ total_block
+    minor_block ++ total_block ++ totals_due_date(data, opts, colors, type, fmt_date, total_block)
   end
 
   defp build_totals_blocks(_data, _opts), do: []
@@ -635,6 +636,28 @@ defmodule Rendro.Recipes.Invoice do
   defp maybe_append_totals_line(acc, label, %Decimal{} = amount, fmt) do
     acc ++ ["#{label}: #{fmt.(amount)}"]
   end
+
+  # A supplied theme makes the payment-summary relationship explicit without
+  # changing the frozen nil-theme layout: move an available due date next to
+  # the dominant Total Due only when the summary has a total to bind it to.
+  defp header_due_date(data, opts) do
+    if themed_payment_summary?(data, opts), do: nil, else: Map.get(data, :due_date)
+  end
+
+  defp totals_due_date(data, opts, colors, type, fmt_date, total_block) do
+    if themed_payment_summary?(data, opts) and total_block != [] do
+      [due_date_block(Map.fetch!(data, :due_date), colors, type, fmt_date)]
+    else
+      []
+    end
+  end
+
+  defp themed_payment_summary?(%{totals: totals} = data, opts) when is_map(totals) do
+    not is_nil(opts[:theme]) and match?(%Decimal{}, Map.get(totals, :total)) and
+      match?(%Date{}, Map.get(data, :due_date))
+  end
+
+  defp themed_payment_summary?(_data, _opts), do: false
 
   # ---------------------------------------------------------------------------
   # Color seam (INV-07 / S1)
