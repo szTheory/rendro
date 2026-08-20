@@ -325,6 +325,30 @@ defmodule Guardrails.RequiredChecksContractTest do
       refute test_block =~ "phase-126-preset-raster-bless"
     end
 
+    test "Swiss dark diagnostic upload is failure-only and bound to the authorized base" do
+      ci = File.read!(@ci_path)
+      advisory_block = ci_job_block!(ci, "advisory-checks")
+      test_block = ci_job_block!(ci, "test")
+
+      assert ci =~ "      - 'gsd/diagnostic-swiss-dark-f8ee18d'"
+      assert advisory_block =~ "fetch-depth: 2"
+      assert advisory_block =~ "id: preset-raster-snapshot"
+
+      diagnostic_guard =
+        "failure() && github.event_name == 'push' && github.ref_name == 'gsd/diagnostic-swiss-dark-f8ee18d' && steps.preset-raster-snapshot.outcome == 'failure'"
+
+      assert advisory_block =~ diagnostic_guard
+      assert advisory_block =~ "git rev-parse \"${GITHUB_SHA}^\""
+      assert advisory_block =~ "f8ee18d3d6504b3f4db58289efe1c6a5d178c419"
+      assert advisory_block =~ "swiss_certificate_dark_page_1.png"
+      assert advisory_block =~ "swiss_dark_actual.sha256"
+      assert advisory_block =~ "ACTUAL_RASTER_SHA256=${actual_raster_sha}"
+      assert advisory_block =~ "name: swiss-dark-preset-raster-diagnostic"
+      assert advisory_block =~ "path: ${{ runner.temp }}/swiss_dark_preset_raster_diagnostic"
+      assert advisory_block =~ "if-no-files-found: error"
+      refute test_block =~ "swiss-dark-preset-raster-diagnostic"
+    end
+
     test "required test job runs only the deterministic mix ci lane" do
       ci = File.read!(@ci_path)
       test_block = ci_job_block!(ci, "test")

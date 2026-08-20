@@ -84,6 +84,14 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
     else
       expected_hash = reference_path |> File.read!() |> String.trim()
 
+      if actual_hash != expected_hash and genre == :swiss and mode == :dark do
+        IO.puts(
+          "preset-raster-diagnostic id=#{genre}_#{mode} expected_sha256=#{expected_hash} actual_sha256=#{actual_hash}"
+        )
+
+        write_review_hash(genre, mode, actual_hash)
+      end
+
       assert actual_hash == expected_hash,
              "pinned PDFium page-one hash mismatch for #{genre}/#{mode}; review the advisory raster in the bounded caller-provided directory before updating the reference"
     end
@@ -116,6 +124,19 @@ defmodule Rendro.Theme.PresetRasterSnapshotTest do
 
         File.mkdir_p!(expanded_directory)
         File.write!(Path.join(expanded_directory, "#{id}_page_1.png"), png)
+    end
+  end
+
+  defp write_review_hash(genre, mode, actual_hash) do
+    case System.get_env(@review_dir_env) do
+      nil ->
+        :ok
+
+      "" ->
+        :ok
+
+      directory ->
+        File.write!(Path.join(directory, "#{genre}_#{mode}_actual.sha256"), actual_hash <> "\n")
     end
   end
 

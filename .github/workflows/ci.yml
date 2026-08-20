@@ -7,6 +7,7 @@ on:
       - 'gsd/phase-126-raster-bless-*'
       - 'gsd/phase-127-catalog-bless-*'
       - 'gsd/phase-130-catalog-review-*'
+      - 'gsd/diagnostic-swiss-dark-f8ee18d'
   pull_request:
     branches:
       - main
@@ -222,6 +223,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 2
 
       - name: Setup Beam
         uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
@@ -257,10 +260,49 @@ jobs:
         run: mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs
 
       - name: Run Preset Raster Snapshot Tests
+        id: preset-raster-snapshot
         env:
           MIX_RASTER_BLESS: ${{ github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-126-raster-bless-') && 'true' || 'false' }}
           RENDRO_PRESET_RASTER_REVIEW_DIR: ${{ runner.temp }}/rendro_phase126_review
         run: mix test --include raster_snapshot test/rendro/theme/preset_raster_snapshot_test.exs
+
+      - name: Stage Swiss dark preset raster diagnostic
+        if: failure() && github.event_name == 'push' && github.ref_name == 'gsd/diagnostic-swiss-dark-f8ee18d' && steps.preset-raster-snapshot.outcome == 'failure'
+        env:
+          ARTIFACT_DIR: ${{ runner.temp }}/swiss_dark_preset_raster_diagnostic
+          REVIEW_DIR: ${{ runner.temp }}/rendro_phase126_review
+        run: |
+          test "$(git rev-parse "${GITHUB_SHA}^")" = "f8ee18d3d6504b3f4db58289efe1c6a5d178c419"
+          expected_pdfium_sha="$(jq -r '.sha256' priv/pdfium_pin.json)"
+          actual_pdfium_sha="$(sha256sum "$(command -v pdfium-cli)" | cut -d ' ' -f 1)"
+          test "${actual_pdfium_sha}" = "${expected_pdfium_sha}"
+          expected_raster_sha="$(tr -d '\n' < priv/raster_refs/presets/swiss/dark.sha256)"
+          actual_raster_sha="$(tr -d '\n' < "${REVIEW_DIR}/swiss_dark_actual.sha256")"
+          test "${actual_raster_sha}" != "${expected_raster_sha}"
+          test -f "${REVIEW_DIR}/swiss_certificate_dark_page_1.png"
+          mkdir -p "${ARTIFACT_DIR}"
+          cp "${REVIEW_DIR}/swiss_certificate_dark_page_1.png" "${ARTIFACT_DIR}/swiss_certificate_dark_page_1.png"
+          printf '%s\n' "${actual_raster_sha}" > "${ARTIFACT_DIR}/swiss_dark_actual.sha256"
+          {
+            echo "GITHUB_REF_NAME=${GITHUB_REF_NAME}"
+            echo "GITHUB_SHA=${GITHUB_SHA}"
+            echo "BASE_SHA=$(git rev-parse "${GITHUB_SHA}^")"
+            echo "GITHUB_RUN_ID=${GITHUB_RUN_ID}"
+            echo "PDFIUM_VERSION=$(jq -r '.version' priv/pdfium_pin.json)"
+            echo "PDFIUM_SHA256=${actual_pdfium_sha}"
+            echo "EXPECTED_RASTER_SHA256=${expected_raster_sha}"
+            echo "ACTUAL_RASTER_SHA256=${actual_raster_sha}"
+            echo "PAYLOAD_PATHS:"
+            (cd "${ARTIFACT_DIR}" && find . -maxdepth 1 -type f | sort)
+          } > "${ARTIFACT_DIR}/manifest.txt"
+
+      - name: Upload Swiss dark preset raster diagnostic
+        if: failure() && github.event_name == 'push' && github.ref_name == 'gsd/diagnostic-swiss-dark-f8ee18d' && steps.preset-raster-snapshot.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: swiss-dark-preset-raster-diagnostic
+          path: ${{ runner.temp }}/swiss_dark_preset_raster_diagnostic
+          if-no-files-found: error
 
       - name: Generate and review Phase 127 catalog evidence
         if: github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-127-catalog-bless-')
