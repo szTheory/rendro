@@ -177,8 +177,8 @@ defmodule Guardrails.RequiredChecksContractTest do
       test_block = ci_job_block!(ci, "test")
 
       assert ci =~ "      - 'gsd/phase-130-catalog-review-*'"
-      assert advisory_block =~ "^gsd/phase-130-catalog-review-[0-9a-f]{40}$"
-      assert advisory_block =~ "${BASH_REMATCH[1]}" <> " == \"${GITHUB_SHA}\""
+      assert advisory_block =~ "^gsd/phase-130-catalog-review-([0-9a-f]{40})$"
+      assert advisory_block =~ "[[ \"${BASH_REMATCH[1]}\" == \"${GITHUB_SHA}\" ]]"
       assert advisory_block =~ "mix rendro.catalog.candidate"
 
       assert advisory_block =~
