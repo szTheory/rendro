@@ -484,18 +484,42 @@ defmodule Rendro.Recipes.Payslip do
         )
       )
 
+    value_text = fmt_amount.(data.net_pay)
+
     # The SOLE `display`-anchored element on the Payslip (D-01) — the "one key
-    # fact." mono font, since it is an amount.
+    # fact." mono font, since it is an amount. The supplied-theme path gives
+    # the complete money token one right edge shared with the summary band.
+    # Payslip's themed type roles intentionally resolve to the recipe's
+    # Helvetica-backed `:payslip_sans`, so the placement measure and rendered
+    # value remain coupled. The nil-theme branch retains its original implicit
+    # width and x coordinate for byte identity.
+    value_block_opts =
+      case Keyword.get(opts, :theme) do
+        nil ->
+          []
+
+        _theme ->
+          value_width =
+            Rendro.PDF.Font.text_width(
+              Rendro.PDF.Font.helvetica(),
+              value_text,
+              type.scale.display
+            )
+
+          [x: max(band_w - value_width, 0), width: value_width]
+      end
+
     value_block =
       Rendro.block(
-        Rendro.text(fmt_amount.(data.net_pay),
+        Rendro.text(value_text,
           size: type.scale.display,
           font: type.fonts.mono,
           line_height: type.leading,
           widows: type.widows,
           orphans: type.orphans,
           color: colors.ink
-        )
+        ),
+        value_block_opts
       )
 
     Rendro.section(
