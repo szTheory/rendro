@@ -156,6 +156,18 @@ For a light promotion, retain both schema and checker closure: `content_hierarch
 
 ## Shared Patterns
 
+### Downstream launch/golden reconciliation after recipe-byte motion
+
+**Sources:** `test/support/golden.ex`, `lib/rendro/launch_artifacts.ex`, `.planning/milestones/v2.12-phases/126-carryover-polish-dark-mode-legibility-hierarchy-decision-gol/126-03-PLAN.md`, `126-04-PLAN.md`, and Phase 127 catalog evidence artifacts.
+**Apply to:** Plans 130-07, 130-08, and final publication in 130-06.
+
+- Use a detached exact-HEAD worktree at `tmp/phase130-launch-reconcile` as the private publication boundary; snapshot canonical golden/launch/evidence hashes before any generated write.
+- Golden blessing remains explicit and exact: print both old/new SHA-256 pairs, require a blocking human decision, bless only inside staging, and rerun assert-only.
+- Launch generation/check uses the identical absolute PDFium v0.11.0 binary with executable SHA `b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a`.
+- Treat the ten changed gallery PNGs, `artifacts.json`, `manual.pdf`, generated README/recipes blocks, and the separately maintained `guides/theming.md` hash table as one mechanical batch; `branded_invoice.png` is the byte-stable negative control.
+- The six changed light gallery images require sequential full-size reauthorization because six legacy `passed` rows cite them. Dark/brand rows are deterministic-only; generation cannot authorize quality.
+- Publish staged assets and separately transcribed legacy evidence atomically in Plan 06. This sibling family never invokes or counts as the one final `mix rendro.catalog.gen` after the distinct twelve-image catalog review.
+
 ### Theme and byte-identity boundary
 
 **Sources:** `lib/rendro/recipes/receipt.ex:589-645`, `lib/rendro/recipes/table_cell.ex:4-18`.  

@@ -33,7 +33,7 @@
   3. Maintainers can regenerate the complete fixed 32-cell catalog and have its existing deterministic artifact, hash, schema, and coverage checks accept the current generated output.
   4. A human can review the twelve exact full-size pinned-raster outputs and find every disposition bound to the current catalog ID and reviewed artifact hashes; any cell that misses the frozen threshold remains `needs_work` rather than being promoted.
 
-**Plans**: 2/6 plans executed
+**Plans**: 2/8 plans executed
 
 Plans:
 **Wave 1**
@@ -47,15 +47,23 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 130-04-PLAN.md — Generate and gate one isolated 32-cell candidate bundle with an authoritative actual diff.
+- [ ] 130-07-PLAN.md — Stage exact-HEAD downstream reconciliation and authorize only the two known dark golden transitions.
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 130-05-PLAN.md — Perform the exact twelve-image full-size human review against candidate identities.
+- [ ] 130-08-PLAN.md — Generate/check the pinned launch family in staging and reauthorize the six changed light images full-size.
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 130-06-PLAN.md — Transcribe evidence, regenerate canonical output once, derive truthful projections, and close provenance.
+- [ ] 130-04-PLAN.md — Generate and gate one isolated 32-cell candidate bundle with an authoritative actual diff.
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
+- [ ] 130-05-PLAN.md — Perform the separate exact twelve-image full-size catalog review against candidate identities.
+
+**Wave 7** *(blocked on Wave 6 completion)*
+
+- [ ] 130-06-PLAN.md — Publish reviewed golden/launch evidence, transcribe the separate catalog review, generate the canonical catalog once, and close provenance.
 
 ### Phase 131: Adoption Snapshot & Phoenix Newcomer Proof
 
@@ -75,5 +83,5 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 130. Catalog Quality & Evidence Ratchet | 2/6 | In Progress|  |
+| 130. Catalog Quality & Evidence Ratchet | 2/8 | In Progress|  |
 | 131. Adoption Snapshot & Phoenix Newcomer Proof | 0/TBD | Not started | - |
