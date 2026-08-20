@@ -26,6 +26,7 @@ defmodule Rendro.CatalogReviewPayloadContractTest do
              CatalogReviewPayload.classify(manifest, proofs)
 
     assert Enum.map(final, & &1["catalog_id"]) == @ids
+
     assert Enum.map(multipage, & &1["id"]) ==
              [
                "invoice-line-items-60-plus-page-first",
@@ -40,6 +41,57 @@ defmodule Rendro.CatalogReviewPayloadContractTest do
                &Map.has_key?(identity, &1)
              )
            end)
+
+    refute Enum.any?(
+             final ++ multipage,
+             &(Map.has_key?(&1, "quality") or Map.has_key?(&1, "scores"))
+           )
+
+    assert manifest == candidate_manifest()
+    assert proofs == multipage_proofs()
+  end
+
+  test "fails closed for incomplete, stale, reordered, or quality-bearing candidate identities" do
+    manifest = candidate_manifest()
+
+    invalid_manifests = [
+      Map.update!(manifest, "cells", &List.replace_at(&1, 1, hd(&1))),
+      Map.update!(manifest, "cells", &Enum.drop(&1, 1)),
+      Map.update!(manifest, "cells", &(&1 ++ [hd(&1)])),
+      Map.update!(manifest, "cells", &Enum.reverse/1),
+      put_in(manifest, ["cells", Access.at(0), "mode"], "dark"),
+      put_in(manifest, ["cells", Access.at(0), "png_path"], "../canonical.png"),
+      put_in(manifest, ["cells", Access.at(0), "renderer_sha256"], String.duplicate("f", 64)),
+      put_in(manifest, ["cells", Access.at(0), "source_pdf_sha256"], "not-a-sha"),
+      put_in(manifest, ["candidate", "commit_sha"], "short"),
+      put_in(manifest, ["candidate", "run_id"], " "),
+      put_in(manifest, ["cells", Access.at(0), "quality"], %{"status" => "passed"}),
+      put_in(manifest, ["candidate", "scores"], %{"content_hierarchy" => 5})
+    ]
+
+    for invalid <- invalid_manifests do
+      assert {:error, _reason} = CatalogReviewPayload.classify(invalid, multipage_proofs())
+    end
+
+    assert {:error, _reason} =
+             CatalogReviewPayload.classify(Map.delete(manifest, "candidate"), multipage_proofs())
+  end
+
+  test "fails closed for malformed, missing, extra, or unsafe multipage proof entries" do
+    proofs = multipage_proofs()
+
+    invalid_proofs = [
+      Enum.drop(proofs, 1),
+      proofs ++ [hd(proofs)],
+      Enum.reverse(proofs),
+      put_in(proofs, [Access.at(0), "png_path"], "/tmp/unsafe.png"),
+      put_in(proofs, [Access.at(0), "png_sha256"], "not-a-sha"),
+      put_in(proofs, [Access.at(0), "quality"], %{"status" => "passed"})
+    ]
+
+    for invalid <- invalid_proofs do
+      assert {:error, _reason} = CatalogReviewPayload.classify(candidate_manifest(), invalid)
+    end
   end
 
   defp candidate_manifest do
@@ -72,7 +124,12 @@ defmodule Rendro.CatalogReviewPayloadContractTest do
   end
 
   defp multipage_proofs do
-    for {family, page} <- [invoice: "first", invoice: "final", statement: "first", statement: "final"] do
+    for {family, page} <- [
+          invoice: "first",
+          invoice: "final",
+          statement: "first",
+          statement: "final"
+        ] do
       %{
         "id" => "#{family}-line-items-60-plus-page-#{page}",
         "family" => Atom.to_string(family),

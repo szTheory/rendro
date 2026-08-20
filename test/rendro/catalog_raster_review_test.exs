@@ -2,61 +2,59 @@ defmodule Rendro.CatalogRasterReviewTest do
   use ExUnit.Case, async: false
 
   alias Rendro.Adapters.Pdfium
+  alias Rendro.CatalogReviewPayload
   alias Rendro.Test.EdgeFixtures
 
+  @candidate_manifest_path "tmp/phase130-candidate/candidate-manifest.json"
   @review_dir_env "RENDRO_CATALOG_REVIEW_DIR"
-  @flagship_ids [
-    "invoice--cedar-mutual--corporate-classic--light",
-    "invoice--cedar-mutual--corporate-classic--dark",
-    "statement--signal-ledger--minimal-mono--light",
-    "statement--signal-ledger--minimal-mono--dark",
-    "receipt--poppy-and-grain--humanist--light",
-    "receipt--poppy-and-grain--humanist--dark",
-    "certificate--meridian-arts-fellowship--editorial--light",
-    "certificate--meridian-arts-fellowship--editorial--dark",
-    "payslip--northline-logistics--swiss--light",
-    "payslip--northline-logistics--swiss--dark",
-    "ticket--aurora-live--brutalist--light",
-    "ticket--aurora-live--brutalist--dark"
-  ]
 
   @tag raster_snapshot: true
-  test "writes only the twelve flagship page ones and bounded multipage proof to the caller review directory" do
+  test "renders only the validated candidate payload into separate final and multipage review directories" do
+    manifest = @candidate_manifest_path |> File.read!() |> JSON.decode!()
     review_dir = System.fetch_env!(@review_dir_env)
-    File.mkdir_p!(review_dir)
-    manifest = Rendro.Catalog.read_manifest!()
-    cells_by_id = Map.new(manifest["cells"], &{&1["id"], &1})
+    final_dir = Path.join(review_dir, "final")
+    multipage_dir = Path.join(review_dir, "multipage")
 
-    assert @flagship_ids ==
-             Rendro.Catalog.catalog_specs()
-             |> Enum.map(& &1.id)
-             |> Enum.filter(&(&1 in @flagship_ids))
+    assert {:ok, %{final: final, multipage: multipage}} =
+             CatalogReviewPayload.classify(manifest, Map.fetch!(manifest, "multipage"))
 
-    for id <- @flagship_ids do
-      spec = Enum.find(Rendro.Catalog.catalog_specs(), &(&1.id == id))
-      cell = Map.fetch!(cells_by_id, id)
+    File.mkdir_p!(final_dir)
+    File.mkdir_p!(multipage_dir)
+
+    for identity <- final do
+      spec = Enum.find(Rendro.Catalog.catalog_specs(), &(&1.id == identity["catalog_id"]))
+      assert spec
+      assert sha256(File.read!(identity["png_path"])) == identity["png_sha256"]
       assert {:ok, pdf} = Rendro.Catalog.render_source_pdf(spec)
-      assert {:ok, [png]} = Pdfium.render(pdf, dpi: cell["dpi"], pages: "1")
-      assert sha256(png) == cell["png_sha256"]
-      assert sha256(File.read!(cell["png_path"])) == cell["png_sha256"]
-      File.write!(Path.join(review_dir, "#{id}_page_1.png"), png)
+      assert sha256(pdf) == identity["source_pdf_sha256"]
+      assert {:ok, [png]} = Pdfium.render(pdf, dpi: 96, pages: "1")
+      assert sha256(png) == identity["png_sha256"]
+
+      File.write!(Path.join(final_dir, "#{identity["catalog_id"]}_page_1.png"), png)
     end
 
-    for {family, prefix} <- [invoice: "invoice", statement: "statement"] do
+    for proof <- multipage do
+      family = String.to_existing_atom(proof["family"])
       document = EdgeFixtures.document(family, :line_items_60_plus)
       assert {:ok, pdf} = Rendro.render(document, deterministic: true)
-      assert page_count(pdf) > 1
+      assert sha256(pdf) == proof["source_pdf_sha256"]
       assert {:ok, pages} = Pdfium.render(pdf, dpi: 96)
       assert length(pages) > 1
-      first = hd(pages)
-      last = List.last(pages)
-      File.write!(Path.join(review_dir, "#{prefix}_line_items_60_plus_page_first.png"), first)
-      File.write!(Path.join(review_dir, "#{prefix}_line_items_60_plus_page_final.png"), last)
+
+      png = if proof["page"] == "first", do: hd(pages), else: List.last(pages)
+      assert sha256(png) == proof["png_sha256"]
+      assert sha256(File.read!(proof["png_path"])) == proof["png_sha256"]
+      File.write!(Path.join(multipage_dir, "#{proof["id"]}.png"), png)
     end
 
-    assert review_dir |> File.ls!() |> Enum.sort() |> length() == 16
+    File.write!(
+      Path.join(final_dir, "identity-manifest.json"),
+      Jason.encode!(%{"images" => final}, pretty: true) <> "\n"
+    )
+
+    assert final_dir |> File.ls!() |> Enum.count(&String.ends_with?(&1, ".png")) == 12
+    assert multipage_dir |> File.ls!() |> Enum.count(&String.ends_with?(&1, ".png")) == 4
   end
 
-  defp page_count(pdf), do: :binary.matches(pdf, "/Type /Page") |> length()
   defp sha256(binary), do: :crypto.hash(:sha256, binary) |> Base.encode16(case: :lower)
 end
