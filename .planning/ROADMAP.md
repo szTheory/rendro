@@ -92,9 +92,16 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
+**Wave 1**
 
 - [ ] 131-01-PLAN.md — Capture one bounded adoption snapshot and project its source-backed gate decision.
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 131-02-PLAN.md — Prepare exact 1.3.0, stop for explicit release approval, then verify every public prerequisite.
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 131-03-PLAN.md — Run the isolated public-Hex Phoenix journey and retain bounded dual-HTTP proof.
 
 ## Progress
