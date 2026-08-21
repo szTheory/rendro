@@ -21,7 +21,8 @@ defmodule Rendro.PublicReleaseVerifierTest do
     assert record =~ "registry_mutated: false"
     assert record =~ "3d014b8194782fc29bc685c0d5e84e4adc64b2c3"
     assert record =~ "32513353551"
-    assert record =~ "concluded **failure** before Hex publication"
+    assert record =~ "concluded **failure** before Hex"
+    assert record =~ "publication. The version extraction"
     assert record =~ "Hex package `1.3.0` is absent"
     assert record =~ "HexDocs `1.3.0` was not dispatched and is absent"
   end
