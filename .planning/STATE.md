@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v2.13
 milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 131
-current_phase_name: Adoption Snapshot & Phoenix Newcomer Proof
+current_phase_name: adoption-snapshot-phoenix-newcomer-proof
 status: executing
-stopped_at: Phase 131 context gathered
-last_updated: "2026-08-21T17:02:50.942Z"
-last_activity: 2026-08-20
-last_activity_desc: Phase 130 complete, transitioned to Phase 131
+stopped_at: Completed 131-01-PLAN.md
+last_updated: "2026-08-21T17:12:03.540Z"
+last_activity: 2026-08-21
+last_activity_desc: Phase 131 execution started
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 14
-  completed_plans: 11
+  completed_plans: 12
   percent: 50
 ---
 
@@ -24,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-19)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 130 — Catalog Quality & Evidence Ratchet
+**Current focus:** Phase 131 — adoption-snapshot-phoenix-newcomer-proof
 
 ## Current Position
 
-Phase: 131 — Adoption Snapshot & Phoenix Newcomer Proof
-Plan: Not started
+Phase: 131 (adoption-snapshot-phoenix-newcomer-proof) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-08-20 — Phase 130 complete, transitioned to Phase 131
+Last activity: 2026-08-21 — Phase 131 execution started
 
-Progress: [██████████] 100%
+Progress: [█████████░] 86%
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
@@ -70,6 +70,8 @@ Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Not started
 - [Phase ?]: The sole successful canonical catalog writer ran in the SHA-bound CI PDFium lane; local publication only materialized its verified artifact.
 - [Phase ?]: Phase 130 Nyquist closure requires green deterministic gates while pinned renderer and human evidence remain separate.
 - [Phase ?]: Phase 130 temporary provenance is removed only after literal remote SHA, manifest, and publication-subset checks.
+- [Phase ?]: 2026-08-21 adoption snapshot is a read-only HOLD decision: Downloads ACCUMULATING; Demand and Contributor HOLD; composite is the minimum family state.
+- [Phase ?]: Dated adoption evidence is packaged and published atomically through an exclusive temporary output plus hard-link target creation.
 
 ### Pending Todos
 
@@ -97,9 +99,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-21T16:24:23.202Z
-Stopped at: Phase 131 context gathered
-Resume file: .planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-CONTEXT.md
+Last session: 2026-08-21T17:12:03.531Z
+Stopped at: Completed 131-01-PLAN.md
+Resume file: None
 
 ## Next Steps
 
@@ -120,3 +122,4 @@ Resume file: .planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-C
 | Phase 130 P06 | 13m | 1 tasks | 19 files |
 | Phase 130 P10 | ~45m | 2 tasks | 36 files |
 | Phase 130-catalog-quality-evidence-ratchet P11 | 19m | 2 tasks | 2 files |
+| Phase 131 P01 | 12m | 2 tasks | 6 files |
