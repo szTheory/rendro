@@ -7,6 +7,7 @@ on:
       - 'gsd/phase-126-raster-bless-*'
       - 'gsd/phase-127-catalog-bless-*'
       - 'gsd/phase-130-catalog-review-*'
+      - 'gsd/phase-130-catalog-canonical-*'
   pull_request:
     branches:
       - main
@@ -382,6 +383,50 @@ jobs:
         with:
           name: phase-130-catalog-multipage
           path: ${{ runner.temp }}/phase130_catalog_multipage
+          if-no-files-found: error
+
+      - name: Generate Phase 130 canonical catalog
+        if: github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-130-catalog-canonical-')
+        run: |
+          [[ "${GITHUB_REF_NAME}" =~ ^gsd/phase-130-catalog-canonical-([0-9a-f]{40})$ ]]
+          [[ "${BASH_REMATCH[1]}" == "${GITHUB_SHA}" ]]
+          expected_sha="$(jq -r '.sha256' priv/pdfium_pin.json)"
+          actual_sha="$(sha256sum "$(command -v pdfium-cli)" | cut -d ' ' -f 1)"
+          test "${actual_sha}" = "${expected_sha}"
+          mix rendro.catalog.gen
+          mix rendro.catalog.check
+
+      - name: Stage Phase 130 canonical catalog artifact
+        if: github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-130-catalog-canonical-')
+        env:
+          ARTIFACT_DIR: ${{ runner.temp }}/phase130_catalog_canonical
+        run: |
+          [[ "${GITHUB_REF_NAME}" =~ ^gsd/phase-130-catalog-canonical-([0-9a-f]{40})$ ]]
+          [[ "${BASH_REMATCH[1]}" == "${GITHUB_SHA}" ]]
+          test "$(find assets/rendro/catalog -type f -name '*.png' | wc -l | tr -d ' ')" = "32"
+          jq -e '
+            .generated_by == "mix rendro.catalog.gen" and
+            (.cells | length) == 32 and
+            .renderer.pin_sha256 == $pin
+          ' --arg pin "$(jq -r '.sha256' priv/pdfium_pin.json)" assets/rendro/catalog.json >/dev/null
+          mkdir -p "${ARTIFACT_DIR}/assets/rendro"
+          cp assets/rendro/catalog.json "${ARTIFACT_DIR}/assets/rendro/catalog.json"
+          cp -R assets/rendro/catalog "${ARTIFACT_DIR}/assets/rendro/catalog"
+          {
+            echo "GITHUB_SHA=${GITHUB_SHA}"
+            echo "GITHUB_RUN_ID=${GITHUB_RUN_ID}"
+            echo "PDFIUM_VERSION=$(jq -r '.version' priv/pdfium_pin.json)"
+            echo "PDFIUM_SHA256=$(jq -r '.sha256' priv/pdfium_pin.json)"
+            echo "PAYLOAD_SHA256:"
+            (cd "${ARTIFACT_DIR}" && find assets -type f -print0 | sort -z | xargs -0 sha256sum)
+          } > "${ARTIFACT_DIR}/manifest.txt"
+
+      - name: Upload Phase 130 canonical catalog artifact
+        if: github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-130-catalog-canonical-')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: phase-130-catalog-canonical
+          path: ${{ runner.temp }}/phase130_catalog_canonical
           if-no-files-found: error
 
       - name: Stage Phase 126 preset raster blessing evidence

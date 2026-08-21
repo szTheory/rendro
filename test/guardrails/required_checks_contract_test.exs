@@ -202,6 +202,26 @@ defmodule Guardrails.RequiredChecksContractTest do
       refute test_block =~ "RENDRO_CATALOG_REVIEW_DIR"
     end
 
+    test "Phase 130 canonical catalog route is SHA-bound, pinned, and advisory-only" do
+      ci = File.read!(@ci_path)
+      advisory_block = ci_job_block!(ci, "advisory-checks")
+      test_block = ci_job_block!(ci, "test")
+
+      assert ci =~ "      - 'gsd/phase-130-catalog-canonical-*'"
+      assert advisory_block =~ "^gsd/phase-130-catalog-canonical-([0-9a-f]{40})$"
+      assert advisory_block =~ "mix rendro.catalog.gen"
+      assert advisory_block =~ "mix rendro.catalog.check"
+      assert advisory_block =~ "name: phase-130-catalog-canonical"
+      assert advisory_block =~ "phase130_catalog_canonical"
+      assert advisory_block =~ "PAYLOAD_SHA256:"
+      assert advisory_block =~ ".generated_by == \"mix rendro.catalog.gen\""
+      assert advisory_block =~ "(.cells | length) == 32"
+      assert advisory_block =~ "actual_sha"
+      assert advisory_block =~ "expected_sha"
+
+      refute test_block =~ "phase-130-catalog-canonical"
+    end
+
     test "Phase 127 catalog blessing is isolated, bounded, and absent from required CI" do
       ci = File.read!(@ci_path)
       advisory_block = ci_job_block!(ci, "advisory-checks")
