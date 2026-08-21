@@ -1,49 +1,48 @@
 ---
-candidate_commit_sha: 3d014b8194782fc29bc685c0d5e84e4adc64b2c3
-version: 1.3.0
-release_ref: v1.3.0
-package_checksum: d10c9a7b0ec04519a1248e298c3d858dd4f7f64eaf951734893dd3384ff853bd
+candidate_commit_sha: PENDING_RECOVERY_TASK
+version: 1.3.1
+release_ref: v1.3.1
+package_checksum: PENDING_RECOVERY_TASK
 tag_pushed: false
 hexdocs_dispatched: false
 registry_mutated: false
+supersedes_failed_version: 1.3.0
 ---
 
-# Rendro v1.3.0 Release Candidate
+# Rendro v1.3.1 Recovery Candidate
 
-The exact code-bearing release candidate is
-`3d014b8194782fc29bc685c0d5e84e4adc64b2c3`. This record is committed after
-that candidate so it can state its identity without a self-referential Git hash.
+This record is intentionally not approval-ready yet. Plan 131-02 Task 1 must
+replace both `PENDING_RECOVERY_TASK` values with the exact committed v1.3.1
+candidate SHA and validated package checksum after the parser repair, regression
+contract, version/source-ref/changelog/verifier/HexDocs updates, CI, preflight,
+dry-run, package, docs, and public no-mutation checks all pass.
 
-## Candidate facts
+Public consumer documentation remains `{:rendro, "~> 1.3"}`; exact `1.3.1` is
+the superseding evidence pin and clean-room target per D-32.
 
-- Version and source reference: exact `1.3.0` / `v1.3.0`.
-- Package archive checksum: `d10c9a7b0ec04519a1248e298c3d858dd4f7f64eaf951734893dd3384ff853bd`.
-- Archive inventory includes `README.md`, `guides/presets.md`,
-  `assets/rendro/configurator/index.html`, the curated fonts, `NOTICE`, and
-  `priv/adoption_evidence/2026-08-21.json`.
-- `mix ci.fast`, `mix release.preflight`, and `mix hex.publish --dry-run`
-  completed successfully against the candidate surface.
-- Local tag absence check passed: `git tag -l v1.3.0` produced no output.
-- HexDocs dispatch inputs are fixed to
-  `candidate_commit_sha=3d014b8194782fc29bc685c0d5e84e4adc64b2c3` and
-  `release_ref=v1.3.0`; the workflow requires both exact values and runs in the
-  protected `Hex Publish` environment.
+## Immutable failed v1.3.0 incident evidence
 
-## No-mutation proof
+- Annotated public tag `v1.3.0` exists and peels to approved commit
+  `3d014b8194782fc29bc685c0d5e84e4adc64b2c3`.
+- Protected release workflow run `32513353551` concluded **failure** before Hex
+  publication. The version extraction matched both the top-level
+  `@version "1.3.0"` declaration and the interpolated `source_ref` consumer,
+  producing a multiline `MIX_VERSION` that could not equal the tag version.
+- Hex package `1.3.0` is absent.
+- HexDocs `1.3.0` was not dispatched and is absent.
+- The tag and failed run are historical evidence, not a successful release.
+  They must not be deleted, moved, overwritten, recreated, retried, or routed
+  through an alternate publication mechanism.
 
-- `tag_pushed: false` — no annotated tag was created or pushed.
-- `hexdocs_dispatched: false` — no GitHub workflow dispatch occurred.
-- `registry_mutated: false` — no Hex or HexDocs publication occurred.
+## Recovery gates still required
 
-This candidate preparation is not release authorization. Only the next
-blocking-human decision may authorize all three mutations together: tag push,
-protected Hex publication, and protected candidate-bound HexDocs publication.
+- Deterministic exactly-one `@version` parser with zero/multiple-match failure.
+- Regression contract reproducing the v1.3.0 multiline extraction failure.
+- Exact `1.3.1` agreement across project version, source ref, changelog,
+  HexDocs dispatch gates, verifier, package contracts, and this record.
+- Successful `mix ci.fast`, release preflight, Hex dry-run, package inventory,
+  docs build, and local/remote `v1.3.1` absence checks.
+- Fresh blocking-human approval naming the final exact candidate SHA before any
+  v1.3.1 tag, Hex, or HexDocs mutation.
 
-## Superseded approval
-
-The prior candidate `68c3a630aa071e34faf464f96d7f767641b2e8aa` lacked an
-executable verifier boundary: its planned verifier command could exit zero
-without producing a record. Its candidate facts and any approval tied to it are
-superseded and non-transferable. Only an explicit approval naming
-`3d014b8194782fc29bc685c0d5e84e4adc64b2c3` may authorize the complete tag,
-Hex, and HexDocs mutation set.
+No prior v1.3.0 approval transfers to v1.3.1.

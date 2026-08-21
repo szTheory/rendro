@@ -9,7 +9,7 @@
 
 ### Locked Decisions
 
-The public package journey must fail closed on Hex, publish the intended `1.3.0` additive minor before proving the journey, use `{:rendro, "~> 1.3"}` in docs but retain an exact `1.3.0` evidence pin, and verify the Hex API/package/HexDocs surfaces before creating the clean app. Reuse the existing version/tag parity, allowlist, dry-run, preflight, CI, and post-publish release path. An explicit human decision checkpoint is required immediately before pushing the release tag or publishing; this context authorizes planning that checkpoint, not publication.
+The public package journey must fail closed on Hex. Execution-time D-32 supersedes the original exact `1.3.0` target with exact `1.3.1`: public docs remain `{:rendro, "~> 1.3"}`, while retained release and clean-room evidence pin exact `1.3.1`. Reuse the existing version/tag parity, allowlist, dry-run, preflight, CI, protected tag-driven Hex path, and candidate-bound HexDocs path. A fresh exact-candidate blocking-human approval is required immediately before v1.3.1 external mutation. Annotated `v1.3.0`, peeled commit `3d014b8194782fc29bc685c0d5e84e4adc64b2c3`, and failed protected run `32513353551` are immutable incident evidence; Hex/HexDocs 1.3.0 are absent and no retry, tag mutation, or alternate publication path is allowed.
 
 `ADOPTION.md` is the human index and a compact dated JSON sidecar under `priv/adoption_evidence/` is immutable retained evidence that must ship in the package. Retrieval availability is independent of the `HOLD`/`ACCUMULATING`/`TRIGGER` decision. `UNAVAILABLE` is never numeric zero and never yields `TRIGGER`; the composite is the weakest-link conjunction of demand, downloads, and contributor activity. Retain bounded public metadata only, take one deliberate snapshot with no polling/analytics/mutation, and enforce the evidence contract offline without fetching.
 
@@ -53,11 +53,15 @@ None — global text shaping remains demand-gated; no new UI, analytics, schedul
 
 ## Summary
 
-Phase 131 is chiefly an evidence-and-release boundary, not a Phoenix feature. Public Hex currently reports Rendro `1.0.0` as latest, while the repository already contains the Theme/preset/configurator and optional Phoenix seams required by the locked journey. The journey must therefore be sequenced behind a deliberately authorized `1.3.0` release, verified from public infrastructure, and then exercised in a disposable consumer application. [VERIFIED: Hex package API] [VERIFIED: codebase]
+Phase 131 is chiefly an evidence-and-release boundary, not a Phoenix feature. The first protected attempt created immutable tag `v1.3.0` but failed before Hex publication because release version extraction matched both the declaration and its `source_ref` use. The journey must therefore be sequenced behind a freshly authorized exact `1.3.1` recovery release, verified from public infrastructure, and then exercised in a disposable consumer application. The failed v1.3.0 run is retained as evidence rather than success. [VERIFIED: execution state] [VERIFIED: codebase]
 
 The implementation should split into deterministic contract work and one explicitly advisory execution run. Offline tests validate the adoption-sidecar grammar, status arithmetic, package/docs bindings, clean-room harness templates, manifest shape, and leakage detectors. The run itself observes Hex/GitHub/public documentation and a real local server; it writes only bounded source facts, commands, hashes, and outcomes. It must never be represented as a deterministic CI proof of the then-live public registry. [VERIFIED: 131-CONTEXT.md] [VERIFIED: codebase]
 
 **Primary recommendation:** plan release closure, evidence contracts, README/document-module/harness templates, then gate tag/publish with a human checkpoint before executing the public-Hex clean-room run and committing its bounded advisory record.
+
+### Execution incident lesson: parse declarations, not token occurrences
+
+Protected release run `32513353551` failed before publication because `grep '@version' mix.exs` selected both `@version "1.3.0"` and `source_ref: "v#{@version}"`, producing a multiline value. Recovery must keep the existing workflow, replace that broad occurrence search with an exactly-one top-level declaration parser, and contract-test the original two-line input plus zero/multiple-declaration failures. The v1.3.0 tag stays immutable at peeled commit `3d014b8194782fc29bc685c0d5e84e4adc64b2c3`; because Hex and HexDocs 1.3.0 are absent, exact v1.3.1 becomes the release/verifier/journey pin. [VERIFIED: failed workflow run 32513353551] [VERIFIED: D-32]
 
 ## Architectural Responsibility Map
 
@@ -76,7 +80,7 @@ The implementation should split into deterministic contract work and one explici
 
 | Library/tool | Version | Purpose | Why standard |
 |---|---:|---|---|
-| Rendro public Hex package | exact `1.3.0` evidence pin; docs `~> 1.3` | Consumer PDF/theme/recipe API | Locked public-package boundary; currently published `1.0.0` proves release prerequisite. [VERIFIED: Hex package API] |
+| Rendro public Hex package | exact `1.3.1` evidence pin; docs `~> 1.3` | Consumer PDF/theme/recipe API | D-32 recovery boundary after failed v1.3.0; public package verification remains prerequisite. [VERIFIED: D-32] |
 | Phoenix + Plug + Bandit generated app | generator-resolved; retain exact lock versions | HTTP route, controller, endpoint, test | Phoenix's idiomatic generated app provides the controller/ConnCase boundary. [CITED: https://phoenix.hexdocs.pm/testing_controllers.html] |
 | `mix phx.new` | local `1.8.9`; record actual execution value | Fresh API-only consumer app | Official generator supports no-Ecto/no-HTML/no-assets/no-install use. [CITED: https://phoenix.hexdocs.pm/Mix.Tasks.Phx.New.html] |
 | Hex API + GitHub CLI | record actual versions/results | Read-only adoption observations | Existing `ADOPTION.md` already defines their public source commands. [VERIFIED: codebase] |
@@ -90,7 +94,7 @@ The implementation should split into deterministic contract work and one explici
 | `gh` | Scoped issue/PR metadata | Record query/limit and candidate metadata, never mutate labels/issues. [CITED: https://cli.github.com/manual/gh_issue_list] |
 | `sha256sum`/`shasum` | Lock/PDF/result identity | Retain hashes rather than payloads. [ASSUMED] |
 
-**Installation:** No new root runtime dependency is warranted. The generated Phoenix application's `mix.exs` must declare only public `{:rendro, "1.3.0"}` for evidence, allowing its Phoenix-generated dependencies to resolve normally. [VERIFIED: 131-CONTEXT.md]
+**Installation:** No new root runtime dependency is warranted. The generated Phoenix application's `mix.exs` must declare only public `{:rendro, "1.3.1"}` for evidence, allowing its Phoenix-generated dependencies to resolve normally. [VERIFIED: D-32]
 
 ## Package Legitimacy Audit
 
@@ -126,8 +130,8 @@ README -> preset/configurator snippet -> App.InvoiceDocument -> controller -> Re
 priv/adoption_evidence/
   2026-08-21.json                    # immutable, bounded adoption snapshot
 priv/journey_evidence/
-  phoenix_clean_room_1.3.0.json      # advisory result manifest, no payload
-  phoenix_clean_room_1.3.0.md        # concise human transcript
+  phoenix_clean_room_1.3.1.json      # advisory result manifest, no payload
+  phoenix_clean_room_1.3.1.md        # concise human transcript
 scripts/
   adoption_snapshot.exs               # one-shot retrieval + validation + write procedure
   phoenix_clean_room_proof.exs        # isolated generated-app orchestration
@@ -279,8 +283,8 @@ end
   "schema_version": 1,
   "lane": "advisory_external_evidence",
   "executed_at_utc": "...",
-  "declared": {"rendro": "1.3.0"},
-  "resolved": {"elixir": "...", "otp": "...", "hex": "...", "phx_new": "...", "phoenix": "...", "plug": "...", "bandit": "...", "rendro": "1.3.0", "mix_lock_sha256": "..."},
+  "declared": {"rendro": "1.3.1"},
+  "resolved": {"elixir": "...", "otp": "...", "hex": "...", "phx_new": "...", "phoenix": "...", "plug": "...", "bandit": "...", "rendro": "1.3.1", "mix_lock_sha256": "..."},
   "isolation": {"phx_new_cache_dir": "UNSET", "forbidden_sources": []},
   "steps": [{"name": "conn_case", "exit_code": 0}, {"name": "loopback_http", "status": 200, "content_type": "application/pdf; charset=utf-8", "disposition": "attachment; filename=\"invoice.pdf\"", "body_bytes": 1234, "pdf_magic": true, "body_sha256": "..."}],
   "repairs": []
@@ -293,7 +297,7 @@ Never save the request/response body, local port, full local filesystem path, pr
 
 | Old approach | Current approach | Impact |
 |---|---|---|
-| Repository example with a path dependency | Ephemeral Phoenix consumer app resolving public Hex `1.3.0` | Separates regression convenience from adoption truth. [VERIFIED: codebase] |
+| Repository example with a path dependency | Ephemeral Phoenix consumer app resolving public Hex `1.3.1` | Separates regression convenience from adoption truth. [VERIFIED: D-32] |
 | Distributed human-only ADOPTION tables | Human index plus typed immutable sidecar | Enables offline validation and accurate unavailable semantics. [VERIFIED: 131-CONTEXT.md] |
 | One response proof | ConnCase plus loopback HTTP | Covers both internal routing and actual endpoint handoff. [VERIFIED: 131-CONTEXT.md] |
 
@@ -307,13 +311,13 @@ Never save the request/response body, local port, full local filesystem path, pr
 ## Open Questions (RESOLVED)
 
 1. **Fail-closed public package and HexDocs verification procedure**
-   - **Resolution:** Plan 131-02 creates the named, read-only `Rendro.PublicReleaseVerifier` in `scripts/verify_public_release.exs`; it is the sole producer of `131-PUBLIC-PREREQUISITE.json`. It is not an existing command yet, so execution must implement and test it before any irreversible action. [VERIFIED: 131-02-PLAN.md]
-   - **Invocation contract:** after the explicit human checkpoint, the executor invokes `mix run scripts/verify_public_release.exs -- --candidate-record .planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-RELEASE-CANDIDATE.md --tag v1.3.0 --release-run-id "$RENDRO_RELEASE_RUN_ID" --hexdocs-run-id "$RENDRO_HEXDOCS_RUN_ID" --output .planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json --check-existing`. This verifier performs only read-only checks and writes `public_prerequisite: VERIFIED` atomically only after every condition passes. [VERIFIED: 131-02-PLAN.md]
-   - **Required facts:** compare `candidate_commit_sha` with the peeled remote `refs/tags/v1.3.0^{}` commit (record the annotated tag-object SHA separately); require both the release and candidate-bound HexDocs workflow runs to have successful conclusions, the exact candidate head SHA, and their expected event/input identities; require the Hex package API to expose exact `1.3.0`; fetch the public archive, calculate/retain its checksum, and inspect its `contents.tar.gz` inventory for every asserted package file, including public preset/font/configurator/adapter and adoption-evidence surfaces; then probe versioned HexDocs for `1.3.0`, source identity equal to the candidate, and the locked Theme, presets, explicit font registration, formatter/configurator asset, and `Rendro.Adapters.Phoenix.render_pdf/3` symbols. Any absent, stale, mismatched, or unparseable fact yields no VERIFIED record and blocks Plan 131-03. [VERIFIED: 131-02-PLAN.md] [VERIFIED: codebase]
+   - **Resolution:** Plan 131-02 retains and updates the named, read-only `Rendro.PublicReleaseVerifier` in `scripts/verify_public_release.exs`; it is the sole producer of `131-PUBLIC-PREREQUISITE.json`. Recovery tests and retargets it to exact 1.3.1 before any new irreversible action. [VERIFIED: 131-02-PLAN.md]
+   - **Invocation contract:** after the fresh exact-candidate human checkpoint, the executor invokes `mix run scripts/verify_public_release.exs -- --candidate-record .planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-RELEASE-CANDIDATE.md --tag v1.3.1 --release-run-id "$RENDRO_RELEASE_RUN_ID" --hexdocs-run-id "$RENDRO_HEXDOCS_RUN_ID" --output .planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json --check-existing`. This verifier performs only read-only checks and writes `public_prerequisite: VERIFIED` atomically only after every condition passes. [VERIFIED: 131-02-PLAN.md]
+   - **Required facts:** compare `candidate_commit_sha` with the peeled remote `refs/tags/v1.3.1^{}` commit (record the annotated tag-object SHA separately); require both the release and candidate-bound HexDocs workflow runs to have successful conclusions, the exact candidate head SHA, and their expected event/input identities; require the Hex package API to expose exact `1.3.1`; fetch the public archive, calculate/retain its checksum, and inspect its `contents.tar.gz` inventory for every asserted package file, including public preset/font/configurator/adapter and adoption-evidence surfaces; then probe versioned HexDocs for `1.3.1`, source identity equal to the candidate, and the locked Theme, presets, explicit font registration, formatter/configurator asset, and `Rendro.Adapters.Phoenix.render_pdf/3` symbols. The same record preserves v1.3.0 peeled commit `3d014b8194782fc29bc685c0d5e84e4adc64b2c3`, failed run `32513353551`, and Hex/HexDocs 1.3.0 absence. Any absent, stale, mismatched, or unparseable fact yields no VERIFIED record and blocks Plan 131-03. [VERIFIED: 131-02-PLAN.md] [VERIFIED: D-32]
    - **Why this is sufficient:** the existing release workflow supplies tag/version parity, CI, preflight, dry-run, and protected Hex publication; the planned existing-workflow dispatch adds exact candidate inputs and parity gates for HexDocs. The verifier confirms public effects after those protected workflows, rather than inventing another publication path. [VERIFIED: .github/workflows/release.yml] [VERIFIED: 131-02-PLAN.md]
 2. **Generated app's Phoenix/Plug/Bandit versions**
-   - **Resolution:** versions are intentionally resolver-selected during the one advisory clean-room execution, not a missing design choice. The generated application records actual `phx_new`, Phoenix, Plug, Bandit, Elixir, OTP, Hex, Rendro exact `1.3.0`, and the `mix.lock` SHA-256 in the bounded manifest; the lockfile itself is not retained. [VERIFIED: 131-03-PLAN.md]
-   - **Planning implication:** documentation remains range-based for normal consumers, while the harness declares exact Rendro `1.3.0` and treats the resolved generated-app graph as evidence. A source/version other than public Hex Rendro `1.3.0`, a malformed lock, or a forbidden `path:`/`git:`/workspace/cache source fails the advisory record rather than selecting a substitute version. [VERIFIED: 131-03-PLAN.md]
+   - **Resolution:** versions are intentionally resolver-selected during the one advisory clean-room execution, not a missing design choice. The generated application records actual `phx_new`, Phoenix, Plug, Bandit, Elixir, OTP, Hex, Rendro exact `1.3.1`, and the `mix.lock` SHA-256 in the bounded manifest; the lockfile itself is not retained. [VERIFIED: 131-03-PLAN.md]
+   - **Planning implication:** documentation remains range-based for normal consumers, while the harness declares exact Rendro `1.3.1` and treats the resolved generated-app graph as evidence. A source/version other than public Hex Rendro `1.3.1`, a malformed lock, or a forbidden `path:`/`git:`/workspace/cache source fails the advisory record rather than selecting a substitute version. [VERIFIED: 131-03-PLAN.md]
 
 ## Environment Availability
 

@@ -98,11 +98,11 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 131-02-PLAN.md — Prepare exact 1.3.0, stop for explicit release approval, then verify every public prerequisite.
+- [ ] 131-02-PLAN.md — Preserve failed v1.3.0 history, repair its parser regression, prepare and freshly approve exact v1.3.1, then verify protected public prerequisites.
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 131-03-PLAN.md — Run the isolated public-Hex Phoenix journey and retain bounded dual-HTTP proof.
+- [ ] 131-03-PLAN.md — Run the isolated exact-public-1.3.1 Phoenix journey and retain bounded dual-HTTP proof plus the failed v1.3.0 incident identity.
 
 ## Progress
 

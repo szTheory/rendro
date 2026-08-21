@@ -61,6 +61,10 @@ The phase may publish the already-shipped additive-minor preset/configurator sur
 - **D-30 — Evidence lanes stay truthful:** the live Hex/GitHub/network/server run is advisory external evidence. Deterministic tests may prove the harness, templates, docs, manifest schema, and retained assertions, but must not present a cached or mocked network run as proof that public installation succeeded.
 - **D-31 — Existing example retains its narrower role:** `examples/phoenix_example` remains the fast, reviewable repository regression fixture for adapter/controller behavior. Its path dependency and warm lock/build context disqualify it from JOURNEY-01 but do not reduce its ongoing test value.
 
+### Execution-time superseding decision — failed v1.3.0 release recovery
+
+- **D-32 — Preserve v1.3.0 history and recover with exact v1.3.1:** annotated public tag `v1.3.0` is immutable failed-release evidence and continues to peel to approved commit `3d014b8194782fc29bc685c0d5e84e4adc64b2c3`; protected release workflow run `32513353551` failed before Hex publication because its version extraction matched both the `@version "1.3.0"` declaration and `source_ref: "v#{@version}"`, producing a multiline `MIX_VERSION`. Hex package `1.3.0` is absent and HexDocs `1.3.0` was not dispatched or published. Exact `1.3.1` supersedes exact `1.3.0` as the public-package evidence pin and clean-room target, while public documentation remains `{:rendro, "~> 1.3"}`. Recovery must fix the existing release workflow parser with zero/multiple-match failure, reproduce the multiline regression deterministically, prepare and freshly approve one exact `1.3.1` candidate, and use only the existing protected tag-driven Hex path plus candidate-bound HexDocs path. The executor must never delete, move, overwrite, recreate, or retry `v1.3.0`, and must not publish `1.3.0` through any alternate path. This decision supersedes only the exact-release target portions of D-02, D-03, and D-04; D-01 through D-31 otherwise remain binding. — **Reversibility: one-way for the eventual v1.3.1 publication; reversible for the parser repair and private candidate preparation.**
+
 ### the agent's Discretion
 
 The planner may choose exact private helper/module names, the bounded JSON schema keys, temporary-directory layout, safe local port-selection mechanics, retry/readiness probing for the local server, and focused test-module placement. It may choose the exact filenames beneath `priv/adoption_evidence/` as long as ADOPTION and journey evidence remain clearly separated or typed. It may not weaken the public-Hex boundary, remove the pre-publish human checkpoint, use a Git/path dependency, conflate unavailable with zero, change the gate thresholds, duplicate the canonical snippet, expose backend mechanics as user-facing API, commit generated/cache/PDF payloads, or merge advisory network evidence into deterministic authority.
@@ -153,7 +157,7 @@ The planner may choose exact private helper/module names, the bounded JSON schem
 - `Rendro.Theme.Snippet` plus the committed configurator index: already own the exact requested-code seam for all bounded selections; Phase 131 should consume rather than fork it.
 - `Rendro.Adapters.Phoenix`: already owns PDF response headers, disposition, sending, and structured error translation behind optional Phoenix/Plug guards.
 - `examples/phoenix_example` tests: already demonstrate idiomatic `ConnCase` assertions for `200`, `application/pdf`, and `%PDF-`; they are templates for the ephemeral app, not clean-room evidence themselves.
-- Existing release workflow and preflight proof: already provide the safe path for the necessary `1.3.0` publication.
+- Existing release workflow and preflight proof: remain the required protected path for exact `1.3.1` recovery after repairing the version parser; failed `v1.3.0` is evidence, not a retry target (D-32).
 
 ### Established Patterns
 

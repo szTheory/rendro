@@ -43,7 +43,8 @@ created: 2026-08-21
 | 131-W0-02 | TBD | 0 | JOURNEY-01, JOURNEY-02, JOURNEY-04 | T-131-02 | Public-package proof rejects path/Git/workspace/cache leakage and retains no payload | docs contract | `mix test test/docs_contract/phoenix_newcomer_contract_test.exs` | ❌ W0 | ⬜ pending |
 | 131-W0-03 | TBD | 0 | JOURNEY-01, JOURNEY-03, JOURNEY-04 | T-131-03 | Harness isolates run state, bounds process lifetime, and validates captured response metadata | unit | `mix test test/scripts/phoenix_clean_room_proof_test.exs` | ❌ W0 | ⬜ pending |
 | 131-ADV-01 | TBD | advisory | SIGNAL-02, SIGNAL-03, SIGNAL-04, SIGNAL-05 | T-131-01 | One read-only public snapshot retains allowlisted metadata only | advisory external | Named adoption snapshot command from the finalized plan | ❌ | ⬜ pending |
-| 131-ADV-02 | TBD | advisory | JOURNEY-01, JOURNEY-02, JOURNEY-03, JOURNEY-04 | T-131-02, T-131-03 | Exact public `rendro` 1.3.0 resolves in a fresh generated app and returns a valid PDF through ConnCase and loopback HTTP | advisory external | Named clean-room harness command from the finalized plan | ❌ | ⬜ pending |
+| 131-REL-RECOVERY | 02 | 2 | JOURNEY-01, JOURNEY-02 | T-131-08, T-131-14 | Release parser selects exactly one `@version` declaration, fails on zero/multiple declarations, and deterministically reproduces the failed v1.3.0 multiline case before preparing exact 1.3.1 | contract/integration | `mix test test/guardrails/required_checks_contract_test.exs test/scripts/public_release_verifier_test.exs --max-failures 1` | ✅ | ⬜ pending |
+| 131-ADV-02 | 03 | advisory | JOURNEY-01, JOURNEY-02, JOURNEY-03, JOURNEY-04 | T-131-09, T-131-13, T-131-15 | Exact public `rendro` 1.3.1 resolves in a fresh generated app and returns a valid PDF through ConnCase and loopback HTTP; run 32513353551 remains failed incident evidence | advisory external | Named exact 1.3.1 clean-room harness command from Plan 131-03 | ❌ | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -54,6 +55,7 @@ created: 2026-08-21
 - [ ] `test/docs_contract/adoption_evidence_contract_test.exs` — sidecar schema, retrieval/decision enums, threshold arithmetic, bounded metadata, package binding.
 - [ ] `test/docs_contract/phoenix_newcomer_contract_test.exs` — README/snippet/harness/manifest/no-leakage contracts.
 - [ ] `test/scripts/phoenix_clean_room_proof_test.exs` — pure command, path, lock, timeout, redaction, and result helper tests.
+- [ ] `test/guardrails/required_checks_contract_test.exs` — exact-one release-version extraction, including the former multiline input and zero/multiple-declaration failures.
 - [ ] Keep live publish, Hex/GitHub retrieval, package resolution, and endpoint execution out of default deterministic CI; invoke them only through named advisory procedures.
 
 ---
@@ -62,8 +64,8 @@ created: 2026-08-21
 
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
-| Authorize and publish public Rendro 1.3.0 | JOURNEY-01 | Tagging and Hex publication are irreversible external mutations requiring an explicit human decision | Run the existing release preflight and dry run; inspect the candidate; stop at the plan's decision checkpoint; only after explicit approval push the exact tag through the protected release workflow. |
-| Verify public registry, package contents, and HexDocs | JOURNEY-01, JOURNEY-02 | Public infrastructure is temporally variable and cannot be claimed by offline CI | After publication, query the Hex API for exact 1.3.0, inspect the fetched package allowlist, and verify versioned HexDocs expose the preset, font-registration, snippet, and Phoenix-adapter surfaces before generating the app. |
+| Authorize and publish public Rendro 1.3.1 | JOURNEY-01 | Tagging and Hex publication are irreversible external mutations requiring a fresh exact-candidate human approval | Inspect the fully validated private 1.3.1 candidate and immutable v1.3.0 failure evidence; stop at the new blocking checkpoint; only after explicit exact-SHA approval push v1.3.1 through the protected tag workflow and dispatch candidate-bound HexDocs. Never retry or mutate v1.3.0. |
+| Verify public registry, package contents, HexDocs, and failed-release history | JOURNEY-01, JOURNEY-02 | Public infrastructure is temporally variable and cannot be claimed by offline CI | After protected publication, query exact 1.3.1 Hex/archive/HexDocs/source/symbol facts and retain exact run IDs. Also prove v1.3.0 still peels to `3d014b8194782fc29bc685c0d5e84e4adc64b2c3`, run `32513353551` remains failed, and Hex/HexDocs 1.3.0 remain absent. |
 | Execute one bounded adoption snapshot | SIGNAL-02, SIGNAL-03, SIGNAL-04, SIGNAL-05 | Hex/GitHub availability and public activity are live advisory observations | Run the named one-shot snapshot procedure once; inspect retrieval statuses, raw bounded facts, family decisions, and weakest-link composite; commit only the sidecar and human index. |
 | Execute the public-Hex Phoenix journey | JOURNEY-01, JOURNEY-02, JOURNEY-03, JOURNEY-04 | Fresh dependency resolution and a real loopback listener depend on live external/local state | Run the harness from an empty isolated run root; inspect its source-leakage audits, ConnCase output, loopback response contract, manifest, and transcript; retain no app/cache/PDF/process artifacts. |
 
