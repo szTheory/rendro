@@ -110,8 +110,6 @@ defmodule Rendro.CatalogReviewReconciliation do
        }}
     else
       false -> {:error, :local_binding_mismatch}
-      {:error, _reason} = error -> error
-      _ -> {:error, :invalid_png}
     end
   end
 
