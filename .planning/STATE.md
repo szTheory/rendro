@@ -5,16 +5,16 @@ milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 130
 current_phase_name: Catalog Quality & Evidence Ratchet
 status: executing
-stopped_at: Completed 130-10-PLAN.md
-last_updated: "2026-08-21T01:14:46.722Z"
+stopped_at: Completed 130-11-PLAN.md
+last_updated: "2026-08-21T01:36:18.408Z"
 last_activity: 2026-08-20
-last_activity_desc: Phase 130 execution started
+last_activity_desc: "Completed quick task 260820-trn: Remove unreachable Phase 130 catalog review fallbacks so Dialyzer and ci.fast pass"
 progress:
   total_phases: 2
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 11
-  completed_plans: 10
-  percent: 0
+  completed_plans: 11
+  percent: 50
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 130 (Catalog Quality & Evidence Ratchet) — EXECUTING
-Plan: 9 of 11
+Plan: 10 of 11
 Status: Ready to execute
 Last activity: 2026-08-20 — Completed quick task 260820-trn: Remove unreachable Phase 130 catalog review fallbacks so Dialyzer and ci.fast pass
 
-Progress: [█████████░] 91%
+Progress: [██████████] 100%
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
@@ -68,6 +68,8 @@ Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Not started
 - [Phase ?]: Plan 130-05 promotes four light cells only; every dark cell remains needs_work while print_safety is false.
 - [Phase ?]: Published the exact reviewed 19-path launch and golden batch as one reversible commit after staging identity validation.
 - [Phase ?]: The sole successful canonical catalog writer ran in the SHA-bound CI PDFium lane; local publication only materialized its verified artifact.
+- [Phase ?]: Phase 130 Nyquist closure requires green deterministic gates while pinned renderer and human evidence remain separate.
+- [Phase ?]: Phase 130 temporary provenance is removed only after literal remote SHA, manifest, and publication-subset checks.
 
 ### Pending Todos
 
@@ -94,8 +96,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-21T01:14:46.717Z
-Stopped at: Completed 130-10-PLAN.md
+Last session: 2026-08-21T01:36:18.403Z
+Stopped at: Completed 130-11-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -116,3 +118,4 @@ Resume file: None
 | Phase 130 P05 | 32min | 1 tasks | 1 files |
 | Phase 130 P06 | 13m | 1 tasks | 19 files |
 | Phase 130 P10 | ~45m | 2 tasks | 36 files |
+| Phase 130-catalog-quality-evidence-ratchet P11 | 19m | 2 tasks | 2 files |
