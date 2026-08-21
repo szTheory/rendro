@@ -1,11 +1,11 @@
 ---
 phase: 130
 slug: catalog-quality-evidence-ratchet
-status: draft
+status: blocked
 nyquist_compliant: false
 wave_0_complete: false
 created: 2026-08-19
-revised: 2026-08-20
+revised: 2026-08-21
 ---
 
 # Phase 130 — Validation Strategy
@@ -46,23 +46,23 @@ revised: 2026-08-20
 | 130-02-01 | 02 | 1 | CATALOG-06 | T-130-02A/B/C | Certificate rank and coupled centering | Certificate focused suites | ✅ complete |
 | 130-02-02 | 02 | 1 | CATALOG-06 | T-130-02A/B/C | Payslip Net Pay and atomic money | Payslip focused suites | ✅ complete |
 | 130-02-03 | 02 | 1 | CATALOG-06 | T-130-02A/B/C | Ticket placement-first hierarchy | Ticket focused suites | ✅ complete |
-| 130-03-01 | 03 | 2 | CATALOG-09 | T-130-03A/C | Exact 12-image payload, separate 4-image multipage proof, complete identity | Pure payload contract | ⬜ pending |
-| 130-03-02 | 03 | 2 | CATALOG-09 | T-130-03B/C | Full-40-SHA advisory route remains non-required | Required-checks contract | ⬜ pending |
-| 130-07-01 | 07 | 3 | CATALOG-06,07,08 | T-130-07B/C | Exact-HEAD detached worktree and baseline fence | SHA equality + baseline + main diff fence | ⬜ pending |
-| 130-07-02 | 07 | 3 | CATALOG-06,07,08 | T-130-07A/C | Blocking exact two-golden authorization | Human authorize/reject exact four hashes | ⬜ pending |
-| 130-07-03 | 07 | 3 | CATALOG-06,07,08 | T-130-07A/B | Only authorized goldens blessed in staging | Focused golden + exact two-file diff | ⬜ pending |
-| 130-08-01 | 08 | 4 | CATALOG-06,07,08 | T-130-08A/C | Blocking pinned PDFium path or exact-SHA CI action | Pin provenance + gen/check + focused contracts | ⬜ pending |
-| 130-08-02 | 08 | 4 | CATALOG-06,07,08 | T-130-08B/C | Exact ten-change/stable-control staged diff and rollback | Diff JSON + launch checks + canonical fences | ⬜ pending |
-| 130-09-01 | 09 | 5 | CATALOG-06,07,09 | T-130-09A/B/C | Blocking six-light full-size launch review, no binary ownership | Six complete current decisions or blocked marker | ⬜ pending |
-| 130-04-01 | 04 | 6 | CATALOG-08,09 | T-130-04A/B/C/D | Compile-first fixed-target quality-free candidate seam, strict options, and atomic cleanup | Catalog/quality contracts + invalid-option command proves alias discovery before any publication | ⬜ pending |
-| 130-04-02 | 04 | 6 | CATALOG-08,09 | T-130-04A/D | Blocking exact-SHA pinned 32-cell candidate batch | Ref/run/pin + 32 candidate + 12 final + 4 multipage | ⬜ pending |
-| 130-04-03 | 04 | 6 | CATALOG-08,09 | T-130-04A/B/C/D | Exact actual-diff partition and canonical unchanged | Family/catalog tests + jq partition | ⬜ pending |
-| 130-05-01 | 05 | 7 | CATALOG-09 | T-130-05A/B/C | Blocking distinct twelve-cell full-size catalog review | Twelve complete records or blocked marker | ⬜ pending |
-| 130-06-01 | 06 | 8 | CATALOG-06,07,08 | T-130-06A/B/C | One 19-path reviewed launch publication commit and whole-commit rollback | Exact inventory + focused contracts + clean fences | ⬜ pending |
-| 130-10-01 | 10 | 9 | CATALOG-08,09 | T-130-10A/B | Exact catalog transcription and threshold/dark closure | 12 scored + mutation contracts | ⬜ pending |
-| 130-10-02 | 10 | 9 | CATALOG-08,09 | T-130-10B/C | Sole canonical generation and 32-cell candidate reproduction | generation_count 1 + catalog check/contracts | ⬜ pending |
-| 130-11-01 | 11 | 10 | CATALOG-06,07,08,09 | T-130-11A/C | Complete source/decision/UI/edge/prohibition and deterministic closure | Focused/full/ci.fast + live cardinalities | ⬜ pending |
-| 130-11-02 | 11 | 10 | CATALOG-06,07,08,09 | T-130-11A/B | Exact ref/worktree/candidate cleanup after durable closure | Absence gates + Nyquist flags | ⬜ pending |
+| 130-03-01 | 03 | 2 | CATALOG-09 | T-130-03A/C | Exact 12-image payload, separate 4-image multipage proof, complete identity | Pure payload contract; 130-03-SUMMARY | ✅ complete |
+| 130-03-02 | 03 | 2 | CATALOG-09 | T-130-03B/C | Full-40-SHA advisory route remains non-required | Required-checks contract; 130-03-SUMMARY | ✅ complete |
+| 130-07-01 | 07 | 3 | CATALOG-06,07,08 | T-130-07B/C | Exact-HEAD detached worktree and baseline fence | SHA equality + baseline + main diff fence; 130-07-SUMMARY | ✅ complete |
+| 130-07-02 | 07 | 3 | CATALOG-06,07,08 | T-130-07A/C | Blocking exact two-golden authorization | Authorized exact old/new SHA pairs; 130-07-SUMMARY | ✅ complete |
+| 130-07-03 | 07 | 3 | CATALOG-06,07,08 | T-130-07A/B | Only authorized goldens blessed in staging | Assert-only 7-test golden check + exact two-file diff; 130-07-SUMMARY | ✅ complete |
+| 130-08-01 | 08 | 4 | CATALOG-06,07,08 | T-130-08A/C | Blocking pinned PDFium path or exact-SHA CI action | Pin/provenance and CI renderer/generation evidence; 130-08-SUMMARY | ✅ complete |
+| 130-08-02 | 08 | 4 | CATALOG-06,07,08 | T-130-08B/C | Exact ten-change/stable-control staged diff and rollback | Exact diff JSON, stable control, canonical fences; 130-08-SUMMARY | ✅ complete |
+| 130-09-01 | 09 | 5 | CATALOG-06,07,09 | T-130-09A/B/C | Blocking six-light full-size launch review, no binary ownership | Six complete dated/hash-bound decisions; 130-09-SUMMARY | ✅ complete |
+| 130-04-01 | 04 | 6 | CATALOG-08,09 | T-130-04A/B/C/D | Compile-first fixed-target quality-free candidate seam, strict options, and atomic cleanup | Catalog/quality contracts + invalid-option proof; 130-04-SUMMARY | ✅ complete |
+| 130-04-02 | 04 | 6 | CATALOG-08,09 | T-130-04A/D | Blocking exact-SHA pinned 32-cell candidate batch | Full-SHA route/run/pin; 32 candidate + 12 final + 4 multipage; 130-04/05 summaries | ✅ complete |
+| 130-04-03 | 04 | 6 | CATALOG-08,09 | T-130-04A/B/C/D | Exact actual-diff partition and canonical unchanged | 12 scored/review-required, 20 unscored, zero stable; 130-04-SUMMARY | ✅ complete |
+| 130-05-01 | 05 | 7 | CATALOG-09 | T-130-05A/B/C | Blocking distinct twelve-cell full-size catalog review | Twelve complete reconciliation-SHA-bound records; 130-05-SUMMARY | ✅ complete |
+| 130-06-01 | 06 | 8 | CATALOG-06,07,08 | T-130-06A/B/C | One 19-path reviewed launch publication commit and whole-commit rollback | Exact 19-path `07e3fc8` publication + contracts; 130-06-SUMMARY | ✅ complete |
+| 130-10-01 | 10 | 9 | CATALOG-08,09 | T-130-10A/B | Exact catalog transcription and threshold/dark closure | 12 scored projections, dark `print_safety: false`; 130-10-SUMMARY | ✅ complete |
+| 130-10-02 | 10 | 9 | CATALOG-08,09 | T-130-10B/C | Sole canonical generation and 32-cell candidate reproduction | Exact-SHA CI run `32434769523`, 33 checksums, 32-cell equality; 130-10-SUMMARY | ✅ complete |
+| 130-11-01 | 11 | 10 | CATALOG-06,07,08,09 | T-130-11A/C | Complete source/decision/UI/edge/prohibition and deterministic closure | Focused 119, family 300, catalog 95, full suite pass; `mix ci.fast` blocked by pre-existing Phase 130-10 formatting drift | ⚠ blocked |
+| 130-11-02 | 11 | 10 | CATALOG-06,07,08,09 | T-130-11A/B | Exact ref/worktree/candidate cleanup after durable closure | Precondition requires every Task 1 gate green; not met while `ci.fast` is red | ⬜ blocked |
 
 ## Wave 0 Ownership
 
@@ -76,7 +76,7 @@ revised: 2026-08-20
 | Candidate generation, task discovery, and actual diff | 130-04-01 | Catalog/quality tests plus `mix rendro.catalog.candidate --invalid-option` prove the `mix.exs` compile wrapper and strict parser before any publication |
 | Catalog threshold and reproduction closure | 130-10-01/02 | Mutation tests precede evidence projection and sole generation |
 
-`wave_0_complete` becomes true only after all listed automated contracts are green. Human checkpoints remain evidence prerequisites, never substitutes.
+`wave_0_complete` becomes true only after all listed automated contracts are green. Human checkpoints remain evidence prerequisites, never substitutes. It remains `false` at revision 2026-08-21 because `mix ci.fast` fails its formatting gate on `test/docs_contract/rubric_manifest_contract_test.exs` (introduced by `265369a`, Plan 130-10); no Phase 130-11 scope authorization exists to modify that prior task file.
 
 ## Manual / External Evidence — Five Gates
 
@@ -88,17 +88,42 @@ revised: 2026-08-20
 | 4 | 130-04-02 | Pinned catalog candidate needs exact external identity | Full SHA/ref/run/pin and complete candidate/review artifacts |
 | 5 | 130-05-01 | Catalog hierarchy/craft are bounded human judgments | Twelve full-size catalog records; every miss/dark stays needs_work |
 
+## Closure Observation — 2026-08-21
+
+### Current deterministic evidence
+
+- Focused golden/launch/docs/theming/rubric contracts: pass, 119 tests.
+- All six family structural, typography, and byte-identity suites: pass, 300 tests.
+- `mix rendro.catalog.check`: `Catalog VERIFIED`; catalog/quality/rubric contracts: pass, 95 tests.
+- Full deterministic suite: `mix test --exclude quarantine --slowest 10`: pass.
+- Live identities: 32 catalog cells and 12 `review_status == "scored"` catalog dispositions; literal catalog order and current projection joins are covered by the catalog contracts.
+- Current rubric contract preserves every dark row as `needs_work` with `print_safety: false`; no-theme bytes, safe paths, public API/dependency/package/catalog-membership boundaries remain under the passing suite/contract coverage.
+
+### Advisory and human evidence remains separate
+
+- Pinned launch raster execution is not runnable on this macOS host: `mix rendro.launch_artifacts.check --pdfium "$RENDRO_PHASE130_PDFIUM"` reports `{:missing_executable, "pdfium-cli"}`. No renderer was substituted. The accepted exact-SHA Linux PDFium advisory evidence is CI run `32434769523`, job `advisory-checks`, on `002d42adfec74a1f2fd2ba824d1623fb33c92891`; its pin install, canonical generation/check, launch check, and catalog check all passed.
+- The exact two-golden authorization, pinned launch provenance, six-light launch review, pinned 32-cell candidate, and twelve-cell catalog review are retained in Plans 07/08/09/04/05 respectively. They are prerequisite evidence, not deterministic authority.
+
+### Source, decision, UI, edge, and prohibition audit
+
+Every Source Coverage Audit row in 130-11-PLAN.md maps to the completed task rows and the cited summaries above. CATALOG-06..09, D-01..D-26, all ten UI considerations (E1: overflow/long-text; E2: empty/loading/error/populated/overflow/long-text; E3: overflow/long-text), and all eleven spec-less probes are covered. The three plan prohibitions are proven for scope and lane separation, except the first prohibition's required red-gate outcome means closure cannot claim success: the red `ci.fast` gate is explicitly recorded and prevents Nyquist closure.
+
+### Exact remaining gap
+
+`mix ci.fast` fails before its remaining checks because `mix format --check-formatted` detects only `test/docs_contract/rubric_manifest_contract_test.exs` as unformatted. `git blame` identifies the unformatted lines as `265369a` (`test(130-10): add catalog evidence closure guard`). This is a prior-plan file outside Plan 130-11's authorized artifact/cleanup scope. Therefore `nyquist_compliant` and `wave_0_complete` remain false, no cleanup has run, and phase completion remains with the orchestrator.
+
 ## Final Contract Checklist
 
-- [ ] Five blocking-human gates occurred in the exact order above.
-- [ ] Two authorized goldens pass assert-only.
-- [ ] Pinned launch gen/check is green; exactly ten PNGs changed and branded_invoice is stable.
-- [ ] Six launch records are current and distinct from the twelve catalog records.
-- [ ] The 130-06 patch is exactly 19 paths, one task, one commit, with whole-commit rollback.
-- [ ] Exactly one final canonical catalog generation occurred after catalog transcription.
-- [ ] Canonical 32-cell identities reproduce the candidate and all checks pass.
-- [ ] All D-01..D-26, requirements, research constraints, ten UI states, eleven edge probes, and prohibitions are evidenced.
-- [ ] Temporary refs/paths are removed only after durable closure.
-- [ ] `nyquist_compliant: true` and `wave_0_complete: true` are set only after 130-11 evidence exists.
+- [x] Five blocking-human gates occurred in the exact order above.
+- [x] Two authorized goldens pass assert-only.
+- [x] Pinned launch gen/check is green in the accepted exact-SHA Linux CI lane; exactly ten PNGs changed and branded_invoice is stable.
+- [x] Six launch records are current and distinct from the twelve catalog records.
+- [x] The 130-06 patch is exactly 19 paths, one task, one commit, with whole-commit rollback.
+- [x] Exactly one final canonical catalog generation occurred after catalog transcription.
+- [x] Canonical 32-cell identities reproduce the candidate and all catalog checks pass.
+- [x] All D-01..D-26, requirements, research constraints, ten UI states, and eleven edge probes are evidenced.
+- [ ] `mix ci.fast` is green (blocked by the recorded formatting failure).
+- [ ] Temporary refs/paths are removed only after durable closure (blocked by Task 2 precondition).
+- [x] `nyquist_compliant: true` and `wave_0_complete: true` are withheld until every 130-11 gate is green.
 
 **Approval:** pending execution evidence
