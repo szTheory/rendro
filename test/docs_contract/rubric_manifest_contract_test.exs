@@ -14,6 +14,69 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
   @non_prose_fixture_path "test/fixtures/quality/rubric_scores_phase130_non_prose.json"
   @sign_off_path "priv/quality/SIGN-OFF.md"
   @justification_keys ~w(information_architecture content_hierarchy domain_fit reader_affordances typographic_craft restraint_cohesion)
+  @phase130_expected_gzip_base64 "H4sIAAAAAAAC/+2cW2/lyHHHvwohBMiLuGTf2N3xk50NFgmQxIn9EgSBti/VEj085FmSZ7THwX73VDXPTdLhzEi7zszaAwPjI5Jd" <>
+                                   "XX371Z/Vzf3v/70JbnbdcH/Xxpt/uGn790MboCwDRDeWm928cx3+NYzbYXQzlKFz09SGsuza+4f55vYmuU3b7c9F8ZIfXU/GLm3g" <>
+                                   "5e0IE8x0/bk1vLkZIuCto1V430boA9yNkPAyPgXzVI3Qx3GoDh5Xhxqry3qql65mm99s+3vyob+/mx4cVw1ZdQ2XSnMZkzdBO5VS" <>
+                                   "I2KIMclaCFXL1EgjwViBT9raeB6ZtTFY5oVIJqK9adiN6OU2prPZ2kYWhY3SWsZT5DHQ47VTCpTyQdhahMQF1tSAcR6aBlgTQh09" <>
+                                   "k0Y4gWZHwGZEiHeO+ovXvClrU/I633rfwuPdNLt5N+HNCZ8EciW2G+indujv8iW8h2M79DP0891DC6MbwwOOk8Inh41r+7vUonF5" <>
+                                   "iwOXhnHjZipKD7UzhHk3Qr45gosw3rmEz0SHIzIdLk/ziEbmuzA8ANWaL8/77XA/uu1DG+7C6BJV8NPtzT0OB47ktOvm7NZ2pJKT" <>
+                                   "SzCjR/O4g6WiFkeH2j0uF7HklkY+Hp+Z2vseO2VI6c7TlPsXrPbJ1Zfd9afdNLepDbl5ufL15t6007SD8TSvfNt15TzcFvjIZrot" <>
+                                   "3GbY9XPRuYgu4p99LOIOioitK8hmAT9u0RbEYh62ZRwe++J+HHbb6Rt05MpQ3PgOi/9xwNlcfIu/2qnY9e0PO+j2WMl4j338tBKc" <>
+                                   "FhBhKtrNBmKLV/BBD93wSBVcjupxMRb9buOxRVT62JxqhnEzVT/M+wrHAZs57fxMPlSz+7FaflGNboQCnX6PTmNXue6bm+uz4abD" <>
+                                   "OdxN2dPN0MMeS3W7TY9XcOX1SwtgCmO7JUPFI86PqcD5Sw/2M/oMkWxfmTt0DYopuA6yGWwNoMvFjH7MONvno5NTO1HnFo/t/FD0" <>
+                                   "QxG6drvF2YRDl3s9NwA7a9thdUtDXs7fG3S+cCFku1jbtHXjROY322Fqs+8Hrx9gPD60dXtypExD2E3UkJ+yceyBPMEWfBmu6lo1" <>
+                                   "qQ7Jc2gsMJYaA8pL1XCbouFOA/eMJvNuC1grdtjdX4aBP92+Gfl4+90vTvyD0V+ysWTyGu+1MykqqVN03ggmvYgq1JY7xwXzLFgh" <>
+                                   "BY/R+1poljQzdTD4b9MEg0D3fIX3qnZSMeW0d0JqW9dOQNBGRmui5xhWjEFLNUtMYEVBqIjxAWormkYGwOZ+6bwX19eLuLpmxUd5" <>
+                                   "n1w3fRT4h4f+0sSf3AYOkEa6UjchgtEf7O4eZ0kHa+g+U3spNhXzA2BZt/Ht/W7YTRgRkFuHmPGCz2nXdcUR0q5387DZnyzlZbMU" <>
+                                   "ugrcf8ZwVP0H8vv3xG+EGtZ2GbMW3B+xXhz5jKjEUFFSa0ZHoeWeapsL37nwbiEe3ifc9j0OzBqTNziq7RaJjOsPYpWtY8DrMS65" <>
+                                   "7XYcXHjIfeHRKvXsgv8tdjrB2IV5iQubUwuvkLhz+2E3V0cYP4W8383Y0YCBqTi15RHcO1wNxdHGl8rhE5peYJgWOORQUtL0RgR3" <>
+                                   "EO9hLMtN27cb/BuD63BFd58KXnD4iYVLEF/aeqPqPtVXPamleuLmquZWHLvfoIJ2vrFWKMls0jWqZRGjjAp47ThzUXoFQkOKumY1" <>
+                                   "B0D9HISpmV5hsLapSSB4o6zgDLGrZKNr7z3KeRu9sDxEui8YV2CNrVVsYuJgfXJSevvlMFi9SnOrX73mxjVOhKxwubVDrIYtEHyq" <>
+                                   "0KHmwv9fJhfCtCM2EVdonPrQdm02hwIMJR/pPgRGZg72UXh34Nc1ch8s47Md9e0T1Y2j1PYOGYNxgOoiTJePbcQqPK6sFxjfuOkd" <>
+                                   "yv1DG26LpRG3R9v4zrB0FCpW10/IPuqQ5c1h3GXKntz4ZLmd6YkmH/LNqVoizHRQoyRMaXL8GZ+gXomje8RQWiDPEEUzORI+BHdc" <>
+                                   "vE8iVzbrh7gvTo/vF187cP1vci+RQiau597+cT7FMXL/GEOvYt7hREEpjX3RwVRRDx+6gZ54v2h+5Py4L6DLyDk2Y3o2C1Zwn5yJ" <>
+                                   "tQvOiBrBogOTsTEBUnDJNQpqXjdSBvcG3L8Sgm+m/XPJ/QvA/jWC+5OauSa3GxGtVBL/ENJDXScvfaNUkrXRVmG0VcoklMXIXxO5" <>
+                                   "aXSDj+hGa+20MEytoD7UAFa6JIPXyTlmgaR3gwU4DiqivwaZsGbpLKsZBOsCNFLpxteBcxu/yu3PJ7cPoCznoTxwj34eGI9N3uUH" <>
+                                   "TwD5NCn+HOjn0s+o/gLfp+n9QoIT0jqYYZXC35LE/vac1qh+m3FZ/e7gxMPS3QuWp2EDJzrmfwhzPaBSPKvkW6w87gjOWYIfUbcu" <>
+                                   "wynRdDRKtSwB4ayJqY737dR67IJFL6+C+LCerwzBM919Mt72pzthT28sFLimHDA/JsI/M5XXJTil13A0y3I7bLf7Evu0vKeuKsuH" <>
+                                   "3cb12Ngr8vtQ6ILHz0pfEvlo543S+1BX9ayG6uTequw2yExTG6cihxgtcMutZID49Y0IlH4W0hhnWJO0wwFAmkKIKmhXO42IXWGx" <>
+                                   "lbWrbUiSCy1w+GopNNcKK2qAQe2jkanRIuoAFulsmWAhuWBS0pY56b942a3+WmX3BvBvZOKSK8gJ7sqNKBg3MLdhSQMXWPTwMr8d" <>
+                                   "sBnlkMqJcrHEpw8nRtolH4JLH4rYTlt8oS+XPC4O/0sQv/Sm/XN2+2lyeutayq1TBVkn4mxAui15cVwXR4qvQvsoVC8y1iOtmPKo" <>
+                                   "qU9aGpX6+5yGRzNYY25MrngNx6i46XXlEcheNW2zyl5LT7vHd49uRF2NXr6bVqlMlf6wawELunGT30AqksoFBg5Ec4uOYseGRSfn" <>
+                                   "7u7a7YX6XkyuJaWjVqC5T4ozVQtmhNOIBykM97QJZkLiqJiSfgOHX8GpN0H4uSr+mQx+jSL+aNPW1LCVgglpvbS1CR4ECONVI21K" <>
+                                   "gblGB+G99Zw3LARvk6HfYHWD+Gy8kS6sEFg2jEepYm1j0pF54xyWjjEmbkwIBv+HPFcmmhQjjmZSDEc2xjo2TDMHf2sE/uKSz0cm" <>
+                                   "XWQIiglQuB5yE6e9vk8H7vL+fhW0z0hJxT4qdR1KuosNvFPG4SJeLMlluM80zq/xC1CX/ACOwDAWtDDO+jEC9lI7kwNHjToC8n38" <>
+                                   "5M3AJzr350H2jMrFy2k3Yu/BAtt2OiUkvjyQrovZAONhJkJZ0rYpTqK+dOM8lQkomTY9tNuyxLk1D2NLO34vpO2FiQu0rtm6ZOzJ" <>
+                                   "6huF7kXN1Vp91dn1VdkroxcNkyaiSlUsCVM3PIBLHlSNSjfUtZQxNFYo5hQw03hKHQRnDdhYN80KdAWiEwsxoZy1PjVCGZEallDW" <>
+                                   "8mB8oymzbALOcdZIVNHKRYnzwDbIeg3af802fy7Zi93eblt6QyTxSLlWlJaU3jzsmdFrI06q/XKewxW0/wQjvWjjv/j62NJL8oHO" <>
+                                   "a0D+pw56V/zrMCKpJsLH4SzHbXGuM6dPR4TeRHlMfPcnyKImPZ3xeEHuDlcfwg8R6OYZaHJQpMjZhZPT1MOFm8jvozS+WEm3BSXJ" <>
+                                   "7x+QvV3rYVzOjxzejdc187EHpj1GohlrOeVg3YWlyw4iO6s6GVdzKk7dtWxeHmPghCEwJ5svBuIZ3TP5KfW8CvR76GGkDdhHGnhS" <>
+                                   "4ku8OPlPFilPsf+oRNa1dMp4pqUGHhN4pAbqtyCxn6zkUguN77XyLamKNxPuFwD9c/n8i3L+NWL6lZ2wJq2DAYEIriFZEVTg2jNu" <>
+                                   "HA6Us15pawFqfDAxwPhcO4wGvrEcDFdBCh0VX000uyAM1DWXRumguPEeUEQLLURSUafoPZfRAXhtFRjGao9BwUXOkmmE/Fuj/Jck" <>
+                                   "rb9y/ivnf42cX9fzW7en9E5Z9jgmDx02psR72FttmMpyemyn6YqEP5S6wPqV4pdEz4beqNoPlVVXqqgWB1eFegjOaWaCtE44G4iy" <>
+                                   "yVoufCNYHbwMnCtpmHdNZLVQwkiLPLd1pOMjHswKwp0xHpjWJiUIGAk4WmRSq6ZhqPi9aaL0xgttNMN3AhO0sIJbr/F9wOK7Afxa" <>
+                                   "9wrlG/cKP0Wo/z8RHDbbbtjDWB1+wPGESA9ziTOtmmlPkObgk+MgC0ZGvDrjws8n+5aMwjWC/5245Up8o+rjeY9/g7n4vdvnVOvV" <>
+                                   "gyEvcH3FTSxPQWaqKE1Le4BVpI29JXcSdiMd0aj+64/fVujdNFF7Pv3wB47kBhtU/OPZTPHedTs4nL+ms3klLb1jjjsf6Xt+WOI6" <>
+                                   "sv99S4QnLxHQGMv2t8V/DjtC/vAe79xTIgc27W5zW/xhCBQA2n7ajeQaPglzOy57qTkx0/oM2OWsy+Gw5KkX8hnwY4Km2/+mcPFP" <>
+                                   "bjnqd0zAY4fMGRareZvTGfD2Mtd9Cn55emDgwnU4X2xQzsP2I/uTAlTtTNPUMkSDbKmjbfCa0JIFFqR33kFwLL0hGLwGkG8LAM+l" <>
+                                   "/c/l/2vU/Mdbt3owG6QNCpV70txLHWoWYw3WpMbb2mIUFlpz12D3Ry8YQ7lfC+x1bq02ghm5Qv8kfLDGNl5KyxxPljWGvvkBDU4n" <>
+                                   "730SgIvMWvzNlEysqRlWoUALz9GDL57+/K/3pMhX/F/fwKQva86HSzy2fvPiJAkpYmRf3g/IWwxL0KiIuhQ8FjQe9glvaZcXSHxi" <>
+                                   "O9sNpeCPR1A+dAp8Ofa9fMtDvfX8QPbhMP2S24cPZt+3+P40zznRnjV99uTZuZMnB9cX/8PDSG3/tJPfnxXq66IeH3qH87l0uxFf" <>
+                                   "I5H+76Es/bjDR66fNlkKXOD8ouQlxk823ijll3qqC+vV2a1VFR+1QlHtVUjOB94EbwUSXaJejy6gzEYpr1NQKNoZpMAapZzkxjdO" <>
+                                   "oRBnul5LxIiIyj/xKLgxTAnpHOVeJAOwAi2x2OjoQTRSp9rIIDlnQTUeKc+ETfariv98GCem3S7HFDb5J846+nqOvjucd37Rh/mL" <>
+                                   "xEzBSAunD/P5U8oPf0FJynQ57Hyq4gBrJDAqyPmwWXiq9SXByUOc7xtE99FENYHbVGdPF//OWRf81aFm3eDipqCzLJZVaB+2QDeo" <>
+                                   "qIs/wLLDmzV78f13v/3+wFAcv6GYYOtykuX7776vvsd7hJPpdLwDYwxK2e9yFiYHgnw6JrcxC+qs9V1Bk+N0ROfqRiraegf7iy6b" <>
+                                   "B2To309P90zPonk74Lp/oMhBW7DZzAeJ/kA2aPM0j3H1uyM5kO/Dkps5hIfjp5TXoe2t5olZmejMmrBcQcQVHeqQVBKIb3xzp6PA" <>
+                                   "/g3Q/kS+vRrYz/X3z+D1a6T3B5uzej7bonSOmlvTRFEHqI2VRiYjfO0tF1YHRfucgNRuQhMV9wacTD4BaxoLa5ujrgFKzkitoxU4" <>
+                                   "OqwJzrNaquiQz0EKAUwq65gLInAQIsRg61obFSQOp/uqur/i+nPj+gRmSln7DOF8rOSJDF0yLC/qRY4vMrpI9NRugjUOH4JCmemb" <>
+                                   "q9vmQ4M5kZP/MwLnr2k+9ST3M8JO56/VSUYvX+scj3BvjifmsVk4Lh+R0J+Lxmf1/D//Bxo/W+GuRAAA"
+
+  defp phase130_expected_records do
+    @phase130_expected_gzip_base64
+    |> Base.decode64!()
+    |> :zlib.gunzip()
+    |> JSON.decode!()
+  end
 
   defp manifest do
     @manifest_path
@@ -190,70 +253,44 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
     end
   end
 
-  test "Phase 130 transcribes the twelve reviewed catalog records with frozen dark boundaries" do
-    dispositions = manifest()["catalog_dispositions"]
+  test "Phase 130 literally pins all twelve reviewed catalog records and current sign-off evidence" do
+    scored = Enum.filter(manifest()["catalog_dispositions"], &(&1["review_status"] == "scored"))
+    assert scored == phase130_expected_records()
 
-    expected = %{
-      "invoice--cedar-mutual--corporate-classic--light" => {"4/5/4/4/4/4", true},
-      "invoice--cedar-mutual--corporate-classic--dark" => {"4/5/4/3/3/3", false},
-      "statement--signal-ledger--minimal-mono--light" => {"5/5/4/4/4/5", true},
-      "statement--signal-ledger--minimal-mono--dark" => {"4/5/4/3/3/3", false},
-      "receipt--poppy-and-grain--humanist--light" => {"5/5/4/5/4/5", true},
-      "receipt--poppy-and-grain--humanist--dark" => {"5/5/4/5/4/5", false},
-      "certificate--meridian-arts-fellowship--editorial--light" => {"5/5/4/4/4/5", true},
-      "certificate--meridian-arts-fellowship--editorial--dark" => {"5/5/4/4/4/5", false},
-      "payslip--northline-logistics--swiss--light" => {"4/5/4/3/3/4", false},
-      "payslip--northline-logistics--swiss--dark" => {"4/5/4/2/3/3", false},
-      "ticket--aurora-live--brutalist--light" => {"4/5/4/3/3/4", false},
-      "ticket--aurora-live--brutalist--dark" => {"4/5/4/2/3/3", false}
-    }
+    assert Enum.map(scored, & &1["catalog_id"]) ==
+             Enum.map(phase130_expected_records(), & &1["catalog_id"])
 
-    scored = Enum.filter(dispositions, &(&1["review_status"] == "scored"))
-    assert MapSet.new(Enum.map(scored, & &1["catalog_id"])) == MapSet.new(Map.keys(expected))
-
-    for disposition <- scored do
-      {scores, expected_passed} = Map.fetch!(expected, disposition["catalog_id"])
-
-      assert disposition["dimension_scores"]
-             |> Map.take(
-               ~w(information_architecture content_hierarchy domain_fit reader_affordances typographic_craft restraint_cohesion)
-             )
-             |> then(fn dimensions ->
-               ~w(information_architecture content_hierarchy domain_fit reader_affordances typographic_craft restraint_cohesion)
-               |> Enum.map_join("/", &Integer.to_string(dimensions[&1]))
-             end) == scores
-
-      assert disposition["passed"] == expected_passed
-
-      assert disposition["passed"] ==
-               passed?(disposition["dimension_scores"], disposition["gate_results"])
-
-      assert disposition["signed_off_by"] == "Jon"
-      assert disposition["signed_off_at"] == "2026-08-20"
-      assert is_binary(disposition["supersedes_evidence_ref"])
-      assert is_binary(disposition["resolution_ref"])
-    end
-
-    for disposition <- scored, disposition["mode"] == "dark" do
-      refute disposition["passed"]
-      refute disposition["gate_results"]["print_safety"]
-    end
-
-    humanist_dark =
-      Enum.find(scored, &(&1["catalog_id"] == "receipt--poppy-and-grain--humanist--dark"))
-
-    assert humanist_dark["justifications"]["reader_affordances"] ==
-             "all descriptions/amounts/arithmetic are legible and aligned; the prior dark contrast deficit is visibly repaired."
+    assert Enum.count(scored, & &1["passed"]) == 4
+    assert Enum.count(scored, &(not &1["passed"])) == 8
 
     sign_off = File.read!(@sign_off_path)
     {current_heading, _} = :binary.match(sign_off, "## Phase 130 catalog review")
     {historical_heading, _} = :binary.match(sign_off, "## Phase 127 catalog flagship review")
-
     assert current_heading < historical_heading
-    assert sign_off =~ "1646eeb8875cc67d7d452d3f28bc2b0d6503f943a2a6775f7e256a3e51bb3f22"
-    assert sign_off =~ "Statement endpoints close at `$7,500`"
-    assert sign_off =~ "line 41 is neither asserted nor denied"
-    assert sign_off =~ "historical; superseded by Phase 130 above"
+
+    for record <- phase130_expected_records() do
+      assert sign_off =~ "`#{record["catalog_id"]}`"
+      assert sign_off =~ "`#{record["png_sha256"]}`"
+      assert sign_off =~ "`#{record["source_pdf_sha256"]}`"
+    end
+
+    for expected <- [
+          "1646eeb8875cc67d7d452d3f28bc2b0d6503f943a2a6775f7e256a3e51bb3f22",
+          "411cdcafa5d3090f3d0ec144c0cba59d991ba99f",
+          "30657d92cf8be49f30094c57aaf163b76bd0ad9c",
+          "gsd/phase130-candidate-route-411cdcafa5d3090f3d0ec144c0cba59d991ba99f",
+          "32417257428",
+          "pdfium-cli v0.11.0",
+          "b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a",
+          "content_hierarchy == 5 AND every other dimension >= 4",
+          "Statement endpoints close at `$7,500`",
+          "line 41 is neither asserted nor denied",
+          "historical; superseded by Phase 130 above"
+        ] do
+      assert sign_off =~ expected
+    end
+
+    assert length(Regex.scan(~r/true\/false; needs_work/, sign_off)) == 6
   end
 
   test "threshold-arithmetic correctness, not the subjective score" do
