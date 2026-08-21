@@ -268,11 +268,27 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
     {historical_heading, _} = :binary.match(sign_off, "## Phase 127 catalog flagship review")
     assert current_heading < historical_heading
 
-    for record <- phase130_expected_records() do
-      assert sign_off =~ "`#{record["catalog_id"]}`"
-      assert sign_off =~ "`#{record["png_sha256"]}`"
-      assert sign_off =~ "`#{record["source_pdf_sha256"]}`"
-    end
+    {_, last_row_offset} = {nil, current_heading}
+
+    Enum.reduce(phase130_expected_records(), last_row_offset, fn record, prior_offset ->
+      scores =
+        ~w(information_architecture content_hierarchy domain_fit reader_affordances typographic_craft restraint_cohesion)
+        |> Enum.map_join("/", &Integer.to_string(record["dimension_scores"][&1]))
+
+      gates =
+        "#{record["gate_results"]["reading_order"]}/#{record["gate_results"]["print_safety"]}; " <>
+          if(record["passed"], do: "pass", else: "needs_work")
+
+      expected_row =
+        "| `#{record["catalog_id"]}` | `#{record["png_sha256"]}` | `#{record["source_pdf_sha256"]}` | #{scores} | #{gates} |"
+
+      {offset, _} = :binary.match(sign_off, expected_row)
+
+      assert offset > prior_offset,
+             "Phase 130 SIGN-OFF rows must retain canonical light-then-dark order"
+
+      offset
+    end)
 
     for expected <- [
           "1646eeb8875cc67d7d452d3f28bc2b0d6503f943a2a6775f7e256a3e51bb3f22",
@@ -280,17 +296,22 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
           "30657d92cf8be49f30094c57aaf163b76bd0ad9c",
           "gsd/phase130-candidate-route-411cdcafa5d3090f3d0ec144c0cba59d991ba99f",
           "32417257428",
-          "pdfium-cli v0.11.0",
+          "attempt `1`",
+          "job `candidate-evidence`",
+          "advisory job `96581121473`",
+          "adapter `pdfium-render`, executable `pdfium-cli v0.11.0`",
           "b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a",
-          "content_hierarchy == 5 AND every other dimension >= 4",
+          "passed = content_hierarchy == 5 AND every other dimension >= 4 AND reading_order == true AND print_safety == true",
+          "Four light rows pass; eight rows remain `needs_work`.",
+          "Every dark row is screen-oriented and non-print-safe because `print_safety: false`",
           "Statement endpoints close at `$7,500`",
+          "Supplied Invoice endpoints show lines 1–40 and 42–65",
           "line 41 is neither asserted nor denied",
+          "deterministic-test evidence only",
           "historical; superseded by Phase 130 above"
         ] do
       assert sign_off =~ expected
     end
-
-    assert length(Regex.scan(~r/true\/false; needs_work/, sign_off)) == 6
   end
 
   test "threshold-arithmetic correctness, not the subjective score" do

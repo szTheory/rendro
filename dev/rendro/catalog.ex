@@ -796,11 +796,10 @@ defmodule Rendro.Catalog do
 
   defp exact_justifications?(justifications) when is_map(justifications) do
     required =
-      MapSet.new(
-        ~w(information_architecture content_hierarchy domain_fit reader_affordances typographic_craft restraint_cohesion)
-      )
+      ~w(information_architecture content_hierarchy domain_fit reader_affordances typographic_craft restraint_cohesion)
+      |> Enum.sort()
 
-    MapSet.new(Map.keys(justifications)) == required and
+    Enum.sort(Map.keys(justifications)) == required and
       Enum.all?(justifications, fn {_dimension, value} -> concrete?(value) end)
   end
 

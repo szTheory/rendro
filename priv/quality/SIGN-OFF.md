@@ -87,7 +87,7 @@ binary is not executable on this macOS host.
 
 ## Phase 130 catalog review · 2026-08-20 (current)
 
-This is the current catalog-review authority, reconciled to SHA-256 `1646eeb8875cc67d7d452d3f28bc2b0d6503f943a2a6775f7e256a3e51bb3f22`. Candidate/source SHA is `411cdcafa5d3090f3d0ec144c0cba59d991ba99f`; route/ref is `30657d92cf8be49f30094c57aaf163b76bd0ad9c` / `gsd/phase130-candidate-route-411cdcafa5d3090f3d0ec144c0cba59d991ba99f`; run `32417257428`, attempt `1`, job `candidate-evidence`. The review used `pdfium-render`, `pdfium-cli v0.11.0`, executable SHA-256 `b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a`.
+This is the current catalog-review authority, reconciled to SHA-256 `1646eeb8875cc67d7d452d3f28bc2b0d6503f943a2a6775f7e256a3e51bb3f22`. Candidate/source SHA is `411cdcafa5d3090f3d0ec144c0cba59d991ba99f`; route/ref is `30657d92cf8be49f30094c57aaf163b76bd0ad9c` / `gsd/phase130-candidate-route-411cdcafa5d3090f3d0ec144c0cba59d991ba99f`; candidate run `32417257428`, attempt `1`, job `candidate-evidence`; advisory job `96581121473`. The review used adapter `pdfium-render`, executable `pdfium-cli v0.11.0`, executable SHA-256 `b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a`.
 
 `passed = content_hierarchy == 5 AND every other dimension >= 4 AND reading_order == true AND print_safety == true`. Four light rows pass; eight rows remain `needs_work`. Every dark row is screen-oriented and non-print-safe because `print_safety: false`; this makes no print, accessibility, PDF/UA, or WCAG claim.
 
