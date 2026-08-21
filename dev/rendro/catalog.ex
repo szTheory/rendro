@@ -734,25 +734,7 @@ defmodule Rendro.Catalog do
       "catalog #{id}: source PDF hash is stale; deliberately rebind this artifact"
     )
     |> Kernel.++(review_status_errors(id, disposition))
-    |> Kernel.++(promotion_evidence_errors(id, disposition))
   end
-
-  defp promotion_evidence_errors(id, %{"passed" => true} = disposition) do
-    cond do
-      not concrete?(disposition["supersedes_evidence_ref"]) ->
-        [
-          "catalog #{id}: passed disposition needs a concrete prior or superseded evidence reference"
-        ]
-
-      not concrete?(disposition["resolution_ref"]) ->
-        ["catalog #{id}: passed disposition needs a non-empty behavioral resolution_ref"]
-
-      true ->
-        []
-    end
-  end
-
-  defp promotion_evidence_errors(_id, _disposition), do: []
 
   defp review_status_errors(id, %{"review_status" => "unscored", "reason" => reason})
        when is_binary(reason) do
@@ -780,25 +762,54 @@ defmodule Rendro.Catalog do
       passed != rubric_passed?(scores, gates) ->
         ["catalog #{id}: passed must match the rubric thresholds; correct the recorded verdict"]
 
-      passed and not concrete?(disposition["signed_off_by"]) ->
-        ["catalog #{id}: passed scored disposition needs a non-empty signed_off_by"]
-
-      passed and not concrete?(disposition["signed_off_at"]) ->
-        ["catalog #{id}: passed scored disposition needs a non-empty signed_off_at"]
-
-      concrete?(disposition["supersedes_evidence_ref"]) and
-          not concrete?(disposition["resolution_ref"]) ->
-        [
-          "catalog #{id}: a superseded evidence transition needs a non-empty behavioral resolution_ref"
-        ]
-
       true ->
-        []
+        scored_evidence_errors(id, disposition)
     end
   end
 
   defp review_status_errors(id, _),
     do: ["catalog #{id}: review_status must be scored or unscored; correct the reviewer record"]
+
+  defp scored_evidence_errors(id, disposition) do
+    []
+    |> add_unless(
+      concrete?(disposition["signed_off_by"]),
+      "catalog #{id}: scored disposition needs a non-empty signed_off_by"
+    )
+    |> add_unless(
+      valid_iso_date?(disposition["signed_off_at"]),
+      "catalog #{id}: scored disposition needs a valid ISO calendar signed_off_at date"
+    )
+    |> add_unless(
+      exact_justifications?(disposition["justifications"]),
+      "catalog #{id}: scored disposition needs exactly the six non-empty justification dimensions"
+    )
+    |> add_unless(
+      concrete?(disposition["resolution_ref"]),
+      "catalog #{id}: scored disposition needs a non-empty behavioral resolution_ref"
+    )
+    |> add_unless(
+      concrete?(disposition["supersedes_evidence_ref"]),
+      "catalog #{id}: scored disposition needs a concrete prior or superseded evidence reference"
+    )
+  end
+
+  defp exact_justifications?(justifications) when is_map(justifications) do
+    required =
+      MapSet.new(
+        ~w(information_architecture content_hierarchy domain_fit reader_affordances typographic_craft restraint_cohesion)
+      )
+
+    MapSet.new(Map.keys(justifications)) == required and
+      Enum.all?(justifications, fn {_dimension, value} -> concrete?(value) end)
+  end
+
+  defp exact_justifications?(_), do: false
+
+  defp valid_iso_date?(value) when is_binary(value),
+    do: match?({:ok, _}, Date.from_iso8601(value))
+
+  defp valid_iso_date?(_), do: false
 
   defp projection_errors(%{"quality" => quality} = cell, disposition) do
     if quality == quality_projection(disposition),

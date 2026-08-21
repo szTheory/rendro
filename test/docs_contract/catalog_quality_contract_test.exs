@@ -3,6 +3,13 @@ defmodule Rendro.DocsContract.CatalogQualityContractTest do
 
   alias Rendro.Catalog
 
+  @rubric_path "priv/quality/rubric_scores.json"
+  @catalog_manifest_path "assets/rendro/catalog.json"
+  @justification_keys ~w(information_architecture content_hierarchy domain_fit reader_affordances typographic_craft restraint_cohesion)
+
+  defp checked_in_rubric, do: @rubric_path |> File.read!() |> JSON.decode!()
+  defp checked_in_catalog, do: @catalog_manifest_path |> File.read!() |> JSON.decode!()
+
   defp catalog_cells do
     Enum.map(Catalog.catalog_specs(), fn spec ->
       %{
@@ -35,6 +42,44 @@ defmodule Rendro.DocsContract.CatalogQualityContractTest do
   end
 
   defp rubric(dispositions), do: %{"catalog_dispositions" => dispositions}
+
+  defp replace_catalog_disposition(dispositions, replacement) do
+    Enum.map(dispositions, fn disposition ->
+      if disposition["catalog_id"] == replacement["catalog_id"],
+        do: replacement,
+        else: disposition
+    end)
+  end
+
+  defp mutate_scored_record(record, {:delete, field}), do: Map.delete(record, field)
+  defp mutate_scored_record(record, {:blank, field}), do: Map.put(record, field, "")
+  defp mutate_scored_record(record, {:date, value}), do: Map.put(record, "signed_off_at", value)
+
+  defp mutate_scored_record(record, {:delete_justification, key}) do
+    update_in(record, ["justifications"], &Map.delete(&1, key))
+  end
+
+  defp mutate_scored_record(record, {:blank_justification, key}) do
+    put_in(record, ["justifications", key], "")
+  end
+
+  defp mutate_scored_record(record, :extra_justification) do
+    put_in(record, ["justifications", "unsupported_dimension"], "Not approved.")
+  end
+
+  defp scored_evidence_mutations do
+    Enum.map(
+      ~w(signed_off_by signed_off_at resolution_ref supersedes_evidence_ref justifications),
+      &{:delete, &1}
+    ) ++
+      Enum.map(
+        ~w(signed_off_by signed_off_at resolution_ref supersedes_evidence_ref),
+        &{:blank, &1}
+      ) ++
+      [{:date, "not-a-date"}, {:date, "2026-02-30"}] ++
+      Enum.map(@justification_keys, &{:delete_justification, &1}) ++
+      Enum.map(@justification_keys, &{:blank_justification, &1}) ++ [:extra_justification]
+  end
 
   test "exact ordered join accepts one disposition per cell and projects unscored without approval" do
     cells = catalog_cells()
@@ -91,31 +136,33 @@ defmodule Rendro.DocsContract.CatalogQualityContractTest do
     assert Enum.any?(stale_errors, &String.contains?(&1, "#{first["id"]}: PNG hash is stale"))
   end
 
-  test "scored dispositions preserve valid failed evidence and enforce threshold arithmetic" do
-    [cell | rest] = catalog_cells()
+  test "scored passed and failed records fail closed for every incomplete evidence mutation" do
+    rubric = checked_in_rubric()
+    catalog = checked_in_catalog()
 
-    scored =
-      Map.merge(unscored(cell), %{
-        "review_status" => "scored",
-        "dimension_scores" => %{
-          "information_architecture" => 5,
-          "content_hierarchy" => 5,
-          "domain_fit" => 5,
-          "reader_affordances" => 5,
-          "typographic_craft" => 5,
-          "restraint_cohesion" => 5
-        },
-        "gate_results" => %{"reading_order" => true, "print_safety" => false},
-        "passed" => false,
-        "signed_off_by" => "reviewer",
-        "signed_off_at" => "2026-08-17",
-        "justifications" => %{"print_safety" => "Observed a concrete issue."}
-      })
+    for passed <- [true, false] do
+      record =
+        Enum.find(
+          rubric["catalog_dispositions"],
+          &(&1["review_status"] == "scored" and &1["passed"] == passed)
+        )
 
-    assert Catalog.quality_contract_errors(
-             %{"cells" => [cell | rest]},
-             rubric([scored | Enum.map(rest, &unscored/1)])
-           ) == []
+      for mutation <- scored_evidence_mutations() do
+        mutated_record = mutate_scored_record(record, mutation)
+
+        mutated_rubric =
+          Map.put(
+            rubric,
+            "catalog_dispositions",
+            replace_catalog_disposition(rubric["catalog_dispositions"], mutated_record)
+          )
+
+        errors = Catalog.quality_contract_errors(catalog, mutated_rubric)
+
+        assert Enum.any?(errors, &String.contains?(&1, record["catalog_id"])),
+               "#{record["catalog_id"]}: #{inspect(mutation)} must report its catalog ID, got: #{inspect(errors)}"
+      end
+    end
   end
 
   test "candidate cells remain free of projected quality and reviewer sign-off fields" do

@@ -139,8 +139,11 @@
         "passed": { "type": "boolean" },
         "recorded_at": { "type": "string", "format": "date" },
         "stress_exempt": { "type": "boolean" },
-        "signed_off_by": { "type": "string", "minLength": 1 },
-        "signed_off_at": { "type": "string", "format": "date" },
+        "signed_off_by": { "type": "string", "minLength": 1, "pattern": ".*\\S.*" },
+        "signed_off_at": {
+          "type": "string",
+          "pattern": "^(?:(?:(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29)|(?:[0-9]{4}-(?:(?:01|03|05|07|08|10|12)-(?:0[1-9]|[12][0-9]|3[01])|(?:04|06|09|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8]))))$"
+        },
         "evidence_ref": { "type": "string", "minLength": 1 }
       },
       "additionalProperties": true,
@@ -169,17 +172,20 @@
         "dimension_scores": { "$ref": "#/$defs/score_entry/properties/dimension_scores" },
         "gate_results": { "$ref": "#/$defs/score_entry/properties/gate_results" },
         "passed": { "type": "boolean" },
-        "signed_off_by": { "type": "string", "minLength": 1 },
-        "signed_off_at": { "type": "string", "format": "date" },
-        "justifications": { "type": "object", "minProperties": 1 },
+        "signed_off_by": { "type": "string", "minLength": 1, "pattern": ".*\\S.*" },
+        "signed_off_at": {
+          "type": "string",
+          "pattern": "^(?:(?:(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29)|(?:[0-9]{4}-(?:(?:01|03|05|07|08|10|12)-(?:0[1-9]|[12][0-9]|3[01])|(?:04|06|09|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8]))))$"
+        },
+        "justifications": { "$ref": "#/$defs/justifications" },
         "reason": { "type": "string", "minLength": 1 },
-        "supersedes_evidence_ref": { "type": "string", "minLength": 1 },
-        "resolution_ref": { "type": "string", "minLength": 1 }
+        "supersedes_evidence_ref": { "type": "string", "minLength": 1, "pattern": ".*\\S.*" },
+        "resolution_ref": { "type": "string", "minLength": 1, "pattern": ".*\\S.*" }
       },
       "allOf": [
         {
           "if": { "properties": { "review_status": { "const": "scored" } }, "required": ["review_status"] },
-          "then": { "required": ["dimension_scores", "gate_results", "passed", "signed_off_by", "signed_off_at", "justifications"], "not": { "required": ["reason"] } }
+          "then": { "required": ["dimension_scores", "gate_results", "passed", "signed_off_by", "signed_off_at", "justifications", "resolution_ref", "supersedes_evidence_ref"], "not": { "required": ["reason"] } }
         },
         {
           "if": { "properties": { "review_status": { "const": "unscored" } }, "required": ["review_status"] },
@@ -188,18 +194,28 @@
         {
           "if": { "required": ["supersedes_evidence_ref"] },
           "then": { "required": ["resolution_ref"] }
-        },
-        {
-          "if": {
-            "properties": {
-              "review_status": { "const": "scored" },
-              "passed": { "const": true }
-            },
-            "required": ["review_status", "passed"]
-          },
-          "then": { "required": ["supersedes_evidence_ref", "resolution_ref"] }
         }
       ],
+      "additionalProperties": false
+    },
+    "justifications": {
+      "type": "object",
+      "required": [
+        "information_architecture",
+        "content_hierarchy",
+        "domain_fit",
+        "reader_affordances",
+        "typographic_craft",
+        "restraint_cohesion"
+      ],
+      "properties": {
+        "information_architecture": { "type": "string", "minLength": 1, "pattern": ".*\\S.*" },
+        "content_hierarchy": { "type": "string", "minLength": 1, "pattern": ".*\\S.*" },
+        "domain_fit": { "type": "string", "minLength": 1, "pattern": ".*\\S.*" },
+        "reader_affordances": { "type": "string", "minLength": 1, "pattern": ".*\\S.*" },
+        "typographic_craft": { "type": "string", "minLength": 1, "pattern": ".*\\S.*" },
+        "restraint_cohesion": { "type": "string", "minLength": 1, "pattern": ".*\\S.*" }
+      },
       "additionalProperties": false
     }
   }

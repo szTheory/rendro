@@ -11,6 +11,8 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
   @manifest_path "priv/quality/rubric_scores.json"
   @schema_path "priv/schemas/rubric_scores.schema.json"
   @gallery_manifest_path "assets/rendro/artifacts.json"
+  @non_prose_fixture_path "test/fixtures/quality/rubric_scores_phase130_non_prose.json"
+  @justification_keys ~w(information_architecture content_hierarchy domain_fit reader_affordances typographic_craft restraint_cohesion)
 
   defp manifest do
     @manifest_path
@@ -31,6 +33,50 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
     |> File.read!()
     |> JSON.decode!()
     |> JSV.build!()
+  end
+
+  defp non_prose_fixture do
+    @non_prose_fixture_path
+    |> File.read!()
+    |> JSON.decode!()
+  end
+
+  defp replace_catalog_disposition(dispositions, replacement) do
+    Enum.map(dispositions, fn disposition ->
+      if disposition["catalog_id"] == replacement["catalog_id"],
+        do: replacement,
+        else: disposition
+    end)
+  end
+
+  defp mutate_scored_record(record, {:delete, field}), do: Map.delete(record, field)
+  defp mutate_scored_record(record, {:blank, field}), do: Map.put(record, field, "")
+  defp mutate_scored_record(record, {:date, value}), do: Map.put(record, "signed_off_at", value)
+
+  defp mutate_scored_record(record, {:delete_justification, key}) do
+    update_in(record, ["justifications"], &Map.delete(&1, key))
+  end
+
+  defp mutate_scored_record(record, {:blank_justification, key}) do
+    put_in(record, ["justifications", key], "")
+  end
+
+  defp mutate_scored_record(record, :extra_justification) do
+    put_in(record, ["justifications", "unsupported_dimension"], "Not approved.")
+  end
+
+  defp scored_evidence_mutations do
+    Enum.map(
+      ~w(signed_off_by signed_off_at resolution_ref supersedes_evidence_ref justifications),
+      &{:delete, &1}
+    ) ++
+      Enum.map(
+        ~w(signed_off_by signed_off_at resolution_ref supersedes_evidence_ref),
+        &{:blank, &1}
+      ) ++
+      [{:date, "not-a-date"}, {:date, "2026-02-30"}] ++
+      Enum.map(@justification_keys, &{:delete_justification, &1}) ++
+      Enum.map(@justification_keys, &{:blank_justification, &1}) ++ [:extra_justification]
   end
 
   # Test-only pass/fail helper. Mirrors Rendro.Comparison's accumulator style but is
@@ -58,38 +104,46 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
            "#{@manifest_path} failed validation against #{@schema_path}"
   end
 
-  test "schema rejects passed catalog dispositions missing promotion closure references" do
+  test "schema rejects incomplete scored evidence for both passing and failed Phase 130 rows" do
     m = manifest()
 
-    promoted =
-      m["catalog_dispositions"]
-      |> Enum.find(&(&1["review_status"] == "scored"))
-      |> Map.merge(%{
-        "dimension_scores" => %{
-          "information_architecture" => 5,
-          "content_hierarchy" => 5,
-          "domain_fit" => 5,
-          "reader_affordances" => 5,
-          "typographic_craft" => 5,
-          "restraint_cohesion" => 5
-        },
-        "gate_results" => %{"reading_order" => true, "print_safety" => true},
-        "passed" => true,
-        "supersedes_evidence_ref" => "priv/quality/rubric_scores.json#catalog-dispositions",
-        "resolution_ref" => "priv/quality/rubric_scores.json#catalog-dispositions"
-      })
-
-    for field <- ["supersedes_evidence_ref", "resolution_ref"] do
-      mutated =
-        put_in(
-          m,
-          ["catalog_dispositions"],
-          replace_catalog_disposition(m["catalog_dispositions"], Map.delete(promoted, field))
+    for passed <- [true, false] do
+      record =
+        Enum.find(
+          m["catalog_dispositions"],
+          &(&1["review_status"] == "scored" and &1["passed"] == passed)
         )
 
-      refute match?({:ok, _}, JSV.validate(mutated, rubric_schema())),
-             "passed:true catalog disposition missing #{field} must fail schema validation"
+      for mutation <- scored_evidence_mutations() do
+        mutated_record = mutate_scored_record(record, mutation)
+
+        mutated =
+          put_in(
+            m,
+            ["catalog_dispositions"],
+            replace_catalog_disposition(m["catalog_dispositions"], mutated_record)
+          )
+
+        refute match?({:ok, _}, JSV.validate(mutated, rubric_schema())),
+               "#{record["catalog_id"]}: #{inspect(mutation)} must fail schema validation"
+      end
     end
+  end
+
+  test "the independent pre-fix snapshot preserves every non-prose manifest value" do
+    stripped =
+      manifest()
+      |> update_in(["catalog_dispositions"], fn dispositions ->
+        Enum.map(dispositions, fn
+          %{"review_status" => "scored"} = disposition ->
+            Map.delete(disposition, "justifications")
+
+          disposition ->
+            disposition
+        end)
+      end)
+
+    assert stripped == non_prose_fixture()
   end
 
   test "structural enumeration: 6 dimensions, 2 gates, hierarchy/core thresholds" do
@@ -308,13 +362,5 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
     assert MapSet.size(Rendro.EdgeMatrixTest.stress_fixture_ids()) == 62,
            "disjointness must not pass vacuously — the imported stress-fixture set " <>
              "must be the full 62 :applies cells"
-  end
-
-  defp replace_catalog_disposition(dispositions, replacement) do
-    Enum.map(dispositions, fn disposition ->
-      if disposition["catalog_id"] == replacement["catalog_id"],
-        do: replacement,
-        else: disposition
-    end)
   end
 end
