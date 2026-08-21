@@ -41,7 +41,6 @@ defmodule Rendro.CatalogReviewPayload do
     else
       true -> {:error, :quality_bearing_input}
       {:error, reason} -> {:error, reason}
-      _ -> {:error, :invalid_candidate_payload}
     end
   end
 

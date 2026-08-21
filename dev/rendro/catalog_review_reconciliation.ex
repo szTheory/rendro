@@ -27,8 +27,6 @@ defmodule Rendro.CatalogReviewReconciliation do
        }}
     else
       {:error, _reason} = error -> error
-      false -> {:error, :identity_mismatch}
-      _ -> {:error, :invalid_reconciliation_input}
     end
   end
 
