@@ -7,6 +7,24 @@ defmodule Rendro.PublicReleaseVerifierTest do
 
   @candidate String.duplicate("a", 40)
   @script Path.expand("../../scripts/verify_public_release.exs", __DIR__)
+  @candidate_record ".planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-RELEASE-CANDIDATE.md"
+
+  test "private candidate binds the exact recovery target while retaining the immutable incident" do
+    record = File.read!(@candidate_record)
+
+    assert record =~ ~r/^version: 1\.3\.1$/m
+    assert record =~ ~r/^release_ref: v1\.3\.1$/m
+    assert record =~ ~r/^candidate_commit_sha: [0-9a-f]{40}$/m
+    assert record =~ ~r/^package_checksum: [0-9a-f]{64}$/m
+    assert record =~ "tag_pushed: false"
+    assert record =~ "hexdocs_dispatched: false"
+    assert record =~ "registry_mutated: false"
+    assert record =~ "3d014b8194782fc29bc685c0d5e84e4adc64b2c3"
+    assert record =~ "32513353551"
+    assert record =~ "concluded **failure** before Hex publication"
+    assert record =~ "Hex package `1.3.0` is absent"
+    assert record =~ "HexDocs `1.3.0` was not dispatched and is absent"
+  end
 
   test "refuses a tag object when its peeled commit differs from the candidate" do
     facts = valid_facts(%{"peeled_tag_sha" => "different"})
@@ -46,7 +64,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
     File.write!(record, "candidate_commit_sha: #{@candidate}\n")
     File.write!(fixture, JSON.encode!(valid_facts() |> Map.merge(fixture_metadata())))
 
-    assert {_, status} = run_cli(record, output, fixture, ["--tag", "v1.3.0"])
+    assert {_, status} = run_cli(record, output, fixture, ["--tag", "v1.3.1"])
     assert status != 0
     refute File.exists?(output)
 
@@ -97,7 +115,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "--candidate-record",
         record,
         "--tag",
-        "v1.3.0",
+        "v1.3.1",
         "--release-run-id",
         "12",
         "--hexdocs-run-id",
@@ -122,7 +140,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
   end
 
   defp fixture_metadata do
-    %{"tag" => "v1.3.0", "release_run_id" => "12", "hexdocs_run_id" => "34"}
+    %{"tag" => "v1.3.1", "release_run_id" => "12", "hexdocs_run_id" => "34"}
   end
 
   defp valid_facts(overrides \\ %{}) do
@@ -138,9 +156,9 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "hexdocs_conclusion" => "success",
         "hexdocs_event" => "workflow_dispatch",
         "hexdocs_name" => "HexDocs",
-        "version" => "1.3.0",
-        "hex_version" => "1.3.0",
-        "hexdocs_version" => "1.3.0",
+        "version" => "1.3.1",
+        "hex_version" => "1.3.1",
+        "hexdocs_version" => "1.3.1",
         "hexdocs_source_sha" => @candidate,
         "archive_members" => [
           "mix.exs",
