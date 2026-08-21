@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 Phase: 130 (Catalog Quality & Evidence Ratchet) — EXECUTING
 Plan: 9 of 11
 Status: Ready to execute
-Last activity: 2026-08-20 — Completed quick task 260820-tn3: Format the Phase 130-10 rubric manifest contract test so mix ci.fast can close Phase 130-11
+Last activity: 2026-08-20 — Completed quick task 260820-trn: Remove unreachable Phase 130 catalog review fallbacks so Dialyzer and ci.fast pass
 
 Progress: [█████████░] 91%
 
@@ -82,6 +82,7 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260820-tn3 | Format the Phase 130-10 rubric manifest contract test so mix ci.fast can close Phase 130-11 | 2026-08-20 | d81fe5f | [260820-tn3-format-the-phase-130-10-rubric-manifest-](./quick/260820-tn3-format-the-phase-130-10-rubric-manifest-/) |
+| 260820-trn | Remove unreachable Phase 130 catalog review fallbacks so Dialyzer and ci.fast pass | 2026-08-20 | 3ae636d | [260820-trn-remove-the-two-unreachable-phase-130-cat](./quick/260820-trn-remove-the-two-unreachable-phase-130-cat/) |
 
 ## Deferred Items
 
