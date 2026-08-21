@@ -475,7 +475,7 @@ defmodule Guardrails.RequiredChecksContractTest do
         assert workflow =~ "sed '/^$/d' | wc -l | tr -d ' '"
 
         assert workflow =~ ~S{if [ "$VERSION_DECLARATION_COUNT" -ne 1 ]; then}
-        assert workflow =~ "expected exactly one top-level @version declaration"
+        assert workflow =~ "Expected exactly one top-level @version declaration"
       end
     end
 
@@ -563,8 +563,11 @@ defmodule Guardrails.RequiredChecksContractTest do
       |> List.flatten()
 
     case declarations do
-      [version] -> {:ok, version}
-      versions -> {:error, "expected exactly one top-level @version declaration; found #{length(versions)}"}
+      [version] ->
+        {:ok, version}
+
+      versions ->
+        {:error, "expected exactly one top-level @version declaration; found #{length(versions)}"}
     end
   end
 end

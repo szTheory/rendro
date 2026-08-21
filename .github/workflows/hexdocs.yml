@@ -76,7 +76,14 @@ jobs:
         run: |
           test "${{ inputs.candidate_commit_sha }}" = "$GITHUB_SHA"
           test "${{ inputs.release_ref }}" = "v1.3.0"
-          test "$(grep '@version' mix.exs | sed -E 's/.*\"([^\"]+)\".*/\1/')" = "1.3.0"
+          VERSION_DECLARATIONS=$(sed -nE 's/^[[:space:]]*@version[[:space:]]+"([^"]+)"[[:space:]]*$/\1/p' mix.exs)
+          VERSION_DECLARATION_COUNT=$(printf '%s\n' "$VERSION_DECLARATIONS" | sed '/^$/d' | wc -l | tr -d ' ')
+          if [ "$VERSION_DECLARATION_COUNT" -ne 1 ]; then
+            echo "::error::Expected exactly one top-level @version declaration in mix.exs; found $VERSION_DECLARATION_COUNT"
+            exit 1
+          fi
+          MIX_VERSION=$VERSION_DECLARATIONS
+          test "$MIX_VERSION" = "1.3.0"
 
       - name: Setup Beam
         uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1

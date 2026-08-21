@@ -30,7 +30,13 @@ jobs:
 
       - name: Verify Version Match
         run: |
-          MIX_VERSION=$(grep '@version' mix.exs | sed -E 's/.*"([^"]+)".*/\1/')
+          VERSION_DECLARATIONS=$(sed -nE 's/^[[:space:]]*@version[[:space:]]+"([^"]+)"[[:space:]]*$/\1/p' mix.exs)
+          VERSION_DECLARATION_COUNT=$(printf '%s\n' "$VERSION_DECLARATIONS" | sed '/^$/d' | wc -l | tr -d ' ')
+          if [ "$VERSION_DECLARATION_COUNT" -ne 1 ]; then
+            echo "::error::Expected exactly one top-level @version declaration in mix.exs; found $VERSION_DECLARATION_COUNT"
+            exit 1
+          fi
+          MIX_VERSION=$VERSION_DECLARATIONS
           TAG_VERSION=${GITHUB_REF_NAME#v}
           if [ "$MIX_VERSION" != "$TAG_VERSION" ]; then
             echo "Version mismatch: mix.exs has $MIX_VERSION but tag is $TAG_VERSION"
