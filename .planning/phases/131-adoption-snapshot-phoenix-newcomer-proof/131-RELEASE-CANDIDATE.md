@@ -1,5 +1,5 @@
 ---
-candidate_commit_sha: 52d0410fe16d9fa8085c3fb5a4d802db70f18ea9
+candidate_commit_sha: 3d014b8194782fc29bc685c0d5e84e4adc64b2c3
 version: 1.3.0
 release_ref: v1.3.0
 package_checksum: d10c9a7b0ec04519a1248e298c3d858dd4f7f64eaf951734893dd3384ff853bd
@@ -11,7 +11,7 @@ registry_mutated: false
 # Rendro v1.3.0 Release Candidate
 
 The exact code-bearing release candidate is
-`52d0410fe16d9fa8085c3fb5a4d802db70f18ea9`. This record is committed after
+`3d014b8194782fc29bc685c0d5e84e4adc64b2c3`. This record is committed after
 that candidate so it can state its identity without a self-referential Git hash.
 
 ## Candidate facts
@@ -25,7 +25,7 @@ that candidate so it can state its identity without a self-referential Git hash.
   completed successfully against the candidate surface.
 - Local tag absence check passed: `git tag -l v1.3.0` produced no output.
 - HexDocs dispatch inputs are fixed to
-  `candidate_commit_sha=52d0410fe16d9fa8085c3fb5a4d802db70f18ea9` and
+  `candidate_commit_sha=3d014b8194782fc29bc685c0d5e84e4adc64b2c3` and
   `release_ref=v1.3.0`; the workflow requires both exact values and runs in the
   protected `Hex Publish` environment.
 
@@ -45,5 +45,5 @@ The prior candidate `68c3a630aa071e34faf464f96d7f767641b2e8aa` lacked an
 executable verifier boundary: its planned verifier command could exit zero
 without producing a record. Its candidate facts and any approval tied to it are
 superseded and non-transferable. Only an explicit approval naming
-`52d0410fe16d9fa8085c3fb5a4d802db70f18ea9` may authorize the complete tag,
+`3d014b8194782fc29bc685c0d5e84e4adc64b2c3` may authorize the complete tag,
 Hex, and HexDocs mutation set.
