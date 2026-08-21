@@ -360,7 +360,7 @@ defmodule Rendro.AdoptionSnapshot do
 
   defp help_text,
     do:
-      "usage: mix run scripts/adoption_snapshot.exs -- --output PATH --date YYYY-MM-DD [--issues-limit 1..100] [--prs-limit 1..100]"
+      "usage: mix run --require scripts/adoption_snapshot.exs -- --output PATH --date YYYY-MM-DD [--issues-limit 1..100] [--prs-limit 1..100]"
 end
 
 unless Code.ensure_loaded?(ExUnit.Server) and Process.whereis(ExUnit.Server) do
