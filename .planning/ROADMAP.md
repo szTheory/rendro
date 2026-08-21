@@ -89,7 +89,13 @@ Plans:
   3. A newcomer in a clean Phoenix environment can follow public discovery material to install the public Rendro package, select the canonical Swiss/light Invoice, and customize it using the documented preset/configurator path without a repository checkout or warm dependency cache.
   4. That clean Phoenix application responds through the optional Phoenix adapter with a successful `application/pdf` response whose bytes begin `%PDF-`, and the recorded journey states the exact versions, commands, results, and any repairs limited to existing handoffs.
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+
+- [ ] 131-01-PLAN.md — Capture one bounded adoption snapshot and project its source-backed gate decision.
+- [ ] 131-02-PLAN.md — Prepare exact 1.3.0, stop for explicit release approval, then verify every public prerequisite.
+- [ ] 131-03-PLAN.md — Run the isolated public-Hex Phoenix journey and retain bounded dual-HTTP proof.
 
 ## Progress
 
