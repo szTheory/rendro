@@ -8,7 +8,14 @@ defmodule Rendro.DocsContract.PhoenixNewcomerContractTest do
       assert readme =~ "### #{label}"
     end
 
-    assert ordered?(readme, ["### Install", "### Select", "### Customize", "### Serve", "### Verify"])
+    assert ordered?(readme, [
+             "### Install",
+             "### Select",
+             "### Customize",
+             "### Serve",
+             "### Verify"
+           ])
+
     assert readme =~ "{:rendro, \"~> 1.3\"}"
     assert readme =~ "https://hexdocs.pm/rendro"
     assert readme =~ "guides/presets.md"

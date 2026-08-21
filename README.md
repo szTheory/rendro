@@ -16,6 +16,45 @@ Rendro is an open-source, Elixir-native PDF layout library for Phoenix teams tha
 - **Canonical recipes:** Use `document/2`, `page_template/1`, and `sections/2` escape hatches for invoices, statements, receipts, reports, certificates, payslips, and tickets.
 - **Operational proof:** Telemetry, diagnostics, support boundaries, and docs-contract checks keep public claims auditable.
 
+## Phoenix first invoice
+
+Copy the theme source, build the invoice document, then serve it through the
+Phoenix adapter. This short route uses the public package; for integration and
+API depth, see [HexDocs](https://hexdocs.pm/rendro).
+
+### Install
+
+Add Rendro to your Phoenix application's `mix.exs` and fetch dependencies:
+
+```elixir
+{:rendro, "~> 1.3"}
+```
+
+### Select
+
+Start with **Invoice / Swiss / `#2C6BED` / light**. Browse the bounded choices
+in the [preset guide](guides/presets.md) or [static configurator](assets/rendro/configurator/index.html).
+Light is the print-oriented first path; dark output remains screen-oriented and
+is not a print, accessibility, PDF/UA, or WCAG claim.
+
+### Customize
+
+Use the formatter-owned source from the preset guide or configurator for theme
+construction and explicit font registration. Those generated sources are the
+authority; this README deliberately does not duplicate the theme snippet.
+
+### Serve
+
+Keep invoice mapping and document construction in your application, then hand
+the completed document to `Rendro.Adapters.Phoenix.render_pdf/3` from a thin
+controller. The adapter owns the PDF response headers and error boundary.
+
+### Verify
+
+Request the controller route and verify an HTTP 200 PDF response whose body
+begins `%PDF-`. See the [Phoenix example README](examples/phoenix_example/README.md)
+for the broader runnable reference, not clean-room authority.
+
 ## Choose a preset
 
 Curated presets are strong starting points; adjust them for your document and

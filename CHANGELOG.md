@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-08-21
+
+This additive release makes the existing preset and configurator discovery path
+available to public Hex and HexDocs users. Start with the README's bounded
+Invoice / Swiss / `#2C6BED` / light route; presets remain starting points, not
+design-quality, accessibility, PDF/UA, WCAG, or print-safety guarantees.
+
+### Added
+
+- README-first `install -> select -> customize -> serve -> verify` handoff for
+  Phoenix teams, with the public `~> 1.3` dependency range and links to the
+  formatter-owned preset/configurator sources and runnable reference app.
+- Candidate-bound HexDocs publication guardrails: an explicit exact-SHA dispatch
+  under the protected Hex Publish environment is now required for docs release.
+
 ### Changed
 
 #### v2.7 Docs, Claims, and Release Hygiene

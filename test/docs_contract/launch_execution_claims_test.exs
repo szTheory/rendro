@@ -120,7 +120,7 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     end
   end
 
-  test "HexDocs workflow publishes docs-only from main with a repository secret" do
+  test "HexDocs workflow publishes docs only from an exact approved dispatch" do
     workflow = File.read!(@hexdocs_workflow_path)
 
     assert {:ok, %{"jobs" => jobs}} = YamlElixir.read_from_string(workflow)
@@ -132,7 +132,14 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     assert workflow =~ "permissions:\n  contents: read"
     assert workflow =~ "concurrency:"
     assert workflow =~ "branches:\n      - main"
-    assert workflow =~ "if: github.event_name == 'push' && github.ref == 'refs/heads/main'"
+    assert workflow =~ "candidate_commit_sha:"
+    assert workflow =~ "release_ref:"
+    assert workflow =~ "if: github.event_name == 'workflow_dispatch'"
+    assert workflow =~ "inputs.release_ref == 'v1.3.0'"
+    assert workflow =~ "inputs.candidate_commit_sha == github.sha"
+    assert workflow =~ "ref: ${{ inputs.candidate_commit_sha }}"
+    assert workflow =~ "Verify approved candidate identity"
+    assert workflow =~ "environment: 'Hex Publish'"
     assert workflow =~ "HEX_API_KEY: ${{ secrets.HEX_API_KEY }}"
     assert workflow =~ "mix hex.publish docs --yes"
     assert workflow =~ "scripts/verify_public_launch_urls.sh"
@@ -140,7 +147,6 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     assert workflow =~ "erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7"
 
     refute workflow =~ ~r/mix hex\.publish --yes/
-    refute workflow =~ ~r/^\s+environment:/m
   end
 
   test "public launch URL verifier covers GitHub raw and HexDocs proof routes" do

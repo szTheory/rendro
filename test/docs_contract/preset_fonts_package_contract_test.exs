@@ -8,7 +8,7 @@ defmodule Rendro.DocsContract.PresetFontsPackageContractTest do
     "priv/fonts/jetbrains-mono/JetBrainsMono-Regular.ttf"
   ]
 
-  test "built Hex archive includes all curated faces and NOTICE" do
+  test "built Hex archive includes curated faces, adoption evidence, and public discovery surfaces" do
     tarball = Rendro.Test.HexBuildCache.tarball_path!()
     {output, 0} = Rendro.Test.HexBuildCache.get_build_output()
     assert output =~ Path.basename(tarball)
@@ -21,5 +21,14 @@ defmodule Rendro.DocsContract.PresetFontsPackageContractTest do
     end
 
     assert "NOTICE" in String.split(contents, "\n", trim: true)
+
+    for path <- [
+          "priv/adoption_evidence/2026-08-21.json",
+          "README.md",
+          "guides/presets.md",
+          "assets/rendro/configurator/index.html"
+        ] do
+      assert path in String.split(contents, "\n", trim: true), "expected #{path} in Hex archive"
+    end
   end
 end
