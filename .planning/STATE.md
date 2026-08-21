@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 Phase: 130 (Catalog Quality & Evidence Ratchet) — EXECUTING
 Plan: 10 of 11
 Status: Ready to execute
-Last activity: 2026-08-20 — Completed quick task 260820-trn: Remove unreachable Phase 130 catalog review fallbacks so Dialyzer and ci.fast pass
+Last activity: 2026-08-20 — Completed validated quick task 260820-u73: Reconcile Phase 130 catalog review evidence and fail-closed contracts
 
 Progress: [██████████] 100%
 
@@ -81,10 +81,11 @@ None yet.
 
 ### Quick Tasks Completed
 
-| # | Description | Date | Commit | Directory |
-|---|-------------|------|--------|-----------|
-| 260820-tn3 | Format the Phase 130-10 rubric manifest contract test so mix ci.fast can close Phase 130-11 | 2026-08-20 | d81fe5f | [260820-tn3-format-the-phase-130-10-rubric-manifest-](./quick/260820-tn3-format-the-phase-130-10-rubric-manifest-/) |
-| 260820-trn | Remove unreachable Phase 130 catalog review fallbacks so Dialyzer and ci.fast pass | 2026-08-20 | 3ae636d | [260820-trn-remove-the-two-unreachable-phase-130-cat](./quick/260820-trn-remove-the-two-unreachable-phase-130-cat/) |
+| # | Description | Date | Commit | Status | Directory |
+|---|-------------|------|--------|--------|-----------|
+| 260820-tn3 | Format the Phase 130-10 rubric manifest contract test so mix ci.fast can close Phase 130-11 | 2026-08-20 | d81fe5f |  | [260820-tn3-format-the-phase-130-10-rubric-manifest-](./quick/260820-tn3-format-the-phase-130-10-rubric-manifest-/) |
+| 260820-trn | Remove unreachable Phase 130 catalog review fallbacks so Dialyzer and ci.fast pass | 2026-08-20 | 3ae636d |  | [260820-trn-remove-the-two-unreachable-phase-130-cat](./quick/260820-trn-remove-the-two-unreachable-phase-130-cat/) |
+| 260820-u73 | Reconcile all twelve Phase 130 catalog review justifications and SIGN-OFF evidence, then strengthen fail-closed evidence contracts | 2026-08-20 | a125928 | Verified | [260820-u73-reconcile-all-twelve-phase-130-catalog-r](./quick/260820-u73-reconcile-all-twelve-phase-130-catalog-r/) |
 
 ## Deferred Items
 
