@@ -1,8 +1,8 @@
 ---
-candidate_commit_sha: 3d22ce89df8e6cd7ad8440950e2d668e7661625d
+candidate_commit_sha: 41c7113cc9de2eda34ca3bd438fd503d7a4d41d7
 version: 1.3.1
 release_ref: v1.3.1
-package_checksum: 3dd6f70733111e2de2ceb4607da91403f592854b130802c495b6952dad05d0ef
+package_checksum: 85856694ee5e4192cdd189186f353a0698235e6479ba2f86c2cc1aa48a9307d7
 tag_pushed: false
 hexdocs_dispatched: false
 registry_mutated: false
@@ -19,8 +19,8 @@ hexdocs_1_3_0_present: false
 # Rendro v1.3.1 Recovery Candidate
 
 This private candidate binds the committed v1.3.1 release surface at
-`3d22ce89df8e6cd7ad8440950e2d668e7661625d`. Its package checksum is
-`3dd6f70733111e2de2ceb4607da91403f592854b130802c495b6952dad05d0ef`.
+`41c7113cc9de2eda34ca3bd438fd503d7a4d41d7`. Its package checksum is
+`85856694ee5e4192cdd189186f353a0698235e6479ba2f86c2cc1aa48a9307d7`.
 It remains approval-gated: no tag, workflow dispatch, Hex/HexDocs publication,
 or registry mutation has occurred.
 
