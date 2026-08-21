@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.13
 milestone_name: Quality Ratchet & Adoption Readiness
-current_phase: 130
-current_phase_name: Catalog Quality & Evidence Ratchet
-status: executing
+current_phase: 131
+current_phase_name: Adoption Snapshot & Phoenix Newcomer Proof
+status: planning
 stopped_at: Completed 130-11-PLAN.md
-last_updated: "2026-08-21T01:36:18.408Z"
+last_updated: "2026-08-21T02:42:06.222Z"
 last_activity: 2026-08-20
-last_activity_desc: "Completed quick task 260820-trn: Remove unreachable Phase 130 catalog review fallbacks so Dialyzer and ci.fast pass"
+last_activity_desc: Phase 130 complete, transitioned to Phase 131
 progress:
   total_phases: 2
   completed_phases: 1
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 ## Current Position
 
-Phase: 130 (Catalog Quality & Evidence Ratchet) — EXECUTING
-Plan: 10 of 11
-Status: Ready to execute
-Last activity: 2026-08-20 — Completed validated quick task 260820-u73: Reconcile Phase 130 catalog review evidence and fail-closed contracts
+Phase: 131 — Adoption Snapshot & Phoenix Newcomer Proof
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-08-20 — Phase 130 complete, transitioned to Phase 131
 
 Progress: [██████████] 100%
 
