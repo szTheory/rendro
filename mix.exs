@@ -151,6 +151,7 @@ defmodule Rendro.MixProject do
         assets/rendro/manual.pdf
         brand/tokens/tokens.css
         priv/branded
+        priv/adoption_evidence
         priv/examples
         priv/fonts
         bench/results

@@ -6,6 +6,8 @@ This ledger records public, reviewable signals for Rendro's conditional global t
 
 Rendro does not use private analytics, social counters, launch campaigns, or GitHub Projects to trigger this gate. Every counted signal must be reviewable from a source URL or an explicitly anonymized private report.
 
+The current review is bound to the immutable, packaged sidecar [`priv/adoption_evidence/2026-08-21.json`](priv/adoption_evidence/2026-08-21.json). It contains bounded public source metadata and digests only; unavailable retrieval remains explicitly unavailable rather than becoming zero activity.
+
 ## Current Gate: Conditional Global Text Shaping
 
 The gate is currently **blocked** until all three threshold families are met in the same review window: demand, downloads, and contributor signal.
@@ -57,6 +59,7 @@ curl -fsSL https://hex.pm/api/packages/rendro | jq '.downloads'
 | Date | Hex downloads.all | Hex downloads.week | Source | Notes |
 | --- | --- | --- | --- | --- |
 | 2026-06-13 | 877 | 117 | Hex package API | Captured during v2.8 stewardship planning review (not scheduled telemetry). +10 all / +2 week since 2026-06-12 baseline; negligible movement, Downloads threshold still blocked. First post-baseline data point; next snapshot only when planning future work or reviewing concrete demand. |
+| 2026-08-21 | 3,149 | 182 | [bounded source record](priv/adoption_evidence/2026-08-21.json) | AVAILABLE. +2,282 all / +67 week since baseline; the all-time and weekly predicates have progressed, but this review retains Downloads as ACCUMULATING pending the complete unchanged two-snapshot threshold record. |
 
 ## External Contributors
 
@@ -106,3 +109,4 @@ gh issue list --state all --label "area:text-shaping" \
 | Date | Reviewer | Demand | Downloads | Contributor | Decision | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-06-13 | Maintainer (v2.8 planning) | 0 | 877 all / 117 wk | 0 | HOLD | HOLD (all three families). Decision rule applied: TRIGGER / ACCUMULATING / HOLD / HOLD-noise. Downloads 867→877 all, 115→117 week since baseline: noise, not the +1,500 / >=150 thresholds. Zero qualifying shaping signals; zero non-maintainer PRs. Re-check is pull-based, not scheduled: next review triggered by the first qualifying text-shaping issue, a counted contributor PR, or the next milestone-planning pass — whichever comes first. Gate cannot trigger before 2026-07-27 (earliest-possible floor, not a reminder). |
+| 2026-08-21 | Maintainer (Phase 131) | HOLD (AVAILABLE; 0 candidates) | ACCUMULATING (AVAILABLE; 3,149 all / 182 wk) | HOLD (AVAILABLE; 0 candidates) | HOLD | Read-only Hex and bounded GitHub issue/merged-PR review recorded in the [dated sidecar](priv/adoption_evidence/2026-08-21.json). Composite is HOLD because it is the weakest family decision; no source failure was counted as zero and no polling, mutation, labeling, or outreach was added. |

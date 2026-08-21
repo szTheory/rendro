@@ -76,7 +76,8 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
 
     assert adoption =~ Enum.join(@ledger_columns, " | ")
     assert adoption =~ "No qualifying shaping signals have been counted yet."
-    assert adoption =~ "No post-baseline Hex download snapshots recorded yet."
+    assert adoption =~ "2026-08-21"
+    assert adoption =~ "3,149"
     assert adoption =~ "No qualifying non-maintainer contributor signal has been counted yet."
   end
 

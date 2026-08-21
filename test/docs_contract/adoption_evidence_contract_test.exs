@@ -86,4 +86,38 @@ defmodule Rendro.DocsContract.AdoptionEvidenceContractTest do
     assert Enum.all?(results, &(&1 in [:ok, {:error, :target_exists}]))
     assert {:ok, ^payload} = path |> File.read!() |> Jason.decode()
   end
+
+  test "dated sidecar is bounded, conjunctive, and bound to the public index" do
+    path = "priv/adoption_evidence/2026-08-21.json"
+    adoption = File.read!("ADOPTION.md")
+    snapshot = path |> File.read!() |> Jason.decode!()
+
+    assert snapshot["review_date"] == "2026-08-21"
+    assert snapshot["composite"] == %{"decision" => "HOLD", "rule" => "minimum family decision"}
+    assert adoption =~ "priv/adoption_evidence/2026-08-21.json"
+
+    for family <- ["downloads", "demand", "contributor"] do
+      record = snapshot["families"][family]
+      assert record["retrieval"] in ["AVAILABLE", "UNAVAILABLE"]
+      assert record["decision"] in ["HOLD", "ACCUMULATING", "TRIGGER"]
+      assert is_binary(record["source"])
+      assert is_binary(record["query"])
+      assert is_integer(record["pagination_limit"])
+      assert is_binary(record["result_digest"]) or is_binary(record["failure_reason"])
+
+      if record["retrieval"] == "UNAVAILABLE" do
+        assert record["decision"] == "HOLD"
+        refute Map.has_key?(record, "raw")
+      end
+    end
+
+    assert snapshot["families"]["downloads"]["raw"] == %{"all" => 3_149, "week" => 182}
+    assert snapshot["families"]["demand"]["candidate_count"] == 0
+    assert snapshot["families"]["contributor"]["candidate_count"] == 0
+    refute File.read!(path) =~ ~r/"body"|authorization|HEX_API_KEY|HOME|\/Users\//
+  end
+
+  test "package allowlist ships the evidence linked from ADOPTION.md" do
+    assert File.read!("mix.exs") =~ "priv/adoption_evidence"
+  end
 end
