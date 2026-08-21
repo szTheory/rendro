@@ -160,14 +160,19 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
       {scores, expected_passed} = Map.fetch!(expected, disposition["catalog_id"])
 
       assert disposition["dimension_scores"]
-             |> Map.take(~w(information_architecture content_hierarchy domain_fit reader_affordances typographic_craft restraint_cohesion))
+             |> Map.take(
+               ~w(information_architecture content_hierarchy domain_fit reader_affordances typographic_craft restraint_cohesion)
+             )
              |> then(fn dimensions ->
                ~w(information_architecture content_hierarchy domain_fit reader_affordances typographic_craft restraint_cohesion)
                |> Enum.map_join("/", &Integer.to_string(dimensions[&1]))
              end) == scores
 
       assert disposition["passed"] == expected_passed
-      assert disposition["passed"] == passed?(disposition["dimension_scores"], disposition["gate_results"])
+
+      assert disposition["passed"] ==
+               passed?(disposition["dimension_scores"], disposition["gate_results"])
+
       assert disposition["signed_off_by"] == "Jon"
       assert disposition["signed_off_at"] == "2026-08-20"
       assert is_binary(disposition["supersedes_evidence_ref"])
