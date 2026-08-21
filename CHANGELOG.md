@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.3.0] - 2026-08-21
+## [1.3.1] - 2026-08-21
 
 This additive release makes the existing preset and configurator discovery path
 available to public Hex and HexDocs users. Start with the README's bounded

@@ -12,6 +12,7 @@ defmodule Rendro.PublicReleaseVerifier do
     "Rendro.Theme.Presets",
     "Rendro.Adapters.Phoenix.render_pdf/3"
   ]
+  @candidate_tag "v1.3.1"
 
   def run(argv, context \\ default_context()) do
     with {:ok, options} <- parse_args(argv),
@@ -345,13 +346,16 @@ defmodule Rendro.PublicReleaseVerifier do
 
   defp validate_candidate(_), do: {:error, "candidate SHA must be 40 lowercase hex characters"}
 
+  defp validate_tag(@candidate_tag), do: :ok
+
   defp validate_tag("v" <> version) do
     if Regex.match?(~r/^\d+\.\d+\.\d+$/, version),
-      do: :ok,
-      else: {:error, "tag must be an exact vX.Y.Z release tag"}
+      do: {:error, "tag must match the exact approved recovery candidate #{@candidate_tag}"},
+      else: {:error, "tag must be the exact approved recovery candidate #{@candidate_tag}"}
   end
 
-  defp validate_tag(_), do: {:error, "tag must be an exact vX.Y.Z release tag"}
+  defp validate_tag(_),
+    do: {:error, "tag must be the exact approved recovery candidate #{@candidate_tag}"}
 
   defp ensure_safe_output(path) do
     if path == "" or File.exists?(path), do: {:error, "output must not already exist"}, else: :ok
