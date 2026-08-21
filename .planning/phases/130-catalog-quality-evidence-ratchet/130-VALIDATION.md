@@ -1,9 +1,9 @@
 ---
 phase: 130
 slug: catalog-quality-evidence-ratchet
-status: blocked
-nyquist_compliant: false
-wave_0_complete: false
+status: validating_cleanup
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-08-19
 revised: 2026-08-21
 ---
@@ -61,8 +61,8 @@ revised: 2026-08-21
 | 130-06-01 | 06 | 8 | CATALOG-06,07,08 | T-130-06A/B/C | One 19-path reviewed launch publication commit and whole-commit rollback | Exact 19-path `07e3fc8` publication + contracts; 130-06-SUMMARY | ✅ complete |
 | 130-10-01 | 10 | 9 | CATALOG-08,09 | T-130-10A/B | Exact catalog transcription and threshold/dark closure | 12 scored projections, dark `print_safety: false`; 130-10-SUMMARY | ✅ complete |
 | 130-10-02 | 10 | 9 | CATALOG-08,09 | T-130-10B/C | Sole canonical generation and 32-cell candidate reproduction | Exact-SHA CI run `32434769523`, 33 checksums, 32-cell equality; 130-10-SUMMARY | ✅ complete |
-| 130-11-01 | 11 | 10 | CATALOG-06,07,08,09 | T-130-11A/C | Complete source/decision/UI/edge/prohibition and deterministic closure | Focused 119, family 300, catalog 95, full suite pass; `mix ci.fast` blocked by pre-existing Phase 130-10 formatting drift | ⚠ blocked |
-| 130-11-02 | 11 | 10 | CATALOG-06,07,08,09 | T-130-11A/B | Exact ref/worktree/candidate cleanup after durable closure | Precondition requires every Task 1 gate green; not met while `ci.fast` is red | ⬜ blocked |
+| 130-11-01 | 11 | 10 | CATALOG-06,07,08,09 | T-130-11A/C | Complete source/decision/UI/edge/prohibition and deterministic closure | Focused 119, family 300, catalog 95, full suite pass; final `mix ci.fast` pass (1,839 tests, 0 failures; Dialyzer 0 errors) | ✅ complete |
+| 130-11-02 | 11 | 10 | CATALOG-06,07,08,09 | T-130-11A/B | Exact ref/worktree/candidate cleanup after durable closure | Exact route/ref/SHA, review-manifest, and worktree publication-subset checks green; cleanup in progress | ⏳ validating |
 
 ## Wave 0 Ownership
 
@@ -76,7 +76,7 @@ revised: 2026-08-21
 | Candidate generation, task discovery, and actual diff | 130-04-01 | Catalog/quality tests plus `mix rendro.catalog.candidate --invalid-option` prove the `mix.exs` compile wrapper and strict parser before any publication |
 | Catalog threshold and reproduction closure | 130-10-01/02 | Mutation tests precede evidence projection and sole generation |
 
-`wave_0_complete` becomes true only after all listed automated contracts are green. Human checkpoints remain evidence prerequisites, never substitutes. It remains `false` at revision 2026-08-21 because `mix ci.fast` fails its formatting gate on `test/docs_contract/rubric_manifest_contract_test.exs` (introduced by `265369a`, Plan 130-10); no Phase 130-11 scope authorization exists to modify that prior task file.
+`wave_0_complete` becomes true only after all listed automated contracts are green. Human checkpoints remain evidence prerequisites, never substitutes. It is `true` at revision 2026-08-21: the separately authorized GSD quick fixes formatted the Phase 130-10 rubric contract and removed Phase-130 review-reconciliation Dialyzer warnings; final `mix ci.fast` passed with 1,839 tests, 0 failures, and Dialyzer 0 errors.
 
 ## Manual / External Evidence — Five Gates
 
@@ -106,11 +106,11 @@ revised: 2026-08-21
 
 ### Source, decision, UI, edge, and prohibition audit
 
-Every Source Coverage Audit row in 130-11-PLAN.md maps to the completed task rows and the cited summaries above. CATALOG-06..09, D-01..D-26, all ten UI considerations (E1: overflow/long-text; E2: empty/loading/error/populated/overflow/long-text; E3: overflow/long-text), and all eleven spec-less probes are covered. The three plan prohibitions are proven for scope and lane separation, except the first prohibition's required red-gate outcome means closure cannot claim success: the red `ci.fast` gate is explicitly recorded and prevents Nyquist closure.
+Every Source Coverage Audit row in 130-11-PLAN.md maps to the completed task rows and the cited summaries above. CATALOG-06..09, D-01..D-26, all ten UI considerations (E1: overflow/long-text; E2: empty/loading/error/populated/overflow/long-text; E3: overflow/long-text), and all eleven spec-less probes are covered. The three plan prohibitions are proven: deterministic, advisory, and human lanes remain separate; no scope was widened; and every former red gate is now green.
 
-### Exact remaining gap
+### Closure transition
 
-`mix ci.fast` fails before its remaining checks because `mix format --check-formatted` detects only `test/docs_contract/rubric_manifest_contract_test.exs` as unformatted. `git blame` identifies the unformatted lines as `265369a` (`test(130-10): add catalog evidence closure guard`). This is a prior-plan file outside Plan 130-11's authorized artifact/cleanup scope. Therefore `nyquist_compliant` and `wave_0_complete` remain false, no cleanup has run, and phase completion remains with the orchestrator.
+The prior formatting and Dialyzer gates were resolved through separately authorized, narrow GSD quick tasks, not by expanding Plan 130-11. Final `mix ci.fast` completed with 1,839 tests, 0 failures, and Dialyzer 0 errors. All mapped automated and human prerequisites are green; `nyquist_compliant` and `wave_0_complete` are therefore true. Exact provenance cleanup remains the final Task 2 operation and is recorded below after each literal target is removed.
 
 ## Final Contract Checklist
 
@@ -122,7 +122,7 @@ Every Source Coverage Audit row in 130-11-PLAN.md maps to the completed task row
 - [x] Exactly one final canonical catalog generation occurred after catalog transcription.
 - [x] Canonical 32-cell identities reproduce the candidate and all catalog checks pass.
 - [x] All D-01..D-26, requirements, research constraints, ten UI states, and eleven edge probes are evidenced.
-- [ ] `mix ci.fast` is green (blocked by the recorded formatting failure).
+- [x] `mix ci.fast` is green (1,839 tests, 0 failures; Dialyzer 0 errors).
 - [ ] Temporary refs/paths are removed only after durable closure (blocked by Task 2 precondition).
 - [x] `nyquist_compliant: true` and `wave_0_complete: true` are withheld until every 130-11 gate is green.
 
