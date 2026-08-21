@@ -7,7 +7,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
     runner =
       command_runner_for(%{
         {"git", ["status", "--short"]} => {" M README.md\n", 0},
-        {"git", ["describe", "--tags", "--exact-match"]} => {"v1.0.0\n", 0},
+        {"git", ["describe", "--tags", "--exact-match"]} => {"v1.3.1\n", 0},
         {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0}
       })
 
@@ -44,7 +44,7 @@ defmodule Mix.Tasks.Release.PreflightTest do
     runner =
       command_runner_for(%{
         {"git", ["status", "--short"]} => {"", 0},
-        {"git", ["describe", "--tags", "--exact-match"]} => {"v1.0.0\n", 0},
+        {"git", ["describe", "--tags", "--exact-match"]} => {"v1.3.1\n", 0},
         {"mix", ["ci.fast"]} => {"ci ok", 0},
         {"mix", ["docs.contract"]} => {"docs drifted", 1},
         {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0},
@@ -86,18 +86,21 @@ defmodule Mix.Tasks.Release.PreflightTest do
 
   test "anonymous hex publish dry-run passes after local checks reach the auth boundary" do
     runner =
-      command_runner_for(%{
-        {"git", ["status", "--short"]} => {"", 0},
-        {"git", ["describe", "--tags", "--exact-match"]} => {"v1.0.0\n", 0},
-        {"mix", ["ci.fast"]} => {"ci ok", 0},
-        {"mix", ["docs.contract"]} => {"docs ok", 0},
-        {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0},
-        {"sh", ["-c", "printf 'n\\n' | mix hex.publish --dry-run --yes"]} =>
-          {"Building rendro 1.0.0\nPublishing package to public repository hexpm.\nNo authenticated user found. Run `mix hex.user auth`\n",
-           1},
-        {"mix", ["hex.audit"]} => {"hex audit ok", 0},
-        {"mix", ["deps.audit", "--ignore-file", ".mix_audit.ignore"]} => {"deps audit ok", 0}
-      })
+      command_runner_for(
+        %{
+          {"git", ["status", "--short"]} => {"", 0},
+          {"git", ["describe", "--tags", "--exact-match"]} => {"v1.0.0\n", 0},
+          {"mix", ["ci.fast"]} => {"ci ok", 0},
+          {"mix", ["docs.contract"]} => {"docs ok", 0},
+          {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0},
+          {"sh", ["-c", "printf 'n\\n' | mix hex.publish --dry-run --yes"]} =>
+            {"Building rendro 1.0.0\nPublishing package to public repository hexpm.\nNo authenticated user found. Run `mix hex.user auth`\n",
+             1},
+          {"mix", ["hex.audit"]} => {"hex audit ok", 0},
+          {"mix", ["deps.audit", "--ignore-file", ".mix_audit.ignore"]} => {"deps audit ok", 0}
+        },
+        "1.0.0"
+      )
 
     {messages, result} =
       capture_shell_messages(fn ->
@@ -125,16 +128,19 @@ defmodule Mix.Tasks.Release.PreflightTest do
 
   test "skip security audits keeps deterministic release proof separate from advisory checks" do
     runner =
-      command_runner_for(%{
-        {"git", ["status", "--short"]} => {"", 0},
-        {"git", ["describe", "--tags", "--exact-match"]} => {"v1.0.0\n", 0},
-        {"mix", ["ci.fast"]} => {"ci ok", 0},
-        {"mix", ["docs.contract"]} => {"docs ok", 0},
-        {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0},
-        {"sh", ["-c", "printf 'n\\n' | mix hex.publish --dry-run --yes"]} =>
-          {"Building rendro 1.0.0\nPublishing package to public repository hexpm.\nNo authenticated user found. Run `mix hex.user auth`\n",
-           1}
-      })
+      command_runner_for(
+        %{
+          {"git", ["status", "--short"]} => {"", 0},
+          {"git", ["describe", "--tags", "--exact-match"]} => {"v1.0.0\n", 0},
+          {"mix", ["ci.fast"]} => {"ci ok", 0},
+          {"mix", ["docs.contract"]} => {"docs ok", 0},
+          {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0},
+          {"sh", ["-c", "printf 'n\\n' | mix hex.publish --dry-run --yes"]} =>
+            {"Building rendro 1.0.0\nPublishing package to public repository hexpm.\nNo authenticated user found. Run `mix hex.user auth`\n",
+             1}
+        },
+        "1.0.0"
+      )
 
     {messages, result} =
       capture_shell_messages(fn ->
@@ -168,17 +174,20 @@ defmodule Mix.Tasks.Release.PreflightTest do
 
   test "skip ci keeps remote release proof from duplicating required merge gate" do
     runner =
-      command_runner_for(%{
-        {"git", ["status", "--short"]} => {"", 0},
-        {"git", ["describe", "--tags", "--exact-match"]} => {"v1.0.0\n", 0},
-        {"mix", ["docs.contract"]} => {"docs ok", 0},
-        {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0},
-        {"sh", ["-c", "printf 'n\\n' | mix hex.publish --dry-run --yes"]} =>
-          {"Building rendro 1.0.0\nPublishing package to public repository hexpm.\nNo authenticated user found. Run `mix hex.user auth`\n",
-           1},
-        {"mix", ["hex.audit"]} => {"hex audit ok", 0},
-        {"mix", ["deps.audit", "--ignore-file", ".mix_audit.ignore"]} => {"deps audit ok", 0}
-      })
+      command_runner_for(
+        %{
+          {"git", ["status", "--short"]} => {"", 0},
+          {"git", ["describe", "--tags", "--exact-match"]} => {"v1.0.0\n", 0},
+          {"mix", ["docs.contract"]} => {"docs ok", 0},
+          {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0},
+          {"sh", ["-c", "printf 'n\\n' | mix hex.publish --dry-run --yes"]} =>
+            {"Building rendro 1.0.0\nPublishing package to public repository hexpm.\nNo authenticated user found. Run `mix hex.user auth`\n",
+             1},
+          {"mix", ["hex.audit"]} => {"hex audit ok", 0},
+          {"mix", ["deps.audit", "--ignore-file", ".mix_audit.ignore"]} => {"deps audit ok", 0}
+        },
+        "1.0.0"
+      )
 
     {messages, result} =
       capture_shell_messages(fn ->
@@ -230,11 +239,14 @@ defmodule Mix.Tasks.Release.PreflightTest do
     end)
 
     runner =
-      command_runner_for(%{
-        {"git", ["status", "--short"]} => {"", 0},
-        {"git", ["describe", "--tags", "--exact-match"]} => {"v0.2.0\n", 0},
-        {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0}
-      })
+      command_runner_for(
+        %{
+          {"git", ["status", "--short"]} => {"", 0},
+          {"git", ["describe", "--tags", "--exact-match"]} => {"v0.2.0\n", 0},
+          {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0}
+        },
+        "0.2.0"
+      )
 
     {messages, result} =
       capture_shell_messages(fn ->
@@ -258,14 +270,13 @@ defmodule Mix.Tasks.Release.PreflightTest do
     refute_received {:preflight_command, "mix", ["ci.fast"]}
   end
 
-  defp command_runner_for(responses) do
+  defp command_runner_for(responses, version \\ Mix.Project.config()[:version]) do
     test_pid = self()
 
     fn command, args, _opts ->
       send(test_pid, {:preflight_command, command, args})
 
       if command == "mix" and args == ["hex.build", "--unpack"] do
-        version = Mix.Project.config()[:version]
         File.mkdir_p!("rendro-#{version}/guides")
 
         Enum.each(
