@@ -5,15 +5,15 @@ milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 131
 current_phase_name: adoption-snapshot-phoenix-newcomer-proof
 status: executing
-stopped_at: Completed 131-02-PLAN.md
-last_updated: "2026-08-21T21:39:51.663Z"
+stopped_at: Completed 131-03-PLAN.md
+last_updated: "2026-08-21T21:58:24.891Z"
 last_activity: 2026-08-21
 last_activity_desc: Phase 131 execution started
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 16
-  completed_plans: 13
+  completed_plans: 14
   percent: 50
 ---
 
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 131 (adoption-snapshot-phoenix-newcomer-proof) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-08-21 — Phase 131 execution started
 
-Progress: [████████░░] 81%
+Progress: [█████████░] 88%
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
@@ -73,6 +73,8 @@ Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Not started
 - [Phase ?]: 2026-08-21 adoption snapshot is a read-only HOLD decision: Downloads ACCUMULATING; Demand and Contributor HOLD; composite is the minimum family state.
 - [Phase ?]: Dated adoption evidence is packaged and published atomically through an exclusive temporary output plus hard-link target creation.
 - [Phase ?]: Both protected version consumers now extract exactly one top-level @version declaration and fail closed on zero or multiple matches.
+- [Phase ?]: Private v1.3.1 candidate is bound to SHA 7afb1dd056bba234d1bd4ec1c4487f2ea8e308f1 with public docs still ~> 1.3.
+- [Phase ?]: v1.3.0 remains immutable failed-release evidence; no tag, dispatch, Hex, HexDocs, or registry mutation occurred in Plan 131-03.
 
 ### Pending Todos
 
@@ -100,8 +102,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-21T21:39:51.654Z
-Stopped at: Completed 131-02-PLAN.md
+Last session: 2026-08-21T21:58:24.882Z
+Stopped at: Completed 131-03-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -125,3 +127,4 @@ Resume file: None
 | Phase 130-catalog-quality-evidence-ratchet P11 | 19m | 2 tasks | 2 files |
 | Phase 131 P01 | 12m | 2 tasks | 6 files |
 | Phase 131 P02 | ~10m | 1 tasks | 3 files |
+| Phase 131-adoption-snapshot-phoenix-newcomer-proof P03 | ~45m | 1 tasks | 9 files |
