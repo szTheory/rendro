@@ -1,7 +1,7 @@
 ---
 phase: 130
 slug: catalog-quality-evidence-ratchet
-status: validating_cleanup
+status: complete
 nyquist_compliant: true
 wave_0_complete: true
 created: 2026-08-19
@@ -62,7 +62,7 @@ revised: 2026-08-21
 | 130-10-01 | 10 | 9 | CATALOG-08,09 | T-130-10A/B | Exact catalog transcription and threshold/dark closure | 12 scored projections, dark `print_safety: false`; 130-10-SUMMARY | ✅ complete |
 | 130-10-02 | 10 | 9 | CATALOG-08,09 | T-130-10B/C | Sole canonical generation and 32-cell candidate reproduction | Exact-SHA CI run `32434769523`, 33 checksums, 32-cell equality; 130-10-SUMMARY | ✅ complete |
 | 130-11-01 | 11 | 10 | CATALOG-06,07,08,09 | T-130-11A/C | Complete source/decision/UI/edge/prohibition and deterministic closure | Focused 119, family 300, catalog 95, full suite pass; final `mix ci.fast` pass (1,839 tests, 0 failures; Dialyzer 0 errors) | ✅ complete |
-| 130-11-02 | 11 | 10 | CATALOG-06,07,08,09 | T-130-11A/B | Exact ref/worktree/candidate cleanup after durable closure | Exact route/ref/SHA, review-manifest, and worktree publication-subset checks green; cleanup in progress | ⏳ validating |
+| 130-11-02 | 11 | 10 | CATALOG-06,07,08,09 | T-130-11A/B | Exact ref/worktree/candidate cleanup after durable closure | Exact remote SHA/manifest/worktree checks passed; two refs, detached launch worktree, and review root absent afterward | ✅ complete |
 
 ## Wave 0 Ownership
 
@@ -112,6 +112,14 @@ Every Source Coverage Audit row in 130-11-PLAN.md maps to the completed task row
 
 The prior formatting and Dialyzer gates were resolved through separately authorized, narrow GSD quick tasks, not by expanding Plan 130-11. Final `mix ci.fast` completed with 1,839 tests, 0 failures, and Dialyzer 0 errors. All mapped automated and human prerequisites are green; `nyquist_compliant` and `wave_0_complete` are therefore true. Exact provenance cleanup remains the final Task 2 operation and is recorded below after each literal target is removed.
 
+### Exact cleanup record
+
+- Verified then deleted remote candidate ref `gsd/phase-130-catalog-review-411cdcafa5d3090f3d0ec144c0cba59d991ba99f` only after `git ls-remote` returned the literal recorded SHA `411cdcafa5d3090f3d0ec144c0cba59d991ba99f`.
+- Verified then deleted remote canonical ref `gsd/phase-130-catalog-canonical-002d42adfec74a1f2fd2ba824d1623fb33c92891` only after `git ls-remote` returned the literal recorded SHA `002d42adfec74a1f2fd2ba824d1623fb33c92891`.
+- Verified `tmp/phase130-launch-reconcile` at `2463749d2b877c4761f2b7bf3a25dd1e8673a9bd` and proved each tracked difference belonged to the published `07e3fc8` launch batch; removed it with `git worktree remove --force tmp/phase130-launch-reconcile`.
+- Verified both review inventories with `shasum -a 256 -c` before removing their literal manifest-enumerated files and empty directories. `tmp/phase130-candidate` was already absent and was not targeted for deletion.
+- Final absence checks passed for the two refs and `tmp/phase130-launch-reconcile`, `tmp/phase130-candidate`, and `tmp/phase130-review`.
+
 ## Final Contract Checklist
 
 - [x] Five blocking-human gates occurred in the exact order above.
@@ -123,7 +131,7 @@ The prior formatting and Dialyzer gates were resolved through separately authori
 - [x] Canonical 32-cell identities reproduce the candidate and all catalog checks pass.
 - [x] All D-01..D-26, requirements, research constraints, ten UI states, and eleven edge probes are evidenced.
 - [x] `mix ci.fast` is green (1,839 tests, 0 failures; Dialyzer 0 errors).
-- [ ] Temporary refs/paths are removed only after durable closure (blocked by Task 2 precondition).
+- [x] Temporary refs/paths are removed only after durable closure and literal identity checks.
 - [x] `nyquist_compliant: true` and `wave_0_complete: true` are withheld until every 130-11 gate is green.
 
-**Approval:** pending execution evidence
+**Approval:** complete — final deterministic, advisory, human-evidence, and exact-cleanup closure recorded.
