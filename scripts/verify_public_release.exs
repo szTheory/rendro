@@ -277,8 +277,11 @@ defmodule Rendro.PublicReleaseVerifier do
                path,
                "https://repo.hex.pm/tarballs/rendro-#{version}.tar"
              ]),
-           {members, 0} <- System.cmd("tar", ["-tf", path]) do
-        {:ok, String.split(members, "\n", trim: true)}
+           {:ok, archive} <- File.read(path),
+           {:ok, outer} <- :erl_tar.extract({:binary, archive}, [:memory]),
+           {_, contents} when is_binary(contents) <- List.keyfind(outer, ~c"contents.tar.gz", 0),
+           {:ok, inner} <- :erl_tar.extract({:binary, :zlib.gunzip(contents)}, [:memory]) do
+        {:ok, Enum.map(inner, fn {member, _contents} -> List.to_string(member) end)}
       else
         _ -> {:error, "read-only Hex archive probe failed"}
       end
