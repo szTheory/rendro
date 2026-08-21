@@ -26,7 +26,7 @@ API depth, see [HexDocs](https://hexdocs.pm/rendro).
 
 Add Rendro to your Phoenix application's `mix.exs` and fetch dependencies:
 
-```elixir
+```elixir-schematic
 {:rendro, "~> 1.3"}
 ```
 
