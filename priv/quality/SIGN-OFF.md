@@ -85,7 +85,30 @@ binary is not executable on this macOS host.
 
 ---
 
-## Phase 127 catalog flagship review · 2026-08-17
+## Phase 130 catalog review · 2026-08-20 (current)
+
+This is the current catalog-review authority, reconciled to SHA-256 `1646eeb8875cc67d7d452d3f28bc2b0d6503f943a2a6775f7e256a3e51bb3f22`. Candidate/source SHA is `411cdcafa5d3090f3d0ec144c0cba59d991ba99f`; route/ref is `30657d92cf8be49f30094c57aaf163b76bd0ad9c` / `gsd/phase130-candidate-route-411cdcafa5d3090f3d0ec144c0cba59d991ba99f`; run `32417257428`, attempt `1`, job `candidate-evidence`. The review used `pdfium-render`, `pdfium-cli v0.11.0`, executable SHA-256 `b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a`.
+
+`passed = content_hierarchy == 5 AND every other dimension >= 4 AND reading_order == true AND print_safety == true`. Four light rows pass; eight rows remain `needs_work`. Every dark row is screen-oriented and non-print-safe because `print_safety: false`; this makes no print, accessibility, PDF/UA, or WCAG claim.
+
+| Catalog ID | PNG SHA-256 | Source-PDF SHA-256 | Scores | Gates / verdict |
+|---|---|---|---|---|
+| `invoice--cedar-mutual--corporate-classic--light` | `aa6245724dfb8c7a5ff63dcddf4033504f6484e893aa6908b2d199dc91b33f8d` | `09d1d39d49912fd2dcb33f0a55e55bc3903cf233dc6e8abe66e16cc0db1483a3` | 4/5/4/4/4/4 | true/true; pass |
+| `invoice--cedar-mutual--corporate-classic--dark` | `7a8fd547fdab8314b3d5c092aa231b1c93432ddbb0371f7180c871866c81d3b2` | `50a4515a7ba347900a3ec784d98db27a58880c01f13a23c35dd1de093664ceef` | 4/5/4/3/3/3 | true/false; needs_work |
+| `statement--signal-ledger--minimal-mono--light` | `526f0891bab69935419f7039d3dd4d5e20a21ad4b5e37efd70102ee3f0c38017` | `79f6fe32659321db254670bbbdcd9db392cdfe323125e98905d6df2e9bfa44b9` | 5/5/4/4/4/5 | true/true; pass |
+| `statement--signal-ledger--minimal-mono--dark` | `63d945425634be00fb4b655f408795fd8558f01f44b8d286760fb76777a73815` | `c0ee94af4cb7faa19e5a7b68152a65db20e4fd944a9101ec9ace64576b0c229d` | 4/5/4/3/3/3 | true/false; needs_work |
+| `receipt--poppy-and-grain--humanist--light` | `8ee9808a5d2edd9e292941ef01b63c16cc3488a816f7a206815ecd5c7a0a719e` | `940a09cf42373afa043727508a6e1e0bd84f673d7ce92a69131cfac8ff791a4b` | 5/5/4/5/4/5 | true/true; pass |
+| `receipt--poppy-and-grain--humanist--dark` | `9431349b4908cbe3e38b5649ffc1a67c3bb9b2261ccb9f89b22e976f676b84ac` | `4612d45d09df7d1b8aa9f8dddf288cc8c8ca2058d8fddcf7f518cfdd0d6171ae` | 5/5/4/5/4/5 | true/false; needs_work |
+| `certificate--meridian-arts-fellowship--editorial--light` | `4db36148da0951f38062ceafbe506f7c0044dc69351a5e186b4fd9ca98e9d066` | `3171693135a99bf63583f61fff72c8b67f2e98cdef164d5c5ad4d8c96fc17e7b` | 5/5/4/4/4/5 | true/true; pass |
+| `certificate--meridian-arts-fellowship--editorial--dark` | `c8e33580ef93c5c27b128a490a9b5799ee0256f1e1500a48db692e825c437d52` | `c0ac38e0024857c528bbeddc3733f5d7fdbb24daeeb795e8110b931ad21f8634` | 5/5/4/4/4/5 | true/false; needs_work |
+| `payslip--northline-logistics--swiss--light` | `ccaa718c49a3a9cddc3f9923b6310cb4c225481ba6d10353849f1e90d19f7be8` | `a88be1778ffec799223b147566151ab86d4b8b37871fbe8c739329b73519004e` | 4/5/4/3/3/4 | true/true; needs_work |
+| `payslip--northline-logistics--swiss--dark` | `7e49c55c2f72b47c01dd0e98f6b9094ad3772a6c1cdb3118e303ede299783184` | `f3bc9896b4491a2f9168aa62e7ea7fbbbf3eead99fbb154f16011cd5e73b2dd0` | 4/5/4/2/3/3 | true/false; needs_work |
+| `ticket--aurora-live--brutalist--light` | `d75ab8b5cfabc26cb93f724353dacb3710c7fc5d191efc1655a428b6a56d4170` | `c3d1baf2d32881534aafdbb41ee931ef1d67dbe3647f084c4221c56bea7139f9` | 4/5/4/3/3/4 | true/true; needs_work |
+| `ticket--aurora-live--brutalist--dark` | `69184d72986d30ce089484f83b0b92397c51716e10c6c6d52b8ea4fbfe1669e6` | `a6e49f1477d9394b16cab1045da47fc433e1459a1ac3c2e33cdc900785c4ee9a` | 4/5/4/2/3/3 | true/false; needs_work |
+
+Bounded multipage review: Statement endpoints close at `$7,500`. Supplied Invoice endpoints show lines 1–40 and 42–65; line 41 is neither asserted nor denied and remains deterministic-test evidence only.
+
+## Phase 127 catalog flagship review · 2026-08-17 (historical; superseded by Phase 130 above)
 
 Jon reviewed the twelve full-size catalog inputs in canonical family order, with each light cell
 immediately followed by its dark sibling. The catalog PNG and complete source-PDF hashes below

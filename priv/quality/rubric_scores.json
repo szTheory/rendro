@@ -17,7 +17,7 @@
       "anchors": {
         "1": "Every field has the same size/weight; no single fact stands out from the rest.",
         "3": "Some size/weight variation exists, but the one fact the reader needs first is not clearly the most prominent element on the page.",
-        "4": "The one fact the reader needs first is visually dominant — larger and/or bolder than everything else.",
+        "4": "The one fact the reader needs first is visually dominant \u2014 larger and/or bolder than everything else.",
         "5": "The key fact is dominant AND every other element recedes in proportion to its importance, producing one unambiguous focal point."
       }
     },
@@ -35,7 +35,7 @@
       "id": "reader_affordances",
       "label": "Reader affordances",
       "anchors": {
-        "1": "No navigational aids exist — a wall of unlabeled text or numbers with no alignment or whitespace to guide scanning.",
+        "1": "No navigational aids exist \u2014 a wall of unlabeled text or numbers with no alignment or whitespace to guide scanning.",
         "3": "Some labels exist, but alignment or whitespace is inconsistent.",
         "4": "Labels, alignment, and whitespace are applied consistently throughout.",
         "5": "Affordances actively anticipate the reader's exact scanning path."
@@ -48,7 +48,7 @@
         "1": "Type sizing/weight is arbitrary or inconsistent; text is cramped, overflowing, or wrapped awkwardly.",
         "3": "Sizing/weight is mostly consistent, but a few awkward line breaks or spacing issues remain.",
         "4": "Sizing, weight, and spacing are consistent throughout with no awkward breaks.",
-        "5": "Every typographic choice reads as intentional — a coherent, deliberate type system with zero awkward breaks."
+        "5": "Every typographic choice reads as intentional \u2014 a coherent, deliberate type system with zero awkward breaks."
       }
     },
     {
@@ -58,7 +58,7 @@
         "1": "The document is visually noisy or internally inconsistent across sections.",
         "3": "The document is mostly restrained, but one or two decorative inconsistencies remain.",
         "4": "The document is fully restrained and internally consistent.",
-        "5": "The document is restrained, consistent, AND every visual element earns its place — nothing could be removed without losing information."
+        "5": "The document is restrained, consistent, AND every visual element earns its place \u2014 nothing could be removed without losing information."
       }
     }
   ],
@@ -111,12 +111,12 @@
       "signed_off_at": "2026-08-17",
       "evidence_ref": "assets/rendro/gallery/invoice.png",
       "justifications": {
-        "information_architecture": "Issuer letterhead, then a bounded Bill To/date/due/terms block, then the line-item table, then subtotal/tax/total — each zone bounded and ordered to match the reader's natural top-to-bottom scan (who's billing -> who's billed/when -> what for -> how much) with no backtracking.",
+        "information_architecture": "Issuer letterhead, then a bounded Bill To/date/due/terms block, then the line-item table, then subtotal/tax/total \u2014 each zone bounded and ordered to match the reader's natural top-to-bottom scan (who's billing -> who's billed/when -> what for -> how much) with no backtracking.",
         "content_hierarchy": "The historical default/0 gallery score remains 5. Phase 126 additionally reviewed the exact pinned-PDFium swiss_invoice_light and corporate_classic_invoice_dark page-one rows at full readable size: the dark table header and body values were readable, while Total Due remains the bounded page focal point. This is a six-row repair review only, not a WCAG, PDF/UA, print-safety, or universal preset-quality claim.",
         "domain_fit": "Issuer address, invoice number, bill-to, due date, payment terms (Net 30), itemized qty/price table, and subtotal/tax/total breakdown together read as a real small-business invoice, not a toy layout.",
         "reader_affordances": "Item/Qty/Price column headers, consistent column alignment, and a clearly labeled subtotal/tax/total stack make the math easy to trace.",
         "typographic_craft": "Consistent 2-decimal money throughout (the prior $79.0 defect is gone); one item description wraps to a second line but wraps cleanly at a word boundary with no overlap or orphan.",
-        "restraint_cohesion": "Restrained and internally consistent; no decorative noise. The lower two-thirds of the page is blank because the fixture has only 5 line items — empty space, not visual clutter."
+        "restraint_cohesion": "Restrained and internally consistent; no decorative noise. The lower two-thirds of the page is blank because the fixture has only 5 line items \u2014 empty space, not visual clutter."
       },
       "domain_md": "priv/examples/invoice/DOMAIN.md"
     },
@@ -145,8 +145,8 @@
       "signed_off_at": "2026-08-17",
       "evidence_ref": "assets/rendro/gallery/statement.png",
       "justifications": {
-        "information_architecture": "Account header, statement period, and opening balance are grouped, immediately followed by the boxed closing-balance summary, then the transaction ledger — matching the way a statement reader actually scans (bottom line first, then verify against detail).",
-        "content_hierarchy": "Re-measured against the themed default/0 raster blessed in 123-03: the boxed 'Closing balance $6,647.56' (display, 21pt themed) computes to 25.9px vs. 'Northwind Ledger Co - Operating Account ****8140' (title, 16.5pt themed) at 20.4px — a 1.27 ratio. Closing balance remains the single largest, unambiguous focal point. Human sign-off 2026-07-28 confirmed dominance on the actual rendered raster — the 2026-07-19 native-scale numbers (26px/19px) no longer describe this render and are superseded here.",
+        "information_architecture": "Account header, statement period, and opening balance are grouped, immediately followed by the boxed closing-balance summary, then the transaction ledger \u2014 matching the way a statement reader actually scans (bottom line first, then verify against detail).",
+        "content_hierarchy": "Re-measured against the themed default/0 raster blessed in 123-03: the boxed 'Closing balance $6,647.56' (display, 21pt themed) computes to 25.9px vs. 'Northwind Ledger Co - Operating Account ****8140' (title, 16.5pt themed) at 20.4px \u2014 a 1.27 ratio. Closing balance remains the single largest, unambiguous focal point. Human sign-off 2026-07-28 confirmed dominance on the actual rendered raster \u2014 the 2026-07-19 native-scale numbers (26px/19px) no longer describe this render and are superseded here.",
         "domain_fit": "Masked account number, statement period, opening balance, boxed closing balance, and a running-balance ledger with parenthesized debits read as a conventional bank/ledger statement.",
         "reader_affordances": "Clear Date/Description/Amount/Balance columns with a running balance make it easy to trace any line.",
         "typographic_craft": "Consistent money formatting and clean alignment throughout, including the closing-balance box.",
@@ -179,8 +179,8 @@
       "signed_off_at": "2026-07-28",
       "evidence_ref": "assets/rendro/gallery/receipt_report.png",
       "justifications": {
-        "information_architecture": "The merchant identity (Harbor & Oak Cafe + address) now heads the render, followed by the sales-receipt/guest/date block, item table, and totals — each group bounded and ordered top-to-bottom the way a receipt is naturally scanned.",
-        "content_hierarchy": "Re-measured against the themed default/0 raster blessed in 123-03: 'Total: $30.78' (display, 21pt themed) computes to 25.9px vs. the 'Harbor & Oak Cafe / 214 Wharf Street...' merchant block (title, 16.5pt themed) at 20.4px — a 1.27 ratio. Total remains the single largest element and the clear focal point. Human sign-off 2026-07-28 confirmed dominance on the actual rendered raster — the 2026-07-19 native-scale numbers (22px/17-19px) no longer describe this render and are superseded here.",
+        "information_architecture": "The merchant identity (Harbor & Oak Cafe + address) now heads the render, followed by the sales-receipt/guest/date block, item table, and totals \u2014 each group bounded and ordered top-to-bottom the way a receipt is naturally scanned.",
+        "content_hierarchy": "Re-measured against the themed default/0 raster blessed in 123-03: 'Total: $30.78' (display, 21pt themed) computes to 25.9px vs. the 'Harbor & Oak Cafe / 214 Wharf Street...' merchant block (title, 16.5pt themed) at 20.4px \u2014 a 1.27 ratio. Total remains the single largest element and the clear focal point. Human sign-off 2026-07-28 confirmed dominance on the actual rendered raster \u2014 the 2026-07-19 native-scale numbers (22px/17-19px) no longer describe this render and are superseded here.",
         "domain_fit": "Merchant name/address, Sales Receipt label, item list, and subtotal/tax/total now read as a conventional retail receipt (previously missing the merchant identity entirely).",
         "reader_affordances": "Description/Amount columns plus a subtotal/tax/total breakdown make the math easy to follow.",
         "typographic_craft": "Clean and consistent money and alignment.",
@@ -214,7 +214,7 @@
       "evidence_ref": "assets/rendro/gallery/certificate.png",
       "justifications": {
         "information_architecture": "Content is now vertically and horizontally centered within the border as a single ceremonial flow (title -> 'this certifies that' -> recipient -> body -> date -> signatory), matching the order a reader naturally scans a certificate.",
-        "content_hierarchy": "Re-measured against the themed default/0 raster blessed in 123-03: 'Alex Rivera' (display, 21pt themed) computes to 25.9px vs. 'Certificate of Completion' (title, 16.5pt themed) at 20.4px — a 1.27 ratio, DOWN from the native-scale 1.70 measured 2026-07-19 (the theme's uniform scale compresses recipient/title from 34pt/26pt to 21pt/16.5pt). This compression is real and is recorded honestly, not hidden — see priv/quality/SIGN-OFF.md. Human visual sign-off 2026-07-28 confirmed the recipient name still reads as the single unambiguous focal point on the actual re-blessed raster, so content_hierarchy honestly clears 5 at the compressed ratio — noted-but-acceptable, not silently passed.",
+        "content_hierarchy": "Re-measured against the themed default/0 raster blessed in 123-03: 'Alex Rivera' (display, 21pt themed) computes to 25.9px vs. 'Certificate of Completion' (title, 16.5pt themed) at 20.4px \u2014 a 1.27 ratio, DOWN from the native-scale 1.70 measured 2026-07-19 (the theme's uniform scale compresses recipient/title from 34pt/26pt to 21pt/16.5pt). This compression is real and is recorded honestly, not hidden \u2014 see priv/quality/SIGN-OFF.md. Human visual sign-off 2026-07-28 confirmed the recipient name still reads as the single unambiguous focal point on the actual re-blessed raster, so content_hierarchy honestly clears 5 at the compressed ratio \u2014 noted-but-acceptable, not silently passed.",
         "domain_fit": "Centered, bordered, ceremonial layout with title/recipient/body/date/signatory reads as a real-world certificate, not a top-left log entry.",
         "reader_affordances": "Centering and the width-constrained (68%) body paragraph guide the eye down the page consistently; no explicit field labels are needed for this document type.",
         "typographic_craft": "Consistent sizing/weight; the body paragraph now wraps within its constrained width with clean line breaks instead of running edge-to-edge.",
@@ -248,7 +248,7 @@
       "evidence_ref": "assets/rendro/gallery/payslip.png",
       "justifications": {
         "information_architecture": "Employer/employee header, the Net Pay box, and the earnings/deductions table (separated by a spacer column) are each clearly bounded and ordered net-pay-first, matching how a payslip is scanned.",
-        "content_hierarchy": "Re-measured against the themed default/0 raster blessed in 123-03: 'NET PAY $3,292.50' (display, 21pt themed) computes to 25.9px vs. the 'Employer: Aurora Live / 18 Northgate Road...' header block (title, 16.5pt themed) at 20.4px — a 1.27 ratio. NET PAY remains unambiguously dominant in its boxed line. Human sign-off 2026-07-28 confirmed dominance on the actual rendered raster.",
+        "content_hierarchy": "Re-measured against the themed default/0 raster blessed in 123-03: 'NET PAY $3,292.50' (display, 21pt themed) computes to 25.9px vs. the 'Employer: Aurora Live / 18 Northgate Road...' header block (title, 16.5pt themed) at 20.4px \u2014 a 1.27 ratio. NET PAY remains unambiguously dominant in its boxed line. Human sign-off 2026-07-28 confirmed dominance on the actual rendered raster.",
         "domain_fit": "Reads as a conventional UK payslip: PAYE, National Insurance, pension, tax code, YTD columns.",
         "reader_affordances": "Header row reads 'YTD Deductions' with a clear space (a narrow spacer column separates the groups) instead of a 'YTDDeductions' collision.",
         "typographic_craft": "Phase 126's exact pinned-PDFium humanist_payslip_dark and brutalist_payslip_dark page-one review found '$4,200.00' and '$25,200.00' unbroken, right-aligned, and unclipped after the measured themed-width repair. The score remains 4: this bounded fixture evidence resolves WINDOWS id 3 without claiming universal typography quality, accessibility, PDF/UA, or print safety.",
@@ -299,8 +299,8 @@
       "preset": null,
       "mode": "light",
       "evidence_ref": "assets/rendro/catalog/invoice/default/default-light.png",
-    "png_sha256": "e592870f68abc9e0591973eb68725ba656651421e143f8df9d9c424f752ce69a",
-    "source_pdf_sha256": "640b58c123cb9ba876606a159feadb2b0aff28d99e91ce3b38d8e3713b8a62a2",
+      "png_sha256": "e592870f68abc9e0591973eb68725ba656651421e143f8df9d9c424f752ce69a",
+      "source_pdf_sha256": "640b58c123cb9ba876606a159feadb2b0aff28d99e91ce3b38d8e3713b8a62a2",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
@@ -312,8 +312,8 @@
       "preset": "swiss",
       "mode": "light",
       "evidence_ref": "assets/rendro/catalog/invoice/northline-logistics/swiss-light.png",
-    "png_sha256": "0840f21faf8c56f7b703471e7787211d8e10f35cef3ef83b122bbbc1b2b0d147",
-    "source_pdf_sha256": "1c02186c1f80e4e56cc47e9f385ba25e9f480cdb8f9f64b684c50d884893024c",
+      "png_sha256": "0840f21faf8c56f7b703471e7787211d8e10f35cef3ef83b122bbbc1b2b0d147",
+      "source_pdf_sha256": "1c02186c1f80e4e56cc47e9f385ba25e9f480cdb8f9f64b684c50d884893024c",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
@@ -325,22 +325,22 @@
       "preset": "swiss",
       "mode": "dark",
       "evidence_ref": "assets/rendro/catalog/invoice/northline-logistics/swiss-dark.png",
-    "png_sha256": "227a54446b315fcf3c1d76d9d5b56cb5f02c55be2582dd0ed0aac395a23458fa",
-    "source_pdf_sha256": "d8f9504692bedef4c3c0b292f7c830221985a50e7e88c231c8ae3ff1a971ab41",
+      "png_sha256": "227a54446b315fcf3c1d76d9d5b56cb5f02c55be2582dd0ed0aac395a23458fa",
+      "source_pdf_sha256": "d8f9504692bedef4c3c0b292f7c830221985a50e7e88c231c8ae3ff1a971ab41",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
     },
     {
-    "brand": "cedar-mutual",
-    "catalog_id": "invoice--cedar-mutual--corporate-classic--light",
-    "dimension_scores": {
-      "content_hierarchy": 5,
-      "domain_fit": 4,
-      "information_architecture": 4,
-      "reader_affordances": 4,
-      "restraint_cohesion": 4,
-      "typographic_craft": 4
+      "brand": "cedar-mutual",
+      "catalog_id": "invoice--cedar-mutual--corporate-classic--light",
+      "dimension_scores": {
+        "content_hierarchy": 5,
+        "domain_fit": 4,
+        "information_architecture": 4,
+        "reader_affordances": 4,
+        "restraint_cohesion": 4,
+        "typographic_craft": 4
       },
       "evidence_ref": "assets/rendro/catalog/invoice/cedar-mutual/corporate-classic-light.png",
       "family": "invoice",
@@ -349,35 +349,35 @@
         "reading_order": true
       },
       "justifications": {
-        "content_hierarchy": "Total and due information are visible but not judged at the required unambiguous 5-level focal dominance.",
-        "domain_fit": "Cedar Mutual identity, billing fields, itemization, and amount ladder read as a real invoice.",
-        "information_architecture": "Issuer, bill-to, invoice facts, line items, and totals form a credible top-to-bottom invoice scan, though the provisional review reserves a higher hierarchy bar.",
-        "reader_affordances": "Labels and aligned money columns support payment review, with no blanket usability claim.",
-        "restraint_cohesion": "Corporate-Classic treatment is coherent and restrained for this exact cell.",
-        "typographic_craft": "Type and numeric alignment look competent in this exact light raster; a higher-fidelity typography ratchet remains deferred."
+        "information_architecture": "issuer/invoice/bill-to, items, amount ladder, and due date form expected top-down groups.",
+        "content_hierarchy": "blue Total Due is uniquely largest and due date recedes immediately below.",
+        "domain_fit": "invoice number/date/bill-to/terms/qty/price/subtotal/tax/total/due are conventional.",
+        "reader_affordances": "labels and money columns align and description wraps stay contained.",
+        "typographic_craft": "type scale and numeric treatment are consistent with no clipping, intentionally plain.",
+        "restraint_cohesion": "one accent and sparse composition stay coherent and payment-focused."
       },
       "mode": "light",
-    "passed": true,
-    "png_sha256": "aa6245724dfb8c7a5ff63dcddf4033504f6484e893aa6908b2d199dc91b33f8d",
+      "passed": true,
+      "png_sha256": "aa6245724dfb8c7a5ff63dcddf4033504f6484e893aa6908b2d199dc91b33f8d",
       "preset": "corporate-classic",
-    "recorded_at": "2026-08-20",
+      "recorded_at": "2026-08-20",
       "review_status": "scored",
-    "signed_off_at": "2026-08-20",
+      "signed_off_at": "2026-08-20",
       "signed_off_by": "Jon",
-    "source_pdf_sha256": "09d1d39d49912fd2dcb33f0a55e55bc3903cf233dc6e8abe66e16cc0db1483a3",
-    "supersedes_evidence_ref": "assets/rendro/catalog/invoice/cedar-mutual/corporate-classic-light.png",
-    "resolution_ref": "8250056f0cfb2e69e11f68e5b45629fd82a7e2b1"
+      "source_pdf_sha256": "09d1d39d49912fd2dcb33f0a55e55bc3903cf233dc6e8abe66e16cc0db1483a3",
+      "supersedes_evidence_ref": "assets/rendro/catalog/invoice/cedar-mutual/corporate-classic-light.png",
+      "resolution_ref": "8250056f0cfb2e69e11f68e5b45629fd82a7e2b1"
     },
     {
       "brand": "cedar-mutual",
       "catalog_id": "invoice--cedar-mutual--corporate-classic--dark",
       "dimension_scores": {
-      "content_hierarchy": 5,
+        "content_hierarchy": 5,
         "domain_fit": 4,
         "information_architecture": 4,
-      "reader_affordances": 3,
-      "restraint_cohesion": 3,
-      "typographic_craft": 3
+        "reader_affordances": 3,
+        "restraint_cohesion": 3,
+        "typographic_craft": 3
       },
       "evidence_ref": "assets/rendro/catalog/invoice/cedar-mutual/corporate-classic-dark.png",
       "family": "invoice",
@@ -386,24 +386,24 @@
         "reading_order": true
       },
       "justifications": {
-        "content_hierarchy": "Key payment facts are visible, but this provisional review does not award 5-level dominance.",
-        "domain_fit": "The exact dark cell still reads as a credible invoice with billing and payment anatomy.",
-        "information_architecture": "The same issuer-to-total invoice flow remains understandable in the screen-oriented dark rendition.",
-        "reader_affordances": "Table labels and amount alignment support an on-screen scan without extending to accessibility claims.",
-        "restraint_cohesion": "The dark Corporate-Classic treatment stays visually cohesive on screen; it is not a print claim.",
-        "typographic_craft": "Typography is provisionally competent in this exact screen image; further color and typography ratcheting is reserved."
+        "information_architecture": "same groups remain understandable.",
+        "content_hierarchy": "Total Due remains the unambiguous focal amount.",
+        "domain_fit": "full invoice anatomy remains present.",
+        "reader_affordances": "Item/Qty/Price plus invoice/bill/date/subtotal labels are low-contrast against black and slow scanning.",
+        "typographic_craft": "multiple muted/label tones approach the background despite intact alignment.",
+        "restraint_cohesion": "layout/accent are consistent but uneven contrast weakens cohesion."
       },
       "mode": "dark",
       "passed": false,
-    "png_sha256": "7a8fd547fdab8314b3d5c092aa231b1c93432ddbb0371f7180c871866c81d3b2",
+      "png_sha256": "7a8fd547fdab8314b3d5c092aa231b1c93432ddbb0371f7180c871866c81d3b2",
       "preset": "corporate-classic",
-    "recorded_at": "2026-08-20",
+      "recorded_at": "2026-08-20",
       "review_status": "scored",
-    "signed_off_at": "2026-08-20",
+      "signed_off_at": "2026-08-20",
       "signed_off_by": "Jon",
-    "source_pdf_sha256": "50a4515a7ba347900a3ec784d98db27a58880c01f13a23c35dd1de093664ceef",
-    "supersedes_evidence_ref": "assets/rendro/catalog/invoice/cedar-mutual/corporate-classic-dark.png",
-    "resolution_ref": "8250056f0cfb2e69e11f68e5b45629fd82a7e2b1"
+      "source_pdf_sha256": "50a4515a7ba347900a3ec784d98db27a58880c01f13a23c35dd1de093664ceef",
+      "supersedes_evidence_ref": "assets/rendro/catalog/invoice/cedar-mutual/corporate-classic-dark.png",
+      "resolution_ref": "8250056f0cfb2e69e11f68e5b45629fd82a7e2b1"
     },
     {
       "catalog_id": "statement--default--default--light",
@@ -412,8 +412,8 @@
       "preset": null,
       "mode": "light",
       "evidence_ref": "assets/rendro/catalog/statement/default/default-light.png",
-    "png_sha256": "de1e53c5397454a453fa6723d424befb5a72327009677a1d0e46d1aadf4b34f1",
-    "source_pdf_sha256": "d035e901fb5d17800242b1c6e8ede3383444d09451cc997d935ac37435b462d4",
+      "png_sha256": "de1e53c5397454a453fa6723d424befb5a72327009677a1d0e46d1aadf4b34f1",
+      "source_pdf_sha256": "d035e901fb5d17800242b1c6e8ede3383444d09451cc997d935ac37435b462d4",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
@@ -422,11 +422,11 @@
       "brand": "signal-ledger",
       "catalog_id": "statement--signal-ledger--minimal-mono--light",
       "dimension_scores": {
-      "content_hierarchy": 5,
+        "content_hierarchy": 5,
         "domain_fit": 4,
-      "information_architecture": 5,
+        "information_architecture": 5,
         "reader_affordances": 4,
-      "restraint_cohesion": 5,
+        "restraint_cohesion": 5,
         "typographic_craft": 4
       },
       "evidence_ref": "assets/rendro/catalog/statement/signal-ledger/minimal-mono-light.png",
@@ -436,35 +436,35 @@
         "reading_order": true
       },
       "justifications": {
-        "content_hierarchy": "Closing-balance emphasis is present but not rated at the strict 5-level threshold in this provisional review.",
-        "domain_fit": "The account period, transactions, and running-balance structure read as a real statement.",
-        "information_architecture": "Account context, balance summary, and ledger form a credible statement reading sequence.",
-        "reader_affordances": "Column labels and ledger alignment support reconciliation in this named raster.",
-        "restraint_cohesion": "The light treatment is disciplined and visually consistent without a passing-quality assertion.",
-        "typographic_craft": "Minimal-Mono type treatment is coherent, while a future high-fidelity typography ratchet remains open."
+        "information_architecture": "account/period/opening/closing/ledger follow the reconciliation path without backtracking.",
+        "content_hierarchy": "closing balance is uniquely dominant in the full-width band.",
+        "domain_fit": "masked account, period, balances, signed transactions, and running balance are conventional.",
+        "reader_affordances": "aligned headers/amounts and parenthesized withdrawals support tracing.",
+        "typographic_craft": "mono focal amount and body typography are clean; the compact context remains readable.",
+        "restraint_cohesion": "austere rules/band are cohesive and every element supports reconciliation."
       },
       "mode": "light",
-    "passed": true,
-    "png_sha256": "526f0891bab69935419f7039d3dd4d5e20a21ad4b5e37efd70102ee3f0c38017",
+      "passed": true,
+      "png_sha256": "526f0891bab69935419f7039d3dd4d5e20a21ad4b5e37efd70102ee3f0c38017",
       "preset": "minimal-mono",
-    "recorded_at": "2026-08-20",
+      "recorded_at": "2026-08-20",
       "review_status": "scored",
-    "signed_off_at": "2026-08-20",
+      "signed_off_at": "2026-08-20",
       "signed_off_by": "Jon",
-    "source_pdf_sha256": "79f6fe32659321db254670bbbdcd9db392cdfe323125e98905d6df2e9bfa44b9",
-    "supersedes_evidence_ref": "assets/rendro/catalog/statement/signal-ledger/minimal-mono-light.png",
-    "resolution_ref": "8fa8d0aca830e207c14d68cefcafa65e020644ca"
+      "source_pdf_sha256": "79f6fe32659321db254670bbbdcd9db392cdfe323125e98905d6df2e9bfa44b9",
+      "supersedes_evidence_ref": "assets/rendro/catalog/statement/signal-ledger/minimal-mono-light.png",
+      "resolution_ref": "8fa8d0aca830e207c14d68cefcafa65e020644ca"
     },
     {
       "brand": "signal-ledger",
       "catalog_id": "statement--signal-ledger--minimal-mono--dark",
       "dimension_scores": {
-      "content_hierarchy": 5,
+        "content_hierarchy": 5,
         "domain_fit": 4,
         "information_architecture": 4,
-      "reader_affordances": 3,
-      "restraint_cohesion": 3,
-      "typographic_craft": 3
+        "reader_affordances": 3,
+        "restraint_cohesion": 3,
+        "typographic_craft": 3
       },
       "evidence_ref": "assets/rendro/catalog/statement/signal-ledger/minimal-mono-dark.png",
       "family": "statement",
@@ -473,24 +473,24 @@
         "reading_order": true
       },
       "justifications": {
-        "content_hierarchy": "The balance summary is visible but is conservatively below the required 5-level focal verdict.",
-        "domain_fit": "Statement anatomy remains credible for the named dark render.",
-        "information_architecture": "Account-to-ledger flow remains intelligible in this exact screen-oriented dark cell.",
-        "reader_affordances": "Ledger labels and aligned figures support an on-screen scan only.",
-        "restraint_cohesion": "Minimal-Mono remains cohesive on screen; the record intentionally makes no print claim.",
-        "typographic_craft": "The exact dark raster is provisionally legible, pending a higher-fidelity color and type review."
+        "information_architecture": "account-to-balance-to-ledger structure remains understandable.",
+        "content_hierarchy": "closing balance remains uniquely dominant.",
+        "domain_fit": "statement anatomy remains complete.",
+        "reader_affordances": "Date/Description/Amount/Balance headings and some context text are near-background, reducing scan support.",
+        "typographic_craft": "muted context and header contrast are visibly uneven.",
+        "restraint_cohesion": "minimal structure remains consistent but contrast inconsistency prevents full cohesion."
       },
       "mode": "dark",
       "passed": false,
-    "png_sha256": "63d945425634be00fb4b655f408795fd8558f01f44b8d286760fb76777a73815",
+      "png_sha256": "63d945425634be00fb4b655f408795fd8558f01f44b8d286760fb76777a73815",
       "preset": "minimal-mono",
-    "recorded_at": "2026-08-20",
+      "recorded_at": "2026-08-20",
       "review_status": "scored",
-    "signed_off_at": "2026-08-20",
+      "signed_off_at": "2026-08-20",
       "signed_off_by": "Jon",
-    "source_pdf_sha256": "c0ee94af4cb7faa19e5a7b68152a65db20e4fd944a9101ec9ace64576b0c229d",
-    "supersedes_evidence_ref": "assets/rendro/catalog/statement/signal-ledger/minimal-mono-dark.png",
-    "resolution_ref": "8fa8d0aca830e207c14d68cefcafa65e020644ca"
+      "source_pdf_sha256": "c0ee94af4cb7faa19e5a7b68152a65db20e4fd944a9101ec9ace64576b0c229d",
+      "supersedes_evidence_ref": "assets/rendro/catalog/statement/signal-ledger/minimal-mono-dark.png",
+      "resolution_ref": "8fa8d0aca830e207c14d68cefcafa65e020644ca"
     },
     {
       "catalog_id": "statement--aster-research-fund--editorial--light",
@@ -499,8 +499,8 @@
       "preset": "editorial",
       "mode": "light",
       "evidence_ref": "assets/rendro/catalog/statement/aster-research-fund/editorial-light.png",
-    "png_sha256": "4ec741f91d0436486de1805403449182de05ecca695e3152bd23af9b34673b1f",
-    "source_pdf_sha256": "793eefdc918519e50ec3310a2ffa36f88ef034f7dcab046e8d28ca731e29e7ab",
+      "png_sha256": "4ec741f91d0436486de1805403449182de05ecca695e3152bd23af9b34673b1f",
+      "source_pdf_sha256": "793eefdc918519e50ec3310a2ffa36f88ef034f7dcab046e8d28ca731e29e7ab",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
@@ -512,8 +512,8 @@
       "preset": "editorial",
       "mode": "dark",
       "evidence_ref": "assets/rendro/catalog/statement/aster-research-fund/editorial-dark.png",
-    "png_sha256": "17332c04a1d507f326bf296e16e79699d5acf37f6fe9723a40169c2d4ec76795",
-    "source_pdf_sha256": "8a5514348386f48d1b6c0a1b222a394d8b4c44dee355ac93dea9e64117848eef",
+      "png_sha256": "17332c04a1d507f326bf296e16e79699d5acf37f6fe9723a40169c2d4ec76795",
+      "source_pdf_sha256": "8a5514348386f48d1b6c0a1b222a394d8b4c44dee355ac93dea9e64117848eef",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
@@ -525,22 +525,22 @@
       "preset": null,
       "mode": "light",
       "evidence_ref": "assets/rendro/catalog/receipt/default/default-light.png",
-    "png_sha256": "2ee376b4024f0f38ed9fb5099f7a806f3e7069148400b9f827e5fb06449b514b",
-    "source_pdf_sha256": "2dde87ab329ad4cd53e0b27273536f3f3b3d6d30a21889e9ce97b67a222a7f5f",
+      "png_sha256": "2ee376b4024f0f38ed9fb5099f7a806f3e7069148400b9f827e5fb06449b514b",
+      "source_pdf_sha256": "2dde87ab329ad4cd53e0b27273536f3f3b3d6d30a21889e9ce97b67a222a7f5f",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
     },
     {
-    "brand": "poppy-and-grain",
-    "catalog_id": "receipt--poppy-and-grain--humanist--light",
-    "dimension_scores": {
-      "content_hierarchy": 5,
-      "domain_fit": 4,
-      "information_architecture": 5,
-      "reader_affordances": 5,
-      "restraint_cohesion": 5,
-      "typographic_craft": 4
+      "brand": "poppy-and-grain",
+      "catalog_id": "receipt--poppy-and-grain--humanist--light",
+      "dimension_scores": {
+        "content_hierarchy": 5,
+        "domain_fit": 4,
+        "information_architecture": 5,
+        "reader_affordances": 5,
+        "restraint_cohesion": 5,
+        "typographic_craft": 4
       },
       "evidence_ref": "assets/rendro/catalog/receipt/poppy-and-grain/humanist-light.png",
       "family": "receipt",
@@ -549,35 +549,35 @@
         "reading_order": true
       },
       "justifications": {
-        "content_hierarchy": "The total is visible but not judged as an unambiguous 5-level focal point.",
-        "domain_fit": "Poppy & Grain identity, purchase details, and payment total read as a real receipt.",
-        "information_architecture": "Merchant, receipt facts, item rows, and total form a credible compact receipt scan.",
-        "reader_affordances": "Compact labels and aligned amounts support checking the transaction.",
-        "restraint_cohesion": "The light treatment is cohesive without implying a passing quality verdict.",
-        "typographic_craft": "The light Humanist raster is provisionally competent, with later high-fidelity typography work still needed."
+        "information_architecture": "merchant/date/items/arithmetic/total match the point-of-sale scan.",
+        "content_hierarchy": "Total is the sole display-scale fact.",
+        "domain_fit": "merchant/date/itemization/subtotal/tax/paid total are credible receipt anatomy.",
+        "reader_affordances": "compact labels and right-aligned amounts actively lead to the total.",
+        "typographic_craft": "sizing/weight/spacing are consistent with no awkward breaks.",
+        "restraint_cohesion": "the quiet warm band/rule earns its place and the slip remains restrained."
       },
       "mode": "light",
-    "passed": true,
-    "png_sha256": "8ee9808a5d2edd9e292941ef01b63c16cc3488a816f7a206815ecd5c7a0a719e",
+      "passed": true,
+      "png_sha256": "8ee9808a5d2edd9e292941ef01b63c16cc3488a816f7a206815ecd5c7a0a719e",
       "preset": "humanist",
-    "recorded_at": "2026-08-20",
+      "recorded_at": "2026-08-20",
       "review_status": "scored",
-    "signed_off_at": "2026-08-20",
+      "signed_off_at": "2026-08-20",
       "signed_off_by": "Jon",
-    "source_pdf_sha256": "940a09cf42373afa043727508a6e1e0bd84f673d7ce92a69131cfac8ff791a4b",
-    "supersedes_evidence_ref": "assets/rendro/catalog/receipt/poppy-and-grain/humanist-light.png",
-    "resolution_ref": "d75e72bf521503183a7a5d4382b3dcd8cf2b0cf7"
+      "source_pdf_sha256": "940a09cf42373afa043727508a6e1e0bd84f673d7ce92a69131cfac8ff791a4b",
+      "supersedes_evidence_ref": "assets/rendro/catalog/receipt/poppy-and-grain/humanist-light.png",
+      "resolution_ref": "d75e72bf521503183a7a5d4382b3dcd8cf2b0cf7"
     },
     {
       "brand": "poppy-and-grain",
-    "catalog_id": "receipt--poppy-and-grain--humanist--dark",
-    "dimension_scores": {
-      "content_hierarchy": 5,
-      "domain_fit": 4,
-      "information_architecture": 5,
-      "reader_affordances": 5,
-      "restraint_cohesion": 5,
-      "typographic_craft": 4
+      "catalog_id": "receipt--poppy-and-grain--humanist--dark",
+      "dimension_scores": {
+        "content_hierarchy": 5,
+        "domain_fit": 4,
+        "information_architecture": 5,
+        "reader_affordances": 5,
+        "restraint_cohesion": 5,
+        "typographic_craft": 4
       },
       "evidence_ref": "assets/rendro/catalog/receipt/poppy-and-grain/humanist-dark.png",
       "family": "receipt",
@@ -586,24 +586,24 @@
         "reading_order": true
       },
       "justifications": {
-        "content_hierarchy": "The total is visible but does not clear the strict 5-level hierarchy bar.",
-        "domain_fit": "Receipt identity, transaction rows, and totals remain domain-credible.",
-        "information_architecture": "The merchant-to-total receipt sequence remains structurally understandable.",
-        "reader_affordances": "Black/dark text over brown or black-ish areas, especially the description, impairs the on-screen reading affordance.",
-        "restraint_cohesion": "The Humanist dark palette has some cohesion, but the observed low-contrast-looking areas keep it below the ordinary provisional score.",
-        "typographic_craft": "The observed dark-on-brown/black-ish text treatment, especially description text, needs high-fidelity color and typography ratcheting."
+        "information_architecture": "same compact transaction sequence is immediate.",
+        "content_hierarchy": "Total is the sole focal fact.",
+        "domain_fit": "receipt anatomy is complete.",
+        "reader_affordances": "all descriptions/amounts/arithmetic are legible and aligned; the prior dark contrast deficit is visibly repaired.",
+        "typographic_craft": "type scale and contrast are consistent with no awkward breaks.",
+        "restraint_cohesion": "the restrained dark surface/rule is cohesive."
       },
       "mode": "dark",
       "passed": false,
-    "png_sha256": "9431349b4908cbe3e38b5649ffc1a67c3bb9b2261ccb9f89b22e976f676b84ac",
+      "png_sha256": "9431349b4908cbe3e38b5649ffc1a67c3bb9b2261ccb9f89b22e976f676b84ac",
       "preset": "humanist",
-    "recorded_at": "2026-08-20",
+      "recorded_at": "2026-08-20",
       "review_status": "scored",
-    "signed_off_at": "2026-08-20",
+      "signed_off_at": "2026-08-20",
       "signed_off_by": "Jon",
-    "source_pdf_sha256": "4612d45d09df7d1b8aa9f8dddf288cc8c8ca2058d8fddcf7f518cfdd0d6171ae",
-    "supersedes_evidence_ref": "assets/rendro/catalog/receipt/poppy-and-grain/humanist-dark.png",
-    "resolution_ref": "d75e72bf521503183a7a5d4382b3dcd8cf2b0cf7"
+      "source_pdf_sha256": "4612d45d09df7d1b8aa9f8dddf288cc8c8ca2058d8fddcf7f518cfdd0d6171ae",
+      "supersedes_evidence_ref": "assets/rendro/catalog/receipt/poppy-and-grain/humanist-dark.png",
+      "resolution_ref": "d75e72bf521503183a7a5d4382b3dcd8cf2b0cf7"
     },
     {
       "catalog_id": "receipt--circuit-supply-co--minimal-mono--light",
@@ -612,8 +612,8 @@
       "preset": "minimal-mono",
       "mode": "light",
       "evidence_ref": "assets/rendro/catalog/receipt/circuit-supply-co/minimal-mono-light.png",
-    "png_sha256": "382a70c40af4c5c4498166d2d85834011bc8b0f91bd404e79cfded4671de5efa",
-    "source_pdf_sha256": "43fb2489643f8ec945e08073aee63b845f4a0eac19a97f9795dae6cf2855cfa9",
+      "png_sha256": "382a70c40af4c5c4498166d2d85834011bc8b0f91bd404e79cfded4671de5efa",
+      "source_pdf_sha256": "43fb2489643f8ec945e08073aee63b845f4a0eac19a97f9795dae6cf2855cfa9",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
@@ -625,8 +625,8 @@
       "preset": "minimal-mono",
       "mode": "dark",
       "evidence_ref": "assets/rendro/catalog/receipt/circuit-supply-co/minimal-mono-dark.png",
-    "png_sha256": "46e0721e16970430c3d35083c4a266682eeca0a9c3370dde2d67e9d5f8376924",
-    "source_pdf_sha256": "3ebb88c4c4184dbd1e6a1e7c08d9578dd4d8c480344b706031c3ebdee711d103",
+      "png_sha256": "46e0721e16970430c3d35083c4a266682eeca0a9c3370dde2d67e9d5f8376924",
+      "source_pdf_sha256": "3ebb88c4c4184dbd1e6a1e7c08d9578dd4d8c480344b706031c3ebdee711d103",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
@@ -638,8 +638,8 @@
       "preset": null,
       "mode": "light",
       "evidence_ref": "assets/rendro/catalog/certificate/default/default-light.png",
-    "png_sha256": "66adb7fe66d66d6d7e0d231929613c4f8478fc5c628c09d28024826d6867cfde",
-    "source_pdf_sha256": "e55b71ff1a40792450bb9c577e72e578047e38f12b31176def52f6679434777d",
+      "png_sha256": "66adb7fe66d66d6d7e0d231929613c4f8478fc5c628c09d28024826d6867cfde",
+      "source_pdf_sha256": "e55b71ff1a40792450bb9c577e72e578047e38f12b31176def52f6679434777d",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
@@ -651,8 +651,8 @@
       "preset": "swiss",
       "mode": "light",
       "evidence_ref": "assets/rendro/catalog/certificate/aster-institute/swiss-light.png",
-    "png_sha256": "c999546de58d5d3c9293cbd121fd51de8a2e68cb351fe086e34f56e48ef235bc",
-    "source_pdf_sha256": "34ff3bfec4d064d30079df7ae0c078f5c8ffba3693be6d37a9b6128b3c3b56ec",
+      "png_sha256": "c999546de58d5d3c9293cbd121fd51de8a2e68cb351fe086e34f56e48ef235bc",
+      "source_pdf_sha256": "34ff3bfec4d064d30079df7ae0c078f5c8ffba3693be6d37a9b6128b3c3b56ec",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
@@ -664,8 +664,8 @@
       "preset": "swiss",
       "mode": "dark",
       "evidence_ref": "assets/rendro/catalog/certificate/aster-institute/swiss-dark.png",
-    "png_sha256": "fe344823abe3b621500c18462d8c2728efd66d28b6ade7da52ff9d77cfdc4225",
-    "source_pdf_sha256": "31b1788a73ab11a82689ed12cbe89634cea567bd44bb6e3bb555dde0ad7b7d74",
+      "png_sha256": "fe344823abe3b621500c18462d8c2728efd66d28b6ade7da52ff9d77cfdc4225",
+      "source_pdf_sha256": "31b1788a73ab11a82689ed12cbe89634cea567bd44bb6e3bb555dde0ad7b7d74",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
@@ -674,11 +674,11 @@
       "brand": "meridian-arts-fellowship",
       "catalog_id": "certificate--meridian-arts-fellowship--editorial--light",
       "dimension_scores": {
-      "content_hierarchy": 5,
+        "content_hierarchy": 5,
         "domain_fit": 4,
-      "information_architecture": 5,
+        "information_architecture": 5,
         "reader_affordances": 4,
-      "restraint_cohesion": 5,
+        "restraint_cohesion": 5,
         "typographic_craft": 4
       },
       "evidence_ref": "assets/rendro/catalog/certificate/meridian-arts-fellowship/editorial-light.png",
@@ -688,34 +688,34 @@
         "reading_order": true
       },
       "justifications": {
-        "content_hierarchy": "Recipient and credential are visible but not awarded the strict 5-level hierarchy result.",
-        "domain_fit": "Landscape composition and Fellowship identity read as a credible certificate.",
-        "information_architecture": "Title, recipient, award statement, and issuer details make a coherent ceremonial sequence.",
-        "reader_affordances": "Centered grouping supports a deliberate ceremonial read in this exact cell.",
-        "restraint_cohesion": "The light Editorial composition is restrained and internally consistent.",
-        "typographic_craft": "Editorial typography is provisionally competent; further high-fidelity work remains a future ratchet."
+        "information_architecture": "recipient/credential/body/date/signatory form a centered ceremonial sequence.",
+        "content_hierarchy": "Elena Morales is largest, credential clearly second, all else recedes.",
+        "domain_fit": "landscape attestation and signatory read as a credible certificate, though deliberately minimal.",
+        "reader_affordances": "centered symmetry supports a deliberate ceremonial read.",
+        "typographic_craft": "serif hierarchy plus compact sans body/signatory are consistent and clean.",
+        "restraint_cohesion": "generous whitespace and symmetry are fully restrained."
       },
       "mode": "light",
-    "passed": true,
-    "png_sha256": "4db36148da0951f38062ceafbe506f7c0044dc69351a5e186b4fd9ca98e9d066",
+      "passed": true,
+      "png_sha256": "4db36148da0951f38062ceafbe506f7c0044dc69351a5e186b4fd9ca98e9d066",
       "preset": "editorial",
-    "recorded_at": "2026-08-20",
+      "recorded_at": "2026-08-20",
       "review_status": "scored",
-    "signed_off_at": "2026-08-20",
+      "signed_off_at": "2026-08-20",
       "signed_off_by": "Jon",
-    "source_pdf_sha256": "3171693135a99bf63583f61fff72c8b67f2e98cdef164d5c5ad4d8c96fc17e7b",
-    "supersedes_evidence_ref": "assets/rendro/catalog/certificate/meridian-arts-fellowship/editorial-light.png",
-    "resolution_ref": "704a58b1747e2dfeb506490c4ade9424737e924a"
+      "source_pdf_sha256": "3171693135a99bf63583f61fff72c8b67f2e98cdef164d5c5ad4d8c96fc17e7b",
+      "supersedes_evidence_ref": "assets/rendro/catalog/certificate/meridian-arts-fellowship/editorial-light.png",
+      "resolution_ref": "704a58b1747e2dfeb506490c4ade9424737e924a"
     },
     {
       "brand": "meridian-arts-fellowship",
       "catalog_id": "certificate--meridian-arts-fellowship--editorial--dark",
       "dimension_scores": {
-      "content_hierarchy": 5,
+        "content_hierarchy": 5,
         "domain_fit": 4,
-      "information_architecture": 5,
+        "information_architecture": 5,
         "reader_affordances": 4,
-      "restraint_cohesion": 5,
+        "restraint_cohesion": 5,
         "typographic_craft": 4
       },
       "evidence_ref": "assets/rendro/catalog/certificate/meridian-arts-fellowship/editorial-dark.png",
@@ -725,24 +725,24 @@
         "reading_order": true
       },
       "justifications": {
-        "content_hierarchy": "Recipient and credential prominence remain below the strict 5-level provisional bar.",
-        "domain_fit": "Meridian Arts Fellowship still reads as a formal certificate in this named dark raster.",
-        "information_architecture": "The recipient-centered ceremonial flow remains understandable on screen.",
-        "reader_affordances": "Centered information grouping supports an on-screen read only.",
-        "restraint_cohesion": "The dark composition remains cohesive on screen, without a print or compliance assertion.",
-        "typographic_craft": "The dark Editorial type treatment is provisionally competent pending higher-fidelity color/type review."
+        "information_architecture": "recipient/credential/body/date/signatory form a centered ceremonial sequence.",
+        "content_hierarchy": "Elena Morales is largest, credential clearly second, all else recedes.",
+        "domain_fit": "landscape attestation and signatory read as a credible certificate, though deliberately minimal.",
+        "reader_affordances": "centered symmetry supports a deliberate ceremonial read.",
+        "typographic_craft": "serif hierarchy plus compact sans body/signatory are consistent and clean.",
+        "restraint_cohesion": "generous whitespace and symmetry are fully restrained."
       },
       "mode": "dark",
       "passed": false,
-    "png_sha256": "c8e33580ef93c5c27b128a490a9b5799ee0256f1e1500a48db692e825c437d52",
+      "png_sha256": "c8e33580ef93c5c27b128a490a9b5799ee0256f1e1500a48db692e825c437d52",
       "preset": "editorial",
-    "recorded_at": "2026-08-20",
+      "recorded_at": "2026-08-20",
       "review_status": "scored",
-    "signed_off_at": "2026-08-20",
+      "signed_off_at": "2026-08-20",
       "signed_off_by": "Jon",
-    "source_pdf_sha256": "c0ac38e0024857c528bbeddc3733f5d7fdbb24daeeb795e8110b931ad21f8634",
-    "supersedes_evidence_ref": "assets/rendro/catalog/certificate/meridian-arts-fellowship/editorial-dark.png",
-    "resolution_ref": "704a58b1747e2dfeb506490c4ade9424737e924a"
+      "source_pdf_sha256": "c0ac38e0024857c528bbeddc3733f5d7fdbb24daeeb795e8110b931ad21f8634",
+      "supersedes_evidence_ref": "assets/rendro/catalog/certificate/meridian-arts-fellowship/editorial-dark.png",
+      "resolution_ref": "704a58b1747e2dfeb506490c4ade9424737e924a"
     },
     {
       "catalog_id": "payslip--default--default--light",
@@ -751,22 +751,22 @@
       "preset": null,
       "mode": "light",
       "evidence_ref": "assets/rendro/catalog/payslip/default/default-light.png",
-    "png_sha256": "bf764cd92cc9775fdd9f03901dba47de0c2108769dbaf4e02dcbc699586f4274",
-    "source_pdf_sha256": "fe6943472202526c46647eb65275a3385e570b6d0fd8aee05d3ade4b5620425a",
+      "png_sha256": "bf764cd92cc9775fdd9f03901dba47de0c2108769dbaf4e02dcbc699586f4274",
+      "source_pdf_sha256": "fe6943472202526c46647eb65275a3385e570b6d0fd8aee05d3ade4b5620425a",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
     },
     {
-    "brand": "northline-logistics",
-    "catalog_id": "payslip--northline-logistics--swiss--light",
-    "dimension_scores": {
-      "content_hierarchy": 5,
-      "domain_fit": 4,
-      "information_architecture": 4,
-      "reader_affordances": 3,
-      "restraint_cohesion": 4,
-      "typographic_craft": 3
+      "brand": "northline-logistics",
+      "catalog_id": "payslip--northline-logistics--swiss--light",
+      "dimension_scores": {
+        "content_hierarchy": 5,
+        "domain_fit": 4,
+        "information_architecture": 4,
+        "reader_affordances": 3,
+        "restraint_cohesion": 4,
+        "typographic_craft": 3
       },
       "evidence_ref": "assets/rendro/catalog/payslip/northline-logistics/swiss-light.png",
       "family": "payslip",
@@ -775,35 +775,35 @@
         "reading_order": true
       },
       "justifications": {
-        "content_hierarchy": "Net pay is visible but is conservatively not rated at the exact 5-level requirement.",
-        "domain_fit": "Northline details, payroll fields, and monetary columns read as a real payslip.",
-        "information_architecture": "Employer and employee context, net pay, and earnings/deductions tables support a credible pay-stub scan.",
-        "reader_affordances": "Labels and aligned period/YTD amounts support reconciliation in this exact light image.",
-        "restraint_cohesion": "The light Swiss treatment is coherent and restrained.",
-        "typographic_craft": "Swiss typography and money alignment are provisionally competent, with future ratcheting retained."
+        "information_architecture": "employer/employee/period/net-pay/tables/reconciliation are correctly grouped.",
+        "content_hierarchy": "$3,253.50 in the Net Pay band is uniquely dominant.",
+        "domain_fit": "employer/employee/pay dates/earnings/deductions/current/YTD/gross/net are conventional.",
+        "reader_affordances": "cramped Current/YTD values and multi-line labels slow reconciliation.",
+        "typographic_craft": "Operations salary, Route coverage premium, Social insurance, Retirement contribution, and Total Deductions wrap awkwardly; adjacent amounts are tight.",
+        "restraint_cohesion": "treatment is restrained, though table density prevents top cohesion."
       },
       "mode": "light",
       "passed": false,
-    "png_sha256": "ccaa718c49a3a9cddc3f9923b6310cb4c225481ba6d10353849f1e90d19f7be8",
+      "png_sha256": "ccaa718c49a3a9cddc3f9923b6310cb4c225481ba6d10353849f1e90d19f7be8",
       "preset": "swiss",
-    "recorded_at": "2026-08-20",
+      "recorded_at": "2026-08-20",
       "review_status": "scored",
-    "signed_off_at": "2026-08-20",
+      "signed_off_at": "2026-08-20",
       "signed_off_by": "Jon",
-    "source_pdf_sha256": "a88be1778ffec799223b147566151ab86d4b8b37871fbe8c739329b73519004e",
-    "supersedes_evidence_ref": "assets/rendro/catalog/payslip/northline-logistics/swiss-light.png",
-    "resolution_ref": "3e50a86604cd87be0d963e53741c1c4babaeca1f"
+      "source_pdf_sha256": "a88be1778ffec799223b147566151ab86d4b8b37871fbe8c739329b73519004e",
+      "supersedes_evidence_ref": "assets/rendro/catalog/payslip/northline-logistics/swiss-light.png",
+      "resolution_ref": "3e50a86604cd87be0d963e53741c1c4babaeca1f"
     },
     {
       "brand": "northline-logistics",
       "catalog_id": "payslip--northline-logistics--swiss--dark",
       "dimension_scores": {
-      "content_hierarchy": 5,
+        "content_hierarchy": 5,
         "domain_fit": 4,
         "information_architecture": 4,
-      "reader_affordances": 2,
-      "restraint_cohesion": 3,
-      "typographic_craft": 3
+        "reader_affordances": 2,
+        "restraint_cohesion": 3,
+        "typographic_craft": 3
       },
       "evidence_ref": "assets/rendro/catalog/payslip/northline-logistics/swiss-dark.png",
       "family": "payslip",
@@ -812,24 +812,24 @@
         "reading_order": true
       },
       "justifications": {
-        "content_hierarchy": "Net pay is visible but remains below the strict 5-level provisional hierarchy threshold.",
-        "domain_fit": "The exact screen-oriented cell retains recognizable payslip anatomy.",
-        "information_architecture": "Identity, net-pay, and earnings/deductions sequencing remain readable in the named dark render.",
-        "reader_affordances": "Labels and aligned money support an on-screen scan without a broader access claim.",
-        "restraint_cohesion": "The dark treatment remains cohesive on screen only; it is not asserted print-safe.",
-        "typographic_craft": "The dark Swiss raster is provisionally competent pending later color and typography ratcheting."
+        "information_architecture": "employer/employee/period/net-pay/tables/reconciliation are correctly grouped.",
+        "content_hierarchy": "$3,253.50 in the Net Pay band is uniquely dominant.",
+        "domain_fit": "employer/employee/pay dates/earnings/deductions/current/YTD/gross/net are conventional.",
+        "reader_affordances": "column headings become near-background while the same cramped/wrapped table remains, materially impairing scanning.",
+        "typographic_craft": "label wraps and uneven contrast remain visible.",
+        "restraint_cohesion": "the palette is generally consistent but low-contrast table chrome weakens cohesion."
       },
       "mode": "dark",
       "passed": false,
-    "png_sha256": "7e49c55c2f72b47c01dd0e98f6b9094ad3772a6c1cdb3118e303ede299783184",
+      "png_sha256": "7e49c55c2f72b47c01dd0e98f6b9094ad3772a6c1cdb3118e303ede299783184",
       "preset": "swiss",
-    "recorded_at": "2026-08-20",
+      "recorded_at": "2026-08-20",
       "review_status": "scored",
-    "signed_off_at": "2026-08-20",
+      "signed_off_at": "2026-08-20",
       "signed_off_by": "Jon",
-    "source_pdf_sha256": "f3bc9896b4491a2f9168aa62e7ea7fbbbf3eead99fbb154f16011cd5e73b2dd0",
-    "supersedes_evidence_ref": "assets/rendro/catalog/payslip/northline-logistics/swiss-dark.png",
-    "resolution_ref": "3e50a86604cd87be0d963e53741c1c4babaeca1f"
+      "source_pdf_sha256": "f3bc9896b4491a2f9168aa62e7ea7fbbbf3eead99fbb154f16011cd5e73b2dd0",
+      "supersedes_evidence_ref": "assets/rendro/catalog/payslip/northline-logistics/swiss-dark.png",
+      "resolution_ref": "3e50a86604cd87be0d963e53741c1c4babaeca1f"
     },
     {
       "catalog_id": "payslip--cedar-mutual--corporate-classic--light",
@@ -838,8 +838,8 @@
       "preset": "corporate-classic",
       "mode": "light",
       "evidence_ref": "assets/rendro/catalog/payslip/cedar-mutual/corporate-classic-light.png",
-    "png_sha256": "1ed16549e63d8f52bfd99d87a58718d3151ba8457970694dfcf0a57d12cbb44c",
-    "source_pdf_sha256": "9ddd82cf25dae5afd6e42cdb1b873fb81244f440ab436c5efb8749cd657179fb",
+      "png_sha256": "1ed16549e63d8f52bfd99d87a58718d3151ba8457970694dfcf0a57d12cbb44c",
+      "source_pdf_sha256": "9ddd82cf25dae5afd6e42cdb1b873fb81244f440ab436c5efb8749cd657179fb",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
@@ -851,8 +851,8 @@
       "preset": "corporate-classic",
       "mode": "dark",
       "evidence_ref": "assets/rendro/catalog/payslip/cedar-mutual/corporate-classic-dark.png",
-    "png_sha256": "efe59c0c36d755c866349dbc05f8a4815a59f7fba346079c434709cdc29d76a1",
-    "source_pdf_sha256": "faebde994c4e768ceb168112999783501b68134459ee27db64fad9761c14756c",
+      "png_sha256": "efe59c0c36d755c866349dbc05f8a4815a59f7fba346079c434709cdc29d76a1",
+      "source_pdf_sha256": "faebde994c4e768ceb168112999783501b68134459ee27db64fad9761c14756c",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
@@ -864,8 +864,8 @@
       "preset": null,
       "mode": "light",
       "evidence_ref": "assets/rendro/catalog/ticket/default/default-light.png",
-    "png_sha256": "be472db142b956d98b0b79882c6d535d8edf8ec63512ca4256933c4e2d90b784",
-    "source_pdf_sha256": "9e2da79e6e544abe48315b910e139f098c10997bf7eb2d2127e6f5b8461b3574",
+      "png_sha256": "be472db142b956d98b0b79882c6d535d8edf8ec63512ca4256933c4e2d90b784",
+      "source_pdf_sha256": "9e2da79e6e544abe48315b910e139f098c10997bf7eb2d2127e6f5b8461b3574",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
@@ -877,8 +877,8 @@
       "preset": "minimal-mono",
       "mode": "light",
       "evidence_ref": "assets/rendro/catalog/ticket/field-notes-conference/minimal-mono-light.png",
-    "png_sha256": "de83805beaaa7442149a6a82a16b0731d532afd9f6e4cf17622f36fc68d17c8e",
-    "source_pdf_sha256": "3df8ef93c864b7dfa84c06419f434544a30006c3e4754e028571d78198277e26",
+      "png_sha256": "de83805beaaa7442149a6a82a16b0731d532afd9f6e4cf17622f36fc68d17c8e",
+      "source_pdf_sha256": "3df8ef93c864b7dfa84c06419f434544a30006c3e4754e028571d78198277e26",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
@@ -890,8 +890,8 @@
       "preset": "minimal-mono",
       "mode": "dark",
       "evidence_ref": "assets/rendro/catalog/ticket/field-notes-conference/minimal-mono-dark.png",
-    "png_sha256": "0bb27b3982962ea6577a9a154f4b40785274ad5b9de49709e9a1c3ff30228fd8",
-    "source_pdf_sha256": "42057a0c92c5cdb6b36a6267063cb189411bef178a2ed6a6e1881b1339aad919",
+      "png_sha256": "0bb27b3982962ea6577a9a154f4b40785274ad5b9de49709e9a1c3ff30228fd8",
+      "source_pdf_sha256": "42057a0c92c5cdb6b36a6267063cb189411bef178a2ed6a6e1881b1339aad919",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
@@ -903,8 +903,8 @@
       "preset": "editorial",
       "mode": "light",
       "evidence_ref": "assets/rendro/catalog/ticket/the-letterpress-hall/editorial-light.png",
-    "png_sha256": "65a8d0a03fdfbf79c801f91126c9f000371eca63a1a2a92c30b2e2ee48d467b8",
-    "source_pdf_sha256": "c81e638e4caaa83d80daccb4ef910ae1f7d6c888e93f05c32722e2413ac0cab2",
+      "png_sha256": "65a8d0a03fdfbf79c801f91126c9f000371eca63a1a2a92c30b2e2ee48d467b8",
+      "source_pdf_sha256": "c81e638e4caaa83d80daccb4ef910ae1f7d6c888e93f05c32722e2413ac0cab2",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
@@ -916,8 +916,8 @@
       "preset": "editorial",
       "mode": "dark",
       "evidence_ref": "assets/rendro/catalog/ticket/the-letterpress-hall/editorial-dark.png",
-    "png_sha256": "51d9b2c76e3b6cbc2c162be38b05216ac44692acc8027e17438cb9702f4dc78b",
-    "source_pdf_sha256": "f5af9327fabe223160a92a51afc83d1b0e1a1d4bec59843df8e448a0f0142427",
+      "png_sha256": "51d9b2c76e3b6cbc2c162be38b05216ac44692acc8027e17438cb9702f4dc78b",
+      "source_pdf_sha256": "f5af9327fabe223160a92a51afc83d1b0e1a1d4bec59843df8e448a0f0142427",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
@@ -926,12 +926,12 @@
       "brand": "aurora-live",
       "catalog_id": "ticket--aurora-live--brutalist--light",
       "dimension_scores": {
-      "content_hierarchy": 5,
+        "content_hierarchy": 5,
         "domain_fit": 4,
         "information_architecture": 4,
-      "reader_affordances": 3,
-      "restraint_cohesion": 4,
-      "typographic_craft": 3
+        "reader_affordances": 3,
+        "restraint_cohesion": 4,
+        "typographic_craft": 3
       },
       "evidence_ref": "assets/rendro/catalog/ticket/aurora-live/brutalist-light.png",
       "family": "ticket",
@@ -940,35 +940,35 @@
         "reading_order": true
       },
       "justifications": {
-        "content_hierarchy": "Placement is visible but not judged as an unambiguous 5-level focal point in this conservative review.",
-        "domain_fit": "Aurora Live event details and ticket anatomy read as a real admission ticket.",
-        "information_architecture": "Event identity, placement fields, and reference/stub form a credible rapid ticket scan.",
-        "reader_affordances": "Placement labels and reference area support locating entry details in this exact light image.",
-        "restraint_cohesion": "The light Brutalist treatment is distinctive yet coherent for the named cell.",
-        "typographic_craft": "Brutalist typography is provisionally competent, with a later high-fidelity ratchet explicitly retained."
+        "information_architecture": "event, placement, reference/stub, and terms are distinct expected groups.",
+        "content_hierarchy": "oversized placement dominates title and reference.",
+        "domain_fit": "event/time/placement/seam/reference/terms read as a real admission ticket.",
+        "reader_affordances": "the primary Section value `GA` wraps into separate `G`/`A` lines and the empty Gate column/subtitle wrap slow a gate scan.",
+        "typographic_craft": "the key placement token's awkward break prevents polished type craft.",
+        "restraint_cohesion": "the hard rule/stub/Brutalist geometry remain coherent."
       },
       "mode": "light",
       "passed": false,
-    "png_sha256": "d75ab8b5cfabc26cb93f724353dacb3710c7fc5d191efc1655a428b6a56d4170",
+      "png_sha256": "d75ab8b5cfabc26cb93f724353dacb3710c7fc5d191efc1655a428b6a56d4170",
       "preset": "brutalist",
-    "recorded_at": "2026-08-20",
+      "recorded_at": "2026-08-20",
       "review_status": "scored",
-    "signed_off_at": "2026-08-20",
+      "signed_off_at": "2026-08-20",
       "signed_off_by": "Jon",
-    "source_pdf_sha256": "c3d1baf2d32881534aafdbb41ee931ef1d67dbe3647f084c4221c56bea7139f9",
-    "supersedes_evidence_ref": "assets/rendro/catalog/ticket/aurora-live/brutalist-light.png",
-    "resolution_ref": "b972f194f2edd3925eda71c0cf5f363e8b3ee94b"
+      "source_pdf_sha256": "c3d1baf2d32881534aafdbb41ee931ef1d67dbe3647f084c4221c56bea7139f9",
+      "supersedes_evidence_ref": "assets/rendro/catalog/ticket/aurora-live/brutalist-light.png",
+      "resolution_ref": "b972f194f2edd3925eda71c0cf5f363e8b3ee94b"
     },
     {
       "brand": "aurora-live",
       "catalog_id": "ticket--aurora-live--brutalist--dark",
       "dimension_scores": {
-      "content_hierarchy": 5,
+        "content_hierarchy": 5,
         "domain_fit": 4,
         "information_architecture": 4,
-      "reader_affordances": 2,
-      "restraint_cohesion": 3,
-      "typographic_craft": 3
+        "reader_affordances": 2,
+        "restraint_cohesion": 3,
+        "typographic_craft": 3
       },
       "evidence_ref": "assets/rendro/catalog/ticket/aurora-live/brutalist-dark.png",
       "family": "ticket",
@@ -977,24 +977,24 @@
         "reading_order": true
       },
       "justifications": {
-        "content_hierarchy": "Placement is visible but conservatively below the required 5-level hierarchy result.",
-        "domain_fit": "The named Aurora Live cell retains recognizable admission-ticket anatomy.",
-        "information_architecture": "Event-to-placement-to-reference sequencing remains understandable in the exact dark screen image.",
-        "reader_affordances": "Placement and reference areas support an on-screen read without a universal usability claim.",
-        "restraint_cohesion": "The exact dark cell is visually cohesive on screen, not a print or compliance assertion.",
-        "typographic_craft": "The dark Brutalist treatment is provisionally competent; later color and typography ratcheting remains needed."
+        "information_architecture": "event, placement, reference/stub, and terms are distinct expected groups.",
+        "content_hierarchy": "oversized placement dominates title and reference.",
+        "domain_fit": "event/time/placement/seam/reference/terms read as a real admission ticket.",
+        "reader_affordances": "the `GA` wrap combines with low-contrast labels/reference/terms to impair fast use.",
+        "typographic_craft": "primary-token wrapping and muted text remain visibly uneven.",
+        "restraint_cohesion": "geometry remains coherent but the contrast imbalance lowers cohesion."
       },
       "mode": "dark",
       "passed": false,
-    "png_sha256": "69184d72986d30ce089484f83b0b92397c51716e10c6c6d52b8ea4fbfe1669e6",
+      "png_sha256": "69184d72986d30ce089484f83b0b92397c51716e10c6c6d52b8ea4fbfe1669e6",
       "preset": "brutalist",
-    "recorded_at": "2026-08-20",
+      "recorded_at": "2026-08-20",
       "review_status": "scored",
-    "signed_off_at": "2026-08-20",
+      "signed_off_at": "2026-08-20",
       "signed_off_by": "Jon",
-    "source_pdf_sha256": "a6e49f1477d9394b16cab1045da47fc433e1459a1ac3c2e33cdc900785c4ee9a",
-    "supersedes_evidence_ref": "assets/rendro/catalog/ticket/aurora-live/brutalist-dark.png",
-    "resolution_ref": "b972f194f2edd3925eda71c0cf5f363e8b3ee94b"
+      "source_pdf_sha256": "a6e49f1477d9394b16cab1045da47fc433e1459a1ac3c2e33cdc900785c4ee9a",
+      "supersedes_evidence_ref": "assets/rendro/catalog/ticket/aurora-live/brutalist-dark.png",
+      "resolution_ref": "b972f194f2edd3925eda71c0cf5f363e8b3ee94b"
     }
   ]
 }

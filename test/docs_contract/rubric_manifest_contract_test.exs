@@ -12,6 +12,7 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
   @schema_path "priv/schemas/rubric_scores.schema.json"
   @gallery_manifest_path "assets/rendro/artifacts.json"
   @non_prose_fixture_path "test/fixtures/quality/rubric_scores_phase130_non_prose.json"
+  @sign_off_path "priv/quality/SIGN-OFF.md"
   @justification_keys ~w(information_architecture content_hierarchy domain_fit reader_affordances typographic_craft restraint_cohesion)
 
   defp manifest do
@@ -237,6 +238,22 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
       refute disposition["passed"]
       refute disposition["gate_results"]["print_safety"]
     end
+
+    humanist_dark =
+      Enum.find(scored, &(&1["catalog_id"] == "receipt--poppy-and-grain--humanist--dark"))
+
+    assert humanist_dark["justifications"]["reader_affordances"] ==
+             "all descriptions/amounts/arithmetic are legible and aligned; the prior dark contrast deficit is visibly repaired."
+
+    sign_off = File.read!(@sign_off_path)
+    {current_heading, _} = :binary.match(sign_off, "## Phase 130 catalog review")
+    {historical_heading, _} = :binary.match(sign_off, "## Phase 127 catalog flagship review")
+
+    assert current_heading < historical_heading
+    assert sign_off =~ "1646eeb8875cc67d7d452d3f28bc2b0d6503f943a2a6775f7e256a3e51bb3f22"
+    assert sign_off =~ "Statement endpoints close at `$7,500`"
+    assert sign_off =~ "line 41 is neither asserted nor denied"
+    assert sign_off =~ "historical; superseded by Phase 130 above"
   end
 
   test "threshold-arithmetic correctness, not the subjective score" do
