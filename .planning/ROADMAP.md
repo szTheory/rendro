@@ -33,7 +33,7 @@
   3. Maintainers can regenerate the complete fixed 32-cell catalog and have its existing deterministic artifact, hash, schema, and coverage checks accept the current generated output.
   4. A human can review the twelve exact full-size pinned-raster outputs and find every disposition bound to the current catalog ID and reviewed artifact hashes; any cell that misses the frozen threshold remains `needs_work` rather than being promoted.
 
-**Plans**: 9/11 plans executed
+**Plans**: 10/11 plans executed
 
 Plans:
 **Wave 1**
@@ -71,7 +71,7 @@ Plans:
 
 **Wave 9** *(blocked on Wave 8 completion)*
 
-- [ ] 130-10-PLAN.md — Transcribe the twelve catalog records and run exactly one candidate-identical canonical catalog generation.
+- [x] 130-10-PLAN.md — Transcribe the twelve catalog records and run exactly one candidate-identical canonical catalog generation.
 
 **Wave 10** *(blocked on Wave 9 completion)*
 
@@ -95,5 +95,5 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 130. Catalog Quality & Evidence Ratchet | 9/11 | In Progress|  |
+| 130. Catalog Quality & Evidence Ratchet | 10/11 | In Progress|  |
 | 131. Adoption Snapshot & Phoenix Newcomer Proof | 0/TBD | Not started | - |
