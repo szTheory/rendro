@@ -1,18 +1,16 @@
+Code.require_file(Path.expand("../../scripts/adoption_snapshot.exs", __DIR__))
+
 defmodule Rendro.DocsContract.AdoptionEvidenceContractTest do
   use ExUnit.Case, async: true
 
-  @script Path.expand("../../scripts/adoption_snapshot.exs", __DIR__)
-
-  setup_all do
-    Code.require_file(@script)
-    :ok
-  end
-
   test "AVAILABLE Hex metadata retains exact totals and threshold classification" do
     assert {:ok, family} =
-             Rendro.AdoptionSnapshot.hex_family(%{
-               "downloads" => %{"all" => 3_149, "week" => 182}
-             }, "2026-08-21T12:00:00Z")
+             Rendro.AdoptionSnapshot.hex_family(
+               %{
+                 "downloads" => %{"all" => 3_149, "week" => 182}
+               },
+               "2026-08-21T12:00:00Z"
+             )
 
     assert family.retrieval == "AVAILABLE"
     assert family.decision == "ACCUMULATING"
@@ -30,12 +28,21 @@ defmodule Rendro.DocsContract.AdoptionEvidenceContractTest do
   end
 
   test "empty available candidates are HOLD while nil or malformed candidates fail closed" do
-    assert {:ok, family} = Rendro.AdoptionSnapshot.candidate_family("demand", [], "2026-08-21T12:00:00Z")
+    assert {:ok, family} =
+             Rendro.AdoptionSnapshot.candidate_family("demand", [], "2026-08-21T12:00:00Z")
+
     assert family.candidate_count == 0
     assert family.decision == "HOLD"
 
-    assert {:error, _} = Rendro.AdoptionSnapshot.candidate_family("demand", nil, "2026-08-21T12:00:00Z")
-    assert {:error, _} = Rendro.AdoptionSnapshot.candidate_family("demand", [%{"number" => nil}], "2026-08-21T12:00:00Z")
+    assert {:error, _} =
+             Rendro.AdoptionSnapshot.candidate_family("demand", nil, "2026-08-21T12:00:00Z")
+
+    assert {:error, _} =
+             Rendro.AdoptionSnapshot.candidate_family(
+               "demand",
+               [%{"number" => nil}],
+               "2026-08-21T12:00:00Z"
+             )
   end
 
   test "canonical UTF-8 digests ignore map ordering" do
@@ -47,7 +54,9 @@ defmodule Rendro.DocsContract.AdoptionEvidenceContractTest do
   end
 
   test "exclusive writer leaves no partial target or temp file after interruption" do
-    path = Path.join(System.tmp_dir!(), "rendro-adoption-#{System.unique_integer([:positive])}.json")
+    path =
+      Path.join(System.tmp_dir!(), "rendro-adoption-#{System.unique_integer([:positive])}.json")
+
     payload = %{"schema_version" => 1, "review_date" => "2026-08-21"}
 
     assert :ok = Rendro.AdoptionSnapshot.write_snapshot(path, payload)
@@ -57,7 +66,12 @@ defmodule Rendro.DocsContract.AdoptionEvidenceContractTest do
   end
 
   test "parallel writers produce one complete authoritative target" do
-    path = Path.join(System.tmp_dir!(), "rendro-adoption-parallel-#{System.unique_integer([:positive])}.json")
+    path =
+      Path.join(
+        System.tmp_dir!(),
+        "rendro-adoption-parallel-#{System.unique_integer([:positive])}.json"
+      )
+
     payload = %{"schema_version" => 1, "review_date" => "2026-08-21"}
 
     results =
