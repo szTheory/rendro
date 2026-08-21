@@ -457,6 +457,50 @@ defmodule Guardrails.RequiredChecksContractTest do
     end
   end
 
+  describe "protected workflow version extraction" do
+    @v1_3_0_multiline_fixture ~S"""
+    @version "1.3.0"
+    source_ref: "v#{@version}"
+    """
+
+    test "each protected workflow uses an exact-one top-level @version declaration parser" do
+      for path <- [@release_path, @hexdocs_path] do
+        workflow = File.read!(path)
+
+        assert workflow =~
+                 ~S{VERSION_DECLARATIONS=$(sed -nE 's/^[[:space:]]*@version[[:space:]]+"([^"]+)"[[:space:]]*$/\1/p' mix.exs)}
+
+        assert workflow =~ ~S{VERSION_DECLARATION_COUNT=$(printf '%s\n'}
+        assert workflow =~ ~S{$VERSION_DECLARATIONS}
+        assert workflow =~ "sed '/^$/d' | wc -l | tr -d ' '"
+
+        assert workflow =~ ~S{if [ "$VERSION_DECLARATION_COUNT" -ne 1 ]; then}
+        assert workflow =~ "expected exactly one top-level @version declaration"
+      end
+    end
+
+    test "each protected workflow rejects the v1.3.0 multiline incident and ambiguous declarations" do
+      for path <- [@release_path, @hexdocs_path] do
+        assert legacy_broad_versions(@v1_3_0_multiline_fixture) == ["1.3.0", ~S(v#{@version})],
+               "#{path} must retain the failed v1.3.0 broad-match incident as a regression fixture"
+
+        assert extract_exactly_one_version(@v1_3_0_multiline_fixture) == {:ok, "1.3.0"},
+               "#{path} must extract only the declaration, not source_ref interpolation"
+
+        assert {:error, zero_diagnostic} = extract_exactly_one_version("source_ref: \"v1.3.0\"\n")
+        assert zero_diagnostic =~ "found 0"
+
+        duplicate_fixture = ~S"""
+        @version "1.3.0"
+        @version "1.3.1"
+        """
+
+        assert {:error, duplicate_diagnostic} = extract_exactly_one_version(duplicate_fixture)
+        assert duplicate_diagnostic =~ "found 2"
+      end
+    end
+  end
+
   describe "fork-safe offline contract" do
     test "does not reference network APIs or tokens" do
       source = File.read!(__ENV__.file)
@@ -498,6 +542,29 @@ defmodule Guardrails.RequiredChecksContractTest do
     case Regex.run(pattern, job_block) do
       [block] -> block
       _ -> flunk("expected CI step block #{inspect(step_name)}")
+    end
+  end
+
+  defp legacy_broad_versions(mix_exs) do
+    mix_exs
+    |> String.split("\n")
+    |> Enum.filter(&String.contains?(&1, "@version"))
+    |> Enum.map(fn line ->
+      [version] = Regex.run(~r/.*"([^"]+)".*/, line, capture: :all_but_first)
+      version
+    end)
+  end
+
+  defp extract_exactly_one_version(mix_exs) do
+    declarations =
+      Regex.scan(~r/^[[:space:]]*@version[[:space:]]+"([^"]+)"[[:space:]]*$/m, mix_exs,
+        capture: :all_but_first
+      )
+      |> List.flatten()
+
+    case declarations do
+      [version] -> {:ok, version}
+      versions -> {:error, "expected exactly one top-level @version declaration; found #{length(versions)}"}
     end
   end
 end
