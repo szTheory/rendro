@@ -5,15 +5,15 @@ milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 131
 current_phase_name: adoption-snapshot-phoenix-newcomer-proof
 status: executing
-stopped_at: Completed 131-01-PLAN.md
-last_updated: "2026-08-21T17:12:03.540Z"
+stopped_at: Completed 131-02-PLAN.md
+last_updated: "2026-08-21T21:39:51.663Z"
 last_activity: 2026-08-21
 last_activity_desc: Phase 131 execution started
 progress:
   total_phases: 2
   completed_phases: 1
-  total_plans: 14
-  completed_plans: 12
+  total_plans: 16
+  completed_plans: 13
   percent: 50
 ---
 
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 131 (adoption-snapshot-phoenix-newcomer-proof) — EXECUTING
-Plan: 2 of 3
+Plan: 2 of 5
 Status: Ready to execute
 Last activity: 2026-08-21 — Phase 131 execution started
 
-Progress: [█████████░] 86%
+Progress: [████████░░] 81%
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
@@ -72,6 +72,7 @@ Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Not started
 - [Phase ?]: Phase 130 temporary provenance is removed only after literal remote SHA, manifest, and publication-subset checks.
 - [Phase ?]: 2026-08-21 adoption snapshot is a read-only HOLD decision: Downloads ACCUMULATING; Demand and Contributor HOLD; composite is the minimum family state.
 - [Phase ?]: Dated adoption evidence is packaged and published atomically through an exclusive temporary output plus hard-link target creation.
+- [Phase ?]: Both protected version consumers now extract exactly one top-level @version declaration and fail closed on zero or multiple matches.
 
 ### Pending Todos
 
@@ -99,8 +100,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-21T17:12:03.531Z
-Stopped at: Completed 131-01-PLAN.md
+Last session: 2026-08-21T21:39:51.654Z
+Stopped at: Completed 131-02-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -123,3 +124,4 @@ Resume file: None
 | Phase 130 P10 | ~45m | 2 tasks | 36 files |
 | Phase 130-catalog-quality-evidence-ratchet P11 | 19m | 2 tasks | 2 files |
 | Phase 131 P01 | 12m | 2 tasks | 6 files |
+| Phase 131 P02 | ~10m | 1 tasks | 3 files |

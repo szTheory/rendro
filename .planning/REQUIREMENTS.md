@@ -25,8 +25,8 @@ Requirements for this milestone. Each maps to exactly one roadmap phase.
 
 ### Phoenix Newcomer Proof
 
-- [ ] **JOURNEY-01**: A newcomer can install the public Rendro package in a clean Phoenix environment without relying on the repository checkout or warm dependency caches.
-- [ ] **JOURNEY-02**: A newcomer can follow public discovery surfaces to select and customize the canonical Swiss/light Invoice using the documented preset/configurator path.
+- [x] **JOURNEY-01**: A newcomer can install the public Rendro package in a clean Phoenix environment without relying on the repository checkout or warm dependency caches.
+- [x] **JOURNEY-02**: A newcomer can follow public discovery surfaces to select and customize the canonical Swiss/light Invoice using the documented preset/configurator path.
 - [ ] **JOURNEY-03**: The clean Phoenix application serves that customized document through the optional Phoenix adapter as a successful `application/pdf` response containing valid `%PDF-` bytes.
 - [ ] **JOURNEY-04**: The journey records exact versions, commands, results, and any repaired documentation or integration handoff; fixes remain confined to existing surfaces.
 
@@ -67,8 +67,8 @@ Roadmap mapping approved with the milestone roadmap.
 | SIGNAL-03 | Phase 131 | Complete |
 | SIGNAL-04 | Phase 131 | Complete |
 | SIGNAL-05 | Phase 131 | Complete |
-| JOURNEY-01 | Phase 131 | Pending |
-| JOURNEY-02 | Phase 131 | Pending |
+| JOURNEY-01 | Phase 131 | Complete |
+| JOURNEY-02 | Phase 131 | Complete |
 | JOURNEY-03 | Phase 131 | Pending |
 | JOURNEY-04 | Phase 131 | Pending |
 
