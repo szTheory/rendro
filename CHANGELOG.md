@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.4] - Unreleased
+
+### Fixed
+
+- Supersedes the immutable failed `v1.3.3` release attempt with a fresh exact
+  1.3.4 candidate. Complete credential-free release preflight remains the
+  validation gate; only actual protected Hex publication receives `HEX_API_KEY`.
+
 ## [1.3.3] - Unreleased
 
 ### Fixed

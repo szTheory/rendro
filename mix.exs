@@ -1,7 +1,7 @@
 defmodule Rendro.MixProject do
   use Mix.Project
 
-  @version "1.3.3"
+  @version "1.3.4"
   @source_url "https://github.com/szTheory/rendro"
 
   def project do
