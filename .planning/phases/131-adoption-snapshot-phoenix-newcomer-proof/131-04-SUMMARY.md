@@ -21,7 +21,7 @@ status: complete
 
 - Added candidate-SHA preflight parity and tag-ref snapshot proof mode.
 - Bound verifier policy and protected HexDocs gate to v1.3.2 while retaining v1.3.0/v1.3.1 incident facts.
-- Sealed candidate `3bfa1f1374097cc6994950fef0f3f33e45a3a66a` with package checksum `a3e1517b175510c868cb8fd883290fe90dcd6fa02e045b9c6d7dec4fa6eececb`.
+- Sealed candidate `47af6448d2989ffe69c4b80c77935c896b1ddb07` with package checksum `a3e1517b175510c868cb8fd883290fe90dcd6fa02e045b9c6d7dec4fa6eececb`.
 
 ## Verification
 
@@ -30,6 +30,7 @@ status: complete
 - Detached `mix ci.fast`: passed (Dialyzer total errors: 0).
 - Exact-SHA no-tag preflight, Hex dry run, package build/inventory, and docs: passed.
 - Tag refs unchanged; no local v1.3.2 tag.
+- Absence probes follow bounded redirects and accept only a final 404 response.
 
 ## Task Commits
 

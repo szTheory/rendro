@@ -1,5 +1,5 @@
 ---
-candidate_commit_sha: 3bfa1f1374097cc6994950fef0f3f33e45a3a66a
+candidate_commit_sha: 47af6448d2989ffe69c4b80c77935c896b1ddb07
 version: 1.3.2
 release_ref: v1.3.2
 package_checksum: a3e1517b175510c868cb8fd883290fe90dcd6fa02e045b9c6d7dec4fa6eececb
@@ -29,7 +29,7 @@ hex_1_3_0_present: false
 hexdocs_1_3_0_present: false
 ---
 
-# Rendro v1.3.1 Failed Public-Tag Candidate Record
+# Rendro v1.3.2 Private Candidate Record
 
 This historical record binds the committed v1.3.1 release surface at
 `7afb1dd056bba234d1bd4ec1c4487f2ea8e308f1`. Its package checksum is
