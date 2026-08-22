@@ -21,7 +21,7 @@ defmodule Rendro.MixProject do
       homepage_url: @source_url,
       docs: docs(),
       dialyzer: [
-        plt_add_apps: [:ex_unit, :mix, :stream_data, :jsv, :yaml_elixir, :livebook],
+        plt_add_apps: [:ex_unit, :mix, :stream_data, :jsv, :yaml_elixir],
         plt_core_path: "priv/plts",
         plt_local_path: "priv/plts"
       ]
@@ -67,7 +67,6 @@ defmodule Rendro.MixProject do
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.40", only: [:dev, :test], runtime: false},
-      {:livebook, "~> 0.19.8", only: [:dev, :test], runtime: false},
       {:req, "~> 0.5", only: [:dev, :test]},
       {:jsv, "~> 0.18", only: [:dev, :test], runtime: false},
       {:yaml_elixir, ">= 2.11.0 and < 3.0.0", only: [:dev, :test], runtime: false},
@@ -156,6 +155,7 @@ defmodule Rendro.MixProject do
         priv/fonts
         bench/results
         guides
+        scripts/verify_livebook.exs
         .formatter.exs
         mix.exs
         README.md

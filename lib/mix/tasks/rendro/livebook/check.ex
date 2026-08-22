@@ -4,16 +4,14 @@ defmodule Mix.Tasks.Rendro.Livebook.Check do
   @shortdoc "Execute the Rendro first-invoice Livebook without starting a server"
 
   @moduledoc """
-  Converts `guides/livebook/first_invoice.livemd` with
-  `Livebook.live_markdown_to_elixir/1` and executes the resulting script with
-  `RENDRO_LIVEBOOK_LOCAL=1`.
+  Converts `guides/livebook/first_invoice.livemd` in an isolated Livebook
+  authoring process and executes the resulting script with `RENDRO_LIVEBOOK_LOCAL=1`.
 
       mix rendro.livebook.check
   """
   @moduledoc tags: [:adapter]
-  @compile {:no_warn_undefined, Livebook}
-
   @default_notebook_path "guides/livebook/first_invoice.livemd"
+  @converter_script_path Path.expand("../../../../../scripts/verify_livebook.exs", __DIR__)
   @converter_env :livebook_converter
   @command_runner_env :livebook_command_runner
 
@@ -60,13 +58,26 @@ defmodule Mix.Tasks.Rendro.Livebook.Check do
   end
 
   defp default_converter(markdown) do
-    case Code.ensure_loaded(Livebook) do
-      {:module, Livebook} ->
-        {:ok, Livebook.live_markdown_to_elixir(markdown)}
+    notebook_path = temporary_path("input.livemd")
+    output_path = temporary_path("output.exs")
 
-      {:error, _reason} ->
-        {:error,
-         "Livebook is not available; run mix deps.get and keep :livebook as a dev/test runtime:false dependency"}
+    File.write!(notebook_path, markdown)
+
+    try do
+      case System.cmd(
+             "elixir",
+             [@converter_script_path, notebook_path, output_path],
+             stderr_to_stdout: true
+           ) do
+        {_output, 0} ->
+          File.read(output_path)
+
+        {output, status} ->
+          {:error, "Livebook conversion failed with status #{status}:\n#{output}"}
+      end
+    after
+      File.rm(notebook_path)
+      File.rm(output_path)
     end
   end
 
@@ -94,5 +105,12 @@ defmodule Mix.Tasks.Rendro.Livebook.Check do
     after
       File.rm(tmp_path)
     end
+  end
+
+  defp temporary_path(suffix) do
+    Path.join(
+      System.tmp_dir!(),
+      "rendro-livebook-#{System.unique_integer([:positive])}-#{suffix}"
+    )
   end
 end

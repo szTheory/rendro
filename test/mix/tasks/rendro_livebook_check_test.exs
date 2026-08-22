@@ -140,6 +140,20 @@ defmodule Mix.Tasks.RendroLivebookCheckTest do
     refute source =~ "livebook server"
   end
 
+  test "Livebook authoring tooling is isolated from the root release graph" do
+    deps = Keyword.fetch!(Rendro.MixProject.project(), :deps)
+    refute Enum.any?(deps, &(elem(&1, 0) == :livebook))
+
+    refute File.read!("mix.lock") =~ "\"livebook\""
+
+    assert File.read!("scripts/verify_livebook.exs") =~
+             "Mix.install([{:livebook, \"~> 0.19.9\"}])"
+
+    assert "scripts/verify_livebook.exs" in Keyword.fetch!(Rendro.MixProject.project(), :package)[
+             :files
+           ]
+  end
+
   defp capture_shell_messages(fun) do
     original_shell = Mix.shell()
     Mix.shell(Mix.Shell.Process)
