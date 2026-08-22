@@ -5,16 +5,16 @@ milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 131
 current_phase_name: adoption-snapshot-phoenix-newcomer-proof
 status: executing
-stopped_at: Replanned immutable v1.3.3 recovery; next 131-07
-last_updated: "2026-08-22T21:30:00Z"
+stopped_at: Completed 131-07-PLAN.md
+last_updated: "2026-08-22T21:07:53.375Z"
 last_activity: 2026-08-22
-last_activity_desc: Phase 131 replanned for exact v1.3.4 after immutable v1.3.3 failure
+last_activity_desc: D-35 exact v1.3.4 recovery replanned
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 21
-  completed_plans: 17
-  percent: 81
+  completed_plans: 18
+  percent: 50
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 131 (adoption-snapshot-phoenix-newcomer-proof) — EXECUTING
-Plan: 6 of 10
+Plan: 7 of 10
 Status: Ready to execute 131-07
 Last activity: 2026-08-22 — D-35 exact v1.3.4 recovery replanned
 
-Progress: [████████░░] 81%
+Progress: [█████████░] 86%
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
@@ -76,6 +76,8 @@ Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... In progress (6/10 pl
 - [Phase ?]: Private v1.3.1 candidate is bound to SHA 7afb1dd056bba234d1bd4ec1c4487f2ea8e308f1 with public docs still ~> 1.3.
 - [Phase ?]: v1.3.0 remains immutable failed-release evidence; no tag, dispatch, Hex, HexDocs, or registry mutation occurred in Plan 131-03.
 - [Phase 131]: D-35 makes exact v1.3.4 the fresh protected release/verifier/journey target on bbe75d2 ancestry; complete credential-free preflight is the validation gate and only actual protected publish receives HEX_API_KEY. v1.3.0 through v1.3.3 remain immutable failed history.
+- [Phase ?]: Exact 1.3.4 is the sole recovery target; v1.3.0-v1.3.3 remain immutable failed history.
+- [Phase ?]: Plan 10 owns the clean-room harness and evidence only after Plan 09 writes the public prerequisite.
 
 ### Pending Todos
 
@@ -104,8 +106,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-22T21:30:00Z
-Stopped at: Replanned D-35 recovery; next 131-07
+Last session: 2026-08-22T21:07:53.368Z
+Stopped at: Completed 131-07-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -130,3 +132,4 @@ Resume file: None
 | Phase 131 P01 | 12m | 2 tasks | 6 files |
 | Phase 131 P02 | ~10m | 1 tasks | 3 files |
 | Phase 131-adoption-snapshot-phoenix-newcomer-proof P03 | ~45m | 1 tasks | 9 files |
+| Phase 131 P07 | 20min | 2 tasks | 6 files |

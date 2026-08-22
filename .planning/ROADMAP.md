@@ -89,7 +89,7 @@ Plans:
   3. A newcomer in a clean Phoenix environment can follow public discovery material to install the public Rendro package, select the canonical Swiss/light Invoice, and customize it using the documented preset/configurator path without a repository checkout or warm dependency cache.
   4. That clean Phoenix application responds through the optional Phoenix adapter with a successful `application/pdf` response whose bytes begin `%PDF-`, and the recorded journey states the exact versions, commands, results, and any repairs limited to existing handoffs.
 
-**Plans**: 6/10 plans executed
+**Plans**: 7/10 plans executed
 
 Plans:
 **Wave 1**
@@ -118,7 +118,7 @@ Plans:
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
-- [ ] 131-07-PLAN.md — Finish the committed exact v1.3.4 release/HexDocs/verifier/four-incident surfaces on the bbe75d2 boundary; defer clean-room creation to Plan 10.
+- [x] 131-07-PLAN.md — Finish the committed exact v1.3.4 release/HexDocs/verifier/four-incident surfaces on the bbe75d2 boundary; defer clean-room creation to Plan 10.
 
 **Wave 8** *(blocked on Wave 7 completion)*
 
@@ -137,4 +137,4 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 130. Catalog Quality & Evidence Ratchet | 11/11 | Complete    | 2026-08-20 |
-| 131. Adoption Snapshot & Phoenix Newcomer Proof | 6/10 | In Progress|  |
+| 131. Adoption Snapshot & Phoenix Newcomer Proof | 7/10 | In Progress|  |
