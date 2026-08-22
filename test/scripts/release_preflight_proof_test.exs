@@ -101,6 +101,57 @@ defmodule Rendro.ReleasePreflightProofTest do
              ReleasePreflightProof.validate_worktree(File.cwd!())
   end
 
+  test "exact candidate proof is ref-free, asserts detached HEAD, and preserves tag refs" do
+    candidate = String.duplicate("a", 40)
+    tag_refs = "deadbeef refs/tags/v1.3.0\nfeedface refs/tags/v1.3.1\n"
+
+    assert {:ok, %{candidate_sha: ^candidate, synthetic_tag: false}} =
+             ReleasePreflightProof.parse_args([
+               "--candidate-sha",
+               candidate,
+               "--worktree",
+               "/tmp/release-proof"
+             ])
+
+    assert {:error, "use exactly one of --ref, --current-version-tag, or --candidate-sha"} =
+             ReleasePreflightProof.parse_args([
+               "--ref",
+               "v1.3.2",
+               "--candidate-sha",
+               candidate,
+               "--worktree",
+               "/tmp/release-proof"
+             ])
+
+    runner =
+      command_runner_for(%{
+        {"git", ["show-ref", "--tags"]} => {tag_refs, 0},
+        {"git", ["worktree", "add", "--detach", "/tmp/release-proof", candidate]} => {"", 0},
+        {"git", ["-C", "/tmp/release-proof", "rev-parse", "HEAD"]} => {candidate <> "\n", 0},
+        {"mix", ["deps.get"]} => {"deps ok\n", 0},
+        {"mix", ["release.preflight", "--candidate-sha", candidate]} => {"preflight ok\n", 0},
+        {"git", ["worktree", "remove", "--force", "/tmp/release-proof"]} => {"", 0}
+      })
+
+    assert {:ok, output} =
+             ReleasePreflightProof.execute_proof(
+               %{
+                 candidate_sha: candidate,
+                 worktree: "/tmp/release-proof",
+                 dry_run: false,
+                 keep: false,
+                 synthetic_tag: false,
+                 skip_ci: false,
+                 skip_security_audits: false
+               },
+               %{runner: runner, project_config: [version: "1.3.2"]}
+             )
+
+    assert output =~ "preflight ok"
+    refute_received {:proof_command, "git", ["tag" | _], _}
+    assert_received {:proof_command, "git", ["-C", "/tmp/release-proof", "rev-parse", "HEAD"], _}
+  end
+
   test "synthetic tag proof creates and cleans up isolated release state on success" do
     runner =
       command_runner_for(%{

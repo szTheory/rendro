@@ -270,6 +270,50 @@ defmodule Mix.Tasks.Release.PreflightTest do
     refute_received {:preflight_command, "mix", ["ci.fast"]}
   end
 
+  test "candidate SHA mode requires a lowercase exact HEAD match without tag discovery" do
+    candidate = String.duplicate("a", 40)
+
+    assert {:ok, %{candidate_sha: ^candidate}} =
+             Preflight.parse_args(["--candidate-sha", candidate])
+
+    assert {:error, "candidate SHA must be 40 lowercase hex characters"} =
+             Preflight.parse_args(["--candidate-sha", String.upcase(candidate)])
+
+    runner =
+      command_runner_for(
+        %{
+          {"git", ["status", "--short"]} => {"", 0},
+          {"git", ["rev-parse", "HEAD"]} => {candidate <> "\n", 0},
+          {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0},
+          {"mix", ["ci.fast"]} => {"ci ok", 0},
+          {"mix", ["docs.contract"]} => {"docs ok", 0},
+          {"sh", ["-c", "printf 'n\\n' | mix hex.publish --dry-run --yes"]} =>
+            {"Building rendro 1.0.0\nPublishing package to public repository hexpm.\nNo authenticated user found\n",
+             1},
+          {"mix", ["hex.audit"]} => {"hex audit ok", 0},
+          {"mix", ["deps.audit", "--ignore-file", ".mix_audit.ignore"]} => {"deps audit ok", 0}
+        },
+        "1.0.0"
+      )
+
+    assert {:ok, _} =
+             Preflight.run_with_context(
+               %{
+                 project_config: [
+                   version: "1.0.0",
+                   docs: [source_ref: "v1.0.0"],
+                   package: [licenses: ["MIT"], links: %{"GitHub" => "https://example.test"}]
+                 ],
+                 command_runner: runner,
+                 env: %{}
+               },
+               candidate_sha: candidate
+             )
+
+    assert_received {:preflight_command, "git", ["rev-parse", "HEAD"]}
+    refute_received {:preflight_command, "git", ["describe", "--tags", "--exact-match"]}
+  end
+
   defp command_runner_for(responses, version \\ Mix.Project.config()[:version]) do
     test_pid = self()
 
