@@ -12,7 +12,12 @@ defmodule Rendro.PublicReleaseVerifier do
     "Rendro.Theme.Presets",
     "Rendro.Adapters.Phoenix.render_pdf/3"
   ]
-  @candidate_tag "v1.3.1"
+  @candidate_tag "v1.3.2"
+  @v1_3_0_peeled_sha "3d014b8194782fc29bc685c0d5e84e4adc64b2c3"
+  @v1_3_0_run_id "32513353551"
+  @v1_3_1_tag_object_sha "b386d1e39b6c9e63af58aa1fa5890d93909d278f"
+  @v1_3_1_peeled_sha "7afb1dd056bba234d1bd4ec1c4487f2ea8e308f1"
+  @v1_3_1_run_id "32539594278"
 
   def run(argv, context \\ default_context()) do
     with {:ok, options} <- parse_args(argv),
@@ -130,7 +135,9 @@ defmodule Rendro.PublicReleaseVerifier do
              "HexDocs source does not match candidate"
            ),
          :ok <- require_members(facts["archive_members"] || []),
-         :ok <- require_symbols(facts["hexdocs_symbols"] || []) do
+         :ok <- require_symbols(facts["hexdocs_symbols"] || []),
+         :ok <- validate_v1_3_0_incident(facts),
+         :ok <- validate_v1_3_1_incident(facts) do
       :ok
     end
   end
@@ -201,23 +208,27 @@ defmodule Rendro.PublicReleaseVerifier do
          {:ok, hexdocs} <- github_run(options.hexdocs_run_id),
          {:ok, hex} <- hex_release(options.tag),
          {:ok, archive_members} <- archive_members(options.tag),
-         {:ok, docs} <- hexdocs_probes(options.tag, candidate) do
+         {:ok, docs} <- hexdocs_probes(options.tag, candidate),
+         {:ok, incidents} <- collect_incident_facts(repository) do
       {:ok,
-       Map.merge(docs, %{
-         "candidate_commit_sha" => candidate,
-         "peeled_tag_sha" => peeled_tag_sha,
-         "release_head_sha" => release["headSha"],
-         "release_conclusion" => release["conclusion"],
-         "release_event" => release["event"],
-         "release_name" => release["name"],
-         "hexdocs_head_sha" => hexdocs["headSha"],
-         "hexdocs_conclusion" => hexdocs["conclusion"],
-         "hexdocs_event" => hexdocs["event"],
-         "hexdocs_name" => hexdocs["name"],
-         "version" => String.trim_leading(options.tag, "v"),
-         "hex_version" => hex["version"],
-         "archive_members" => archive_members
-       })}
+       Map.merge(
+         incidents,
+         Map.merge(docs, %{
+           "candidate_commit_sha" => candidate,
+           "peeled_tag_sha" => peeled_tag_sha,
+           "release_head_sha" => release["headSha"],
+           "release_conclusion" => release["conclusion"],
+           "release_event" => release["event"],
+           "release_name" => release["name"],
+           "hexdocs_head_sha" => hexdocs["headSha"],
+           "hexdocs_conclusion" => hexdocs["conclusion"],
+           "hexdocs_event" => hexdocs["event"],
+           "hexdocs_name" => hexdocs["name"],
+           "version" => String.trim_leading(options.tag, "v"),
+           "hex_version" => hex["version"],
+           "archive_members" => archive_members
+         })
+       )}
     end
   end
 
@@ -242,8 +253,74 @@ defmodule Rendro.PublicReleaseVerifier do
     end
   end
 
+  defp github_tag_object(repository, tag) do
+    with {:ok, ref} <- github_json(["api", "repos/#{repository}/git/ref/tags/#{tag}"]),
+         %{"object" => %{"sha" => object_sha, "type" => "tag"}} <- ref,
+         {:ok, tag_object} <- github_json(["api", "repos/#{repository}/git/tags/#{object_sha}"]),
+         %{"object" => %{"sha" => peeled_sha, "type" => "commit"}} <- tag_object do
+      {:ok, %{object_sha: object_sha, peeled_sha: peeled_sha}}
+    else
+      _ -> {:error, "remote tag is not an annotated tag pointing at a commit"}
+    end
+  end
+
   defp github_run(id),
-    do: github_json(["run", "view", id, "--json", "conclusion,event,headSha,name"])
+    do: github_json(["run", "view", id, "--json", "conclusion,event,headSha,name,jobs"])
+
+  defp collect_incident_facts(repository) do
+    with {:ok, v1_3_0} <- github_tag(repository, "v1.3.0"),
+         {:ok, v1_3_0_run} <- github_run(@v1_3_0_run_id),
+         {:ok, v1_3_1} <- github_tag_object(repository, "v1.3.1"),
+         {:ok, v1_3_1_run} <- github_run(@v1_3_1_run_id),
+         true <- publish_job_skipped?(v1_3_1_run),
+         true <- hex_absent?("1.3.0"),
+         true <- hexdocs_absent?("1.3.0"),
+         true <- hex_absent?("1.3.1"),
+         true <- hexdocs_absent?("1.3.1") do
+      {:ok,
+       %{
+         "v1_3_0_peeled_sha" => v1_3_0,
+         "v1_3_0_run_id" => @v1_3_0_run_id,
+         "v1_3_0_conclusion" => v1_3_0_run["conclusion"],
+         "v1_3_0_hex_absent" => true,
+         "v1_3_0_hexdocs_absent" => true,
+         "v1_3_1_tag_object_sha" => v1_3_1.object_sha,
+         "v1_3_1_peeled_sha" => v1_3_1.peeled_sha,
+         "v1_3_1_run_id" => @v1_3_1_run_id,
+         "v1_3_1_conclusion" => v1_3_1_run["conclusion"],
+         "v1_3_1_publish_job_skipped" => true,
+         "v1_3_1_hex_absent" => true,
+         "v1_3_1_hexdocs_absent" => true
+       }}
+    else
+      _ -> {:error, "immutable failed-release incident probes did not match"}
+    end
+  end
+
+  defp publish_job_skipped?(%{"jobs" => jobs}) when is_list(jobs) do
+    Enum.any?(jobs, fn job -> job["name"] == "publish" and job["conclusion"] == "skipped" end)
+  end
+
+  defp publish_job_skipped?(_), do: false
+
+  defp hex_absent?(version),
+    do: url_absent?("https://hex.pm/api/packages/rendro/releases/#{version}")
+
+  defp hexdocs_absent?(version), do: url_absent?("https://hexdocs.pm/rendro/#{version}")
+
+  defp url_absent?(url) do
+    case System.cmd("curl", [
+           "--silent",
+           "--output",
+           "/dev/null",
+           "--write-out",
+           "%{http_code}",
+           url
+         ]) do
+      {"404", 0} -> true
+      _ -> false
+    end
+  end
 
   defp github_json(args) do
     case System.cmd("gh", args, stderr_to_stdout: true) do
@@ -346,6 +423,51 @@ defmodule Rendro.PublicReleaseVerifier do
 
   defp validate_candidate(_), do: {:error, "candidate SHA must be 40 lowercase hex characters"}
 
+  defp validate_v1_3_0_incident(facts) do
+    with :ok <-
+           equal?(
+             facts["v1_3_0_peeled_sha"],
+             @v1_3_0_peeled_sha,
+             "v1.3.0 incident peeled SHA is incorrect"
+           ),
+         :ok <-
+           equal?(facts["v1_3_0_run_id"], @v1_3_0_run_id, "v1.3.0 incident run ID is incorrect"),
+         :ok <- equal?(facts["v1_3_0_conclusion"], "failure", "v1.3.0 incident did not fail"),
+         :ok <- equal?(facts["v1_3_0_hex_absent"], true, "v1.3.0 Hex release is present"),
+         :ok <- equal?(facts["v1_3_0_hexdocs_absent"], true, "v1.3.0 HexDocs page is present") do
+      :ok
+    end
+  end
+
+  defp validate_v1_3_1_incident(facts) do
+    with :ok <-
+           equal?(
+             facts["v1_3_1_tag_object_sha"],
+             @v1_3_1_tag_object_sha,
+             "v1.3.1 incident tag object SHA is incorrect"
+           ),
+         :ok <-
+           equal?(
+             facts["v1_3_1_peeled_sha"],
+             @v1_3_1_peeled_sha,
+             "v1.3.1 incident peeled SHA is incorrect"
+           ),
+         :ok <-
+           equal?(facts["v1_3_1_run_id"], @v1_3_1_run_id, "v1.3.1 incident run ID is incorrect"),
+         :ok <-
+           equal?(facts["v1_3_1_conclusion"], "cancelled", "v1.3.1 incident was not cancelled"),
+         :ok <-
+           equal?(
+             facts["v1_3_1_publish_job_skipped"],
+             true,
+             "v1.3.1 incident publish job was not skipped"
+           ),
+         :ok <- equal?(facts["v1_3_1_hex_absent"], true, "v1.3.1 Hex release is present"),
+         :ok <- equal?(facts["v1_3_1_hexdocs_absent"], true, "v1.3.1 HexDocs page is present") do
+      :ok
+    end
+  end
+
   defp validate_tag(@candidate_tag), do: :ok
 
   defp validate_tag("v" <> version) do
@@ -400,7 +522,7 @@ defmodule Rendro.PublicReleaseVerifier do
     ])
   end
 
-  defp equal?(value, value, _message) when is_binary(value), do: :ok
+  defp equal?(value, value, _message), do: :ok
   defp equal?(_actual, _expected, message), do: {:error, message}
 
   defp require_members(members) do

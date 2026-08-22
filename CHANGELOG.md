@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.2] - Unreleased
+
+### Fixed
+
+- Repaired the release-preflight test stdin deadlock exposed by the failed,
+  unpublished `v1.3.1` release attempt. Candidate validation now proves the
+  bounded non-interactive conflict path and keeps release validation/publish
+  timeout caps separate. This private candidate does not publish or retry the
+  immutable `v1.3.0` or `v1.3.1` tags.
+
 ## [1.3.1] - 2026-08-21
 
 This additive release makes the existing preset and configurator discovery path
