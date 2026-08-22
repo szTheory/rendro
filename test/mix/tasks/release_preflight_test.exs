@@ -7,7 +7,8 @@ defmodule Mix.Tasks.Release.PreflightTest do
     runner =
       command_runner_for(%{
         {"git", ["status", "--short"]} => {" M README.md\n", 0},
-        {"git", ["describe", "--tags", "--exact-match"]} => {"v1.3.1\n", 0},
+        {"git", ["describe", "--tags", "--exact-match"]} =>
+          {"v#{Mix.Project.config()[:version]}\n", 0},
         {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0}
       })
 
@@ -44,7 +45,8 @@ defmodule Mix.Tasks.Release.PreflightTest do
     runner =
       command_runner_for(%{
         {"git", ["status", "--short"]} => {"", 0},
-        {"git", ["describe", "--tags", "--exact-match"]} => {"v1.3.1\n", 0},
+        {"git", ["describe", "--tags", "--exact-match"]} =>
+          {"v#{Mix.Project.config()[:version]}\n", 0},
         {"mix", ["ci.fast"]} => {"ci ok", 0},
         {"mix", ["docs.contract"]} => {"docs drifted", 1},
         {"mix", ["hex.build", "--unpack"]} => {"hex build ok", 0},
