@@ -1,7 +1,7 @@
 ---
 prepared_at: 2026-08-22T21:20:00Z
 version: 1.3.4
-candidate_commit_sha: ed68ff83a3211cc8318d0cab88acbd4c01859474
+candidate_commit_sha: f03c78bab54efe1cd1596d51cf3f28193232e2a3
 required_fix_ancestor: bbe75d2bf3f53e5235626974c539500395d2032e
 proof_mode: exact-sha-no-tag-complete-audits
 head_equals_candidate: true
@@ -27,7 +27,7 @@ recovery_decision: D-35
 # Rendro v1.3.4 Release Approval Packet
 
 This pending packet binds only private candidate
-`ed68ff83a3211cc8318d0cab88acbd4c01859474`, whose ancestry includes
+`f03c78bab54efe1cd1596d51cf3f28193232e2a3`, whose ancestry includes
 `bbe75d2bf3f53e5235626974c539500395d2032e`. It authorizes nothing.
 
 ## Fresh no-tag evidence
@@ -60,7 +60,7 @@ consumed by its failed immutable attempt and does not transfer to v1.3.4.
 ## Required fresh human decision
 
 Only an explicit blocking-human approval that names
-`ed68ff83a3211cc8318d0cab88acbd4c01859474` and jointly authorizes the single
+`f03c78bab54efe1cd1596d51cf3f28193232e2a3` and jointly authorizes the single
 annotated `v1.3.4` tag, protected tag-driven Hex publication, and
 candidate-bound protected HexDocs dispatch may advance this packet. Generic
 assent, prior approval, silence, partial approval, and automatic advancement do
