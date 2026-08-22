@@ -266,7 +266,8 @@ defmodule Mix.Tasks.Release.Preflight do
           "CHANGELOG.md",
           "guides/api_stability.md",
           "guides/branding.md",
-          "guides/integrations.md"
+          "guides/integrations.md",
+          "scripts/verify_livebook.exs"
         ]
 
         missing_files =
@@ -278,14 +279,16 @@ defmodule Mix.Tasks.Release.Preflight do
           "priv/support_matrix.json",
           "priv/viewer_evidence/",
           "priv/guardrails/",
-          "scripts/",
           "test/"
         ]
 
         leaked_files =
-          Enum.filter(forbidden_paths, fn path ->
-            File.exists?(Path.join(dir, path))
-          end)
+          Enum.filter(forbidden_paths, &File.exists?(Path.join(dir, &1))) ++
+            (dir
+             |> Path.join("scripts/**/*")
+             |> Path.wildcard()
+             |> Enum.reject(&String.ends_with?(&1, "/scripts/verify_livebook.exs"))
+             |> Enum.map(&Path.relative_to(&1, dir)))
 
         File.rm_rf!(dir)
         File.rm(dir <> ".tar")
