@@ -2,13 +2,15 @@
 candidate_commit_sha: cfc58a81865e060351ce33d98f5e52de8cd198d9
 version: 1.3.3
 release_ref: v1.3.3
-candidate_status: sealed_private_pending_blocking_human
+candidate_status: consumed_failed_immutable_incident
 required_fix_ancestor: 9dabf90
 proof_mode: exact-sha-no-tag-complete-audits
-tag_pushed: false
+tag_pushed: true
 hexdocs_dispatched: false
 registry_mutated: false
 supersedes_failed_version: 1.3.2
+recovery_target: 1.3.4
+recovery_decision: D-35
 ---
 
 # Rendro v1.3.3 Candidate Control Record
@@ -19,18 +21,17 @@ tests), FIFO, isolated Livebook, package/docs, `mix ci.fast` (Dialyzer 0),
 both audits, and complete no-skip candidate preflight passed. Archive SHA-256:
 `41b1766c8010dbd401da610ef32e12cdcf13e5062da5c17960beaba466a872c8`.
 
-This candidate is sealed for private review and requires fresh blocking-human
-approval before any tag, Hex publication, or HexDocs dispatch. The complete
-proof included focused regressions, FIFO, `mix ci.fast`, isolated tutorial,
-package/docs checks, and no-skip candidate preflight with both security audits.
+This candidate was approved and consumed by the single immutable v1.3.3
+release attempt. It is historical evidence only and is not eligible for a
+retry, new tag, package publication, or HexDocs dispatch.
 
-No local or remote `v1.3.3` tag may exist, even temporarily, before the fresh
-Plan 131-06 approval. Complete local and remote tag-ref snapshots must remain
-unchanged throughout private proof. After the candidate is captured,
-`candidate..HEAD` may contain only Phase 131 planning/control records.
+Before the consumed Plan 131-06 approval, no local or remote `v1.3.3` tag
+existed and complete tag-ref snapshots remained unchanged throughout private
+proof. After approval, the single immutable tag was created exactly once.
 
-Public consumer documentation remains `{:rendro, "~> 1.3"}`; exact `1.3.3` is
-the release verifier and clean-room evidence target per D-34.
+Public consumer documentation remains `{:rendro, "~> 1.3"}`. Exact `1.3.3`
+is historical failed evidence; exact `1.3.4` is the current verifier and
+clean-room target per D-35.
 
 ## Immutable failed v1.3.2 incident
 
@@ -60,12 +61,26 @@ the release verifier and clean-room evidence target per D-34.
   `32539594278` was cancelled during repeated CI; publish was skipped and
   Hex/HexDocs 1.3.1 are absent.
 
-None of the three tags or runs may be retried, moved, deleted, overwritten,
+None of these three tags or runs may be retried, moved, deleted, overwritten,
 recreated, repushed, dispatched, or routed through an alternate publisher.
 
-## Superseding approval boundary
+## Immutable failed v1.3.3 incident
 
-No approval transfers from a prior candidate. Plan 131-06 must repeat the
-complete no-tag proof immediately before a blocking-human decision. Approval
-must name the final exact 40-character v1.3.3 SHA and authorize annotated tag,
-protected Hex, and candidate-bound protected HexDocs together.
+- Annotated tag object `c96bf205d7216cdcf4846a0f24a312f9c1c75b0f`
+  peels to this candidate.
+- Protected run `32596108284`, validate job `97087204354`, publish job
+  `97088652899`.
+- Version, CI, and complete release preflight passed. A redundant standalone
+  unauthenticated Hex dry run then failed; protected publish skipped.
+- Hex and HexDocs 1.3.3 are absent, no HexDocs dispatch occurred, and the
+  public verifier did not run.
+
+## D-35 recovery boundary
+
+Exact `1.3.4` is the only current recovery target. Commit
+`bbe75d2bf3f53e5235626974c539500395d2032e` removes the redundant standalone
+dry run and preserves complete credential-free preflight; `HEX_API_KEY` remains
+exclusive to actual protected publish. No approval transfers from this record.
+Plans 131-07 and 131-08 must commit every exact-version/verifier/incident
+surface before capturing a new candidate, require `bbe75d2` ancestry, and
+replace this file only after complete detached exact-SHA/no-tag proof passes.

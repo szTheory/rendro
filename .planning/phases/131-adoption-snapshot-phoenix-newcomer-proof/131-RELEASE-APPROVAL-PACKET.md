@@ -20,6 +20,9 @@ v1_3_3_hex_absent: true
 v1_3_3_hexdocs_absent: true
 approval_status: approved_exact_blocking_human
 release_status: failed_immutable_incident
+approval_consumed: true
+recovery_target: 1.3.4
+recovery_decision: D-35
 release_run_id: "32596108284"
 release_validate_job_id: "97087204354"
 release_publish_job_id: "97088652899"
@@ -29,9 +32,10 @@ tag_peeled_sha: cfc58a81865e060351ce33d98f5e52de8cd198d9
 
 # Rendro v1.3.3 Release Approval Packet
 
-This is a fresh pre-approval control record, not approval. It binds only the
-exact candidate `cfc58a81865e060351ce33d98f5e52de8cd198d9`; detached HEAD
-equaled that SHA and its ancestry contains resolved commit `9dabf90`.
+This is the historical, consumed v1.3.3 approval control record. It binds only
+the exact candidate `cfc58a81865e060351ce33d98f5e52de8cd198d9`; detached HEAD
+equaled that SHA and its ancestry contains resolved commit `9dabf90`. It
+authorizes no current or future action.
 
 ## Fresh no-tag proof — 2026-08-22T19:02:51Z
 
@@ -86,14 +90,14 @@ None of those tags, runs, or absence facts may be retried, moved, deleted,
 overwritten, recreated, repushed, dispatched, or routed through another
 publisher.
 
-## Required blocking-human decision
+## Historical blocking-human decision boundary
 
-Only a new literal approval that names
+At execution time, only a literal approval that named
 `cfc58a81865e060351ce33d98f5e52de8cd198d9` and jointly authorizes the
 annotated `v1.3.3` tag, protected tag-driven Hex publication, and
-candidate-bound protected HexDocs publication may advance this packet. Prior
+candidate-bound protected HexDocs publication could advance this packet. Prior
 approval, generic assent, silence, partial approval, and automatic advancement
-do not authorize mutation.
+did not authorize mutation.
 
 ## Literal blocking-human approval
 
@@ -125,3 +129,21 @@ both return `404`; no candidate-bound `workflow_dispatch` HexDocs run exists.
 This is immutable failure evidence. Do not retry, move, delete, recreate, or
 repush the tag; do not use another publisher; and do not dispatch HexDocs for
 this failed release.
+
+## D-35 superseding recovery control
+
+This approval is fully consumed by the immutable v1.3.3 attempt and authorizes
+nothing for v1.3.4. Commit `bbe75d2bf3f53e5235626974c539500395d2032e`
+removed the redundant standalone dry-run step and added the least-privilege
+guardrail: complete credential-free `mix release.preflight`, including its
+internal Hex dry run, remains the validation gate; only actual protected
+`mix hex.publish --yes` receives `HEX_API_KEY` and acts as the authorization
+gate.
+
+Plans 131-07 and 131-08 must commit all exact-version, verifier, incident,
+workflow-contract, package/docs, and journey-bound changes before capturing a
+fresh exact v1.3.4 SHA; require `bbe75d2` in its ancestry; run the complete
+detached no-tag proof; and permit only Phase-131 control records afterward.
+Plan 131-09 must generate a new packet immediately before a new blocking-human
+decision. No prior approval, including the literal v1.3.3 approval above,
+transfers to v1.3.4.

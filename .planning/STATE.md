@@ -5,16 +5,16 @@ milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 131
 current_phase_name: adoption-snapshot-phoenix-newcomer-proof
 status: executing
-stopped_at: Completed 131-03-PLAN.md
-last_updated: "2026-08-22T20:28:35.654Z"
-last_activity: 2026-08-21
-last_activity_desc: Phase 131 execution started
+stopped_at: Replanned immutable v1.3.3 recovery; next 131-07
+last_updated: "2026-08-22T21:30:00Z"
+last_activity: 2026-08-22
+last_activity_desc: Phase 131 replanned for exact v1.3.4 after immutable v1.3.3 failure
 progress:
   total_phases: 2
   completed_phases: 1
-  total_plans: 18
+  total_plans: 21
   completed_plans: 17
-  percent: 50
+  percent: 81
 ---
 
 # Project State
@@ -29,18 +29,18 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 131 (adoption-snapshot-phoenix-newcomer-proof) — EXECUTING
-Plan: 3 of 5
-Status: Ready to execute
-Last activity: 2026-08-21 — Phase 131 execution started
+Plan: 6 of 10
+Status: Ready to execute 131-07
+Last activity: 2026-08-22 — D-35 exact v1.3.4 recovery replanned
 
-Progress: [█████████░] 88%
+Progress: [████████░░] 81%
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
 ```text
 [░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 0% — 0/2 phases complete
-Phase 130 Catalog Quality & Evidence Ratchet .............. In progress (2/11 plans)
-Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Not started
+Phase 130 Catalog Quality & Evidence Ratchet .............. Complete (11/11 plans)
+Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... In progress (6/10 plans)
 ```
 
 **Locked sequencing:** 130 repairs, regenerates, and truthfully re-reviews the fixed twelve cells before 131 records final adoption evidence and validates the public newcomer path against that stable catalog state.
@@ -75,6 +75,7 @@ Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Not started
 - [Phase ?]: Both protected version consumers now extract exactly one top-level @version declaration and fail closed on zero or multiple matches.
 - [Phase ?]: Private v1.3.1 candidate is bound to SHA 7afb1dd056bba234d1bd4ec1c4487f2ea8e308f1 with public docs still ~> 1.3.
 - [Phase ?]: v1.3.0 remains immutable failed-release evidence; no tag, dispatch, Hex, HexDocs, or registry mutation occurred in Plan 131-03.
+- [Phase 131]: D-35 makes exact v1.3.4 the fresh protected release/verifier/journey target on bbe75d2 ancestry; complete credential-free preflight is the validation gate and only actual protected publish receives HEX_API_KEY. v1.3.0 through v1.3.3 remain immutable failed history.
 
 ### Pending Todos
 
@@ -83,7 +84,7 @@ None yet.
 ### Blockers/Concerns
 
 - Human re-review and network/Phoenix observations are evidence inputs, not deterministic proof; unavailable evidence must remain explicitly unavailable.
-- Immutable v1.3.3 release incident: annotated tag c96bf205d7216cdcf4846a0f24a312f9c1c75b0f / run 32596108284 failed at unauthenticated Hex dry run; publish job 97088652899 skipped; Hex/HexDocs absent and no docs dispatch. Do not retry or mutate v1.3.3.
+- D-35 immutable v1.3.3 release incident: annotated tag object c96bf205d7216cdcf4846a0f24a312f9c1c75b0f peels to cfc58a81865e060351ce33d98f5e52de8cd198d9; run 32596108284 validate job 97087204354 passed version, CI, and complete preflight before the redundant unauthenticated standalone dry run failed; publish job 97088652899 skipped; Hex/HexDocs absent, with no docs dispatch/verifier. Fix bbe75d2 removes only that duplicate and confines HEX_API_KEY to actual protected publish. Exact v1.3.4 is the fresh target; v1.3.0 through v1.3.3 are immutable and must never be retried or mutated.
 
 ### Quick Tasks Completed
 
@@ -103,14 +104,14 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-21T21:58:24.882Z
-Stopped at: Completed 131-03-PLAN.md
+Last session: 2026-08-22T21:30:00Z
+Stopped at: Replanned D-35 recovery; next 131-07
 Resume file: None
 
 ## Next Steps
 
-1. Resume Phase 130 with the next dependency-ready incomplete plan, preserving the detached reconciliation worktree for Plan 06.
-2. Execute the remaining seven plans in their recorded wave order; do not claim phase completion before 130-11 succeeds.
+1. Execute 131-07 to commit every exact v1.3.4 release/verifier/incident/journey surface on bbe75d2 ancestry.
+2. Continue 131-08 through 131-10 in wave order; do not create v1.3.4 before the fresh Plan-09 blocking-human approval or run the clean-room proof before the atomic verifier prerequisite exists.
 
 ## Performance Metrics
 

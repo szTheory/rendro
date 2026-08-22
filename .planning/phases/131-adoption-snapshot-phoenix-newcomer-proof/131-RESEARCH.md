@@ -71,6 +71,14 @@ D-34 supersedes every exact `1.3.2` recovery target in this research while prese
 
 The private candidate procedure must be behaviorally identical to the protected release preflight for CI and security: candidate mode cannot accept CI or audit bypasses, and planning/contracts must fail if one is requested. Commit every release-bearing change before capturing the candidate SHA, run the exact SHA from a detached clean worktree, retain complete local/remote tag-ref snapshots, and allow only Phase 131 control records in `candidate..HEAD`. No local or remote v1.3.3 tag may exist even temporarily before approval. The Livebook guide remains a packaged ExDoc extra and executable documentation, but its authoring/runtime tool graph is isolated through the ephemeral verifier and must not return to root dependencies/configuration. This is a release-integrity boundary, not a removal of tutorial functionality. [VERIFIED: D-34] [VERIFIED: commit `9dabf90`]
 
+### Execution-time supersession after redundant dry-run failure (2026-08-22)
+
+D-35 supersedes every exact `1.3.3` recovery target in this research while preserving the complete-audit, protected-path, evidence, Phoenix, and clean-room architecture. Annotated `v1.3.3` is immutable public tag object `c96bf205d7216cdcf4846a0f24a312f9c1c75b0f`, peeling to `cfc58a81865e060351ce33d98f5e52de8cd198d9`. Protected run `32596108284` validate job `97087204354` passed version, CI, and complete preflight, then failed the redundant standalone unauthenticated Hex dry run; publish job `97088652899` skipped, Hex/HexDocs `1.3.3` are absent, and no docs dispatch or verifier ran. Commit `bbe75d2bf3f53e5235626974c539500395d2032e` removes that duplicate and proves the least-privilege contract: complete credential-free preflight, including its internal Hex dry run, is the validation gate; only actual protected `mix hex.publish --yes` receives `HEX_API_KEY` and tests authorization. Exact `1.3.4` is now the candidate, protected release/verifier, and clean-room pin; public docs remain `~> 1.3`. All exact 1.3.1/1.3.2/1.3.3 filenames and examples below are historical inputs. Plans 131-07 through 131-10 must commit all exact-version/verifier/incident surfaces before candidate capture, require `bbe75d2` ancestry, preserve all four immutable failures, run complete detached proof, obtain fresh exact-SHA approval, use protected release then candidate-bound HexDocs, atomically verify public state, and only then execute the clean-room journey. [VERIFIED: D-35] [VERIFIED: `.planning/debug/v133-hex-dry-run.md`] [VERIFIED: commit `bbe75d2`]
+
+### Validation versus authorization boundary
+
+Do not restore or require a second workflow-level Hex dry run after `mix release.preflight`. The complete preflight already performs the package/docs/local Hex dry-run checks without protected credentials and deliberately recognizes the post-local-check anonymous boundary. A dry run with an inert key can exit successfully despite reporting an invalid key, so it cannot prove credential authorization. The protected publish job is the first meaningful authorization check and is the only release job allowed to receive `HEX_API_KEY`. Candidate and approval contracts must assert this exact split. [VERIFIED: resolved v1.3.3 debug session] [VERIFIED: least-privilege regression]
+
 ### Execution incident lesson: parse declarations, not token occurrences
 
 Protected release run `32513353551` failed before publication because `grep '@version' mix.exs` selected both `@version "1.3.0"` and `source_ref: "v#{@version}"`, producing a multiline value. The same broad consumer also exists in the protected HexDocs workflow. Recovery must keep both existing workflows, replace every protected workflow version consumer with the same exactly-one top-level declaration semantics, and contract-test the original two-line input plus zero/multiple-declaration failures independently against release.yml and hexdocs.yml. The v1.3.0 tag stays immutable at peeled commit `3d014b8194782fc29bc685c0d5e84e4adc64b2c3`; because Hex and HexDocs 1.3.0 are absent, exact v1.3.1 becomes the release/verifier/journey pin. [VERIFIED: failed workflow run 32513353551] [VERIFIED: workflow inspection] [VERIFIED: D-32]
@@ -92,7 +100,7 @@ Protected release run `32513353551` failed before publication because `grep '@ve
 
 | Library/tool | Version | Purpose | Why standard |
 |---|---:|---|---|
-| Rendro public Hex package | exact `1.3.1` evidence pin; docs `~> 1.3` | Consumer PDF/theme/recipe API | D-32 recovery boundary after failed v1.3.0; public package verification remains prerequisite. [VERIFIED: D-32] |
+| Rendro public Hex package | exact `1.3.4` evidence pin; docs `~> 1.3` | Consumer PDF/theme/recipe API | D-35 recovery boundary after four immutable failures; public package verification remains prerequisite. [VERIFIED: D-35] |
 | Phoenix + Plug + Bandit generated app | generator-resolved; retain exact lock versions | HTTP route, controller, endpoint, test | Phoenix's idiomatic generated app provides the controller/ConnCase boundary. [CITED: https://phoenix.hexdocs.pm/testing_controllers.html] |
 | `mix phx.new` | local `1.8.9`; record actual execution value | Fresh API-only consumer app | Official generator supports no-Ecto/no-HTML/no-assets/no-install use. [CITED: https://phoenix.hexdocs.pm/Mix.Tasks.Phx.New.html] |
 | Hex API + GitHub CLI | record actual versions/results | Read-only adoption observations | Existing `ADOPTION.md` already defines their public source commands. [VERIFIED: codebase] |
@@ -106,7 +114,7 @@ Protected release run `32513353551` failed before publication because `grep '@ve
 | `gh` | Scoped issue/PR metadata | Record query/limit and candidate metadata, never mutate labels/issues. [CITED: https://cli.github.com/manual/gh_issue_list] |
 | `sha256sum`/`shasum` | Lock/PDF/result identity | Retain hashes rather than payloads. [ASSUMED] |
 
-**Installation:** No new root runtime dependency is warranted. The generated Phoenix application's `mix.exs` must declare only public `{:rendro, "1.3.1"}` for evidence, allowing its Phoenix-generated dependencies to resolve normally. [VERIFIED: D-32]
+**Installation:** No new root runtime dependency is warranted. The generated Phoenix application's `mix.exs` must declare only public `{:rendro, "1.3.4"}` for evidence, allowing its Phoenix-generated dependencies to resolve normally. Public documentation remains `{:rendro, "~> 1.3"}`. [VERIFIED: D-35]
 
 ## Package Legitimacy Audit
 
