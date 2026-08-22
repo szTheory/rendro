@@ -5,15 +5,15 @@ milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 131
 current_phase_name: adoption-snapshot-phoenix-newcomer-proof
 status: executing
-stopped_at: Completed 131-07-PLAN.md
-last_updated: "2026-08-22T21:07:53.375Z"
+stopped_at: Completed 131-08-PLAN.md
+last_updated: "2026-08-22T21:33:46.892Z"
 last_activity: 2026-08-22
 last_activity_desc: D-35 exact v1.3.4 recovery replanned
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 21
-  completed_plans: 18
+  completed_plans: 19
   percent: 50
 ---
 
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 131 (adoption-snapshot-phoenix-newcomer-proof) — EXECUTING
-Plan: 7 of 10
+Plan: 8 of 10
 Status: Ready to execute 131-07
 Last activity: 2026-08-22 — D-35 exact v1.3.4 recovery replanned
 
-Progress: [█████████░] 86%
+Progress: [█████████░] 90%
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
@@ -78,6 +78,8 @@ Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... In progress (6/10 pl
 - [Phase 131]: D-35 makes exact v1.3.4 the fresh protected release/verifier/journey target on bbe75d2 ancestry; complete credential-free preflight is the validation gate and only actual protected publish receives HEX_API_KEY. v1.3.0 through v1.3.3 remain immutable failed history.
 - [Phase ?]: Exact 1.3.4 is the sole recovery target; v1.3.0-v1.3.3 remain immutable failed history.
 - [Phase ?]: Plan 10 owns the clean-room harness and evidence only after Plan 09 writes the public prerequisite.
+- [Phase ?]: f03c78bab54efe1cd1596d51cf3f28193232e2a3 is the sole private v1.3.4 candidate after fresh detached proof.
+- [Phase ?]: v1.3.4 approval remains pending_blocking_human; no v1.3.3 approval transfers.
 
 ### Pending Todos
 
@@ -106,8 +108,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-22T21:07:53.368Z
-Stopped at: Completed 131-07-PLAN.md
+Last session: 2026-08-22T21:33:46.886Z
+Stopped at: Completed 131-08-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -133,3 +135,4 @@ Resume file: None
 | Phase 131 P02 | ~10m | 1 tasks | 3 files |
 | Phase 131-adoption-snapshot-phoenix-newcomer-proof P03 | ~45m | 1 tasks | 9 files |
 | Phase 131 P07 | 20min | 2 tasks | 6 files |
+| Phase 131-adoption-snapshot-phoenix-newcomer-proof P08 | 24min | 2 tasks | 4 files |
