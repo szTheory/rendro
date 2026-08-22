@@ -12,8 +12,8 @@ defmodule Rendro.PublicReleaseVerifierTest do
   test "private candidate binds the exact recovery target while retaining the immutable incident" do
     record = File.read!(@candidate_record)
 
-    assert record =~ ~r/^version: 1\.3\.1$/m
-    assert record =~ ~r/^release_ref: v1\.3\.1$/m
+    assert record =~ ~r/^version: 1\.3\.2$/m
+    assert record =~ ~r/^release_ref: v1\.3\.2$/m
     assert record =~ ~r/^candidate_commit_sha: [0-9a-f]{40}$/m
     assert record =~ ~r/^package_checksum: [0-9a-f]{64}$/m
     assert record =~ "tag_pushed: false"
@@ -21,6 +21,8 @@ defmodule Rendro.PublicReleaseVerifierTest do
     assert record =~ "registry_mutated: false"
     assert record =~ "3d014b8194782fc29bc685c0d5e84e4adc64b2c3"
     assert record =~ "32513353551"
+    assert record =~ "32539594278"
+    assert record =~ "b386d1e39b6c9e63af58aa1fa5890d93909d278f"
     assert record =~ "concluded **failure** before Hex"
     assert record =~ "publication. The version extraction"
     assert record =~ "Hex package `1.3.0` is absent"
@@ -45,6 +47,14 @@ defmodule Rendro.PublicReleaseVerifierTest do
              PublicReleaseVerifier.validate(valid_facts(%{"hexdocs_version" => "1.2.0"}))
   end
 
+  test "refuses candidate verification unless both immutable failed incidents remain exact" do
+    assert {:error, "v1.3.0 incident peeled SHA is incorrect"} =
+             PublicReleaseVerifier.validate(valid_facts(%{"v1_3_0_peeled_sha" => "different"}))
+
+    assert {:error, "v1.3.1 incident publish job was not skipped"} =
+             PublicReleaseVerifier.validate(valid_facts(%{"v1_3_1_publish_job_skipped" => false}))
+  end
+
   test "real CLI invocation writes a bounded parseable VERIFIED record from test fixture facts" do
     {record, fixture, output} = fixture_paths()
     on_exit(fn -> Enum.each([record, fixture, output], &File.rm/1) end)
@@ -65,7 +75,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
     File.write!(record, "candidate_commit_sha: #{@candidate}\n")
     File.write!(fixture, JSON.encode!(valid_facts() |> Map.merge(fixture_metadata())))
 
-    assert {_, status} = run_cli(record, output, fixture, ["--tag", "v1.3.1"])
+    assert {_, status} = run_cli(record, output, fixture, ["--tag", "v1.3.2"])
     assert status != 0
     refute File.exists?(output)
 
@@ -116,7 +126,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "--candidate-record",
         record,
         "--tag",
-        "v1.3.1",
+        "v1.3.2",
         "--release-run-id",
         "12",
         "--hexdocs-run-id",
@@ -141,7 +151,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
   end
 
   defp fixture_metadata do
-    %{"tag" => "v1.3.1", "release_run_id" => "12", "hexdocs_run_id" => "34"}
+    %{"tag" => "v1.3.2", "release_run_id" => "12", "hexdocs_run_id" => "34"}
   end
 
   defp valid_facts(overrides \\ %{}) do
@@ -157,9 +167,9 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "hexdocs_conclusion" => "success",
         "hexdocs_event" => "workflow_dispatch",
         "hexdocs_name" => "HexDocs",
-        "version" => "1.3.1",
-        "hex_version" => "1.3.1",
-        "hexdocs_version" => "1.3.1",
+        "version" => "1.3.2",
+        "hex_version" => "1.3.2",
+        "hexdocs_version" => "1.3.2",
         "hexdocs_source_sha" => @candidate,
         "archive_members" => [
           "mix.exs",
@@ -171,7 +181,19 @@ defmodule Rendro.PublicReleaseVerifierTest do
           "Rendro.Theme",
           "Rendro.Theme.Presets",
           "Rendro.Adapters.Phoenix.render_pdf/3"
-        ]
+        ],
+        "v1_3_0_peeled_sha" => "3d014b8194782fc29bc685c0d5e84e4adc64b2c3",
+        "v1_3_0_run_id" => "32513353551",
+        "v1_3_0_conclusion" => "failure",
+        "v1_3_0_hex_absent" => true,
+        "v1_3_0_hexdocs_absent" => true,
+        "v1_3_1_tag_object_sha" => "b386d1e39b6c9e63af58aa1fa5890d93909d278f",
+        "v1_3_1_peeled_sha" => "7afb1dd056bba234d1bd4ec1c4487f2ea8e308f1",
+        "v1_3_1_run_id" => "32539594278",
+        "v1_3_1_conclusion" => "cancelled",
+        "v1_3_1_publish_job_skipped" => true,
+        "v1_3_1_hex_absent" => true,
+        "v1_3_1_hexdocs_absent" => true
       },
       overrides
     )
