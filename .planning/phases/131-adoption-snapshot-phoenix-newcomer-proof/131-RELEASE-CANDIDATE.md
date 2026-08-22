@@ -3,9 +3,19 @@ candidate_commit_sha: 7afb1dd056bba234d1bd4ec1c4487f2ea8e308f1
 version: 1.3.1
 release_ref: v1.3.1
 package_checksum: 85856694ee5e4192cdd189186f353a0698235e6479ba2f86c2cc1aa48a9307d7
-tag_pushed: false
+candidate_status: immutable_failed_public_tag
+tag_object_sha: b386d1e39b6c9e63af58aa1fa5890d93909d278f
+tag_pushed: true
 hexdocs_dispatched: false
 registry_mutated: false
+release_run_id: "32539594278"
+release_conclusion: cancelled
+release_stage: repeated-ci-inside-release-preflight
+publish_job_skipped: true
+hex_1_3_1_present: false
+hexdocs_1_3_1_present: false
+recovery_fix_commit: 9dee9c8b837510191a1036a642e43e0b5dba2018
+superseded_by_planned_version: 1.3.2
 supersedes_failed_version: 1.3.0
 failed_release_tag: v1.3.0
 failed_release_peeled_commit: 3d014b8194782fc29bc685c0d5e84e4adc64b2c3
@@ -16,16 +26,33 @@ hex_1_3_0_present: false
 hexdocs_1_3_0_present: false
 ---
 
-# Rendro v1.3.1 Recovery Candidate
+# Rendro v1.3.1 Failed Public-Tag Candidate Record
 
-This private candidate binds the committed v1.3.1 release surface at
+This historical record binds the committed v1.3.1 release surface at
 `7afb1dd056bba234d1bd4ec1c4487f2ea8e308f1`. Its package checksum is
 `85856694ee5e4192cdd189186f353a0698235e6479ba2f86c2cc1aa48a9307d7`.
-It remains approval-gated: no tag, workflow dispatch, Hex/HexDocs publication,
-or registry mutation has occurred.
+Annotated tag `v1.3.1` now exists as public immutable history. Protected run
+`32539594278` was automatically cancelled after release preflight's repeated CI
+blocked; its publish job was skipped, Hex `1.3.1` remains absent, and HexDocs was
+not dispatched.
 
-Public consumer documentation remains `{:rendro, "~> 1.3"}`; exact `1.3.1` is
-the superseding evidence pin and clean-room target per D-32.
+Public consumer documentation remains `{:rendro, "~> 1.3"}`. Per D-33, exact
+`1.3.2` is the next release/verifier/clean-room target; no 1.3.2 candidate SHA
+is recorded until all candidate-bound source and evidence fixes are committed.
+
+## Immutable failed v1.3.1 incident evidence
+
+- Annotated public tag object `b386d1e39b6c9e63af58aa1fa5890d93909d278f`
+  peels to `7afb1dd056bba234d1bd4ec1c4487f2ea8e308f1`.
+- Protected release run `32539594278` passed version parity and first CI, then
+  hung in repeated preflight CI at `Mix.Tasks.RendroGenThemeTest`; GitHub
+  cancelled it at the six-hour limit and skipped publication.
+- Hex `1.3.1` is absent and HexDocs was not dispatched.
+- Commit `9dee9c8b837510191a1036a642e43e0b5dba2018` fixes the shell mismatch and
+  adds 45/15-minute protected release job timeout caps, with 26 focused tests
+  and a full `mix ci.fast` recorded in the debug session.
+- Push-tag-only `release.yml` means this tag is never moved or retried. Exact
+  `v1.3.2` requires a new private candidate and fresh exact-SHA approval.
 
 ## Immutable failed v1.3.0 incident evidence
 
@@ -41,7 +68,7 @@ the superseding evidence pin and clean-room target per D-32.
   They must not be deleted, moved, overwritten, recreated, retried, or routed
   through an alternate publication mechanism.
 
-## Completed private validation
+## Historical private validation
 
 - Deterministic exactly-one `@version` parser with zero/multiple-match failure,
   including the v1.3.0 multiline regression fixture.
@@ -51,8 +78,8 @@ the superseding evidence pin and clean-room target per D-32.
   inventory/checksum, docs build, local/remote `v1.3.1` absence, and read-only
   v1.3.0 incident checks.
 
-## Approval boundary still required
+## Superseding approval boundary
 
-A fresh blocking-human approval must name the exact candidate SHA above before
-any v1.3.1 tag, Hex, or HexDocs mutation. No prior v1.3.0 approval transfers to
-v1.3.1.
+No approval transfers from v1.3.0 or v1.3.1. A future blocking-human approval
+must name the final exact v1.3.2 candidate SHA and authorize annotated tag,
+protected Hex, and candidate-bound HexDocs together immediately before mutation.
