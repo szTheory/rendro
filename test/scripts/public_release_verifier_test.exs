@@ -9,7 +9,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
   @script Path.expand("../../scripts/verify_public_release.exs", __DIR__)
   @candidate_record ".planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-RELEASE-CANDIDATE.md"
 
-  test "historical record retains all three immutable incidents before the v1.3.3 candidate is sealed" do
+  test "historical record retains all four immutable incidents before the v1.3.4 candidate is captured" do
     record = File.read!(@candidate_record)
 
     assert record =~ ~r/^version: 1\.3\.3$/m
@@ -27,6 +27,12 @@ defmodule Rendro.PublicReleaseVerifierTest do
     assert record =~ "32586098785"
     assert record =~ "97062582546"
     assert record =~ "97064173653"
+    assert record =~ "c96bf205d7216cdcf4846a0f24a312f9c1c75b0f"
+    assert record =~ "cfc58a81865e060351ce33d98f5e52de8cd198d9"
+    assert record =~ "32596108284"
+    assert record =~ "97087204354"
+    assert record =~ "97088652899"
+    assert record =~ "recovery_target: 1.3.4"
   end
 
   test "refuses a tag object when its peeled commit differs from the candidate" do
@@ -58,6 +64,9 @@ defmodule Rendro.PublicReleaseVerifierTest do
              PublicReleaseVerifier.validate(
                valid_facts(%{"v1_3_2_validate_job_conclusion" => "success"})
              )
+
+    assert {:error, "v1.3.3 incident HexDocs dispatch was not absent"} =
+             PublicReleaseVerifier.validate(valid_facts(%{"v1_3_3_hexdocs_dispatch_absent" => false}))
   end
 
   test "real CLI invocation writes a bounded parseable VERIFIED record from test fixture facts" do
@@ -131,7 +140,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "--candidate-record",
         record,
         "--tag",
-        "v1.3.3",
+        "v1.3.4",
         "--release-run-id",
         "12",
         "--hexdocs-run-id",
@@ -156,7 +165,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
   end
 
   defp fixture_metadata do
-    %{"tag" => "v1.3.3", "release_run_id" => "12", "hexdocs_run_id" => "34"}
+    %{"tag" => "v1.3.4", "release_run_id" => "12", "hexdocs_run_id" => "34"}
   end
 
   defp valid_facts(overrides \\ %{}) do
@@ -172,9 +181,9 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "hexdocs_conclusion" => "success",
         "hexdocs_event" => "workflow_dispatch",
         "hexdocs_name" => "HexDocs",
-        "version" => "1.3.3",
-        "hex_version" => "1.3.3",
-        "hexdocs_version" => "1.3.3",
+        "version" => "1.3.4",
+        "hex_version" => "1.3.4",
+        "hexdocs_version" => "1.3.4",
         "hexdocs_source_sha" => @candidate,
         "archive_members" => [
           "mix.exs",
@@ -208,7 +217,19 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "v1_3_2_publish_job_id" => "97064173653",
         "v1_3_2_publish_job_conclusion" => "skipped",
         "v1_3_2_hex_absent" => true,
-        "v1_3_2_hexdocs_absent" => true
+        "v1_3_2_hexdocs_absent" => true,
+        "v1_3_3_tag_object_sha" => "c96bf205d7216cdcf4846a0f24a312f9c1c75b0f",
+        "v1_3_3_peeled_sha" => "cfc58a81865e060351ce33d98f5e52de8cd198d9",
+        "v1_3_3_run_id" => "32596108284",
+        "v1_3_3_conclusion" => "failure",
+        "v1_3_3_validate_job_id" => "97087204354",
+        "v1_3_3_validate_job_conclusion" => "failure",
+        "v1_3_3_publish_job_id" => "97088652899",
+        "v1_3_3_publish_job_conclusion" => "skipped",
+        "v1_3_3_hex_absent" => true,
+        "v1_3_3_hexdocs_absent" => true,
+        "v1_3_3_hexdocs_dispatch_absent" => true,
+        "v1_3_3_verifier_absent" => true
       },
       overrides
     )
