@@ -140,10 +140,13 @@ internal Hex dry run, remains the validation gate; only actual protected
 `mix hex.publish --yes` receives `HEX_API_KEY` and acts as the authorization
 gate.
 
-Plans 131-07 and 131-08 must commit all exact-version, verifier, incident,
-workflow-contract, package/docs, and journey-bound changes before capturing a
-fresh exact v1.3.4 SHA; require `bbe75d2` in its ancestry; run the complete
-detached no-tag proof; and permit only Phase-131 control records afterward.
+Plans 131-07 and 131-08 must commit all existing release-bearing exact-version,
+package/docs, workflow, verifier, and incident changes before capturing a fresh
+exact v1.3.4 SHA; require `bbe75d2` in its ancestry; run the complete detached
+no-tag proof; and permit only Phase-131 control records afterward. Plan 131-10
+creates the clean-room harness, tests, and retained evidence only after Plan
+131-09's atomic verifier writes `VERIFIED`; those artifacts do not exist at
+candidate capture and are not candidate prerequisites.
 Plan 131-09 must generate a new packet immediately before a new blocking-human
 decision. No prior approval, including the literal v1.3.3 approval above,
 transfers to v1.3.4.

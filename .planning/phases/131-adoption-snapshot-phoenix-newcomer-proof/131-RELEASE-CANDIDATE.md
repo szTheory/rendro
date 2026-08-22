@@ -81,6 +81,10 @@ Exact `1.3.4` is the only current recovery target. Commit
 `bbe75d2bf3f53e5235626974c539500395d2032e` removes the redundant standalone
 dry run and preserves complete credential-free preflight; `HEX_API_KEY` remains
 exclusive to actual protected publish. No approval transfers from this record.
-Plans 131-07 and 131-08 must commit every exact-version/verifier/incident
-surface before capturing a new candidate, require `bbe75d2` ancestry, and
-replace this file only after complete detached exact-SHA/no-tag proof passes.
+Plans 131-07 and 131-08 must commit every existing release-bearing
+exact-version, package/docs, workflow, verifier, and incident surface before
+capturing a new candidate, require `bbe75d2` ancestry, and replace this file
+only after complete detached exact-SHA/no-tag proof passes. Plan 131-10 creates
+the clean-room harness, tests, and retained evidence only after Plan 131-09's
+atomic verifier writes `VERIFIED`; those artifacts are not pre-candidate
+invariants.

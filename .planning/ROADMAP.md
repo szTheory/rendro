@@ -118,7 +118,7 @@ Plans:
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
-- [ ] 131-07-PLAN.md — Commit exact v1.3.4 release/verifier/incident surfaces on the bbe75d2 least-privilege workflow boundary.
+- [ ] 131-07-PLAN.md — Finish the committed exact v1.3.4 release/HexDocs/verifier/four-incident surfaces on the bbe75d2 boundary; defer clean-room creation to Plan 10.
 
 **Wave 8** *(blocked on Wave 7 completion)*
 

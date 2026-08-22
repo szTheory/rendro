@@ -28,13 +28,16 @@ Requirements for this milestone. Each maps to exactly one roadmap phase.
 Execution control note (2026-08-22): D-35 preserves failed public
 `v1.3.0` through `v1.3.3` history and makes exact public `1.3.4` the JOURNEY
 verifier and clean-room target while documentation remains `~> 1.3`.
-JOURNEY-01 cannot advance until every exact-version/verifier/incident surface
-is committed in a candidate containing `bbe75d2`, that exact SHA passes the
+JOURNEY-01 cannot advance until every existing release-bearing exact-version,
+package/docs, workflow, verifier, and incident surface is committed in a
+candidate containing `bbe75d2`, that exact SHA passes the
 complete detached no-tag proof with repeated CI, docs/package/tutorial checks,
 and both security audits, receives fresh exact-SHA approval, and succeeds
 through the existing protected tag/Hex/HexDocs paths. The complete preflight's
 credential-free Hex dry run is the validation gate; only the actual protected
-publish uses `HEX_API_KEY` and tests authorization.
+publish uses `HEX_API_KEY` and tests authorization. The clean-room harness and
+evidence are created only after the atomic public verifier succeeds; they are
+not required to exist in the pre-release candidate.
 
 - [ ] **JOURNEY-01**: A newcomer can install the public Rendro package in a clean Phoenix environment without relying on the repository checkout or warm dependency caches.
 - [ ] **JOURNEY-02**: A newcomer can follow public discovery surfaces to select and customize the canonical Swiss/light Invoice using the documented preset/configurator path.
