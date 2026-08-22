@@ -1,49 +1,90 @@
 ---
-prepared_at: 2026-08-22
+prepared_at: 2026-08-22T19:02:51Z
 version: 1.3.3
 candidate_commit_sha: cfc58a81865e060351ce33d98f5e52de8cd198d9
+required_fix_ancestor: 9dabf90
 proof_mode: exact-sha-no-tag-complete-audits
 head_equals_candidate: true
+focused_regressions: pass
 fifo_regression: pass
+mix_ci_fast: pass
+tutorial_verification: pass
+docs_contract: pass
+package_checksum: 41b1766c8010dbd401da610ef32e12cdcf13e5062da5c17960beaba466a872c8
 complete_release_preflight: pass
 security_audits_included: required
 tag_refs_unchanged: true
-v1_3_3_local_tag_absent: required
-v1_3_3_remote_tag_absent: required
-v1_3_3_hex_absent: required
-v1_3_3_hexdocs_absent: required
+v1_3_3_local_tag_absent: true
+v1_3_3_remote_tag_absent: true
+v1_3_3_hex_absent: true
+v1_3_3_hexdocs_absent: true
 approval_status: pending_blocking_human
 ---
 
 # Rendro v1.3.3 Release Approval Packet
 
-This packet is a planning control record, not approval. It becomes eligible for
-human review only after Plan 131-05 seals an exact v1.3.3 candidate and Plan
-131-06 immediately repeats the complete exact-SHA no-tag preflight.
+This is a fresh pre-approval control record, not approval. It binds only the
+exact candidate `cfc58a81865e060351ce33d98f5e52de8cd198d9`; detached HEAD
+equaled that SHA and its ancestry contains resolved commit `9dabf90`.
 
-The refreshed packet must record:
+## Fresh no-tag proof — 2026-08-22T19:02:51Z
 
-- the exact 40-character candidate SHA and proof that detached HEAD equals it;
-- ancestry containing resolved commit `9dabf90`;
-- focused preflight/verifier/workflow/tutorial regressions;
-- the open-silent FIFO result with no interactive overwrite prompt;
-- `mix ci.fast`, tutorial verification, package checksum/inventory, and docs;
-- complete candidate-SHA release preflight with repeated CI and both
-  `mix hex.audit` and `mix deps.audit` included;
-- full local and remote tag-ref snapshots unchanged;
-- no local/remote `v1.3.3` tag and no Hex/HexDocs 1.3.3 surface;
-- a `candidate..HEAD` delta containing only Phase 131 control-plane records;
-- the exact v1.3.0, v1.3.1, and v1.3.2 failed tag/run/job and public-absence
-  facts recorded in `131-RELEASE-CANDIDATE.md`.
+- Local and remote full tag-ref snapshots were taken before proof and compared
+  byte-for-byte after each detached proof and again at completion. The final
+  local snapshot has 25 entries and SHA-256
+  `0161828e07d55fe922aaf62f6989d2e6e5428e6bbcd9eeaf22c528eba21a940a`; the
+  final remote snapshot has 33 entries and SHA-256
+  `8960bc4b24f5b028b99c13d550a0e210d1d8030dba1cf2c2c53c2cccf5a14eab`.
+  Both equal their before snapshots. `v1.3.3` is absent locally and at
+  `origin`; no tag command was run.
+- Read-only public checks found no Hex or HexDocs 1.3.3 surface: `GET
+  https://hex.pm/api/packages/rendro/releases/1.3.3` returned `404`, and
+  `GET https://hexdocs.pm/rendro/1.3.3/` returned `404`.
+- The exact no-tag wrapper ran `mix run scripts/release_preflight_proof.exs
+  --candidate-sha cfc58a81865e060351ce33d98f5e52de8cd198d9 --worktree
+  <isolated-temp-dir>`. It created a detached worktree at the candidate,
+  asserted its HEAD, ran `mix deps.get`, and completed `mix release.preflight
+  --candidate-sha cfc58a81865e060351ce33d98f5e52de8cd198d9`. The complete
+  preflight passed clean-worktree/candidate/package/source-ref/changelog and
+  package-artifact gates, repeated `mix ci.fast`, docs contract, unpack,
+  anonymous Hex publish dry run, `mix hex.audit`, and `mix deps.audit`; the
+  worktree was removed afterwards.
+- A second detached candidate check ran the focused release-preflight,
+  workflow, public-verifier, and isolated-Livebook regression set: 57 tests,
+  0 failures. It also passed `mix rendro.livebook.check`, `mix docs.contract`,
+  `mix deps.audit`, and `mix hex.audit`; `mix hex.build` produced archive
+  SHA-256 `41b1766c8010dbd401da610ef32e12cdcf13e5062da5c17960beaba466a872c8`.
+  The inventory exposed the expected Hex archive envelope
+  (`CHECKSUM`, `VERSION`, `contents.tar.gz`, `metadata.config`), while the
+  complete preflight separately unpacked and verified required/forbidden
+  package contents.
+- `candidate..HEAD` was inspected before this packet update and contains only
+  control record `06254306fc3fd4b90caa610a0b476e02d3f70466`
+  (`docs(131-05): rebind sealed candidate proof`).
 
-Any audit/CI bypass, stale candidate, mismatched checksum/inventory, tag-ref
-change, public v1.3.3 presence, or non-control delta leaves
-`approval_status: not_ready`.
+## Immutable failed incidents
 
-## Required decision
+- `v1.3.0` peels to `3d014b8194782fc29bc685c0d5e84e4adc64b2c3`; protected
+  run `32513353551` failed before publication. Hex and HexDocs 1.3.0 remain
+  absent.
+- `v1.3.1` tag object `b386d1e39b6c9e63af58aa1fa5890d93909d278f` peels to
+  `7afb1dd056bba234d1bd4ec1c4487f2ea8e308f1`; protected run `32539594278`
+  was cancelled during repeated CI, and publishing was skipped. Hex and
+  HexDocs 1.3.1 remain absent.
+- `v1.3.2` tag object `9b7ff50c69c0e9bd6ae39f0c79f76c4663d936fd` peels to
+  `47af6448d2989ffe69c4b80c77935c896b1ddb07`; protected run `32586098785`
+  had validate job `97062582546` fail its release preflight and publish job
+  `97064173653` skip. Hex and HexDocs 1.3.2 remain absent.
 
-Fresh approval must name the exact candidate and jointly authorize all three
-permanent actions: annotated `v1.3.3`, protected tag-driven Hex publication,
-and exact-candidate protected HexDocs publication. Previous approvals, generic
-approval, silence, partial approval, and automatic advancement do not authorize
-mutation.
+None of those tags, runs, or absence facts may be retried, moved, deleted,
+overwritten, recreated, repushed, dispatched, or routed through another
+publisher.
+
+## Required blocking-human decision
+
+Only a new literal approval that names
+`cfc58a81865e060351ce33d98f5e52de8cd198d9` and jointly authorizes the
+annotated `v1.3.3` tag, protected tag-driven Hex publication, and
+candidate-bound protected HexDocs publication may advance this packet. Prior
+approval, generic assent, silence, partial approval, and automatic advancement
+do not authorize mutation.
