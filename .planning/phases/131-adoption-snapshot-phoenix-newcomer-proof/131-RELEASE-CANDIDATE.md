@@ -62,13 +62,14 @@ no HexDocs dispatch occurred, and no public verifier was run.
   during repeated CI and publishing was skipped. Hex and HexDocs 1.3.1 are absent.
 - `v1.3.2` object `9b7ff50c69c0e9bd6ae39f0c79f76c4663d936fd` peels to
   `47af6448d2989ffe69c4b80c77935c896b1ddb07`; validate job `97062582546`
-  failed complete preflight and publish job `97064173653` skipped. Hex and
-  HexDocs 1.3.2 are absent.
+  failed complete preflight in protected run `32586098785` and publish job
+  `97064173653` skipped. Hex and HexDocs 1.3.2 are absent.
 - `v1.3.3` object `c96bf205d7216cdcf4846a0f24a312f9c1c75b0f` peels to
-  `cfc58a81865e060351ce33d98f5e52de8cd198d9`; validate job `97087204354`
-  passed version, CI, and preflight before its redundant standalone dry run
-  failed, and publish job `97088652899` skipped. Hex and HexDocs 1.3.3 are
-  absent; no HexDocs dispatch or public verifier occurred.
+  `cfc58a81865e060351ce33d98f5e52de8cd198d9`; protected run `32596108284`
+  reached validate job `97087204354`, which passed version, CI, and preflight
+  before its redundant standalone dry run failed, and publish job `97088652899`
+  skipped. Hex and HexDocs 1.3.3 are absent; no HexDocs dispatch or public
+  verifier occurred.
 
 All four incidents are immutable historical evidence and may not be retried,
 moved, deleted, overwritten, recreated, repushed, dispatched, or published
