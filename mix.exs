@@ -155,7 +155,6 @@ defmodule Rendro.MixProject do
         priv/fonts
         bench/results
         guides
-        scripts/verify_livebook.exs
         .formatter.exs
         mix.exs
         README.md

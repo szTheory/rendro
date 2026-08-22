@@ -149,7 +149,7 @@ defmodule Mix.Tasks.RendroLivebookCheckTest do
     assert File.read!("scripts/verify_livebook.exs") =~
              "Mix.install([{:livebook, \"~> 0.19.9\"}])"
 
-    assert "scripts/verify_livebook.exs" in Keyword.fetch!(Rendro.MixProject.project(), :package)[
+    refute "scripts/verify_livebook.exs" in Keyword.fetch!(Rendro.MixProject.project(), :package)[
              :files
            ]
   end

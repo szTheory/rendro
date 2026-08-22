@@ -341,11 +341,9 @@ defmodule Mix.Tasks.Release.PreflightTest do
             "CHANGELOG.md",
             "guides/api_stability.md",
             "guides/branding.md",
-            "guides/integrations.md",
-            "scripts/verify_livebook.exs"
+            "guides/integrations.md"
           ],
           fn file ->
-            File.mkdir_p!(Path.dirname(Path.join("rendro-#{version}", file)))
             File.touch!(Path.join("rendro-#{version}", file))
           end
         )
