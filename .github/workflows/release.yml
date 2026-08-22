@@ -11,6 +11,7 @@ permissions:
 jobs:
   validate-and-dry-run:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
       - name: Checkout
@@ -55,6 +56,7 @@ jobs:
   publish:
     needs: validate-and-dry-run
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment: 'Hex Publish'
 
     steps:

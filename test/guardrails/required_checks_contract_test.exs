@@ -453,7 +453,8 @@ defmodule Guardrails.RequiredChecksContractTest do
       refute release =~ "contents: write"
       refute release =~ "gh release"
       refute release =~ "release-please"
-      assert is_map(workflow["jobs"]["publish"])
+      assert workflow["jobs"]["validate-and-dry-run"]["timeout-minutes"] == 45
+      assert workflow["jobs"]["publish"]["timeout-minutes"] == 15
     end
   end
 

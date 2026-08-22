@@ -91,8 +91,14 @@ defmodule Mix.Tasks.RendroGenThemeTest do
       assert File.read!(path) == generated
 
       File.write!(path, "# detached application policy\n")
-      send(self(), {:mix_shell_input, :yes?, false})
-      Theme.run(args)
+
+      {conflict_messages, :ok} =
+        capture_shell_messages(fn ->
+          send(self(), {:mix_shell_input, :yes?, false})
+          Theme.run(args)
+        end)
+
+      assert Enum.join(conflict_messages, "\n") =~ "Skipped lib/generated_theme.ex"
       assert File.read!(path) == "# detached application policy\n"
 
       Theme.run(args ++ ["--force"])
