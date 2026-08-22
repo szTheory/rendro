@@ -135,7 +135,7 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     assert workflow =~ "candidate_commit_sha:"
     assert workflow =~ "release_ref:"
     assert workflow =~ "if: github.event_name == 'workflow_dispatch'"
-    assert workflow =~ "inputs.release_ref == 'v1.3.3'"
+    assert workflow =~ "inputs.release_ref == 'v1.3.4'"
     assert workflow =~ "inputs.candidate_commit_sha == github.sha"
     assert workflow =~ "ref: ${{ inputs.candidate_commit_sha }}"
     assert workflow =~ "Verify approved candidate identity"
@@ -147,6 +147,16 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     assert workflow =~ "erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7"
 
     refute workflow =~ ~r/mix hex\.publish --yes/
+  end
+
+  test "the protected project and HexDocs identities are exact 1.3.4 while public installation stays range-based" do
+    assert Mix.Project.config()[:version] == "1.3.4"
+    assert File.read!("CHANGELOG.md") =~ "## [1.3.4] - Unreleased"
+    assert File.read!("README.md") =~ "{:rendro, \"~> 1.3\"}"
+
+    workflow = File.read!(@hexdocs_workflow_path)
+    assert workflow =~ "test \"${{ inputs.release_ref }}\" = \"v1.3.4\""
+    assert workflow =~ "test \"$MIX_VERSION\" = \"1.3.4\""
   end
 
   test "public launch URL verifier covers GitHub raw and HexDocs proof routes" do
