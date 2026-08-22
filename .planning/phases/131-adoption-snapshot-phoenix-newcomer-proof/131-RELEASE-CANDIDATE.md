@@ -1,5 +1,5 @@
 ---
-candidate_commit_sha: 108c312f0746fdec97db934eba98ed692b395c7d
+candidate_commit_sha: cfc58a81865e060351ce33d98f5e52de8cd198d9
 version: 1.3.3
 release_ref: v1.3.3
 candidate_status: sealed_private_pending_blocking_human
@@ -13,7 +13,7 @@ supersedes_failed_version: 1.3.2
 
 # Rendro v1.3.3 Candidate Control Record
 
-**Sealed private candidate:** `108c312f0746fdec97db934eba98ed692b395c7d`.
+**Sealed private candidate:** `cfc58a81865e060351ce33d98f5e52de8cd198d9`.
 Detached HEAD matched this SHA; it contains `9dabf90`. Focused contracts (67
 tests), FIFO, isolated Livebook, package/docs, `mix ci.fast` (Dialyzer 0),
 both audits, and complete no-skip candidate preflight passed. Archive SHA-256:

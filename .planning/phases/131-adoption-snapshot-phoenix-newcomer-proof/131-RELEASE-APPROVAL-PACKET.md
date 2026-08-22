@@ -1,7 +1,7 @@
 ---
 prepared_at: 2026-08-22
 version: 1.3.3
-candidate_commit_sha: 108c312f0746fdec97db934eba98ed692b395c7d
+candidate_commit_sha: cfc58a81865e060351ce33d98f5e52de8cd198d9
 proof_mode: exact-sha-no-tag-complete-audits
 head_equals_candidate: true
 fifo_regression: pass

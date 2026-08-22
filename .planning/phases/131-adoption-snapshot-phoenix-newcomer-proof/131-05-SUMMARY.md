@@ -16,13 +16,13 @@ Private exact-SHA v1.3.3 candidate sealed without tags or registry mutation.
 
 ## Candidate Evidence
 
-- Candidate SHA: `108c312f0746fdec97db934eba98ed692b395c7d`
+- Candidate SHA: `cfc58a81865e060351ce33d98f5e52de8cd198d9`
 - Required ancestor: `9dabf90`
 - Archive SHA-256: `41b1766c8010dbd401da610ef32e12cdcf13e5062da5c17960beaba466a872c8`
 - Focused contracts: 67 tests passed, including FIFO, timeout, bypass, verifier, and isolated Livebook boundaries.
 - Detached `mix ci.fast`: passed; Dialyzer reported 0 errors.
 - `mix deps.audit` and `mix hex.audit`: passed.
-- Complete detached `mix release.preflight --candidate-sha 108c312f0746fdec97db934eba98ed692b395c7d`: passed all Phase 1/2 gates, including repeated CI, docs, package unpack, Hex dry run, and both audits.
+- Complete detached `mix release.preflight --candidate-sha cfc58a81865e060351ce33d98f5e52de8cd198d9`: passed all Phase 1/2 gates, including repeated CI, docs, package unpack, Hex dry run, and both audits.
 - Local and remote tag snapshots remained unchanged; v1.3.3 remains absent locally and remotely.
 
 ## Immutable Incidents
