@@ -3,7 +3,7 @@ defmodule Rendro.ReleasePreflightProof do
 
   def run(args, context \\ default_context()) do
     with {:ok, options} <- parse_args(args, context),
-         :ok <- validate_ref(options.ref),
+         :ok <- validate_options(options),
          :ok <- validate_worktree(options.worktree) do
       if options.dry_run do
         Mix.shell().info(dry_run_message(options))
@@ -36,6 +36,7 @@ defmodule Rendro.ReleasePreflightProof do
           dry_run: :boolean,
           keep: :boolean,
           current_version_tag: :boolean,
+          candidate_sha: :string,
           skip_ci: :boolean,
           skip_security_audits: :boolean
         ],
@@ -47,14 +48,14 @@ defmodule Rendro.ReleasePreflightProof do
         {:error,
          "invalid options: #{Enum.map_join(invalid, ", ", fn {key, _} -> "--#{key}" end)}"}
 
-      !opts[:current_version_tag] && is_nil(opts[:ref]) ->
-        {:error, "missing required --ref vX.Y.Z or --current-version-tag"}
+      is_nil(opts[:current_version_tag]) && is_nil(opts[:ref]) && is_nil(opts[:candidate_sha]) ->
+        {:error, "missing required --ref vX.Y.Z, --current-version-tag, or --candidate-sha SHA"}
 
       is_nil(opts[:worktree]) ->
         {:error, "missing required --worktree PATH"}
 
-      opts[:current_version_tag] && opts[:ref] ->
-        {:error, "use either --ref vX.Y.Z or --current-version-tag, not both"}
+      Enum.count([opts[:current_version_tag], opts[:ref], opts[:candidate_sha]], & &1) != 1 ->
+        {:error, "use exactly one of --ref, --current-version-tag, or --candidate-sha"}
 
       opts[:current_version_tag] ->
         {:ok,
@@ -64,6 +65,18 @@ defmodule Rendro.ReleasePreflightProof do
            dry_run: Keyword.get(opts, :dry_run, false),
            keep: Keyword.get(opts, :keep, false),
            synthetic_tag: true,
+           skip_ci: Keyword.get(opts, :skip_ci, false),
+           skip_security_audits: Keyword.get(opts, :skip_security_audits, false)
+         }}
+
+      opts[:candidate_sha] ->
+        {:ok,
+         %{
+           candidate_sha: opts[:candidate_sha],
+           worktree: opts[:worktree],
+           dry_run: Keyword.get(opts, :dry_run, false),
+           keep: Keyword.get(opts, :keep, false),
+           synthetic_tag: false,
            skip_ci: Keyword.get(opts, :skip_ci, false),
            skip_security_audits: Keyword.get(opts, :skip_security_audits, false)
          }}
@@ -92,6 +105,14 @@ defmodule Rendro.ReleasePreflightProof do
 
   def validate_ref(ref), do: {:error, "ref must be an exact release tag like vX.Y.Z; got #{ref}"}
 
+  def validate_options(%{candidate_sha: candidate_sha}) when is_binary(candidate_sha) do
+    if Regex.match?(~r/^[0-9a-f]{40}$/, candidate_sha),
+      do: :ok,
+      else: {:error, "candidate SHA must be 40 lowercase hex characters"}
+  end
+
+  def validate_options(%{ref: ref}), do: validate_ref(ref)
+
   def validate_worktree(worktree) do
     if Path.expand(worktree) == File.cwd!() do
       {:error, "worktree path must be isolated from the active workspace"}
@@ -101,6 +122,14 @@ defmodule Rendro.ReleasePreflightProof do
   end
 
   def execute_proof(options, context \\ default_context()) do
+    if Map.has_key?(options, :candidate_sha) do
+      execute_candidate_sha_proof(options, context)
+    else
+      execute_tag_proof(options, context)
+    end
+  end
+
+  defp execute_tag_proof(options, context) do
     case maybe_prepare_synthetic_tag(options, context) do
       {:ok, cleanup_state} ->
         with {_, 0} <-
@@ -133,6 +162,42 @@ defmodule Rendro.ReleasePreflightProof do
 
       {:error, message} ->
         {:error, 1, message}
+    end
+  end
+
+  defp execute_candidate_sha_proof(options, context) do
+    with {before_refs, 0} <- run_command(context, "git", ["show-ref", "--tags"]),
+         {_, 0} <-
+           run_command(context, "git", [
+             "worktree",
+             "add",
+             "--detach",
+             options.worktree,
+             options.candidate_sha
+           ]),
+         {head, 0} <- run_command(context, "git", ["-C", options.worktree, "rev-parse", "HEAD"]),
+         true <- String.trim(head) == options.candidate_sha,
+         {deps_output, 0} <- run_command(context, "mix", ["deps.get"], cd: options.worktree),
+         {preflight_output, status} <-
+           run_command(context, "mix", release_preflight_args(options), cd: options.worktree),
+         :ok <- cleanup(options, %{tag: nil, previous_target: nil}, context),
+         {after_refs, 0} <- run_command(context, "git", ["show-ref", "--tags"]),
+         true <- before_refs == after_refs do
+      output = deps_output <> preflight_output
+
+      if status == 0 do
+        {:ok, output}
+      else
+        {:error, status, output}
+      end
+    else
+      false ->
+        cleanup(options, %{tag: nil, previous_target: nil}, context)
+        {:error, 1, "candidate SHA or tag-ref snapshot mismatch"}
+
+      {output, status} ->
+        cleanup(options, %{tag: nil, previous_target: nil}, context)
+        {:error, status, output}
     end
   end
 
@@ -187,12 +252,22 @@ defmodule Rendro.ReleasePreflightProof do
 
   defp release_preflight_args(options) do
     ["release.preflight"]
+    |> maybe_add_candidate_sha(options)
     |> maybe_add_flag(options, :skip_ci, "--skip-ci")
     |> maybe_add_flag(options, :skip_security_audits, "--skip-security-audits")
   end
 
+  defp maybe_add_candidate_sha(args, %{candidate_sha: candidate_sha}),
+    do: args ++ ["--candidate-sha", candidate_sha]
+
+  defp maybe_add_candidate_sha(args, _options), do: args
+
   defp dry_run_message(%{synthetic_tag: true, ref: ref, worktree: worktree} = options) do
     "Dry run: would create disposable exact tag #{ref} at HEAD, create isolated worktree #{worktree}, run mix deps.get and mix release.preflight#{proof_flag_suffix(options)}, then clean up"
+  end
+
+  defp dry_run_message(%{candidate_sha: candidate_sha, worktree: worktree} = options) do
+    "Dry run: would create isolated detached worktree #{worktree} at exact SHA #{candidate_sha}, assert HEAD equality and unchanged tag refs, run mix deps.get and mix release.preflight#{proof_flag_suffix(options)}, then clean up"
   end
 
   defp dry_run_message(%{ref: ref, worktree: worktree} = options) do

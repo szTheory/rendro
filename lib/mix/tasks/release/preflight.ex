@@ -17,7 +17,7 @@ defmodule Mix.Tasks.Release.Preflight do
     {"Hex Audit", ["hex.audit"]},
     {"Deps Audit", ["deps.audit", "--ignore-file", ".mix_audit.ignore"]}
   ]
-  @switches [skip_ci: :boolean, skip_security_audits: :boolean]
+  @switches [skip_ci: :boolean, skip_security_audits: :boolean, candidate_sha: :string]
 
   def run(args) do
     case parse_args(args) do
@@ -39,15 +39,22 @@ defmodule Mix.Tasks.Release.Preflight do
   def parse_args(args) do
     {opts, _argv, invalid} = OptionParser.parse(args, strict: @switches)
 
-    if invalid == [] do
-      {:ok,
-       %{
-         skip_ci: Keyword.get(opts, :skip_ci, false),
-         skip_security_audits: Keyword.get(opts, :skip_security_audits, false)
-       }}
-    else
-      invalid_options = Enum.map_join(invalid, ", ", fn {key, _} -> "--#{key}" end)
-      {:error, "invalid options: #{invalid_options}"}
+    cond do
+      invalid != [] ->
+        invalid_options = Enum.map_join(invalid, ", ", fn {key, _} -> "--#{key}" end)
+        {:error, "invalid options: #{invalid_options}"}
+
+      is_binary(opts[:candidate_sha]) and
+          !Regex.match?(~r/^[0-9a-f]{40}$/, opts[:candidate_sha]) ->
+        {:error, "candidate SHA must be 40 lowercase hex characters"}
+
+      true ->
+        {:ok,
+         %{
+           skip_ci: Keyword.get(opts, :skip_ci, false),
+           skip_security_audits: Keyword.get(opts, :skip_security_audits, false),
+           candidate_sha: opts[:candidate_sha]
+         }}
     end
   end
 
@@ -60,7 +67,7 @@ defmodule Mix.Tasks.Release.Preflight do
 
     phase_1_results = [
       check_clean_worktree(context),
-      check_exact_tag(context, version),
+      check_release_identity(context, version, options),
       check_package_metadata(context.project_config),
       check_source_ref_parity(context, version),
       check_changelog_release_tail(context),
@@ -108,14 +115,16 @@ defmodule Mix.Tasks.Release.Preflight do
   defp normalize_options(options) when is_map(options) do
     %{
       skip_ci: Map.get(options, :skip_ci, false),
-      skip_security_audits: Map.get(options, :skip_security_audits, false)
+      skip_security_audits: Map.get(options, :skip_security_audits, false),
+      candidate_sha: Map.get(options, :candidate_sha)
     }
   end
 
   defp normalize_options(options) when is_list(options) do
     %{
       skip_ci: Keyword.get(options, :skip_ci, false),
-      skip_security_audits: Keyword.get(options, :skip_security_audits, false)
+      skip_security_audits: Keyword.get(options, :skip_security_audits, false),
+      candidate_sha: Keyword.get(options, :candidate_sha)
     }
   end
 
@@ -169,6 +178,26 @@ defmodule Mix.Tasks.Release.Preflight do
 
       {output, status} ->
         fail("Clean worktree", "git status failed (#{status})\n#{output}")
+    end
+  end
+
+  defp check_release_identity(context, _version, %{candidate_sha: candidate_sha})
+       when is_binary(candidate_sha) do
+    check_candidate_sha(context, candidate_sha)
+  end
+
+  defp check_release_identity(context, version, _options), do: check_exact_tag(context, version)
+
+  defp check_candidate_sha(context, candidate_sha) do
+    case run_command(context, "git", ["rev-parse", "HEAD"]) do
+      {^candidate_sha <> "\n", 0} ->
+        pass("Candidate SHA parity")
+
+      {actual_sha, 0} ->
+        fail("Candidate SHA parity", "expected #{candidate_sha}, got #{String.trim(actual_sha)}")
+
+      {output, _status} ->
+        fail("Candidate SHA parity", "expected #{candidate_sha}, got no HEAD SHA\n#{output}")
     end
   end
 

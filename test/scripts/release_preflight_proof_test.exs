@@ -6,7 +6,8 @@ defmodule Rendro.ReleasePreflightProofTest do
   alias Rendro.ReleasePreflightProof
 
   test "requires explicit ref and worktree arguments" do
-    assert {:error, "missing required --ref vX.Y.Z or --current-version-tag"} =
+    assert {:error,
+            "missing required --ref vX.Y.Z, --current-version-tag, or --candidate-sha SHA"} =
              ReleasePreflightProof.parse_args([])
 
     assert {:error, "missing required --worktree PATH"} =
