@@ -19,14 +19,10 @@ tests), FIFO, isolated Livebook, package/docs, `mix ci.fast` (Dialyzer 0),
 both audits, and complete no-skip candidate preflight passed. Archive SHA-256:
 `41b1766c8010dbd401da610ef32e12cdcf13e5062da5c17960beaba466a872c8`.
 
-No v1.3.3 candidate SHA is sealed yet. Plan 131-05 must first commit every
-release-bearing change, including resolved commit `9dabf90`, then capture the
-exact commit and validate it in a detached clean worktree. Candidate proof must
-include focused regressions, the open-silent FIFO regression, `mix ci.fast`,
-tutorial/package inventory/checksum/docs checks, and complete
-`mix release.preflight --candidate-sha` with repeated CI, `mix hex.audit`, and
-`mix deps.audit` included. A proof or contract that bypasses CI or security
-audits is invalid.
+This candidate is sealed for private review and requires fresh blocking-human
+approval before any tag, Hex publication, or HexDocs dispatch. The complete
+proof included focused regressions, FIFO, `mix ci.fast`, isolated tutorial,
+package/docs checks, and no-skip candidate preflight with both security audits.
 
 No local or remote `v1.3.3` tag may exist, even temporarily, before the fresh
 Plan 131-06 approval. Complete local and remote tag-ref snapshots must remain

@@ -1,18 +1,18 @@
 ---
-prepared_at: pending
+prepared_at: 2026-08-22
 version: 1.3.3
-candidate_commit_sha: pending
+candidate_commit_sha: 108c312f0746fdec97db934eba98ed692b395c7d
 proof_mode: exact-sha-no-tag-complete-audits
-head_equals_candidate: pending
-fifo_regression: pending
-complete_release_preflight: pending
+head_equals_candidate: true
+fifo_regression: pass
+complete_release_preflight: pass
 security_audits_included: required
-tag_refs_unchanged: pending
+tag_refs_unchanged: true
 v1_3_3_local_tag_absent: required
 v1_3_3_remote_tag_absent: required
 v1_3_3_hex_absent: required
 v1_3_3_hexdocs_absent: required
-approval_status: not_ready
+approval_status: pending_blocking_human
 ---
 
 # Rendro v1.3.3 Release Approval Packet

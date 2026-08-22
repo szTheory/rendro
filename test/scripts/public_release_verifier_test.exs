@@ -14,7 +14,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
 
     assert record =~ ~r/^version: 1\.3\.3$/m
     assert record =~ ~r/^release_ref: v1\.3\.3$/m
-    assert record =~ "candidate_status: planned_after_complete_audit_proof"
+    assert record =~ "candidate_status: sealed_private_pending_blocking_human"
     assert record =~ "tag_pushed: false"
     assert record =~ "hexdocs_dispatched: false"
     assert record =~ "registry_mutated: false"
