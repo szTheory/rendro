@@ -316,6 +316,15 @@ defmodule Mix.Tasks.Release.PreflightTest do
     refute_received {:preflight_command, "git", ["describe", "--tags", "--exact-match"]}
   end
 
+  test "candidate SHA mode refuses CI and security-audit bypasses" do
+    candidate = String.duplicate("a", 40)
+
+    for bypass <- ["--skip-ci", "--skip-security-audits"] do
+      assert {:error, "candidate SHA preflight cannot bypass CI or security audits"} =
+               Preflight.parse_args(["--candidate-sha", candidate, bypass])
+    end
+  end
+
   defp command_runner_for(responses, version \\ Mix.Project.config()[:version]) do
     test_pid = self()
 

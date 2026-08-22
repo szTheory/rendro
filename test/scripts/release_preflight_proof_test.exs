@@ -153,6 +153,21 @@ defmodule Rendro.ReleasePreflightProofTest do
     assert_received {:proof_command, "git", ["-C", "/tmp/release-proof", "rev-parse", "HEAD"], _}
   end
 
+  test "candidate SHA mode rejects CI and security-audit bypasses before detached proof begins" do
+    candidate = String.duplicate("a", 40)
+
+    for bypass <- ["--skip-ci", "--skip-security-audits"] do
+      assert {:error, "candidate SHA proof cannot bypass CI or security audits"} =
+               ReleasePreflightProof.parse_args([
+                 "--candidate-sha",
+                 candidate,
+                 bypass,
+                 "--worktree",
+                 "/tmp/release-proof"
+               ])
+    end
+  end
+
   test "synthetic tag proof creates and cleans up isolated release state on success" do
     runner =
       command_runner_for(%{

@@ -48,6 +48,10 @@ defmodule Mix.Tasks.Release.Preflight do
           !Regex.match?(~r/^[0-9a-f]{40}$/, opts[:candidate_sha]) ->
         {:error, "candidate SHA must be 40 lowercase hex characters"}
 
+      is_binary(opts[:candidate_sha]) and
+          (Keyword.get(opts, :skip_ci, false) || Keyword.get(opts, :skip_security_audits, false)) ->
+        {:error, "candidate SHA preflight cannot bypass CI or security audits"}
+
       true ->
         {:ok,
          %{

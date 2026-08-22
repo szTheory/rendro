@@ -57,6 +57,10 @@ defmodule Rendro.ReleasePreflightProof do
       Enum.count([opts[:current_version_tag], opts[:ref], opts[:candidate_sha]], & &1) != 1 ->
         {:error, "use exactly one of --ref, --current-version-tag, or --candidate-sha"}
 
+      opts[:candidate_sha] &&
+          (Keyword.get(opts, :skip_ci, false) || Keyword.get(opts, :skip_security_audits, false)) ->
+        {:error, "candidate SHA proof cannot bypass CI or security audits"}
+
       opts[:current_version_tag] ->
         {:ok,
          %{
@@ -77,8 +81,8 @@ defmodule Rendro.ReleasePreflightProof do
            dry_run: Keyword.get(opts, :dry_run, false),
            keep: Keyword.get(opts, :keep, false),
            synthetic_tag: false,
-           skip_ci: Keyword.get(opts, :skip_ci, false),
-           skip_security_audits: Keyword.get(opts, :skip_security_audits, false)
+           skip_ci: false,
+           skip_security_audits: false
          }}
 
       true ->

@@ -456,6 +456,15 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert workflow["jobs"]["validate-and-dry-run"]["timeout-minutes"] == 45
       assert workflow["jobs"]["publish"]["timeout-minutes"] == 15
     end
+
+    test "candidate proof remains complete-audit only and never creates a tag" do
+      proof = File.read!("scripts/release_preflight_proof.exs")
+
+      assert proof =~ "candidate SHA proof cannot bypass CI or security audits"
+      assert proof =~ "defp maybe_add_candidate_sha(args, %{candidate_sha: candidate_sha})"
+      assert proof =~ "args ++ [\"--candidate-sha\", candidate_sha]"
+      assert proof =~ "execute_candidate_sha_proof"
+    end
   end
 
   describe "protected workflow version extraction" do
