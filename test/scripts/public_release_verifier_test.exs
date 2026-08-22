@@ -9,13 +9,14 @@ defmodule Rendro.PublicReleaseVerifierTest do
   @script Path.expand("../../scripts/verify_public_release.exs", __DIR__)
   @candidate_record ".planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-RELEASE-CANDIDATE.md"
 
-  test "historical record retains all four immutable incidents before the v1.3.4 candidate is captured" do
+  test "sealed v1.3.4 record retains all four immutable incidents" do
     record = File.read!(@candidate_record)
 
-    assert record =~ ~r/^version: 1\.3\.3$/m
-    assert record =~ ~r/^release_ref: v1\.3\.3$/m
-    assert record =~ "candidate_status: consumed_failed_immutable_incident"
-    assert record =~ "tag_pushed: true"
+    assert record =~ ~r/^version: 1\.3\.4$/m
+    assert record =~ ~r/^release_ref: v1\.3\.4$/m
+    assert record =~ "candidate_status: proof_complete_control_pending"
+    assert record =~ "required_fix_ancestor: bbe75d2bf3f53e5235626974c539500395d2032e"
+    assert record =~ "tag_pushed: false"
     assert record =~ "hexdocs_dispatched: false"
     assert record =~ "registry_mutated: false"
     assert record =~ "3d014b8194782fc29bc685c0d5e84e4adc64b2c3"
