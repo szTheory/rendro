@@ -51,7 +51,7 @@ created: 2026-08-21
 | 131-REL-TIMEOUT | 04,05,06 | 4,5,6 | JOURNEY-01 | T-131-39 | `.github/workflows/release.yml` retains `validate-and-dry-run.timeout-minutes: 45` and `publish.timeout-minutes: 15` | contract | `mix test test/guardrails/required_checks_contract_test.exs --max-failures 1` | ✅ | ⬜ pending |
 | 131-REL-NO-TAG | 04,05,06 | 4,5,6 | JOURNEY-01, JOURNEY-02 | T-131-36, T-131-41 | Exact-SHA detached proof asserts HEAD equality, invokes no tag command, and leaves complete local/remote tag-ref snapshots unchanged | contract/integration | `mix test test/scripts/release_preflight_proof_test.exs test/mix/tasks/release_preflight_test.exs --max-failures 1` plus named exact-SHA proof | ✅ | ⬜ pending |
 | 131-REL-CANDIDATE-133 | 05 | 5 | JOURNEY-01, JOURNEY-02, JOURNEY-04 | T-131-35, T-131-36, T-131-37, T-131-38 | Release-bearing changes including 9dabf90 are committed before candidate capture; detached complete-audit proof seals exact 1.3.3 and permits only control records afterward | contract/integration | Named full private candidate command from Plan 131-05 | ❌ | ⬜ pending |
-| 131-ADV-REL | 06 | advisory | JOURNEY-01, JOURNEY-02, JOURNEY-04 | T-131-40, T-131-42, T-131-43, T-131-45 | Fresh complete no-tag revalidation and exact-SHA approval immediately precede protected v1.3.3 mutations; named verifier preserves all three older incidents | advisory external | Named protected release, candidate-bound HexDocs, and public verifier commands from Plan 131-06 | ❌ | ⬜ pending |
+| 131-ADV-REL | 06 | advisory | JOURNEY-01, JOURNEY-02, JOURNEY-04 | T-131-40, T-131-42, T-131-43, T-131-45 | Exact approval preceded one annotated v1.3.3 tag; protected release run 32596108284 failed at unauthenticated dry run, publish job 97088652899 skipped, and Hex/HexDocs remain absent | advisory external | Release run 32596108284, validation job 97087204354, and read-only Hex/HexDocs 404 checks | ✅ | ❌ immutable incident |
 | 131-ADV-02 | 07 | advisory | JOURNEY-01, JOURNEY-02, JOURNEY-03, JOURNEY-04 | T-131-46, T-131-47, T-131-49, T-131-50 | Exact public `rendro` 1.3.3 resolves in a fresh generated app and returns a valid PDF through ConnCase and loopback HTTP; all three older failed tags/runs remain incident evidence only | advisory external | Named exact 1.3.3 clean-room harness command from Plan 131-07 | ❌ | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
@@ -95,4 +95,4 @@ created: 2026-08-21
 - [ ] Live external claims remain explicitly advisory and are never substituted by offline tests.
 - [ ] `nyquist_compliant: true` set in frontmatter after execution evidence exists.
 
-**Approval:** pending
+**Approval:** failed immutable v1.3.3 incident — Plan 06 stopped fail-closed; no HexDocs dispatch or public prerequisite was written.

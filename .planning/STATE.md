@@ -6,14 +6,14 @@ current_phase: 131
 current_phase_name: adoption-snapshot-phoenix-newcomer-proof
 status: executing
 stopped_at: Completed 131-03-PLAN.md
-last_updated: "2026-08-21T21:58:24.891Z"
+last_updated: "2026-08-22T20:28:35.654Z"
 last_activity: 2026-08-21
 last_activity_desc: Phase 131 execution started
 progress:
   total_phases: 2
   completed_phases: 1
-  total_plans: 16
-  completed_plans: 14
+  total_plans: 18
+  completed_plans: 17
   percent: 50
 ---
 
@@ -83,6 +83,7 @@ None yet.
 ### Blockers/Concerns
 
 - Human re-review and network/Phoenix observations are evidence inputs, not deterministic proof; unavailable evidence must remain explicitly unavailable.
+- Immutable v1.3.3 release incident: annotated tag c96bf205d7216cdcf4846a0f24a312f9c1c75b0f / run 32596108284 failed at unauthenticated Hex dry run; publish job 97088652899 skipped; Hex/HexDocs absent and no docs dispatch. Do not retry or mutate v1.3.3.
 
 ### Quick Tasks Completed
 

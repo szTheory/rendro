@@ -19,6 +19,12 @@ v1_3_3_remote_tag_absent: true
 v1_3_3_hex_absent: true
 v1_3_3_hexdocs_absent: true
 approval_status: approved_exact_blocking_human
+release_status: failed_immutable_incident
+release_run_id: "32596108284"
+release_validate_job_id: "97087204354"
+release_publish_job_id: "97088652899"
+tag_object_sha: c96bf205d7216cdcf4846a0f24a312f9c1c75b0f
+tag_peeled_sha: cfc58a81865e060351ce33d98f5e52de8cd198d9
 ---
 
 # Rendro v1.3.3 Release Approval Packet
@@ -91,7 +97,7 @@ do not authorize mutation.
 
 ## Literal blocking-human approval
 
-**Recorded at:** 2026-08-22T19:18:00Z
+**Recorded at:** 2026-08-22T20:14:00Z
 
 > approve exact v1.3.3 candidate cfc58a81865e060351ce33d98f5e52de8cd198d9 for annotated tag, protected Hex, and candidate-bound HexDocs
 
@@ -99,3 +105,23 @@ The approval names the exact candidate in this packet and jointly authorizes
 only one annotated `v1.3.3` tag, its existing protected tag-driven Hex path,
 and the existing candidate-bound protected HexDocs dispatch. It authorizes no
 retry, ref movement, deletion, alternate publisher, or action on a mismatch.
+
+## Immutable v1.3.3 failed-release incident
+
+The single approved annotated tag was created and pushed exactly once:
+`v1.3.3` object `c96bf205d7216cdcf4846a0f24a312f9c1c75b0f` peels to approved
+candidate `cfc58a81865e060351ce33d98f5e52de8cd198d9`.
+
+Protected `Release to Hex` run `32596108284` was a `push` event at the exact
+candidate and concluded `failure`. Its validation job `97087204354` passed
+Verify Version Match, Run CI Checks, and Run Release Preflight, then failed
+the separate **Publish to Hex (Dry Run)** at `2026-08-22T20:26:14Z` with exit
+1: `No authenticated user found. Run mix hex.user auth`; its interactive
+authentication prompt was not answered. The protected `publish` job
+`97088652899` was skipped.
+
+Read-only checks immediately afterwards confirm Hex 1.3.3 and HexDocs 1.3.3
+both return `404`; no candidate-bound `workflow_dispatch` HexDocs run exists.
+This is immutable failure evidence. Do not retry, move, delete, recreate, or
+repush the tag; do not use another publisher; and do not dispatch HexDocs for
+this failed release.

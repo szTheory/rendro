@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 9
+open_count: 10
 waived_count: 0
 fixed_count: 6
-total_count: 15
-last_updated: 2026-08-20T15:34:07.633Z
+total_count: 16
+last_updated: 2026-08-22T20:28:47.267Z
 ---
 
 # Broken Windows Ledger
@@ -30,6 +30,7 @@ last_updated: 2026-08-20T15:34:07.633Z
 | 13 | 127 | deviation | priv/pdfium_pin.json |  | Used the exact SHA-verified GitHub advisory lane because the pinned Linux PDFium binary cannot execute on the macOS ARM executor. | open |  | 2026-08-18T01:41:06.678Z |  |
 | 14 | 130 | unrun-verify | tmp/phase130-launch-reconcile |  | Focused local Mix tests were unrun because the detached staging worktree has no dependency cache; exact-SHA CI artifact provenance was verified. | open |  | 2026-08-20T15:34:07.544Z |  |
 | 15 | 130 | deviation | tmp/phase130-launch-reconcile |  | Detached-worktree dependency cache unavailable; no packages were installed and only artifact/hash fences were used. | open |  | 2026-08-20T15:34:07.633Z |  |
+| 16 | 131 | unrun-verify | .planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json |  | Plan 131-06 public prerequisite verifier intentionally not run: protected v1.3.3 release failed at unauthenticated Hex dry run before publication. | open |  | 2026-08-22T20:28:47.267Z |  |
 
 ````json
 [
@@ -211,6 +212,18 @@ last_updated: 2026-08-20T15:34:07.633Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-20T15:34:07.633Z",
+    "resolved_at": null
+  },
+  {
+    "id": 16,
+    "kind": "unrun-verify",
+    "phase": "131",
+    "file": ".planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json",
+    "line": null,
+    "description": "Plan 131-06 public prerequisite verifier intentionally not run: protected v1.3.3 release failed at unauthenticated Hex dry run before publication.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-22T20:28:47.267Z",
     "resolved_at": null
   }
 ]
