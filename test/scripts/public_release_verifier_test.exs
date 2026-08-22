@@ -14,8 +14,8 @@ defmodule Rendro.PublicReleaseVerifierTest do
 
     assert record =~ ~r/^version: 1\.3\.3$/m
     assert record =~ ~r/^release_ref: v1\.3\.3$/m
-    assert record =~ "candidate_status: sealed_private_pending_blocking_human"
-    assert record =~ "tag_pushed: false"
+    assert record =~ "candidate_status: consumed_failed_immutable_incident"
+    assert record =~ "tag_pushed: true"
     assert record =~ "hexdocs_dispatched: false"
     assert record =~ "registry_mutated: false"
     assert record =~ "3d014b8194782fc29bc685c0d5e84e4adc64b2c3"
@@ -66,7 +66,9 @@ defmodule Rendro.PublicReleaseVerifierTest do
              )
 
     assert {:error, "v1.3.3 incident HexDocs dispatch was not absent"} =
-             PublicReleaseVerifier.validate(valid_facts(%{"v1_3_3_hexdocs_dispatch_absent" => false}))
+             PublicReleaseVerifier.validate(
+               valid_facts(%{"v1_3_3_hexdocs_dispatch_absent" => false})
+             )
   end
 
   test "real CLI invocation writes a bounded parseable VERIFIED record from test fixture facts" do
