@@ -1,90 +1,84 @@
 ---
-candidate_commit_sha: cfc58a81865e060351ce33d98f5e52de8cd198d9
-version: 1.3.3
-release_ref: v1.3.3
-candidate_status: consumed_failed_immutable_incident
-required_fix_ancestor: 9dabf90
+candidate_commit_sha: ed68ff83a3211cc8318d0cab88acbd4c01859474
+version: 1.3.4
+release_ref: v1.3.4
+candidate_status: proof_complete_control_pending
+required_fix_ancestor: bbe75d2bf3f53e5235626974c539500395d2032e
 proof_mode: exact-sha-no-tag-complete-audits
-tag_pushed: true
+tag_pushed: false
 hexdocs_dispatched: false
 registry_mutated: false
-supersedes_failed_version: 1.3.2
 recovery_target: 1.3.4
 recovery_decision: D-35
 ---
 
-# Rendro v1.3.3 Candidate Control Record
+# Rendro v1.3.4 Candidate Control Record
 
-**Sealed private candidate:** `cfc58a81865e060351ce33d98f5e52de8cd198d9`.
-Detached HEAD matched this SHA; it contains `9dabf90`. Focused contracts (67
-tests), FIFO, isolated Livebook, package/docs, `mix ci.fast` (Dialyzer 0),
-both audits, and complete no-skip candidate preflight passed. Archive SHA-256:
-`41b1766c8010dbd401da610ef32e12cdcf13e5062da5c17960beaba466a872c8`.
+**Sealed private candidate:** `ed68ff83a3211cc8318d0cab88acbd4c01859474`.
+This exact committed SHA contains required fix
+`bbe75d2bf3f53e5235626974c539500395d2032e`. It is private deterministic
+control evidence only: no `v1.3.4` tag was created, no package was published,
+no HexDocs dispatch occurred, and no public verifier was run.
 
-This candidate was approved and consumed by the single immutable v1.3.3
-release attempt. It is historical evidence only and is not eligible for a
-retry, new tag, package publication, or HexDocs dispatch.
+## Exact no-tag proof — 2026-08-22
 
-Before the consumed Plan 131-06 approval, no local or remote `v1.3.3` tag
-existed and complete tag-ref snapshots remained unchanged throughout private
-proof. After approval, the single immutable tag was created exactly once.
+- Fresh local and `origin` tag-ref snapshots were captured before the detached
+  proof and compared byte-for-byte afterwards. The local snapshot has 26
+  entries and SHA-256
+  `8ac725d50e6afa6af5a8f69fea7997eecdbaee9abe2842361d27e3a2da9b7996`; the
+  remote snapshot has 35 entries and SHA-256
+  `646bbb2f2df8156e482d695a57a4bb8ea5ec9cab9f472f5aa3e9df0e3538fdf9`.
+  Both are unchanged. `v1.3.4` is absent locally and at `origin`.
+- Read-only public checks returned `404` for
+  `https://hex.pm/api/packages/rendro/releases/1.3.4` and
+  `https://hexdocs.pm/rendro/1.3.4/`.
+- An isolated detached worktree was created at this SHA and its `HEAD` was
+  asserted equal to the candidate. The focused release-preflight, workflow,
+  public-verifier, isolated-Livebook, and open-silent FIFO regression suite
+  passed: 61 tests, 0 failures.
+- The detached SHA passed `mix ci.fast` (including Dialyzer: 0 errors),
+  `mix docs.contract`, `mix rendro.livebook.check`, `mix hex.build`, package
+  unpack allowlist/forbidden-path checks, `mix hex.audit`, and `mix deps.audit`.
+  Archive SHA-256 is
+  `7c886783fa1f73b2b154b4840295e6092b3f26e7bf568203476d204b0c0c369a`.
+  Archive inventory is exactly `CHECKSUM`, `VERSION`, `contents.tar.gz`, and
+  `metadata.config`; unpacked contents include the required license, README,
+  changelog, and API-stability, branding, and integrations guides, with the
+  forbidden support-matrix/viewer-evidence/guardrails/test paths absent.
+- `mix run scripts/release_preflight_proof.exs --candidate-sha
+  ed68ff83a3211cc8318d0cab88acbd4c01859474 --worktree <isolated-temp-dir>`
+  created its own detached worktree, asserted exact `HEAD`, ran `mix deps.get`,
+  and completed `mix release.preflight --candidate-sha` with no skips. It passed
+  clean-worktree, candidate parity, package/source-ref/changelog/artifact gates,
+  repeated CI, docs, unpack, credential-free internal Hex dry run, and both
+  audits. Its cleanup completed before the after snapshots.
 
-Public consumer documentation remains `{:rendro, "~> 1.3"}`. Exact `1.3.3`
-is historical failed evidence; exact `1.3.4` is the current verifier and
-clean-room target per D-35.
+## Immutable failed-release incidents
 
-## Immutable failed v1.3.2 incident
+- `v1.3.0` peels to `3d014b8194782fc29bc685c0d5e84e4adc64b2c3`; protected run
+  `32513353551` failed before publication. Hex and HexDocs 1.3.0 are absent.
+- `v1.3.1` object `b386d1e39b6c9e63af58aa1fa5890d93909d278f` peels to
+  `7afb1dd056bba234d1bd4ec1c4487f2ea8e308f1`; run `32539594278` was cancelled
+  during repeated CI and publishing was skipped. Hex and HexDocs 1.3.1 are absent.
+- `v1.3.2` object `9b7ff50c69c0e9bd6ae39f0c79f76c4663d936fd` peels to
+  `47af6448d2989ffe69c4b80c77935c896b1ddb07`; validate job `97062582546`
+  failed complete preflight and publish job `97064173653` skipped. Hex and
+  HexDocs 1.3.2 are absent.
+- `v1.3.3` object `c96bf205d7216cdcf4846a0f24a312f9c1c75b0f` peels to
+  `cfc58a81865e060351ce33d98f5e52de8cd198d9`; validate job `97087204354`
+  passed version, CI, and preflight before its redundant standalone dry run
+  failed, and publish job `97088652899` skipped. Hex and HexDocs 1.3.3 are
+  absent; no HexDocs dispatch or public verifier occurred.
 
-- Annotated public tag object `9b7ff50c69c0e9bd6ae39f0c79f76c4663d936fd`
-  peels to approved candidate `47af6448d2989ffe69c4b80c77935c896b1ddb07`.
-- Protected release run `32586098785`, validate job `97062582546`, publish job
-  `97064173653`.
-- Exact version match and `Run CI Checks` succeeded. `Run Release Preflight`
-  failed with exit 1 from `2026-08-22T17:04:19Z` through `17:06:49Z`.
-- The separate Hex dry run and publish job were skipped. Hex `1.3.2` is absent;
-  HexDocs `1.3.2` was not dispatched and is absent.
-- Exact detached reproduction passed preflight phase 1, repeated CI, docs,
-  package unpack, and Hex dry run, then failed both audits because root
-  Livebook 0.19.x pinned vulnerable Req 0.5.8, Protobuf 0.13.0, and related
-  tooling transitives. The previous private wrapper had omitted the audits.
-- Commit `9dabf90` removes root Livebook/config coupling while retaining the
-  packaged ExDoc/Hex guide and isolated ephemeral `Mix.install` execution.
-  Tutorial verification, package inventory, both audits, and `mix ci.fast`
-  with 1,862 tests pass; no ignore was added.
+All four incidents are immutable historical evidence and may not be retried,
+moved, deleted, overwritten, recreated, repushed, dispatched, or published
+through another route. The D-35 fix removes only the duplicate dry run and
+confines `HEX_API_KEY` to later protected actual publication.
 
-## Earlier immutable failed incidents
+## Approval boundary
 
-- `v1.3.0` peels to `3d014b8194782fc29bc685c0d5e84e4adc64b2c3`;
-  run `32513353551` failed before publication; Hex/HexDocs 1.3.0 are absent.
-- `v1.3.1` tag object `b386d1e39b6c9e63af58aa1fa5890d93909d278f`
-  peels to `7afb1dd056bba234d1bd4ec1c4487f2ea8e308f1`; run
-  `32539594278` was cancelled during repeated CI; publish was skipped and
-  Hex/HexDocs 1.3.1 are absent.
-
-None of these three tags or runs may be retried, moved, deleted, overwritten,
-recreated, repushed, dispatched, or routed through an alternate publisher.
-
-## Immutable failed v1.3.3 incident
-
-- Annotated tag object `c96bf205d7216cdcf4846a0f24a312f9c1c75b0f`
-  peels to this candidate.
-- Protected run `32596108284`, validate job `97087204354`, publish job
-  `97088652899`.
-- Version, CI, and complete release preflight passed. A redundant standalone
-  unauthenticated Hex dry run then failed; protected publish skipped.
-- Hex and HexDocs 1.3.3 are absent, no HexDocs dispatch occurred, and the
-  public verifier did not run.
-
-## D-35 recovery boundary
-
-Exact `1.3.4` is the only current recovery target. Commit
-`bbe75d2bf3f53e5235626974c539500395d2032e` removes the redundant standalone
-dry run and preserves complete credential-free preflight; `HEX_API_KEY` remains
-exclusive to actual protected publish. No approval transfers from this record.
-Plans 131-07 and 131-08 must commit every existing release-bearing
-exact-version, package/docs, workflow, verifier, and incident surface before
-capturing a new candidate, require `bbe75d2` ancestry, and replace this file
-only after complete detached exact-SHA/no-tag proof passes. Plan 131-10 creates
-the clean-room harness, tests, and retained evidence only after Plan 131-09's
-atomic verifier writes `VERIFIED`; those artifacts are not pre-candidate
-invariants.
+This record is not approval. `candidate..HEAD` was empty at capture. Only
+Phase-131 control records may follow this SHA. A fresh blocking-human decision
+must name this exact SHA and jointly authorize one annotated `v1.3.4` tag, its
+protected tag-driven Hex publish, and exact-candidate HexDocs dispatch. No
+v1.3.3 approval transfers.
