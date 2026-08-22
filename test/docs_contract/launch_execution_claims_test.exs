@@ -135,7 +135,7 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     assert workflow =~ "candidate_commit_sha:"
     assert workflow =~ "release_ref:"
     assert workflow =~ "if: github.event_name == 'workflow_dispatch'"
-    assert workflow =~ "inputs.release_ref == 'v1.3.2'"
+    assert workflow =~ "inputs.release_ref == 'v1.3.3'"
     assert workflow =~ "inputs.candidate_commit_sha == github.sha"
     assert workflow =~ "ref: ${{ inputs.candidate_commit_sha }}"
     assert workflow =~ "Verify approved candidate identity"
