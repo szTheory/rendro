@@ -9,13 +9,12 @@ defmodule Rendro.PublicReleaseVerifierTest do
   @script Path.expand("../../scripts/verify_public_release.exs", __DIR__)
   @candidate_record ".planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-RELEASE-CANDIDATE.md"
 
-  test "historical record retains both immutable incidents before the v1.3.2 candidate is sealed" do
+  test "historical record retains all three immutable incidents before the v1.3.3 candidate is sealed" do
     record = File.read!(@candidate_record)
 
-    assert record =~ ~r/^version: 1\.3\.2$/m
-    assert record =~ ~r/^release_ref: v1\.3\.2$/m
-    assert record =~ ~r/^candidate_commit_sha: [0-9a-f]{40}$/m
-    assert record =~ ~r/^package_checksum: [0-9a-f]{64}$/m
+    assert record =~ ~r/^version: 1\.3\.3$/m
+    assert record =~ ~r/^release_ref: v1\.3\.3$/m
+    assert record =~ "candidate_status: planned_after_complete_audit_proof"
     assert record =~ "tag_pushed: false"
     assert record =~ "hexdocs_dispatched: false"
     assert record =~ "registry_mutated: false"
@@ -23,11 +22,11 @@ defmodule Rendro.PublicReleaseVerifierTest do
     assert record =~ "32513353551"
     assert record =~ "32539594278"
     assert record =~ "b386d1e39b6c9e63af58aa1fa5890d93909d278f"
-    assert record =~ "superseded_by_planned_version: 1.3.2"
-    assert record =~ "concluded **failure** before Hex"
-    assert record =~ "publication. The version extraction"
-    assert record =~ "Hex package `1.3.0` is absent"
-    assert record =~ "HexDocs `1.3.0` was not dispatched and is absent"
+    assert record =~ "9b7ff50c69c0e9bd6ae39f0c79f76c4663d936fd"
+    assert record =~ "47af6448d2989ffe69c4b80c77935c896b1ddb07"
+    assert record =~ "32586098785"
+    assert record =~ "97062582546"
+    assert record =~ "97064173653"
   end
 
   test "refuses a tag object when its peeled commit differs from the candidate" do
@@ -48,12 +47,17 @@ defmodule Rendro.PublicReleaseVerifierTest do
              PublicReleaseVerifier.validate(valid_facts(%{"hexdocs_version" => "1.2.0"}))
   end
 
-  test "refuses candidate verification unless both immutable failed incidents remain exact" do
+  test "refuses candidate verification unless all immutable failed incidents remain exact" do
     assert {:error, "v1.3.0 incident peeled SHA is incorrect"} =
              PublicReleaseVerifier.validate(valid_facts(%{"v1_3_0_peeled_sha" => "different"}))
 
     assert {:error, "v1.3.1 incident publish job was not skipped"} =
              PublicReleaseVerifier.validate(valid_facts(%{"v1_3_1_publish_job_skipped" => false}))
+
+    assert {:error, "v1.3.2 incident validate job was not a failure"} =
+             PublicReleaseVerifier.validate(
+               valid_facts(%{"v1_3_2_validate_job_conclusion" => "success"})
+             )
   end
 
   test "real CLI invocation writes a bounded parseable VERIFIED record from test fixture facts" do
@@ -76,7 +80,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
     File.write!(record, "candidate_commit_sha: #{@candidate}\n")
     File.write!(fixture, JSON.encode!(valid_facts() |> Map.merge(fixture_metadata())))
 
-    assert {_, status} = run_cli(record, output, fixture, ["--tag", "v1.3.2"])
+    assert {_, status} = run_cli(record, output, fixture, ["--tag", "v1.3.3"])
     assert status != 0
     refute File.exists?(output)
 
@@ -127,7 +131,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "--candidate-record",
         record,
         "--tag",
-        "v1.3.2",
+        "v1.3.3",
         "--release-run-id",
         "12",
         "--hexdocs-run-id",
@@ -152,7 +156,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
   end
 
   defp fixture_metadata do
-    %{"tag" => "v1.3.2", "release_run_id" => "12", "hexdocs_run_id" => "34"}
+    %{"tag" => "v1.3.3", "release_run_id" => "12", "hexdocs_run_id" => "34"}
   end
 
   defp valid_facts(overrides \\ %{}) do
@@ -168,9 +172,9 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "hexdocs_conclusion" => "success",
         "hexdocs_event" => "workflow_dispatch",
         "hexdocs_name" => "HexDocs",
-        "version" => "1.3.2",
-        "hex_version" => "1.3.2",
-        "hexdocs_version" => "1.3.2",
+        "version" => "1.3.3",
+        "hex_version" => "1.3.3",
+        "hexdocs_version" => "1.3.3",
         "hexdocs_source_sha" => @candidate,
         "archive_members" => [
           "mix.exs",
@@ -194,7 +198,17 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "v1_3_1_conclusion" => "cancelled",
         "v1_3_1_publish_job_skipped" => true,
         "v1_3_1_hex_absent" => true,
-        "v1_3_1_hexdocs_absent" => true
+        "v1_3_1_hexdocs_absent" => true,
+        "v1_3_2_tag_object_sha" => "9b7ff50c69c0e9bd6ae39f0c79f76c4663d936fd",
+        "v1_3_2_peeled_sha" => "47af6448d2989ffe69c4b80c77935c896b1ddb07",
+        "v1_3_2_run_id" => "32586098785",
+        "v1_3_2_conclusion" => "failure",
+        "v1_3_2_validate_job_id" => "97062582546",
+        "v1_3_2_validate_job_conclusion" => "failure",
+        "v1_3_2_publish_job_id" => "97064173653",
+        "v1_3_2_publish_job_conclusion" => "skipped",
+        "v1_3_2_hex_absent" => true,
+        "v1_3_2_hexdocs_absent" => true
       },
       overrides
     )

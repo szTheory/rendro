@@ -12,12 +12,17 @@ defmodule Rendro.PublicReleaseVerifier do
     "Rendro.Theme.Presets",
     "Rendro.Adapters.Phoenix.render_pdf/3"
   ]
-  @candidate_tag "v1.3.2"
+  @candidate_tag "v1.3.3"
   @v1_3_0_peeled_sha "3d014b8194782fc29bc685c0d5e84e4adc64b2c3"
   @v1_3_0_run_id "32513353551"
   @v1_3_1_tag_object_sha "b386d1e39b6c9e63af58aa1fa5890d93909d278f"
   @v1_3_1_peeled_sha "7afb1dd056bba234d1bd4ec1c4487f2ea8e308f1"
   @v1_3_1_run_id "32539594278"
+  @v1_3_2_tag_object_sha "9b7ff50c69c0e9bd6ae39f0c79f76c4663d936fd"
+  @v1_3_2_peeled_sha "47af6448d2989ffe69c4b80c77935c896b1ddb07"
+  @v1_3_2_run_id "32586098785"
+  @v1_3_2_validate_job_id "97062582546"
+  @v1_3_2_publish_job_id "97064173653"
 
   def run(argv, context \\ default_context()) do
     with {:ok, options} <- parse_args(argv),
@@ -137,7 +142,8 @@ defmodule Rendro.PublicReleaseVerifier do
          :ok <- require_members(facts["archive_members"] || []),
          :ok <- require_symbols(facts["hexdocs_symbols"] || []),
          :ok <- validate_v1_3_0_incident(facts),
-         :ok <- validate_v1_3_1_incident(facts) do
+         :ok <- validate_v1_3_1_incident(facts),
+         :ok <- validate_v1_3_2_incident(facts) do
       :ok
     end
   end
@@ -273,10 +279,16 @@ defmodule Rendro.PublicReleaseVerifier do
          {:ok, v1_3_1} <- github_tag_object(repository, "v1.3.1"),
          {:ok, v1_3_1_run} <- github_run(@v1_3_1_run_id),
          true <- publish_job_skipped?(v1_3_1_run),
+         {:ok, v1_3_2} <- github_tag_object(repository, "v1.3.2"),
+         {:ok, v1_3_2_run} <- github_run(@v1_3_2_run_id),
+         true <- job_conclusion?(v1_3_2_run, @v1_3_2_validate_job_id, "failure"),
+         true <- job_conclusion?(v1_3_2_run, @v1_3_2_publish_job_id, "skipped"),
          true <- hex_absent?("1.3.0"),
          true <- hexdocs_absent?("1.3.0"),
          true <- hex_absent?("1.3.1"),
-         true <- hexdocs_absent?("1.3.1") do
+         true <- hexdocs_absent?("1.3.1"),
+         true <- hex_absent?("1.3.2"),
+         true <- hexdocs_absent?("1.3.2") do
       {:ok,
        %{
          "v1_3_0_peeled_sha" => v1_3_0,
@@ -290,7 +302,17 @@ defmodule Rendro.PublicReleaseVerifier do
          "v1_3_1_conclusion" => v1_3_1_run["conclusion"],
          "v1_3_1_publish_job_skipped" => true,
          "v1_3_1_hex_absent" => true,
-         "v1_3_1_hexdocs_absent" => true
+         "v1_3_1_hexdocs_absent" => true,
+         "v1_3_2_tag_object_sha" => v1_3_2.object_sha,
+         "v1_3_2_peeled_sha" => v1_3_2.peeled_sha,
+         "v1_3_2_run_id" => @v1_3_2_run_id,
+         "v1_3_2_conclusion" => v1_3_2_run["conclusion"],
+         "v1_3_2_validate_job_id" => @v1_3_2_validate_job_id,
+         "v1_3_2_validate_job_conclusion" => "failure",
+         "v1_3_2_publish_job_id" => @v1_3_2_publish_job_id,
+         "v1_3_2_publish_job_conclusion" => "skipped",
+         "v1_3_2_hex_absent" => true,
+         "v1_3_2_hexdocs_absent" => true
        }}
     else
       _ -> {:error, "immutable failed-release incident probes did not match"}
@@ -302,6 +324,14 @@ defmodule Rendro.PublicReleaseVerifier do
   end
 
   defp publish_job_skipped?(_), do: false
+
+  defp job_conclusion?(%{"jobs" => jobs}, job_id, conclusion) when is_list(jobs) do
+    Enum.any?(jobs, fn job ->
+      to_string(job["databaseId"] || job["id"]) == job_id and job["conclusion"] == conclusion
+    end)
+  end
+
+  defp job_conclusion?(_, _, _), do: false
 
   defp hex_absent?(version),
     do: url_absent?("https://hex.pm/api/packages/rendro/releases/#{version}")
@@ -467,6 +497,52 @@ defmodule Rendro.PublicReleaseVerifier do
            ),
          :ok <- equal?(facts["v1_3_1_hex_absent"], true, "v1.3.1 Hex release is present"),
          :ok <- equal?(facts["v1_3_1_hexdocs_absent"], true, "v1.3.1 HexDocs page is present") do
+      :ok
+    end
+  end
+
+  defp validate_v1_3_2_incident(facts) do
+    with :ok <-
+           equal?(
+             facts["v1_3_2_tag_object_sha"],
+             @v1_3_2_tag_object_sha,
+             "v1.3.2 incident tag object SHA is incorrect"
+           ),
+         :ok <-
+           equal?(
+             facts["v1_3_2_peeled_sha"],
+             @v1_3_2_peeled_sha,
+             "v1.3.2 incident peeled SHA is incorrect"
+           ),
+         :ok <-
+           equal?(facts["v1_3_2_run_id"], @v1_3_2_run_id, "v1.3.2 incident run ID is incorrect"),
+         :ok <- equal?(facts["v1_3_2_conclusion"], "failure", "v1.3.2 incident run did not fail"),
+         :ok <-
+           equal?(
+             facts["v1_3_2_validate_job_id"],
+             @v1_3_2_validate_job_id,
+             "v1.3.2 incident validate job ID is incorrect"
+           ),
+         :ok <-
+           equal?(
+             facts["v1_3_2_validate_job_conclusion"],
+             "failure",
+             "v1.3.2 incident validate job was not a failure"
+           ),
+         :ok <-
+           equal?(
+             facts["v1_3_2_publish_job_id"],
+             @v1_3_2_publish_job_id,
+             "v1.3.2 incident publish job ID is incorrect"
+           ),
+         :ok <-
+           equal?(
+             facts["v1_3_2_publish_job_conclusion"],
+             "skipped",
+             "v1.3.2 incident publish job was not skipped"
+           ),
+         :ok <- equal?(facts["v1_3_2_hex_absent"], true, "v1.3.2 Hex release is present"),
+         :ok <- equal?(facts["v1_3_2_hexdocs_absent"], true, "v1.3.2 HexDocs page is present") do
       :ok
     end
   end
