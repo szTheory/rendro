@@ -25,6 +25,14 @@ Requirements for this milestone. Each maps to exactly one roadmap phase.
 
 ### Phoenix Newcomer Proof
 
+Execution control note (2026-08-22): D-34 preserves failed public
+`v1.3.0`/`v1.3.1`/`v1.3.2` history and makes exact public `1.3.3` the
+JOURNEY verifier and clean-room target while documentation remains `~> 1.3`.
+JOURNEY-01 cannot advance until a committed exact candidate containing
+`9dabf90` passes the complete detached release preflight with repeated CI and
+both security audits, receives fresh exact-SHA approval, and succeeds through
+the existing protected tag/Hex/HexDocs paths.
+
 - [ ] **JOURNEY-01**: A newcomer can install the public Rendro package in a clean Phoenix environment without relying on the repository checkout or warm dependency caches.
 - [ ] **JOURNEY-02**: A newcomer can follow public discovery surfaces to select and customize the canonical Swiss/light Invoice using the documented preset/configurator path.
 - [ ] **JOURNEY-03**: The clean Phoenix application serves that customized document through the optional Phoenix adapter as a successful `application/pdf` response containing valid `%PDF-` bytes.
@@ -80,4 +88,4 @@ Roadmap mapping approved with the milestone roadmap.
 
 ---
 *Requirements defined: 2026-08-19*
-*Last updated: 2026-08-19 after v2.13 roadmap approval*
+*Last updated: 2026-08-22 after D-34 immutable v1.3.2 incident recovery planning*

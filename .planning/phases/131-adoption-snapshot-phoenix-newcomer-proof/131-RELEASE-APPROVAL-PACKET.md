@@ -1,81 +1,49 @@
 ---
-prepared_at: 2026-08-22T16:48:04Z
-version: 1.3.2
-candidate_commit_sha: 47af6448d2989ffe69c4b80c77935c896b1ddb07
-package_checksum: a3e1517b175510c868cb8fd883290fe90dcd6fa02e045b9c6d7dec4fa6eececb
-proof_mode: exact-sha-no-tag
-head_equals_candidate: true
-fifo_regression: passed
-overwrite_prompt_seen: false
-release_timeout_contract: passed
-tag_refs_unchanged: true
-v1_3_2_local_tag_absent: true
-v1_3_2_remote_tag_absent: true
-v1_3_2_hex_absent: true
-v1_3_2_hexdocs_absent: true
-approval_status: pending_blocking_human
+prepared_at: pending
+version: 1.3.3
+candidate_commit_sha: pending
+proof_mode: exact-sha-no-tag-complete-audits
+head_equals_candidate: pending
+fifo_regression: pending
+complete_release_preflight: pending
+security_audits_included: required
+tag_refs_unchanged: pending
+v1_3_3_local_tag_absent: required
+v1_3_3_remote_tag_absent: required
+v1_3_3_hex_absent: required
+v1_3_3_hexdocs_absent: required
+approval_status: not_ready
 ---
 
-# Rendro v1.3.2 Release Approval Packet
+# Rendro v1.3.3 Release Approval Packet
 
-This is a fresh, read-only approval packet for the final private candidate
-`47af6448d2989ffe69c4b80c77935c896b1ddb07`. It is evidence, not approval, and
-does not create, move, push, or dispatch any tag, Hex package, or HexDocs release.
+This packet is a planning control record, not approval. It becomes eligible for
+human review only after Plan 131-05 seals an exact v1.3.3 candidate and Plan
+131-06 immediately repeats the complete exact-SHA no-tag preflight.
 
-## Candidate identity
+The refreshed packet must record:
 
-| Field | Value |
-| --- | --- |
-| Version | `1.3.2` |
-| Candidate SHA | `47af6448d2989ffe69c4b80c77935c896b1ddb07` |
-| Detached HEAD | `47af6448d2989ffe69c4b80c77935c896b1ddb07` |
-| Package checksum | `a3e1517b175510c868cb8fd883290fe90dcd6fa02e045b9c6d7dec4fa6eececb` |
-| Required recovery ancestor | `9dee9c8b837510191a1036a642e43e0b5dba2018` (present) |
+- the exact 40-character candidate SHA and proof that detached HEAD equals it;
+- ancestry containing resolved commit `9dabf90`;
+- focused preflight/verifier/workflow/tutorial regressions;
+- the open-silent FIFO result with no interactive overwrite prompt;
+- `mix ci.fast`, tutorial verification, package checksum/inventory, and docs;
+- complete candidate-SHA release preflight with repeated CI and both
+  `mix hex.audit` and `mix deps.audit` included;
+- full local and remote tag-ref snapshots unchanged;
+- no local/remote `v1.3.3` tag and no Hex/HexDocs 1.3.3 surface;
+- a `candidate..HEAD` delta containing only Phase 131 control-plane records;
+- the exact v1.3.0, v1.3.1, and v1.3.2 failed tag/run/job and public-absence
+  facts recorded in `131-RELEASE-CANDIDATE.md`.
 
-## Deterministic private proof
-
-- **Open-silent FIFO regression:** passed under a separate 10-minute bound. The
-  detached candidate test completed its internal `Skipped lib/generated_theme.ex`
-  assertion; captured output contained no `overwrite? [Yn]` prompt.
-- **Release timeout contract:** passed. `release.yml` retains independent
-  45-minute `validate-and-dry-run` and 15-minute `publish` limits.
-- **Focused contracts:** passed — 46 tests across exact-SHA preflight, release
-  preflight, public verifier, and protected-workflow contracts.
-- **Exact-SHA no-tag preflight:** passed through
-  `mix run scripts/release_preflight_proof.exs --candidate-sha
-  47af6448d2989ffe69c4b80c77935c896b1ddb07 --worktree <unique-path>`.
-  The wrapper created a new detached worktree at the candidate, asserted HEAD
-  equality, repeated CI/security checks, package build/inventory, Hex dry run,
-  and docs build, then removed the worktree.
-- **No-tag boundary:** the proof used candidate-SHA mode only. It did not invoke
-  the legacy synthetic-tag mode or any tag mutation command. Complete tag-ref
-  snapshots before and after were byte-for-byte unchanged.
-
-## Read-only public state
-
-All HTTP facts below are advisory external evidence; deterministic contracts above
-remain the release authority.
-
-- Local and remote `refs/tags/v1.3.2` are absent.
-- Hex `rendro` release `1.3.2` is absent (final HTTP `404`).
-- HexDocs `rendro/1.3.2` is absent (bounded redirect-following final HTTP `404`).
-- Candidate-to-HEAD control-plane delta contains only
-  `131-RELEASE-CANDIDATE.md` and `131-04-SUMMARY.md` before this packet.
-
-## Immutable failed-release incidents
-
-| Version | Tag identity | Protected run | Verified state |
-| --- | --- | --- | --- |
-| v1.3.0 | peels to `3d014b8194782fc29bc685c0d5e84e4adc64b2c3` | `32513353551` | `failure`; publish skipped; Hex and HexDocs absent (final `404`) |
-| v1.3.1 | object `b386d1e39b6c9e63af58aa1fa5890d93909d278f`, peels to `7afb1dd056bba234d1bd4ec1c4487f2ea8e308f1` | `32539594278` | `cancelled`; publish skipped; Hex and HexDocs absent (final `404`) |
-
-Neither historical tag, run, package, nor docs state was changed during this
-proof.
+Any audit/CI bypass, stale candidate, mismatched checksum/inventory, tag-ref
+change, public v1.3.3 presence, or non-control delta leaves
+`approval_status: not_ready`.
 
 ## Required decision
 
-Approval must be freshly stated against the exact 40-character candidate above
-and must authorize all three permanent actions together: annotated `v1.3.2` tag,
-protected tag-driven Hex publication, and candidate-bound protected HexDocs
-publication. Previous approvals, generic approval, silence, or partial approval
-do not authorize mutation.
+Fresh approval must name the exact candidate and jointly authorize all three
+permanent actions: annotated `v1.3.3`, protected tag-driven Hex publication,
+and exact-candidate protected HexDocs publication. Previous approvals, generic
+approval, silence, partial approval, and automatic advancement do not authorize
+mutation.
