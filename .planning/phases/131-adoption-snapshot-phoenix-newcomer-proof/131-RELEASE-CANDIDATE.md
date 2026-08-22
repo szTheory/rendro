@@ -1,5 +1,5 @@
 ---
-candidate_commit_sha: ed68ff83a3211cc8318d0cab88acbd4c01859474
+candidate_commit_sha: f03c78bab54efe1cd1596d51cf3f28193232e2a3
 version: 1.3.4
 release_ref: v1.3.4
 candidate_status: proof_complete_control_pending
@@ -14,7 +14,7 @@ recovery_decision: D-35
 
 # Rendro v1.3.4 Candidate Control Record
 
-**Sealed private candidate:** `ed68ff83a3211cc8318d0cab88acbd4c01859474`.
+**Sealed private candidate:** `f03c78bab54efe1cd1596d51cf3f28193232e2a3`.
 This exact committed SHA contains required fix
 `bbe75d2bf3f53e5235626974c539500395d2032e`. It is private deterministic
 control evidence only: no `v1.3.4` tag was created, no package was published,
@@ -46,7 +46,7 @@ no HexDocs dispatch occurred, and no public verifier was run.
   changelog, and API-stability, branding, and integrations guides, with the
   forbidden support-matrix/viewer-evidence/guardrails/test paths absent.
 - `mix run scripts/release_preflight_proof.exs --candidate-sha
-  ed68ff83a3211cc8318d0cab88acbd4c01859474 --worktree <isolated-temp-dir>`
+  f03c78bab54efe1cd1596d51cf3f28193232e2a3 --worktree <isolated-temp-dir>`
   created its own detached worktree, asserted exact `HEAD`, ran `mix deps.get`,
   and completed `mix release.preflight --candidate-sha` with no skips. It passed
   clean-worktree, candidate parity, package/source-ref/changelog/artifact gates,
