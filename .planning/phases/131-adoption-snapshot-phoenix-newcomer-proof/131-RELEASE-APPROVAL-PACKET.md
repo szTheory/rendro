@@ -18,7 +18,7 @@ v1_3_3_local_tag_absent: true
 v1_3_3_remote_tag_absent: true
 v1_3_3_hex_absent: true
 v1_3_3_hexdocs_absent: true
-approval_status: pending_blocking_human
+approval_status: approved_exact_blocking_human
 ---
 
 # Rendro v1.3.3 Release Approval Packet
@@ -88,3 +88,14 @@ annotated `v1.3.3` tag, protected tag-driven Hex publication, and
 candidate-bound protected HexDocs publication may advance this packet. Prior
 approval, generic assent, silence, partial approval, and automatic advancement
 do not authorize mutation.
+
+## Literal blocking-human approval
+
+**Recorded at:** 2026-08-22T19:18:00Z
+
+> approve exact v1.3.3 candidate cfc58a81865e060351ce33d98f5e52de8cd198d9 for annotated tag, protected Hex, and candidate-bound HexDocs
+
+The approval names the exact candidate in this packet and jointly authorizes
+only one annotated `v1.3.3` tag, its existing protected tag-driven Hex path,
+and the existing candidate-bound protected HexDocs dispatch. It authorizes no
+retry, ref movement, deletion, alternate publisher, or action on a mismatch.
