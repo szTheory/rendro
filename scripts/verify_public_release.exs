@@ -311,6 +311,9 @@ defmodule Rendro.PublicReleaseVerifier do
   defp url_absent?(url) do
     case System.cmd("curl", [
            "--silent",
+           "--location",
+           "--max-redirs",
+           "5",
            "--output",
            "/dev/null",
            "--write-out",

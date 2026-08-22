@@ -12,11 +12,11 @@ defmodule Rendro.PublicReleaseVerifierTest do
   test "historical record retains both immutable incidents before the v1.3.2 candidate is sealed" do
     record = File.read!(@candidate_record)
 
-    assert record =~ ~r/^version: 1\.3\.1$/m
-    assert record =~ ~r/^release_ref: v1\.3\.1$/m
+    assert record =~ ~r/^version: 1\.3\.2$/m
+    assert record =~ ~r/^release_ref: v1\.3\.2$/m
     assert record =~ ~r/^candidate_commit_sha: [0-9a-f]{40}$/m
     assert record =~ ~r/^package_checksum: [0-9a-f]{64}$/m
-    assert record =~ "tag_pushed: true"
+    assert record =~ "tag_pushed: false"
     assert record =~ "hexdocs_dispatched: false"
     assert record =~ "registry_mutated: false"
     assert record =~ "3d014b8194782fc29bc685c0d5e84e4adc64b2c3"
