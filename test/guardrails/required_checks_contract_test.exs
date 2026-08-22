@@ -457,6 +457,24 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert workflow["jobs"]["publish"]["timeout-minutes"] == 15
     end
 
+    test "release relies on credential-free preflight before protected publish" do
+      release = File.read!(@release_path)
+      workflow = load_workflow!(@release_path)
+      validate_job = workflow["jobs"]["validate-and-dry-run"]
+
+      assert is_nil(validate_job["environment"])
+      assert Enum.any?(validate_job["steps"], &(&1["name"] == "Run Release Preflight"))
+      refute Enum.any?(validate_job["steps"], &(&1["name"] == "Publish to Hex (Dry Run)"))
+      refute Enum.any?(validate_job["steps"], &get_in(&1, ["env", "HEX_API_KEY"]))
+      refute release =~ "mix hex.publish --dry-run"
+
+      publish_step =
+        workflow["jobs"]["publish"]["steps"]
+        |> Enum.find(&(&1["name"] == "Publish to Hex"))
+
+      assert publish_step["env"]["HEX_API_KEY"] == "${{ secrets.HEX_API_KEY }}"
+    end
+
     test "candidate proof remains complete-audit only and never creates a tag" do
       proof = File.read!("scripts/release_preflight_proof.exs")
 

@@ -50,9 +50,6 @@ jobs:
       - name: Run Release Preflight
         run: mix release.preflight
 
-      - name: Publish to Hex (Dry Run)
-        run: mix hex.publish --dry-run
-
   publish:
     needs: validate-and-dry-run
     runs-on: ubuntu-latest
