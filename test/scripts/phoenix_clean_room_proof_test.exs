@@ -148,7 +148,16 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
       {"* creating phx_new 1.8.5", 0}
     end
 
-    inspector = fn ^root -> {:ok, [Path.join(root, "mix/archives/phx_new-1.8.5")]} end
+    inspector = fn ^root ->
+      {:ok,
+       [
+         %{
+           path: Path.join(root, "mix/archives/phx_new-1.8.5.ez"),
+           entries: ["phx_new-1.8.5/ebin/phx_new.app"],
+           app: "{application,phx_new,[]}."
+         }
+       ]}
+    end
 
     version = fn "mix", ["phx.new", "--version"], _env, ^root, _timeout ->
       {"Phoenix v1.8.5", 0}
@@ -159,7 +168,18 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
 
   test "rejects failed, wrong-version, host-sourced, and timed-out phx_new bootstrap" do
     root = "/isolated/clean-room"
-    inspector = fn _ -> {:ok, [Path.join(root, "mix/archives/phx_new-1.8.5")]} end
+
+    inspector = fn _ ->
+      {:ok,
+       [
+         %{
+           path: Path.join(root, "mix/archives/phx_new-1.8.5.ez"),
+           entries: ["phx_new-1.8.5/ebin/phx_new.app"],
+           app: "{application,phx_new,[]}."
+         }
+       ]}
+    end
+
     version = fn _, _, _, _, _ -> {"Phoenix v1.8.5", 0} end
 
     assert {:error, :phx_new_install_failed} =
@@ -182,7 +202,10 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
              PhoenixCleanRoomProof.bootstrap_phx_new(
                root,
                fn _, _, _, _, _ -> {"ok", 0} end,
-               fn _ -> {:ok, ["/Users/me/.mix/archives/phx_new-1.8.5"]} end,
+               fn _ ->
+                 {:ok,
+                  [%{path: "/Users/me/.mix/archives/phx_new-1.8.5.ez", entries: [], app: ""}]}
+               end,
                version
              )
 

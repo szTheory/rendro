@@ -367,15 +367,53 @@ defmodule Rendro.PhoenixCleanRoomProof do
     archive_root = Path.join(root, "mix/archives")
 
     case File.ls(archive_root) do
-      {:ok, entries} -> {:ok, Enum.map(entries, &Path.join(archive_root, &1))}
+      {:ok, entries} ->
+        entries
+        |> Enum.map(&Path.join(archive_root, &1))
+        |> Enum.map(&read_archive/1)
+        |> collect_archives()
+
+      _ ->
+        {:error, :phx_new_source_missing}
+    end
+  end
+
+  defp read_archive(path) do
+    with {:ok, %File.Stat{type: :regular}} <- File.lstat(path),
+         {:ok, entries} <- :zip.table(String.to_charlist(path)),
+         {:ok, files} <- :zip.extract(String.to_charlist(path), [:memory]),
+         {_, app} when is_binary(app) <-
+           Enum.find(files, fn {name, _} ->
+             String.ends_with?(List.to_string(name), "/ebin/phx_new.app")
+           end) do
+      {:ok,
+       %{
+         path: path,
+         entries: Enum.map(entries, fn entry -> entry |> elem(0) |> List.to_string() end),
+         app: app
+       }}
+    else
       _ -> {:error, :phx_new_source_missing}
     end
   end
 
-  defp verify_archive_sources(sources, root) when is_list(sources) do
-    expected = Path.join(root, "mix/archives/phx_new-#{@phx_new_version}")
+  defp collect_archives(results) do
+    if Enum.all?(results, &match?({:ok, _}, &1)),
+      do: {:ok, Enum.map(results, fn {:ok, archive} -> archive end)},
+      else: {:error, :phx_new_source_missing}
+  end
 
-    if Enum.member?(sources, expected) and Enum.all?(sources, &String.starts_with?(&1, root)),
+  defp verify_archive_sources(sources, root) when is_list(sources) do
+    expected = Path.join(root, "mix/archives/phx_new-#{@phx_new_version}.ez")
+
+    exact =
+      Enum.find(sources, fn source ->
+        source.path == expected and
+          Enum.member?(source.entries, "phx_new-#{@phx_new_version}/ebin/phx_new.app") and
+          String.contains?(source.app, "{application,phx_new,")
+      end)
+
+    if not is_nil(exact) and Enum.all?(sources, &String.starts_with?(&1.path, root)),
       do: :ok,
       else: {:error, :phx_new_source_leakage}
   end
