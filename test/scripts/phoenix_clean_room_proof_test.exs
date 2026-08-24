@@ -91,6 +91,197 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
     File.rm_rf!(root)
   end
 
+  test "loopback retries delayed readiness and records only response facts" do
+    server = make_ref()
+    calls = :counters.new(1, [])
+
+    requester = fn ->
+      call = :counters.add(calls, 1, 1)
+
+      if call == 1 do
+        {:error, :tcp_unavailable}
+      else
+        {:ok, 200,
+         [
+           {~c"content-type", ~c"application/pdf"},
+           {~c"content-disposition", ~c"attachment; filename=\"invoice.pdf\""}
+         ], "%PDF-1.7"}
+      end
+    end
+
+    assert {:ok, %{status: 200, pdf_magic: true}} =
+             PhoenixCleanRoomProof.await_loopback(server, 2, requester, fn _ -> :ok end)
+  end
+
+  test "loopback build uses the consumer test environment and has typed failures" do
+    app = "/isolated/clean-room"
+    env = [{"MIX_HOME", "/isolated/mix"}]
+
+    assert :ok =
+             PhoenixCleanRoomProof.compile_loopback(app, env, fn "mix",
+                                                                 ["compile"],
+                                                                 actual_env,
+                                                                 ^app,
+                                                                 120_000 ->
+               assert {"MIX_ENV", "test"} in actual_env
+               {"compiled", 0}
+             end)
+
+    assert {:error, :loopback_build_timeout} =
+             PhoenixCleanRoomProof.compile_loopback(app, env, fn _, _, _, _, _ -> :timeout end)
+
+    assert {:error, :loopback_build_failed} =
+             PhoenixCleanRoomProof.compile_loopback(app, env, fn _, _, _, _, _ ->
+               {"failure", 1}
+             end)
+  end
+
+  test "loopback configuration is compiled before the server starts" do
+    source = File.read!(Path.expand("../../scripts/phoenix_clean_room_proof.exs", __DIR__))
+
+    assert :binary.match(source, "configure_loopback(app, loopback_port)") <
+             :binary.match(source, "compile_loopback(app, env)")
+
+    assert :binary.match(source, "compile_loopback(app, env)") <
+             :binary.match(source, "loopback_facts(app, env, loopback_port)")
+
+    assert source =~ "{\"MIX_ENV\", \"test\"}"
+    assert source =~ "Keyword.merge(config, server: true, http: http)"
+    assert source =~ "ip: {127, 0, 0, 1}, port: port"
+    assert source =~ "Application.ensure_all_started(:clean_room)"
+  end
+
+  test "Port launcher clears host overrides and supplies only the isolated environment" do
+    root = "/isolated/clean-room"
+
+    assert {:ok, {executable, args, port_env}} =
+             PhoenixCleanRoomProof.port_launcher(
+               PhoenixCleanRoomProof.isolated_env(root),
+               40_123,
+               fn
+                 "env" -> "/usr/bin/env"
+                 "mix" -> "/usr/local/bin/mix"
+               end
+             )
+
+    assert executable == "/usr/bin/env"
+    assert port_env == []
+
+    assert Enum.take(args, 14) ==
+             Enum.flat_map(
+               ~w(MIX_HOME HEX_HOME HEX_USER_HOME REBAR_CACHE_DIR MIX_DEPS_PATH MIX_BUILD_PATH NETRC),
+               &["-u", &1]
+             )
+
+    assert "MIX_ENV=test" in args
+    assert "RENDRO_LOOPBACK_PORT=40123" in args
+    assert "MIX_HOME=/isolated/clean-room/mix" in args
+    assert "MIX_DEPS_PATH=/isolated/clean-room/deps" in args
+    refute Enum.any?(args, &String.starts_with?(&1, "MIX_BUILD_PATH="))
+    assert "/usr/local/bin/mix" in args
+    refute Enum.any?(args, &String.contains?(&1, "sh -c"))
+    assert Enum.any?(args, &String.contains?(&1, "ip: {127, 0, 0, 1}, port: port"))
+
+    assert Enum.any?(
+             args,
+             &String.contains?(&1, "Keyword.merge(config, server: true, http: http)")
+           )
+
+    assert {:error, :invalid_loopback_port} = PhoenixCleanRoomProof.port_launcher([], 0)
+    assert {:error, :invalid_loopback_port} = PhoenixCleanRoomProof.port_launcher([], 65_536)
+  end
+
+  test "loopback fails fast on server exit and classifies bounded port output" do
+    server = make_ref()
+    send(self(), {server, {:data, "could not compile /tmp/private"}})
+    send(self(), {server, {:exit_status, 1}})
+
+    assert {:error, {:loopback_server_exited, 1, :compile_failed}} =
+             PhoenixCleanRoomProof.await_loopback(
+               server,
+               2,
+               fn -> flunk("must not request") end,
+               fn _ -> :ok end
+             )
+  end
+
+  test "loopback classifies compilation output without retaining it" do
+    server = make_ref()
+    send(self(), {server, {:data, "Compiling /tmp/secret.ex"}})
+
+    assert {:error, {:loopback_timeout, :compiling, :tcp_unavailable}} =
+             PhoenixCleanRoomProof.await_loopback(
+               server,
+               1,
+               fn -> {:error, :tcp_unavailable} end,
+               fn _ -> :ok end
+             )
+  end
+
+  test "loopback distinguishes HTTP statuses, invalid headers, invalid body, and timeout" do
+    server = make_ref()
+
+    headers = [
+      {~c"content-type", ~c"application/pdf"},
+      {~c"content-disposition", ~c"attachment; filename=\"invoice.pdf\""}
+    ]
+
+    assert {:error, {:loopback_http_status, 404}} =
+             PhoenixCleanRoomProof.await_loopback(server, 1, fn -> {:ok, 404, [], ""} end, fn _ ->
+               :ok
+             end)
+
+    assert {:error, {:loopback_http_status, 500}} =
+             PhoenixCleanRoomProof.await_loopback(server, 1, fn -> {:ok, 500, [], ""} end, fn _ ->
+               :ok
+             end)
+
+    assert {:error, :loopback_invalid_headers} =
+             PhoenixCleanRoomProof.await_loopback(
+               server,
+               1,
+               fn -> {:ok, 200, [], "%PDF-1.7"} end,
+               fn _ -> :ok end
+             )
+
+    assert {:error, :loopback_invalid_body} =
+             PhoenixCleanRoomProof.await_loopback(
+               server,
+               1,
+               fn -> {:ok, 200, headers, ""} end,
+               fn _ -> :ok end
+             )
+
+    assert {:error, {:loopback_timeout, :no_output, :tcp_unavailable}} =
+             PhoenixCleanRoomProof.await_loopback(
+               server,
+               1,
+               fn -> {:error, :tcp_unavailable} end,
+               fn _ -> :ok end
+             )
+  end
+
+  test "loopback teardown runs after a timeout" do
+    server = make_ref()
+    parent = self()
+
+    assert {:error, {:loopback_timeout, :no_output, :tcp_unavailable}} =
+             PhoenixCleanRoomProof.run_loopback(
+               server,
+               fn server ->
+                 PhoenixCleanRoomProof.await_loopback(
+                   server,
+                   1,
+                   fn -> {:error, :tcp_unavailable} end,
+                   fn _ -> :ok end
+                 )
+               end,
+               fn ^server -> send(parent, :stopped) end
+             )
+
+    assert_receive :stopped
+  end
+
   test "accepts only the exact verified public 1.3.4 combined-release prerequisite" do
     prerequisite = valid_prerequisite()
 

@@ -8,6 +8,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
   @public_inner_checksum "2a72bac4466e7b34e26486242d6aa22971edbd92cac2572d739441ff85615cc7"
   @bootstrap_timeout_ms 120_000
   @loopback_attempts 240
+  @loopback_retry_ms 250
   @forbidden ~w(MIX_HOME HEX_HOME HEX_USER_HOME REBAR_CACHE_DIR MIX_DEPS_PATH MIX_BUILD_PATH NETRC)
 
   def main(args \\ System.argv(), executor \\ &run_with_cleanup/2) do
@@ -338,7 +339,10 @@ defmodule Rendro.PhoenixCleanRoomProof do
                app
              ),
            :ok <- audit_public_source(app),
-           {:ok, loopback} <- loopback_facts(app, env),
+           {:ok, loopback_port} <- reserve_port(),
+           :ok <- configure_loopback(app, loopback_port),
+           :ok <- compile_loopback(app, env),
+           {:ok, loopback} <- loopback_facts(app, env, loopback_port),
            :ok <- assert_cleanup_candidate(root, app) do
         project_evidence(%{
           elixir: System.version(),
@@ -516,6 +520,15 @@ defmodule Rendro.PhoenixCleanRoomProof do
       else: :ok
   end
 
+  @doc false
+  def compile_loopback(app, env, runner \\ &run_bounded/5) do
+    case runner.("mix", ["compile"], [{"MIX_ENV", "test"} | env], app, @bootstrap_timeout_ms) do
+      {_output, 0} -> :ok
+      :timeout -> {:error, :loopback_build_timeout}
+      {_output, _status} -> {:error, :loopback_build_failed}
+    end
+  end
+
   defp response_facts,
     do: %{
       status: 200,
@@ -525,15 +538,11 @@ defmodule Rendro.PhoenixCleanRoomProof do
       pdf_magic: true
     }
 
-  defp loopback_facts(app, env) do
-    with {:ok, port} <- reserve_port(),
-         :ok <- configure_loopback(app, port),
-         {:ok, server} <- start_server(app, env) do
-      try do
-        await_response(port, @loopback_attempts)
-      after
-        stop_server(server)
-      end
+  def loopback_facts(app, env, port) do
+    with {:ok, server} <- start_server(app, env, port) do
+      run_loopback(server, fn server ->
+        await_loopback(server, @loopback_attempts, fn -> request_loopback(port) end)
+      end)
     end
   end
 
@@ -545,7 +554,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
   end
 
   defp configure_loopback(app, port) do
-    path = Path.join(app, "config/dev.exs")
+    path = Path.join(app, "config/test.exs")
 
     File.write(
       path,
@@ -554,56 +563,166 @@ defmodule Rendro.PhoenixCleanRoomProof do
     )
   end
 
-  defp start_server(app, env) do
-    executable = System.find_executable("sh") || "sh"
+  defp start_server(app, env, port) do
+    with {:ok, {executable, args, port_env}} <- port_launcher(env, port) do
+      server =
+        Port.open(
+          {:spawn_executable, executable},
+          [
+            :binary,
+            :exit_status,
+            args: Enum.map(args, &String.to_charlist/1),
+            cd: String.to_charlist(app),
+            env:
+              Enum.map(port_env, fn {key, value} ->
+                {String.to_charlist(key), String.to_charlist(value)}
+              end)
+          ]
+        )
 
-    server =
-      Port.open(
-        {:spawn_executable, executable},
-        [
-          :binary,
-          :exit_status,
-          args: ["-c", "exec mix phx.server"],
-          cd: String.to_charlist(app),
-          env:
-            Enum.map([{"MIX_ENV", "dev"} | env], fn
-              {key, nil} -> {String.to_charlist(key), false}
-              {key, value} -> {String.to_charlist(key), String.to_charlist(value)}
-            end)
-        ]
-      )
-
-    {:ok, server}
+      {:ok, server}
+    end
   rescue
     error -> {:error, {:server_start_failed, Exception.message(error)}}
   end
 
-  defp await_response(_port, 0), do: {:error, :loopback_timeout}
+  @doc false
+  def port_launcher(env, port, finder \\ &System.find_executable/1)
 
-  defp await_response(port, attempts) do
+  def port_launcher(env, port, finder)
+      when is_integer(port) and port in 1..65_535 do
+    env_executable = finder.("env") || "/usr/bin/env"
+    mix_executable = finder.("mix") || "mix"
+
+    assignments =
+      [{"MIX_ENV", "test"}, {"RENDRO_LOOPBACK_PORT", Integer.to_string(port)} | env]
+      |> Enum.reject(fn {_key, value} -> is_nil(value) end)
+      |> Enum.map(fn {key, value} -> "#{key}=#{value}" end)
+
+    command =
+      "port = String.to_integer(System.fetch_env!(\"RENDRO_LOOPBACK_PORT\")); config = Application.get_env(:clean_room, CleanRoomWeb.Endpoint, []); http = Keyword.merge(Keyword.get(config, :http, []), ip: {127, 0, 0, 1}, port: port); Application.put_env(:clean_room, CleanRoomWeb.Endpoint, Keyword.merge(config, server: true, http: http)); Application.ensure_all_started(:clean_room)"
+
+    args =
+      Enum.flat_map(@forbidden, &["-u", &1]) ++
+        assignments ++ [mix_executable, "run", "--no-start", "--no-halt", "-e", command]
+
+    {:ok, {env_executable, args, []}}
+  end
+
+  def port_launcher(_env, _port, _finder), do: {:error, :invalid_loopback_port}
+
+  @doc false
+  def run_loopback(server, waiter, stopper \\ &stop_server/1) do
+    try do
+      waiter.(server)
+    after
+      stopper.(server)
+    end
+  end
+
+  @doc false
+  def await_loopback(server, attempts, requester, sleeper \\ &Process.sleep/1)
+
+  def await_loopback(server, attempts, requester, sleeper) do
+    await_loopback(server, attempts, requester, sleeper, %{exit_status: nil, output: ""}, :none)
+  end
+
+  defp await_loopback(_server, 0, _requester, _sleeper, server_state, last_http) do
+    {:error, {:loopback_timeout, server_output_kind(server_state), last_http}}
+  end
+
+  defp await_loopback(server, attempts, requester, sleeper, server_state, _last_http) do
+    server_state = drain_server_messages(server, server_state)
+
+    case server_state.exit_status do
+      status when is_integer(status) ->
+        {:error, {:loopback_server_exited, status, server_output_kind(server_state)}}
+
+      nil ->
+        case requester.() do
+          {:ok, 200, headers, body} ->
+            validate_loopback_response(headers, body)
+
+          {:ok, status, _headers, _body} ->
+            {:error, {:loopback_http_status, status}}
+
+          {:error, reason} ->
+            sleeper.(@loopback_retry_ms)
+            await_loopback(server, attempts - 1, requester, sleeper, server_state, reason)
+        end
+    end
+  end
+
+  defp drain_server_messages(server, server_state) do
+    receive do
+      {^server, {:data, data}} when is_binary(data) ->
+        output = String.slice(server_state.output <> data, -240, 240)
+        drain_server_messages(server, %{server_state | output: bounded(output)})
+
+      {^server, {:exit_status, status}} when is_integer(status) ->
+        %{server_state | exit_status: status}
+    after
+      0 -> server_state
+    end
+  end
+
+  defp server_output_kind(%{output: output}) do
+    cond do
+      output == "" ->
+        :no_output
+
+      String.contains?(output, "address already in use") ->
+        :bind_failed
+
+      String.contains?(output, ["could not compile", "Compilation error"]) ->
+        :compile_failed
+
+      String.contains?(output, "Compiling ") ->
+        :compiling
+
+      String.contains?(output, ["Running CleanRoomWeb.Endpoint", "Access CleanRoomWeb.Endpoint"]) ->
+        :endpoint_started
+
+      String.contains?(output, ["error", "Error"]) ->
+        :server_error
+
+      true ->
+        :output_observed
+    end
+  end
+
+  defp request_loopback(port) do
     :inets.start()
 
-    case :httpc.request(
-           :get,
-           {String.to_charlist("http://127.0.0.1:#{port}/invoice.pdf"), []},
-           [],
-           body_format: :binary
-         ) do
-      {:ok, {{_http, 200, _reason}, headers, body}} ->
-        content_type = header(headers, ~c"content-type")
-        disposition = header(headers, ~c"content-disposition")
+    with {:ok, socket} <- :gen_tcp.connect({127, 0, 0, 1}, port, [:binary], 1_000),
+         :ok <- :gen_tcp.close(socket) do
+      case :httpc.request(
+             :get,
+             {String.to_charlist("http://127.0.0.1:#{port}/invoice.pdf"), []},
+             [],
+             body_format: :binary
+           ) do
+        {:ok, {{_http, status, _reason}, headers, body}} -> {:ok, status, headers, body}
+        {:error, _reason} -> {:error, :http_unavailable}
+      end
+    else
+      {:error, _reason} -> {:error, :tcp_unavailable}
+    end
+  end
 
-        if content_type =~ "application/pdf" and disposition =~ "filename=invoice.pdf" and
-             byte_size(body) > 0 and
-             String.starts_with?(body, "%PDF-") do
-          {:ok, response_facts()}
-        else
-          {:error, :invalid_loopback_response}
-        end
+  defp validate_loopback_response(headers, body) do
+    content_type = header(headers, ~c"content-type")
+    disposition = header(headers, ~c"content-disposition")
 
-      _ ->
-        Process.sleep(250)
-        await_response(port, attempts - 1)
+    cond do
+      not (content_type =~ "application/pdf" and disposition =~ "filename=\"invoice.pdf\"") ->
+        {:error, :loopback_invalid_headers}
+
+      byte_size(body) == 0 or not String.starts_with?(body, "%PDF-") ->
+        {:error, :loopback_invalid_body}
+
+      true ->
+        {:ok, response_facts()}
     end
   end
 
