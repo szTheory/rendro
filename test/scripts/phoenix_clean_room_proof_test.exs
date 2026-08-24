@@ -126,6 +126,8 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
              "Rendro.Adapters.Phoenix.render_pdf(conn, InvoiceDocument.build(), \"invoice.pdf\")"
 
     assert templates.test =~ "use CleanRoomWeb.ConnCase"
+    assert templates.test =~ "application/pdf; charset=utf-8"
+    assert templates.test =~ "attachment; filename=\\\"invoice.pdf\\\""
     assert templates.test =~ "loopback proof"
 
     assert :binary.match(templates.test, "ConnCase proof") <
@@ -178,6 +180,16 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
     end
 
     assert :ok = PhoenixCleanRoomProof.bootstrap_phx_new(root, runner, inspector, version)
+  end
+
+  test "keeps generated-app build artifacts app-owned while clearing host build paths" do
+    root = "/isolated/clean-room"
+
+    env = PhoenixCleanRoomProof.isolated_env(root)
+
+    assert {"MIX_DEPS_PATH", Path.join(root, "deps")} in env
+    assert {"MIX_BUILD_PATH", nil} in env
+    refute {"MIX_BUILD_PATH", Path.join(root, "build")} in env
   end
 
   test "rejects failed, wrong-version, host-sourced, and timed-out phx_new bootstrap" do

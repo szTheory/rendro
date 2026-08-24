@@ -164,8 +164,8 @@ defmodule Rendro.PhoenixCleanRoomProof do
         test \"ConnCase proof\" do
           conn = get(build_conn(), \"/invoice.pdf\")
           assert conn.status == 200
-          assert [\"application/pdf\"] = Plug.Conn.get_resp_header(conn, \"content-type\")
-          assert [\"attachment; filename=invoice.pdf\"] = Plug.Conn.get_resp_header(conn, \"content-disposition\")
+          assert [\"application/pdf; charset=utf-8\"] = Plug.Conn.get_resp_header(conn, \"content-type\")
+          assert [\"attachment; filename=\\\"invoice.pdf\\\"\"] = Plug.Conn.get_resp_header(conn, \"content-disposition\")
           assert byte_size(conn.resp_body) > 0 and String.starts_with?(conn.resp_body, \"%PDF-\")
         end
         test \"loopback proof\" do
@@ -281,8 +281,9 @@ defmodule Rendro.PhoenixCleanRoomProof do
     try do
       with :ok <- assert_empty_root(root),
            :ok <- bootstrap_phx_new(root),
-           {_, 0} <-
-             run(
+           :ok <-
+             run_stage(
+               :generated_app,
                "mix",
                [
                  "phx.new",
@@ -302,7 +303,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
              ),
            :ok <- write_consumer(app),
            :ok <- audit_dependency_source!(File.read!(Path.join(app, "mix.exs")) |> rendro_dep()),
-           {_, 0} <- run("mix", ["deps.get"], env, app),
+           :ok <- run_stage(:deps_get, "mix", ["deps.get"], env, app),
            :ok <-
              audit_lock!(
                Path.join(app, "mix.lock")
@@ -310,7 +311,14 @@ defmodule Rendro.PhoenixCleanRoomProof do
                |> Code.eval_string()
                |> elem(0)
              ),
-           {_, 0} <- run("mix", ["test"], [{"MIX_ENV", "test"} | env], app),
+           :ok <-
+             run_stage(
+               :generated_consumer_test,
+               "mix",
+               ["test"],
+               [{"MIX_ENV", "test"} | env],
+               app
+             ),
            :ok <- audit_public_source(app),
            {:ok, loopback} <- loopback_facts(app, env),
            :ok <- assert_cleanup_candidate(root, app) do
@@ -335,9 +343,6 @@ defmodule Rendro.PhoenixCleanRoomProof do
           candidate_sha: prerequisite["candidate_commit_sha"]
         })
       else
-        {output, status} when is_binary(output) ->
-          failure({:command_failed, status, bounded(output)})
-
         {:error, reason} ->
           failure(reason)
       end
@@ -346,14 +351,13 @@ defmodule Rendro.PhoenixCleanRoomProof do
     end
   end
 
-  defp isolated_env(root) do
+  def isolated_env(root) do
     isolated = [
       {"MIX_HOME", Path.join(root, "mix")},
       {"HEX_HOME", Path.join(root, "hex")},
       {"HEX_USER_HOME", Path.join(root, "hex-user")},
       {"REBAR_CACHE_DIR", Path.join(root, "rebar")},
       {"MIX_DEPS_PATH", Path.join(root, "deps")},
-      {"MIX_BUILD_PATH", Path.join(root, "build")},
       {"NETRC", Path.join(root, "netrc")}
     ]
 
@@ -367,6 +371,13 @@ defmodule Rendro.PhoenixCleanRoomProof do
 
   defp run(command, args, env, cd),
     do: System.cmd(command, args, env: env, cd: cd, stderr_to_stdout: true)
+
+  defp run_stage(stage, command, args, env, cd) do
+    case run(command, args, env, cd) do
+      {_output, 0} -> :ok
+      {output, status} -> {:error, {:command_failed, stage, status, bounded(output)}}
+    end
+  end
 
   defp run_bounded(command, args, env, cd, timeout) do
     task = Task.async(fn -> run(command, args, env, cd) end)
