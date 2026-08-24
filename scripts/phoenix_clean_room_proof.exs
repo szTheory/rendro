@@ -7,35 +7,52 @@ defmodule Rendro.PhoenixCleanRoomProof do
   @public_outer_checksum "a6048f87aa54a8467374c56bab87d25be26e8c835e8cf8f06050573f8c4a7c80"
   @public_inner_checksum "2a72bac4466e7b34e26486242d6aa22971edbd92cac2572d739441ff85615cc7"
   @bootstrap_timeout_ms 120_000
+  @loopback_attempts 240
   @forbidden ~w(MIX_HOME HEX_HOME HEX_USER_HOME REBAR_CACHE_DIR MIX_DEPS_PATH MIX_BUILD_PATH NETRC)
 
-  def main(args \\ System.argv()) do
-    with {:ok, options} <- parse_args(args),
-         {:ok, prerequisite} <- read_prerequisite(options.prerequisite),
-         :ok <- validate_prerequisite(prerequisite) do
-      run_with_cleanup(options, prerequisite)
-    else
-      {:error, reason} ->
-        emit(failure(reason), options_output(args))
-        {:error, reason}
-    end
+  def main(args \\ System.argv(), executor \\ &run_with_cleanup/2) do
+    result =
+      try do
+        with {:ok, options} <- parse_args(args),
+             {:ok, prerequisite} <- read_prerequisite(options.prerequisite),
+             :ok <- validate_prerequisite(prerequisite) do
+          executor.(options, prerequisite)
+        else
+          {:error, reason} -> failure(reason)
+        end
+      rescue
+        error -> failure({:exception, error.__struct__})
+      catch
+        kind, reason -> failure({kind, reason})
+      end
+
+    emit(result, options_output(args))
+    result
   end
 
-  defp run_with_cleanup(options, prerequisite) do
+  @doc false
+  def run_with_cleanup(
+        options,
+        prerequisite,
+        runner \\ &run_once/3,
+        cleanup \\ &cleanup_root/1
+      ) do
     with {:ok, root} <- create_root(options.root) do
       result =
         try do
-          run_once(root, options, prerequisite)
-        after
-          remove_root(root)
+          runner.(root, options, prerequisite)
+        rescue
+          error -> failure({:exception, error.__struct__})
+        catch
+          kind, reason -> failure({kind, reason})
         end
 
-      emit(result, options.output)
-      result
+      case cleanup_root(root, cleanup) do
+        :ok -> result
+        {:error, reason} -> failure({:cleanup_failed, reason})
+      end
     else
-      {:error, reason} ->
-        emit(failure(reason), options.output)
-        {:error, reason}
+      {:error, reason} -> failure(reason)
     end
   end
 
@@ -234,6 +251,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
     end
   end
 
+  defp options_output(["--" | args]), do: options_output(args)
   defp options_output(["--prerequisite", _, "--output", output | _]), do: output
   defp options_output(_), do: nil
 
@@ -510,10 +528,12 @@ defmodule Rendro.PhoenixCleanRoomProof do
   defp loopback_facts(app, env) do
     with {:ok, port} <- reserve_port(),
          :ok <- configure_loopback(app, port),
-         {:ok, server} <- start_server(app, env),
-         {:ok, facts} <- await_response(port, 20),
-         :ok <- stop_server(server) do
-      {:ok, facts}
+         {:ok, server} <- start_server(app, env) do
+      try do
+        await_response(port, @loopback_attempts)
+      after
+        stop_server(server)
+      end
     end
   end
 
@@ -591,6 +611,14 @@ defmodule Rendro.PhoenixCleanRoomProof do
     do: headers |> List.keyfind(key, 0, {key, ~c""}) |> elem(1) |> to_string()
 
   defp stop_server(server) do
+    case Port.info(server, :os_pid) do
+      {:os_pid, pid} ->
+        _ = System.cmd("kill", ["-TERM", Integer.to_string(pid)], stderr_to_stdout: true)
+
+      _ ->
+        :ok
+    end
+
     Port.close(server)
 
     receive do
@@ -604,6 +632,22 @@ defmodule Rendro.PhoenixCleanRoomProof do
     do: if(String.starts_with?(app, root), do: :ok, else: {:error, :unsafe_app_path})
 
   defp terminate_process_tree(_root), do: :ok
+
+  defp cleanup_root(root, cleanup) do
+    try do
+      cleanup.(root)
+    rescue
+      error -> {:error, {:cleanup_exception, error.__struct__}}
+    catch
+      kind, reason -> {:error, {:cleanup_exit, kind, reason}}
+    end
+  end
+
+  defp cleanup_root(root) do
+    with :ok <- terminate_process_tree(root),
+         :ok <- remove_root(root),
+         do: :ok
+  end
 
   defp remove_root(root) do
     case File.rm_rf(root) do
@@ -623,7 +667,20 @@ defmodule Rendro.PhoenixCleanRoomProof do
       })
 
   defp emit(result, nil), do: IO.puts(Jason.encode!(result))
-  defp emit(result, output), do: File.write!(output, Jason.encode!(result))
+
+  defp emit(result, output) do
+    encoded = Jason.encode!(result)
+    temporary = "#{output}.#{System.unique_integer([:positive])}.tmp"
+
+    with :ok <- File.write(temporary, encoded),
+         :ok <- File.rename(temporary, output) do
+      :ok
+    else
+      _ ->
+        File.rm(temporary)
+        IO.puts(Jason.encode!(failure(:evidence_write_failed)))
+    end
+  end
 
   defp bounded(value) when is_binary(value),
     do: value |> String.replace(~r/\/[^\s]+|\b\d{4,}\b/, "[redacted]") |> String.slice(0, 240)

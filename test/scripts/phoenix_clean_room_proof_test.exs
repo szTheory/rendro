@@ -7,24 +7,92 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
 
   @candidate "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
 
+  test "atomically emits a bounded failure when the harness exits unexpectedly" do
+    directory =
+      Path.join(
+        System.tmp_dir!(),
+        "rendro-clean-room-proof-#{System.unique_integer([:positive])}"
+      )
+
+    output = Path.join(directory, "result.json")
+    prerequisite = Path.join(directory, "prerequisite.json")
+    File.mkdir_p!(directory)
+    File.write!(prerequisite, Jason.encode!(valid_prerequisite()))
+
+    assert %{"outcome" => "failure", "next_action" => next_action} =
+             PhoenixCleanRoomProof.main(
+               [
+                 "--prerequisite",
+                 prerequisite,
+                 "--output",
+                 output,
+                 "--root",
+                 Path.join(directory, "root")
+               ],
+               fn _, _ -> exit(:injected_harness_exit) end
+             )
+
+    assert String.length(next_action) <= 240
+    assert {:ok, emitted} = File.read(output)
+    assert %{"outcome" => "failure", "next_action" => ^next_action} = Jason.decode!(emitted)
+    assert [] = Path.wildcard("#{output}.*.tmp")
+    refute emitted =~ directory
+
+    File.rm_rf!(directory)
+  end
+
+  test "uses the requested output path when Mix supplies its leading separator" do
+    directory =
+      Path.join(
+        System.tmp_dir!(),
+        "rendro-clean-room-proof-#{System.unique_integer([:positive])}"
+      )
+
+    output = Path.join(directory, "result.json")
+    prerequisite = Path.join(directory, "prerequisite.json")
+    File.mkdir_p!(directory)
+    File.write!(prerequisite, Jason.encode!(valid_prerequisite()))
+
+    assert %{"outcome" => "failure"} =
+             PhoenixCleanRoomProof.main(
+               [
+                 "--",
+                 "--prerequisite",
+                 prerequisite,
+                 "--output",
+                 output,
+                 "--root",
+                 Path.join(directory, "root")
+               ],
+               fn _, _ -> exit(:injected_harness_exit) end
+             )
+
+    assert %{"outcome" => "failure"} = output |> File.read!() |> Jason.decode!()
+    File.rm_rf!(directory)
+  end
+
+  test "cleanup failures turn an otherwise-successful run into bounded failure" do
+    root =
+      Path.join(
+        System.tmp_dir!(),
+        "rendro-clean-room-proof-#{System.unique_integer([:positive])}"
+      )
+
+    assert %{"outcome" => "failure", "next_action" => next_action} =
+             PhoenixCleanRoomProof.run_with_cleanup(
+               %{root: root, output: nil, prerequisite: "unused"},
+               %{},
+               fn _, _, _ -> %{"outcome" => "success", "next_action" => "none"} end,
+               fn _ -> exit(:injected_cleanup_exit) end
+             )
+
+    assert String.length(next_action) <= 240
+    refute next_action =~ root
+    File.rm_rf!(root)
+  end
+
   test "accepts only the exact verified public 1.3.4 combined-release prerequisite" do
-    prerequisite = %{
-      "public_prerequisite" => "VERIFIED",
-      "version" => "1.3.4",
-      "hex_version" => "1.3.4",
-      "hexdocs_version" => "1.3.4",
-      "candidate_commit_sha" => @candidate,
-      "peeled_tag_sha" => @candidate,
-      "release_name" => "Release to Hex",
-      "release_conclusion" => "success",
-      "release_publish_job_conclusion" => "success",
-      "hexdocs_provenance" => "protected_release_publish",
-      "docs_provenance_run_id" => "32763039854",
-      "v1_3_0_conclusion" => "failure",
-      "v1_3_1_conclusion" => "cancelled",
-      "v1_3_2_conclusion" => "failure",
-      "v1_3_3_conclusion" => "failure"
-    }
+    prerequisite = valid_prerequisite()
 
     assert :ok = PhoenixCleanRoomProof.validate_prerequisite(prerequisite)
 
@@ -247,5 +315,25 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
                inspector,
                version
              )
+  end
+
+  defp valid_prerequisite do
+    %{
+      "public_prerequisite" => "VERIFIED",
+      "version" => "1.3.4",
+      "hex_version" => "1.3.4",
+      "hexdocs_version" => "1.3.4",
+      "candidate_commit_sha" => @candidate,
+      "peeled_tag_sha" => @candidate,
+      "release_name" => "Release to Hex",
+      "release_conclusion" => "success",
+      "release_publish_job_conclusion" => "success",
+      "hexdocs_provenance" => "protected_release_publish",
+      "docs_provenance_run_id" => "32763039854",
+      "v1_3_0_conclusion" => "failure",
+      "v1_3_1_conclusion" => "cancelled",
+      "v1_3_2_conclusion" => "failure",
+      "v1_3_3_conclusion" => "failure"
+    }
   end
 end
