@@ -27,6 +27,19 @@ defmodule Rendro.DocsContract.PhoenixNewcomerContractTest do
     refute readme =~ "Rendro.Theme.preset(:swiss"
   end
 
+  test "clean-room evidence is explicit about the unavailable generator and retains no sensitive run state" do
+    evidence = File.read!("priv/journey_evidence/phoenix_clean_room_1.3.4.json")
+    transcript = File.read!("priv/journey_evidence/phoenix_clean_room_1.3.4.md")
+
+    assert evidence =~ "\"version\":\"1.3.4\""
+    assert evidence =~ "\"outcome\":\"failure\""
+    assert transcript =~ "mix phx.new is unavailable"
+    assert transcript =~ "advisory failure"
+
+    refute evidence =~ ~r/HEX_API_KEY|HOME|\/Users\/|\"pid\"|\"port\"|%PDF-/
+    refute transcript =~ ~r/HEX_API_KEY|HOME|\/Users\/|\bPID\b|%PDF-/
+  end
+
   defp ordered?(text, values) do
     values
     |> Enum.map(&:binary.match(text, &1))
