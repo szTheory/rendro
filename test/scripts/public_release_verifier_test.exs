@@ -176,10 +176,56 @@ defmodule Rendro.PublicReleaseVerifierTest do
 
     assert {_, 0} = run_cli(record, output, fixture)
 
-    assert %{"public_prerequisite" => "VERIFIED", "candidate_commit_sha" => @candidate} =
-             output |> File.read!() |> JSON.decode!()
+    result = output |> File.read!() |> JSON.decode!()
+
+    assert result["public_prerequisite"] == "VERIFIED"
+    assert result["candidate_commit_sha"] == @candidate
+    assert is_binary(result["tag_object_sha"]) and byte_size(result["tag_object_sha"]) == 40
+    assert result["release_validate_job_id"] == "97546095415"
+    assert result["release_publish_job_id"] == "97549444486"
+
+    assert is_binary(result["sealed_archive_sha256"]) and
+             byte_size(result["sealed_archive_sha256"]) == 64
+
+    assert result["public_archive_sha256"] == result["hex_api_checksum"]
+    assert result["public_manifest_sha256"] == result["sealed_manifest_sha256"]
+    assert result["public_metadata_sha256"] == result["sealed_metadata_sha256"]
+    assert result["hexdocs_provenance"] == "protected_release_publish"
+    assert result["docs_provenance_run_id"] == "12"
 
     assert byte_size(File.read!(output)) < 5_000
+  end
+
+  test "check-existing revalidates fresh facts without rewriting a matching bounded record" do
+    {record, fixture, output} = fixture_paths()
+    on_exit(fn -> Enum.each([record, fixture, output], &File.rm/1) end)
+    File.write!(record, "candidate_commit_sha: #{@candidate}\n")
+    File.write!(fixture, JSON.encode!(valid_facts() |> Map.merge(fixture_metadata())))
+
+    assert {_, 0} = run_cli(record, output, fixture)
+    original = File.read!(output)
+    original_mtime = File.stat!(output).mtime
+
+    assert {_, 0} = run_cli(record, output, fixture)
+    assert File.read!(output) == original
+    assert File.stat!(output).mtime == original_mtime
+  end
+
+  test "check-existing rejects a tampered bounded record and normal create refuses overwrite" do
+    {record, fixture, output} = fixture_paths()
+    on_exit(fn -> Enum.each([record, fixture, output], &File.rm/1) end)
+    File.write!(record, "candidate_commit_sha: #{@candidate}\n")
+    File.write!(fixture, JSON.encode!(valid_facts() |> Map.merge(fixture_metadata())))
+
+    assert :ok = PublicReleaseVerifier.write_verified(output, valid_facts())
+
+    assert {:error, "output must not already exist"} =
+             PublicReleaseVerifier.write_verified(output, valid_facts())
+
+    File.write!(output, "{}")
+    assert {_, status} = run_cli(record, output, fixture)
+    assert status != 0
+    assert File.read!(output) == "{}"
   end
 
   test "CLI rejects missing, duplicate, and invalid arguments without writing output" do
@@ -271,18 +317,24 @@ defmodule Rendro.PublicReleaseVerifierTest do
     Map.merge(
       %{
         "candidate_commit_sha" => @candidate,
+        "tag" => "v1.3.4",
+        "tag_object_sha" => String.duplicate("b", 40),
         "peeled_tag_sha" => @candidate,
+        "release_run_id" => "12",
         "release_head_sha" => @candidate,
         "release_conclusion" => "success",
         "release_event" => "push",
         "release_name" => "Release to Hex",
         "release_publish_job_id" => "97549444486",
         "release_publish_job_conclusion" => "success",
+        "release_validate_job_id" => "97546095415",
+        "release_validate_job_conclusion" => "success",
         "hexdocs_head_sha" => @candidate,
         "hexdocs_conclusion" => "success",
         "hexdocs_event" => "push",
         "hexdocs_name" => "Release to Hex",
         "hexdocs_provenance" => "protected_release_publish",
+        "docs_provenance_run_id" => "12",
         "version" => "1.3.4",
         "hex_version" => "1.3.4",
         "hex_api_checksum" => String.duplicate("c", 64),

@@ -36,7 +36,7 @@ defmodule Rendro.PublicReleaseVerifier do
          :ok <- validate_tag(options.tag),
          {:ok, facts} <- context.collect.(options, candidate),
          :ok <- validate(facts),
-         :ok <- write_verified(options.output, facts) do
+         :ok <- write_or_check_verified(options.output, facts) do
       :ok
     else
       {:error, message} -> {:error, message}
@@ -91,7 +91,13 @@ defmodule Rendro.PublicReleaseVerifier do
     candidate = facts["candidate_commit_sha"]
 
     with :ok <- validate_candidate(candidate),
+         :ok <-
+           valid_sha?(
+             facts["tag_object_sha"],
+             "tag object SHA must be 40 lowercase hex characters"
+           ),
          :ok <- equal?(facts["peeled_tag_sha"], candidate, "peeled tag does not match candidate"),
+         :ok <- valid_numeric?(facts["release_run_id"], "release run ID must be numeric"),
          :ok <-
            equal?(
              facts["release_head_sha"],
@@ -107,6 +113,17 @@ defmodule Rendro.PublicReleaseVerifier do
          :ok <- equal?(facts["release_event"], "push", "release workflow event is not a tag push"),
          :ok <-
            equal?(facts["release_name"], "Release to Hex", "release workflow name is incorrect"),
+         :ok <-
+           valid_numeric?(
+             facts["release_validate_job_id"],
+             "release validate job ID must be numeric"
+           ),
+         :ok <-
+           equal?(
+             facts["release_validate_job_conclusion"],
+             "success",
+             "release validate job did not conclude successfully"
+           ),
          :ok <- validate_public_archive_identity(facts),
          :ok <- validate_docs_provenance(facts, candidate),
          :ok <-
@@ -134,11 +151,35 @@ defmodule Rendro.PublicReleaseVerifier do
   def write_verified(path, facts) do
     with :ok <- validate(facts),
          :ok <- ensure_safe_output(path),
-         record <- Map.put(facts, "public_prerequisite", "VERIFIED"),
-         encoded <- JSON.encode!(bounded_record(record)),
+         encoded <- verified_record(facts),
          :ok <- atomic_write(path, encoded) do
       :ok
     end
+  end
+
+  defp write_or_check_verified(path, facts) do
+    if File.exists?(path),
+      do: check_existing_verified(path, facts),
+      else: write_verified(path, facts)
+  end
+
+  defp check_existing_verified(path, facts) do
+    with :ok <- validate(facts),
+         expected <- verified_record(facts),
+         {:ok, existing} <- File.read(path),
+         true <- existing == expected do
+      :ok
+    else
+      false -> {:error, "existing public prerequisite does not match fresh verified facts"}
+      _ -> {:error, "existing public prerequisite does not match fresh verified facts"}
+    end
+  end
+
+  defp verified_record(facts) do
+    facts
+    |> Map.put("public_prerequisite", "VERIFIED")
+    |> bounded_record()
+    |> JSON.encode!()
   end
 
   defp default_context do
@@ -178,7 +219,7 @@ defmodule Rendro.PublicReleaseVerifier do
              "fixture release run ID does not match"
            ),
          :ok <- validate_fixture_hexdocs_run(facts, options.hexdocs_run_id) do
-      {:ok, Map.drop(facts, ["tag", "release_run_id", "hexdocs_run_id"])}
+      {:ok, facts}
     else
       {:error, reason} when is_binary(reason) -> {:error, reason}
       {:error, _} -> {:error, "fixture is not valid JSON"}
@@ -187,7 +228,7 @@ defmodule Rendro.PublicReleaseVerifier do
 
   defp collect_live_facts(options, candidate) do
     with {:ok, repository} <- repository(),
-         {:ok, peeled_tag_sha} <- github_tag(repository, options.tag),
+         {:ok, tag_object} <- github_tag_object(repository, options.tag),
          {:ok, release} <- github_run(options.release_run_id),
          {:ok, hexdocs} <- docs_provenance_run(options),
          {:ok, hex} <- hex_release(options.tag),
@@ -200,7 +241,10 @@ defmodule Rendro.PublicReleaseVerifier do
          incidents,
          Map.merge(docs, %{
            "candidate_commit_sha" => candidate,
-           "peeled_tag_sha" => peeled_tag_sha,
+           "tag" => options.tag,
+           "tag_object_sha" => tag_object.object_sha,
+           "peeled_tag_sha" => tag_object.peeled_sha,
+           "release_run_id" => options.release_run_id,
            "release_head_sha" => release["headSha"],
            "release_conclusion" => release["conclusion"],
            "release_event" => release["event"],
@@ -212,6 +256,9 @@ defmodule Rendro.PublicReleaseVerifier do
            "hexdocs_provenance" => docs_provenance(options),
            "release_publish_job_id" => release_publish_job_id(release),
            "release_publish_job_conclusion" => release_publish_job_conclusion(release),
+           "release_validate_job_id" => release_validate_job_id(release),
+           "release_validate_job_conclusion" => release_validate_job_conclusion(release),
+           "docs_provenance_run_id" => docs_provenance_run_id(options),
            "version" => String.trim_leading(options.tag, "v"),
            "hex_version" => hex["version"],
            "hex_api_checksum" => hex["checksum"],
@@ -270,6 +317,9 @@ defmodule Rendro.PublicReleaseVerifier do
       do: "hexdocs_workflow_dispatch",
       else: "protected_release_publish"
   end
+
+  defp docs_provenance_run_id(options),
+    do: Map.get(options, :hexdocs_run_id, options.release_run_id)
 
   defp collect_incident_facts(repository) do
     with {:ok, v1_3_0} <- github_tag(repository, "v1.3.0"),
@@ -710,6 +760,11 @@ defmodule Rendro.PublicReleaseVerifier do
              facts["hexdocs_conclusion"],
              "success",
              "HexDocs workflow did not conclude successfully"
+           ),
+         :ok <-
+           valid_numeric?(
+             facts["docs_provenance_run_id"],
+             "docs provenance run ID must be numeric"
            ) do
       case facts["hexdocs_provenance"] do
         "protected_release_publish" ->
@@ -763,6 +818,12 @@ defmodule Rendro.PublicReleaseVerifier do
 
   defp valid_digest?(_, message), do: {:error, message}
 
+  defp valid_sha?(value, message) when is_binary(value) do
+    if Regex.match?(~r/^[0-9a-f]{40}$/, value), do: :ok, else: {:error, message}
+  end
+
+  defp valid_sha?(_, message), do: {:error, message}
+
   defp valid_numeric?(value, message) when is_binary(value) do
     if Regex.match?(~r/^\d+$/, value), do: :ok, else: {:error, message}
   end
@@ -788,6 +849,26 @@ defmodule Rendro.PublicReleaseVerifier do
   end
 
   defp release_publish_job_conclusion(_), do: nil
+
+  defp release_validate_job_id(%{"jobs" => jobs}) when is_list(jobs) do
+    jobs
+    |> Enum.find(&(&1["name"] == "validate-and-dry-run"))
+    |> case do
+      nil -> nil
+      job -> to_string(job["databaseId"] || job["id"])
+    end
+  end
+
+  defp release_validate_job_id(_), do: nil
+
+  defp release_validate_job_conclusion(%{"jobs" => jobs}) when is_list(jobs) do
+    case Enum.find(jobs, &(&1["name"] == "validate-and-dry-run")) do
+      nil -> nil
+      job -> job["conclusion"]
+    end
+  end
+
+  defp release_validate_job_conclusion(_), do: nil
 
   defp validate_v1_3_0_incident(facts) do
     with :ok <-
@@ -974,11 +1055,27 @@ defmodule Rendro.PublicReleaseVerifier do
     |> Map.take([
       "public_prerequisite",
       "candidate_commit_sha",
+      "tag",
+      "tag_object_sha",
       "peeled_tag_sha",
+      "release_run_id",
       "release_head_sha",
       "release_conclusion",
       "release_event",
       "release_name",
+      "release_validate_job_id",
+      "release_validate_job_conclusion",
+      "release_publish_job_id",
+      "release_publish_job_conclusion",
+      "sealed_archive_sha256",
+      "hex_api_checksum",
+      "public_archive_sha256",
+      "sealed_manifest_sha256",
+      "public_manifest_sha256",
+      "sealed_metadata_sha256",
+      "public_metadata_sha256",
+      "hexdocs_provenance",
+      "docs_provenance_run_id",
       "hexdocs_head_sha",
       "hexdocs_conclusion",
       "hexdocs_event",
@@ -987,7 +1084,41 @@ defmodule Rendro.PublicReleaseVerifier do
       "hex_version",
       "hexdocs_version",
       "archive_members",
-      "hexdocs_symbols"
+      "hexdocs_symbols",
+      "v1_3_0_peeled_sha",
+      "v1_3_0_run_id",
+      "v1_3_0_conclusion",
+      "v1_3_0_hex_absent",
+      "v1_3_0_hexdocs_absent",
+      "v1_3_1_tag_object_sha",
+      "v1_3_1_peeled_sha",
+      "v1_3_1_run_id",
+      "v1_3_1_conclusion",
+      "v1_3_1_publish_job_skipped",
+      "v1_3_1_hex_absent",
+      "v1_3_1_hexdocs_absent",
+      "v1_3_2_tag_object_sha",
+      "v1_3_2_peeled_sha",
+      "v1_3_2_run_id",
+      "v1_3_2_conclusion",
+      "v1_3_2_validate_job_id",
+      "v1_3_2_validate_job_conclusion",
+      "v1_3_2_publish_job_id",
+      "v1_3_2_publish_job_conclusion",
+      "v1_3_2_hex_absent",
+      "v1_3_2_hexdocs_absent",
+      "v1_3_3_tag_object_sha",
+      "v1_3_3_peeled_sha",
+      "v1_3_3_run_id",
+      "v1_3_3_conclusion",
+      "v1_3_3_validate_job_id",
+      "v1_3_3_validate_job_conclusion",
+      "v1_3_3_publish_job_id",
+      "v1_3_3_publish_job_conclusion",
+      "v1_3_3_hex_absent",
+      "v1_3_3_hexdocs_absent",
+      "v1_3_3_hexdocs_dispatch_absent",
+      "v1_3_3_verifier_absent"
     ])
   end
 
