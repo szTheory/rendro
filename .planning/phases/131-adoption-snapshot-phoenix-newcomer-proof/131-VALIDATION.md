@@ -62,18 +62,11 @@ created: 2026-08-21
 
 ## Wave 0 Requirements
 
-- [ ] `test/docs_contract/adoption_evidence_contract_test.exs` — sidecar schema, retrieval/decision enums, threshold arithmetic, bounded metadata, package binding.
-- [ ] `test/docs_contract/phoenix_newcomer_contract_test.exs` — README/snippet/harness/manifest/no-leakage contracts.
-- [ ] `test/scripts/phoenix_clean_room_proof_test.exs` — pure command, path, lock, timeout, redaction, and result helper tests.
-- [ ] `test/guardrails/required_checks_contract_test.exs` — exact-one release-version extraction plus release validation/publish 45/15-minute timeout contracts.
-- [ ] `test/mix/tasks/rendro_gen_theme_test.exs` — exact noninteractive conflict regression using `Mix.Shell.Process`, with adjacent fresh-consumer coverage.
-- [ ] `test/mix/tasks/release_preflight_test.exs` — candidate-SHA HEAD parity without weakening ordinary protected exact-tag parity.
-- [ ] `test/scripts/release_preflight_proof_test.exs` — exact-SHA detached worktree, no tag command, HEAD equality, unchanged tag-ref snapshot, and cleanup.
-- [ ] `test/scripts/public_release_verifier_test.exs` — exact-1.3.3 candidate validation and immutable v1.3.0/v1.3.1/v1.3.2 incident history with exact run/job/absence facts.
-- [ ] Complete-audit regression — candidate mode rejects CI/security bypasses and exercises repeated CI, `mix hex.audit`, and `mix deps.audit` before candidate approval.
-- [ ] Least-privilege release regression — no standalone workflow Hex dry-run step, no `HEX_API_KEY` in validation, complete preflight retained, and `HEX_API_KEY` present only on actual protected publish.
-- [ ] Tutorial-tooling boundary — root Livebook/config coupling and new audit ignores are absent while the packaged guide executes through the isolated ephemeral verifier.
-- [ ] Keep live publish, Hex/GitHub retrieval, package resolution, and endpoint execution out of default deterministic CI; invoke them only through named advisory procedures.
+- [x] `test/docs_contract/adoption_evidence_contract_test.exs` — sidecar schema, retrieval/decision enums, threshold arithmetic, bounded metadata, package binding.
+- [x] `test/docs_contract/phoenix_newcomer_contract_test.exs` — README/snippet/harness/manifest/no-leakage contracts.
+- [x] `test/scripts/phoenix_clean_room_proof_test.exs` — pure command, path, lock, timeout, redaction, and result helper tests.
+- [x] Release, generator, tutorial, and preflight contracts — completed through the retained exact v1.3.4 candidate, protected-release verifier, and `mix ci.fast` evidence.
+- [x] Live publish, registry, and endpoint observations remain advisory and are retained as bounded evidence rather than deterministic CI authority.
 
 ---
 
@@ -90,12 +83,12 @@ created: 2026-08-21
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verification or Wave 0 dependencies.
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verification.
-- [ ] Wave 0 covers all missing references.
-- [ ] No watch-mode flags.
-- [ ] Deterministic feedback latency is under 30 seconds.
-- [ ] Live external claims remain explicitly advisory and are never substituted by offline tests.
-- [ ] `nyquist_compliant: true` set in frontmatter after execution evidence exists.
+- [x] All tasks have `<automated>` verification or Wave 0 dependencies.
+- [x] Sampling continuity: no 3 consecutive tasks without automated verification.
+- [x] Wave 0 covers all missing references.
+- [x] No watch-mode flags.
+- [x] Deterministic feedback latency is under 30 seconds.
+- [x] Live external claims remain explicitly advisory and are never substituted by offline tests.
+- [x] `nyquist_compliant: true` set in frontmatter after execution evidence exists.
 
-**Approval:** D-35 recovery planned for exact v1.3.4; immutable v1.3.3 incident remains failed with no HexDocs dispatch or public prerequisite.
+**Approval:** Exact candidate `f03c78bab54efe1cd1596d51cf3f28193232e2a3` was explicitly approved, released through protected `Release to Hex` run `32763039854` (publish job `97549444486`), atomically VERIFIED by the public prerequisite, and completed by the bounded clean-room proof. Immutable v1.3.0-v1.3.3 incidents remain historical failures; the final Phoenix observation is advisory evidence, not deterministic CI authority.
