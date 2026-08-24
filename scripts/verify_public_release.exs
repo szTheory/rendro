@@ -469,11 +469,10 @@ defmodule Rendro.PublicReleaseVerifier do
   defp normalized_metadata_sha256(outer) do
     case List.keyfind(outer, ~c"metadata.config", 0) do
       {_, metadata} ->
-        metadata
-        |> metadata_terms()
-        |> normalize_metadata()
-        |> :erlang.term_to_binary()
-        |> sha256()
+        case canonical_metadata_sha256(metadata) do
+          {:ok, digest} -> digest
+          {:error, _} -> ""
+        end
 
       _ ->
         ""
@@ -482,30 +481,59 @@ defmodule Rendro.PublicReleaseVerifier do
     _ -> ""
   end
 
-  defp metadata_terms(metadata) do
-    {:ok, tokens, _} = :erl_scan.string(String.to_charlist(metadata))
-
-    tokens
-    |> Enum.reduce({[], []}, fn token, {current, terms} ->
-      if elem(token, 0) == :dot do
-        {[], [current |> Enum.reverse() |> then(&:erl_parse.parse_term/1) | terms]}
-      else
-        {[token | current], terms}
-      end
-    end)
-    |> elem(1)
-    |> Enum.reverse()
-    |> Enum.map(fn {:ok, term} -> term end)
-    |> Map.new()
+  @doc false
+  def canonical_metadata_sha256(metadata) when is_binary(metadata) do
+    with {:ok, terms} <- metadata_terms(metadata) do
+      {:ok, terms |> normalize_metadata() |> :erlang.term_to_binary() |> sha256()}
+    end
+  rescue
+    _ -> {:error, "Hex metadata.config is malformed"}
   end
 
-  defp normalize_metadata(value) when is_map(value),
-    do: value |> Map.new(fn {key, item} -> {key, normalize_metadata(item)} end)
+  def canonical_metadata_sha256(_), do: {:error, "Hex metadata.config is malformed"}
 
-  defp normalize_metadata(value) when is_list(value),
-    do: value |> Enum.map(&normalize_metadata/1) |> Enum.sort()
+  defp metadata_terms(metadata) do
+    with {:ok, tokens, _} <- :erl_scan.string(String.to_charlist(metadata)),
+         {:ok, terms} <- parse_metadata_terms(tokens) do
+      {:ok, Map.new(terms)}
+    else
+      _ -> {:error, "Hex metadata.config is malformed"}
+    end
+  end
 
-  defp normalize_metadata(value), do: value
+  defp parse_metadata_terms(tokens) do
+    tokens
+    |> Enum.reduce_while({[], []}, fn token, {current, terms} ->
+      if elem(token, 0) == :dot do
+        case :erl_parse.parse_term(Enum.reverse([token | current])) do
+          {:ok, term} -> {:cont, {[], [term | terms]}}
+          _ -> {:halt, :error}
+        end
+      else
+        {:cont, {[token | current], terms}}
+      end
+    end)
+    |> case do
+      :error -> {:error, "Hex metadata.config is malformed"}
+      {[], terms} -> {:ok, Enum.reverse(terms)}
+      _ -> {:error, "Hex metadata.config is malformed"}
+    end
+  end
+
+  defp normalize_metadata(value) when is_map(value) do
+    Map.new(value, fn {key, item} ->
+      {key, normalize_metadata(item, key == <<"files">>)}
+    end)
+  end
+
+  defp normalize_metadata(value), do: normalize_metadata(value, false)
+
+  defp normalize_metadata(value, sort?) when is_list(value) do
+    normalized = Enum.map(value, &normalize_metadata/1)
+    if sort?, do: Enum.sort(normalized), else: normalized
+  end
+
+  defp normalize_metadata(value, _sort?), do: value
 
   defp tar_entries(binary), do: tar_entries(binary, [])
 

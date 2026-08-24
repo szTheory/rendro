@@ -98,6 +98,29 @@ defmodule Rendro.PublicReleaseVerifierTest do
              )
   end
 
+  test "canonical metadata ignores only Hex files ordering" do
+    ordered = realistic_metadata(["lib/rendro.ex", "README.md"])
+    reordered_files = realistic_metadata(["README.md", "lib/rendro.ex"])
+
+    changed_license_order =
+      realistic_metadata(["lib/rendro.ex", "README.md"], ["Apache-2.0", "MIT"])
+
+    assert {:ok, ordered_digest} = PublicReleaseVerifier.canonical_metadata_sha256(ordered)
+
+    assert {:ok, ^ordered_digest} =
+             PublicReleaseVerifier.canonical_metadata_sha256(reordered_files)
+
+    assert {:ok, changed_license_digest} =
+             PublicReleaseVerifier.canonical_metadata_sha256(changed_license_order)
+
+    refute ordered_digest == changed_license_digest
+  end
+
+  test "canonical metadata rejects malformed Hex metadata.config bytes" do
+    assert {:error, "Hex metadata.config is malformed"} =
+             PublicReleaseVerifier.canonical_metadata_sha256("{<<\"files\">>,[<<\"lib\">>]}")
+  end
+
   test "refuses candidate verification unless all immutable failed incidents remain exact" do
     assert {:error, "v1.3.0 incident peeled SHA is incorrect"} =
              PublicReleaseVerifier.validate(valid_facts(%{"v1_3_0_peeled_sha" => "different"}))
@@ -290,5 +313,17 @@ defmodule Rendro.PublicReleaseVerifierTest do
       },
       overrides
     )
+  end
+
+  defp realistic_metadata(files, licenses \\ ["MIT"]) do
+    files = files |> Enum.map_join(",", &"<<\"#{&1}\">>")
+    licenses = licenses |> Enum.map_join(",", &"<<\"#{&1}\">>")
+
+    """
+    {<<"links">>,[{<<"GitHub">>,<<"https://github.com/szTheory/rendro">>}]}.
+    {<<"name">>,<<"rendro">>}.
+    {<<"licenses">>,[#{licenses}]}.
+    {<<"files">>,[#{files}]}.
+    """
   end
 end
