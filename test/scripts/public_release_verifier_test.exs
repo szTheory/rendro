@@ -118,7 +118,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
 
   test "canonical metadata rejects malformed Hex metadata.config bytes" do
     assert {:error, "Hex metadata.config is malformed"} =
-             PublicReleaseVerifier.canonical_metadata_sha256("{<<\"files\">>,[<<\"lib\">>]}")
+             PublicReleaseVerifier.canonical_metadata_sha256(~s({<<"files">>,[<<"lib">>]}))
   end
 
   test "HexDocs probes use public guide and tag-pinned source links" do

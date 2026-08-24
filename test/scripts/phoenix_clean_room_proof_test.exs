@@ -375,7 +375,7 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
         otp: "28",
         root: "/tmp/rendro-clean-room-secret",
         pid: 1234,
-        port: 40123,
+        port: 40_123,
         response_body: "%PDF-secret",
         hex_api_key: "secret",
         commands: ["loopback HTTP probe \"/tmp/rendro-clean-room-secret\""],
