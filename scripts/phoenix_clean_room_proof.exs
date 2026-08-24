@@ -5,7 +5,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
   @candidate "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
   @phx_new_version "1.8.5"
   @bootstrap_timeout_ms 120_000
-  @forbidden ~w(HOME MIX_HOME HEX_HOME HEX_USER_HOME REBAR_CACHE_DIR MIX_DEPS_PATH MIX_BUILD_PATH)
+  @forbidden ~w(MIX_HOME HEX_HOME HEX_USER_HOME REBAR_CACHE_DIR MIX_DEPS_PATH MIX_BUILD_PATH NETRC)
 
   def main(args \\ System.argv()) do
     with {:ok, options} <- parse_args(args),
@@ -345,7 +345,8 @@ defmodule Rendro.PhoenixCleanRoomProof do
       {"HEX_USER_HOME", Path.join(root, "hex-user")},
       {"REBAR_CACHE_DIR", Path.join(root, "rebar")},
       {"MIX_DEPS_PATH", Path.join(root, "deps")},
-      {"MIX_BUILD_PATH", Path.join(root, "build")}
+      {"MIX_BUILD_PATH", Path.join(root, "build")},
+      {"NETRC", Path.join(root, "netrc")}
     ]
 
     @forbidden

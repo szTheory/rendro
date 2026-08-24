@@ -143,8 +143,9 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
 
     runner = fn "mix", args, env, ^root, _timeout ->
       assert args == ["archive.install", "hex", "phx_new", "1.8.5", "--force"]
-      assert {"HOME", nil} in env
+      refute Enum.any?(env, fn {key, _} -> key == "HOME" end)
       assert {"MIX_HOME", Path.join(root, "mix")} in env
+      assert {"NETRC", Path.join(root, "netrc")} in env
       {"* creating phx_new 1.8.5", 0}
     end
 
