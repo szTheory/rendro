@@ -91,6 +91,35 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
     File.rm_rf!(root)
   end
 
+  test "a successful evidence record is marked removed only after cleanup succeeds" do
+    root =
+      Path.join(
+        System.tmp_dir!(),
+        "rendro-clean-room-proof-#{System.unique_integer([:positive])}"
+      )
+
+    parent = self()
+
+    assert %{"outcome" => "success", "cleanup" => "removed"} =
+             PhoenixCleanRoomProof.run_with_cleanup(
+               %{root: root, output: nil, prerequisite: "unused"},
+               %{},
+               fn _, _, _ ->
+                 send(parent, :runner_finished)
+                 %{"outcome" => "success", "cleanup" => "pending", "next_action" => "none"}
+               end,
+               fn cleanup_root ->
+                 assert_received :runner_finished
+                 File.rm_rf!(cleanup_root)
+                 send(parent, :cleanup_finished)
+                 :ok
+               end
+             )
+
+    assert_received :cleanup_finished
+    refute File.exists?(root)
+  end
+
   test "loopback retries delayed readiness and records only response facts" do
     server = make_ref()
     calls = :counters.new(1, [])
@@ -349,6 +378,7 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
         port: 40123,
         response_body: "%PDF-secret",
         hex_api_key: "secret",
+        commands: ["loopback HTTP probe \"/tmp/rendro-clean-room-secret\""],
         conn_case: %{
           status: 200,
           content_type: "application/pdf",
@@ -371,6 +401,69 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
     refute Map.has_key?(projected, "pid")
     refute Map.has_key?(projected, "port")
     refute Map.has_key?(projected, "response_body")
+    refute inspect(projected) =~ "/tmp/"
+    refute inspect(projected) =~ "secret"
+  end
+
+  test "projects the complete advisory identity schema without corrupting safe MIME values" do
+    projected =
+      PhoenixCleanRoomProof.project_evidence(%{
+        schema_version: 1,
+        lane: "advisory_external_evidence",
+        advisory: true,
+        version: "1.3.4",
+        candidate_sha: @candidate,
+        prerequisite_sha: String.duplicate("a", 64),
+        phoenix: "1.8.5",
+        plug: "1.18.1",
+        bandit: "1.7.0",
+        lock_sha256: String.duplicate("b", 64),
+        commands: ["mix archive.install hex phx_new 1.8.5 --force", "loopback HTTP probe"],
+        conn_case: %{content_type: "application/pdf", filename: "invoice.pdf", status: 200},
+        loopback: %{content_type: "application/pdf", filename: "invoice.pdf", status: 200},
+        cleanup: "removed"
+      })
+
+    for key <-
+          ~w(schema_version lane advisory version candidate_sha prerequisite_sha phoenix plug bandit lock_sha256 commands conn_case loopback cleanup) do
+      assert Map.has_key?(projected, key)
+    end
+
+    assert projected["conn_case"]["content_type"] == "application/pdf"
+    assert projected["loopback"]["content_type"] == "application/pdf"
+    assert projected["candidate_sha"] == @candidate
+    assert projected["prerequisite_sha"] == String.duplicate("a", 64)
+    assert projected["lock_sha256"] == String.duplicate("b", 64)
+  end
+
+  test "extracts only resolver-selected Phoenix, Plug, and Bandit versions from atom-key locks" do
+    lock = %{
+      phoenix: {:hex, :phoenix, "1.8.5", "checksum", [:mix], [], "hexpm", "outer"},
+      plug: {:hex, :plug, "1.18.1", "checksum", [:mix], [], "hexpm", "outer"},
+      bandit: {:hex, :bandit, "1.7.0", "checksum", [:mix], [], "hexpm", "outer"},
+      private: {:git, "https://example.test/private", "sha", []}
+    }
+
+    assert {:ok, %{phoenix: "1.8.5", plug: "1.18.1", bandit: "1.7.0"}} =
+             PhoenixCleanRoomProof.resolved_versions(lock)
+
+    assert {:error, :missing_resolved_dependency} = PhoenixCleanRoomProof.resolved_versions(%{})
+  end
+
+  test "success evidence records only the bounded command allowlist" do
+    source = File.read!(Path.expand("../../scripts/phoenix_clean_room_proof.exs", __DIR__))
+
+    for command <- [
+          "mix archive.install hex phx_new 1.8.5 --force",
+          "mix phx.new --no-install --no-ecto --no-html --no-assets --no-mailer",
+          "mix deps.get",
+          "mix test",
+          "mix compile",
+          "loopback endpoint start",
+          "loopback HTTP probe"
+        ] do
+      assert source =~ ~s("#{command}")
+    end
   end
 
   test "generated source keeps the document app-owned, the controller thin, and ConnCase before loopback" do

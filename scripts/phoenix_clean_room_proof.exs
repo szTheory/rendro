@@ -49,7 +49,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
         end
 
       case cleanup_root(root, cleanup) do
-        :ok -> result
+        :ok -> mark_cleanup_removed(result)
         {:error, reason} -> failure({:cleanup_failed, reason})
       end
     else
@@ -121,6 +121,12 @@ defmodule Rendro.PhoenixCleanRoomProof do
   def project_evidence(facts) when is_map(facts) do
     facts
     |> Map.take([
+      :schema_version,
+      :lane,
+      :advisory,
+      :version,
+      :candidate_sha,
+      :prerequisite_sha,
       :elixir,
       :otp,
       :phoenix,
@@ -139,6 +145,26 @@ defmodule Rendro.PhoenixCleanRoomProof do
       :next_action
     ])
     |> Enum.into(%{}, fn {key, value} -> {Atom.to_string(key), redact(value)} end)
+  end
+
+  @doc false
+  def resolved_versions(lock) when is_map(lock) do
+    with {:ok, phoenix} <- hex_lock_version(lock, :phoenix),
+         {:ok, plug} <- hex_lock_version(lock, :plug),
+         {:ok, bandit} <- hex_lock_version(lock, :bandit) do
+      {:ok, %{phoenix: phoenix, plug: plug, bandit: bandit}}
+    end
+  end
+
+  defp hex_lock_version(lock, dependency) do
+    case Map.get(lock, dependency) do
+      {:hex, ^dependency, version, _checksum, _managers, _dependencies, "hexpm", _outer}
+      when is_binary(version) ->
+        {:ok, version}
+
+      _ ->
+        {:error, :missing_resolved_dependency}
+    end
   end
 
   def templates do
@@ -293,7 +319,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
     end
   end
 
-  defp run_once(root, _options, prerequisite) do
+  defp run_once(root, options, prerequisite) do
     env = isolated_env(root)
     app = Path.join(root, "clean_room")
 
@@ -323,13 +349,9 @@ defmodule Rendro.PhoenixCleanRoomProof do
            :ok <- write_consumer(app),
            :ok <- audit_dependency_source!(File.read!(Path.join(app, "mix.exs")) |> rendro_dep()),
            :ok <- run_stage(:deps_get, "mix", ["deps.get"], env, app),
-           :ok <-
-             audit_lock!(
-               Path.join(app, "mix.lock")
-               |> File.read!()
-               |> Code.eval_string()
-               |> elem(0)
-             ),
+           {:ok, lock} <- read_lock(app),
+           :ok <- audit_lock!(lock),
+           {:ok, resolved} <- resolved_versions(lock),
            :ok <-
              run_stage(
                :generated_consumer_test,
@@ -345,24 +367,36 @@ defmodule Rendro.PhoenixCleanRoomProof do
            {:ok, loopback} <- loopback_facts(app, env, loopback_port),
            :ok <- assert_cleanup_candidate(root, app) do
         project_evidence(%{
+          schema_version: 1,
+          lane: "advisory_external_evidence",
+          advisory: true,
+          version: @version,
+          candidate_sha: prerequisite["candidate_commit_sha"],
+          prerequisite_sha: sha256(options.prerequisite),
           elixir: System.version(),
           otp: System.otp_release(),
+          phoenix: resolved.phoenix,
+          plug: resolved.plug,
+          bandit: resolved.bandit,
           hex: command_version("mix", ["hex.info"], env, app),
           phx_new: command_version("mix", ["phx.new", "--version"], env, root),
           phx_new_source: "isolated_mix_archive_phx_new_#{@phx_new_version}",
           commands: [
+            "mix archive.install hex phx_new 1.8.5 --force",
             "mix phx.new --no-install --no-ecto --no-html --no-assets --no-mailer",
             "mix deps.get",
-            "mix test"
+            "mix test",
+            "mix compile",
+            "loopback endpoint start",
+            "loopback HTTP probe"
           ],
           lock_sha256: sha256(Path.join(app, "mix.lock")),
           source_audits: "public_hex_exact_1.3.4",
           conn_case: response_facts(),
           loopback: loopback,
-          cleanup: "removed_after_projection",
+          cleanup: "pending",
           outcome: "success",
-          next_action: "none",
-          candidate_sha: prerequisite["candidate_commit_sha"]
+          next_action: "none"
         })
       else
         {:error, reason} ->
@@ -393,6 +427,15 @@ defmodule Rendro.PhoenixCleanRoomProof do
 
   defp run(command, args, env, cd),
     do: System.cmd(command, args, env: env, cd: cd, stderr_to_stdout: true)
+
+  defp read_lock(app) do
+    try do
+      lock = app |> Path.join("mix.lock") |> File.read!() |> Code.eval_string() |> elem(0)
+      {:ok, lock}
+    rescue
+      _ -> {:error, :invalid_lockfile}
+    end
+  end
 
   defp run_stage(stage, command, args, env, cd) do
     case run(command, args, env, cd) do
@@ -785,6 +828,11 @@ defmodule Rendro.PhoenixCleanRoomProof do
         cleanup: "attempted"
       })
 
+  defp mark_cleanup_removed(%{"outcome" => "success"} = result),
+    do: Map.put(result, "cleanup", "removed")
+
+  defp mark_cleanup_removed(result), do: result
+
   defp emit(result, nil), do: IO.puts(Jason.encode!(result))
 
   defp emit(result, output) do
@@ -802,7 +850,11 @@ defmodule Rendro.PhoenixCleanRoomProof do
   end
 
   defp bounded(value) when is_binary(value),
-    do: value |> String.replace(~r/\/[^\s]+|\b\d{4,}\b/, "[redacted]") |> String.slice(0, 240)
+    do:
+      value
+      |> String.replace(~r{(^|[^[:alnum:]_])/(?:[^\s]+)}, "\\1[redacted]")
+      |> String.replace(~r/\b\d{4,}\b/, "[redacted]")
+      |> String.slice(0, 240)
 
   defp redact(value) when is_map(value),
     do: Map.new(value, fn {k, v} -> {to_string(k), redact(v)} end)
