@@ -58,12 +58,23 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
 
     assert :ok =
              PhoenixCleanRoomProof.audit_lock!(%{
-               "rendro" => {:hex, :rendro, "1.3.4", "checksum", [], "hexpm", "checksum"}
+               "rendro" =>
+                 {:hex, :rendro, "1.3.4", String.duplicate("a", 64), [:mix], [], "hexpm",
+                  "a6048f87aa54a8467374c56bab87d25be26e8c835e8cf8f06050573f8c4a7c80"}
              })
 
     assert {:error, _} =
              PhoenixCleanRoomProof.audit_lock!(%{
-               "rendro" => {:hex, :rendro, "1.3.3", "checksum", [], "hexpm", "checksum"}
+               "rendro" =>
+                 {:hex, :rendro, "1.3.3", String.duplicate("a", 64), [:mix], [], "hexpm",
+                  String.duplicate("b", 64)}
+             })
+
+    assert {:error, :invalid_rendro_lock} =
+             PhoenixCleanRoomProof.audit_lock!(%{
+               "rendro" =>
+                 {:hex, :rendro, "1.3.4", String.duplicate("a", 64), [:mix], "hexpm",
+                  String.duplicate("b", 64)}
              })
 
     assert {:error, _} =

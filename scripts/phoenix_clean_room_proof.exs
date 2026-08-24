@@ -4,6 +4,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
   @version "1.3.4"
   @candidate "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
   @phx_new_version "1.8.5"
+  @public_outer_checksum "a6048f87aa54a8467374c56bab87d25be26e8c835e8cf8f06050573f8c4a7c80"
   @bootstrap_timeout_ms 120_000
   @forbidden ~w(MIX_HOME HEX_HOME HEX_USER_HOME REBAR_CACHE_DIR MIX_DEPS_PATH MIX_BUILD_PATH NETRC)
 
@@ -77,9 +78,15 @@ defmodule Rendro.PhoenixCleanRoomProof do
   end
 
   def audit_lock!(%{
-        "rendro" => {:hex, :rendro, @version, _checksum, _managers, "hexpm", _outer}
-      }),
-      do: :ok
+        "rendro" =>
+          {:hex, :rendro, @version, inner, managers, dependencies, "hexpm",
+           @public_outer_checksum}
+      })
+      when is_list(managers) and is_list(dependencies) do
+    if :mix in managers and Regex.match?(~r/^[0-9a-f]{64}$/, inner),
+      do: :ok,
+      else: {:error, :invalid_rendro_lock}
+  end
 
   def audit_lock!(_), do: {:error, :invalid_rendro_lock}
 
