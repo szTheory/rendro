@@ -19,14 +19,6 @@ expected isolated `phx_new-1.8.5` path. No consumer app, dependency cache,
 build, lockfile, server process, PDF, or response body was retained. Therefore
 no public Hex source audit, ConnCase response, or loopback response is claimed.
 
-The second failure is also retained byte-for-byte as
-`phoenix_clean_room_1.3.4_second_failed_attempt.{json,md}` (JSON SHA-256
-`e36e6671dfe69a3c783bc4ce069708b650e089e8d27f1fc5f4d0b4666f2a5b51`,
-transcript SHA-256
-`1d008406a451b23ff99462dcc5da2888dee49954c8dc1927b322d4198efe6a6c`).
-
-After the `.ez` audit repair, one new fresh-root attempt again failed closed
-with `phx_new_source_missing` before any Phoenix consumer was generated. No
-retry was performed. Investigate that isolated archive inspection before
-authorizing another attempt. Until one succeeds, this record is an advisory
-failure and JOURNEY/Nyquist remain red.
+No retry was performed. Correct the bootstrap archive-layout audit, then run
+one new approved advisory attempt from a fresh empty isolated root. Until that
+succeeds, this record is an advisory failure and JOURNEY/Nyquist remain red.
