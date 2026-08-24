@@ -264,11 +264,18 @@ defmodule Rendro.PublicReleaseVerifier do
   defp github_run(id),
     do: github_json(["run", "view", id, "--json", "conclusion,event,headSha,name,jobs"])
 
-  defp docs_provenance_run(%{hexdocs_run_id: nil, release_run_id: id}), do: github_run(id)
-  defp docs_provenance_run(%{hexdocs_run_id: id}), do: github_run(id)
+  defp docs_provenance_run(options) do
+    case Map.get(options, :hexdocs_run_id) do
+      nil -> github_run(options.release_run_id)
+      id -> github_run(id)
+    end
+  end
 
-  defp docs_provenance(%{hexdocs_run_id: nil}), do: "protected_release_publish"
-  defp docs_provenance(_), do: "hexdocs_workflow_dispatch"
+  defp docs_provenance(options) do
+    if Map.get(options, :hexdocs_run_id),
+      do: "hexdocs_workflow_dispatch",
+      else: "protected_release_publish"
+  end
 
   defp collect_incident_facts(repository) do
     with {:ok, v1_3_0} <- github_tag(repository, "v1.3.0"),

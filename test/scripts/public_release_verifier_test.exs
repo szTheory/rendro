@@ -67,6 +67,23 @@ defmodule Rendro.PublicReleaseVerifierTest do
     assert :ok = PublicReleaseVerifier.validate(facts)
   end
 
+  test "does not require a redundant HexDocs run ID for combined protected release provenance" do
+    assert {:ok, options} =
+             PublicReleaseVerifier.parse_args([
+               "--candidate-record",
+               "candidate.md",
+               "--tag",
+               "v1.3.4",
+               "--release-run-id",
+               "32763039854",
+               "--output",
+               "public.json",
+               "--check-existing"
+             ])
+
+    refute Map.has_key?(options, :hexdocs_run_id)
+  end
+
   test "rejects an archive whose download digest differs from the Hex API checksum" do
     assert {:error, "public archive SHA-256 does not match Hex API checksum"} =
              PublicReleaseVerifier.validate(
