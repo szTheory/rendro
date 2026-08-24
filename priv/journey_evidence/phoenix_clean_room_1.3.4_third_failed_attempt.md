@@ -30,14 +30,3 @@ with `phx_new_source_missing` before any Phoenix consumer was generated. No
 retry was performed. Investigate that isolated archive inspection before
 authorizing another attempt. Until one succeeds, this record is an advisory
 failure and JOURNEY/Nyquist remain red.
-
-The third failure is retained byte-for-byte as
-`phoenix_clean_room_1.3.4_third_failed_attempt.{json,md}` (JSON SHA-256
-`e299610dd0d66d660f8148d6bdd0fbf92df5ebb60bdc55fae2764d523c638658`,
-transcript SHA-256
-`f53c270e07c9402409ea486888b0cf0bb9cfd49612b6b98670cfd8ac48120f26`).
-
-After the expanded-archive repair, one new fresh-root attempt again failed
-closed with `phx_new_source_missing` before any Phoenix consumer was generated.
-No retry was performed. Diagnose the isolated expanded archive inspection
-before authorizing another attempt. JOURNEY/Nyquist remain red.
