@@ -53,14 +53,3 @@ bootstrap and dependency resolution, then failed closed at the exact public
 Rendro lock audit with `invalid_rendro_lock`. No ConnCase or loopback response
 is claimed. No retry was performed; diagnose that lock tuple before authorizing
 another attempt. JOURNEY/Nyquist remain red.
-
-The fifth failure is retained byte-for-byte as
-`phoenix_clean_room_1.3.4_fifth_failed_attempt.{json,md}` (JSON SHA-256
-`d6f7c0935eb04c9dedbd26813c72832b2c5a3a85768c4e0a19d185b511d3374b`,
-transcript SHA-256
-`2f80cabc688c9393ba3c4eec1d91fa8da29ad8964d858f9ec2183fe170d46427`).
-
-After the current lock-identity repair, one new fresh-root attempt again failed
-closed at `invalid_rendro_lock` after dependency resolution. No ConnCase or
-loopback response is claimed and no retry was performed. JOURNEY/Nyquist remain
-red until the observed lock tuple is diagnosed.

@@ -56,6 +56,12 @@ defmodule Rendro.DocsContract.PhoenixNewcomerContractTest do
 
     assert File.exists?("priv/journey_evidence/phoenix_clean_room_1.3.4_fourth_failed_attempt.md")
 
+    assert File.exists?(
+             "priv/journey_evidence/phoenix_clean_room_1.3.4_fifth_failed_attempt.json"
+           )
+
+    assert File.exists?("priv/journey_evidence/phoenix_clean_room_1.3.4_fifth_failed_attempt.md")
+
     refute evidence =~ ~r/HEX_API_KEY|HOME|\/Users\/|\"pid\"|\"port\"|%PDF-/
     refute transcript =~ ~r/HEX_API_KEY|HOME|\/Users\/|\bPID\b|%PDF-/
   end
