@@ -41,15 +41,3 @@ After the expanded-archive repair, one new fresh-root attempt again failed
 closed with `phx_new_source_missing` before any Phoenix consumer was generated.
 No retry was performed. Diagnose the isolated expanded archive inspection
 before authorizing another attempt. JOURNEY/Nyquist remain red.
-
-The fourth failure is retained byte-for-byte as
-`phoenix_clean_room_1.3.4_fourth_failed_attempt.{json,md}` (JSON SHA-256
-`efc0d3303a946b20dfe60832b368a2b643cfad80b768a5517b261c54a0c1bba1`,
-transcript SHA-256
-`4b46c1e8660cba574ed55f191bc2810632499d34386399ea2700adde2b9969b6`).
-
-After the isolated bootstrap repair, one new fresh-root attempt passed generator
-bootstrap and dependency resolution, then failed closed at the exact public
-Rendro lock audit with `invalid_rendro_lock`. No ConnCase or loopback response
-is claimed. No retry was performed; diagnose that lock tuple before authorizing
-another attempt. JOURNEY/Nyquist remain red.
