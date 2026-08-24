@@ -3,6 +3,8 @@ defmodule Rendro.PhoenixCleanRoomProof do
 
   @version "1.3.4"
   @candidate "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
+  @phx_new_version "1.8.5"
+  @bootstrap_timeout_ms 120_000
   @forbidden ~w(HOME MIX_HOME HEX_HOME HEX_USER_HOME REBAR_CACHE_DIR MIX_DEPS_PATH MIX_BUILD_PATH)
 
   def main(args \\ System.argv()) do
@@ -100,6 +102,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
       :bandit,
       :hex,
       :phx_new,
+      :phx_new_source,
       :commands,
       :lock_sha256,
       :source_audits,
@@ -163,6 +166,39 @@ defmodule Rendro.PhoenixCleanRoomProof do
       end
       """
     }
+  end
+
+  @doc false
+  def bootstrap_phx_new(
+        root,
+        runner \\ &run_bounded/5,
+        inspector \\ &archive_sources/1,
+        version_runner \\ &run_bounded/5
+      ) do
+    env = isolated_env(root)
+
+    with {_, 0} <-
+           runner.(
+             "mix",
+             ["archive", "install", "hex", "phx_new", @phx_new_version, "--force"],
+             env,
+             root,
+             @bootstrap_timeout_ms
+           ),
+         {:ok, sources} <- inspector.(root),
+         :ok <- verify_archive_sources(sources, root),
+         {version, 0} <-
+           version_runner.("mix", ["phx.new", "--version"], env, root, @bootstrap_timeout_ms),
+         true <- String.contains?(version, "#{@phx_new_version}") do
+      :ok
+    else
+      :timeout -> {:error, :phx_new_install_timeout}
+      {_, 1} -> {:error, :phx_new_install_failed}
+      {_, status} when is_integer(status) -> {:error, :phx_new_install_failed}
+      {:error, _} = error -> error
+      false -> {:error, :phx_new_wrong_version}
+      _ -> {:error, :phx_new_install_failed}
+    end
   end
 
   defp parse_args(args) do
@@ -236,6 +272,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
 
     try do
       with :ok <- assert_empty_root(root),
+           :ok <- bootstrap_phx_new(root),
            {_, 0} <-
              run(
                "mix",
@@ -274,6 +311,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
           otp: System.otp_release(),
           hex: command_version("mix", ["hex.info"], env, app),
           phx_new: command_version("mix", ["phx.new", "--version"], env, root),
+          phx_new_source: "isolated_mix_archive_phx_new_#{@phx_new_version}",
           commands: [
             "mix phx.new --no-install --no-ecto --no-html --no-assets --no-mailer",
             "mix deps.get",
@@ -315,6 +353,32 @@ defmodule Rendro.PhoenixCleanRoomProof do
 
   defp run(command, args, env, cd),
     do: System.cmd(command, args, env: env, cd: cd, stderr_to_stdout: true)
+
+  defp run_bounded(command, args, env, cd, timeout) do
+    task = Task.async(fn -> run(command, args, env, cd) end)
+
+    case Task.yield(task, timeout) || Task.shutdown(task, :brutal_kill) do
+      {:ok, result} -> result
+      nil -> :timeout
+    end
+  end
+
+  defp archive_sources(root) do
+    archive_root = Path.join(root, "mix/archives")
+
+    case File.ls(archive_root) do
+      {:ok, entries} -> {:ok, Enum.map(entries, &Path.join(archive_root, &1))}
+      _ -> {:error, :phx_new_source_missing}
+    end
+  end
+
+  defp verify_archive_sources(sources, root) when is_list(sources) do
+    expected = Path.join(root, "mix/archives/phx_new-#{@phx_new_version}")
+
+    if Enum.member?(sources, expected) and Enum.all?(sources, &String.starts_with?(&1, root)),
+      do: :ok,
+      else: {:error, :phx_new_source_leakage}
+  end
 
   defp command_version(command, args, env, cd),
     do: run(command, args, env, cd) |> elem(0) |> bounded()

@@ -137,4 +137,61 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
     refute patched =~ "path:"
     refute patched =~ "git:"
   end
+
+  test "bootstraps only the exact phx_new archive inside the disposable root" do
+    root = "/isolated/clean-room"
+
+    runner = fn "mix", args, env, ^root, _timeout ->
+      assert args == ["archive", "install", "hex", "phx_new", "1.8.5", "--force"]
+      assert {"HOME", nil} in env
+      assert {"MIX_HOME", Path.join(root, "mix")} in env
+      {"* creating phx_new 1.8.5", 0}
+    end
+
+    inspector = fn ^root -> {:ok, [Path.join(root, "mix/archives/phx_new-1.8.5")]} end
+
+    version = fn "mix", ["phx.new", "--version"], _env, ^root, _timeout ->
+      {"Phoenix v1.8.5", 0}
+    end
+
+    assert :ok = PhoenixCleanRoomProof.bootstrap_phx_new(root, runner, inspector, version)
+  end
+
+  test "rejects failed, wrong-version, host-sourced, and timed-out phx_new bootstrap" do
+    root = "/isolated/clean-room"
+    inspector = fn _ -> {:ok, [Path.join(root, "mix/archives/phx_new-1.8.5")]} end
+    version = fn _, _, _, _, _ -> {"Phoenix v1.8.5", 0} end
+
+    assert {:error, :phx_new_install_failed} =
+             PhoenixCleanRoomProof.bootstrap_phx_new(
+               root,
+               fn _, _, _, _, _ -> {"failed", 1} end,
+               inspector,
+               version
+             )
+
+    assert {:error, :phx_new_wrong_version} =
+             PhoenixCleanRoomProof.bootstrap_phx_new(
+               root,
+               fn _, _, _, _, _ -> {"ok", 0} end,
+               inspector,
+               fn _, _, _, _, _ -> {"Phoenix v1.8.4", 0} end
+             )
+
+    assert {:error, :phx_new_source_leakage} =
+             PhoenixCleanRoomProof.bootstrap_phx_new(
+               root,
+               fn _, _, _, _, _ -> {"ok", 0} end,
+               fn _ -> {:ok, ["/Users/me/.mix/archives/phx_new-1.8.5"]} end,
+               version
+             )
+
+    assert {:error, :phx_new_install_timeout} =
+             PhoenixCleanRoomProof.bootstrap_phx_new(
+               root,
+               fn _, _, _, _, _ -> :timeout end,
+               inspector,
+               version
+             )
+  end
 end
