@@ -152,9 +152,14 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
       {:ok,
        [
          %{
-           path: Path.join(root, "mix/archives/phx_new-1.8.5.ez"),
-           entries: ["phx_new-1.8.5/ebin/phx_new.app"],
-           app: "{application,phx_new,[]}."
+           path: Path.join(root, "mix/archives/phx_new-1.8.5"),
+           app: "{application,phx_new,[{vsn,\"1.8.5\"}]}.",
+           role: :phx_new
+         },
+         %{
+           path: Path.join(root, "mix/archives/hex-2.5.1"),
+           app: "{application,hex,[{vsn,\"2.5.1\"}]}.",
+           role: :hex
          }
        ]}
     end
@@ -173,9 +178,14 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
       {:ok,
        [
          %{
-           path: Path.join(root, "mix/archives/phx_new-1.8.5.ez"),
-           entries: ["phx_new-1.8.5/ebin/phx_new.app"],
-           app: "{application,phx_new,[]}."
+           path: Path.join(root, "mix/archives/phx_new-1.8.5"),
+           app: "{application,phx_new,[{vsn,\"1.8.5\"}]}.",
+           role: :phx_new
+         },
+         %{
+           path: Path.join(root, "mix/archives/hex-2.5.1"),
+           app: "{application,hex,[{vsn,\"2.5.1\"}]}.",
+           role: :hex
          }
        ]}
     end
@@ -204,7 +214,7 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
                fn _, _, _, _, _ -> {"ok", 0} end,
                fn _ ->
                  {:ok,
-                  [%{path: "/Users/me/.mix/archives/phx_new-1.8.5.ez", entries: [], app: ""}]}
+                  [%{path: "/Users/me/.mix/archives/phx_new-1.8.5", app: "", role: :phx_new}]}
                end,
                version
              )

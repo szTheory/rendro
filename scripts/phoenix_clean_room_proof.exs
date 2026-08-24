@@ -370,7 +370,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
       {:ok, entries} ->
         entries
         |> Enum.map(&Path.join(archive_root, &1))
-        |> Enum.map(&read_archive/1)
+        |> Enum.map(&read_archive(&1, root))
         |> collect_archives()
 
       _ ->
@@ -378,20 +378,21 @@ defmodule Rendro.PhoenixCleanRoomProof do
     end
   end
 
-  defp read_archive(path) do
-    with {:ok, %File.Stat{type: :regular}} <- File.lstat(path),
-         {:ok, entries} <- :zip.table(String.to_charlist(path)),
-         {:ok, files} <- :zip.extract(String.to_charlist(path), [:memory]),
-         {_, app} when is_binary(app) <-
-           Enum.find(files, fn {name, _} ->
-             String.ends_with?(List.to_string(name), "/ebin/phx_new.app")
-           end) do
-      {:ok,
-       %{
-         path: path,
-         entries: Enum.map(entries, fn entry -> entry |> elem(0) |> List.to_string() end),
-         app: app
-       }}
+  defp read_archive(path, root) do
+    name = Path.basename(path)
+
+    {app_name, version} =
+      if String.starts_with?(name, "phx_new-"),
+        do: {"phx_new", String.replace_prefix(name, "phx_new-", "")},
+        else: {"hex", String.replace_prefix(name, "hex-", "")}
+
+    app_path = Path.join([path, "#{app_name}-#{version}", "ebin", "#{app_name}.app"])
+
+    with true <- String.starts_with?(path, root),
+         {:ok, %File.Stat{type: :directory}} <- File.lstat(path),
+         {:ok, %File.Stat{type: :regular}} <- File.lstat(app_path),
+         {:ok, app} <- File.read(app_path) do
+      {:ok, %{path: path, app: app, role: String.to_atom(app_name)}}
     else
       _ -> {:error, :phx_new_source_missing}
     end
@@ -404,18 +405,24 @@ defmodule Rendro.PhoenixCleanRoomProof do
   end
 
   defp verify_archive_sources(sources, root) when is_list(sources) do
-    expected = Path.join(root, "mix/archives/phx_new-#{@phx_new_version}.ez")
+    expected = Path.join(root, "mix/archives/phx_new-#{@phx_new_version}")
 
     exact =
       Enum.find(sources, fn source ->
-        source.path == expected and
-          Enum.member?(source.entries, "phx_new-#{@phx_new_version}/ebin/phx_new.app") and
-          String.contains?(source.app, "{application,phx_new,")
+        source.path == expected and source.role == :phx_new and
+          String.contains?(source.app, "{application,phx_new,") and
+          String.contains?(source.app, "{vsn,\"#{@phx_new_version}\"}")
       end)
 
-    if not is_nil(exact) and Enum.all?(sources, &String.starts_with?(&1.path, root)),
-      do: :ok,
-      else: {:error, :phx_new_source_leakage}
+    allowed = ["phx_new-#{@phx_new_version}", "hex-2.5.1"]
+
+    if not is_nil(exact) and
+         Enum.all?(
+           sources,
+           &(String.starts_with?(&1.path, root) and Path.basename(&1.path) in allowed)
+         ),
+       do: :ok,
+       else: {:error, :phx_new_source_leakage}
   end
 
   defp command_version(command, args, env, cd),
