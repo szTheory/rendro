@@ -56,26 +56,23 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
       assert {:error, _} = PhoenixCleanRoomProof.audit_dependency_source!(source)
     end
 
-    assert :ok =
-             PhoenixCleanRoomProof.audit_lock!(%{
-               "rendro" =>
-                 {:hex, :rendro, "1.3.4", String.duplicate("a", 64), [:mix], [], "hexpm",
-                  "a6048f87aa54a8467374c56bab87d25be26e8c835e8cf8f06050573f8c4a7c80"}
-             })
+    lock =
+      {:hex, :rendro, "1.3.4", "2a72bac4466e7b34e26486242d6aa22971edbd92cac2572d739441ff85615cc7",
+       [:mix], [{:decimal, "~> 2.3"}, {:telemetry, "~> 1.4"}], "hexpm",
+       "a6048f87aa54a8467374c56bab87d25be26e8c835e8cf8f06050573f8c4a7c80"}
 
-    assert {:error, _} =
-             PhoenixCleanRoomProof.audit_lock!(%{
-               "rendro" =>
-                 {:hex, :rendro, "1.3.3", String.duplicate("a", 64), [:mix], [], "hexpm",
-                  String.duplicate("b", 64)}
-             })
+    assert :ok = PhoenixCleanRoomProof.audit_lock!(%{rendro: lock})
 
-    assert {:error, :invalid_rendro_lock} =
-             PhoenixCleanRoomProof.audit_lock!(%{
-               "rendro" =>
-                 {:hex, :rendro, "1.3.4", String.duplicate("a", 64), [:mix], "hexpm",
-                  String.duplicate("b", 64)}
-             })
+    for bad <- [
+          %{"rendro" => lock},
+          %{rendro: {:hex, :rendro, "1.3.4", "checksum", [:mix], "hexpm", "outer"}},
+          %{rendro: put_elem(lock, 3, String.duplicate("a", 64))},
+          %{rendro: put_elem(lock, 7, String.duplicate("b", 64))},
+          %{rendro: put_elem(lock, 2, "1.3.3")},
+          %{rendro: {:git, "https://example.test/rendro", "sha", []}}
+        ] do
+      assert {:error, :invalid_rendro_lock} = PhoenixCleanRoomProof.audit_lock!(bad)
+    end
 
     assert {:error, _} =
              PhoenixCleanRoomProof.audit_lock!(%{
