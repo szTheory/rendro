@@ -3,7 +3,7 @@ phase: 131
 slug: adoption-snapshot-phoenix-newcomer-proof
 # status lifecycle: draft (seeded by plan-phase) -> validated (set by validate-phase)
 status: draft
-nyquist_compliant: false
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-08-21
 ---
@@ -54,7 +54,7 @@ created: 2026-08-21
 | 131-REL-LEAST-PRIVILEGE | 07 | 7 | JOURNEY-01, JOURNEY-04 | T-131-52, T-131-53 | Candidate contains bbe75d2; complete credential-free preflight is the sole dry-run validation gate and only actual protected publish receives HEX_API_KEY | contract | `mix test test/guardrails/required_checks_contract_test.exs test/mix/tasks/release_preflight_test.exs --max-failures 1` | ✅ | ⬜ pending |
 | 131-REL-CANDIDATE-134 | 07,08 | 7,8 | JOURNEY-01, JOURNEY-02, JOURNEY-04 | T-131-52, T-131-54, T-131-55 | Every existing 1.3.4 release-bearing exact-version, package/docs, workflow, verifier, and incident surface is committed before exact-SHA capture; detached complete proof leaves refs unchanged and permits only control records afterward; clean-room artifacts remain post-verifier Plan-10 work | contract/integration | Named full private candidate command from Plan 131-08 | ❌ | ⬜ pending |
 | 131-ADV-REL-134 | 09 | advisory | JOURNEY-01, JOURNEY-02, JOURNEY-04 | T-131-56, T-131-57, T-131-58, T-131-59 | Fresh approval precedes one v1.3.4 tag; protected release+Hex succeeds before candidate-bound HexDocs and atomic verifier | advisory external | Named protected run/dispatch/verifier commands from Plan 131-09 | ❌ | ⬜ pending |
-| 131-ADV-02 | 10 | advisory | JOURNEY-01, JOURNEY-02, JOURNEY-03, JOURNEY-04 | T-131-60, T-131-61, T-131-62, T-131-63 | Exact public `rendro` 1.3.4 resolves in a fresh generated app and returns a valid PDF through ConnCase and loopback HTTP; all four older failed tags/runs remain incident evidence only | advisory external | Named exact 1.3.4 clean-room harness command from Plan 131-10 | ✅ | ❌ red — current lock-identity repair again reached isolated generation/dependency resolution, then failed closed at exact Rendro lock audit; all six bounded failures retained |
+| 131-ADV-02 | 10 | advisory | JOURNEY-01, JOURNEY-02, JOURNEY-03, JOURNEY-04 | T-131-60, T-131-61, T-131-62, T-131-63 | Exact public `rendro` 1.3.4 resolves in a fresh generated app and returns a valid PDF through ConnCase and loopback HTTP; all four older failed tags/runs remain incident evidence only | advisory external | Final schema-complete Plan 131-10 harness run | ✅ | ✅ green — dual 200/PDF facts and cleanup observed; prior failed attempts retained |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 

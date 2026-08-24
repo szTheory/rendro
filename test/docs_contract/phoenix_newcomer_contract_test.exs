@@ -32,9 +32,8 @@ defmodule Rendro.DocsContract.PhoenixNewcomerContractTest do
     transcript = File.read!("priv/journey_evidence/phoenix_clean_room_1.3.4.md")
 
     assert evidence =~ "\"version\":\"1.3.4\""
-    assert evidence =~ "\"outcome\":\"failure\""
-    assert transcript =~ "phx_new_source_missing"
-    assert transcript =~ "advisory failure"
+    assert evidence =~ "\"outcome\":\"success\""
+    assert transcript =~ "advisory success"
     assert File.exists?("priv/journey_evidence/phoenix_clean_room_1.3.4_failed_attempt.json")
     assert File.exists?("priv/journey_evidence/phoenix_clean_room_1.3.4_failed_attempt.md")
 
