@@ -16,9 +16,9 @@ defmodule Rendro.PublicReleaseVerifierTest do
     assert record =~ ~r/^release_ref: v1\.3\.4$/m
     assert record =~ "candidate_status: public_release_pending_atomic_verification"
     assert record =~ "required_fix_ancestor: bbe75d2bf3f53e5235626974c539500395d2032e"
-    assert record =~ "tag_pushed: false"
+    assert record =~ "tag_pushed: true"
     assert record =~ "hexdocs_dispatched: false"
-    assert record =~ "registry_mutated: false"
+    assert record =~ "registry_mutated: true"
     assert record =~ "3d014b8194782fc29bc685c0d5e84e4adc64b2c3"
     assert record =~ "32513353551"
     assert record =~ "32539594278"
