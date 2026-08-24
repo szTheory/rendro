@@ -18,7 +18,8 @@ v1_3_4_local_tag_absent: true
 v1_3_4_remote_tag_absent: true
 v1_3_4_hex_absent: true
 v1_3_4_hexdocs_absent: true
-approval_status: pending_blocking_human
+approval_status: approved_exact_publication_sequence
+approved_at: 2026-08-24T18:32:19Z
 release_status: private_candidate_only
 recovery_target: 1.3.4
 recovery_decision: D-35
@@ -72,12 +73,15 @@ The packet retains the four immutable failed-release incidents: v1.3.0/run
 versions are absent. They cannot be retried or mutated. The v1.3.3 approval was
 consumed by its failed immutable attempt and does not transfer to v1.3.4.
 
-## Required fresh human decision
+## Recorded fresh human decision
 
-Only an explicit blocking-human approval that names
-`f03c78bab54efe1cd1596d51cf3f28193232e2a3` and jointly authorizes the single
+The blocking-human response was recorded verbatim at 2026-08-24T18:32:19Z:
+
+`approve exact v1.3.4 candidate f03c78bab54efe1cd1596d51cf3f28193232e2a3 for annotated tag, protected release and Hex, and candidate-bound HexDocs`
+
+It names this packet's candidate and jointly authorizes only the single
 annotated `v1.3.4` tag, protected tag-driven Hex publication, and
-candidate-bound protected HexDocs dispatch may advance this packet. Generic
-assent, prior approval, silence, partial approval, and automatic advancement do
-not authorize mutation. No tag, publish, dispatch, or public verifier has been
-run for this candidate.
+candidate-bound protected HexDocs dispatch. Generic assent, prior approval,
+silence, partial approval, and automatic advancement do not authorize mutation.
+No tag, publish, dispatch, or public verifier had run when this decision was
+recorded.
