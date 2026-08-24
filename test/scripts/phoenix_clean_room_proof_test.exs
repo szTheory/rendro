@@ -27,9 +27,21 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
     }
 
     assert :ok = PhoenixCleanRoomProof.validate_prerequisite(prerequisite)
-    assert {:error, _} = PhoenixCleanRoomProof.validate_prerequisite(Map.put(prerequisite, "version", "1.3.3"))
-    assert {:error, _} = PhoenixCleanRoomProof.validate_prerequisite(Map.delete(prerequisite, "v1_3_3_conclusion"))
-    assert {:error, _} = PhoenixCleanRoomProof.validate_prerequisite(Map.put(prerequisite, "hexdocs_provenance", "workflow_dispatch"))
+
+    assert {:error, _} =
+             PhoenixCleanRoomProof.validate_prerequisite(
+               Map.put(prerequisite, "version", "1.3.3")
+             )
+
+    assert {:error, _} =
+             PhoenixCleanRoomProof.validate_prerequisite(
+               Map.delete(prerequisite, "v1_3_3_conclusion")
+             )
+
+    assert {:error, _} =
+             PhoenixCleanRoomProof.validate_prerequisite(
+               Map.put(prerequisite, "hexdocs_provenance", "workflow_dispatch")
+             )
   end
 
   test "rejects non-public dependency sources and malformed exact lock entries" do
@@ -44,9 +56,20 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
       assert {:error, _} = PhoenixCleanRoomProof.audit_dependency_source!(source)
     end
 
-    assert :ok = PhoenixCleanRoomProof.audit_lock!(%{"rendro" => {:hex, :rendro, "1.3.4", "checksum", [], "hexpm", "checksum"}})
-    assert {:error, _} = PhoenixCleanRoomProof.audit_lock!(%{"rendro" => {:hex, :rendro, "1.3.3", "checksum", [], "hexpm", "checksum"}})
-    assert {:error, _} = PhoenixCleanRoomProof.audit_lock!(%{"rendro" => {:git, "https://example.test/rendro", "sha", []}})
+    assert :ok =
+             PhoenixCleanRoomProof.audit_lock!(%{
+               "rendro" => {:hex, :rendro, "1.3.4", "checksum", [], "hexpm", "checksum"}
+             })
+
+    assert {:error, _} =
+             PhoenixCleanRoomProof.audit_lock!(%{
+               "rendro" => {:hex, :rendro, "1.3.3", "checksum", [], "hexpm", "checksum"}
+             })
+
+    assert {:error, _} =
+             PhoenixCleanRoomProof.audit_lock!(%{
+               "rendro" => {:git, "https://example.test/rendro", "sha", []}
+             })
   end
 
   test "projects bounded evidence without paths, bodies, ports, PIDs, or secrets" do
@@ -59,8 +82,18 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
         port: 40123,
         response_body: "%PDF-secret",
         hex_api_key: "secret",
-        conn_case: %{status: 200, content_type: "application/pdf", filename: "invoice.pdf", pdf_magic: true},
-        loopback: %{status: 200, content_type: "application/pdf", filename: "invoice.pdf", pdf_magic: true},
+        conn_case: %{
+          status: 200,
+          content_type: "application/pdf",
+          filename: "invoice.pdf",
+          pdf_magic: true
+        },
+        loopback: %{
+          status: 200,
+          content_type: "application/pdf",
+          filename: "invoice.pdf",
+          pdf_magic: true
+        },
         cleanup: "removed"
       })
 
@@ -80,12 +113,28 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
     assert templates.document =~ "preset = :swiss"
     assert templates.document =~ "{44, 107, 237}"
     assert templates.document =~ "mode: :light"
-    assert templates.controller =~ "Rendro.Adapters.Phoenix.render_pdf(conn, InvoiceDocument.build(), \"invoice.pdf\")"
+
+    assert templates.controller =~
+             "Rendro.Adapters.Phoenix.render_pdf(conn, InvoiceDocument.build(), \"invoice.pdf\")"
+
     assert templates.test =~ "use CleanRoomWeb.ConnCase"
     assert templates.test =~ "loopback proof"
-    assert String.index(templates.test, "ConnCase proof") < String.index(templates.test, "loopback proof")
+
+    assert :binary.match(templates.test, "ConnCase proof") <
+             :binary.match(templates.test, "loopback proof")
+
     refute templates.mix =~ "ecto"
     refute templates.mix =~ "path:"
     refute templates.mix =~ "git:"
+  end
+
+  test "consumer dependency patch adds only exact public Rendro" do
+    mix = "defp deps do\n  [\n    {:phoenix, \"~> 1.8\"}\n  ]\nend\n"
+
+    assert {:ok, patched} = PhoenixCleanRoomProof.add_exact_rendro_dependency(mix)
+    assert patched =~ "{:rendro, \"1.3.4\"}"
+    assert :ok = PhoenixCleanRoomProof.audit_dependency_source!("{:rendro, \"1.3.4\"}")
+    refute patched =~ "path:"
+    refute patched =~ "git:"
   end
 end
