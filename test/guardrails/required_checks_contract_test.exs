@@ -448,7 +448,7 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert release =~ "tags:"
       assert release =~ "'v*.*.*'"
       assert release =~ "mix release.preflight"
-      assert release =~ "mix hex.publish --yes"
+      assert release =~ "mix hex.publish --yes --no-docs"
       assert release =~ "HEX_API_KEY"
       refute release =~ "contents: write"
       refute release =~ "gh release"

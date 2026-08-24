@@ -58,7 +58,7 @@ defmodule Rendro.PublicReleaseVerifier do
         ]
       )
 
-    required = [:candidate_record, :tag, :release_run_id, :hexdocs_run_id, :output]
+    required = [:candidate_record, :tag, :release_run_id, :output]
 
     cond do
       positional != [] ->
@@ -79,7 +79,7 @@ defmodule Rendro.PublicReleaseVerifier do
       !Regex.match?(~r/^\d+$/, opts[:release_run_id]) ->
         {:error, "release run ID must be numeric"}
 
-      !Regex.match?(~r/^\d+$/, opts[:hexdocs_run_id]) ->
+      !is_nil(opts[:hexdocs_run_id]) and !Regex.match?(~r/^\d+$/, opts[:hexdocs_run_id]) ->
         {:error, "HexDocs run ID must be numeric"}
 
       true ->
@@ -107,25 +107,8 @@ defmodule Rendro.PublicReleaseVerifier do
          :ok <- equal?(facts["release_event"], "push", "release workflow event is not a tag push"),
          :ok <-
            equal?(facts["release_name"], "Release to Hex", "release workflow name is incorrect"),
-         :ok <-
-           equal?(
-             facts["hexdocs_head_sha"],
-             candidate,
-             "HexDocs workflow head does not match candidate"
-           ),
-         :ok <-
-           equal?(
-             facts["hexdocs_conclusion"],
-             "success",
-             "HexDocs workflow did not conclude successfully"
-           ),
-         :ok <-
-           equal?(
-             facts["hexdocs_event"],
-             "workflow_dispatch",
-             "HexDocs workflow event is not dispatch"
-           ),
-         :ok <- equal?(facts["hexdocs_name"], "HexDocs", "HexDocs workflow name is incorrect"),
+         :ok <- validate_public_archive_identity(facts),
+         :ok <- validate_docs_provenance(facts, candidate),
          :ok <-
            equal?(
              facts["hex_version"],
@@ -200,12 +183,7 @@ defmodule Rendro.PublicReleaseVerifier do
              options.release_run_id,
              "fixture release run ID does not match"
            ),
-         :ok <-
-           equal?(
-             facts["hexdocs_run_id"],
-             options.hexdocs_run_id,
-             "fixture HexDocs run ID does not match"
-           ) do
+         :ok <- validate_fixture_hexdocs_run(facts, options.hexdocs_run_id) do
       {:ok, Map.drop(facts, ["tag", "release_run_id", "hexdocs_run_id"])}
     else
       {:error, reason} when is_binary(reason) -> {:error, reason}
@@ -217,9 +195,10 @@ defmodule Rendro.PublicReleaseVerifier do
     with {:ok, repository} <- repository(),
          {:ok, peeled_tag_sha} <- github_tag(repository, options.tag),
          {:ok, release} <- github_run(options.release_run_id),
-         {:ok, hexdocs} <- github_run(options.hexdocs_run_id),
+         {:ok, hexdocs} <- docs_provenance_run(options),
          {:ok, hex} <- hex_release(options.tag),
-         {:ok, archive_members} <- archive_members(options.tag),
+         {:ok, archive} <- archive_facts(options.tag),
+         {:ok, sealed} <- candidate_evidence(options.candidate_record),
          {:ok, docs} <- hexdocs_probes(options.tag, candidate),
          {:ok, incidents} <- collect_incident_facts(repository) do
       {:ok,
@@ -236,10 +215,16 @@ defmodule Rendro.PublicReleaseVerifier do
            "hexdocs_conclusion" => hexdocs["conclusion"],
            "hexdocs_event" => hexdocs["event"],
            "hexdocs_name" => hexdocs["name"],
+           "hexdocs_provenance" => docs_provenance(options),
+           "release_publish_job_id" => release_publish_job_id(release),
+           "release_publish_job_conclusion" => release_publish_job_conclusion(release),
            "version" => String.trim_leading(options.tag, "v"),
            "hex_version" => hex["version"],
-           "archive_members" => archive_members
+           "hex_api_checksum" => hex["checksum"],
+           "archive_members" => archive.members
          })
+         |> Map.merge(archive)
+         |> Map.merge(sealed)
        )}
     end
   end
@@ -278,6 +263,12 @@ defmodule Rendro.PublicReleaseVerifier do
 
   defp github_run(id),
     do: github_json(["run", "view", id, "--json", "conclusion,event,headSha,name,jobs"])
+
+  defp docs_provenance_run(%{hexdocs_run_id: nil, release_run_id: id}), do: github_run(id)
+  defp docs_provenance_run(%{hexdocs_run_id: id}), do: github_run(id)
+
+  defp docs_provenance(%{hexdocs_run_id: nil}), do: "protected_release_publish"
+  defp docs_provenance(_), do: "hexdocs_workflow_dispatch"
 
   defp collect_incident_facts(repository) do
     with {:ok, v1_3_0} <- github_tag(repository, "v1.3.0"),
@@ -396,7 +387,7 @@ defmodule Rendro.PublicReleaseVerifier do
     end
   end
 
-  defp archive_members(tag) do
+  defp archive_facts(tag) do
     version = String.trim_leading(tag, "v")
 
     path =
@@ -415,13 +406,136 @@ defmodule Rendro.PublicReleaseVerifier do
            {:ok, archive} <- File.read(path),
            {:ok, outer} <- :erl_tar.extract({:binary, archive}, [:memory]),
            {_, contents} when is_binary(contents) <- List.keyfind(outer, ~c"contents.tar.gz", 0),
-           {:ok, inner} <- :erl_tar.extract({:binary, :zlib.gunzip(contents)}, [:memory]) do
-        {:ok, Enum.map(inner, fn {member, _contents} -> List.to_string(member) end)}
+           entries when is_list(entries) <- tar_entries(:zlib.gunzip(contents)) do
+        members = Enum.map(entries, & &1.path)
+
+        {:ok,
+         %{
+           "public_archive_sha256" => sha256(archive),
+           "public_manifest_sha256" => canonical_manifest_sha256(entries),
+           "public_metadata_sha256" => normalized_metadata_sha256(outer),
+           members: members
+         }}
       else
         _ -> {:error, "read-only Hex archive probe failed"}
       end
     after
       File.rm(path)
+    end
+  end
+
+  defp candidate_evidence(path) do
+    with {:ok, record} <- File.read(path),
+         {:ok, sealed_archive} <- record_digest(record, "sealed_archive_sha256"),
+         {:ok, manifest} <- record_digest(record, "sealed_manifest_sha256"),
+         {:ok, metadata} <- record_digest(record, "sealed_metadata_sha256") do
+      {:ok,
+       %{
+         "sealed_archive_sha256" => sealed_archive,
+         "sealed_manifest_sha256" => manifest,
+         "sealed_metadata_sha256" => metadata
+       }}
+    else
+      _ -> {:error, "candidate record lacks sealed package evidence"}
+    end
+  end
+
+  defp record_digest(record, key) do
+    case Regex.run(~r/^#{key}:\s*([0-9a-f]{64})\s*$/m, record, capture: :all_but_first) do
+      [digest] -> {:ok, digest}
+      _ -> {:error, "missing digest"}
+    end
+  end
+
+  defp sha256(data), do: :crypto.hash(:sha256, data) |> Base.encode16(case: :lower)
+
+  defp canonical_manifest_sha256(entries) do
+    entries
+    |> Enum.map(fn entry ->
+      [entry.path, entry.mode, Integer.to_string(entry.size), entry.sha256] |> Enum.join("\t")
+    end)
+    |> Enum.sort()
+    |> Enum.join("\n")
+    |> sha256()
+  end
+
+  defp normalized_metadata_sha256(outer) do
+    case List.keyfind(outer, ~c"metadata.config", 0) do
+      {_, metadata} ->
+        metadata
+        |> metadata_terms()
+        |> normalize_metadata()
+        |> :erlang.term_to_binary()
+        |> sha256()
+
+      _ ->
+        ""
+    end
+  rescue
+    _ -> ""
+  end
+
+  defp metadata_terms(metadata) do
+    {:ok, tokens, _} = :erl_scan.string(String.to_charlist(metadata))
+
+    tokens
+    |> Enum.reduce({[], []}, fn token, {current, terms} ->
+      if elem(token, 0) == :dot do
+        {[], [current |> Enum.reverse() |> then(&:erl_parse.parse_term/1) | terms]}
+      else
+        {[token | current], terms}
+      end
+    end)
+    |> elem(1)
+    |> Enum.reverse()
+    |> Enum.map(fn {:ok, term} -> term end)
+    |> Map.new()
+  end
+
+  defp normalize_metadata(value) when is_map(value),
+    do: value |> Map.new(fn {key, item} -> {key, normalize_metadata(item)} end)
+
+  defp normalize_metadata(value) when is_list(value),
+    do: value |> Enum.map(&normalize_metadata/1) |> Enum.sort()
+
+  defp normalize_metadata(value), do: value
+
+  defp tar_entries(binary), do: tar_entries(binary, [])
+
+  defp tar_entries(<<0::size(4096), _rest::binary>>, entries), do: Enum.reverse(entries)
+
+  defp tar_entries(<<header::binary-size(512), rest::binary>>, entries) do
+    size = tar_octal(binary_part(header, 124, 12))
+
+    mode =
+      header
+      |> binary_part(100, 8)
+      |> tar_octal()
+      |> Integer.to_string(8)
+      |> String.pad_leading(4, "0")
+
+    padded_size = div(size + 511, 512) * 512
+
+    <<contents::binary-size(size), _padding::binary-size(padded_size - size), tail::binary>> =
+      rest
+
+    tar_entries(tail, [
+      %{path: tar_name(header), mode: mode, size: size, sha256: sha256(contents)} | entries
+    ])
+  end
+
+  defp tar_name(header) do
+    name = tar_string(binary_part(header, 0, 100))
+    prefix = tar_string(binary_part(header, 345, 155))
+    if prefix == "", do: name, else: prefix <> "/" <> name
+  end
+
+  defp tar_string(value), do: value |> :binary.split(<<0>>) |> hd()
+
+  defp tar_octal(value) do
+    case value |> tar_string() |> String.trim() do
+      "" -> 0
+      digits -> String.to_integer(digits, 8)
     end
   end
 
@@ -479,6 +593,127 @@ defmodule Rendro.PublicReleaseVerifier do
   end
 
   defp validate_candidate(_), do: {:error, "candidate SHA must be 40 lowercase hex characters"}
+
+  defp validate_fixture_hexdocs_run(_facts, nil), do: :ok
+
+  defp validate_fixture_hexdocs_run(facts, expected) do
+    equal?(facts["hexdocs_run_id"], expected, "fixture HexDocs run ID does not match")
+  end
+
+  defp validate_public_archive_identity(facts) do
+    with :ok <- valid_digest?(facts["sealed_archive_sha256"], "sealed archive SHA-256 is invalid"),
+         :ok <-
+           equal?(
+             facts["public_archive_sha256"],
+             facts["hex_api_checksum"],
+             "public archive SHA-256 does not match Hex API checksum"
+           ),
+         :ok <-
+           equal?(
+             facts["public_manifest_sha256"],
+             facts["sealed_manifest_sha256"],
+             "public archive manifest does not match the sealed candidate"
+           ),
+         :ok <-
+           equal?(
+             facts["public_metadata_sha256"],
+             facts["sealed_metadata_sha256"],
+             "public archive metadata does not match the sealed candidate"
+           ) do
+      :ok
+    end
+  end
+
+  defp validate_docs_provenance(facts, candidate) do
+    with :ok <-
+           equal?(
+             facts["hexdocs_head_sha"],
+             candidate,
+             "HexDocs workflow head does not match candidate"
+           ),
+         :ok <-
+           equal?(
+             facts["hexdocs_conclusion"],
+             "success",
+             "HexDocs workflow did not conclude successfully"
+           ) do
+      case facts["hexdocs_provenance"] do
+        "protected_release_publish" ->
+          with :ok <-
+                 equal?(
+                   facts["hexdocs_event"],
+                   "push",
+                   "combined release docs event is not a tag push"
+                 ),
+               :ok <-
+                 equal?(
+                   facts["hexdocs_name"],
+                   "Release to Hex",
+                   "combined release docs workflow name is incorrect"
+                 ),
+               :ok <-
+                 valid_numeric?(
+                   facts["release_publish_job_id"],
+                   "release publish job ID must be numeric"
+                 ),
+               :ok <-
+                 equal?(
+                   facts["release_publish_job_conclusion"],
+                   "success",
+                   "release publish job did not conclude successfully"
+                 ) do
+            :ok
+          end
+
+        "hexdocs_workflow_dispatch" ->
+          with :ok <-
+                 equal?(
+                   facts["hexdocs_event"],
+                   "workflow_dispatch",
+                   "HexDocs workflow event is not dispatch"
+                 ),
+               :ok <-
+                 equal?(facts["hexdocs_name"], "HexDocs", "HexDocs workflow name is incorrect") do
+            :ok
+          end
+
+        _ ->
+          {:error, "HexDocs provenance is not recognized"}
+      end
+    end
+  end
+
+  defp valid_digest?(value, message) when is_binary(value) do
+    if Regex.match?(~r/^[0-9a-f]{64}$/, value), do: :ok, else: {:error, message}
+  end
+
+  defp valid_digest?(_, message), do: {:error, message}
+
+  defp valid_numeric?(value, message) when is_binary(value) do
+    if Regex.match?(~r/^\d+$/, value), do: :ok, else: {:error, message}
+  end
+
+  defp valid_numeric?(_, message), do: {:error, message}
+
+  defp release_publish_job_id(%{"jobs" => jobs}) when is_list(jobs) do
+    jobs
+    |> Enum.find(&(&1["name"] == "publish"))
+    |> case do
+      nil -> nil
+      job -> to_string(job["databaseId"] || job["id"])
+    end
+  end
+
+  defp release_publish_job_id(_), do: nil
+
+  defp release_publish_job_conclusion(%{"jobs" => jobs}) when is_list(jobs) do
+    case Enum.find(jobs, &(&1["name"] == "publish")) do
+      nil -> nil
+      job -> job["conclusion"]
+    end
+  end
+
+  defp release_publish_job_conclusion(_), do: nil
 
   defp validate_v1_3_0_incident(facts) do
     with :ok <-

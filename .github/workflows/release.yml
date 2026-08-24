@@ -72,4 +72,6 @@ jobs:
       - name: Publish to Hex
         env:
           HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
-        run: mix hex.publish --yes
+        # Hex publishes docs by default. Keep future tag releases package-only:
+        # the candidate-bound HexDocs workflow owns the separately approved docs publish.
+        run: mix hex.publish --yes --no-docs

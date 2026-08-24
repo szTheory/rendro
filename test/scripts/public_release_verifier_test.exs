@@ -54,6 +54,33 @@ defmodule Rendro.PublicReleaseVerifierTest do
              PublicReleaseVerifier.validate(valid_facts(%{"hexdocs_version" => "1.2.0"}))
   end
 
+  test "accepts the protected release publish job as candidate-bound HexDocs provenance" do
+    facts =
+      valid_facts(%{
+        "hexdocs_provenance" => "protected_release_publish",
+        "hexdocs_event" => "push",
+        "hexdocs_name" => "Release to Hex",
+        "release_publish_job_id" => "97549444486",
+        "release_publish_job_conclusion" => "success"
+      })
+
+    assert :ok = PublicReleaseVerifier.validate(facts)
+  end
+
+  test "rejects an archive whose download digest differs from the Hex API checksum" do
+    assert {:error, "public archive SHA-256 does not match Hex API checksum"} =
+             PublicReleaseVerifier.validate(
+               valid_facts(%{"public_archive_sha256" => String.duplicate("b", 64)})
+             )
+  end
+
+  test "rejects a public payload when its canonical manifest differs from the sealed candidate" do
+    assert {:error, "public archive manifest does not match the sealed candidate"} =
+             PublicReleaseVerifier.validate(
+               valid_facts(%{"public_manifest_sha256" => String.duplicate("b", 64)})
+             )
+  end
+
   test "refuses candidate verification unless all immutable failed incidents remain exact" do
     assert {:error, "v1.3.0 incident peeled SHA is incorrect"} =
              PublicReleaseVerifier.validate(valid_facts(%{"v1_3_0_peeled_sha" => "different"}))
@@ -180,12 +207,22 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "release_conclusion" => "success",
         "release_event" => "push",
         "release_name" => "Release to Hex",
+        "release_publish_job_id" => "97549444486",
+        "release_publish_job_conclusion" => "success",
         "hexdocs_head_sha" => @candidate,
         "hexdocs_conclusion" => "success",
-        "hexdocs_event" => "workflow_dispatch",
-        "hexdocs_name" => "HexDocs",
+        "hexdocs_event" => "push",
+        "hexdocs_name" => "Release to Hex",
+        "hexdocs_provenance" => "protected_release_publish",
         "version" => "1.3.4",
         "hex_version" => "1.3.4",
+        "hex_api_checksum" => String.duplicate("c", 64),
+        "public_archive_sha256" => String.duplicate("c", 64),
+        "sealed_archive_sha256" => String.duplicate("d", 64),
+        "sealed_manifest_sha256" => String.duplicate("e", 64),
+        "public_manifest_sha256" => String.duplicate("e", 64),
+        "sealed_metadata_sha256" => String.duplicate("f", 64),
+        "public_metadata_sha256" => String.duplicate("f", 64),
         "hexdocs_version" => "1.3.4",
         "hexdocs_source_sha" => @candidate,
         "archive_members" => [
