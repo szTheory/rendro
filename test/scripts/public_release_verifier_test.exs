@@ -121,6 +121,35 @@ defmodule Rendro.PublicReleaseVerifierTest do
              PublicReleaseVerifier.canonical_metadata_sha256("{<<\"files\">>,[<<\"lib\">>]}")
   end
 
+  test "HexDocs probes use public guide and tag-pinned source links" do
+    pages = %{
+      theme:
+        "Rendro.Theme v1.3.4 https://github.com/szTheory/rendro/blob/v1.3.4/lib/rendro/theme.ex",
+      phoenix:
+        "Rendro.Adapters.Phoenix render_pdf/3 v1.3.4 https://github.com/szTheory/rendro/blob/v1.3.4/lib/rendro/adapters/phoenix.ex",
+      presets: "Presets v1.3.4",
+      readme: "Rendro v1.3.4"
+    }
+
+    assert :ok = PublicReleaseVerifier.validate_hexdocs_pages(pages, "v1.3.4")
+
+    assert {:error, "HexDocs source links are not pinned to the exact release tag"} =
+             PublicReleaseVerifier.validate_hexdocs_pages(
+               put_in(
+                 pages,
+                 [:theme],
+                 "Rendro.Theme v1.3.4 https://github.com/szTheory/rendro/blob/main/lib/rendro/theme.ex"
+               ),
+               "v1.3.4"
+             )
+
+    assert {:error, "HexDocs public symbols are incomplete"} =
+             PublicReleaseVerifier.validate_hexdocs_pages(
+               Map.put(pages, :phoenix, "v1.3.4"),
+               "v1.3.4"
+             )
+  end
+
   test "refuses candidate verification unless all immutable failed incidents remain exact" do
     assert {:error, "v1.3.0 incident peeled SHA is incorrect"} =
              PublicReleaseVerifier.validate(valid_facts(%{"v1_3_0_peeled_sha" => "different"}))
@@ -180,7 +209,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
     File.write!(
       fixture,
       JSON.encode!(
-        valid_facts(%{"hexdocs_source_sha" => String.duplicate("b", 40)})
+        valid_facts(%{"public_metadata_sha256" => String.duplicate("b", 64)})
         |> Map.merge(fixture_metadata())
       )
     )

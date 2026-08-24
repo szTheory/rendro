@@ -121,12 +121,6 @@ defmodule Rendro.PublicReleaseVerifier do
              facts["version"],
              "HexDocs version does not match candidate version"
            ),
-         :ok <-
-           equal?(
-             facts["hexdocs_source_sha"],
-             candidate,
-             "HexDocs source does not match candidate"
-           ),
          :ok <- require_members(facts["archive_members"] || []),
          :ok <- require_symbols(facts["hexdocs_symbols"] || []),
          :ok <- validate_v1_3_0_incident(facts),
@@ -199,7 +193,7 @@ defmodule Rendro.PublicReleaseVerifier do
          {:ok, hex} <- hex_release(options.tag),
          {:ok, archive} <- archive_facts(options.tag),
          {:ok, sealed} <- candidate_evidence(options.candidate_record),
-         {:ok, docs} <- hexdocs_probes(options.tag, candidate),
+         {:ok, docs} <- hexdocs_probes(options.tag),
          {:ok, incidents} <- collect_incident_facts(repository) do
       {:ok,
        Map.merge(
@@ -574,26 +568,71 @@ defmodule Rendro.PublicReleaseVerifier do
     end
   end
 
-  defp hexdocs_probes(tag, candidate) do
+  defp hexdocs_probes(tag) do
     version = String.trim_leading(tag, "v")
     base = "https://hexdocs.pm/rendro/#{version}"
 
     with {:ok, theme} <- curl_text("#{base}/Rendro.Theme.html"),
-         {:ok, presets} <- curl_text("#{base}/Rendro.Theme.Presets.html"),
+         {:ok, presets} <- curl_text("#{base}/presets.html"),
          {:ok, phoenix} <- curl_text("#{base}/Rendro.Adapters.Phoenix.html"),
          {:ok, readme} <- curl_text("#{base}/readme.html"),
-         true <- Enum.all?([theme, presets, phoenix, readme], &String.contains?(&1, version)),
-         true <- String.contains?(theme, candidate),
-         true <- String.contains?(phoenix, "render_pdf/3") do
+         :ok <-
+           validate_hexdocs_pages(
+             %{theme: theme, presets: presets, phoenix: phoenix, readme: readme},
+             tag
+           ) do
       {:ok,
        %{
          "hexdocs_version" => version,
-         "hexdocs_source_sha" => candidate,
          "hexdocs_symbols" => @required_symbols
        }}
     else
       _ -> {:error, "read-only versioned HexDocs probes failed"}
     end
+  end
+
+  @doc false
+  def validate_hexdocs_pages(pages, "v" <> version = tag) when is_map(pages) do
+    with true <- Regex.match?(~r/^\d+\.\d+\.\d+$/, version),
+         {:ok, theme} <- fetch_page(pages, :theme),
+         {:ok, presets} <- fetch_page(pages, :presets),
+         {:ok, phoenix} <- fetch_page(pages, :phoenix),
+         {:ok, readme} <- fetch_page(pages, :readme),
+         true <- Enum.all?([theme, presets, phoenix, readme], &String.contains?(&1, version)),
+         true <- String.contains?(theme, "Rendro.Theme"),
+         true <- String.contains?(presets, "Presets"),
+         true <- String.contains?(phoenix, "Rendro.Adapters.Phoenix"),
+         true <- String.contains?(phoenix, "render_pdf/3"),
+         :ok <- require_tag_pinned_source_links([theme, phoenix], tag) do
+      :ok
+    else
+      {:error, _} = error -> error
+      _ -> {:error, "HexDocs public symbols are incomplete"}
+    end
+  end
+
+  def validate_hexdocs_pages(_, _), do: {:error, "HexDocs public symbols are incomplete"}
+
+  defp fetch_page(pages, key) do
+    case Map.fetch(pages, key) do
+      {:ok, page} when is_binary(page) -> {:ok, page}
+      _ -> {:error, "HexDocs public symbols are incomplete"}
+    end
+  end
+
+  defp require_tag_pinned_source_links(pages, tag) do
+    links =
+      pages
+      |> Enum.flat_map(fn page ->
+        Regex.scan(~r{https://github\.com/szTheory/rendro/blob/([^/]+)/[^\s\"'<]+}, page,
+          capture: :all_but_first
+        )
+      end)
+      |> List.flatten()
+
+    if links != [] and Enum.all?(links, &(&1 == tag)),
+      do: :ok,
+      else: {:error, "HexDocs source links are not pinned to the exact release tag"}
   end
 
   defp curl_json(url) do
@@ -947,7 +986,6 @@ defmodule Rendro.PublicReleaseVerifier do
       "version",
       "hex_version",
       "hexdocs_version",
-      "hexdocs_source_sha",
       "archive_members",
       "hexdocs_symbols"
     ])
