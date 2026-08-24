@@ -2,12 +2,15 @@
 candidate_commit_sha: f03c78bab54efe1cd1596d51cf3f28193232e2a3
 version: 1.3.4
 release_ref: v1.3.4
-candidate_status: proof_complete_control_pending
+candidate_status: public_release_pending_atomic_verification
+sealed_archive_sha256: 7c886783fa1f73b2b154b4840295e6092b3f26e7bf568203476d204b0c0c369a
+sealed_manifest_sha256: d2ba1a33339d501291736c67df74cbed3ef46f5063409043ac7d6f4f38012f9e
+sealed_metadata_sha256: 52d92fd928453dcf23c1dd0ef1fc0daf699c1de97b68ce3cadb6c5cb0c8564b3
 required_fix_ancestor: bbe75d2bf3f53e5235626974c539500395d2032e
 proof_mode: exact-sha-no-tag-complete-audits
-tag_pushed: false
+tag_pushed: true
 hexdocs_dispatched: false
-registry_mutated: false
+registry_mutated: true
 recovery_target: 1.3.4
 recovery_decision: D-35
 ---
@@ -83,3 +86,14 @@ Phase-131 control records may follow this SHA. A fresh blocking-human decision
 must name this exact SHA and jointly authorize one annotated `v1.3.4` tag, its
 protected tag-driven Hex publish, and exact-candidate HexDocs dispatch. No
 v1.3.3 approval transfers.
+
+## Public v1.3.4 provenance
+
+Tag object `84b0a632af6f6fa96af5fb515cecbbe18dcf6d37` peels to the candidate.
+Protected run `32763039854` succeeded with validate job `97546095415` and
+actual publish job `97549444486`. Public outer archive
+`a6048f87aa54a8467374c56bab87d25be26e8c835e8cf8f06050573f8c4a7c80`
+differs from sealed local outer only through Hex 2.5.1 ordering; canonical
+manifest and normalized metadata digests match. Combined protected
+`mix hex.publish --yes` published versioned docs, so no redundant HexDocs
+dispatch occurred.

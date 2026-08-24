@@ -11,6 +11,8 @@ mix_ci_fast: pass
 tutorial_verification: pass
 docs_contract: pass
 package_checksum: 7c886783fa1f73b2b154b4840295e6092b3f26e7bf568203476d204b0c0c369a
+sealed_manifest_sha256: d2ba1a33339d501291736c67df74cbed3ef46f5063409043ac7d6f4f38012f9e
+sealed_metadata_sha256: 52d92fd928453dcf23c1dd0ef1fc0daf699c1de97b68ce3cadb6c5cb0c8564b3
 complete_release_preflight: pass
 security_audits_included: required
 tag_refs_unchanged: true
@@ -20,7 +22,7 @@ v1_3_4_hex_absent: true
 v1_3_4_hexdocs_absent: true
 approval_status: approved_exact_publication_sequence
 approved_at: 2026-08-24T18:32:19Z
-release_status: private_candidate_only
+release_status: protected_release_complete_pending_atomic_verification
 recovery_target: 1.3.4
 recovery_decision: D-35
 ---
