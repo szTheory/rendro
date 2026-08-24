@@ -142,7 +142,7 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
     root = "/isolated/clean-room"
 
     runner = fn "mix", args, env, ^root, _timeout ->
-      assert args == ["archive", "install", "hex", "phx_new", "1.8.5", "--force"]
+      assert args == ["archive.install", "hex", "phx_new", "1.8.5", "--force"]
       assert {"HOME", nil} in env
       assert {"MIX_HOME", Path.join(root, "mix")} in env
       {"* creating phx_new 1.8.5", 0}
@@ -208,7 +208,7 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
                fn _, _, _, _, _ -> {"Phoenix v1.8.4", 0} end
              )
 
-    assert {:error, :phx_new_source_leakage} =
+    assert {:error, :phx_new_archive_identity_mismatch} =
              PhoenixCleanRoomProof.bootstrap_phx_new(
                root,
                fn _, _, _, _, _ -> {"ok", 0} end,

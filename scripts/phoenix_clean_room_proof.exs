@@ -180,7 +180,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
     with {_, 0} <-
            runner.(
              "mix",
-             ["archive", "install", "hex", "phx_new", @phx_new_version, "--force"],
+             ["archive.install", "hex", "phx_new", @phx_new_version, "--force"],
              env,
              root,
              @bootstrap_timeout_ms
@@ -339,16 +339,21 @@ defmodule Rendro.PhoenixCleanRoomProof do
   end
 
   defp isolated_env(root) do
-    @forbidden
-    |> Enum.map(&{&1, nil})
-    |> Kernel.++([
+    isolated = [
       {"MIX_HOME", Path.join(root, "mix")},
       {"HEX_HOME", Path.join(root, "hex")},
       {"HEX_USER_HOME", Path.join(root, "hex-user")},
       {"REBAR_CACHE_DIR", Path.join(root, "rebar")},
       {"MIX_DEPS_PATH", Path.join(root, "deps")},
       {"MIX_BUILD_PATH", Path.join(root, "build")}
-    ])
+    ]
+
+    @forbidden
+    |> Enum.reject(fn key ->
+      Enum.any?(isolated, fn {isolated_key, _} -> key == isolated_key end)
+    end)
+    |> Enum.map(&{&1, nil})
+    |> Kernel.++(isolated)
   end
 
   defp run(command, args, env, cd),
@@ -374,7 +379,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
         |> collect_archives()
 
       _ ->
-        {:error, :phx_new_source_missing}
+        {:error, :phx_new_archive_root_unavailable}
     end
   end
 
@@ -394,14 +399,21 @@ defmodule Rendro.PhoenixCleanRoomProof do
          {:ok, app} <- File.read(app_path) do
       {:ok, %{path: path, app: app, role: String.to_atom(app_name)}}
     else
-      _ -> {:error, :phx_new_source_missing}
+      false -> {:error, :phx_new_archive_outside_root}
+      {:error, :enoent} -> {:error, :phx_new_app_missing}
+      {:ok, %File.Stat{type: :symlink}} -> {:error, :phx_new_archive_symlink}
+      {:ok, %File.Stat{type: _}} -> {:error, :phx_new_archive_type_mismatch}
+      _ -> {:error, :phx_new_archive_invalid}
     end
   end
 
   defp collect_archives(results) do
     if Enum.all?(results, &match?({:ok, _}, &1)),
       do: {:ok, Enum.map(results, fn {:ok, archive} -> archive end)},
-      else: {:error, :phx_new_source_missing}
+      else:
+        Enum.find(results, {:error, :phx_new_archive_invalid}, fn result ->
+          if match?({:error, _}, result), do: result, else: false
+        end)
   end
 
   defp verify_archive_sources(sources, root) when is_list(sources) do
@@ -422,7 +434,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
            &(String.starts_with?(&1.path, root) and Path.basename(&1.path) in allowed)
          ),
        do: :ok,
-       else: {:error, :phx_new_source_leakage}
+       else: {:error, :phx_new_archive_identity_mismatch}
   end
 
   defp command_version(command, args, env, cd),
