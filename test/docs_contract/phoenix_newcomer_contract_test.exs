@@ -27,14 +27,16 @@ defmodule Rendro.DocsContract.PhoenixNewcomerContractTest do
     refute readme =~ "Rendro.Theme.preset(:swiss"
   end
 
-  test "clean-room evidence is explicit about the unavailable generator and retains no sensitive run state" do
+  test "clean-room evidence preserves both failed attempts and retains no sensitive run state" do
     evidence = File.read!("priv/journey_evidence/phoenix_clean_room_1.3.4.json")
     transcript = File.read!("priv/journey_evidence/phoenix_clean_room_1.3.4.md")
 
     assert evidence =~ "\"version\":\"1.3.4\""
     assert evidence =~ "\"outcome\":\"failure\""
-    assert transcript =~ "mix phx.new is unavailable"
+    assert transcript =~ "phx_new_source_missing"
     assert transcript =~ "advisory failure"
+    assert File.exists?("priv/journey_evidence/phoenix_clean_room_1.3.4_failed_attempt.json")
+    assert File.exists?("priv/journey_evidence/phoenix_clean_room_1.3.4_failed_attempt.md")
 
     refute evidence =~ ~r/HEX_API_KEY|HOME|\/Users\/|\"pid\"|\"port\"|%PDF-/
     refute transcript =~ ~r/HEX_API_KEY|HOME|\/Users\/|\bPID\b|%PDF-/
