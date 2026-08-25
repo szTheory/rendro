@@ -92,6 +92,19 @@ defmodule Rendro.PublicReleaseVerifierTest do
              PublicReleaseVerifier.validate(valid_facts(%{"hexdocs_candidate_binding" => nil}))
   end
 
+  test "rejects a durable binding whose control SHA differs from the authoritative HexDocs run" do
+    control_sha = String.duplicate("9", 40)
+
+    assert {:error,
+            "HexDocs durable binding control SHA does not match authoritative workflow run head SHA"} =
+             PublicReleaseVerifier.validate(
+               valid_facts(%{
+                 "hexdocs_head_sha" => control_sha,
+                 "hexdocs_candidate_binding" => candidate_binding(String.duplicate("8", 40))
+               })
+             )
+  end
+
   test "requires an explicit HexDocs workflow-dispatch run ID" do
     assert {:error, "missing required public-release option"} =
              PublicReleaseVerifier.parse_args([
@@ -417,7 +430,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "hexdocs_name" => "HexDocs",
         "hexdocs_provenance" => "hexdocs_workflow_dispatch",
         "docs_provenance_run_id" => "34",
-        "hexdocs_candidate_binding" => candidate_binding(String.duplicate("8", 40)),
+        "hexdocs_candidate_binding" => candidate_binding(@candidate),
         "version" => "1.3.4",
         "hex_version" => "1.3.4",
         "hex_api_checksum" => String.duplicate("c", 64),

@@ -804,7 +804,8 @@ defmodule Rendro.PublicReleaseVerifier do
               facts["hexdocs_candidate_binding"],
               candidate,
               facts["tag"],
-              facts["docs_provenance_run_id"]
+              facts["docs_provenance_run_id"],
+              facts["hexdocs_head_sha"]
             )
           end
 
@@ -814,7 +815,8 @@ defmodule Rendro.PublicReleaseVerifier do
     end
   end
 
-  defp validate_candidate_binding(binding, candidate, tag, run_id) when is_map(binding) do
+  defp validate_candidate_binding(binding, candidate, tag, run_id, control_sha)
+       when is_map(binding) do
     with :ok <-
            equal?(
              binding["control_ref"],
@@ -822,6 +824,12 @@ defmodule Rendro.PublicReleaseVerifier do
              "HexDocs control ref is not protected main"
            ),
          :ok <- valid_sha?(binding["control_sha"], "HexDocs control SHA is invalid"),
+         :ok <-
+           equal?(
+             binding["control_sha"],
+             control_sha,
+             "HexDocs durable binding control SHA does not match authoritative workflow run head SHA"
+           ),
          :ok <-
            equal?(
              binding["requested_artifact_sha"],
@@ -859,7 +867,7 @@ defmodule Rendro.PublicReleaseVerifier do
     end
   end
 
-  defp validate_candidate_binding(_, _, _, _),
+  defp validate_candidate_binding(_, _, _, _, _),
     do: {:error, "HexDocs candidate-binding artifact is unavailable or invalid"}
 
   defp valid_digest?(value, message) when is_binary(value) do
