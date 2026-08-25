@@ -291,8 +291,8 @@ defmodule Rendro.AdoptionSnapshot do
 
     case {write_result, operations.close.(io)} do
       {:ok, :ok} -> :ok
-      {error, _} -> error
       {:ok, error} -> error
+      {error, _} -> error
     end
   end
 
