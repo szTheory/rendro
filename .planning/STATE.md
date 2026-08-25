@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 131 (Adoption Snapshot & Phoenix Newcomer Proof) — EXECUTING
-Plan: 15 of 17 (next executable: 131-18)
+Plan: 14 of 17 completed (next executable: 131-18)
 Status: Ready to execute 131-18 -> 131-16 -> 131-17
 Last activity: 2026-08-25 — Phase 131 terminal-plan routing corrected
 
