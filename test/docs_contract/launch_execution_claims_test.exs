@@ -137,7 +137,7 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     assert workflow =~ "candidate_commit_sha:"
     assert workflow =~ "release_ref:"
     assert workflow =~ "if: github.event_name == 'workflow_dispatch'"
-    assert workflow =~ "ref: f03c78bab54efe1cd1596d51cf3f28193232e2a3"
+    assert workflow =~ "ref: ${{ github.sha }}"
     assert workflow =~ "fetch-depth: 0"
     assert workflow =~ "Verify approved candidate identity"
     assert workflow =~ "APPROVED_CANDIDATE_SHA=\"f03c78bab54efe1cd1596d51cf3f28193232e2a3\""
@@ -148,7 +148,8 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     assert workflow =~
              "git fetch --force origin \"refs/tags/${APPROVED_RELEASE_REF}:refs/tags/${APPROVED_RELEASE_REF}\""
 
-    assert workflow =~ "CHECKOUT_HEAD=$(git rev-parse HEAD)"
+    assert workflow =~ "git checkout --detach \"$APPROVED_CANDIDATE_SHA\""
+    assert workflow =~ "ARTIFACT_HEAD=$(git rev-parse HEAD)"
     assert workflow =~ "PEELED_TAG_SHA=$(git rev-parse \"${APPROVED_RELEASE_REF}^{}\")"
     assert workflow =~ "environment: 'Hex Publish'"
     assert workflow =~ "HEX_API_KEY: ${{ secrets.HEX_API_KEY }}"
@@ -166,12 +167,11 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     assert File.read!("README.md") =~ "{:rendro, \"~> 1.3\"}"
 
     workflow = File.read!(@hexdocs_workflow_path)
-    assert workflow =~ "ref: f03c78bab54efe1cd1596d51cf3f28193232e2a3"
+    assert workflow =~ "ref: ${{ github.sha }}"
     assert workflow =~ "fetch-depth: 0"
-    assert workflow =~ "test \"$GITHUB_SHA\" = \"$APPROVED_CANDIDATE_SHA\""
     assert workflow =~ "test \"$INPUT_CANDIDATE_COMMIT_SHA\" = \"$APPROVED_CANDIDATE_SHA\""
     assert workflow =~ "test \"$INPUT_RELEASE_REF\" = \"$APPROVED_RELEASE_REF\""
-    assert workflow =~ "test \"$CHECKOUT_HEAD\" = \"$APPROVED_CANDIDATE_SHA\""
+    assert workflow =~ "test \"$ARTIFACT_HEAD\" = \"$APPROVED_CANDIDATE_SHA\""
     assert workflow =~ "test \"$PEELED_TAG_SHA\" = \"$APPROVED_CANDIDATE_SHA\""
   end
 
@@ -185,11 +185,16 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
 
     assert workflow_identity_matches_approved?(workflow_identity())
 
+    assert workflow_identity_matches_approved?(%{
+             workflow_identity()
+             | github_sha: "trusted-control-ref-different-from-artifact"
+           })
+
     other_commit = another_1_3_4_commit!()
 
     assert other_commit != @approved_hexdocs_candidate
 
-    refute workflow_identity_matches_approved?(%{workflow_identity() | github_sha: other_commit})
+    assert workflow_identity_matches_approved?(%{workflow_identity() | github_sha: other_commit})
 
     refute workflow_identity_matches_approved?(%{
              workflow_identity()
@@ -249,8 +254,7 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
   end
 
   defp workflow_identity_matches_approved?(identity) do
-    identity.github_sha == @approved_hexdocs_candidate and
-      identity.input_candidate_sha == @approved_hexdocs_candidate and
+    identity.input_candidate_sha == @approved_hexdocs_candidate and
       identity.input_release_ref == @approved_hexdocs_ref and
       identity.checkout_head == @approved_hexdocs_candidate and
       identity.peeled_tag_sha == @approved_hexdocs_candidate and
