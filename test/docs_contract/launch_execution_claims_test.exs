@@ -161,6 +161,38 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     refute workflow =~ ~r/mix hex\.publish --yes/
   end
 
+  test "docs verification fetches and validates the sealed annotated tag before contracts" do
+    workflow = File.read!(@hexdocs_workflow_path)
+
+    assert {:ok, %{"jobs" => jobs}} = YamlElixir.read_from_string(workflow)
+    verify_steps = jobs["verify-docs-ready"]["steps"]
+
+    checkout_index = step_index!(verify_steps, "Checkout")
+    identity_index = step_index!(verify_steps, "Verify sealed release identity")
+    beam_index = step_index!(verify_steps, "Setup Beam")
+    dependencies_index = step_index!(verify_steps, "Install Dependencies")
+    contract_index = step_index!(verify_steps, "Verify Docs Contract")
+    identity_step = Enum.at(verify_steps, identity_index)
+    identity_run = identity_step["run"]
+
+    assert checkout_index < identity_index
+    assert identity_index < beam_index
+    assert identity_index < dependencies_index
+    assert identity_index < contract_index
+    assert identity_run =~ "set -euo pipefail"
+    assert identity_run =~ "APPROVED_CANDIDATE_SHA=\"#{@approved_hexdocs_candidate}\""
+    assert identity_run =~ "APPROVED_RELEASE_REF=\"#{@approved_hexdocs_ref}\""
+
+    assert identity_run =~
+             "git fetch --force origin \"refs/tags/${APPROVED_RELEASE_REF}:refs/tags/${APPROVED_RELEASE_REF}\""
+
+    assert identity_run =~ "TAG_OBJECT_TYPE=$(git cat-file -t \"${APPROVED_RELEASE_REF}\")"
+    assert identity_run =~ "test \"$TAG_OBJECT_TYPE\" = tag"
+    assert identity_run =~ "PEELED_TAG_SHA=$(git rev-parse \"${APPROVED_RELEASE_REF}^{}\")"
+    assert identity_run =~ "test \"$PEELED_TAG_SHA\" = \"$APPROVED_CANDIDATE_SHA\""
+    refute identity_run =~ "HEX_API_KEY"
+  end
+
   test "the protected project and HexDocs identities are exact 1.3.4 while public installation stays range-based" do
     assert Mix.Project.config()[:version] == "1.3.4"
     assert File.read!("CHANGELOG.md") =~ "## [1.3.4] - Unreleased"
@@ -259,6 +291,10 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
       identity.checkout_head == @approved_hexdocs_candidate and
       identity.peeled_tag_sha == @approved_hexdocs_candidate and
       identity.mix_version == "1.3.4"
+  end
+
+  defp step_index!(steps, name) do
+    Enum.find_index(steps, &(&1["name"] == name)) || flunk("Missing workflow step: #{name}")
   end
 
   defp another_1_3_4_commit! do
