@@ -125,6 +125,19 @@ To leave all external state unchanged, reply:
 reject-or-revise
 ```
 
+## Reconciled Literal Approval Received
+
+decision: approved
+packet_revision: range-reconciled-2026-08-25T19:36:00Z
+literal_response: approve-reconciled-control-and-one-dispatch: packet_revision=range-reconciled-2026-08-25T19:36:00Z control_sha=9f67a222b6e0a846656024035694ee27350e08f8 remote_baseline_sha=7e28826cf9f0832063ea9fd922d6bb065a920fc4 complete_nine_commit_history_sha256=fa3fa9d814b28456fd262e3313fceb872ebff782234917879893c324773fe669 complete_eight_path_delta_sha256=e1e125e3dda9a1818d46373507f99e61647f290ff101bca07d8200d941696d5b candidate_sha=f03c78bab54efe1cd1596d51cf3f28193232e2a3 release_ref=v1.3.4 integrate protected-main and dispatch exactly one new HexDocs workflow
+reviewer_identity: user (interactive GSD blocking-human reconciliation checkpoint)
+recorded_at_utc: 2026-08-25T19:31:21Z
+
+This is the user's unqualified literal approval of the final reconciled packet revision.
+It authorizes only its exact nine-commit/eight-path non-force protected-main integration
+and one newly dispatched `HexDocs` workflow after every stated pre-mutation validation
+passes. It does not transfer or broaden earlier approvals, dispatches, or incidents.
+
 ## Fresh Approval After Revision Review
 
 decision: approved
