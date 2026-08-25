@@ -5,15 +5,15 @@ milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 131
 current_phase_name: Adoption Snapshot & Phoenix Newcomer Proof
 status: executing
-stopped_at: Completed 131-11-PLAN.md
-last_updated: "2026-08-25T14:17:54.959Z"
+stopped_at: Completed 131-12-PLAN.md
+last_updated: "2026-08-25T14:55:51.642Z"
 last_activity: 2026-08-25
 last_activity_desc: Phase 131 execution started
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 24
-  completed_plans: 22
+  completed_plans: 23
   percent: 50
 ---
 
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 131 (Adoption Snapshot & Phoenix Newcomer Proof) — EXECUTING
-Plan: 2 of 13
+Plan: 3 of 13
 Status: Ready to execute
 Last activity: 2026-08-25 — Phase 131 execution started
 
-Progress: [█████████░] 92% implementation plans executed; verification pending
+Progress: [██████████] 96% implementation plans executed; verification pending
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
@@ -82,6 +82,7 @@ Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Verification gaps (1
 - [Phase ?]: v1.3.4 approval remains pending_blocking_human; no v1.3.3 approval transfers.
 - [Phase ?]: Adoption snapshot publication uses an exclusive hard link as the no-replace authority and always cleans writer temporary files.
 - [Phase ?]: Contributor tables state the dated empty evidence explicitly; no account or PR was fabricated.
+- [Phase ?]: HexDocs identity validation is inline in the trusted workflow so the sealed candidate remains immutable while dispatcher, checkout, and peeled-tag identities must match it.
 
 ### Pending Todos
 
@@ -110,8 +111,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-25T14:17:54.952Z
-Stopped at: Completed 131-11-PLAN.md
+Last session: 2026-08-25T14:55:51.634Z
+Stopped at: Completed 131-12-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -140,3 +141,4 @@ Resume file: None
 | Phase 131-adoption-snapshot-phoenix-newcomer-proof P08 | 24min | 2 tasks | 4 files |
 | Phase 131-adoption-snapshot-phoenix-newcomer-proof P10 | ~90m | 2 tasks | 9 files |
 | Phase 131 P11 | 10m | 2 tasks | 3 files |
+| Phase 131 P12 | 18m | 1 tasks | 2 files |
