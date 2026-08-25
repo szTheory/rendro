@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v2.13
 milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 131
-current_phase_name: adoption-snapshot-phoenix-newcomer-proof
-status: in_progress
-stopped_at: Phase 131 verification found gaps
-last_updated: "2026-08-25T14:15:00Z"
+current_phase_name: Adoption Snapshot & Phoenix Newcomer Proof
+status: executing
+stopped_at: Completed 131-11-PLAN.md
+last_updated: "2026-08-25T14:17:54.959Z"
 last_activity: 2026-08-25
-last_activity_desc: Phase 131 verification found 4 gap-closure items
+last_activity_desc: Phase 131 execution started
 progress:
   total_phases: 2
   completed_phases: 1
-  total_plans: 21
-  completed_plans: 21
-  percent: 100
+  total_plans: 24
+  completed_plans: 22
+  percent: 50
 ---
 
 # Project State
@@ -24,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-19)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 131 — adoption-snapshot-phoenix-newcomer-proof
+**Current focus:** Phase 131 — Adoption Snapshot & Phoenix Newcomer Proof
 
 ## Current Position
 
-Phase: 131 (adoption-snapshot-phoenix-newcomer-proof) — IN PROGRESS
-Plan: 10 of 10
-Status: Verification gaps found
-Last activity: 2026-08-25 — 2/4 must-haves verified; gap closure required
+Phase: 131 (Adoption Snapshot & Phoenix Newcomer Proof) — EXECUTING
+Plan: 2 of 13
+Status: Ready to execute
+Last activity: 2026-08-25 — Phase 131 execution started
 
-Progress: [██████████] 100% implementation plans executed; verification pending
+Progress: [█████████░] 92% implementation plans executed; verification pending
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
@@ -80,6 +80,8 @@ Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Verification gaps (1
 - [Phase ?]: Plan 10 owns the clean-room harness and evidence only after Plan 09 writes the public prerequisite.
 - [Phase ?]: f03c78bab54efe1cd1596d51cf3f28193232e2a3 is the sole private v1.3.4 candidate after fresh detached proof.
 - [Phase ?]: v1.3.4 approval remains pending_blocking_human; no v1.3.3 approval transfers.
+- [Phase ?]: Adoption snapshot publication uses an exclusive hard link as the no-replace authority and always cleans writer temporary files.
+- [Phase ?]: Contributor tables state the dated empty evidence explicitly; no account or PR was fabricated.
 
 ### Pending Todos
 
@@ -108,8 +110,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-24T21:12:20.979Z
-Stopped at: Completed 131-10-PLAN.md
+Last session: 2026-08-25T14:17:54.952Z
+Stopped at: Completed 131-11-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -137,3 +139,4 @@ Resume file: None
 | Phase 131 P07 | 20min | 2 tasks | 6 files |
 | Phase 131-adoption-snapshot-phoenix-newcomer-proof P08 | 24min | 2 tasks | 4 files |
 | Phase 131-adoption-snapshot-phoenix-newcomer-proof P10 | ~90m | 2 tasks | 9 files |
+| Phase 131 P11 | 10m | 2 tasks | 3 files |

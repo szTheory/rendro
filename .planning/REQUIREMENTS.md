@@ -18,10 +18,10 @@ Requirements for this milestone. Each maps to exactly one roadmap phase.
 
 ### Adoption Evidence
 
-- [ ] **SIGNAL-02**: Maintainer records a dated Hex download snapshot from the public package API, including source and raw totals.
-- [ ] **SIGNAL-03**: Maintainer reviews public issues for qualifying text-shaping demand using the existing requester, organization, use-case, and blocking criteria.
-- [ ] **SIGNAL-04**: Maintainer reviews merged contributions for a qualifying non-maintainer contributor signal using the existing exclusions.
-- [ ] **SIGNAL-05**: `ADOPTION.md` records source-backed decisions for demand, downloads, contributor activity, and the conjunctive composite gate as `HOLD`, `ACCUMULATING`, or `TRIGGER`; unavailable evidence is never treated as zero.
+- [x] **SIGNAL-02**: Maintainer records a dated Hex download snapshot from the public package API, including source and raw totals.
+- [x] **SIGNAL-03**: Maintainer reviews public issues for qualifying text-shaping demand using the existing requester, organization, use-case, and blocking criteria.
+- [x] **SIGNAL-04**: Maintainer reviews merged contributions for a qualifying non-maintainer contributor signal using the existing exclusions.
+- [x] **SIGNAL-05**: `ADOPTION.md` records source-backed decisions for demand, downloads, contributor activity, and the conjunctive composite gate as `HOLD`, `ACCUMULATING`, or `TRIGGER`; unavailable evidence is never treated as zero.
 
 ### Phoenix Newcomer Proof
 
