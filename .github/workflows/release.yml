@@ -100,7 +100,7 @@ jobs:
 
       - name: Run advisory Phoenix clean-room proof
         env:
-          PROOF_ROOT: ${{ runner.temp }}/rendro-phoenix-clean-room
+          PROOF_ROOT: /tmp/rendro-phoenix-clean-room-${{ github.run_id }}-${{ github.run_attempt }}
           PROOF_OUTPUT: ${{ runner.temp }}/phoenix-clean-room-proof.json
         run: |
           set -euo pipefail
