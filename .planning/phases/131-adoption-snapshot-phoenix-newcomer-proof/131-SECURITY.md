@@ -1,12 +1,12 @@
 ---
 phase: 131-adoption-snapshot-phoenix-newcomer-proof
 audited: 2026-08-25
-status: blocked
+status: secured
 asvs_level: 1
 block_on: high
 threats_total: 54
-threats_closed: 53
-threats_open: 1
+threats_closed: 54
+threats_open: 0
 register_authored_at_plan_time: true
 ---
 
@@ -53,7 +53,7 @@ register_authored_at_plan_time: true
 | 09 | T-131-56 | critical | mitigate | CLOSED | Exact human approval boundary: `131-RELEASE-CANDIDATE.md:82-88`. |
 | 09 | T-131-57 | critical | mitigate | CLOSED | Repeat no-tag/ref-snapshot proof: `scripts/release_preflight_proof.exs:172-200`. |
 | 09 | T-131-58 | critical | mitigate | CLOSED | Protected environment secret placement: `.github/workflows/release.yml:53-77`. |
-| 09 | T-131-59 | critical | mitigate | **OPEN** | Current prerequisite and consumer gate retain legacy package-only HexDocs provenance; see Blocking Finding. |
+| 09 | T-131-59 | critical | mitigate | CLOSED | Protected-main `HexDocs` dispatch binds the control SHA, detached candidate, peeled tag, workflow identity, and run ID; the verifier and clean-room consumer require the same complete binding and reject legacy package-only provenance: `.github/workflows/hexdocs.yml:79-150`; `scripts/verify_public_release.exs:793-871`; `scripts/phoenix_clean_room_proof.exs:60-110`. |
 | 10 | T-131-60 | high | mitigate | CLOSED | Exact VERIFIED v1.3.4 prerequisite, Hex lock, no path/Git source: `scripts/phoenix_clean_room_proof.exs:60-110`. |
 | 10 | T-131-61 | high | mitigate | CLOSED | Disposable root, host env clearing, source audits: `scripts/phoenix_clean_room_proof.exs:298-320,410-426,504-523`. |
 | 10 | T-131-62 | high | mitigate | CLOSED | Allowlisted/redacted journey projection: `scripts/phoenix_clean_room_proof.exs:121-148,852-864`; negative fixture `test/scripts/phoenix_clean_room_proof_test.exs:371-405`. |
@@ -71,34 +71,34 @@ register_authored_at_plan_time: true
 | 13 | T-131-13-03 | medium | mitigate | CLOSED | Unique temp and unconditional cleanup: `scripts/verify_public_release.exs:1095-1112`. |
 | 13 | T-131-13-04 | medium | mitigate | CLOSED | Fresh byte-identical check-existing/no-rewrite behavior: `scripts/verify_public_release.exs:160-175`; `test/scripts/public_release_verifier_test.exs:252-265`. |
 
-## Blocking Finding
+## Closed Finding
 
 ### T-131-59 — Public identity provenance is not carried into the authoritative prerequisite
 
 **Severity:** critical  
 **Disposition:** mitigate  
-**Status:** OPEN
+**Status:** CLOSED
 
-The current verifier correctly requires a protected-main, separately checked-out candidate artifact and durable binding whose `control_sha` equals the authoritative HexDocs run `headSha`:
+The verifier requires a protected-main, separately checked-out candidate artifact and durable binding whose `control_sha` equals the authoritative HexDocs run `headSha`:
 
 - `scripts/verify_public_release.exs:779-871`
 - `.github/workflows/hexdocs.yml:68-103,128-150`
 
-However, `131-PUBLIC-PREREQUISITE.json` records the older package-only route:
+The regenerated `131-PUBLIC-PREREQUISITE.json` now records the current route:
 
-- `hexdocs_provenance: "protected_release_publish"`
-- `hexdocs_event: "push"`
-- `hexdocs_name: "Release to Hex"`
-- no `hexdocs_candidate_binding`
+- `hexdocs_provenance: "hexdocs_workflow_dispatch"`
+- `hexdocs_event: "workflow_dispatch"`
+- `hexdocs_name: "HexDocs"`
+- complete `hexdocs_candidate_binding` for control SHA `f9b63246029396f76c443c5750aad42a3004081b`, candidate `f03c78bab54efe1cd1596d51cf3f28193232e2a3`, tag `v1.3.4`, and run `32898926521`
 
-The clean-room gate explicitly accepts that older route and rejects the new `workflow_dispatch` provenance:
+The clean-room gate requires that same `workflow_dispatch` provenance and complete binding, with no legacy fallback:
 
 - `scripts/phoenix_clean_room_proof.exs:60-82`
 - `test/scripts/phoenix_clean_room_proof_test.exs:314-333`
 
-Thus the current journey-authorizing prerequisite could not have been emitted by the present hardened verifier and does not prove the declared control-ref / artifact-identity / durable-binding chain.
+The authoritative prerequisite was emitted by the hardened verifier and proves the declared control-ref, artifact-identity, tag, and durable-binding chain. Deterministic tests reject legacy package-only provenance and malformed or mismatched bindings.
 
-**Required remediation:** regenerate the authoritative prerequisite through the current verifier using a successful protected-main `HexDocs` `workflow_dispatch` run and its `hexdocs-candidate-binding` artifact; then update `PhoenixCleanRoomProof.validate_prerequisite/1` and its tests to require that provenance and binding rather than `protected_release_publish`. Re-run the clean-room proof and retain the regenerated bounded journey evidence.
+**Verified remediation:** Plans 131-16, 131-17, and 131-18 regenerated the authoritative prerequisite through the protected-main `HexDocs` `workflow_dispatch`, aligned both validators on the same binding contract, and refreshed the bounded journey evidence. The 2026-08-25 re-audit verified 84 focused tests with zero failures.
 
 ## Accepted Risks
 
@@ -120,4 +120,15 @@ None. No Phase 131 execution summary contains a `## Threat Flags` section.
 | Blocking open | 1 |
 | Non-blocking open | 0 |
 
-Phase advancement remains blocked until T-131-59 is remediated and this audit is re-run.
+At this initial audit point, phase advancement remained blocked pending T-131-59 remediation and re-audit.
+
+## Security Audit 2026-08-25 — Re-audit
+
+| Metric | Count |
+|---|---:|
+| Threats found | 54 |
+| Mitigated/accepted | 54 |
+| Blocking open | 0 |
+| Non-blocking open | 0 |
+
+T-131-59 is closed by the protected-main workflow-dispatch candidate binding, verifier/consumer parity, canonical prerequisite, and deterministic legacy-rejection coverage. Phase advancement is no longer security-blocked.
