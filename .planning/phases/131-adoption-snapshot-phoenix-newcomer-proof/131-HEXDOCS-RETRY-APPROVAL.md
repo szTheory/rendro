@@ -1,5 +1,5 @@
 ---
-decision: rejected_or_revise
+decision: approved
 packet_created_at_utc: 2026-08-25T18:20:00Z
 control_sha: 7e28826cf9f0832063ea9fd922d6bb065a920fc4
 remote_baseline_sha: 881b97ffc10551f77e7c6f416bc91df2e1289025
@@ -96,3 +96,16 @@ To leave all external state unchanged, reply:
 ```text
 reject-or-revise
 ```
+
+## Fresh Approval After Revision Review
+
+decision: approved
+literal_response: approve-corrected-control-and-one-dispatch: control_sha=7e28826cf9f0832063ea9fd922d6bb065a920fc4 candidate_sha=f03c78bab54efe1cd1596d51cf3f28193232e2a3 release_ref=v1.3.4 integrate protected-main and dispatch exactly one new HexDocs workflow
+reviewer_identity: user (interactive GSD checkpoint)
+recorded_at_utc: 2026-08-25T18:49:59Z
+
+This fresh decision supersedes only the packet's earlier rejection. It authorizes the exact
+corrected control, sealed candidate, release ref, protected-main integration, and one new
+HexDocs dispatch stated above. It does not authorize rerunning terminal run `32877290266`,
+changing a tag or package, force-pushing, using an alternate publisher, or dispatching more
+than once.
