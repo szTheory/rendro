@@ -65,6 +65,44 @@ defmodule Rendro.DocsContract.AdoptionEvidenceContractTest do
     assert [] == Path.wildcard(path <> ".tmp-*")
   end
 
+  test "exclusive writer closes and cleans up its temp file on write, sync, or close failure" do
+    directory =
+      Path.join(
+        System.tmp_dir!(),
+        "rendro-adoption-failure-#{System.unique_integer([:positive])}"
+      )
+
+    on_exit(fn -> File.rm_rf(directory) end)
+    assert :ok = File.mkdir_p(directory)
+
+    for failure <- [:write, :sync, :close] do
+      path = Path.join(directory, "#{failure}.json")
+      parent = self()
+
+      operations =
+        %{
+          close: fn io ->
+            result = File.close(io)
+            send(parent, {:closed, failure})
+            if failure == :close, do: {:error, :simulated_close_failure}, else: result
+          end
+        }
+        |> maybe_fail(failure, :write, fn _io, _contents -> {:error, :simulated_write_failure} end)
+        |> maybe_fail(failure, :sync, fn _io -> {:error, :simulated_sync_failure} end)
+
+      assert {:error, _} =
+               Rendro.AdoptionSnapshot.write_snapshot(
+                 path,
+                 %{"schema_version" => 1, "review_date" => "2026-08-21"},
+                 operations
+               )
+
+      assert_receive {:closed, ^failure}
+      refute File.exists?(path)
+      assert [] == Path.wildcard(path <> ".tmp-*")
+    end
+  end
+
   test "parallel writers produce one complete authoritative target" do
     directory =
       Path.join(
@@ -146,4 +184,7 @@ defmodule Rendro.DocsContract.AdoptionEvidenceContractTest do
   test "package allowlist ships the evidence linked from ADOPTION.md" do
     assert File.read!("mix.exs") =~ "priv/adoption_evidence"
   end
+
+  defp maybe_fail(operations, failure, failure, callback), do: Map.put(operations, failure, callback)
+  defp maybe_fail(operations, _failure, _operation, _callback), do: operations
 end

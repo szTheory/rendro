@@ -146,9 +146,10 @@ defmodule Rendro.AdoptionSnapshot do
     do:
       value |> canonical_json() |> then(&:crypto.hash(:sha256, &1)) |> Base.encode16(case: :lower)
 
-  def write_snapshot(path, payload) when is_binary(path) and is_map(payload) do
+  def write_snapshot(path, payload, operations \\ %{})
+      when is_binary(path) and is_map(payload) and is_map(operations) do
     with :ok <- File.mkdir_p(Path.dirname(path)),
-         {:ok, temp} <- write_temp(path, Jason.encode!(payload)) do
+         {:ok, temp} <- write_temp(path, Jason.encode!(payload), file_operations(operations)) do
       try do
         case link_exclusively(temp, path) do
           :ok -> :ok
@@ -264,19 +265,47 @@ defmodule Rendro.AdoptionSnapshot do
   defp encode_family(family),
     do: family |> Map.new(fn {key, value} -> {Atom.to_string(key), value} end)
 
-  defp write_temp(path, contents) do
+  defp write_temp(path, contents, operations) do
     temp = path <> ".tmp-" <> Integer.to_string(System.unique_integer([:positive]))
 
-    case File.open(temp, [:write, :exclusive, :binary]) do
+    case operations.open.(temp) do
       {:ok, io} ->
-        IO.binwrite(io, contents)
-        :ok = :file.sync(io)
-        :ok = File.close(io)
-        {:ok, temp}
+        case write_and_close(io, contents, operations) do
+          :ok -> {:ok, temp}
+          error ->
+            _ = File.rm(temp)
+            error
+        end
 
       error ->
         error
     end
+  end
+
+  defp write_and_close(io, contents, operations) do
+    write_result =
+      with :ok <- operations.write.(io, contents),
+           :ok <- operations.sync.(io) do
+        :ok
+      end
+
+    case {write_result, operations.close.(io)} do
+      {:ok, :ok} -> :ok
+      {error, _} -> error
+      {:ok, error} -> error
+    end
+  end
+
+  defp file_operations(overrides) do
+    Map.merge(
+      %{
+        open: &File.open(&1, [:write, :exclusive, :binary]),
+        write: &IO.binwrite/2,
+        sync: &:file.sync/1,
+        close: &File.close/1
+      },
+      overrides
+    )
   end
 
   defp link_exclusively(temp, path),
