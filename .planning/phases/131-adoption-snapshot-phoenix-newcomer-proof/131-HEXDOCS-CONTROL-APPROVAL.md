@@ -96,3 +96,21 @@ reject-or-revise
 ```
 
 An approval may include reviewer identity, but it must not alter the bound control SHA, candidate SHA, tag, workflow name, or authorized scope.
+
+## Task 1 Execution-Now Confirmation
+
+recorded_at_utc: 2026-08-25T17:18:44Z
+execution_control_sha: 881b97ffc10551f77e7c6f416bc91df2e1289025
+execution_candidate_sha: f03c78bab54efe1cd1596d51cf3f28193232e2a3
+execution_release_ref: v1.3.4
+execution_workflow_name: HexDocs
+
+execution_literal_response:
+
+```text
+approve-exact-control-and-docs-now: control_sha=881b97ffc10551f77e7c6f416bc91df2e1289025
+  candidate_sha=f03c78bab54efe1cd1596d51cf3f28193232e2a3 release_ref=v1.3.4 perform protected-main
+  integration and HexDocs dispatch now
+```
+
+This literal response is the Task 1 handoff for Plan 131-15. It is unqualified and binds only the resolved execution identities above: integrate the exact control SHA into protected main, then dispatch `HexDocs` once for the sealed candidate and `v1.3.4` now. No tag, package, force-push, or retry authority is implied.
