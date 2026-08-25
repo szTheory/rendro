@@ -5,16 +5,16 @@ milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 131
 current_phase_name: Adoption Snapshot & Phoenix Newcomer Proof
 status: executing
-stopped_at: Completed 131-13-PLAN.md
-last_updated: "2026-08-25T15:01:01.321Z"
+stopped_at: Phase 131 planning complete — 17 plans ready
+last_updated: "2026-08-25T17:03:08.939Z"
 last_activity: 2026-08-25
-last_activity_desc: Phase 131 execution started
 progress:
   total_phases: 2
-  completed_phases: 2
-  total_plans: 24
+  completed_phases: 1
+  total_plans: 28
   completed_plans: 24
-  percent: 100
+  percent: 50
+last_activity_desc: Phase 131 planning complete — 17 plans ready
 ---
 
 # Project State
@@ -29,18 +29,18 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 131 (Adoption Snapshot & Phoenix Newcomer Proof) — EXECUTING
-Plan: 4 of 13
+Plan: 13 of 17
 Status: Ready to execute
-Last activity: 2026-08-25 — Phase 131 execution started
+Last activity: 2026-08-25 — Phase 131 planning complete
 
-Progress: [██████████] 100% implementation plans executed; verification pending
+Progress: [████████░░] 76% implementation plans executed; 4 gap-closure plans ready
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
 ```text
 [████████████████████░░░░░░░░░░░░░░░░░░░░] 50% — 1/2 phases complete
 Phase 130 Catalog Quality & Evidence Ratchet .............. Complete (11/11 plans)
-Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Verification gaps (10/10 plans executed)
+Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Gap closure ready (13/17 plans executed)
 ```
 
 **Locked sequencing:** 130 repairs, regenerates, and truthfully re-reviews the fixed twelve cells before 131 records final adoption evidence and validates the public newcomer path against that stable catalog state.
@@ -119,8 +119,8 @@ Resume file: None
 
 ## Next Steps
 
-1. Run `$gsd-plan-phase 131 --gaps` to create closure plans from `131-VERIFICATION.md`.
-2. Re-run `$gsd-execute-phase 131 --gaps-only` after the gap plans are approved.
+1. Run `$gsd-execute-phase 131 --gaps-only` to execute Plans 131-14 through 131-17.
+2. Stop at the protected-main and HexDocs checkpoints until the exact hash-bound human approvals are recorded.
 
 ## Performance Metrics
 

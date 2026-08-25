@@ -89,7 +89,7 @@ Plans:
   3. A newcomer in a clean Phoenix environment can follow public discovery material to install the public Rendro package, select the canonical Swiss/light Invoice, and customize it using the documented preset/configurator path without a repository checkout or warm dependency cache.
   4. That clean Phoenix application responds through the optional Phoenix adapter with a successful `application/pdf` response whose bytes begin `%PDF-`, and the recorded journey states the exact versions, commands, results, and any repairs limited to existing handoffs.
 
-**Plans**: 13/13 plans executed
+**Plans**: 13/17 plans executed
 
 Plans:
 
@@ -139,9 +139,25 @@ Plans:
 - [x] 131-12-PLAN.md — Bind HexDocs publication to the immutable approved v1.3.4 candidate and peeled tag.
 - [x] 131-13-PLAN.md — Make public prerequisite publication exclusive under competing verifier processes.
 
+**Wave 12** *(blocked on Wave 11 completion)*
+
+- [ ] 131-14-PLAN.md — Prepare and obtain exact authorization for the protected-main HexDocs control-plane repair.
+
+**Wave 13** *(blocked on Wave 12 completion)*
+
+- [ ] 131-15-PLAN.md — Publish the approved hardened workflow, retain its candidate binding, and regenerate the authoritative prerequisite.
+
+**Wave 14** *(blocked on Wave 13 completion)*
+
+- [ ] 131-16-PLAN.md — Align the clean-room prerequisite consumer with the current fail-closed verifier contract.
+
+**Wave 15** *(blocked on Wave 14 completion)*
+
+- [ ] 131-17-PLAN.md — Rerun the clean Phoenix journey and replace stale evidence with current bound proof.
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 130. Catalog Quality & Evidence Ratchet | 11/11 | Complete    | 2026-08-20 |
-| 131. Adoption Snapshot & Phoenix Newcomer Proof | 13/13 | In Progress|  |
+| 131. Adoption Snapshot & Phoenix Newcomer Proof | 13/17 | In Progress|  |
