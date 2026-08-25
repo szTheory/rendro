@@ -65,6 +65,41 @@ defmodule Rendro.DocsContract.PhoenixNewcomerContractTest do
     refute transcript =~ ~r/HEX_API_KEY|HOME|\/Users\/|\bPID\b|%PDF-/
   end
 
+  test "retained clean-room result proves the exact public PDF journey with dual HTTP facts" do
+    evidence =
+      "priv/journey_evidence/phoenix_clean_room_1.3.4.json"
+      |> File.read!()
+      |> Jason.decode!()
+
+    assert evidence["advisory"] == true
+    assert evidence["outcome"] == "success"
+    assert evidence["version"] == "1.3.4"
+    assert evidence["candidate_sha"] == "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
+    assert evidence["source_audits"] == "public_hex_exact_1.3.4"
+    assert evidence["cleanup"] == "removed"
+
+    assert evidence["commands"] == [
+             "mix archive.install hex phx_new 1.8.5 --force",
+             "mix phx.new --no-install --no-ecto --no-html --no-assets --no-mailer",
+             "mix deps.get",
+             "mix test",
+             "mix compile",
+             "loopback endpoint start",
+             "loopback HTTP probe"
+           ]
+
+    expected_response = %{
+      "status" => 200,
+      "content_type" => "application/pdf",
+      "filename" => "invoice.pdf",
+      "nonempty" => true,
+      "pdf_magic" => true
+    }
+
+    assert evidence["conn_case"] == expected_response
+    assert evidence["loopback"] == expected_response
+  end
+
   defp ordered?(text, values) do
     values
     |> Enum.map(&:binary.match(text, &1))
