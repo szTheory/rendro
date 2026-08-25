@@ -75,3 +75,50 @@ jobs:
         # Hex publishes docs by default. Keep future tag releases package-only:
         # the candidate-bound HexDocs workflow owns the separately approved docs publish.
         run: mix hex.publish --yes --no-docs
+
+  phoenix-clean-room-advisory:
+    # This is an external, advisory proof lane. It intentionally does not become a
+    # required release check, but the job itself fails unless it writes fresh success evidence.
+    needs: publish
+    if: always() && needs.publish.result == 'success'
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Setup Beam
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
+        with:
+          otp-version: '28'
+          elixir-version: '1.19.5'
+
+      - name: Install Dependencies
+        run: mix deps.get
+
+      - name: Run advisory Phoenix clean-room proof
+        env:
+          PROOF_ROOT: ${{ runner.temp }}/rendro-phoenix-clean-room
+          PROOF_OUTPUT: ${{ runner.temp }}/phoenix-clean-room-proof.json
+        run: |
+          set -euo pipefail
+          mix run scripts/phoenix_clean_room_proof.exs -- \
+            --prerequisite .planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json \
+            --root "$PROOF_ROOT" \
+            --output "$PROOF_OUTPUT"
+          node -e '
+            const fs = require("fs");
+            const proof = JSON.parse(fs.readFileSync(process.env.PROOF_OUTPUT, "utf8"));
+            if (proof.outcome !== "success" || proof.cleanup !== "removed" || proof.lane !== "advisory_external_evidence") process.exit(1);
+          '
+
+      - name: Upload advisory Phoenix clean-room evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: phoenix-clean-room-advisory
+          path: ${{ runner.temp }}/phoenix-clean-room-proof.json
+          if-no-files-found: error
+          retention-days: 14

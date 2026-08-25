@@ -171,6 +171,19 @@ defmodule Guardrails.RequiredChecksContractTest do
   end
 
   describe "required/advisory CI separation" do
+    test "release workflow runs and retains a fresh advisory Phoenix clean-room proof" do
+      release = File.read!(@release_path)
+      advisory_block = ci_job_block!(release, "phoenix-clean-room-advisory")
+
+      assert advisory_block =~ "continue-on-error: true"
+      assert advisory_block =~ "scripts/phoenix_clean_room_proof.exs"
+      assert advisory_block =~ "131-PUBLIC-PREREQUISITE.json"
+      assert advisory_block =~ "proof.outcome !== \"success\""
+      assert advisory_block =~ "proof.cleanup !== \"removed\""
+      assert advisory_block =~ "name: phoenix-clean-room-advisory"
+      assert advisory_block =~ "if-no-files-found: error"
+    end
+
     test "Phase 130 catalog review accepts only a full-SHA-bound candidate route" do
       ci = File.read!(@ci_path)
       advisory_block = ci_job_block!(ci, "advisory-checks")
