@@ -5,10 +5,10 @@ milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 131
 current_phase_name: Adoption Snapshot & Phoenix Newcomer Proof
 status: executing
-stopped_at: Completed 131-14-PLAN.md
+stopped_at: Ready for 131-18-PLAN.md
 last_updated: "2026-08-25T17:51:49.502Z"
 last_activity: 2026-08-25
-last_activity_desc: Phase 131 execution started
+last_activity_desc: Phase 131 terminal-plan routing corrected
 progress:
   total_phases: 2
   completed_phases: 1
@@ -29,18 +29,18 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 131 (Adoption Snapshot & Phoenix Newcomer Proof) — EXECUTING
-Plan: 2 of 17
-Status: Ready to execute
-Last activity: 2026-08-25 — Phase 131 execution started
+Plan: 15 of 17 (next executable: 131-18)
+Status: Ready to execute 131-18 -> 131-16 -> 131-17
+Last activity: 2026-08-25 — Phase 131 terminal-plan routing corrected
 
-Progress: [█████████░] 89% implementation plans executed; 4 gap-closure plans ready
+Progress: [████████░░] 82% executable plans executed; 3 gap-closure plans ready
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
 ```text
 [████████████████████░░░░░░░░░░░░░░░░░░░░] 50% — 1/2 phases complete
 Phase 130 Catalog Quality & Evidence Ratchet .............. Complete (11/11 plans)
-Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Gap closure ready (13/17 plans executed)
+Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Gap closure ready (14/17 executable plans executed)
 ```
 
 **Locked sequencing:** 130 repairs, regenerates, and truthfully re-reviews the fixed twelve cells before 131 records final adoption evidence and validates the public newcomer path against that stable catalog state.
@@ -116,13 +116,14 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-08-25T17:14:20.444Z
-Stopped at: Completed 131-14-PLAN.md
+Stopped at: Ready for 131-18-PLAN.md
 Resume file: None
 
 ## Next Steps
 
-1. Run `$gsd-execute-phase 131 --gaps-only` to execute Plans 131-14 through 131-17.
-2. Stop at the protected-main and HexDocs checkpoints until the exact hash-bound human approvals are recorded.
+1. Run `$gsd-execute-phase 131 --gaps-only`; the only pending executable chain is 131-18 -> 131-16 -> 131-17.
+2. Treat `131-15-TERMINAL-INCIDENT.md` as immutable incident evidence; never dispatch it again.
+3. Stop at Plan 131-18's protected-main and HexDocs checkpoints until the fresh exact hash-bound human approvals are recorded.
 
 ## Performance Metrics
 
