@@ -273,3 +273,51 @@ To leave external state unchanged, reply:
 ```text
 reject-or-revise
 ```
+
+## Literal Approval Received
+
+decision: approved
+literal_response: approve-corrected-control-and-one-dispatch: control_sha=9f67a222b6e0a846656024035694ee27350e08f8 remote_baseline_sha=7e28826cf9f0832063ea9fd922d6bb065a920fc4 candidate_sha=f03c78bab54efe1cd1596d51cf3f28193232e2a3 release_ref=v1.3.4 integrate protected-main and dispatch exactly one new HexDocs workflow
+reviewer_identity: user (interactive GSD checkpoint)
+recorded_at_utc: 2026-08-25T19:20:59Z
+
+This is the user's unqualified literal approval for the exact named control,
+baseline, candidate, release ref, protected-main integration, and one new
+HexDocs workflow dispatch. It remains subject to the packet's required
+pre-mutation fact validation; it does not broaden the stated scope.
+
+## Pre-Mutation Validation Stop
+
+status: blocked_range_mismatch
+recorded_at_utc: 2026-08-25T19:20:59Z
+
+No remote mutation was performed. The required remote baseline remains
+`7e28826cf9f0832063ea9fd922d6bb065a920fc4`; the sealed candidate and annotated
+`v1.3.4` tag validate; local workflow, contract, and CI hashes validate; and
+authenticated GitHub access plus the required `ci-success` protected-main control
+are available. However, the approval-bound fast-forward range is not the packet's
+declared two commits. The actual ordered range is nine commits:
+
+```text
+48b5429405dbbd94d1bcc6adac75cd66bce6cb22
+de69fe51183cc9873c969c7c5462c72e5ec430ce
+54964804dd9e5b0af4d23edada11ad2772ddaec7
+b5da699688762361762d4713e46c7cd113ae5f69
+2367609794405381017e640b59a598977bd0a8eb
+d71d81a1adff72b590793cacf7444d83329ca53d
+f5a582af330ccb19d2725450a54b151ab392c473
+c2912e87eeb46bab07e036d29948cffaa9f1add9
+9f67a222b6e0a846656024035694ee27350e08f8
+```
+
+Its SHA-256 is
+`a97ff9e001378603d38edbd1678f68d85c14747b04bfdb757edf19d4ddcad95a`, not the
+packet's two-commit range hash
+`3648d68330e1ecc42494243192a316e72cedbba839dba6ab37815e733ac8600b`.
+The current exact name-status hash is still
+`e1e125e3dda9a1818d46373507f99e61647f290ff101bca07d8200d941696d5b`.
+
+Because that mismatch changes the approval-bound integration scope, execution
+stops before protected-main integration or any workflow dispatch. A reconciled
+packet and fresh blocking-human approval must name the actual nine-commit range
+and its complete path delta before this plan may resume.
