@@ -367,7 +367,9 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
           fn facts ->
             put_in(facts, ["hexdocs_candidate_binding", "workflow_event"], "push")
           end,
-          fn facts -> put_in(facts, ["hexdocs_candidate_binding", "workflow_name"], "Release to Hex") end,
+          fn facts ->
+            put_in(facts, ["hexdocs_candidate_binding", "workflow_name"], "Release to Hex")
+          end,
           fn facts -> put_in(facts, ["hexdocs_candidate_binding", "workflow_run_id"], "1") end,
           fn facts -> Map.put(facts, "hexdocs_head_sha", "not-a-sha") end,
           fn facts -> Map.put(facts, "hexdocs_conclusion", "failure") end,

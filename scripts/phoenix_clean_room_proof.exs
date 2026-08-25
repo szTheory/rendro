@@ -68,20 +68,66 @@ defmodule Rendro.PhoenixCleanRoomProof do
       "release_name" => "Release to Hex",
       "release_conclusion" => "success",
       "release_publish_job_conclusion" => "success",
-      "hexdocs_provenance" => "protected_release_publish",
-      "docs_provenance_run_id" => "32763039854",
+      "hexdocs_provenance" => "hexdocs_workflow_dispatch",
+      "hexdocs_conclusion" => "success",
+      "hexdocs_event" => "workflow_dispatch",
+      "hexdocs_name" => "HexDocs",
       "v1_3_0_conclusion" => "failure",
       "v1_3_1_conclusion" => "cancelled",
       "v1_3_2_conclusion" => "failure",
       "v1_3_3_conclusion" => "failure"
     }
 
-    if Enum.all?(required, fn {key, value} -> Map.get(prerequisite, key) == value end),
+    with true <- Enum.all?(required, fn {key, value} -> Map.get(prerequisite, key) == value end),
+         :ok <- valid_sha?(prerequisite["hexdocs_head_sha"]),
+         :ok <- valid_numeric?(prerequisite["docs_provenance_run_id"]),
+         :ok <-
+           validate_candidate_binding(
+             prerequisite["hexdocs_candidate_binding"],
+             prerequisite["hexdocs_head_sha"],
+             prerequisite["docs_provenance_run_id"]
+           ) do
+      :ok
+    else
+      _ -> {:error, :invalid_public_prerequisite}
+    end
+  end
+
+  def validate_prerequisite(_), do: {:error, :invalid_public_prerequisite}
+
+  defp validate_candidate_binding(binding, control_sha, run_id) when is_map(binding) do
+    required = %{
+      "control_ref" => "refs/heads/main",
+      "control_sha" => control_sha,
+      "requested_artifact_sha" => @candidate,
+      "peeled_tag_sha" => @candidate,
+      "detached_artifact_head" => @candidate,
+      "tag" => "v#{@version}",
+      "workflow_name" => "HexDocs",
+      "workflow_event" => "workflow_dispatch",
+      "workflow_run_id" => run_id
+    }
+
+    if Enum.all?(required, fn {key, value} -> Map.get(binding, key) == value end),
       do: :ok,
       else: {:error, :invalid_public_prerequisite}
   end
 
-  def validate_prerequisite(_), do: {:error, :invalid_public_prerequisite}
+  defp validate_candidate_binding(_, _, _), do: {:error, :invalid_public_prerequisite}
+
+  defp valid_sha?(value) when is_binary(value) do
+    if Regex.match?(~r/^[0-9a-f]{40}$/, value),
+      do: :ok,
+      else: {:error, :invalid_public_prerequisite}
+  end
+
+  defp valid_sha?(_), do: {:error, :invalid_public_prerequisite}
+
+  defp valid_numeric?(value) when is_binary(value) do
+    if Regex.match?(~r/^\d+$/, value), do: :ok, else: {:error, :invalid_public_prerequisite}
+  end
+
+  defp valid_numeric?(_), do: {:error, :invalid_public_prerequisite}
 
   def audit_dependency_source!(source) when is_binary(source) do
     cond do
