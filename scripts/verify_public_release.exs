@@ -764,13 +764,10 @@ defmodule Rendro.PublicReleaseVerifier do
   end
 
   defp validate_public_archive_identity(facts) do
+    # Hex's checksum authenticates the downloaded outer archive. Independent builds can
+    # produce different outer archive bytes, so candidate identity is deliberately bound
+    # by the canonical manifest and normalized metadata contained in that archive.
     with :ok <- valid_digest?(facts["sealed_archive_sha256"], "sealed archive SHA-256 is invalid"),
-         :ok <-
-           equal?(
-             facts["public_archive_sha256"],
-             facts["sealed_archive_sha256"],
-             "public archive SHA-256 does not match the sealed candidate"
-           ),
          :ok <-
            equal?(
              facts["public_archive_sha256"],
