@@ -95,6 +95,7 @@ defmodule Rendro.DocsContract.AdoptionEvidenceContractTest do
         assert_receive {:writer_ready, writer}, 5_000
         writer
       end
+
     Enum.each(writers, &send(&1, :write_snapshot))
     results = Enum.map(tasks, &Task.await(&1, 5_000))
 

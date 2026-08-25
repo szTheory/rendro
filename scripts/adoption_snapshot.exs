@@ -148,14 +148,16 @@ defmodule Rendro.AdoptionSnapshot do
 
   def write_snapshot(path, payload) when is_binary(path) and is_map(payload) do
     with :ok <- File.mkdir_p(Path.dirname(path)),
-         :ok <- ensure_absent(path),
-         {:ok, temp} <- write_temp(path, Jason.encode!(payload)),
-         :ok <- link_exclusively(temp, path) do
-      File.rm(temp)
-      :ok
-    else
-      {:error, :eexist} -> {:error, :target_exists}
-      {:error, _} = error -> error
+         {:ok, temp} <- write_temp(path, Jason.encode!(payload)) do
+      try do
+        case link_exclusively(temp, path) do
+          :ok -> :ok
+          {:error, :eexist} -> {:error, :target_exists}
+          {:error, _} = error -> error
+        end
+      after
+        _ = File.rm(temp)
+      end
     end
   end
 
@@ -261,8 +263,6 @@ defmodule Rendro.AdoptionSnapshot do
 
   defp encode_family(family),
     do: family |> Map.new(fn {key, value} -> {Atom.to_string(key), value} end)
-
-  defp ensure_absent(path), do: if(File.exists?(path), do: {:error, :eexist}, else: :ok)
 
   defp write_temp(path, contents) do
     temp = path <> ".tmp-" <> Integer.to_string(System.unique_integer([:positive]))
