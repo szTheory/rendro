@@ -1,5 +1,5 @@
 ---
-decision: pending
+decision: approved
 packet_created_at_utc: 2026-08-25T17:06:33Z
 local_control_sha: 881b97ffc10551f77e7c6f416bc91df2e1289025
 origin_main_sha: 6c56d390c1765e8724d6caabc1fa088a87266533
@@ -72,7 +72,16 @@ Stop with no external mutation if local workflow changes are uncommitted; `origi
 
 ## Literal Decision Record
 
-decision: pending
+decision: approved
+literal_response: approve-exact-control-and-docs
+reviewer_identity: not supplied
+recorded_at_utc: 2026-08-25T17:12:57Z
+control_sha: 881b97ffc10551f77e7c6f416bc91df2e1289025
+candidate_sha: f03c78bab54efe1cd1596d51cf3f28193232e2a3
+release_ref: v1.3.4
+workflow_name: HexDocs
+
+The literal, unqualified response above authorizes only this ordered action scope for Plan 131-15: fast-forward protected `origin/main` from `6c56d390c1765e8724d6caabc1fa088a87266533` to control SHA `881b97ffc10551f77e7c6f416bc91df2e1289025`; dispatch `HexDocs` from protected `main` exactly once with `candidate_commit_sha=f03c78bab54efe1cd1596d51cf3f28193232e2a3` and `release_ref=v1.3.4`; and retain the emitted `hexdocs-candidate-binding` artifact for subsequent verifier/prerequisite work. It does not authorize any protected-main write, workflow dispatch, tag/package mutation, or HexDocs publication in Plan 131-14.
 
 To authorize the exact scope, reply literally:
 
