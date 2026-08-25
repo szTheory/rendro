@@ -231,6 +231,7 @@ defmodule Rendro.PublicReleaseVerifier do
          {:ok, tag_object} <- github_tag_object(repository, options.tag),
          {:ok, release} <- github_run(options.release_run_id),
          {:ok, hexdocs} <- docs_provenance_run(options),
+         {:ok, candidate_binding} <- candidate_binding_artifact(options),
          {:ok, hex} <- hex_release(options.tag),
          {:ok, archive} <- archive_facts(options.tag),
          {:ok, sealed} <- candidate_evidence(options.candidate_record),
@@ -253,6 +254,7 @@ defmodule Rendro.PublicReleaseVerifier do
            "hexdocs_conclusion" => hexdocs["conclusion"],
            "hexdocs_event" => hexdocs["event"],
            "hexdocs_name" => hexdocs["name"],
+           "hexdocs_candidate_binding" => candidate_binding,
            "hexdocs_provenance" => docs_provenance(options),
            "release_publish_job_id" => release_publish_job_id(release),
            "release_publish_job_conclusion" => release_publish_job_conclusion(release),
@@ -306,6 +308,44 @@ defmodule Rendro.PublicReleaseVerifier do
     do: github_json(["run", "view", id, "--json", "conclusion,event,headSha,name,jobs"])
 
   defp docs_provenance_run(options), do: github_run(options.hexdocs_run_id)
+
+  defp candidate_binding_artifact(options) do
+    directory =
+      Path.join(
+        System.tmp_dir!(),
+        "rendro-hexdocs-binding-#{System.unique_integer([:positive])}"
+      )
+
+    try do
+      with :ok <- File.mkdir_p(directory),
+           {_, 0} <-
+             System.cmd(
+               "gh",
+               [
+                 "run",
+                 "download",
+                 options.hexdocs_run_id,
+                 "--name",
+                 "hexdocs-candidate-binding",
+                 "--dir",
+                 directory
+               ],
+               stderr_to_stdout: true
+             ),
+           [path] <- Path.wildcard(Path.join(directory, "**/*")) |> Enum.filter(&File.regular?/1),
+           "hexdocs-candidate-binding.json" <- Path.basename(path),
+           {:ok, encoded} <- File.read(path),
+           true <- byte_size(encoded) <= 4_096,
+           {:ok, binding} <- JSON.decode(encoded),
+           true <- is_map(binding) do
+        {:ok, binding}
+      else
+        _ -> {:error, "HexDocs candidate-binding artifact is unavailable or invalid"}
+      end
+    after
+      File.rm_rf(directory)
+    end
+  end
 
   defp docs_provenance(_options), do: "hexdocs_workflow_dispatch"
 
@@ -738,11 +778,7 @@ defmodule Rendro.PublicReleaseVerifier do
 
   defp validate_docs_provenance(facts, candidate) do
     with :ok <-
-           equal?(
-             facts["hexdocs_head_sha"],
-             candidate,
-             "HexDocs workflow head does not match candidate"
-           ),
+           valid_sha?(facts["hexdocs_head_sha"], "HexDocs workflow control SHA is invalid"),
          :ok <-
            equal?(
              facts["hexdocs_conclusion"],
@@ -764,7 +800,12 @@ defmodule Rendro.PublicReleaseVerifier do
                  ),
                :ok <-
                  equal?(facts["hexdocs_name"], "HexDocs", "HexDocs workflow name is incorrect") do
-            :ok
+            validate_candidate_binding(
+              facts["hexdocs_candidate_binding"],
+              candidate,
+              facts["tag"],
+              facts["docs_provenance_run_id"]
+            )
           end
 
         _ ->
@@ -772,6 +813,54 @@ defmodule Rendro.PublicReleaseVerifier do
       end
     end
   end
+
+  defp validate_candidate_binding(binding, candidate, tag, run_id) when is_map(binding) do
+    with :ok <-
+           equal?(
+             binding["control_ref"],
+             "refs/heads/main",
+             "HexDocs control ref is not protected main"
+           ),
+         :ok <- valid_sha?(binding["control_sha"], "HexDocs control SHA is invalid"),
+         :ok <-
+           equal?(
+             binding["requested_artifact_sha"],
+             candidate,
+             "HexDocs requested artifact does not match candidate"
+           ),
+         :ok <-
+           equal?(
+             binding["peeled_tag_sha"],
+             candidate,
+             "HexDocs peeled tag does not match candidate"
+           ),
+         :ok <-
+           equal?(
+             binding["detached_artifact_head"],
+             candidate,
+             "HexDocs detached artifact HEAD does not match candidate"
+           ),
+         :ok <- equal?(binding["tag"], tag, "HexDocs provenance tag does not match candidate tag"),
+         :ok <-
+           equal?(
+             binding["workflow_name"],
+             "HexDocs",
+             "HexDocs provenance workflow name is incorrect"
+           ),
+         :ok <-
+           equal?(
+             binding["workflow_event"],
+             "workflow_dispatch",
+             "HexDocs provenance workflow event is incorrect"
+           ),
+         :ok <-
+           equal?(binding["workflow_run_id"], run_id, "HexDocs provenance run ID does not match") do
+      :ok
+    end
+  end
+
+  defp validate_candidate_binding(_, _, _, _),
+    do: {:error, "HexDocs candidate-binding artifact is unavailable or invalid"}
 
   defp valid_digest?(value, message) when is_binary(value) do
     if Regex.match?(~r/^[0-9a-f]{64}$/, value), do: :ok, else: {:error, message}
@@ -1051,6 +1140,7 @@ defmodule Rendro.PublicReleaseVerifier do
       "sealed_metadata_sha256",
       "public_metadata_sha256",
       "hexdocs_provenance",
+      "hexdocs_candidate_binding",
       "docs_provenance_run_id",
       "hexdocs_head_sha",
       "hexdocs_conclusion",

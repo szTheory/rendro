@@ -64,7 +64,32 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "release_publish_job_conclusion" => "success"
       })
 
-    assert {:error, "HexDocs provenance is not recognized"} = PublicReleaseVerifier.validate(facts)
+    assert {:error, "HexDocs provenance is not recognized"} =
+             PublicReleaseVerifier.validate(facts)
+  end
+
+  test "accepts a protected control SHA distinct from the detached candidate only with matching durable binding" do
+    control_sha = String.duplicate("9", 40)
+
+    assert :ok =
+             PublicReleaseVerifier.validate(
+               valid_facts(%{
+                 "hexdocs_head_sha" => control_sha,
+                 "hexdocs_candidate_binding" => candidate_binding(control_sha)
+               })
+             )
+
+    assert {:error, "HexDocs detached artifact HEAD does not match candidate"} =
+             PublicReleaseVerifier.validate(
+               valid_facts(%{
+                 "hexdocs_head_sha" => control_sha,
+                 "hexdocs_candidate_binding" =>
+                   candidate_binding(control_sha, %{"detached_artifact_head" => control_sha})
+               })
+             )
+
+    assert {:error, "HexDocs candidate-binding artifact is unavailable or invalid"} =
+             PublicReleaseVerifier.validate(valid_facts(%{"hexdocs_candidate_binding" => nil}))
   end
 
   test "requires an explicit HexDocs workflow-dispatch run ID" do
@@ -392,6 +417,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "hexdocs_name" => "HexDocs",
         "hexdocs_provenance" => "hexdocs_workflow_dispatch",
         "docs_provenance_run_id" => "34",
+        "hexdocs_candidate_binding" => candidate_binding(String.duplicate("8", 40)),
         "version" => "1.3.4",
         "hex_version" => "1.3.4",
         "hex_api_checksum" => String.duplicate("c", 64),
@@ -448,6 +474,23 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "v1_3_3_hexdocs_absent" => true,
         "v1_3_3_hexdocs_dispatch_absent" => true,
         "v1_3_3_verifier_absent" => true
+      },
+      overrides
+    )
+  end
+
+  defp candidate_binding(control_sha, overrides \\ %{}) do
+    Map.merge(
+      %{
+        "control_ref" => "refs/heads/main",
+        "control_sha" => control_sha,
+        "requested_artifact_sha" => @candidate,
+        "peeled_tag_sha" => @candidate,
+        "detached_artifact_head" => @candidate,
+        "tag" => "v1.3.4",
+        "workflow_name" => "HexDocs",
+        "workflow_event" => "workflow_dispatch",
+        "workflow_run_id" => "34"
       },
       overrides
     )

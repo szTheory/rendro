@@ -529,6 +529,22 @@ defmodule Guardrails.RequiredChecksContractTest do
     end
   end
 
+  describe "HexDocs candidate binding" do
+    test "publication secrets require protected main and preserve a durable detached-artifact binding" do
+      workflow = File.read!(@hexdocs_path)
+
+      assert workflow =~
+               "github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.ref_protected == true"
+
+      assert workflow =~ "git checkout --detach \"$APPROVED_CANDIDATE_SHA\""
+      assert workflow =~ "name: hexdocs-candidate-binding"
+      assert workflow =~ "requested_artifact_sha"
+      assert workflow =~ "peeled_tag_sha"
+      assert workflow =~ "detached_artifact_head"
+      assert workflow =~ "retention-days: 90"
+    end
+  end
+
   describe "fork-safe offline contract" do
     test "does not reference network APIs or tokens" do
       source = File.read!(__ENV__.file)
