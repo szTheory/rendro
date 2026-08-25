@@ -66,25 +66,42 @@ defmodule Rendro.DocsContract.AdoptionEvidenceContractTest do
   end
 
   test "parallel writers produce one complete authoritative target" do
-    path =
+    directory =
       Path.join(
         System.tmp_dir!(),
-        "rendro-adoption-parallel-#{System.unique_integer([:positive])}.json"
+        "rendro-adoption-parallel-#{System.unique_integer([:positive])}"
       )
 
+    on_exit(fn -> File.rm_rf(directory) end)
+    assert :ok = File.mkdir_p(directory)
+
+    path = Path.join(directory, "2026-08-21.json")
     payload = %{"schema_version" => 1, "review_date" => "2026-08-21"}
+    parent = self()
 
-    results =
-      1..4
-      |> Task.async_stream(fn _ -> Rendro.AdoptionSnapshot.write_snapshot(path, payload) end,
-        ordered: false,
-        timeout: 5_000
-      )
-      |> Enum.map(fn {:ok, result} -> result end)
+    tasks =
+      for _ <- 1..4 do
+        Task.async(fn ->
+          send(parent, {:writer_ready, self()})
+
+          receive do
+            :write_snapshot -> Rendro.AdoptionSnapshot.write_snapshot(path, payload)
+          end
+        end)
+      end
+
+    writers =
+      for _ <- tasks do
+        assert_receive {:writer_ready, writer}, 5_000
+        writer
+      end
+    Enum.each(writers, &send(&1, :write_snapshot))
+    results = Enum.map(tasks, &Task.await(&1, 5_000))
 
     assert Enum.count(results, &(&1 == :ok)) == 1
     assert Enum.all?(results, &(&1 in [:ok, {:error, :target_exists}]))
     assert {:ok, ^payload} = path |> File.read!() |> Jason.decode()
+    assert [] == Path.wildcard(path <> ".tmp-*")
   end
 
   test "dated sidecar is bounded, conjunctive, and bound to the public index" do
