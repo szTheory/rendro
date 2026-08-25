@@ -8,6 +8,9 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
   @checklist_file "88-LAUNCH-CHECKLIST.md"
   @copy_file "88-LAUNCH-COPY.md"
   @hexdocs_workflow_path ".github/workflows/hexdocs.yml"
+  @hexdocs_identity_script_path "scripts/verify_hexdocs_release_identity.sh"
+  @approved_hexdocs_candidate "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
+  @approved_hexdocs_ref "v1.3.4"
   @public_url_script_path "scripts/verify_public_launch_urls.sh"
   @readiness_labels [
     "Claim-accuracy fixes are shipped",
@@ -120,7 +123,7 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     end
   end
 
-  test "HexDocs workflow publishes docs only from an exact approved dispatch" do
+  test "HexDocs workflow publishes docs only from the sealed release identity" do
     workflow = File.read!(@hexdocs_workflow_path)
 
     assert {:ok, %{"jobs" => jobs}} = YamlElixir.read_from_string(workflow)
@@ -135,10 +138,12 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     assert workflow =~ "candidate_commit_sha:"
     assert workflow =~ "release_ref:"
     assert workflow =~ "if: github.event_name == 'workflow_dispatch'"
-    assert workflow =~ "inputs.release_ref == 'v1.3.4'"
-    assert workflow =~ "inputs.candidate_commit_sha == github.sha"
-    assert workflow =~ "ref: ${{ inputs.candidate_commit_sha }}"
+    assert workflow =~ "ref: f03c78bab54efe1cd1596d51cf3f28193232e2a3"
+    assert workflow =~ "fetch-depth: 0"
     assert workflow =~ "Verify approved candidate identity"
+    assert workflow =~ "scripts/verify_hexdocs_release_identity.sh"
+    assert workflow =~ "INPUT_CANDIDATE_COMMIT_SHA: ${{ inputs.candidate_commit_sha }}"
+    assert workflow =~ "INPUT_RELEASE_REF: ${{ inputs.release_ref }}"
     assert workflow =~ "environment: 'Hex Publish'"
     assert workflow =~ "HEX_API_KEY: ${{ secrets.HEX_API_KEY }}"
     assert workflow =~ "mix hex.publish docs --yes"
@@ -155,8 +160,54 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     assert File.read!("README.md") =~ "{:rendro, \"~> 1.3\"}"
 
     workflow = File.read!(@hexdocs_workflow_path)
-    assert workflow =~ "test \"${{ inputs.release_ref }}\" = \"v1.3.4\""
-    assert workflow =~ "test \"$MIX_VERSION\" = \"1.3.4\""
+    assert workflow =~ "ref: f03c78bab54efe1cd1596d51cf3f28193232e2a3"
+    assert workflow =~ "scripts/verify_hexdocs_release_identity.sh"
+  end
+
+  test "HexDocs identity gate rejects another valid 1.3.4 commit" do
+    assert File.exists?(@hexdocs_identity_script_path)
+    assert {_, 0} = System.cmd("bash", ["-n", @hexdocs_identity_script_path])
+
+    assert {approved_tag_sha, 0} =
+             System.cmd("git", ["rev-parse", "#{@approved_hexdocs_ref}^{}"],
+               stderr_to_stdout: true
+             )
+
+    assert String.trim(approved_tag_sha) == @approved_hexdocs_candidate
+
+    assert {_, 0} =
+             run_hexdocs_identity_gate(
+               @approved_hexdocs_candidate,
+               @approved_hexdocs_candidate,
+               @approved_hexdocs_candidate
+             )
+
+    other_commit = another_1_3_4_commit!()
+
+    assert other_commit != @approved_hexdocs_candidate
+
+    assert {_, status} =
+             run_hexdocs_identity_gate(other_commit, @approved_hexdocs_candidate, other_commit)
+
+    assert status != 0
+
+    assert {_, status} =
+             run_hexdocs_identity_gate(
+               @approved_hexdocs_candidate,
+               other_commit,
+               @approved_hexdocs_candidate
+             )
+
+    assert status != 0
+
+    assert {_, status} =
+             run_hexdocs_identity_gate(
+               @approved_hexdocs_candidate,
+               @approved_hexdocs_candidate,
+               other_commit
+             )
+
+    assert status != 0
   end
 
   test "public launch URL verifier covers GitHub raw and HexDocs proof routes" do
@@ -187,5 +238,37 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
 
     path || flunk("Could not find #{filename} in active phase dir or v2.6 milestone archive")
     File.read!(path)
+  end
+
+  defp run_hexdocs_identity_gate(github_sha, input_candidate_commit_sha, checkout_head) do
+    System.cmd("bash", [@hexdocs_identity_script_path],
+      stderr_to_stdout: true,
+      env: [
+        {"GITHUB_SHA", github_sha},
+        {"INPUT_CANDIDATE_COMMIT_SHA", input_candidate_commit_sha},
+        {"INPUT_RELEASE_REF", @approved_hexdocs_ref},
+        {"CHECKOUT_HEAD", checkout_head}
+      ]
+    )
+  end
+
+  defp another_1_3_4_commit! do
+    {commits, 0} = System.cmd("git", ["rev-list", "--all"], stderr_to_stdout: true)
+
+    commits
+    |> String.split("\n", trim: true)
+    |> Enum.find(fn commit ->
+      commit != @approved_hexdocs_candidate and version_at_commit?(commit, "1.3.4")
+    end)
+    |> case do
+      nil -> flunk("Could not find another real commit that declares version 1.3.4")
+      commit -> commit
+    end
+  end
+
+  defp version_at_commit?(commit, version) do
+    {mix_exs, 0} = System.cmd("git", ["show", "#{commit}:mix.exs"], stderr_to_stdout: true)
+
+    mix_exs =~ ~r/^\s*@version\s+"#{Regex.escape(version)}"\s*$/m
   end
 end
