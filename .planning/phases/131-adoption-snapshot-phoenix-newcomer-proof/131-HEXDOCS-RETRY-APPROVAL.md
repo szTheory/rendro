@@ -154,6 +154,29 @@ no dispatch and no retry. If all checks pass, this decision authorizes exactly o
 It does not authorize an environment-policy bypass, a rerun, any additional dispatch, tag or
 package mutation, artifact fabrication, or an alternative publisher.
 
+## Dispatch Outcome — Binding Contract Failure
+
+status: terminal_binding_artifact_invalid_no_retry
+recorded_at_utc: 2026-08-25T19:58:00Z
+
+The one authorized new dispatch was created exactly once as run `32891807712` on `main`.
+It is `HexDocs` / `workflow_dispatch` at control SHA
+`9f67a222b6e0a846656024035694ee27350e08f8`; both `verify-docs-ready` (job
+`97945235644`) and `publish-hexdocs` (job `97947208198`) concluded `success`.
+
+The downloaded sole `hexdocs-candidate-binding.json` artifact was 398 bytes with SHA-256
+`35ac6e892b50ede746ad7bd9bc096333aec5dad21cce90c37730504c6ef00b3a`. Its otherwise expected
+identity fields name the approved control, sealed candidate, `v1.3.4`, `HexDocs`, and run
+`32891807712`; however, its final bytes are literal backslash-plus-`n` (`5c 6e`) after the JSON
+object (`7d 5c 6e`). `jq -e .` therefore exits 5 with `Invalid numeric literal at EOF`.
+
+This artifact is not a JSON map, so it fails the bounded binding prerequisite required by this
+plan and by `Rendro.PublicReleaseVerifier`. The old canonical prerequisite remains untouched;
+no legacy copy was made and no replacement VERIFIED record was written. The dispatched run is
+retained as immutable advisory incident evidence. The sole dispatch authority is consumed:
+there was no rerun, second dispatch, binding repair, policy bypass, tag/package mutation, or
+manufactured prerequisite.
+
 ## Reconciled Literal Approval Received
 
 decision: approved
