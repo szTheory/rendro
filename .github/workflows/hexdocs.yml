@@ -150,7 +150,7 @@ jobs:
           test "$CANDIDATE_SHA" = "$PEELED_TAG_SHA"
           test "$CANDIDATE_SHA" = "$ARTIFACT_HEAD"
           export PEELED_TAG_SHA ARTIFACT_HEAD
-          node -e 'const fs = require("fs"); const evidence = {control_ref: process.env.CONTROL_REF, control_sha: process.env.CONTROL_SHA, requested_artifact_sha: process.env.CANDIDATE_SHA, peeled_tag_sha: process.env.PEELED_TAG_SHA, detached_artifact_head: process.env.ARTIFACT_HEAD, tag: process.env.RELEASE_REF, workflow_name: "HexDocs", workflow_event: "workflow_dispatch", workflow_run_id: process.env.WORKFLOW_RUN_ID}; fs.writeFileSync("hexdocs-candidate-binding.json", JSON.stringify(evidence) + "\\n");'
+          node -e 'const fs = require("fs"); const evidence = {control_ref: process.env.CONTROL_REF, control_sha: process.env.CONTROL_SHA, requested_artifact_sha: process.env.CANDIDATE_SHA, peeled_tag_sha: process.env.PEELED_TAG_SHA, detached_artifact_head: process.env.ARTIFACT_HEAD, tag: process.env.RELEASE_REF, workflow_name: "HexDocs", workflow_event: "workflow_dispatch", workflow_run_id: process.env.WORKFLOW_RUN_ID}; fs.writeFileSync("hexdocs-candidate-binding.json", JSON.stringify(evidence));'
 
       - name: Upload candidate binding provenance
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
