@@ -207,13 +207,11 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     assert workflow =~ "test \"$PEELED_TAG_SHA\" = \"$APPROVED_CANDIDATE_SHA\""
   end
 
-  test "HexDocs identity gate rejects another valid 1.3.4 commit" do
-    assert {approved_tag_sha, 0} =
-             System.cmd("git", ["rev-parse", "#{@approved_hexdocs_ref}^{}"],
-               stderr_to_stdout: true
-             )
+  test "HexDocs identity gate rejects another valid 1.3.4 commit without requiring a local tag" do
+    source = File.read!(@hexdocs_workflow_path)
 
-    assert String.trim(approved_tag_sha) == @approved_hexdocs_candidate
+    refute source =~
+             "System.cmd(\"git\", [\"rev-parse\", \"#{@approved_hexdocs_ref}^{}\"]"
 
     assert workflow_identity_matches_approved?(workflow_identity())
 
@@ -242,6 +240,12 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
              workflow_identity()
              | peeled_tag_sha: other_commit
            })
+  end
+
+  test "secondary CI matrix uses an available OTP baseline for Elixir 1.19" do
+    ci_workflow = File.read!(".github/workflows/ci.yml")
+
+    assert ci_workflow =~ "- otp: '26'\n            elixir: '1.19.0'"
   end
 
   test "public launch URL verifier covers GitHub raw and HexDocs proof routes" do

@@ -31,7 +31,7 @@ jobs:
           - otp: '28'
             elixir: '1.19.5'
             primary: true
-          - otp: '25'
+          - otp: '26'
             elixir: '1.19.0'
             primary: false
     env:
