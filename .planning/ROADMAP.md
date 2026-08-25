@@ -17,7 +17,7 @@
 **Milestone Goal:** Strengthen the shipped catalog and adoption experience with current, bounded evidence—repairing and honestly re-reviewing the twelve existing `needs_work` catalog cells, recording an explicit demand-gate decision, and proving one clean Phoenix newcomer path—without expanding Rendro's runtime dependencies, core capability families, catalog, recipes, or presets.
 
 - [x] **Phase 130: Catalog Quality & Evidence Ratchet** - Repair and re-review the exact twelve catalog cells through the existing deterministic and advisory evidence lanes. (completed 2026-08-20)
-- [ ] **Phase 131: Adoption Snapshot & Phoenix Newcomer Proof** - Record a dated demand decision and prove the public Swiss/light Invoice path in a clean Phoenix application.
+- [x] **Phase 131: Adoption Snapshot & Phoenix Newcomer Proof** - Record a dated demand decision and prove the public Swiss/light Invoice path in a clean Phoenix application. (completed 2026-08-25)
 
 ## Phase Details
 
@@ -162,4 +162,4 @@ Incident evidence (non-executable): `131-15-TERMINAL-INCIDENT.md` preserves the 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 130. Catalog Quality & Evidence Ratchet | 11/11 | Complete    | 2026-08-20 |
-| 131. Adoption Snapshot & Phoenix Newcomer Proof | 17/17 | In Progress|  |
+| 131. Adoption Snapshot & Phoenix Newcomer Proof | 17/17 | Complete    | 2026-08-25 |
