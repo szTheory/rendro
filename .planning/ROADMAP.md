@@ -89,7 +89,7 @@ Plans:
   3. A newcomer in a clean Phoenix environment can follow public discovery material to install the public Rendro package, select the canonical Swiss/light Invoice, and customize it using the documented preset/configurator path without a repository checkout or warm dependency cache.
   4. That clean Phoenix application responds through the optional Phoenix adapter with a successful `application/pdf` response whose bytes begin `%PDF-`, and the recorded journey states the exact versions, commands, results, and any repairs limited to existing handoffs.
 
-**Plans**: 14/17 plans executed
+**Plans**: 14/18 plans executed
 
 Plans:
 
@@ -146,6 +146,7 @@ Plans:
 **Wave 13** *(blocked on Wave 12 completion)*
 
 - [ ] 131-15-PLAN.md — Publish the approved hardened workflow, retain its candidate binding, and regenerate the authoritative prerequisite.
+- [ ] 131-18-PLAN.md — Correct the terminal 131-15 missing-tag failure, obtain fresh exact authority, and produce the trusted prerequisite through one new protected dispatch. *(131-15 is immutable incident evidence and must not be rerun)*
 
 **Wave 14** *(blocked on Wave 13 completion)*
 
