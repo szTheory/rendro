@@ -135,6 +135,14 @@ defmodule Rendro.DocsContract.AdoptionEvidenceContractTest do
     refute File.read!(path) =~ ~r/"body"|authorization|HEX_API_KEY|HOME|\/Users\//
   end
 
+  test "adoption ledger uses truthful contributor empty states without debt markers" do
+    adoption = File.read!("ADOPTION.md")
+
+    assert adoption =~ "| No alternate accounts are currently recorded |"
+    assert adoption =~ "| No rejected candidates were recorded for the 2026-08-21 review |"
+    refute adoption =~ ~r/\bTBD\b/
+  end
+
   test "package allowlist ships the evidence linked from ADOPTION.md" do
     assert File.read!("mix.exs") =~ "priv/adoption_evidence"
   end
