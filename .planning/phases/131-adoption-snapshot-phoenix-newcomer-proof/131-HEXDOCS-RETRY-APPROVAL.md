@@ -1,8 +1,10 @@
 ---
-decision: pending_blocking_human
+decision: terminal_binding_artifact_invalid_no_retry
 packet_created_at_utc: 2026-08-25T18:20:00Z
-packet_revised_at_utc: 2026-08-25T19:36:00Z
+packet_revised_at_utc: 2026-08-25T20:04:51Z
 control_sha: 9f67a222b6e0a846656024035694ee27350e08f8
+local_correction_control_sha: 283d753973fa5669b26c7249c10aa656ef86a0fd
+dispatch_authority: spent
 remote_baseline_sha: 7e28826cf9f0832063ea9fd922d6bb065a920fc4
 candidate_sha: f03c78bab54efe1cd1596d51cf3f28193232e2a3
 release_ref: v1.3.4
@@ -124,6 +126,50 @@ To leave all external state unchanged, reply:
 ```text
 reject-or-revise
 ```
+
+## Local Binding-Writer Correction — No Dispatch Authority
+
+status: local_correction_ready_external_authority_spent
+recorded_at_utc: 2026-08-25T20:04:51Z
+
+The successful dispatch `32891807712` remains immutable terminal evidence, not a valid
+prerequisite source. Its `hexdocs-candidate-binding.json` is exactly 398 bytes with
+SHA-256 `35ac6e892b50ede746ad7bd9bc096333aec5dad21cce90c37730504c6ef00b3a` and ends
+`7d 5c 6e`: the writer appended JavaScript string `"\\n"`, producing literal
+backslash-plus-`n` after the JSON object. `jq -e .` exits 5. The verifier remains strict;
+this malformed advisory artifact is not normalized, reused, or used to write the canonical
+prerequisite.
+
+Local correction control `283d753973fa5669b26c7249c10aa656ef86a0fd`
+(`fix(131-18): write parseable HexDocs binding`) replaces the unsafe construction with
+`fs.writeFileSync("hexdocs-candidate-binding.json", JSON.stringify(evidence));`.
+Its deterministic regression executes the exact embedded Node writer in an isolated fixture,
+requires exactly one decoded binding map with the expected control/candidate/tag/workflow/run
+identities, and keeps the exact `7d 5c 6e` malformed fixture as a decoder rejection.
+
+| Local-control fact | Exact value |
+|---|---|
+| Correction control SHA | `283d753973fa5669b26c7249c10aa656ef86a0fd` |
+| Baseline ancestor | `9f67a222b6e0a846656024035694ee27350e08f8` |
+| Ordered local range | eight commits, `9f67a222b6e0a846656024035694ee27350e08f8..283d753973fa5669b26c7249c10aa656ef86a0fd` |
+| Ordered-history SHA-256 | `3f9c330230a5c3fcb16a684613b6b5e2cddaf337a64fac04ee97b62ffbbfdb4b` |
+| Name-status SHA-256 | `a21f4c9100615014480d77186f2eb4c7918c5547e379ce2b52237d3e58c279bb` |
+| Workflow SHA-256 | `949402bf66f7412be323509b22c9bbb553a8fb2999b8c13781733f30ad6beb4b` |
+| Launch-contract SHA-256 | `b08a63a038795295e424865efa40a8ce3f6d5ff63eddcc0ecbb3ccf9fc99342d` |
+| Local verification | focused workflow/verifier contracts: 32 tests, 0 failures; `mix ci.fast`: pass |
+
+### Machine-Gated Next-Attempt Policy
+
+No action is authorized by this local correction: do not push, integrate protected main,
+dispatch, rerun, approve an environment, retrieve another artifact, publish, mutate tags or
+packages, or create the canonical prerequisite. A future attempt needs newly granted external
+authority that explicitly binds a reviewed control, then the existing machine gates must pass in
+order: protected-main non-force integration, exact-SHA push CI, one newly authorized dispatch,
+successful `verify-docs-ready` and `publish-hexdocs`, and strict binding JSON/schema/identity
+validation by the current verifier. Any failure consumes no implicit retry authority and stops.
+
+For unattended retries, consider a separately designed idempotent release-intent record with a
+durable consumed-dispatch state; it is intentionally out of scope for this repository-local fix.
 
 ## Conditional Post-Bypass Approval
 
