@@ -2,8 +2,8 @@
 phase: 131
 slug: adoption-snapshot-phoenix-newcomer-proof
 # status lifecycle: draft (seeded by plan-phase) -> validated (set by validate-phase)
-status: draft
-nyquist_compliant: true
+status: blocked
+nyquist_compliant: false
 wave_0_complete: false
 created: 2026-08-21
 ---
@@ -40,8 +40,8 @@ created: 2026-08-21
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
 | 131-W0-01 | 01 | 0 | SIGNAL-02, SIGNAL-03, SIGNAL-04, SIGNAL-05 | T-131-01 | Evidence is bounded, typed, and never converts unavailable retrieval into zero | contract/unit | `mix test test/docs_contract/adoption_evidence_contract_test.exs` | ❌ W0 | ⬜ pending |
-| 131-W0-02 | 10 | 0 | JOURNEY-01, JOURNEY-02, JOURNEY-04 | T-131-60, T-131-62 | Public-package proof rejects path/Git/workspace/cache leakage and retains no payload | docs contract | `mix test test/docs_contract/phoenix_newcomer_contract_test.exs` | ✅ | ✅ green |
-| 131-W0-03 | 10 | 0 | JOURNEY-01, JOURNEY-03, JOURNEY-04 | T-131-61, T-131-63 | Harness isolates run state, bounds process lifetime, and validates captured response metadata | unit | `mix test test/scripts/phoenix_clean_room_proof_test.exs` | ✅ | ✅ green |
+| 131-W0-02 | 10 | 0 | JOURNEY-01, JOURNEY-02, JOURNEY-04 | T-131-60, T-131-62 | Public-package mechanics reject path/Git/workspace/cache leakage, but the prerequisite provenance is legacy | docs contract | `mix test test/docs_contract/phoenix_newcomer_contract_test.exs` | ✅ | ⚠️ partial |
+| 131-W0-03 | 10 | 0 | JOURNEY-01, JOURNEY-03, JOURNEY-04 | T-131-61, T-131-63 | Harness validates response metadata, but accepts a verifier-incompatible legacy prerequisite | unit | `mix test test/scripts/phoenix_clean_room_proof_test.exs` | ✅ | ⚠️ partial |
 | 131-ADV-01 | 01 | advisory | SIGNAL-02, SIGNAL-03, SIGNAL-04, SIGNAL-05 | T-131-01 | One read-only public snapshot retains allowlisted metadata only | advisory external | Named adoption snapshot command from Plan 131-01 | ❌ | ⬜ pending |
 | 131-REL-PARSER | 02 | 2 | JOURNEY-01, JOURNEY-02 | T-131-08, T-131-14 | Both protected workflow parsers select exactly one `@version` declaration, fail on zero/multiple declarations, and independently reproduce the failed v1.3.0 multiline case | contract | `mix test test/guardrails/required_checks_contract_test.exs --max-failures 1` | ✅ | ⬜ pending |
 | 131-REL-CANDIDATE-131 | 03 | 3 | JOURNEY-01, JOURNEY-02 | T-131-06, T-131-08 | Historical exact 1.3.1 private checks passed, but immutable tag/run 32539594278 failed before publication and cannot satisfy the public prerequisite | historical deterministic | Plan 131-03 evidence plus debug session `release-preflight-theme-hang.md` | ✅ | ✅ historical-only |
@@ -53,8 +53,8 @@ created: 2026-08-21
 | 131-REL-CANDIDATE-133 | 05,06 | 5,6 | JOURNEY-01, JOURNEY-02, JOURNEY-04 | T-131-35, T-131-36, T-131-37, T-131-38 | Historical exact 1.3.3 candidate passed complete proof but immutable run 32596108284 failed only at the redundant standalone unauthenticated Hex dry run | historical deterministic/advisory | Plan 131-05/06 evidence plus `.planning/debug/v133-hex-dry-run.md` | ✅ | ✅ historical-only |
 | 131-REL-LEAST-PRIVILEGE | 07 | 7 | JOURNEY-01, JOURNEY-04 | T-131-52, T-131-53 | Candidate contains bbe75d2; complete credential-free preflight is the sole dry-run validation gate and only actual protected publish receives HEX_API_KEY | contract | `mix test test/guardrails/required_checks_contract_test.exs test/mix/tasks/release_preflight_test.exs --max-failures 1` | ✅ | ⬜ pending |
 | 131-REL-CANDIDATE-134 | 07,08 | 7,8 | JOURNEY-01, JOURNEY-02, JOURNEY-04 | T-131-52, T-131-54, T-131-55 | Every existing 1.3.4 release-bearing exact-version, package/docs, workflow, verifier, and incident surface is committed before exact-SHA capture; detached complete proof leaves refs unchanged and permits only control records afterward; clean-room artifacts remain post-verifier Plan-10 work | contract/integration | Named full private candidate command from Plan 131-08 | ❌ | ⬜ pending |
-| 131-ADV-REL-134 | 09 | advisory | JOURNEY-01, JOURNEY-02, JOURNEY-04 | T-131-56, T-131-57, T-131-58, T-131-59 | Fresh approval precedes one v1.3.4 tag; protected release+Hex succeeds before candidate-bound HexDocs and atomic verifier | advisory external | Named protected run/dispatch/verifier commands from Plan 131-09 | ❌ | ⬜ pending |
-| 131-ADV-02 | 10 | advisory | JOURNEY-01, JOURNEY-02, JOURNEY-03, JOURNEY-04 | T-131-60, T-131-61, T-131-62, T-131-63 | Exact public `rendro` 1.3.4 resolves in a fresh generated app and returns a valid PDF through ConnCase and loopback HTTP; all four older failed tags/runs remain incident evidence only | advisory external | Final schema-complete Plan 131-10 harness run | ✅ | ✅ green — dual 200/PDF facts and cleanup observed; prior failed attempts retained |
+| 131-ADV-REL-134 | 09 | advisory | JOURNEY-01, JOURNEY-02, JOURNEY-04 | T-131-56, T-131-57, T-131-58, T-131-59 | Public record is legacy package-only provenance and lacks the required candidate binding | advisory external | Current-verifier regeneration is required | ❌ | ❌ blocker |
+| 131-ADV-02 | 10 | advisory | JOURNEY-01, JOURNEY-02, JOURNEY-03, JOURNEY-04 | T-131-60, T-131-61, T-131-62, T-131-63 | Retained 200/PDF facts are useful but were authorized by the legacy prerequisite, not the current durable workflow-dispatch contract | advisory external | Regenerate prerequisite, update consumer gate, then rerun clean-room proof | ✅ | ⚠️ partial |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -89,6 +89,93 @@ created: 2026-08-21
 - [x] No watch-mode flags.
 - [x] Deterministic feedback latency is under 30 seconds.
 - [x] Live external claims remain explicitly advisory and are never substituted by offline tests.
-- [x] `nyquist_compliant: true` set in frontmatter after execution evidence exists.
+- [ ] Cross-contract prerequisite provenance is consistent between verifier, retained prerequisite, and clean-room gate (blocked by T-131-59).
 
-**Approval:** Exact candidate `f03c78bab54efe1cd1596d51cf3f28193232e2a3` was explicitly approved, released through protected `Release to Hex` run `32763039854` (publish job `97549444486`), atomically VERIFIED by the public prerequisite, and completed by the bounded clean-room proof. Immutable v1.3.0-v1.3.3 incidents remain historical failures; the final Phoenix observation is advisory evidence, not deterministic CI authority.
+**Current status:** The retained prerequisite records legacy `protected_release_publish`/`push` provenance and no durable candidate binding. It must not be described as atomically VERIFIED by the current verifier, and the clean-room proof it authorized is not current-contract coverage. Immutable v1.3.0-v1.3.3 incidents remain historical failures.
+
+## Nyquist Audit — 2026-08-25
+
+**Superseded result:** This earlier audit found one evidence-drift gap and added
+useful coverage, but it did not compare the verifier and consumer prerequisite
+contracts. See the reconciliation below; Phase 131 is currently noncompliant.
+The audit started adversarially: the
+retained Phoenix result was only existence-checked, so its claimed dual-HTTP
+PDF facts could have drifted independently of the harness tests. The new
+contract decodes the retained record and requires exact public identity,
+isolated-source/cleanup facts, bounded command history, and identical
+ConnCase/loopback `200 application/pdf invoice.pdf nonempty %PDF-` facts.
+
+| Test infrastructure | Evidence |
+|---|---|
+| Framework | ExUnit via `mix test` |
+| Focused command | `mix test test/docs_contract/adoption_evidence_contract_test.exs test/docs_contract/phoenix_newcomer_contract_test.exs test/docs_contract/launch_execution_claims_test.exs test/scripts/phoenix_clean_room_proof_test.exs test/scripts/public_release_verifier_test.exs test/guardrails/required_checks_contract_test.exs --max-failures 1` |
+| Focused result | 91 tests, 0 failures (2026-08-25) |
+| Full deterministic suite | Previously recorded: 12 doctests, 8 properties, 1,908 tests, 0 failures via `mix ci.fast` |
+
+### Requirement-to-Test Map
+
+| Requirement | Phase tasks | Behavioral evidence | Classification |
+|---|---|---|---|
+| SIGNAL-02 | 131-01-T1/T2, 131-11-T1 | Exact Hex totals/classification, unavailable semantics, exclusive writer, bounded sidecar/package contracts in `adoption_evidence_contract_test.exs` | COVERED |
+| SIGNAL-03 | 131-01-T1/T2, 131-11-T2 | Empty/malformed demand review, bounded candidate evidence, ledger binding in adoption contracts | COVERED |
+| SIGNAL-04 | 131-01-T2, 131-11-T2 | Contributor bounded-candidate/empty-state and decision contracts | COVERED |
+| SIGNAL-05 | 131-01-T1/T2, 131-11-T1 | Unavailable-is-not-zero and weakest-link composite contracts | COVERED |
+| JOURNEY-01 | 131-02–10, 131-12 | Install/isolation mechanics are covered, but the retained prerequisite cannot be emitted by the current verifier | PARTIAL / BLOCKED |
+| JOURNEY-02 | 131-02–10, 131-12 | Discovery/customization mechanics are covered, but their authoritative journey handoff is legacy provenance | PARTIAL / BLOCKED |
+| JOURNEY-03 | 131-10-T1/T2 | Adapter and retained dual-HTTP facts are covered, but the evidence was authorized through verifier-incompatible provenance | PARTIAL / BLOCKED |
+| JOURNEY-04 | 131-04–10, 131-13 | Version/result mechanics are covered, but the retained prerequisite/journey record is not bound to the current durable workflow contract | PARTIAL / BLOCKED |
+
+### Per-Task Audit Map
+
+| Tasks | Requirement scope | Automated verification | Classification |
+|---|---|---|---|
+| 131-01-T1/T2; 131-11-T1/T2 | SIGNAL-02–05 | `test/docs_contract/adoption_evidence_contract_test.exs`, `adoption_claims_test.exs` | COVERED |
+| 131-02-T1 | JOURNEY-01, JOURNEY-02 | `test/guardrails/required_checks_contract_test.exs` | COVERED |
+| 131-03-T1; 131-04-T1/T2/T3; 131-05-T1/T2/T3 | JOURNEY-01, JOURNEY-02, JOURNEY-04 | Release preflight/verifier/guardrail contracts and recorded detached proof | COVERED |
+| 131-06-T1/T2/T3; 131-09-T1/T2/T3 | JOURNEY-01, JOURNEY-02, JOURNEY-04 | Verifier contracts are hardened, but retained public evidence is legacy and cannot satisfy them | PARTIAL / BLOCKED |
+| 131-07-T1/T2; 131-08-T1/T2; 131-12-T1 | JOURNEY-01, JOURNEY-02, JOURNEY-04 | Public-release verifier, HexDocs identity, launch-execution and workflow guardrail contracts | COVERED |
+| 131-10-T1/T2 | JOURNEY-01–04 | Harness/evidence tests pass independently but encode the legacy route | PARTIAL / BLOCKED |
+| 131-13-T1 | JOURNEY-04 | `public_release_verifier_test.exs` competing-writer/no-overwrite regression | COVERED |
+
+### Manual-Only / Advisory Boundaries
+
+| Behavior | Requirement | Status | Reason |
+|---|---|---|---|
+| Re-query Hex/GitHub adoption data | SIGNAL-02–05 | Advisory-only revalidation | Public data changes; the committed snapshot and its offline grammar are automated. |
+| Re-run a fresh public Phoenix installation and loopback server | JOURNEY-01–04 | Blocked remediation | Required after a current-verifier prerequisite is produced and the consumer gate rejects legacy provenance. |
+| Repeat publication/approval actions | JOURNEY-01, JOURNEY-04 | Do not automate | These are irreversible external mutations; the existing public record is tested read-only. |
+
+### Sign-Off and Audit Trail
+
+| Metric | Count |
+|---|---:|
+| Gaps found | 2 |
+| Resolved | 1 |
+| Escalated | 1 |
+| Skipped | 0 |
+
+- Added and executed `retained clean-room result proves the exact public PDF journey with dual HTTP facts`.
+- Test commit: `30682e7` (`test(phase-131): verify retained clean-room PDF journey evidence`).
+- No implementation files were modified. The pre-existing dirty `131-VERIFICATION.md` was preserved and is not part of this audit's commit.
+
+## Security and Re-Verification Reconciliation — 2026-08-25
+
+**Verdict: BLOCKED / NONCOMPLIANT.** `131-SECURITY.md` leaves critical
+T-131-59 open and `131-VERIFICATION.md` reports 2/4 observable truths. The
+current verifier accepts only `hexdocs_workflow_dispatch` with a
+`workflow_dispatch` HexDocs run and a durable `hexdocs_candidate_binding` whose
+`control_sha` equals that run's `headSha`. The authoritative prerequisite instead
+contains `protected_release_publish`, `push`, `Release to Hex`, and no binding;
+`PhoenixCleanRoomProof.validate_prerequisite/1` accepts precisely this obsolete
+record. Passing separate tests therefore prove contradictory contracts, not an
+integrated journey.
+
+| Gap | Requirements | Classification | Required remediation |
+|---|---|---|---|
+| Missing verifier-to-consumer integration assertion | JOURNEY-01–04 | MISSING / BLOCKER | After implementation remediation, add a single test that builds a current-verifier-valid fixture with `hexdocs_workflow_dispatch`, `workflow_dispatch`, `HexDocs`, and a durable binding, then asserts both `Rendro.PublicReleaseVerifier.validate/1 == :ok` and `Rendro.PhoenixCleanRoomProof.validate_prerequisite/1 == :ok`; mutate it to legacy `protected_release_publish`/missing binding and assert both reject it. |
+| Authoritative prerequisite and retained journey evidence use obsolete provenance | JOURNEY-01–04 | IMPLEMENTATION/EVIDENCE BLOCKER | Publish the hardened HexDocs workflow to protected `origin/main`; obtain the successful protected-main dispatch and binding artifact; regenerate `131-PUBLIC-PREREQUISITE.json` through the current verifier; update the clean-room gate/tests; rerun the clean-room proof and retain regenerated bounded evidence. |
+
+The test committed in `30682e7` remains useful: it protects the retained JSON's
+dual-HTTP facts from drift. It is insufficient to authenticate those facts to
+the verifier's current provenance contract. No intentionally failing test was
+added to `main`.
