@@ -203,9 +203,9 @@ advisory evidence without changing deterministic contracts.
   `workflow_dispatch` for candidate
   `f03c78bab54efe1cd1596d51cf3f28193232e2a3` and tag `v1.3.4`.
 - Replacement journey JSON SHA-256:
-  `b2715b88f3828335fa3ac962009b4d1f37f22246caffc58cc886ab821cca2bc3`
+  `a59706f89b4c4226c184509457856d1bd75474a495efaf6427e396307d3a2bfd`
 - Replacement journey transcript SHA-256:
-  `777ba87f63c63faecd1d52207fab76053c027e521e0097b19727dcc62b0a6b47`
+  `971539bdeec59b73ab354494fd77f5ea16e5b469bfaa89d3374a17fc720da9c7`
 
 ### Classification and next gate
 

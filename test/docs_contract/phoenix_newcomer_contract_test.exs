@@ -104,6 +104,19 @@ defmodule Rendro.DocsContract.PhoenixNewcomerContractTest do
     assert evidence["loopback"] == expected_response
   end
 
+  test "published validation evidence identities match the retained journey files" do
+    validation =
+      File.read!(
+        ".planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-VALIDATION.md"
+      )
+
+    assert validation =~
+             "Replacement journey JSON SHA-256:\n  `#{sha256("priv/journey_evidence/phoenix_clean_room_1.3.4.json")}`"
+
+    assert validation =~
+             "Replacement journey transcript SHA-256:\n  `#{sha256("priv/journey_evidence/phoenix_clean_room_1.3.4.md")}`"
+  end
+
   defp ordered?(text, values) do
     values
     |> Enum.map(&:binary.match(text, &1))
@@ -112,5 +125,10 @@ defmodule Rendro.DocsContract.PhoenixNewcomerContractTest do
       _, _previous -> {:halt, :error}
     end)
     |> Kernel.!=(:error)
+  end
+
+  defp sha256(path) do
+    :crypto.hash(:sha256, File.read!(path))
+    |> Base.encode16(case: :lower)
   end
 end
