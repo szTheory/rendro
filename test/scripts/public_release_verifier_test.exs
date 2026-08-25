@@ -228,6 +228,53 @@ defmodule Rendro.PublicReleaseVerifierTest do
     assert File.read!(output) == "{}"
   end
 
+  test "competing writers publish exactly one VERIFIED prerequisite without overwrite" do
+    root =
+      Path.join(
+        System.tmp_dir!(),
+        "rendro-public-release-race-#{System.unique_integer([:positive])}"
+      )
+
+    output = Path.join(root, "131-PUBLIC-PREREQUISITE.json")
+    parent = self()
+    File.mkdir_p!(root)
+    on_exit(fn -> File.rm_rf(root) end)
+
+    writers =
+      for suffix <- ["first", "second"] do
+        record = Path.join(root, "#{suffix}.candidate")
+        fixture = Path.join(root, "#{suffix}.fixture.json")
+        File.write!(record, "candidate_commit_sha: #{@candidate}\n")
+        File.write!(fixture, JSON.encode!(valid_facts() |> Map.merge(fixture_metadata())))
+
+        Task.async(fn ->
+          send(parent, :writer_started)
+
+          receive do
+            :publish -> run_cli(record, output, fixture)
+          end
+        end)
+      end
+
+    Enum.each(writers, fn writer ->
+      assert_receive :writer_started
+      send(writer.pid, :publish)
+    end)
+
+    results = Enum.map(writers, &Task.await(&1, 10_000))
+    statuses = Enum.map(results, &elem(&1, 1))
+
+    assert Enum.count(statuses, &(&1 == 0)) == 1
+    assert Enum.count(statuses, &(&1 != 0)) == 1
+
+    record = output |> File.read!() |> JSON.decode!()
+    assert record["public_prerequisite"] == "VERIFIED"
+    assert record["candidate_commit_sha"] == @candidate
+    assert byte_size(File.read!(output)) < 5_000
+
+    assert [] == Path.wildcard(Path.join(root, ".131-PUBLIC-PREREQUISITE.json.*.tmp"))
+  end
+
   test "CLI rejects missing, duplicate, and invalid arguments without writing output" do
     {record, fixture, output} = fixture_paths()
     on_exit(fn -> Enum.each([record, fixture, output], &File.rm/1) end)
