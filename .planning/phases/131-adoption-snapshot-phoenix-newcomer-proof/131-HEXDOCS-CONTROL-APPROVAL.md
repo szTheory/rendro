@@ -114,3 +114,26 @@ approve-exact-control-and-docs-now: control_sha=881b97ffc10551f77e7c6f416bc91df2
 ```
 
 This literal response is the Task 1 handoff for Plan 131-15. It is unqualified and binds only the resolved execution identities above: integrate the exact control SHA into protected main, then dispatch `HexDocs` once for the sealed candidate and `v1.3.4` now. No tag, package, force-push, or retry authority is implied.
+
+## Task 2 Terminal Dispatch Outcome — Fail-Closed Incident Record
+
+Recorded at UTC: `2026-08-25T17:29:00Z`
+
+The approved protected-main fast-forward completed, and the sole authorized `HexDocs` dispatch was consumed. The external run is terminal failure evidence only; this record grants no retry, redispatch, workflow mutation, tag/package mutation, or prerequisite regeneration authority.
+
+| Fact | Observed value |
+|---|---|
+| Run | [`32877290266`](https://github.com/szTheory/rendro/actions/runs/32877290266) — `HexDocs`, `workflow_dispatch` |
+| Trusted control identity | `main` at `881b97ffc10551f77e7c6f416bc91df2e1289025` |
+| Requested sealed artifact | `f03c78bab54efe1cd1596d51cf3f28193232e2a3`, `v1.3.4` |
+| Failed job | `verify-docs-ready` job `97899588380`, step `Verify Docs Contract` |
+| Exact failure | `Rendro.DocsContract.LaunchExecutionClaimsTest`, `HexDocs identity gate rejects another valid 1.3.4 commit`, `test/docs_contract/launch_execution_claims_test.exs:178-179`: `git rev-parse v1.3.4^{}` exited `128` because the Actions checkout did not contain the annotated `v1.3.4` tag. |
+| Publish outcome | `publish-hexdocs` job `97900969705` was skipped. |
+| Artifact outcome | Run artifacts endpoint returned `total_count: 0`; no `hexdocs-candidate-binding` exists. |
+| Public/prerequisite outcome | No HexDocs publication or other public-docs mutation occurred. No canonical prerequisite regeneration occurred; the legacy prerequisite remains authoritative-but-stale. |
+
+### Required Follow-Up Boundary
+
+The protected workflow must fetch and validate the annotated `v1.3.4` tag before the docs-contract lane calls `git rev-parse v1.3.4^{}`. This structural correction is intentionally not implemented here: the sole approved dispatch is spent, and a workflow commit requires a newly reviewed control SHA and fresh hash-bound human approvals before any future dispatch.
+
+**Next safe route:** plan and reverify the workflow correction as a new gap; after its focused contracts pass, obtain a new reviewed control SHA and fresh protected-main/HexDocs human approvals. Do not retry or redispatch this failed run.
