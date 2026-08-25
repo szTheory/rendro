@@ -138,6 +138,32 @@ It authorizes only its exact nine-commit/eight-path non-force protected-main int
 and one newly dispatched `HexDocs` workflow after every stated pre-mutation validation
 passes. It does not transfer or broaden earlier approvals, dispatches, or incidents.
 
+## Protected-Main Safety Stop After Integration
+
+status: blocked_branch_protection_bypass
+recorded_at_utc: 2026-08-25T19:31:21Z
+remote_main_after_integration: 9f67a222b6e0a846656024035694ee27350e08f8
+
+Every approval-bound local and remote identity check passed immediately before the
+authorized non-force integration. The exact control was then sent to
+`refs/heads/main`; GitHub accepted the fast-forward but returned the following
+branch-protection notice:
+
+```text
+Bypassed rule violations for refs/heads/main:
+- Required status check "ci-success" is expected.
+```
+
+The packet and reconciled approval prohibit bypassing branch protection and require
+required CI conditions before the one new `HexDocs` dispatch. Therefore this is a
+safety stop, not dispatch authority: no `workflow_dispatch` was created, no prior
+run was rerun, no tag/package/environment was mutated, no binding artifact was
+retrieved, and the canonical prerequisite was not regenerated or replaced.
+
+Further work requires a new explicit human decision that addresses the already-landed
+protected-main integration and its required-CI/protection state. The existing one-dispatch
+authority is deliberately unconsumed and must not be assumed to transfer.
+
 ## Fresh Approval After Revision Review
 
 decision: approved
