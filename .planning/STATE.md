@@ -5,16 +5,16 @@ milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 131
 current_phase_name: adoption-snapshot-phoenix-newcomer-proof
 status: executing
-stopped_at: Completed 131-16-PLAN.md
-last_updated: "2026-08-25T21:21:50.891Z"
+stopped_at: Completed 131-17-PLAN.md
+last_updated: "2026-08-25T21:31:29.161Z"
 last_activity: 2026-08-25
 last_activity_desc: Phase 131 execution started
 progress:
   total_phases: 2
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 28
-  completed_plans: 27
-  percent: 50
+  completed_plans: 28
+  percent: 100
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 131 (adoption-snapshot-phoenix-newcomer-proof) — EXECUTING
-Plan: 3 of 17
+Plan: 4 of 17
 Status: Ready to execute
 Last activity: 2026-08-25 — Phase 131 execution started
 
-Progress: [██████████] 96% executable plans executed; 3 gap-closure plans ready
+Progress: [██████████] 100% executable plans executed; 3 gap-closure plans ready
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
@@ -88,6 +88,8 @@ Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Gap closure ready (1
 - [Phase ?]: Literal approve-exact-control-and-docs authorizes only packet-bound Plan 131-15 protected-main fast-forward and one candidate-bound HexDocs dispatch.
 - [Phase ?]: The clean-room gate accepts only current hexdocs_workflow_dispatch provenance bound to protected main and the sealed v1.3.4 candidate.
 - [Phase ?]: Legacy protected_release_publish provenance has no clean-room compatibility fallback.
+- [Phase ?]: Phoenix journey evidence binds the current HexDocs workflow-dispatch prerequisite before a fresh advisory clean-room run.
+- [Phase ?]: Live public-Phoenix proof remains advisory; focused tests and mix ci.fast are the deterministic contracts.
 
 ### Pending Todos
 
@@ -118,8 +120,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-25T21:21:50.881Z
-Stopped at: Completed 131-16-PLAN.md
+Last session: 2026-08-25T21:31:29.147Z
+Stopped at: Completed 131-17-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -153,3 +155,4 @@ Resume file: None
 | Phase 131 P13 | 198s | 1 tasks | 2 files |
 | Phase 131 P14 | 6m | 2 tasks | 1 files |
 | Phase 131 P16 | 2m | 1 tasks | 2 files |
+| Phase 131 P17 | 8min | 2 tasks | 3 files |
