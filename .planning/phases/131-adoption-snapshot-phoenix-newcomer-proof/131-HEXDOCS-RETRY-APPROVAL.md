@@ -1,5 +1,5 @@
 ---
-decision: pending_blocking_human
+decision: approved
 packet_created_at_utc: 2026-08-25T18:20:00Z
 packet_revised_at_utc: 2026-08-25T18:52:44Z
 control_sha: 7e28826cf9f0832063ea9fd922d6bb065a920fc4
@@ -152,3 +152,15 @@ A new decision must explicitly acknowledge the complete
 `881b97ffc10551f77e7c6f416bc91df2e1289025..7e28826cf9f0832063ea9fd922d6bb065a920fc4`
 fast-forward history, including the listed planning artifacts, while retaining every existing
 candidate, release, protected-main, one-dispatch, and stop-condition binding.
+
+## Reconciled Literal Decision Record
+
+decision: approved
+literal_response: approve-reconciled-control-and-one-dispatch: packet_revision_sha=2367609794405381017e640b59a598977bd0a8eb control_sha=7e28826cf9f0832063ea9fd922d6bb065a920fc4 remote_baseline_sha=881b97ffc10551f77e7c6f416bc91df2e1289025 complete_fast_forward_history=acknowledged planning_artifacts=acknowledged candidate_sha=f03c78bab54efe1cd1596d51cf3f28193232e2a3 release_ref=v1.3.4 integrate protected-main and dispatch exactly one new HexDocs workflow
+reviewer_identity: user (interactive GSD checkpoint)
+recorded_at_utc: 2026-08-25T19:00:04Z
+
+This fresh decision binds packet revision `2367609794405381017e640b59a598977bd0a8eb`,
+the complete eleven-commit fast-forward and listed planning artifacts, exact control SHA,
+remote baseline, sealed candidate, release ref, protected-main integration, and exactly one
+new HexDocs dispatch. Every previously stated stop condition remains in force.
