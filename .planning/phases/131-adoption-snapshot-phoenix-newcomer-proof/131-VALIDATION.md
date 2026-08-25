@@ -2,8 +2,8 @@
 phase: 131
 slug: adoption-snapshot-phoenix-newcomer-proof
 # status lifecycle: draft (seeded by plan-phase) -> validated (set by validate-phase)
-status: blocked
-nyquist_compliant: false
+status: validated
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-08-21
 ---
@@ -179,3 +179,39 @@ The test committed in `30682e7` remains useful: it protects the retained JSON's
 dual-HTTP facts from drift. It is insufficient to authenticate those facts to
 the verifier's current provenance contract. No intentionally failing test was
 added to `main`.
+
+## Plan 131-17 Current-Prerequisite Closure — 2026-08-25T21:29:03Z
+
+The legacy-provenance reconciliation above is historical. Plans 131-18 and
+131-16 produced the current prerequisite/consumer contract; this plan reran
+the disposable Phoenix consumer against that prerequisite and refreshed the
+advisory evidence without changing deterministic contracts.
+
+| Check | Result |
+|---|---|
+| Current prerequisite validators | PASS — `Rendro.PhoenixCleanRoomProof.validate_prerequisite/1` and `verify_public_release.exs --check-existing` accepted the canonical record. |
+| Fresh clean-room journey | PASS — exact public Rendro `1.3.4`; Phoenix `1.8.13`, Plug `1.20.3`, Bandit `1.12.5`, Phoenix installer `1.8.5`; ConnCase and loopback both recorded 200 / `application/pdf` / attachment `invoice.pdf` / nonempty / PDF magic. |
+| Focused cross-contract suite | PASS — 94 tests, 0 failures: public verifier, clean-room, launch execution, newcomer documentation, adoption evidence, and required-check guardrails. |
+| Cleanup-root regression | PASS — 1 test, 0 failures at `phoenix_clean_room_proof_test.exs:94`; the prior `:unsafe_or_nonempty_root` observation does not recur. |
+| `mix ci.fast` | PASS — format, Hex build, compile warnings-as-errors, deterministic test lane, docs warnings-as-errors, Credo strict, and Dialyzer. |
+
+### Current identities
+
+- Canonical prerequisite SHA-256: `eba7b5003ad35830a44723d6e3e6ec4adfb59ce9586b17f67c4c5c1cc39f84b8`
+- HexDocs run: `32898926521`; control SHA:
+  `f9b63246029396f76c443c5750aad42a3004081b`; binding: protected-main
+  `workflow_dispatch` for candidate
+  `f03c78bab54efe1cd1596d51cf3f28193232e2a3` and tag `v1.3.4`.
+- Replacement journey JSON SHA-256:
+  `b2715b88f3828335fa3ac962009b4d1f37f22246caffc58cc886ab821cca2bc3`
+- Replacement journey transcript SHA-256:
+  `777ba87f63c63faecd1d52207fab76053c027e521e0097b19727dcc62b0a6b47`
+
+### Classification and next gate
+
+The focused suite and `mix ci.fast` are deterministic contracts. The public
+package resolution, Phoenix generation, and loopback observations are
+explicitly advisory evidence; they are bounded to the prerequisite and do not
+inflate CI claims. Cross-contract provenance and the Nyquist gate are green
+for this execution. Fresh GSD security and goal verification remain the next
+independent audits for the prior `T-131-59` report and 2/4 goal report.
