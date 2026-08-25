@@ -17,7 +17,7 @@
 **Milestone Goal:** Strengthen the shipped catalog and adoption experience with current, bounded evidence—repairing and honestly re-reviewing the twelve existing `needs_work` catalog cells, recording an explicit demand-gate decision, and proving one clean Phoenix newcomer path—without expanding Rendro's runtime dependencies, core capability families, catalog, recipes, or presets.
 
 - [x] **Phase 130: Catalog Quality & Evidence Ratchet** - Repair and re-review the exact twelve catalog cells through the existing deterministic and advisory evidence lanes. (completed 2026-08-20)
-- [x] **Phase 131: Adoption Snapshot & Phoenix Newcomer Proof** - Record a dated demand decision and prove the public Swiss/light Invoice path in a clean Phoenix application. (completed 2026-08-24)
+- [ ] **Phase 131: Adoption Snapshot & Phoenix Newcomer Proof** - Record a dated demand decision and prove the public Swiss/light Invoice path in a clean Phoenix application.
 
 ## Phase Details
 
@@ -89,7 +89,7 @@ Plans:
   3. A newcomer in a clean Phoenix environment can follow public discovery material to install the public Rendro package, select the canonical Swiss/light Invoice, and customize it using the documented preset/configurator path without a repository checkout or warm dependency cache.
   4. That clean Phoenix application responds through the optional Phoenix adapter with a successful `application/pdf` response whose bytes begin `%PDF-`, and the recorded journey states the exact versions, commands, results, and any repairs limited to existing handoffs.
 
-**Plans**: 10/10 plans executed
+**Plans**: 10/10 plans executed; verification gaps require closure
 
 Plans:
 **Wave 1**
@@ -137,4 +137,4 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 130. Catalog Quality & Evidence Ratchet | 11/11 | Complete    | 2026-08-20 |
-| 131. Adoption Snapshot & Phoenix Newcomer Proof | 10/10 | Complete    | 2026-08-24 |
+| 131. Adoption Snapshot & Phoenix Newcomer Proof | 10/10 | In Progress |  |

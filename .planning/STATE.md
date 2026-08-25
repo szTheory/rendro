@@ -4,14 +4,14 @@ milestone: v2.13
 milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 131
 current_phase_name: adoption-snapshot-phoenix-newcomer-proof
-status: complete
-stopped_at: Completed 131-10-PLAN.md
-last_updated: "2026-08-24T21:12:20.987Z"
-last_activity: 2026-08-22
-last_activity_desc: D-35 exact v1.3.4 recovery replanned
+status: in_progress
+stopped_at: Phase 131 verification found gaps
+last_updated: "2026-08-25T14:15:00Z"
+last_activity: 2026-08-25
+last_activity_desc: Phase 131 verification found 4 gap-closure items
 progress:
   total_phases: 2
-  completed_phases: 2
+  completed_phases: 1
   total_plans: 21
   completed_plans: 21
   percent: 100
@@ -28,19 +28,19 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 ## Current Position
 
-Phase: 131 (adoption-snapshot-phoenix-newcomer-proof) — COMPLETE
+Phase: 131 (adoption-snapshot-phoenix-newcomer-proof) — IN PROGRESS
 Plan: 10 of 10
-Status: Phase complete
-Last activity: 2026-08-24 — exact public v1.3.4 Phoenix journey verified
+Status: Verification gaps found
+Last activity: 2026-08-25 — 2/4 must-haves verified; gap closure required
 
-Progress: [██████████] 100%
+Progress: [██████████] 100% implementation plans executed; verification pending
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
 ```text
-[████████████████████████████████████████] 100% — 2/2 phases complete
+[████████████████████░░░░░░░░░░░░░░░░░░░░] 50% — 1/2 phases complete
 Phase 130 Catalog Quality & Evidence Ratchet .............. Complete (11/11 plans)
-Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Complete (10/10 plans)
+Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Verification gaps (10/10 plans executed)
 ```
 
 **Locked sequencing:** 130 repairs, regenerates, and truthfully re-reviews the fixed twelve cells before 131 records final adoption evidence and validates the public newcomer path against that stable catalog state.
@@ -114,8 +114,8 @@ Resume file: None
 
 ## Next Steps
 
-1. Execute 131-07 to commit every exact v1.3.4 release/verifier/incident/journey surface on bbe75d2 ancestry.
-2. Continue 131-08 through 131-10 in wave order; do not create v1.3.4 before the fresh Plan-09 blocking-human approval or run the clean-room proof before the atomic verifier prerequisite exists.
+1. Run `$gsd-plan-phase 131 --gaps` to create closure plans from `131-VERIFICATION.md`.
+2. Re-run `$gsd-execute-phase 131 --gaps-only` after the gap plans are approved.
 
 ## Performance Metrics
 
