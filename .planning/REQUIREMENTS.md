@@ -18,10 +18,10 @@ Requirements for this milestone. Each maps to exactly one roadmap phase.
 
 ### Adoption Evidence
 
-- [x] **SIGNAL-02**: Maintainer records a dated Hex download snapshot from the public package API, including source and raw totals.
-- [x] **SIGNAL-03**: Maintainer reviews public issues for qualifying text-shaping demand using the existing requester, organization, use-case, and blocking criteria.
-- [x] **SIGNAL-04**: Maintainer reviews merged contributions for a qualifying non-maintainer contributor signal using the existing exclusions.
-- [x] **SIGNAL-05**: `ADOPTION.md` records source-backed decisions for demand, downloads, contributor activity, and the conjunctive composite gate as `HOLD`, `ACCUMULATING`, or `TRIGGER`; unavailable evidence is never treated as zero.
+- [ ] **SIGNAL-02**: Maintainer records a dated Hex download snapshot from the public package API, including source and raw totals.
+- [ ] **SIGNAL-03**: Maintainer reviews public issues for qualifying text-shaping demand using the existing requester, organization, use-case, and blocking criteria.
+- [ ] **SIGNAL-04**: Maintainer reviews merged contributions for a qualifying non-maintainer contributor signal using the existing exclusions.
+- [ ] **SIGNAL-05**: `ADOPTION.md` records source-backed decisions for demand, downloads, contributor activity, and the conjunctive composite gate as `HOLD`, `ACCUMULATING`, or `TRIGGER`; unavailable evidence is never treated as zero.
 
 ### Phoenix Newcomer Proof
 
@@ -39,10 +39,10 @@ publish uses `HEX_API_KEY` and tests authorization. The clean-room harness and
 evidence are created only after the atomic public verifier succeeds; they are
 not required to exist in the pre-release candidate.
 
-- [x] **JOURNEY-01**: A newcomer can install the public Rendro package in a clean Phoenix environment without relying on the repository checkout or warm dependency caches.
-- [x] **JOURNEY-02**: A newcomer can follow public discovery surfaces to select and customize the canonical Swiss/light Invoice using the documented preset/configurator path.
-- [x] **JOURNEY-03**: The clean Phoenix application serves that customized document through the optional Phoenix adapter as a successful `application/pdf` response containing valid `%PDF-` bytes.
-- [x] **JOURNEY-04**: The journey records exact versions, commands, results, and any repaired documentation or integration handoff; fixes remain confined to existing surfaces.
+- [ ] **JOURNEY-01**: A newcomer can install the public Rendro package in a clean Phoenix environment without relying on the repository checkout or warm dependency caches.
+- [ ] **JOURNEY-02**: A newcomer can follow public discovery surfaces to select and customize the canonical Swiss/light Invoice using the documented preset/configurator path.
+- [ ] **JOURNEY-03**: The clean Phoenix application serves that customized document through the optional Phoenix adapter as a successful `application/pdf` response containing valid `%PDF-` bytes.
+- [ ] **JOURNEY-04**: The journey records exact versions, commands, results, and any repaired documentation or integration handoff; fixes remain confined to existing surfaces.
 
 ## Future Requirements
 
@@ -77,14 +77,14 @@ Roadmap mapping approved with the milestone roadmap.
 | CATALOG-07 | Phase 130 | Complete |
 | CATALOG-08 | Phase 130 | Complete |
 | CATALOG-09 | Phase 130 | Complete |
-| SIGNAL-02 | Phase 131 | Complete |
-| SIGNAL-03 | Phase 131 | Complete |
-| SIGNAL-04 | Phase 131 | Complete |
-| SIGNAL-05 | Phase 131 | Complete |
-| JOURNEY-01 | Phase 131 | Complete |
-| JOURNEY-02 | Phase 131 | Complete |
-| JOURNEY-03 | Phase 131 | Complete |
-| JOURNEY-04 | Phase 131 | Complete |
+| SIGNAL-02 | Phase 131 | Gaps Found |
+| SIGNAL-03 | Phase 131 | Gaps Found |
+| SIGNAL-04 | Phase 131 | Gaps Found |
+| SIGNAL-05 | Phase 131 | Gaps Found |
+| JOURNEY-01 | Phase 131 | Gaps Found |
+| JOURNEY-02 | Phase 131 | Gaps Found |
+| JOURNEY-03 | Phase 131 | Gaps Found |
+| JOURNEY-04 | Phase 131 | Gaps Found |
 
 **Coverage:**
 
