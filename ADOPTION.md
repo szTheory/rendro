@@ -78,13 +78,13 @@ Maintainer alternate accounts excluded from the contributor threshold:
 
 | Account | Reason | Notes |
 | --- | --- | --- |
-| TBD | Maintainer alternate account | Add before counting a borderline contributor PR. |
+| No alternate accounts are currently recorded | Maintainer alternate account exclusion | No account is excluded from the threshold at this dated review. |
 
 Rejected contributor candidates:
 
 | PR | Author | Reason |
 | --- | --- | --- |
-| TBD | TBD | No rejected candidates recorded yet. |
+| No rejected candidates were recorded for the 2026-08-21 review | — | Bounded contributor review returned zero candidates. |
 
 ## Review Log
 
