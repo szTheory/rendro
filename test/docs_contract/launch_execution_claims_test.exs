@@ -144,7 +144,10 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     assert workflow =~ "APPROVED_RELEASE_REF=\"v1.3.4\""
     assert workflow =~ "INPUT_CANDIDATE_COMMIT_SHA: ${{ inputs.candidate_commit_sha }}"
     assert workflow =~ "INPUT_RELEASE_REF: ${{ inputs.release_ref }}"
-    assert workflow =~ "git fetch --force origin \"refs/tags/${APPROVED_RELEASE_REF}:refs/tags/${APPROVED_RELEASE_REF}\""
+
+    assert workflow =~
+             "git fetch --force origin \"refs/tags/${APPROVED_RELEASE_REF}:refs/tags/${APPROVED_RELEASE_REF}\""
+
     assert workflow =~ "CHECKOUT_HEAD=$(git rev-parse HEAD)"
     assert workflow =~ "PEELED_TAG_SHA=$(git rev-parse \"${APPROVED_RELEASE_REF}^{}\")"
     assert workflow =~ "environment: 'Hex Publish'"
@@ -187,9 +190,21 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     assert other_commit != @approved_hexdocs_candidate
 
     refute workflow_identity_matches_approved?(%{workflow_identity() | github_sha: other_commit})
-    refute workflow_identity_matches_approved?(%{workflow_identity() | input_candidate_sha: other_commit})
-    refute workflow_identity_matches_approved?(%{workflow_identity() | checkout_head: other_commit})
-    refute workflow_identity_matches_approved?(%{workflow_identity() | peeled_tag_sha: other_commit})
+
+    refute workflow_identity_matches_approved?(%{
+             workflow_identity()
+             | input_candidate_sha: other_commit
+           })
+
+    refute workflow_identity_matches_approved?(%{
+             workflow_identity()
+             | checkout_head: other_commit
+           })
+
+    refute workflow_identity_matches_approved?(%{
+             workflow_identity()
+             | peeled_tag_sha: other_commit
+           })
   end
 
   test "public launch URL verifier covers GitHub raw and HexDocs proof routes" do
