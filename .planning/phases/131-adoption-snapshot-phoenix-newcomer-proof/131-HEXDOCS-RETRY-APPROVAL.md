@@ -1,5 +1,5 @@
 ---
-decision: approved
+decision: approved_execution_blocked
 packet_created_at_utc: 2026-08-25T18:20:00Z
 packet_revised_at_utc: 2026-08-25T18:52:44Z
 control_sha: 7e28826cf9f0832063ea9fd922d6bb065a920fc4
@@ -164,3 +164,33 @@ This fresh decision binds packet revision `2367609794405381017e640b59a598977bd0a
 the complete eleven-commit fast-forward and listed planning artifacts, exact control SHA,
 remote baseline, sealed candidate, release ref, protected-main integration, and exactly one
 new HexDocs dispatch. Every previously stated stop condition remains in force.
+
+## Protected-Main Integration Outcome and Safety Stop
+
+status: blocked_remote_ci_failure
+recorded_at_utc: 2026-08-25T19:08:15Z
+protected_main_sha: 7e28826cf9f0832063ea9fd922d6bb065a920fc4
+ci_run_id: 32887354057
+ci_success_job_id: 97931741585
+hexdocs_dispatch_consumed: false
+
+The exact approved non-force fast-forward updated `origin/main` from
+`881b97ffc10551f77e7c6f416bc91df2e1289025` to
+`7e28826cf9f0832063ea9fd922d6bb065a920fc4`. GitHub accepted the update but reported that
+the expected `ci-success` rule was bypassed. The push-triggered exact-SHA CI run
+[`32887354057`](https://github.com/szTheory/rendro/actions/runs/32887354057) then produced a
+terminal failure in required job `ci-success` (`97931741585`).
+
+The primary OTP 28 / Elixir 1.19.5 test job `97930815451` failed because
+`Rendro.DocsContract.LaunchExecutionClaimsTest` tried to resolve local `v1.3.4^{}` in the
+generic Actions checkout, where that tag was absent. This is the same shallow-checkout class
+that the HexDocs correction was meant to close, now exposed in the structural test itself.
+The OTP 25 / Elixir 1.19.0 setup job `97930815435` also failed because that toolchain pair is
+unavailable, and configurator-browser job `97930815410` reported four screenshot-height
+mismatches. Local focused tests and `mix ci.fast` had passed before integration, so these
+remote-only failures are retained as bounded CI evidence rather than normalized away.
+
+No `HexDocs` workflow was dispatched. A read-only run inventory after the failure still
+contained only terminal failed run `32877290266`; exactly-one new-dispatch authority remains
+unconsumed but may not be used with this failed control. Any correction requires a new control
+SHA, focused and remote validation, a revised packet, and fresh blocking-human approval.
