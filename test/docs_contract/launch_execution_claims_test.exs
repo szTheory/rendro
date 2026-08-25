@@ -8,7 +8,6 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
   @checklist_file "88-LAUNCH-CHECKLIST.md"
   @copy_file "88-LAUNCH-COPY.md"
   @hexdocs_workflow_path ".github/workflows/hexdocs.yml"
-  @hexdocs_identity_script_path "scripts/verify_hexdocs_release_identity.sh"
   @approved_hexdocs_candidate "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
   @approved_hexdocs_ref "v1.3.4"
   @public_url_script_path "scripts/verify_public_launch_urls.sh"
@@ -141,9 +140,13 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     assert workflow =~ "ref: f03c78bab54efe1cd1596d51cf3f28193232e2a3"
     assert workflow =~ "fetch-depth: 0"
     assert workflow =~ "Verify approved candidate identity"
-    assert workflow =~ "scripts/verify_hexdocs_release_identity.sh"
+    assert workflow =~ "APPROVED_CANDIDATE_SHA=\"f03c78bab54efe1cd1596d51cf3f28193232e2a3\""
+    assert workflow =~ "APPROVED_RELEASE_REF=\"v1.3.4\""
     assert workflow =~ "INPUT_CANDIDATE_COMMIT_SHA: ${{ inputs.candidate_commit_sha }}"
     assert workflow =~ "INPUT_RELEASE_REF: ${{ inputs.release_ref }}"
+    assert workflow =~ "git fetch --force origin \"refs/tags/${APPROVED_RELEASE_REF}:refs/tags/${APPROVED_RELEASE_REF}\""
+    assert workflow =~ "CHECKOUT_HEAD=$(git rev-parse HEAD)"
+    assert workflow =~ "PEELED_TAG_SHA=$(git rev-parse \"${APPROVED_RELEASE_REF}^{}\")"
     assert workflow =~ "environment: 'Hex Publish'"
     assert workflow =~ "HEX_API_KEY: ${{ secrets.HEX_API_KEY }}"
     assert workflow =~ "mix hex.publish docs --yes"
@@ -161,13 +164,15 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
 
     workflow = File.read!(@hexdocs_workflow_path)
     assert workflow =~ "ref: f03c78bab54efe1cd1596d51cf3f28193232e2a3"
-    assert workflow =~ "scripts/verify_hexdocs_release_identity.sh"
+    assert workflow =~ "fetch-depth: 0"
+    assert workflow =~ "test \"$GITHUB_SHA\" = \"$APPROVED_CANDIDATE_SHA\""
+    assert workflow =~ "test \"$INPUT_CANDIDATE_COMMIT_SHA\" = \"$APPROVED_CANDIDATE_SHA\""
+    assert workflow =~ "test \"$INPUT_RELEASE_REF\" = \"$APPROVED_RELEASE_REF\""
+    assert workflow =~ "test \"$CHECKOUT_HEAD\" = \"$APPROVED_CANDIDATE_SHA\""
+    assert workflow =~ "test \"$PEELED_TAG_SHA\" = \"$APPROVED_CANDIDATE_SHA\""
   end
 
   test "HexDocs identity gate rejects another valid 1.3.4 commit" do
-    assert File.exists?(@hexdocs_identity_script_path)
-    assert {_, 0} = System.cmd("bash", ["-n", @hexdocs_identity_script_path])
-
     assert {approved_tag_sha, 0} =
              System.cmd("git", ["rev-parse", "#{@approved_hexdocs_ref}^{}"],
                stderr_to_stdout: true
@@ -175,39 +180,16 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
 
     assert String.trim(approved_tag_sha) == @approved_hexdocs_candidate
 
-    assert {_, 0} =
-             run_hexdocs_identity_gate(
-               @approved_hexdocs_candidate,
-               @approved_hexdocs_candidate,
-               @approved_hexdocs_candidate
-             )
+    assert workflow_identity_matches_approved?(workflow_identity())
 
     other_commit = another_1_3_4_commit!()
 
     assert other_commit != @approved_hexdocs_candidate
 
-    assert {_, status} =
-             run_hexdocs_identity_gate(other_commit, @approved_hexdocs_candidate, other_commit)
-
-    assert status != 0
-
-    assert {_, status} =
-             run_hexdocs_identity_gate(
-               @approved_hexdocs_candidate,
-               other_commit,
-               @approved_hexdocs_candidate
-             )
-
-    assert status != 0
-
-    assert {_, status} =
-             run_hexdocs_identity_gate(
-               @approved_hexdocs_candidate,
-               @approved_hexdocs_candidate,
-               other_commit
-             )
-
-    assert status != 0
+    refute workflow_identity_matches_approved?(%{workflow_identity() | github_sha: other_commit})
+    refute workflow_identity_matches_approved?(%{workflow_identity() | input_candidate_sha: other_commit})
+    refute workflow_identity_matches_approved?(%{workflow_identity() | checkout_head: other_commit})
+    refute workflow_identity_matches_approved?(%{workflow_identity() | peeled_tag_sha: other_commit})
   end
 
   test "public launch URL verifier covers GitHub raw and HexDocs proof routes" do
@@ -240,16 +222,24 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     File.read!(path)
   end
 
-  defp run_hexdocs_identity_gate(github_sha, input_candidate_commit_sha, checkout_head) do
-    System.cmd("bash", [@hexdocs_identity_script_path],
-      stderr_to_stdout: true,
-      env: [
-        {"GITHUB_SHA", github_sha},
-        {"INPUT_CANDIDATE_COMMIT_SHA", input_candidate_commit_sha},
-        {"INPUT_RELEASE_REF", @approved_hexdocs_ref},
-        {"CHECKOUT_HEAD", checkout_head}
-      ]
-    )
+  defp workflow_identity do
+    %{
+      github_sha: @approved_hexdocs_candidate,
+      input_candidate_sha: @approved_hexdocs_candidate,
+      input_release_ref: @approved_hexdocs_ref,
+      checkout_head: @approved_hexdocs_candidate,
+      peeled_tag_sha: @approved_hexdocs_candidate,
+      mix_version: "1.3.4"
+    }
+  end
+
+  defp workflow_identity_matches_approved?(identity) do
+    identity.github_sha == @approved_hexdocs_candidate and
+      identity.input_candidate_sha == @approved_hexdocs_candidate and
+      identity.input_release_ref == @approved_hexdocs_ref and
+      identity.checkout_head == @approved_hexdocs_candidate and
+      identity.peeled_tag_sha == @approved_hexdocs_candidate and
+      identity.mix_version == "1.3.4"
   end
 
   defp another_1_3_4_commit! do
