@@ -58,7 +58,7 @@ defmodule Rendro.PublicReleaseVerifier do
         ]
       )
 
-    required = [:candidate_record, :tag, :release_run_id, :output]
+    required = [:candidate_record, :tag, :release_run_id, :hexdocs_run_id, :output]
 
     cond do
       positional != [] ->
@@ -305,21 +305,11 @@ defmodule Rendro.PublicReleaseVerifier do
   defp github_run(id),
     do: github_json(["run", "view", id, "--json", "conclusion,event,headSha,name,jobs"])
 
-  defp docs_provenance_run(options) do
-    case Map.get(options, :hexdocs_run_id) do
-      nil -> github_run(options.release_run_id)
-      id -> github_run(id)
-    end
-  end
+  defp docs_provenance_run(options), do: github_run(options.hexdocs_run_id)
 
-  defp docs_provenance(options) do
-    if Map.get(options, :hexdocs_run_id),
-      do: "hexdocs_workflow_dispatch",
-      else: "protected_release_publish"
-  end
+  defp docs_provenance(_options), do: "hexdocs_workflow_dispatch"
 
-  defp docs_provenance_run_id(options),
-    do: Map.get(options, :hexdocs_run_id, options.release_run_id)
+  defp docs_provenance_run_id(options), do: options.hexdocs_run_id
 
   defp collect_incident_facts(repository) do
     with {:ok, v1_3_0} <- github_tag(repository, "v1.3.0"),
@@ -718,8 +708,6 @@ defmodule Rendro.PublicReleaseVerifier do
 
   defp validate_candidate(_), do: {:error, "candidate SHA must be 40 lowercase hex characters"}
 
-  defp validate_fixture_hexdocs_run(_facts, nil), do: :ok
-
   defp validate_fixture_hexdocs_run(facts, expected) do
     equal?(facts["hexdocs_run_id"], expected, "fixture HexDocs run ID does not match")
   end
@@ -767,33 +755,6 @@ defmodule Rendro.PublicReleaseVerifier do
              "docs provenance run ID must be numeric"
            ) do
       case facts["hexdocs_provenance"] do
-        "protected_release_publish" ->
-          with :ok <-
-                 equal?(
-                   facts["hexdocs_event"],
-                   "push",
-                   "combined release docs event is not a tag push"
-                 ),
-               :ok <-
-                 equal?(
-                   facts["hexdocs_name"],
-                   "Release to Hex",
-                   "combined release docs workflow name is incorrect"
-                 ),
-               :ok <-
-                 valid_numeric?(
-                   facts["release_publish_job_id"],
-                   "release publish job ID must be numeric"
-                 ),
-               :ok <-
-                 equal?(
-                   facts["release_publish_job_conclusion"],
-                   "success",
-                   "release publish job did not conclude successfully"
-                 ) do
-            :ok
-          end
-
         "hexdocs_workflow_dispatch" ->
           with :ok <-
                  equal?(

@@ -54,7 +54,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
              PublicReleaseVerifier.validate(valid_facts(%{"hexdocs_version" => "1.2.0"}))
   end
 
-  test "accepts the protected release publish job as candidate-bound HexDocs provenance" do
+  test "rejects package-only release provenance for HexDocs" do
     facts =
       valid_facts(%{
         "hexdocs_provenance" => "protected_release_publish",
@@ -64,11 +64,11 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "release_publish_job_conclusion" => "success"
       })
 
-    assert :ok = PublicReleaseVerifier.validate(facts)
+    assert {:error, "HexDocs provenance is not recognized"} = PublicReleaseVerifier.validate(facts)
   end
 
-  test "does not require a redundant HexDocs run ID for combined protected release provenance" do
-    assert {:ok, options} =
+  test "requires an explicit HexDocs workflow-dispatch run ID" do
+    assert {:error, "missing required public-release option"} =
              PublicReleaseVerifier.parse_args([
                "--candidate-record",
                "candidate.md",
@@ -81,7 +81,22 @@ defmodule Rendro.PublicReleaseVerifierTest do
                "--check-existing"
              ])
 
-    refute Map.has_key?(options, :hexdocs_run_id)
+    assert {:ok, options} =
+             PublicReleaseVerifier.parse_args([
+               "--candidate-record",
+               "candidate.md",
+               "--tag",
+               "v1.3.4",
+               "--release-run-id",
+               "32763039854",
+               "--hexdocs-run-id",
+               "32763039855",
+               "--output",
+               "public.json",
+               "--check-existing"
+             ])
+
+    assert options.hexdocs_run_id == "32763039855"
   end
 
   test "rejects an archive whose download digest differs from the Hex API checksum" do
@@ -190,8 +205,8 @@ defmodule Rendro.PublicReleaseVerifierTest do
     assert result["public_archive_sha256"] == result["hex_api_checksum"]
     assert result["public_manifest_sha256"] == result["sealed_manifest_sha256"]
     assert result["public_metadata_sha256"] == result["sealed_metadata_sha256"]
-    assert result["hexdocs_provenance"] == "protected_release_publish"
-    assert result["docs_provenance_run_id"] == "12"
+    assert result["hexdocs_provenance"] == "hexdocs_workflow_dispatch"
+    assert result["docs_provenance_run_id"] == "34"
 
     assert byte_size(File.read!(output)) < 5_000
   end
@@ -373,10 +388,10 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "release_validate_job_conclusion" => "success",
         "hexdocs_head_sha" => @candidate,
         "hexdocs_conclusion" => "success",
-        "hexdocs_event" => "push",
-        "hexdocs_name" => "Release to Hex",
-        "hexdocs_provenance" => "protected_release_publish",
-        "docs_provenance_run_id" => "12",
+        "hexdocs_event" => "workflow_dispatch",
+        "hexdocs_name" => "HexDocs",
+        "hexdocs_provenance" => "hexdocs_workflow_dispatch",
+        "docs_provenance_run_id" => "34",
         "version" => "1.3.4",
         "hex_version" => "1.3.4",
         "hex_api_checksum" => String.duplicate("c", 64),
