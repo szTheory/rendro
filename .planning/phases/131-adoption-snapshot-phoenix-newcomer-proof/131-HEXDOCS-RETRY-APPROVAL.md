@@ -171,6 +171,26 @@ validation by the current verifier. Any failure consumes no implicit retry autho
 For unattended retries, consider a separately designed idempotent release-intent record with a
 durable consumed-dispatch state; it is intentionally out of scope for this repository-local fix.
 
+## One-Time Recovery Authorization
+
+decision: retry-once
+literal_response: retry-once
+reviewer_identity: user (interactive GSD blocking-human checkpoint)
+recorded_at_utc: 2026-08-25T20:10:00Z
+
+The user authorizes exactly one fresh recovery control: create a clean branch rooted at the
+current `origin/main`, carry only local binding-writer correction
+`283d753973fa5669b26c7249c10aa656ef86a0fd`, and integrate it through the repository's
+normal protected PR and required-CI path. The recovery control's eventual merge SHA—not this
+local planning SHA—must be revalidated by exact-SHA push CI and HexDocs verification before a
+single newly created `HexDocs` `workflow_dispatch` may occur.
+
+The sole prospective dispatch remains bound to
+`candidate_commit_sha=f03c78bab54efe1cd1596d51cf3f28193232e2a3` and
+`release_ref=v1.3.4`. No direct push to `main`, branch-protection bypass, force-push, tag or
+package mutation, rerun, alternate publisher, verifier weakening, artifact fabrication, or
+second dispatch is authorized. Any failed machine gate ends this recovery attempt automatically.
+
 ## Conditional Post-Bypass Approval
 
 decision: approved_conditionally_after_exact_sha_push_validation
