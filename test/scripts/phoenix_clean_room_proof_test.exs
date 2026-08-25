@@ -1,11 +1,17 @@
 Code.require_file(Path.expand("../../scripts/phoenix_clean_room_proof.exs", __DIR__))
+Code.require_file(Path.expand("../../scripts/verify_public_release.exs", __DIR__))
 
 defmodule Rendro.PhoenixCleanRoomProofTest do
   use ExUnit.Case, async: true
 
   alias Rendro.PhoenixCleanRoomProof
+  alias Rendro.PublicReleaseVerifier
 
   @candidate "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
+  @prerequisite_path Path.expand(
+                       "../../.planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json",
+                       __DIR__
+                     )
 
   test "atomically emits a bounded failure when the harness exits unexpectedly" do
     directory =
@@ -311,25 +317,66 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
     assert_receive :stopped
   end
 
-  test "accepts only the exact verified public 1.3.4 combined-release prerequisite" do
-    prerequisite = valid_prerequisite()
+  test "shares the current HexDocs workflow-dispatch prerequisite contract with the public verifier" do
+    prerequisite = current_prerequisite()
 
+    assert :ok = PublicReleaseVerifier.validate(prerequisite)
     assert :ok = PhoenixCleanRoomProof.validate_prerequisite(prerequisite)
 
-    assert {:error, _} =
-             PhoenixCleanRoomProof.validate_prerequisite(
-               Map.put(prerequisite, "version", "1.3.3")
-             )
+    legacy =
+      prerequisite
+      |> Map.put("hexdocs_provenance", "protected_release_publish")
+      |> Map.delete("hexdocs_candidate_binding")
 
-    assert {:error, _} =
-             PhoenixCleanRoomProof.validate_prerequisite(
-               Map.delete(prerequisite, "v1_3_3_conclusion")
-             )
+    assert_rejected_by_both(legacy)
 
-    assert {:error, _} =
-             PhoenixCleanRoomProof.validate_prerequisite(
-               Map.put(prerequisite, "hexdocs_provenance", "workflow_dispatch")
-             )
+    for mutation <- [
+          fn facts -> Map.delete(facts, "hexdocs_candidate_binding") end,
+          fn facts ->
+            put_in(
+              facts,
+              ["hexdocs_candidate_binding", "control_ref"],
+              "refs/heads/release"
+            )
+          end,
+          fn facts ->
+            put_in(facts, ["hexdocs_candidate_binding", "control_sha"], String.duplicate("a", 40))
+          end,
+          fn facts ->
+            put_in(
+              facts,
+              ["hexdocs_candidate_binding", "requested_artifact_sha"],
+              String.duplicate("a", 40)
+            )
+          end,
+          fn facts ->
+            put_in(
+              facts,
+              ["hexdocs_candidate_binding", "peeled_tag_sha"],
+              String.duplicate("a", 40)
+            )
+          end,
+          fn facts ->
+            put_in(
+              facts,
+              ["hexdocs_candidate_binding", "detached_artifact_head"],
+              String.duplicate("a", 40)
+            )
+          end,
+          fn facts -> put_in(facts, ["hexdocs_candidate_binding", "tag"], "v1.3.3") end,
+          fn facts ->
+            put_in(facts, ["hexdocs_candidate_binding", "workflow_event"], "push")
+          end,
+          fn facts -> put_in(facts, ["hexdocs_candidate_binding", "workflow_name"], "Release to Hex") end,
+          fn facts -> put_in(facts, ["hexdocs_candidate_binding", "workflow_run_id"], "1") end,
+          fn facts -> Map.put(facts, "hexdocs_head_sha", "not-a-sha") end,
+          fn facts -> Map.put(facts, "hexdocs_conclusion", "failure") end,
+          fn facts -> Map.put(facts, "hexdocs_event", "push") end,
+          fn facts -> Map.put(facts, "hexdocs_name", "Release to Hex") end,
+          fn facts -> Map.put(facts, "docs_provenance_run_id", "not-a-run") end
+        ] do
+      assert_rejected_by_both(mutation.(prerequisite))
+    end
   end
 
   test "rejects non-public dependency sources and malformed exact lock entries" do
@@ -601,23 +648,12 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
              )
   end
 
-  defp valid_prerequisite do
-    %{
-      "public_prerequisite" => "VERIFIED",
-      "version" => "1.3.4",
-      "hex_version" => "1.3.4",
-      "hexdocs_version" => "1.3.4",
-      "candidate_commit_sha" => @candidate,
-      "peeled_tag_sha" => @candidate,
-      "release_name" => "Release to Hex",
-      "release_conclusion" => "success",
-      "release_publish_job_conclusion" => "success",
-      "hexdocs_provenance" => "protected_release_publish",
-      "docs_provenance_run_id" => "32763039854",
-      "v1_3_0_conclusion" => "failure",
-      "v1_3_1_conclusion" => "cancelled",
-      "v1_3_2_conclusion" => "failure",
-      "v1_3_3_conclusion" => "failure"
-    }
+  defp current_prerequisite, do: @prerequisite_path |> File.read!() |> Jason.decode!()
+
+  defp valid_prerequisite, do: current_prerequisite()
+
+  defp assert_rejected_by_both(prerequisite) do
+    assert {:error, _} = PublicReleaseVerifier.validate(prerequisite)
+    assert {:error, _} = PhoenixCleanRoomProof.validate_prerequisite(prerequisite)
   end
 end
