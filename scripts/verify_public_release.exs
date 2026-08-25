@@ -1031,7 +1031,7 @@ defmodule Rendro.PublicReleaseVerifier do
     do: {:error, "tag must be the exact approved recovery candidate #{@candidate_tag}"}
 
   defp ensure_safe_output(path) do
-    if path == "" or File.exists?(path), do: {:error, "output must not already exist"}, else: :ok
+    if path == "", do: {:error, "output must not already exist"}, else: :ok
   end
 
   defp atomic_write(path, encoded) do
@@ -1040,13 +1040,28 @@ defmodule Rendro.PublicReleaseVerifier do
     temporary =
       Path.join(directory, ".#{Path.basename(path)}.#{System.unique_integer([:positive])}.tmp")
 
-    with :ok <- File.write(temporary, encoded, [:binary]),
-         :ok <- File.rename(temporary, path) do
-      :ok
+    try do
+      with {:ok, file} <- :file.open(String.to_charlist(temporary), [:write, :exclusive, :binary]),
+           :ok <- write_and_sync(file, encoded),
+           :ok <- :file.make_link(String.to_charlist(temporary), String.to_charlist(path)) do
+        :ok
+      else
+        {:error, :eexist} -> {:error, "output must not already exist"}
+        _ -> {:error, "could not atomically write public prerequisite record"}
+      end
+    after
+      File.rm(temporary)
+    end
+  end
+
+  defp write_and_sync(file, encoded) do
+    with :ok <- :file.write(file, encoded),
+         :ok <- :file.sync(file) do
+      :file.close(file)
     else
-      _ ->
-        File.rm(temporary)
-        {:error, "could not atomically write public prerequisite record"}
+      error ->
+        :file.close(file)
+        error
     end
   end
 

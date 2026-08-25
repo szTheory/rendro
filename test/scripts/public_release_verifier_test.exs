@@ -241,31 +241,26 @@ defmodule Rendro.PublicReleaseVerifierTest do
     on_exit(fn -> File.rm_rf(root) end)
 
     writers =
-      for suffix <- ["first", "second"] do
-        record = Path.join(root, "#{suffix}.candidate")
-        fixture = Path.join(root, "#{suffix}.fixture.json")
-        File.write!(record, "candidate_commit_sha: #{@candidate}\n")
-        File.write!(fixture, JSON.encode!(valid_facts() |> Map.merge(fixture_metadata())))
-
+      for _ <- ["first", "second"] do
         Task.async(fn ->
           send(parent, :writer_started)
 
           receive do
-            :publish -> run_cli(record, output, fixture)
+            :publish -> PublicReleaseVerifier.write_verified(output, valid_facts())
           end
         end)
       end
 
-    Enum.each(writers, fn writer ->
+    Enum.each(writers, fn _writer ->
       assert_receive :writer_started
-      send(writer.pid, :publish)
     end)
 
-    results = Enum.map(writers, &Task.await(&1, 10_000))
-    statuses = Enum.map(results, &elem(&1, 1))
+    Enum.each(writers, &send(&1.pid, :publish))
 
-    assert Enum.count(statuses, &(&1 == 0)) == 1
-    assert Enum.count(statuses, &(&1 != 0)) == 1
+    results = Enum.map(writers, &Task.await(&1, 10_000))
+
+    assert Enum.count(results, &(&1 == :ok)) == 1
+    assert Enum.count(results, &(&1 == {:error, "output must not already exist"})) == 1
 
     record = output |> File.read!() |> JSON.decode!()
     assert record["public_prerequisite"] == "VERIFIED"
