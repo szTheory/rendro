@@ -321,3 +321,110 @@ Because that mismatch changes the approval-bound integration scope, execution
 stops before protected-main integration or any workflow dispatch. A reconciled
 packet and fresh blocking-human approval must name the actual nine-commit range
 and its complete path delta before this plan may resume.
+
+## Final Reconciliation and Fresh Decision Request
+
+status: pending_blocking_human
+packet_revision: range-reconciled-2026-08-25T19:36:00Z
+recorded_at_utc: 2026-08-25T19:36:00Z
+
+This final section supersedes every earlier approval and rejection record in this packet for
+execution purposes. Earlier controls, approvals, terminal incidents, and CI runs remain immutable
+evidence; none transfers authority to the corrected control below.
+
+### Read-only Reconciliation Facts
+
+`git ls-remote --heads origin refs/heads/main` returned
+`7e28826cf9f0832063ea9fd922d6bb065a920fc4`. That baseline is still an ancestor of control
+`9f67a222b6e0a846656024035694ee27350e08f8`.
+
+| Fact | Exact value | Result |
+|---|---|---|
+| Reconciled packet revision | `range-reconciled-2026-08-25T19:36:00Z` | this decision request |
+| New correction control SHA | `9f67a222b6e0a846656024035694ee27350e08f8` | distinct from failed control `7e28826cf9f0832063ea9fd922d6bb065a920fc4` |
+| Current remote baseline | `7e28826cf9f0832063ea9fd922d6bb065a920fc4` | `origin/main`, read-only observation |
+| Required non-force fast-forward | `7e28826cf9f0832063ea9fd922d6bb065a920fc4..9f67a222b6e0a846656024035694ee27350e08f8` | nine commits |
+| Ordered-history SHA-256 | `fa3fa9d814b28456fd262e3313fceb872ebff782234917879893c324773fe669` | canonical `git log --format='%H%x09%s' --reverse` output |
+| Name-status SHA-256 | `e1e125e3dda9a1818d46373507f99e61647f290ff101bca07d8200d941696d5b` | canonical `git diff --name-status` output |
+| HexDocs workflow SHA-256 | `44bfed3efc2a7ae8c53694112478104b45bfd63c98bdf4c9101659698927ef3a` | sealed-tag correction remains present |
+| Launch-contract SHA-256 | `078b5807e41f117e5ebe6ec1460284a1f41cacc020f3b151bbb6c7fa2459d7cc` | generic checkout has no local-tag assumption |
+| CI workflow SHA-256 | `623ba555485bb87268d2bf085cf2e244416d1e2e8a741e32e88f7d6dacf1ee55` | secondary matrix is OTP 26 / Elixir 1.19.0 |
+| Candidate/tag | `f03c78bab54efe1cd1596d51cf3f28193232e2a3` / `v1.3.4` | annotated tag object `84b0a632af6f6fa96af5fb515cecbbe18dcf6d37` peels to candidate |
+
+### Complete Approval-Bound History
+
+The complete ordered range is exactly:
+
+```text
+48b5429405dbbd94d1bcc6adac75cd66bce6cb22  docs(131-18): record corrected HexDocs approval packet
+de69fe51183cc9873c969c7c5462c72e5ec430ce  docs(131-18): record rejected HexDocs control decision
+54964804dd9e5b0af4d23edada11ad2772ddaec7  docs(131-18): record rejection checkpoint state
+b5da699688762361762d4713e46c7cd113ae5f69  docs(131-18): record fresh HexDocs retry approval
+2367609794405381017e640b59a598977bd0a8eb  docs(131-18): reconcile protected-main fast-forward scope
+d71d81a1adff72b590793cacf7444d83329ca53d  docs(131-18): record reconciled HexDocs approval
+f5a582af330ccb19d2725450a54b151ab392c473  docs(131-18): record protected-main CI safety stop
+c2912e87eeb46bab07e036d29948cffaa9f1add9  fix(131-18): repair required CI gates
+9f67a222b6e0a846656024035694ee27350e08f8  test(131-18): guard generic checkout tag independence
+```
+
+The complete name-status/path delta is exactly:
+
+```text
+M  .github/workflows/ci.yml
+M  .planning/STATE.md
+A  .planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-HEXDOCS-RETRY-APPROVAL.md
+M  scripts/configurator_e2e/tests/configurator.spec.mjs-snapshots/breakpoint-899-representative-linux.png
+M  scripts/configurator_e2e/tests/configurator.spec.mjs-snapshots/desktop-dark-exact-linux.png
+M  scripts/configurator_e2e/tests/configurator.spec.mjs-snapshots/desktop-light-exact-linux.png
+M  scripts/configurator_e2e/tests/configurator.spec.mjs-snapshots/mobile-dark-representative-linux.png
+M  test/docs_contract/launch_execution_claims_test.exs
+```
+
+The correction closes every in-scope remote required-CI failure from run `32887354057`: the
+launch-contract test no longer assumes a generic checkout has the tag, the unavailable OTP 25
+secondary setup is replaced by OTP 26, and the four reviewed Chromium snapshots are refreshed.
+The pinned-container browser suite and deterministic lanes remain strict.
+
+### Prior Approval Is Invalid
+
+The literal approval recorded at `2026-08-25T19:20:59Z` is invalid and cannot authorize external
+mutation. It named this control and baseline but asserted a two-commit fast-forward with history
+hash `3648d68330e1ecc42494243192a316e72cedbba839dba6ab37815e733ac8600b`; the actual approved
+scope is the nine commits and eight paths above, with history hash
+`fa3fa9d814b28456fd262e3313fceb872ebff782234917879893c324773fe669`. The scope discrepancy is
+material, so no prior approval, rejection, or spent authority transfers to this packet revision.
+
+### Immutable Run Inventory
+
+- `32877290266` / job `97899588380` remains the failed, spent `workflow_dispatch` incident;
+  job `97900969705` stayed skipped and no binding artifact exists.
+- `32887354057` / `97931741585` remains the failed required-CI incident that required this
+  correction. It was not rerun.
+- `32887354106` is a separate push-triggered `HexDocs` verification run at failed control
+  `7e28826…`; `verify-docs-ready` succeeded and `publish-hexdocs` was skipped. It is not a
+  workflow dispatch, did not publish, did not create a binding artifact, and does not consume
+  the one-dispatch authority.
+
+### Exact Fresh Approval Required
+
+No external action is authorized until an unqualified literal response states:
+
+```text
+approve-reconciled-control-and-one-dispatch: packet_revision=range-reconciled-2026-08-25T19:36:00Z control_sha=9f67a222b6e0a846656024035694ee27350e08f8 remote_baseline_sha=7e28826cf9f0832063ea9fd922d6bb065a920fc4 complete_nine_commit_history_sha256=fa3fa9d814b28456fd262e3313fceb872ebff782234917879893c324773fe669 complete_eight_path_delta_sha256=e1e125e3dda9a1818d46373507f99e61647f290ff101bca07d8200d941696d5b candidate_sha=f03c78bab54efe1cd1596d51cf3f28193232e2a3 release_ref=v1.3.4 integrate protected-main and dispatch exactly one new HexDocs workflow
+```
+
+This authorizes only the exact non-force nine-commit fast-forward and one later `HexDocs`
+`workflow_dispatch` from `main`. Stop before external mutation for a rejected, silent,
+qualified, mismatched, or recycled approval; changed baseline/control/history/delta/hashes;
+invalid tag type or peeled target; failed checks; unavailable protected-main or environment
+approval; force-push; tag/package mutation; alternate publisher; extra dispatch; rerun; artifact
+fabrication; prerequisite regeneration without a successful new dispatch and binding; or any
+other external mutation not named above. In particular it does not authorize a rerun of
+`32877290266` or `32887354057`, use of `32887354106` as a dispatch, environment bypass,
+publication before the workflow's own protected environment approval, or artifact retrieval.
+
+To leave all external state unchanged, reply:
+
+```text
+reject-or-revise
+```
