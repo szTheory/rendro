@@ -1,5 +1,5 @@
 ---
-decision: pending_blocking_human
+decision: rejected_or_revise
 packet_created_at_utc: 2026-08-25T18:20:00Z
 control_sha: 7e28826cf9f0832063ea9fd922d6bb065a920fc4
 remote_baseline_sha: 881b97ffc10551f77e7c6f416bc91df2e1289025
@@ -74,10 +74,16 @@ Stop before external mutation on a rejected, silent, qualified, mismatched, or r
 
 ## Literal Decision Record
 
-decision: pending_blocking_human
-literal_response:
-reviewer_identity:
-recorded_at_utc:
+decision: rejected_or_revise
+literal_response: reject-or-revise
+reviewer_identity: not supplied
+recorded_at_utc: 2026-08-25T18:24:32Z
+
+The requested protected-main integration and new `HexDocs` workflow dispatch are rejected.
+No protected-main integration, workflow dispatch, rerun, publication, tag/package mutation,
+artifact retrieval, or canonical prerequisite regeneration was performed. The corrected control
+and Task 1 verification evidence remain available only for a future revised packet and fresh
+blocking-human decision.
 
 To authorize the exact scope, reply with an unqualified statement that names all bound facts, for example:
 
