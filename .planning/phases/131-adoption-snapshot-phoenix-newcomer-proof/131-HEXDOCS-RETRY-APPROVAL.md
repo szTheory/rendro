@@ -125,6 +125,35 @@ To leave all external state unchanged, reply:
 reject-or-revise
 ```
 
+## Conditional Post-Bypass Approval
+
+decision: approved_conditionally_after_exact_sha_push_validation
+literal_response: yes
+reviewer_identity: user (interactive GSD checkpoint)
+recorded_at_utc: 2026-08-25T19:44:00Z
+
+The user answered **yes** to the exact checkpoint question: continue automatically if and
+only if both current exact-SHA push runs succeed, consuming the one authorized HexDocs
+dispatch. This accepts the already-landed approved control despite GitHub reporting the
+required-CI protection bypass, but only if all of the following bounded facts hold before
+any dispatch:
+
+- CI run `32890265624` is a `push` run for `main` at
+  `9f67a222b6e0a846656024035694ee27350e08f8`, completes successfully, and its required
+  `ci-success` job succeeds.
+- HexDocs verification run `32890265565` is a `push` run for `main` at the same SHA and
+  completes successfully. It is not a `workflow_dispatch`, creates no binding, and does
+  not consume dispatch authority.
+- No other `HexDocs` `workflow_dispatch` has been created after the spent terminal run
+  `32877290266`.
+
+If any identity check or conclusion fails, is cancelled, or times out, execution stops with
+no dispatch and no retry. If all checks pass, this decision authorizes exactly one new
+`HexDocs` `workflow_dispatch` from `main` with
+`candidate_commit_sha=f03c78bab54efe1cd1596d51cf3f28193232e2a3` and `release_ref=v1.3.4`.
+It does not authorize an environment-policy bypass, a rerun, any additional dispatch, tag or
+package mutation, artifact fabrication, or an alternative publisher.
+
 ## Reconciled Literal Approval Received
 
 decision: approved
