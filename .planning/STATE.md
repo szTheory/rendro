@@ -6,7 +6,7 @@ current_phase: 131
 current_phase_name: Adoption Snapshot & Phoenix Newcomer Proof
 status: executing
 stopped_at: Completed 131-14-PLAN.md
-last_updated: "2026-08-25T17:14:20.455Z"
+last_updated: "2026-08-25T17:51:49.502Z"
 last_activity: 2026-08-25
 last_activity_desc: Phase 131 execution started
 progress:
@@ -95,6 +95,7 @@ None yet.
 
 - Human re-review and network/Phoenix observations are evidence inputs, not deterministic proof; unavailable evidence must remain explicitly unavailable.
 - D-35 immutable v1.3.3 release incident: annotated tag object c96bf205d7216cdcf4846a0f24a312f9c1c75b0f peels to cfc58a81865e060351ce33d98f5e52de8cd198d9; run 32596108284 validate job 97087204354 passed version, CI, and complete preflight before the redundant unauthenticated standalone dry run failed; publish job 97088652899 skipped; Hex/HexDocs absent, with no docs dispatch/verifier. Fix bbe75d2 removes only that duplicate and confines HEX_API_KEY to actual protected publish. Exact v1.3.4 is the fresh target; v1.3.0 through v1.3.3 are immutable and must never be retried or mutated.
+- Plan 131-15 terminal failure: sole authorized HexDocs workflow_dispatch run 32877290266 failed in verify-docs-ready job 97899588380 because checkout lacked annotated v1.3.4 for docs-contract git rev-parse; publish job 97900969705 skipped and no binding artifact exists. No retry: new workflow control SHA, focused re-verification, and fresh human approvals are required.
 
 ### Quick Tasks Completed
 
