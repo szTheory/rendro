@@ -1,9 +1,9 @@
 ---
-decision: approved_execution_blocked
+decision: pending_blocking_human
 packet_created_at_utc: 2026-08-25T18:20:00Z
-packet_revised_at_utc: 2026-08-25T18:52:44Z
-control_sha: 7e28826cf9f0832063ea9fd922d6bb065a920fc4
-remote_baseline_sha: 881b97ffc10551f77e7c6f416bc91df2e1289025
+packet_revised_at_utc: 2026-08-25T19:36:00Z
+control_sha: 9f67a222b6e0a846656024035694ee27350e08f8
+remote_baseline_sha: 7e28826cf9f0832063ea9fd922d6bb065a920fc4
 candidate_sha: f03c78bab54efe1cd1596d51cf3f28193232e2a3
 release_ref: v1.3.4
 workflow_name: HexDocs
@@ -15,7 +15,7 @@ workflow_name: HexDocs
 
 This packet requests one fresh, literal decision for the corrected control. It does not reuse the consumed Plan 131-14/15 authority or authorize a retry of its terminal run.
 
-**Exact proposed action:** integrate reviewed local control commit `7e28826cf9f0832063ea9fd922d6bb065a920fc4` into protected `origin/main`, then dispatch `HexDocs` from `main` exactly once with `candidate_commit_sha=f03c78bab54efe1cd1596d51cf3f28193232e2a3` and `release_ref=v1.3.4`.
+**Exact proposed action:** integrate reviewed local correction control commit `9f67a222b6e0a846656024035694ee27350e08f8` into protected `origin/main`, then dispatch `HexDocs` from `main` exactly once with `candidate_commit_sha=f03c78bab54efe1cd1596d51cf3f28193232e2a3` and `release_ref=v1.3.4`.
 
 The corrected `verify-docs-ready` job fetches the exact tag, rejects a missing or lightweight tag, and requires `v1.3.4^{}` to equal the sealed candidate before Beam setup, dependency installation, or every docs-contract action. It has no secret-bearing environment. The protected `publish-hexdocs` job, detached candidate validation, `HEX_API_KEY` boundary, publication command, and durable `hexdocs-candidate-binding` upload are unchanged.
 
@@ -194,3 +194,82 @@ No `HexDocs` workflow was dispatched. A read-only run inventory after the failur
 contained only terminal failed run `32877290266`; exactly-one new-dispatch authority remains
 unconsumed but may not be used with this failed control. Any correction requires a new control
 SHA, focused and remote validation, a revised packet, and fresh blocking-human approval.
+
+## Superseding Correction Control and Fresh Decision Request
+
+status: pending_blocking_human
+packet_revision: post-`7e28826`-CI-repair
+recorded_at_utc: 2026-08-25T19:36:00Z
+
+This section supersedes every prior approval and rejection record in this packet for execution
+purposes. The older terminal incident, failed control, earlier approvals, and CI runs remain
+immutable historical evidence; none transfers authority to this correction.
+
+| Fact | Exact value | Result |
+|---|---|---|
+| New correction control SHA | `9f67a222b6e0a846656024035694ee27350e08f8` | distinct from failed control `7e28826cf9f0832063ea9fd922d6bb065a920fc4` |
+| Current remote baseline | `7e28826cf9f0832063ea9fd922d6bb065a920fc4` | `origin/main`, read-only observation |
+| Required fast-forward | `7e28826cf9f0832063ea9fd922d6bb065a920fc4..9f67a222b6e0a846656024035694ee27350e08f8` | two correction commits; no force-push |
+| Ordered range SHA-256 | `3648d68330e1ecc42494243192a316e72cedbba839dba6ab37815e733ac8600b` | `c2912e8`, then `9f67a22` |
+| Range name-status SHA-256 | `e1e125e3dda9a1818d46373507f99e61647f290ff101bca07d8200d941696d5b` | bounded to CI workflow, launch contract, and four Chromium snapshots |
+| HexDocs workflow SHA-256 | `44bfed3efc2a7ae8c53694112478104b45bfd63c98bdf4c9101659698927ef3a` | unchanged sealed-tag correction remains present |
+| Launch-contract SHA-256 | `078b5807e41f117e5ebe6ec1460284a1f41cacc020f3b151bbb6c7fa2459d7cc` | no generic-checkout local-tag assumption |
+| CI workflow SHA-256 | `623ba555485bb87268d2bf085cf2e244416d1e2e8a741e32e88f7d6dacf1ee55` | secondary matrix is OTP 26 / Elixir 1.19.0 |
+| Candidate/tag | `f03c78bab54efe1cd1596d51cf3f28193232e2a3` / `v1.3.4` | annotated tag, peeled target matches candidate |
+
+The correction closes every in-scope remote required-CI failure from run
+`32887354057`: its launch-contract test no longer assumes the tag exists in a generic Actions
+checkout; its unavailable OTP 25 / Elixir 1.19.0 secondary setup is replaced by OTP 26; and its
+four pinned Chromium snapshots are refreshed from the reviewed Phase 130 catalog assets. The
+current pinned-container browser suite and local deterministic lanes remain strict rather than
+masked or made advisory.
+
+### Immutable Run Inventory
+
+- `32877290266` / job `97899588380` remains the failed, spent `workflow_dispatch` incident;
+  job `97900969705` stayed skipped and no binding artifact exists.
+- `32887354057` / `97931741585` remains the failed required-CI incident that required this
+  correction. It was not rerun.
+- `32887354106` is a separate push-triggered `HexDocs` verification run at the failed control
+  SHA `7e28826…`; `verify-docs-ready` succeeded and `publish-hexdocs` was skipped. It is not a
+  workflow dispatch, did not publish, did not create a binding artifact, and does not consume
+  the one-dispatch authority.
+
+### Local Verification for This Control
+
+```text
+MIX_ENV=test mix test test/docs_contract/launch_execution_claims_test.exs \
+  test/scripts/public_release_verifier_test.exs --max-failures 1
+
+31 tests, 0 failures
+
+npm run test:container --prefix scripts/configurator_e2e
+
+13 passed
+
+mix ci.fast
+
+pass
+```
+
+### Exact Fresh Approval Required
+
+No external action is authorized by this packet until the user supplies the following
+unqualified literal response through the blocking-human checkpoint:
+
+```text
+approve-corrected-control-and-one-dispatch: control_sha=9f67a222b6e0a846656024035694ee27350e08f8 remote_baseline_sha=7e28826cf9f0832063ea9fd922d6bb065a920fc4 candidate_sha=f03c78bab54efe1cd1596d51cf3f28193232e2a3 release_ref=v1.3.4 integrate protected-main and dispatch exactly one new HexDocs workflow
+```
+
+That literal approval authorizes only the exact non-force fast-forward of the two correction
+commits and one later `HexDocs` `workflow_dispatch` from `main`. It does not authorize a rerun
+of `32877290266` or `32887354057`, use of `32887354106` as a dispatch, force-push, tag/package
+mutation, alternate publisher, environment bypass, publication before the job's own protected
+environment approval, an extra dispatch, artifact fabrication, or canonical prerequisite
+regeneration absent a successful newly dispatched run and its binding.
+
+To leave external state unchanged, reply:
+
+```text
+reject-or-revise
+```
