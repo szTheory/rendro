@@ -33,6 +33,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
+      - name: Verify sealed release identity
+        run: |
+          set -euo pipefail
+          APPROVED_CANDIDATE_SHA="f03c78bab54efe1cd1596d51cf3f28193232e2a3"
+          APPROVED_RELEASE_REF="v1.3.4"
+          git fetch --force origin "refs/tags/${APPROVED_RELEASE_REF}:refs/tags/${APPROVED_RELEASE_REF}"
+          TAG_OBJECT_TYPE=$(git cat-file -t "${APPROVED_RELEASE_REF}")
+          test "$TAG_OBJECT_TYPE" = tag
+          PEELED_TAG_SHA=$(git rev-parse "${APPROVED_RELEASE_REF}^{}")
+          test "$PEELED_TAG_SHA" = "$APPROVED_CANDIDATE_SHA"
+
       - name: Setup Beam
         uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
