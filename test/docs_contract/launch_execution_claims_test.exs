@@ -208,7 +208,7 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
   end
 
   test "HexDocs identity gate rejects another valid 1.3.4 commit without requiring a local tag" do
-    source = File.read!(@hexdocs_workflow_path)
+    source = File.read!(__ENV__.file)
 
     refute source =~
              "System.cmd(\"git\", [\"rev-parse\", \"#{@approved_hexdocs_ref}^{}\"]"
