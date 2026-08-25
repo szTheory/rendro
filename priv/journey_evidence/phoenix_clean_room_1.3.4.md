@@ -14,8 +14,9 @@ through `Rendro.Adapters.Phoenix`. The stages were installer acquisition,
 Phoenix generation, dependency resolution, ConnCase, compilation, endpoint
 start, and loopback HTTP probe. ConnCase ran first; both paths observed HTTP
 200, `application/pdf`, attachment `invoice.pdf`, nonempty content, and PDF
-magic. The disposable application, dependency/cache/build state, process
-state, lock, and payload were removed after the bounded result projection.
+magic. The disposable workspace, application, dependency/cache/build state,
+lock, and payload were removed after the bounded result projection. This
+workspace-removal result does not verify process-tree state.
 
 The launcher was invoked through the harness's public `main/1` entrypoint so
 the proof executes even when `mix run` has an ExUnit server. Retained failed

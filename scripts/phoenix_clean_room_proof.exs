@@ -49,7 +49,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
         end
 
       case cleanup_root(root, cleanup) do
-        :ok -> mark_cleanup_removed(result)
+        :ok -> mark_workspace_removed(result)
         {:error, reason} -> failure({:cleanup_failed, reason})
       end
     else
@@ -369,87 +369,83 @@ defmodule Rendro.PhoenixCleanRoomProof do
     env = isolated_env(root)
     app = Path.join(root, "clean_room")
 
-    try do
-      with :ok <- assert_empty_root(root),
-           :ok <- bootstrap_phx_new(root),
-           :ok <-
-             run_stage(
-               :generated_app,
-               "mix",
-               [
-                 "phx.new",
-                 app,
-                 "--no-install",
-                 "--no-ecto",
-                 "--no-html",
-                 "--no-assets",
-                 "--no-mailer",
-                 "--app",
-                 "clean_room",
-                 "--module",
-                 "CleanRoom"
-               ],
-               env,
-               root
-             ),
-           :ok <- write_consumer(app),
-           :ok <- audit_dependency_source!(File.read!(Path.join(app, "mix.exs")) |> rendro_dep()),
-           :ok <- run_stage(:deps_get, "mix", ["deps.get"], env, app),
-           {:ok, lock} <- read_lock(app),
-           :ok <- audit_lock!(lock),
-           {:ok, resolved} <- resolved_versions(lock),
-           :ok <-
-             run_stage(
-               :generated_consumer_test,
-               "mix",
-               ["test"],
-               [{"MIX_ENV", "test"} | env],
-               app
-             ),
-           :ok <- audit_public_source(app),
-           {:ok, loopback_port} <- reserve_port(),
-           :ok <- configure_loopback(app, loopback_port),
-           :ok <- compile_loopback(app, env),
-           {:ok, loopback} <- loopback_facts(app, env, loopback_port),
-           :ok <- assert_cleanup_candidate(root, app) do
-        project_evidence(%{
-          schema_version: 1,
-          lane: "advisory_external_evidence",
-          advisory: true,
-          version: @version,
-          candidate_sha: prerequisite["candidate_commit_sha"],
-          prerequisite_sha: sha256(options.prerequisite),
-          elixir: System.version(),
-          otp: System.otp_release(),
-          phoenix: resolved.phoenix,
-          plug: resolved.plug,
-          bandit: resolved.bandit,
-          hex: command_version("mix", ["hex.info"], env, app),
-          phx_new: command_version("mix", ["phx.new", "--version"], env, root),
-          phx_new_source: "isolated_mix_archive_phx_new_#{@phx_new_version}",
-          commands: [
-            "mix archive.install hex phx_new 1.8.5 --force",
-            "mix phx.new --no-install --no-ecto --no-html --no-assets --no-mailer",
-            "mix deps.get",
-            "mix test",
-            "mix compile",
-            "loopback endpoint start",
-            "loopback HTTP probe"
-          ],
-          lock_sha256: sha256(Path.join(app, "mix.lock")),
-          source_audits: "public_hex_exact_1.3.4",
-          conn_case: response_facts(),
-          loopback: loopback,
-          cleanup: "pending",
-          outcome: "success",
-          next_action: "none"
-        })
-      else
-        {:error, reason} ->
-          failure(reason)
-      end
-    after
-      terminate_process_tree(root)
+    with :ok <- assert_empty_root(root),
+         :ok <- bootstrap_phx_new(root),
+         :ok <-
+           run_stage(
+             :generated_app,
+             "mix",
+             [
+               "phx.new",
+               app,
+               "--no-install",
+               "--no-ecto",
+               "--no-html",
+               "--no-assets",
+               "--no-mailer",
+               "--app",
+               "clean_room",
+               "--module",
+               "CleanRoom"
+             ],
+             env,
+             root
+           ),
+         :ok <- write_consumer(app),
+         :ok <- audit_dependency_source!(File.read!(Path.join(app, "mix.exs")) |> rendro_dep()),
+         :ok <- run_stage(:deps_get, "mix", ["deps.get"], env, app),
+         {:ok, lock} <- read_lock(app),
+         :ok <- audit_lock!(lock),
+         {:ok, resolved} <- resolved_versions(lock),
+         :ok <-
+           run_stage(
+             :generated_consumer_test,
+             "mix",
+             ["test"],
+             [{"MIX_ENV", "test"} | env],
+             app
+           ),
+         :ok <- audit_public_source(app),
+         {:ok, loopback_port} <- reserve_port(),
+         :ok <- configure_loopback(app, loopback_port),
+         :ok <- compile_loopback(app, env),
+         {:ok, loopback} <- loopback_facts(app, env, loopback_port),
+         :ok <- assert_cleanup_candidate(root, app) do
+      project_evidence(%{
+        schema_version: 1,
+        lane: "advisory_external_evidence",
+        advisory: true,
+        version: @version,
+        candidate_sha: prerequisite["candidate_commit_sha"],
+        prerequisite_sha: sha256(options.prerequisite),
+        elixir: System.version(),
+        otp: System.otp_release(),
+        phoenix: resolved.phoenix,
+        plug: resolved.plug,
+        bandit: resolved.bandit,
+        hex: command_version("mix", ["hex.info"], env, app),
+        phx_new: command_version("mix", ["phx.new", "--version"], env, root),
+        phx_new_source: "isolated_mix_archive_phx_new_#{@phx_new_version}",
+        commands: [
+          "mix archive.install hex phx_new 1.8.5 --force",
+          "mix phx.new --no-install --no-ecto --no-html --no-assets --no-mailer",
+          "mix deps.get",
+          "mix test",
+          "mix compile",
+          "loopback endpoint start",
+          "loopback HTTP probe"
+        ],
+        lock_sha256: sha256(Path.join(app, "mix.lock")),
+        source_audits: "public_hex_exact_1.3.4",
+        conn_case: response_facts(),
+        loopback: loopback,
+        cleanup: "pending",
+        outcome: "success",
+        next_action: "none"
+      })
+    else
+      {:error, reason} ->
+        failure(reason)
     end
   end
 
@@ -839,11 +835,13 @@ defmodule Rendro.PhoenixCleanRoomProof do
   defp assert_cleanup_candidate(root, app),
     do: if(String.starts_with?(app, root), do: :ok, else: {:error, :unsafe_app_path})
 
-  defp terminate_process_tree(_root), do: :ok
-
   defp cleanup_root(root, cleanup) do
     try do
-      cleanup.(root)
+      case cleanup.(root) do
+        :ok -> if File.exists?(root), do: {:error, :workspace_still_exists}, else: :ok
+        {:error, _} = error -> error
+        other -> {:error, {:cleanup_invalid_result, other}}
+      end
     rescue
       error -> {:error, {:cleanup_exception, error.__struct__}}
     catch
@@ -852,9 +850,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
   end
 
   defp cleanup_root(root) do
-    with :ok <- terminate_process_tree(root),
-         :ok <- remove_root(root),
-         do: :ok
+    remove_root(root)
   end
 
   defp remove_root(root) do
@@ -871,13 +867,13 @@ defmodule Rendro.PhoenixCleanRoomProof do
       project_evidence(%{
         outcome: "failure",
         next_action: bounded(inspect(reason)),
-        cleanup: "attempted"
+        cleanup: "workspace_cleanup_attempted"
       })
 
-  defp mark_cleanup_removed(%{"outcome" => "success"} = result),
-    do: Map.put(result, "cleanup", "removed")
+  defp mark_workspace_removed(%{"outcome" => "success"} = result),
+    do: Map.put(result, "cleanup", "workspace_removed")
 
-  defp mark_cleanup_removed(result), do: result
+  defp mark_workspace_removed(result), do: result
 
   defp emit(result, nil), do: IO.puts(Jason.encode!(result))
 

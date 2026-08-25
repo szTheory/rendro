@@ -66,6 +66,8 @@ defmodule Rendro.DocsContract.PhoenixNewcomerContractTest do
   end
 
   test "retained clean-room result proves the exact public PDF journey with dual HTTP facts" do
+    transcript = File.read!("priv/journey_evidence/phoenix_clean_room_1.3.4.md")
+
     evidence =
       "priv/journey_evidence/phoenix_clean_room_1.3.4.json"
       |> File.read!()
@@ -76,7 +78,9 @@ defmodule Rendro.DocsContract.PhoenixNewcomerContractTest do
     assert evidence["version"] == "1.3.4"
     assert evidence["candidate_sha"] == "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
     assert evidence["source_audits"] == "public_hex_exact_1.3.4"
-    assert evidence["cleanup"] == "removed"
+    assert evidence["cleanup"] == "workspace_removed"
+    assert transcript =~ "does not verify process-tree state"
+    refute transcript =~ "process state was removed"
 
     assert evidence["commands"] == [
              "mix archive.install hex phx_new 1.8.5 --force",

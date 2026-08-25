@@ -97,7 +97,7 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
     File.rm_rf!(root)
   end
 
-  test "a successful evidence record is marked removed only after cleanup succeeds" do
+  test "a successful evidence record marks the workspace removed only after cleanup succeeds" do
     root =
       Path.join(
         System.tmp_dir!(),
@@ -106,7 +106,7 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
 
     parent = self()
 
-    assert %{"outcome" => "success", "cleanup" => "removed"} =
+    assert %{"outcome" => "success", "cleanup" => "workspace_removed"} =
              PhoenixCleanRoomProof.run_with_cleanup(
                %{root: root, output: nil, prerequisite: "unused"},
                %{},
@@ -124,6 +124,27 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
 
     assert_received :cleanup_finished
     refute File.exists?(root)
+  end
+
+  test "does not claim workspace removal when a cleanup callback leaves the workspace behind" do
+    root =
+      Path.join(
+        System.tmp_dir!(),
+        "rendro-clean-room-proof-#{System.unique_integer([:positive])}"
+      )
+
+    assert %{"outcome" => "failure", "cleanup" => "workspace_cleanup_attempted"} =
+             PhoenixCleanRoomProof.run_with_cleanup(
+               %{root: root, output: nil, prerequisite: "unused"},
+               %{},
+               fn _, _, _ ->
+                 %{"outcome" => "success", "cleanup" => "pending", "next_action" => "none"}
+               end,
+               fn _ -> :ok end
+             )
+
+    assert File.exists?(root)
+    File.rm_rf!(root)
   end
 
   test "loopback retries delayed readiness and records only response facts" do
@@ -440,11 +461,12 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
           filename: "invoice.pdf",
           pdf_magic: true
         },
-        cleanup: "removed"
+        cleanup: "workspace_removed"
       })
 
     assert projected["elixir"] == "1.19.5"
-    assert projected["cleanup"] == "removed"
+    assert projected["cleanup"] == "workspace_removed"
+    refute Map.has_key?(projected, "process_cleanup")
     refute inspect(projected) =~ "/tmp/"
     refute inspect(projected) =~ "secret"
     refute Map.has_key?(projected, "pid")
@@ -470,7 +492,7 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
         commands: ["mix archive.install hex phx_new 1.8.5 --force", "loopback HTTP probe"],
         conn_case: %{content_type: "application/pdf", filename: "invoice.pdf", status: 200},
         loopback: %{content_type: "application/pdf", filename: "invoice.pdf", status: 200},
-        cleanup: "removed"
+        cleanup: "workspace_removed"
       })
 
     for key <-

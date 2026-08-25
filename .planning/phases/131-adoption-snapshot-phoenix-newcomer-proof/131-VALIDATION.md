@@ -102,7 +102,7 @@ The audit started adversarially: the
 retained Phoenix result was only existence-checked, so its claimed dual-HTTP
 PDF facts could have drifted independently of the harness tests. The new
 contract decodes the retained record and requires exact public identity,
-isolated-source/cleanup facts, bounded command history, and identical
+isolated-source/workspace-cleanup facts, bounded command history, and identical
 ConnCase/loopback `200 application/pdf invoice.pdf nonempty %PDF-` facts.
 
 | Test infrastructure | Evidence |

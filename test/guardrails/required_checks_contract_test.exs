@@ -179,7 +179,7 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert advisory_block =~ "scripts/phoenix_clean_room_proof.exs"
       assert advisory_block =~ "131-PUBLIC-PREREQUISITE.json"
       assert advisory_block =~ "proof.outcome !== \"success\""
-      assert advisory_block =~ "proof.cleanup !== \"removed\""
+      assert advisory_block =~ "proof.cleanup !== \"workspace_removed\""
       assert advisory_block =~ "name: phoenix-clean-room-advisory"
       assert advisory_block =~ "if-no-files-found: error"
     end

@@ -111,7 +111,7 @@ jobs:
           node -e '
             const fs = require("fs");
             const proof = JSON.parse(fs.readFileSync(process.env.PROOF_OUTPUT, "utf8"));
-            if (proof.outcome !== "success" || proof.cleanup !== "removed" || proof.lane !== "advisory_external_evidence") process.exit(1);
+            if (proof.outcome !== "success" || proof.cleanup !== "workspace_removed" || proof.lane !== "advisory_external_evidence") process.exit(1);
           '
 
       - name: Upload advisory Phoenix clean-room evidence
