@@ -53,6 +53,21 @@ defmodule Rendro.DocsContract.AdoptionEvidenceContractTest do
     assert Rendro.AdoptionSnapshot.digest(left) =~ ~r/^[0-9a-f]{64}$/
   end
 
+  test "snapshot arguments reject impossible ISO calendar dates" do
+    for date <- ["2026-02-31", "2026-99-99"] do
+      assert {:error, "--date must be YYYY-MM-DD"} =
+               Rendro.AdoptionSnapshot.parse_args(["--output", "snapshot.json", "--date", date])
+    end
+
+    assert {:ok, _} =
+             Rendro.AdoptionSnapshot.parse_args([
+               "--output",
+               "snapshot.json",
+               "--date",
+               "2026-08-21"
+             ])
+  end
+
   test "exclusive writer leaves no partial target or temp file after interruption" do
     path =
       Path.join(System.tmp_dir!(), "rendro-adoption-#{System.unique_integer([:positive])}.json")
@@ -185,6 +200,8 @@ defmodule Rendro.DocsContract.AdoptionEvidenceContractTest do
     assert File.read!("mix.exs") =~ "priv/adoption_evidence"
   end
 
-  defp maybe_fail(operations, failure, failure, callback), do: Map.put(operations, failure, callback)
+  defp maybe_fail(operations, failure, failure, callback),
+    do: Map.put(operations, failure, callback)
+
   defp maybe_fail(operations, _failure, _operation, _callback), do: operations
 end

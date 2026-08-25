@@ -42,7 +42,7 @@ defmodule Rendro.AdoptionSnapshot do
       is_nil(opts[:output]) ->
         {:error, "missing required --output PATH"}
 
-      !Regex.match?(~r/^\d{4}-\d{2}-\d{2}$/, opts[:date] || "") ->
+      !match?({:ok, _}, Date.from_iso8601(opts[:date] || "")) ->
         {:error, "--date must be YYYY-MM-DD"}
 
       (opts[:issues_limit] || 50) not in 1..100 ->
@@ -271,7 +271,9 @@ defmodule Rendro.AdoptionSnapshot do
     case operations.open.(temp) do
       {:ok, io} ->
         case write_and_close(io, contents, operations) do
-          :ok -> {:ok, temp}
+          :ok ->
+            {:ok, temp}
+
           error ->
             _ = File.rm(temp)
             error

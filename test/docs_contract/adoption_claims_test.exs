@@ -84,6 +84,11 @@ defmodule Rendro.DocsContract.AdoptionClaimsTest do
   test "review cadence and counting exclusions stay measurable" do
     adoption = File.read!(@adoption_path)
 
+    assert adoption =~
+             "Post-baseline Hex download snapshots are recorded only when reviewing inbound signal volume or planning a future milestone; they are not scheduled telemetry."
+
+    refute adoption =~ "No post-baseline Hex download snapshots recorded yet."
+
     for phrase <- [
           "Reviews are pull-based",
           "concrete inbound signals",

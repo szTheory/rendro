@@ -48,7 +48,7 @@ No qualifying shaping signals have been counted yet. Open a blocked-document iss
 
 ## Download Snapshots
 
-No post-baseline Hex download snapshots recorded yet. Add future snapshots only when reviewing inbound signal volume or planning a future milestone.
+Post-baseline Hex download snapshots are recorded only when reviewing inbound signal volume or planning a future milestone; they are not scheduled telemetry.
 
 Use this command when recording a snapshot:
 
