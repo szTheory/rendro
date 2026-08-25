@@ -28,7 +28,7 @@ All 28 requirements passed across phases 125-129. The milestone audit passed wit
 
 ## Current State
 
-**v2.13 started 2026-08-19.** Rendro is strengthening the shipped catalog and evaluator journey before considering another capability family. The milestone retains a quiet, pull-based adoption posture and keeps Studio, charts, and global text shaping out of scope unless refreshed evidence justifies a later milestone.
+**v2.13 implementation completed 2026-08-25 and is ready for milestone audit.** The exact twelve catalog cells were repaired and truthfully re-reviewed, the dated adoption decision remains `HOLD`/`ACCUMULATING` under the existing conjunctive gate, and the public Rendro 1.3.4 Swiss/light Invoice journey is proven in an isolated Phoenix consumer. Release identity, evidence hashes, and the recurring clean-room journey are now machine-gated while external proof remains explicitly advisory. Studio, charts, and global text shaping remain demand-gated and out of scope.
 
 <details>
 <summary>v2.12 phase-by-phase completion context</summary>
@@ -169,6 +169,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Validated
 
+- ✓ Rendro v2.13 implementation completed Quality Ratchet & Adoption Readiness: the fixed 32-cell catalog retains its deterministic and bounded-review contracts; a dated source-backed adoption snapshot records the family/composite decision without polling or outreach; and the public Rendro 1.3.4 Phoenix newcomer journey is bound to protected-main workflow-dispatch provenance, verified package/docs identity, and a machine-gated advisory clean-room proof. All 12 requirements passed across Phases 130–131; milestone audit remains the next lifecycle gate. Validated in Phase 131 on 2026-08-25. — v2.13
 - ✓ Rendro v2.12 shipped Style-Genre Presets, Public Catalog & Static Configurator (`SEED-004`): six strict genre presets, four provenance-bound curated fonts, twelve safe data-only brands, closure of all inherited v2.11 polish gaps, a bounded 32-cell deterministic catalog with honest quality dispositions, a zero-server URL-shareable configurator, canonical copy/codegen/Livebook source, and proof-backed checkout/Hex/ExDoc discovery. All 28 requirements satisfied; milestone audit `passed`. Shipped 2026-08-19 and archived under `milestones/v2.12-*`. — v2.12
 - ✓ Rendro v2.11 shipped Document Theming & Design-Token System (Milestone B / `SEED-003`): the public, deterministic `Rendro.Theme` contract on the adapter/Evolving tier (semantic color roles + materialized type scale + optional spacing/rules/radius/density), `theme:` threaded through all 7 recipes, role-derived `mode: :light | :dark` via a repeating full-page `:background` region (dark bounded as screen-oriented, no print/PDF-UA claim), a strong unbranded `Theme.default/0` that clears the Milestone-A rubric (Phase-118 SHOW-01 gap closed honestly, DATA-first, with human sign-off), orthogonal `brand:`/`from_brand/2`, the 11-row hash-checked gallery, and `guides/theming.md`. Un-themed calls reproduce v2.10 bytes exactly (PLUMB-03). All 21 requirements satisfied; milestone audit `passed`. Known carryover deferred to follow-up/Milestone C: WINDOWS ids 1-3 (Ticket hierarchy inversion + two dark-mode polish items). Shipped 2026-07-28 and archived under `milestones/v2.11-*`. — v2.11
 - ✓ Rendro v2.10 shipped Realistic Business-Document Examples & Anatomy (Milestone A / `SEED-002`): realistic `priv/examples/` fixture library + `@moduledoc false` loaders, an additive Invoice anatomy upgrade with `Rendro.Format` promoted to the public adapter tier + `cell_align: :right`, new Payslip & Ticket families, a family × edge-case stress matrix (hash-checked goldens), and rubric-gated demos + gallery/docs closure. All requirements satisfied; PR #3 squash-merged to `main`. Known carryover: Phase-118 SHOW-01 (six demos honestly scored below the reader-quality rubric) — folded into v2.11 scope. Shipped 2026-07-19 and archived under `milestones/v2.10-*`. — v2.10
@@ -198,9 +199,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-- [ ] Improve and re-review the 12 catalog cells currently classified as `needs_work`.
-- [ ] Refresh adoption evidence and record an explicit demand-gate decision.
-- [ ] Prove the Phoenix newcomer journey from discovery through customized, verified output.
+- No active implementation requirements. v2.13 is ready for milestone audit.
 
 ### Out of Scope
 
@@ -361,4 +360,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-19 after starting v2.13 Quality Ratchet & Adoption Readiness.*
+*Last updated: 2026-08-25 after completing Phase 131 and all v2.13 implementation requirements.*

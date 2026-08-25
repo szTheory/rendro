@@ -24,7 +24,7 @@ current_phase_name: adoption-snapshot-phoenix-newcomer-proof
 See: .planning/PROJECT.md (updated 2026-08-19)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 131 — adoption-snapshot-phoenix-newcomer-proof
+**Current focus:** v2.13 implementation complete — ready for milestone audit
 
 ## Current Position
 
@@ -33,14 +33,14 @@ Plan: Not started
 Status: All phases complete
 Last activity: 2026-08-25 — Phase 131 complete
 
-Progress: [██████████] 100% executable plans executed; 3 gap-closure plans ready
+Progress: [██████████] 100% — 28/28 plans and 2/2 phases complete
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
 ```text
-[████████████████████░░░░░░░░░░░░░░░░░░░░] 50% — 1/2 phases complete
+[████████████████████████████████████████] 100% — 2/2 phases complete
 Phase 130 Catalog Quality & Evidence Ratchet .............. Complete (11/11 plans)
-Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Gap closure ready (14/17 executable plans executed)
+Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Complete (17/17 plans)
 ```
 
 **Locked sequencing:** 130 repairs, regenerates, and truthfully re-reviews the fixed twelve cells before 131 records final adoption evidence and validates the public newcomer path against that stable catalog state.
@@ -99,8 +99,8 @@ None yet.
 
 - Human re-review and network/Phoenix observations are evidence inputs, not deterministic proof; unavailable evidence must remain explicitly unavailable.
 - D-35 immutable v1.3.3 release incident: annotated tag object c96bf205d7216cdcf4846a0f24a312f9c1c75b0f peels to cfc58a81865e060351ce33d98f5e52de8cd198d9; run 32596108284 validate job 97087204354 passed version, CI, and complete preflight before the redundant unauthenticated standalone dry run failed; publish job 97088652899 skipped; Hex/HexDocs absent, with no docs dispatch/verifier. Fix bbe75d2 removes only that duplicate and confines HEX_API_KEY to actual protected publish. Exact v1.3.4 is the fresh target; v1.3.0 through v1.3.3 are immutable and must never be retried or mutated.
-- Plan 131-15 terminal failure: sole authorized HexDocs workflow_dispatch run 32877290266 failed in verify-docs-ready job 97899588380 because checkout lacked annotated v1.3.4 for docs-contract git rev-parse; publish job 97900969705 skipped and no binding artifact exists. No retry: new workflow control SHA, focused re-verification, and fresh human approvals are required.
-- Plan 131-18 protected-main control SHA `7e28826cf9f0832063ea9fd922d6bb065a920fc4` was integrated, but push-triggered CI run 32887354057 failed required `ci-success` job 97931741585. Primary CI exposed a tag-dependent structural test in the generic checkout; secondary toolchain setup and configurator screenshots also failed. No HexDocs dispatch occurred. A new control SHA and fresh approval are required.
+- Resolved historical Plan 131-15 incident: dispatch 32877290266 remains immutable failed evidence; the later candidate-bound recovery path superseded it without retrying that run.
+- Resolved historical Plan 131-18 control incident: failed control `7e28826c…` remains immutable evidence; protected main `f9b63246…`, green exact-SHA gates, and the single successful recovery dispatch 32898926521 now back the canonical prerequisite.
 
 ### Quick Tasks Completed
 
@@ -126,9 +126,9 @@ Resume file: None
 
 ## Next Steps
 
-1. Correct the remote-only CI failures under a new Plan 131-18 control SHA, then obtain fresh protected-main and one-dispatch approval before resuming 131-18 -> 131-16 -> 131-17.
-2. Treat `131-15-TERMINAL-INCIDENT.md` as immutable incident evidence; never dispatch it again.
-3. Do not dispatch HexDocs from failed control `7e28826cf9f0832063ea9fd922d6bb065a920fc4`; the authorized dispatch remains unconsumed.
+1. Run `$gsd-audit-milestone` to audit v2.13 completion against its original intent.
+2. Keep all failed release/dispatch incidents immutable; do not retry or mutate their historical identities.
+3. Preserve the automated release-identity, evidence-hash, clean-room advisory, and deterministic/advisory lane contracts in future changes.
 
 ## Performance Metrics
 
