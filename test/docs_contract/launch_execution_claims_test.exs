@@ -161,6 +161,62 @@ defmodule Rendro.DocsContract.LaunchExecutionClaimsTest do
     refute workflow =~ ~r/mix hex\.publish --yes/
   end
 
+  test "HexDocs candidate binding writer emits one parseable JSON map without literal escape debris" do
+    binding = %{
+      "control_ref" => "refs/heads/main",
+      "control_sha" => String.duplicate("a", 40),
+      "requested_artifact_sha" => @approved_hexdocs_candidate,
+      "peeled_tag_sha" => @approved_hexdocs_candidate,
+      "detached_artifact_head" => @approved_hexdocs_candidate,
+      "tag" => @approved_hexdocs_ref,
+      "workflow_name" => "HexDocs",
+      "workflow_event" => "workflow_dispatch",
+      "workflow_run_id" => "32891807712"
+    }
+
+    malformed_literal_suffix = JSON.encode!(binding) <> "\\\\n"
+
+    assert String.ends_with?(malformed_literal_suffix, "}\\\\n")
+    assert {:error, _} = JSON.decode(malformed_literal_suffix)
+    assert {:ok, ^binding} = JSON.decode(JSON.encode!(binding))
+
+    workflow = File.read!(@hexdocs_workflow_path)
+    assert {:ok, %{"jobs" => jobs}} = YamlElixir.read_from_string(workflow)
+
+    binding_writer =
+      jobs["publish-hexdocs"]["steps"]
+      |> Enum.find(&(&1["name"] == "Record candidate binding provenance"))
+
+    assert binding_writer["run"] =~
+             "fs.writeFileSync(\"hexdocs-candidate-binding.json\", JSON.stringify(evidence));"
+
+    [_, writer_source] = Regex.run(~r/node -e '(.+)'$/s, binding_writer["run"])
+
+    temp_dir =
+      Path.join(System.tmp_dir!(), "rendro-binding-#{System.unique_integer([:positive])}")
+
+    File.mkdir!(temp_dir)
+    on_exit(fn -> File.rm_rf(temp_dir) end)
+
+    assert {"", 0} =
+             System.cmd("node", ["-e", writer_source],
+               cd: temp_dir,
+               env: [
+                 {"CONTROL_REF", binding["control_ref"]},
+                 {"CONTROL_SHA", binding["control_sha"]},
+                 {"CANDIDATE_SHA", binding["requested_artifact_sha"]},
+                 {"PEELED_TAG_SHA", binding["peeled_tag_sha"]},
+                 {"ARTIFACT_HEAD", binding["detached_artifact_head"]},
+                 {"RELEASE_REF", binding["tag"]},
+                 {"WORKFLOW_RUN_ID", binding["workflow_run_id"]}
+               ]
+             )
+
+    artifact = File.read!(Path.join(temp_dir, "hexdocs-candidate-binding.json"))
+    assert {:ok, ^binding} = JSON.decode(artifact)
+    refute String.ends_with?(artifact, "}\\\\n")
+  end
+
   test "docs verification fetches and validates the sealed annotated tag before contracts" do
     workflow = File.read!(@hexdocs_workflow_path)
 
