@@ -5,15 +5,15 @@ milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 131
 current_phase_name: Adoption Snapshot & Phoenix Newcomer Proof
 status: executing
-stopped_at: Phase 131 planning complete — 17 plans ready
-last_updated: "2026-08-25T17:04:26.406Z"
+stopped_at: Completed 131-14-PLAN.md
+last_updated: "2026-08-25T17:14:20.455Z"
 last_activity: 2026-08-25
 last_activity_desc: Phase 131 execution started
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 28
-  completed_plans: 24
+  completed_plans: 25
   percent: 50
 ---
 
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 131 (Adoption Snapshot & Phoenix Newcomer Proof) — EXECUTING
-Plan: 1 of 17
-Status: Executing Phase 131
+Plan: 2 of 17
+Status: Ready to execute
 Last activity: 2026-08-25 — Phase 131 execution started
 
-Progress: [████████░░] 76% implementation plans executed; 4 gap-closure plans ready
+Progress: [█████████░] 89% implementation plans executed; 4 gap-closure plans ready
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
@@ -85,6 +85,7 @@ Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Gap closure ready (1
 - [Phase ?]: HexDocs identity validation is inline in the trusted workflow so the sealed candidate remains immutable while dispatcher, checkout, and peeled-tag identities must match it.
 - [Phase ?]: Use a synced exclusive temporary file plus hard-link publication so a public VERIFIED prerequisite cannot replace an authoritative target.
 - [Phase ?]: Keep --check-existing read-only: matching bounded facts are revalidated without changing the prerequisite bytes or mtime.
+- [Phase ?]: Literal approve-exact-control-and-docs authorizes only packet-bound Plan 131-15 protected-main fast-forward and one candidate-bound HexDocs dispatch.
 
 ### Pending Todos
 
@@ -113,8 +114,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-25T15:01:01.314Z
-Stopped at: Completed 131-13-PLAN.md
+Last session: 2026-08-25T17:14:20.444Z
+Stopped at: Completed 131-14-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -145,3 +146,4 @@ Resume file: None
 | Phase 131 P11 | 10m | 2 tasks | 3 files |
 | Phase 131 P12 | 18m | 1 tasks | 2 files |
 | Phase 131 P13 | 198s | 1 tasks | 2 files |
+| Phase 131 P14 | 6m | 2 tasks | 1 files |
