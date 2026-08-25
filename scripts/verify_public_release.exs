@@ -124,6 +124,17 @@ defmodule Rendro.PublicReleaseVerifier do
              "success",
              "release validate job did not conclude successfully"
            ),
+         :ok <-
+           valid_numeric?(
+             facts["release_publish_job_id"],
+             "release publish job ID must be numeric"
+           ),
+         :ok <-
+           equal?(
+             facts["release_publish_job_conclusion"],
+             "success",
+             "release publish job did not conclude successfully"
+           ),
          :ok <- validate_public_archive_identity(facts),
          :ok <- validate_docs_provenance(facts, candidate),
          :ok <-
@@ -754,6 +765,12 @@ defmodule Rendro.PublicReleaseVerifier do
 
   defp validate_public_archive_identity(facts) do
     with :ok <- valid_digest?(facts["sealed_archive_sha256"], "sealed archive SHA-256 is invalid"),
+         :ok <-
+           equal?(
+             facts["public_archive_sha256"],
+             facts["sealed_archive_sha256"],
+             "public archive SHA-256 does not match the sealed candidate"
+           ),
          :ok <-
            equal?(
              facts["public_archive_sha256"],

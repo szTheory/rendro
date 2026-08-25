@@ -140,8 +140,33 @@ defmodule Rendro.PublicReleaseVerifierTest do
   test "rejects an archive whose download digest differs from the Hex API checksum" do
     assert {:error, "public archive SHA-256 does not match Hex API checksum"} =
              PublicReleaseVerifier.validate(
-               valid_facts(%{"public_archive_sha256" => String.duplicate("b", 64)})
+               valid_facts(%{
+                 "public_archive_sha256" => String.duplicate("b", 64),
+                 "sealed_archive_sha256" => String.duplicate("b", 64)
+               })
              )
+  end
+
+  test "rejects an archive whose digest differs from the sealed candidate" do
+    assert {:error, "public archive SHA-256 does not match the sealed candidate"} =
+             PublicReleaseVerifier.validate(
+               valid_facts(%{"sealed_archive_sha256" => String.duplicate("b", 64)})
+             )
+  end
+
+  test "requires the release publish job to have succeeded" do
+    assert {:error, "release publish job did not conclude successfully"} =
+             PublicReleaseVerifier.validate(
+               valid_facts(%{"release_publish_job_conclusion" => "skipped"})
+             )
+
+    assert {:error, "release publish job did not conclude successfully"} =
+             PublicReleaseVerifier.validate(
+               valid_facts(%{"release_publish_job_conclusion" => "failure"})
+             )
+
+    assert {:error, "release publish job ID must be numeric"} =
+             PublicReleaseVerifier.validate(valid_facts(%{"release_publish_job_id" => nil}))
   end
 
   test "rejects a public payload when its canonical manifest differs from the sealed candidate" do
@@ -435,7 +460,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "hex_version" => "1.3.4",
         "hex_api_checksum" => String.duplicate("c", 64),
         "public_archive_sha256" => String.duplicate("c", 64),
-        "sealed_archive_sha256" => String.duplicate("d", 64),
+        "sealed_archive_sha256" => String.duplicate("c", 64),
         "sealed_manifest_sha256" => String.duplicate("e", 64),
         "public_manifest_sha256" => String.duplicate("e", 64),
         "sealed_metadata_sha256" => String.duplicate("f", 64),
