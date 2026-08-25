@@ -1,6 +1,7 @@
 ---
-decision: approved
+decision: pending_blocking_human
 packet_created_at_utc: 2026-08-25T18:20:00Z
+packet_revised_at_utc: 2026-08-25T18:52:44Z
 control_sha: 7e28826cf9f0832063ea9fd922d6bb065a920fc4
 remote_baseline_sha: 881b97ffc10551f77e7c6f416bc91df2e1289025
 candidate_sha: f03c78bab54efe1cd1596d51cf3f28193232e2a3
@@ -30,7 +31,34 @@ The corrected `verify-docs-ready` job fetches the exact tag, rejects a missing o
 | Annotated tag object | `v1.3.4` is `tag` | pass |
 | Sealed tag target | `v1.3.4^{}` = `f03c78bab54efe1cd1596d51cf3f28193232e2a3` | pass |
 
-The protected-main delta is limited to the explicit pre-contract fetch, annotated-tag-type assertion, and peeled-candidate equality check, plus the structural regression contract. It adds no publisher, dependency, registry mutation, token, secret use, or alternate workflow.
+The executable correction introduced by commits `fe491000822fe2490f848189b5dbd2ea86f6bead`
+and `7e28826cf9f0832063ea9fd922d6bb065a920fc4` is limited to the structural
+regression contract plus the explicit pre-contract fetch, annotated-tag-type assertion,
+and peeled-candidate equality check. It adds no publisher, dependency, registry mutation,
+token, secret use, or alternate workflow.
+
+The protected-main fast-forward itself is broader because the approved control SHA includes
+ten earlier local-only Phase 131 commits after remote baseline
+`881b97ffc10551f77e7c6f416bc91df2e1289025`. The complete ordered range contains eleven
+commits and the following path delta:
+
+| Status | Path |
+|---|---|
+| M | `.github/workflows/hexdocs.yml` |
+| M | `.planning/ROADMAP.md` |
+| M | `.planning/STATE.md` |
+| A | `.planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-14-SUMMARY.md` |
+| R100 | `131-15-PLAN.md` → `131-15-TERMINAL-INCIDENT.md` |
+| M | `.planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-16-PLAN.md` |
+| M | `.planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-17-PLAN.md` |
+| A | `.planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-18-PLAN.md` |
+| A | `.planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-HEXDOCS-CONTROL-APPROVAL.md` |
+| M | `test/docs_contract/launch_execution_claims_test.exs` |
+
+The canonical ordered commit listing has SHA-256
+`abec0f6fe1b74808d0c04e408f53e0a0b10a5944d45e40f17e98386cf449ca36`; the canonical
+`git diff --name-status` listing has SHA-256
+`a9c11367bb265b6c47db1a73a7c3d515add55344f0b64cc464e097e04402460c`.
 
 ## Immutable Terminal Incident
 
@@ -109,3 +137,18 @@ corrected control, sealed candidate, release ref, protected-main integration, an
 HexDocs dispatch stated above. It does not authorize rerunning terminal run `32877290266`,
 changing a tag or package, force-pushing, using an alternate publisher, or dispatching more
 than once.
+
+## Preflight Scope Reconciliation
+
+status: pending_blocking_human
+recorded_at_utc: 2026-08-25T18:52:44Z
+
+The pre-mutation fast-forward check found that the earlier approval described only the two-file
+executable correction, while pushing the exact approved control SHA also integrates the complete
+eleven-commit Phase 131 history enumerated above. The earlier approval is therefore insufficient
+for external mutation and has been invalidated without any push or dispatch.
+
+A new decision must explicitly acknowledge the complete
+`881b97ffc10551f77e7c6f416bc91df2e1289025..7e28826cf9f0832063ea9fd922d6bb065a920fc4`
+fast-forward history, including the listed planning artifacts, while retaining every existing
+candidate, release, protected-main, one-dispatch, and stop-condition binding.
