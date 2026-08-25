@@ -5,10 +5,10 @@ milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 131
 current_phase_name: Adoption Snapshot & Phoenix Newcomer Proof
 status: executing
-stopped_at: Ready for 131-18-PLAN.md
-last_updated: "2026-08-25T17:51:49.502Z"
+stopped_at: "Stopped at 131-18 Task 2: reject-or-revise; no protected-main integration or HexDocs dispatch"
+last_updated: "2026-08-25T18:25:04.500Z"
 last_activity: 2026-08-25
-last_activity_desc: Phase 131 terminal-plan routing corrected
+last_activity_desc: Plan 131-18 rejected at its protected-main and HexDocs dispatch decision checkpoint
 progress:
   total_phases: 2
   completed_phases: 1
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 131 (Adoption Snapshot & Phoenix Newcomer Proof) — EXECUTING
-Plan: 14 of 17 completed (next executable: 131-18)
-Status: Ready to execute 131-18 -> 131-16 -> 131-17
-Last activity: 2026-08-25 — Phase 131 terminal-plan routing corrected
+Plan: 14 of 17 completed (131-18 paused at Task 2 rejection)
+Status: Blocked pending revised 131-18 correction/approval packet
+Last activity: 2026-08-25 — Plan 131-18 protected-main/HexDocs decision rejected; no external mutation
 
 Progress: [████████░░] 82% executable plans executed; 3 gap-closure plans ready
 
@@ -96,6 +96,7 @@ None yet.
 - Human re-review and network/Phoenix observations are evidence inputs, not deterministic proof; unavailable evidence must remain explicitly unavailable.
 - D-35 immutable v1.3.3 release incident: annotated tag object c96bf205d7216cdcf4846a0f24a312f9c1c75b0f peels to cfc58a81865e060351ce33d98f5e52de8cd198d9; run 32596108284 validate job 97087204354 passed version, CI, and complete preflight before the redundant unauthenticated standalone dry run failed; publish job 97088652899 skipped; Hex/HexDocs absent, with no docs dispatch/verifier. Fix bbe75d2 removes only that duplicate and confines HEX_API_KEY to actual protected publish. Exact v1.3.4 is the fresh target; v1.3.0 through v1.3.3 are immutable and must never be retried or mutated.
 - Plan 131-15 terminal failure: sole authorized HexDocs workflow_dispatch run 32877290266 failed in verify-docs-ready job 97899588380 because checkout lacked annotated v1.3.4 for docs-contract git rev-parse; publish job 97900969705 skipped and no binding artifact exists. No retry: new workflow control SHA, focused re-verification, and fresh human approvals are required.
+- Plan 131-18 Task 2 rejected the corrected protected-main integration and exactly one new HexDocs dispatch; revise the correction or approval packet and obtain a new blocking-human decision before any external mutation.
 
 ### Quick Tasks Completed
 
@@ -115,9 +116,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-25T17:14:20.444Z
-Stopped at: Ready for 131-18-PLAN.md
-Resume file: None
+Last session: 2026-08-25T18:25:04.489Z
+Stopped at: Stopped at 131-18 Task 2: reject-or-revise; no protected-main integration or HexDocs dispatch
+Resume file: .planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-HEXDOCS-RETRY-APPROVAL.md
 
 ## Next Steps
 
