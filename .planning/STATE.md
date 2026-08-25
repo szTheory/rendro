@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v2.13
 milestone_name: Quality Ratchet & Adoption Readiness
 current_phase: 131
-current_phase_name: Adoption Snapshot & Phoenix Newcomer Proof
+current_phase_name: adoption-snapshot-phoenix-newcomer-proof
 status: executing
-stopped_at: "Stopped at 131-18 Task 3: protected main at 7e28826, required CI failed; no HexDocs dispatch"
-last_updated: "2026-08-25T19:08:15.000Z"
+stopped_at: Completed 131-18-PLAN.md
+last_updated: "2026-08-25T21:15:13.522Z"
 last_activity: 2026-08-25
-last_activity_desc: Plan 131-18 control reached protected main, but exact-SHA required CI failed before HexDocs dispatch
+last_activity_desc: Phase 131 execution started
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 28
-  completed_plans: 25
+  completed_plans: 26
   percent: 50
 ---
 
@@ -24,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-19)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 131 — Adoption Snapshot & Phoenix Newcomer Proof
+**Current focus:** Phase 131 — adoption-snapshot-phoenix-newcomer-proof
 
 ## Current Position
 
-Phase: 131 (Adoption Snapshot & Phoenix Newcomer Proof) — EXECUTING
-Plan: 14 of 17 completed (131-18 paused at Task 3 remote CI failure)
-Status: Blocked pending a new control SHA, remote CI closure, revised approval, and fresh dispatch authority
-Last activity: 2026-08-25 — Plan 131-18 protected-main/HexDocs decision rejected; no external mutation
+Phase: 131 (adoption-snapshot-phoenix-newcomer-proof) — EXECUTING
+Plan: 2 of 17
+Status: Ready to execute
+Last activity: 2026-08-25 — Phase 131 execution started
 
-Progress: [████████░░] 82% executable plans executed; 3 gap-closure plans ready
+Progress: [█████████░] 93% executable plans executed; 3 gap-closure plans ready
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
@@ -116,9 +116,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-25T19:08:15.000Z
-Stopped at: Stopped at 131-18 Task 3: protected main at 7e28826, required CI failed; no HexDocs dispatch
-Resume file: .planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-HEXDOCS-RETRY-APPROVAL.md
+Last session: 2026-08-25T21:15:13.512Z
+Stopped at: Completed 131-18-PLAN.md
+Resume file: None
 
 ## Next Steps
 

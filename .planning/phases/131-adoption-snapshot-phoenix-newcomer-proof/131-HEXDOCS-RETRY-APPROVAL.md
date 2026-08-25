@@ -191,6 +191,26 @@ The sole prospective dispatch remains bound to
 package mutation, rerun, alternate publisher, verifier weakening, artifact fabrication, or
 second dispatch is authorized. Any failed machine gate ends this recovery attempt automatically.
 
+## Recovery Outcome
+
+status: completed_verified
+control_sha: f9b63246029396f76c443c5750aad42a3004081b
+ci_push_run_id: 32896233006
+hexdocs_push_run_id: 32896232999
+hexdocs_dispatch_run_id: 32898926521
+recorded_at_utc: 2026-08-25T21:13:00Z
+
+Clean PR #47 merged normally at the control SHA above. Its exact-SHA push CI (including
+`ci-success`) and credential-free HexDocs push verification both succeeded before the sole new
+dispatch. Run `32898926521` is the only new `workflow_dispatch`; its `verify-docs-ready`
+job `97967916084` and `publish-hexdocs` job `97969916166` succeeded. The sole bounded
+`hexdocs-candidate-binding` artifact was valid JSON (SHA-256
+`74fd616bfcd4b691b37cffdb5ef6ccd7e9e121b581dbea25feeb5be61cff4ccf`) and exactly bound
+`refs/heads/main`, this control SHA, sealed candidate, `v1.3.4`, `HexDocs`,
+`workflow_dispatch`, and this run. The prior canonical record was retained as legacy
+package provenance (SHA-256 `505394af4ab54393ac06ac35592e8b2bfd935b3365983775191a2a7cca7278bf`);
+the current verifier then solely wrote the replacement VERIFIED prerequisite.
+
 ## Conditional Post-Bypass Approval
 
 decision: approved_conditionally_after_exact_sha_push_validation
