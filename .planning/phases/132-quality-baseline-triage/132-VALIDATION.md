@@ -20,7 +20,7 @@ created: 2026-08-26
 |----------|-------|
 | **Framework** | ExUnit bundled with Elixir 1.19.5 |
 | **Config file** | `test/test_helper.exs` |
-| **Quick run command** | `mix test test/quality/baseline_ledger_contract_test.exs` |
+| **Quick run command** | `mix quality.baseline` (purpose-tagged maintenance contract, default-excluded from ordinary `mix test` and `mix ci.fast`) |
 | **Full suite command** | `mix ci.fast` |
 | **Estimated runtime** | Focused contract: <10 seconds; full lane: record measured runtime in the baseline |
 
@@ -30,7 +30,7 @@ The proof and advisory lanes remain separate commands (`mix ci.proofs`, `mix ci.
 
 ## Sampling Rate
 
-- **After every task commit:** Run `mix test test/quality/baseline_ledger_contract_test.exs` once the Wave 0 contract exists.
+- **After every task commit:** Run `mix quality.baseline` once Task 132-01-01 creates the Wave 0 contract and explicit invocation boundary.
 - **After every plan wave:** Run the focused contract plus the relevant registered baseline commands; run `mix ci.fast` before phase verification.
 - **Before `$gsd-verify-work`:** `mix ci.fast` and every locally available registered baseline command must be green or recorded with an explicit truthful unavailable state.
 - **Max feedback latency:** 10 seconds for the focused contract; long-running registered commands record their measured duration and execute at the plan/wave boundary rather than after every edit.
@@ -41,11 +41,11 @@ The proof and advisory lanes remain separate commands (`mix ci.proofs`, `mix ci.
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 132-01-01 | 01 | 1 | AUDIT-02, AUDIT-03 | T-132-01, T-132-03 | Invalid evidence/finding fields, enums, IDs, or lifecycle records fail loudly. | schema + mutation contract | `mix test test/quality/baseline_ledger_contract_test.exs` | ❌ W0 | ⬜ pending |
-| 132-01-02 | 01 | 1 | AUDIT-01 | T-132-01, T-132-02, T-132-04 | Normalized evidence retains source/lane/hash/redaction identity and cannot promote unavailable advisory evidence. | focused contract + command probes | `mix test test/quality/baseline_ledger_contract_test.exs` | ❌ W0 | ⬜ pending |
-| 132-01-03 | 01 | 1 | AUDIT-02, AUDIT-03, AUDIT-04 | T-132-03 | Every durable finding is unique, fully classified, owned, and governed by its disposition/closure rules. | static contract + human evidence review | `mix test test/quality/baseline_ledger_contract_test.exs` | ❌ W0 | ⬜ pending |
-| 132-02-01 | 02 | 2 | AUDIT-01, AUDIT-04 | T-132-02, T-132-04 | Full registered baseline results preserve lane authority and record unavailable remote/advisory evidence without fabrication. | integration/command evidence | `mix ci.fast` | ✅ | ⬜ pending |
-| 132-02-02 | 02 | 2 | AUDIT-02, AUDIT-03, AUDIT-04 | T-132-01, T-132-03 | Complete triage resolves every finding reference once and enforces disposition-specific proof, owner, and trigger rules. | focused contract + human evidence review | `mix test test/quality/baseline_ledger_contract_test.exs` | ✅ | ⬜ pending |
+| 132-01-01 | 01 | 0 | AUDIT-02, AUDIT-03 | T-132-01, T-132-03 | Creates the isolated maintenance lane; invalid evidence/finding fields, enums, IDs, or lifecycle records fail loudly. | schema + mutation contract | `mix quality.baseline && mix ci.fast` | ❌ W0 | ⬜ pending |
+| 132-01-02 | 01 | 0 | AUDIT-01 | T-132-01, T-132-02, T-132-04 | Normalized evidence retains source/lane/hash/redaction identity and stable SIG IDs, and cannot promote unavailable advisory evidence. | focused contract + command probes | `mix quality.baseline` | ❌ W0 | ⬜ pending |
+| 132-01-03 | 01 | 0 | AUDIT-02, AUDIT-03, AUDIT-04 | T-132-03 | Every durable finding is unique, fully classified, owned, and governed by its disposition/closure rules. | static contract + human evidence review | `mix quality.baseline` | ❌ W0 | ⬜ pending |
+| 132-02-01 | 02 | 1 | AUDIT-01, AUDIT-04 | T-132-02, T-132-04 | Full registered baseline results preserve lane authority, mint stable unique SIG IDs, and record unavailable remote/advisory evidence without fabrication. | integration/command evidence | `mix quality.baseline && mix ci.fast` | ✅ after W0 | ⬜ pending |
+| 132-02-02 | 02 | 1 | AUDIT-02, AUDIT-03, AUDIT-04 | T-132-01, T-132-03 | Non-empty set equality proves every SIG is classified exactly once; omitted/double-classified mutations and incomplete dispositions fail. | focused inverse contract + human evidence review | `mix quality.baseline` | ✅ after W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -56,7 +56,8 @@ The proof and advisory lanes remain separate commands (`mix ci.proofs`, `mix ci.
 - [ ] `.planning/QUALITY.md` — canonical compatibility contract, baseline registry, lifecycle/disposition rules, active/historical/deferred findings, and Phase 137 comparison placeholder.
 - [ ] `.planning/quality/schema/baseline-v1.schema.json` — normalized snapshot/evidence-item contract using existing JSV conventions.
 - [ ] `.planning/quality/baselines/132-initial.json` — exact-source-SHA initial snapshot with normalized facts and no embedded raw artifact payloads.
-- [ ] `test/quality/baseline_ledger_contract_test.exs` — JSV validation plus mutation, unique-ID, lifecycle, reference, disposition, and archive-independence checks.
+- [ ] `test/quality/baseline_ledger_contract_test.exs` — purpose-tagged JSV validation plus mutation, unique-ID, inverse SIG-classification, lifecycle, reference, disposition, and archive-independence checks.
+- [ ] `test/test_helper.exs` and `mix.exs` — default exclusion plus explicit `mix quality.baseline` invocation; ordinary test and `mix ci.fast` do not execute the maintenance contract.
 
 No new test framework or runtime dependency is required.
 
@@ -88,6 +89,7 @@ No new test framework or runtime dependency is required.
 - [ ] No watch-mode flags.
 - [ ] Focused feedback latency remains below 10 seconds.
 - [ ] Deterministic, proof, advisory, and human-review results remain separate.
+- [ ] Every unresolved high-severity threat blocks completion regardless of unrelated green tests; ASVS L1 V4/V5/V6 automated and manual checks are recorded.
 - [ ] `nyquist_compliant: true` set in frontmatter after validation.
 
 **Approval:** pending

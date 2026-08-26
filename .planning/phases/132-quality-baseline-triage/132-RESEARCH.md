@@ -334,17 +334,19 @@ These commands identify compile-connected health; use `mix xref trace` only afte
 | A1 | The proposed `.planning/quality/schema/` and `.planning/quality/baselines/` names are the best discretionary layout. | Architecture Patterns | Low: planner can change names without changing the ledger/evidence contract. |
 | A2 | A dedicated `test/quality/baseline_ledger_contract_test.exs` is the best focused validation mechanism. | Recommended Project Structure / Validation | Medium: it must remain a maintenance contract, not product or release executable state. |
 
-## Open Questions
+## Resolved Questions
 
-1. **Which baseline executions can complete locally on the capture SHA?**
+1. **Which baseline executions complete locally on the capture SHA, and how are unavailable lanes represented?**
    - What we know: Elixir 1.19.5/OTP 28, Mix, Git, SHA-256 utilities, and jq are available locally. [VERIFIED: local environment probe]
-   - What's unclear: The advisory renderer/PDFium and remote artifact retention/URL for each run may not be locally available. [VERIFIED: STATE.md; 132-CONTEXT.md]
-   - Recommendation: Capture every local command that is available, record unavailable advisory items exactly, and add primary-CI raw-artifact metadata after the authoritative run. [VERIFIED: 132-CONTEXT.md]
+   - Resolution: Execute every locally available registered command on the exact capture SHA. Record unavailable advisory/remote items with their concrete reason and rerun/attachment trigger, then add primary-CI raw-artifact metadata only after the authoritative run. Availability is evidence data, not a prerequisite for truthful classification. [RESOLVED: D-12, D-13]
 
-2. **Should the focused ledger contract run inside the ordinary test glob or only as an explicit maintenance test?**
+2. **What invocation boundary keeps the focused ledger contract outside ordinary regression execution?**
    - What we know: D-03 prohibits ordinary regression behavior from consuming the ledger as executable state, while the phase explicitly authorizes focused contract-test mechanics. [VERIFIED: 132-CONTEXT.md]
-   - What's unclear: Whether maintainers prefer a separate CI invocation or a narrowly-scoped test included by `mix ci.fast`.
-   - Recommendation: Keep it isolated under `test/quality/`, make it read only static planning artifacts, and explicitly document that it validates ledger structure—not application behavior. Confirm the CI inclusion choice during detailed planning. [ASSUMED]
+   - Resolution: Keep it isolated under `test/quality/`, default-exclude its purpose tag, and invoke it only through `mix quality.baseline`; ordinary `mix test` and `mix ci.fast` do not run it. [RESOLVED: D-03]
+
+### Resolution
+
+The focused ledger contract is a purpose-named maintenance lane, not part of the ordinary regression glob. Tag the module `@moduletag :quality_ledger_contract`, add `quality_ledger_contract: true` to the default exclusions in `test/test_helper.exs`, and expose only the explicit alias `mix quality.baseline`, which runs `mix test --include quality_ledger_contract --only quality_ledger_contract test/quality/baseline_ledger_contract_test.exs`. `mix test` and `mix ci.fast` remain separate and must not invoke this alias. Planning verification runs `mix quality.baseline` for ledger/schema claims and `mix ci.fast` separately for ordinary regression claims. [RESOLVED: D-03; revision decision 2026-08-26]
 
 ## Environment Availability
 
@@ -370,22 +372,22 @@ These commands identify compile-connected health; use `mix xref trace` only afte
 |----------|-------|
 | Framework | ExUnit bundled with Elixir 1.19.5. [VERIFIED: `mix.exs`; repository test scan] |
 | Config file | `test/test_helper.exs`. [VERIFIED: repository scan] |
-| Quick run command | `mix test test/quality/baseline_ledger_contract_test.exs` — Wave 0 file. [ASSUMED] |
+| Quick run command | `mix quality.baseline` — purpose-tagged Wave 0 maintenance contract, default-excluded from ordinary test execution. [RESOLVED] |
 | Full suite command | `mix ci.fast`; `mix ci.proofs` and `mix ci.advisory` are recorded separately as their locked lanes. [VERIFIED: `mix.exs`; 132-CONTEXT.md] |
 
 ### Phase Requirements → Test Map
 
 | Req ID | Behavior | Test type | Automated command | File exists? |
 |--------|----------|-----------|-------------------|-------------|
-| AUDIT-01 | Snapshot structurally records all registered baseline domains, command/lane/status/provenance, and unavailable facts. | schema + focused contract | `mix test test/quality/baseline_ledger_contract_test.exs` | ❌ Wave 0 |
-| AUDIT-02 | Ledger is current, references durable companion facts, and does not rely on completed phase artifacts for its own references. | static contract | `mix test test/quality/baseline_ledger_contract_test.exs` | ❌ Wave 0 |
-| AUDIT-03 | Every finding has ID, evidence, risk/disposition/owner/verification/status fields and applicable trigger; enums and transitions are constrained. | mutation + static contract | `mix test test/quality/baseline_ledger_contract_test.exs` | ❌ Wave 0 |
-| AUDIT-04 | Accepted high/medium/low routing and closure/deferral requirements are represented in active findings. | static contract + review | `mix test test/quality/baseline_ledger_contract_test.exs` plus human review of evidence | ❌ Wave 0 |
+| AUDIT-01 | Snapshot structurally records all registered baseline domains, command/lane/status/provenance, stable SIG candidates, and unavailable facts. | schema + focused contract | `mix quality.baseline` | ❌ Wave 0 |
+| AUDIT-02 | Ledger is current, references durable companion facts, and does not rely on completed phase artifacts for its own references. | static contract | `mix quality.baseline` | ❌ Wave 0 |
+| AUDIT-03 | Every discovered SIG is classified exactly once and every finding has ID, evidence, risk/disposition/owner/verification/status fields and applicable trigger; enums and transitions are constrained. | mutation + inverse static contract | `mix quality.baseline` | ❌ Wave 0 |
+| AUDIT-04 | Accepted high/medium/low routing and closure/deferral requirements are represented in active findings and explicit non-action classifications. | static contract + review | `mix quality.baseline` plus human review of evidence | ❌ Wave 0 |
 
 ### Sampling Rate
 
-- **Per task commit:** `mix test test/quality/baseline_ledger_contract_test.exs` once Wave 0 exists. [ASSUMED]
-- **Per wave merge:** `mix ci.fast`; execute/report proof and advisory lanes separately rather than collapsing their authority. [VERIFIED: `mix.exs`; 132-CONTEXT.md]
+- **Per task commit:** `mix quality.baseline` once Wave 0 creates the explicit maintenance contract. [RESOLVED]
+- **Per wave merge:** run `mix quality.baseline` for maintenance-contract claims and `mix ci.fast` separately for ordinary regression claims; execute/report proof and advisory lanes separately rather than collapsing their authority. [VERIFIED: `mix.exs`; 132-CONTEXT.md]
 - **Phase gate:** All registered baseline commands have a normalized result, status, and source identity; high/medium finding dispositions meet D-19/D-20. [VERIFIED: 132-CONTEXT.md]
 
 ### Wave 0 Gaps
