@@ -5,15 +5,15 @@ milestone_name: Quality & Maintainability
 current_phase: 133
 current_phase_name: Repository & Evidence Hygiene
 status: executing
-stopped_at: Completed 133-04-PLAN.md
-last_updated: "2026-08-26T22:18:09.236Z"
+stopped_at: Completed 133-05-PLAN.md
+last_updated: "2026-08-26T22:26:25.381Z"
 last_activity: 2026-08-26
 last_activity_desc: Phase 133 execution started
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 17
-  completed_plans: 12
+  completed_plans: 13
   percent: 17
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-26)
 ## Current Position
 
 Phase: 133 (Repository & Evidence Hygiene) — EXECUTING
-Plan: 8 of 13
+Plan: 9 of 13
 Status: Ready to execute
 Last activity: 2026-08-26 — Phase 133 execution started
 
@@ -78,6 +78,7 @@ Phase 137 Closure & Handoff ............................... Pending
 - [Phase ?]: Only scripts/quality_governance.cjs may inspect planning as gsd_tooling; product and evidence consumers are rejected.
 - [Phase ?]: [Phase 133]: The pre-schema success is preserved as a structured journey record with an explicit absent narrative; no Markdown is invented.
 - [Phase ?]: [Phase 133]: All nine journey records remain advisory and inert; active consumers remain restricted to sealed core roles.
+- [Phase ?]: [Phase 133]: Active clean-room and public-release consumers use the validated v1.3.4 capsule loader; the advisory workflow is v1.3.4-only.
 
 ### Pending Todos
 
@@ -100,8 +101,8 @@ None outside the roadmap.
 
 ## Session Continuity
 
-Last session: 2026-08-26T22:18:09.228Z
-Stopped at: Completed 133-04-PLAN.md
+Last session: 2026-08-26T22:26:25.374Z
+Stopped at: Completed 133-05-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -130,3 +131,4 @@ Resume file: None
 | Phase 133 P03 | 10min | 1 tasks | 13 files |
 | Phase 133-repository-evidence-hygiene P11 | 20min | 1 tasks | 4 files |
 | Phase 133 P04 | 21min | 1 tasks | 13 files |
+| Phase 133 P05 | 25min | 1 tasks | 7 files |
