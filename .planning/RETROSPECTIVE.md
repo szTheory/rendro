@@ -331,6 +331,53 @@
 - 307 files changed (+26,752 / −551) from v2.11 through closeout; 65,184 lines of Elixir across `lib/`, `dev/`, and `test/` at ship.
 - Final required verification: 12 doctests, 8 properties, and 1,821 tests with 0 failures; Credo and Dialyzer clean.
 
+## Milestone: v2.13 — Quality Ratchet & Adoption Readiness
+
+**Shipped:** 2026-08-26
+**Phases:** 2 (130-131) | **Plans:** 28 | **Tasks:** 25
+
+### What Was Built
+
+- Targeted supplied-theme hierarchy repairs for the exact twelve catalog cells under review, with nil/no-theme byte identity and the fixed 32-cell registry preserved.
+- An exact-SHA, pinned-PDFium candidate route producing 32 candidate PNGs, twelve final-review PNGs, and four separate multipage proofs with complete inventories and provenance.
+- Hash-bound human dispositions for all twelve cells and a candidate-identical canonical catalog published through one approved Linux PDFium writer.
+- A dated, source-backed adoption snapshot with explicit download, demand, contributor, and composite decisions under the existing conjunctive gate.
+- Exact public Rendro 1.3.4 release/HexDocs/verifier identity controls and an isolated Phoenix journey proving the Swiss/light Invoice through ConnCase and loopback HTTP.
+
+### What Worked
+
+- Deterministic, renderer, human-review, and public-network evidence remained separate lanes, so the milestone could strengthen proof without widening product claims.
+- Exact identities—source SHA, route SHA, executable pin, artifact hashes, release candidate, peeled tag, and workflow dispatch—made each one-way publication auditable and fail closed.
+- The conservative quality threshold remained credible: four light cells were promoted, while every miss and the dark non-print-safe boundary stayed explicit.
+- Gap-driven verification caught adoption publication races, HexDocs identity gaps, and stale Phoenix provenance before closeout; the final audit passed 12/12 requirements and all flows.
+
+### What Was Inefficient
+
+- The candidate evidence route needed several remote corrective cycles for payload shape, artifact layout, and jq predicate precedence before producing an acceptable batch.
+- The protected 1.3.4 recovery path accumulated four immutable failed release versions and multiple control-plane checkpoints before reaching one verified publication.
+- Four already-resolved debug records remained non-terminal and blocked milestone close until later phase evidence was reconciled back into their checkpoints.
+- The milestone handler again emitted noisy per-plan accomplishments, requiring manual milestone-level curation.
+
+### Patterns Established
+
+- **Exact-identity handoff:** every external writer or verifier binds route, source, tool pin, artifact inventory, and consuming plan before publication.
+- **Exclusive no-replace publication:** authoritative evidence files are written through synced temporary files and exclusive hard-link creation, including competing-writer regressions.
+- **Immutable incident recovery:** failed release, tag, dispatch, and control identities remain historical evidence; recovery always targets a fresh exact identity.
+- **Candidate-identical canonical publication:** reviewer-owned judgment binds the candidate, while the canonical writer may only reproduce that exact reviewed identity set.
+
+### Key Lessons
+
+1. Remote evidence routes need local contract tests for payload layout and shell/jq expression semantics before the first dispatch.
+2. Debug checkpoints should be terminalized when their consuming plan accepts the evidence, otherwise closeout audits surface stale work instead of real risk.
+3. Release recovery is safest when every failed identity is immutable and each retry requires a newly sealed candidate and explicit control binding.
+4. Adoption evidence can remain useful and honest without telemetry or outreach when unavailable, empty, accumulating, and triggered states are represented distinctly.
+
+### Cost Observations
+
+- 2 phases / 28 plans / 25 tracked tasks over 8 calendar days (2026-08-19 → 2026-08-26).
+- 248 files changed (+23,149 / −2,256); 68,973 lines of Elixir across `lib/`, `dev/`, and `test/` at ship.
+- Notable rework concentrated in remote candidate routing and protected-release recovery; no new core capability family, runtime dependency, recipe, preset, or catalog cell was added.
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -346,6 +393,7 @@
 | v2.6 | 6 (83-88) | 32 | Quiet public discoverability: claim correction, visible proof artifacts, advisory raster/comparison/Livebook lanes, issue-only intake, and measurable demand-gated v2.7 criteria. |
 | C1 | 6 (108-113) | 18 | CI/CD reliability milestone: measure-first baseline, precise BEAM caching, stable `ci-success` required gate, deterministic/advisory lane separation, release-proof hardening, and remote p50/p95/cache validation. |
 | v2.12 | 5 (125-129) | 29 | Turnkey styling and adoption: bounded preset/catalog registries, deterministic/advisory proof separation, one formatter-owned code seam, and a static zero-server configurator. |
+| v2.13 | 2 (130-131) | 28 | Stewardship and adoption proof: candidate-identical catalog ratchet, exact-identity publication handoffs, immutable release recovery, and a bounded clean Phoenix journey. |
 
 ### Cumulative Quality
 
@@ -359,6 +407,7 @@
 | v2.5 | 2 (engine lanes unchanged; release-proof hardened) | 0 new |
 | v2.6 | 2 (engine lanes unchanged; raster/comparison/Livebook/HexDocs remain advisory or separate) | 1 new optional adapter surface (`Rendro.Adapters.Pdfium.render/2`) |
 | v2.12 | 2 (engine lanes unchanged; PDFium/Chromium/configurator evidence remains advisory or isolated) | 0 new (presets, catalog, formatter, and generator preserve pure core and add no runtime dependency) |
+| v2.13 | 2 (engine lanes unchanged; PDFium/human/network/Phoenix evidence remains advisory or isolated) | 0 new (stewardship milestone; no new runtime dependency or adapter surface) |
 
 ### Top Lessons (Verified Across Milestones)
 

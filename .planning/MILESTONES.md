@@ -1,5 +1,33 @@
 # Milestones
 
+## v2.13 Quality Ratchet & Adoption Readiness (Shipped: 2026-08-26)
+
+**Delivered:** A truthful fixed-catalog quality ratchet, dated adoption decision, and proof-backed public Rendro 1.3.4 Phoenix newcomer path without widening the pure core or catalog scope.
+
+**Phases completed:** 130-131 (2 phases, 28 plans, 25 tasks)
+
+**Verification:** `verified_closeout` — 12/12 requirements satisfied; 2/2 phases verified and Nyquist-compliant; 4/4 integrations wired; 3/3 E2E flows complete; milestone audit `passed`.
+
+**Key accomplishments:**
+
+- Repaired and re-reviewed the exact twelve targeted catalog cells while preserving no-theme byte identity, the fixed 32-cell registry, and the dark screen-oriented/non-print-safe boundary.
+- Produced an exact-SHA, pinned-PDFium evidence batch with 32 candidate PNGs, exactly 12 final review PNGs, four separate multipage proofs, and complete provenance/hash inventories.
+- Published a candidate-identical canonical catalog through one approved Linux PDFium writer, with `Catalog VERIFIED` and all reviewer-owned quality evidence kept distinct from deterministic proof.
+- Recorded a dated, source-backed adoption snapshot whose family decisions remain honestly `HOLD`/`ACCUMULATING` under the existing conjunctive gate.
+- Published and verified exact Rendro 1.3.4, bound HexDocs/release identities fail-closed, and proved the canonical Swiss/light Invoice through an isolated Phoenix ConnCase and loopback HTTP journey.
+
+**Stats:**
+
+- 248 files changed (+23,149 / −2,256)
+- 68,973 lines of Elixir across `lib/`, `dev/`, and `test/` at ship
+- 8 calendar days (2026-08-19 → 2026-08-26)
+
+**Git range:** `docs: start milestone v2.13` (`6b6344f`) → `docs: close stale v2.13 debug sessions` (`e57b16d`)
+
+**What's next:** Define the next milestone from current demand. Studio, charts, and global text shaping remain explicitly demand-gated rather than implied follow-ons.
+
+---
+
 ## v2.12 Style-Genre Presets, Public Catalog & Static Configurator (Shipped: 2026-08-19)
 
 **Delivered:** Turnkey deterministic document styling through six genre presets and curated fonts, a bounded public catalog and quality ratchet, and a zero-server browse → pick → copy/codegen adoption path.
@@ -18,6 +46,7 @@
 - Published proof-backed preset discovery across checkout, Hex, and ExDoc with a truthful `theming.presets` support row and a 27th deterministic docs-contract lane.
 
 **Stats:**
+
 - 307 files changed (+26,752 / −551) from `v2.11` through closeout
 - 65,184 lines of Elixir across `lib/`, `dev/`, and `test/` at ship
 - 248 commits over 23 calendar days (2026-07-28 → 2026-08-19)

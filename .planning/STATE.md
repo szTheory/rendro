@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v2.13
 milestone_name: Quality Ratchet & Adoption Readiness
-current_phase: 131
-status: completed
+status: Awaiting next milestone
 stopped_at: Completed 131-17-PLAN.md
-last_updated: "2026-08-25T22:08:28.243Z"
-last_activity: 2026-08-25
-last_activity_desc: Phase 131 complete
+last_updated: "2026-08-26T15:25:09.283Z"
+last_activity: 2026-08-26
+last_activity_desc: Milestone v2.13 completed and archived
 progress:
   total_phases: 2
   completed_phases: 2
   total_plans: 28
   completed_plans: 28
   percent: 100
+current_phase: 131
 current_phase_name: adoption-snapshot-phoenix-newcomer-proof
 ---
 
@@ -21,19 +21,17 @@ current_phase_name: adoption-snapshot-phoenix-newcomer-proof
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-08-19)
+See: .planning/PROJECT.md (updated 2026-08-26)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** v2.13 implementation complete — ready for milestone audit
+**Current focus:** Planning the next milestone
 
 ## Current Position
 
-Phase: 131
-Plan: Not started
-Status: All phases complete
-Last activity: 2026-08-25 — Phase 131 complete
-
-Progress: [██████████] 100% — 28/28 plans and 2/2 phases complete
+Phase: Milestone v2.13 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-08-26 — Milestone v2.13 completed and archived
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 
@@ -97,10 +95,9 @@ None yet.
 
 ### Blockers/Concerns
 
-- Human re-review and network/Phoenix observations are evidence inputs, not deterministic proof; unavailable evidence must remain explicitly unavailable.
-- D-35 immutable v1.3.3 release incident: annotated tag object c96bf205d7216cdcf4846a0f24a312f9c1c75b0f peels to cfc58a81865e060351ce33d98f5e52de8cd198d9; run 32596108284 validate job 97087204354 passed version, CI, and complete preflight before the redundant unauthenticated standalone dry run failed; publish job 97088652899 skipped; Hex/HexDocs absent, with no docs dispatch/verifier. Fix bbe75d2 removes only that duplicate and confines HEX_API_KEY to actual protected publish. Exact v1.3.4 is the fresh target; v1.3.0 through v1.3.3 are immutable and must never be retried or mutated.
-- Resolved historical Plan 131-15 incident: dispatch 32877290266 remains immutable failed evidence; the later candidate-bound recovery path superseded it without retrying that run.
-- Resolved historical Plan 131-18 control incident: failed control `7e28826c…` remains immutable evidence; protected main `f9b63246…`, green exact-SHA gates, and the single successful recovery dispatch 32898926521 now back the canonical prerequisite.
+- Human re-review and public-network/Phoenix observations remain advisory evidence inputs, not deterministic proof; unavailable evidence must remain explicitly unavailable.
+- The public prerequisite authenticates the complete release archive and inventories required members but does not retain per-catalog-artifact hashes; preserve the independent candidate/current byte-equality check when refreshing this evidence.
+- v1.3.0-v1.3.3 and the failed Plan 131 control/dispatch attempts are immutable historical evidence and must not be retried or rewritten.
 
 ### Quick Tasks Completed
 
@@ -126,8 +123,8 @@ Resume file: None
 
 ## Next Steps
 
-1. Run `$gsd-audit-milestone` to audit v2.13 completion against its original intent.
-2. Keep all failed release/dispatch incidents immutable; do not retry or mutate their historical identities.
+1. Run `$gsd-new-milestone` to define fresh requirements and the next roadmap.
+2. Keep Studio, charts, and global text shaping demand-gated until their existing trigger criteria are met.
 3. Preserve the automated release-identity, evidence-hash, clean-room advisory, and deterministic/advisory lane contracts in future changes.
 
 ## Performance Metrics
@@ -156,3 +153,7 @@ Resume file: None
 | Phase 131 P14 | 6m | 2 tasks | 1 files |
 | Phase 131 P16 | 2m | 1 tasks | 2 files |
 | Phase 131 P17 | 8min | 2 tasks | 3 files |
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone
