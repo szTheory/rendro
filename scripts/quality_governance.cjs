@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const {spawnSync} = require('node:child_process');
 const {createHash} = require('node:crypto');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
@@ -13,6 +14,7 @@ const staleVerificationCommit = 'be640780df7852387b493b392b7eb148308ea01b';
 const ids = ['PROH-132-01', 'PROH-132-02', 'PROH-132-03'];
 const ledgerReference = /\.planning\/(?:QUALITY\.md|quality\/baselines\/132-initial\.json)/;
 const approvedLedgerConsumers = new Set(['test/quality/baseline_ledger_contract_test.exs']);
+const excludedConsumerDirectories = new Set(['_build', 'deps', 'node_modules', '.cache', 'cache', '.git', '.hg', '.svn']);
 const humanStatePatterns = [
   /^\s*(?:-\s*)?human_judgment\s*:\s*true\b/im,
   /^\s*(?:-\s*)?human_needed(?:\s*:\s*true\b|\s*)$/im,
@@ -107,8 +109,10 @@ function markdownFiles(directory) {
 function filesRecursively(directory) {
   if (!fs.existsSync(directory)) return [];
   return fs.readdirSync(directory, {withFileTypes: true}).flatMap((entry) => {
+    if (entry.isSymbolicLink() || excludedConsumerDirectories.has(entry.name)) return [];
     const candidate = path.join(directory, entry.name);
-    return entry.isDirectory() ? filesRecursively(candidate) : [candidate];
+    if (entry.isDirectory()) return filesRecursively(candidate);
+    return entry.isFile() ? [candidate] : [];
   });
 }
 
@@ -271,6 +275,25 @@ if (process.argv[2] === '--check-active') {
       } finally {
         fs.rmSync(file, {force: true});
       }
+    }
+  });
+
+  test('consumer scan skips generated directory symlinks but still rejects regular in-scope consumers', () => {
+    const examplesRoot = path.join(root, 'examples', 'phoenix_example');
+    const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rendro-governance-symlink-'));
+    const symlink = path.join(examplesRoot, '.quality-governance-directory-link');
+    const regularConsumer = path.join(examplesRoot, '.quality-governance-consumer.ex');
+    fs.writeFileSync(path.join(target, 'consumer.ex'), '# .planning/QUALITY.md');
+    fs.symlinkSync(target, symlink, process.platform === 'win32' ? 'junction' : 'dir');
+
+    try {
+      assert.doesNotThrow(() => checkActive([]));
+      fs.writeFileSync(regularConsumer, '# .planning/QUALITY.md');
+      assert.throws(() => checkActive([]), /unapproved ledger consumer/);
+    } finally {
+      fs.rmSync(regularConsumer, {force: true});
+      fs.rmSync(symlink, {force: true});
+      fs.rmSync(target, {recursive: true, force: true});
     }
   });
 
