@@ -190,7 +190,7 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
 
     ids = Regex.scan(~r/^#### (QL-\d{3})/m, ledger, capture: :all_but_first) |> List.flatten()
     assert ids == Enum.sort(ids)
-    assert ids == ["QL-001"]
+    assert ids == ["QL-001", "QL-002", "QL-003", "QL-004"]
 
     for label <- [
           "Opened:",
