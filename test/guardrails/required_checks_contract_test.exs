@@ -477,7 +477,10 @@ defmodule Guardrails.RequiredChecksContractTest do
       refute Map.has_key?(governance, "continue-on-error")
       assert governance["env"] == %{"MIX_ENV" => "test"}
 
-      assert Enum.any?(governance["steps"], &(&1["uses"] == "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10"))
+      assert Enum.any?(
+               governance["steps"],
+               &(&1["uses"] == "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10")
+             )
 
       assert Enum.any?(governance["steps"], fn step ->
                step["uses"] == "erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7" and

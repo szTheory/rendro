@@ -586,9 +586,34 @@ jobs:
       - name: Mix Hex Audit
         run: mix hex.audit
 
+  quality-governance:
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Setup Beam
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
+        with:
+          otp-version: '28'
+          elixir-version: '1.19.5'
+
+      - name: Setup Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: '22.14.0'
+
+      - name: Install Dependencies
+        run: mix deps.get
+
+      - name: Run quality governance
+        run: mix quality.governance
+
   ci-success:
     if: always()
-    needs: [test, configurator-browser, integration-proofs]
+    needs: [test, configurator-browser, integration-proofs, quality-governance]
     runs-on: ubuntu-latest
     steps:
       - name: Enforce strict checks
