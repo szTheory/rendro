@@ -106,11 +106,42 @@ function markdownFiles(directory) {
     .map((entry) => path.join(directory, entry.name));
 }
 
+function isInsideRepository(candidate) {
+  const relative = path.relative(root, candidate);
+  return relative === '' || (!relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative));
+}
+
+function resolvedSymlinkFile(candidate) {
+  const rel = path.relative(root, candidate);
+  let resolved;
+
+  try {
+    resolved = fs.realpathSync(candidate);
+  } catch (error) {
+    throw new Error(`${rel}: in-scope symlink cannot be resolved (${error.code || error.message})`);
+  }
+
+  if (!isInsideRepository(resolved)) {
+    throw new Error(`${rel}: in-scope symlink resolves outside the repository`);
+  }
+
+  let stats;
+  try {
+    stats = fs.statSync(resolved);
+  } catch (error) {
+    throw new Error(`${rel}: in-scope symlink target cannot be inspected (${error.code || error.message})`);
+  }
+
+  if (!stats.isFile()) throw new Error(`${rel}: in-scope symlink must resolve to a regular file`);
+  return candidate;
+}
+
 function filesRecursively(directory) {
   if (!fs.existsSync(directory)) return [];
   return fs.readdirSync(directory, {withFileTypes: true}).flatMap((entry) => {
-    if (entry.isSymbolicLink() || excludedConsumerDirectories.has(entry.name)) return [];
+    if (excludedConsumerDirectories.has(entry.name)) return [];
     const candidate = path.join(directory, entry.name);
+    if (entry.isSymbolicLink()) return [resolvedSymlinkFile(candidate)];
     if (entry.isDirectory()) return filesRecursively(candidate);
     return entry.isFile() ? [candidate] : [];
   });
@@ -281,9 +312,11 @@ if (process.argv[2] === '--check-active') {
   test('consumer scan skips generated directory symlinks but still rejects regular in-scope consumers', () => {
     const examplesRoot = path.join(root, 'examples', 'phoenix_example');
     const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rendro-governance-symlink-'));
-    const symlink = path.join(examplesRoot, '.quality-governance-directory-link');
+    const generatedRoot = path.join(examplesRoot, '.quality-governance-generated');
+    const symlink = path.join(generatedRoot, '_build');
     const regularConsumer = path.join(examplesRoot, '.quality-governance-consumer.ex');
     fs.writeFileSync(path.join(target, 'consumer.ex'), '# .planning/QUALITY.md');
+    fs.mkdirSync(generatedRoot);
     fs.symlinkSync(target, symlink, process.platform === 'win32' ? 'junction' : 'dir');
 
     try {
@@ -293,7 +326,45 @@ if (process.argv[2] === '--check-active') {
     } finally {
       fs.rmSync(regularConsumer, {force: true});
       fs.rmSync(symlink, {force: true});
+      fs.rmSync(generatedRoot, {recursive: true, force: true});
       fs.rmSync(target, {recursive: true, force: true});
+    }
+  });
+
+  test('consumer scan follows an in-repository regular-file symlink under its consumer path', () => {
+    const examplesRoot = path.join(root, 'examples', 'phoenix_example');
+    const generatedRoot = path.join(examplesRoot, '.quality-governance-symlink-target', '_build');
+    const target = path.join(generatedRoot, 'consumer.ex');
+    const symlink = path.join(examplesRoot, '.quality-governance-regular-link.ex');
+    fs.mkdirSync(generatedRoot, {recursive: true});
+    fs.writeFileSync(target, '# .planning/QUALITY.md');
+    fs.symlinkSync(target, symlink, 'file');
+
+    try {
+      assert.throws(() => checkActive([]), /\.quality-governance-regular-link\.ex: unapproved ledger consumer/);
+    } finally {
+      fs.rmSync(symlink, {force: true});
+      fs.rmSync(path.join(examplesRoot, '.quality-governance-symlink-target'), {recursive: true, force: true});
+    }
+  });
+
+  test('consumer scan fails closed for outside and dangling in-scope symlinks', {skip: process.platform === 'win32'}, () => {
+    const examplesRoot = path.join(root, 'examples', 'phoenix_example');
+    const outsideTarget = fs.mkdtempSync(path.join(os.tmpdir(), 'rendro-governance-outside-'));
+    const outsideLink = path.join(examplesRoot, '.quality-governance-outside-link.ex');
+    const danglingLink = path.join(examplesRoot, '.quality-governance-dangling-link.ex');
+    fs.writeFileSync(path.join(outsideTarget, 'consumer.ex'), '# .planning/QUALITY.md');
+    fs.symlinkSync(path.join(outsideTarget, 'consumer.ex'), outsideLink, 'file');
+    fs.symlinkSync(path.join(examplesRoot, '.quality-governance-missing-target.ex'), danglingLink, 'file');
+
+    try {
+      assert.throws(() => checkActive([]), /outside-link\.ex: in-scope symlink resolves outside the repository/);
+      fs.rmSync(outsideLink, {force: true});
+      assert.throws(() => checkActive([]), /dangling-link\.ex: in-scope symlink cannot be resolved/);
+    } finally {
+      fs.rmSync(outsideLink, {force: true});
+      fs.rmSync(danglingLink, {force: true});
+      fs.rmSync(outsideTarget, {recursive: true, force: true});
     }
   });
 
