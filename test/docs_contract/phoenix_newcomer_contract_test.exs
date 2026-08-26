@@ -107,7 +107,7 @@ defmodule Rendro.DocsContract.PhoenixNewcomerContractTest do
   test "published validation evidence identities match the retained journey files" do
     validation =
       File.read!(
-        ".planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-VALIDATION.md"
+        ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-VALIDATION.md"
       )
 
     assert validation =~

@@ -7,7 +7,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
 
   @candidate String.duplicate("a", 40)
   @script Path.expand("../../scripts/verify_public_release.exs", __DIR__)
-  @candidate_record ".planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-RELEASE-CANDIDATE.md"
+  @candidate_record ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-RELEASE-CANDIDATE.md"
 
   test "sealed v1.3.4 record retains all four immutable incidents" do
     record = File.read!(@candidate_record)

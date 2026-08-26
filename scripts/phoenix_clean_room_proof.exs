@@ -331,7 +331,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
   defp default_prerequisite,
     do:
       Path.expand(
-        "../.planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json",
+        "../.planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json",
         __DIR__
       )
 

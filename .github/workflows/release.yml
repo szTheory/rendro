@@ -105,7 +105,7 @@ jobs:
         run: |
           set -euo pipefail
           mix run scripts/phoenix_clean_room_proof.exs -- \
-            --prerequisite .planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json \
+            --prerequisite .planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json \
             --root "$PROOF_ROOT" \
             --output "$PROOF_OUTPUT"
           node -e '

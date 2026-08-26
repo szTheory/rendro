@@ -9,7 +9,7 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
 
   @candidate "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
   @prerequisite_path Path.expand(
-                       "../../.planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json",
+                       "../../.planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json",
                        __DIR__
                      )
 
