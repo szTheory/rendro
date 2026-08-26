@@ -1,20 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.13
-milestone_name: Quality Ratchet & Adoption Readiness
-status: Awaiting next milestone
-stopped_at: Completed 131-17-PLAN.md
-last_updated: "2026-08-26T15:25:09.283Z"
+milestone: v2.14
+milestone_name: Quality & Maintainability
+status: planning
+last_updated: "2026-08-26T17:19:28.368Z"
 last_activity: 2026-08-26
-last_activity_desc: Milestone v2.13 completed and archived
 progress:
-  total_phases: 2
-  completed_phases: 2
-  total_plans: 28
-  completed_plans: 28
-  percent: 100
-current_phase: 131
-current_phase_name: adoption-snapshot-phoenix-newcomer-proof
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -28,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-08-26)
 
 ## Current Position
 
-Phase: Milestone v2.13 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-08-26 — Milestone v2.13 completed and archived
+Status: Defining requirements
+Last activity: 2026-08-26 — Milestone v2.14 started
 
 ## Roadmap Snapshot (v2.13, Phases 130-131)
 

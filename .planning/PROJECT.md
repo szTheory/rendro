@@ -8,11 +8,16 @@ Rendro is a pure-Elixir, Phoenix-first PDF and document generation library for t
 
 Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
 
-## Current Milestone: Planning Next
+## Current Milestone: v2.14 Quality & Maintainability
 
-No implementation milestone is active. The next milestone begins with fresh requirements and a new roadmap through `$gsd-new-milestone`.
+**Goal:** Make Rendro materially easier to understand, change, and operate by removing proven cruft, simplifying high-value architecture and CI seams, and raising the existing catalog's remaining sub-threshold visual dimensions without breaking public APIs or causing unrelated PDF-byte churn.
 
-Demand-gated candidates remain global text shaping/script support, Rendro Studio, and deterministic chart primitives. None is committed until its existing adoption gate or concrete user demand justifies the scope.
+**Target outcomes:**
+- Establish a durable, evidence-backed quality ledger spanning architecture, dependencies, dead code, specs, comments, tests, CI/CD, security, performance, documentation, and repository hygiene.
+- Close every accepted high-impact finding and the bounded medium-impact findings that can be verified without speculative churn.
+- Decouple durable release and test evidence from archived planning artifacts and replace historical phase-number catalog routes with one generic exact-SHA evidence workflow.
+- Repair and re-review the six scored catalog cells with actual visual-score gaps while preserving the fixed 32-cell catalog, the 20 explicitly unscored cells, and the dark screen-only/`print_safety: false` boundary.
+- Publish before/after results and durable next-review triggers so the following milestone begins with high-signal choices rather than rediscovery.
 
 ## Latest Milestone: v2.13 Quality Ratchet & Adoption Readiness
 
@@ -24,7 +29,7 @@ All 12 requirements passed across phases 130-131. The milestone audit passed wit
 
 ## Current State
 
-**v2.13 shipped 2026-08-26 and the project is awaiting its next milestone.** The exact twelve catalog cells were repaired and truthfully re-reviewed, the dated adoption decision remains `HOLD`/`ACCUMULATING` under the existing conjunctive gate, and the public Rendro 1.3.4 Swiss/light Invoice journey is proven in an isolated Phoenix consumer. Release identity, evidence hashes, and the recurring clean-room journey are machine-gated while external proof remains explicitly advisory. Studio, charts, and global text shaping remain demand-gated.
+**v2.14 is active as a conservative quality and maintainability ratchet.** The repository starts from a green deterministic baseline, a fixed 32-cell catalog, and proven public release/Phoenix evidence, but it also carries high-churn architectural seams, phase-specific CI machinery, durable tests coupled to archived planning evidence, loose historical planning artifacts, and six scored catalog cells with sub-threshold visual dimensions. This milestone audits before changing, preserves contracts by default, and records explicit evidence for every fix, deferral, or rejection. Studio, charts, and global text shaping remain demand-gated.
 
 <details>
 <summary>v2.12 phase-by-phase completion context</summary>
@@ -157,7 +162,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 **Active strategic arc:** public 1.0 commitment → quiet public discoverability → report ergonomics with proof-backed claim discipline → demand-gated capability growth
 
 **Planned sequence after v2.7:**
-- Next milestone TBD through `$gsd-new-milestone`.
+- v2.14 improves quality and maintainability without adding a capability family or expanding the catalog.
 - Global Text Shaping & Script Support remains conditional — pursue only when the v2.6-defined `ADOPTION.md` demand gate triggers.
 - Larger report features such as TOC/outlines/anchors/cross-references and charts stay deferred until page context proves useful and demand is concrete.
 
@@ -195,7 +200,11 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-- No active implementation requirements. The next milestone will define a fresh requirement set.
+- [ ] Produce and maintain an evidence-backed quality ledger with risk-ranked dispositions and explicit next-review triggers.
+- [ ] Remove proven repository, evidence-boundary, architecture, readability, test, and CI/CD debt without changing public contracts or unrelated rendered bytes.
+- [ ] Replace historical phase-number catalog evidence routes with one secure, exact-SHA, purpose-named workflow.
+- [ ] Raise all visual dimensions to the accepted threshold for the six scored catalog cells that still have actual visual gaps, while preserving honest dark print boundaries.
+- [ ] Close v2.14 with verified before/after reporting and a decision-ready handoff for the next milestone.
 
 ### Out of Scope
 
@@ -215,6 +224,8 @@ As of v2.12 (2026-08-19), the Happy-Path program's realistic examples, theming, 
 
 As of v2.13 (2026-08-26), the twelve targeted catalog cells have current hash-bound human dispositions and the canonical catalog is candidate-identical and deterministically verified. The adoption gate remains below trigger, while exact public Rendro 1.3.4 and its Phoenix newcomer path are proven through protected release/HexDocs identity controls plus bounded advisory clean-room evidence.
 
+As v2.14 begins (2026-08-26), the project has no active feature gap authorized by demand. The quality baseline is strong—1,917 tests, strict Credo, Dialyzer, deterministic/advisory lane separation, and no open GSD artifacts—but maintainability signals justify a bounded audit: several multi-responsibility modules exceed one thousand lines, three runtime dependency cycles exist, release and newcomer checks consume archived planning files, and the main CI workflow retains historical Phase 126/127/130 catalog routes. These are investigation signals, not automatic defects; every change must be justified by concrete impact and verification.
+
 ## Constraints
 
 - **Tech stack**: Keep the core pure Elixir with no hard dependency on Phoenix, Oban, browser runtimes, Python packages, or external signing binaries — preserves deterministic deployment and product boundaries.
@@ -224,6 +235,10 @@ As of v2.13 (2026-08-26), the twelve targeted catalog cells have current hash-bo
 - **Operational safety**: Key paths, passphrases, raw tool stderr, revocation blobs, and signer-specific secrets must stay redacted in errors, metadata, and audit surfaces.
 - **Documentation honesty**: Public APIs, guides, and examples must not imply viewer support, trust anchoring, or compliance coverage beyond what `priv/support_matrix.json` and proof lanes cover.
 - **Verification**: Merge-blocking, docs-contract, structural-validation, and live-tool proof lanes must stay truthful as the signing surface expands.
+- **Compatibility**: Preserve public APIs and unrelated rendered bytes; only a demonstrated bug or an approved catalog repair may authorize an output change.
+- **Quality discipline**: File size, dependency count, coverage, and runtime cycles are investigation signals rather than quotas; no refactor ships on taste alone.
+- **Comment policy**: Keep comments and docs that explain invariants, tradeoffs, and non-obvious constraints; remove stale phase history and implementation narration from product code.
+- **Milestone scope**: Add no new feature, recipe, preset, catalog cell, runtime dependency, Studio surface, chart primitive, or global shaping capability.
 
 ## Key Decisions
 
@@ -234,6 +249,11 @@ As of v2.13 (2026-08-26), the twelve targeted catalog cells have current hash-bo
 | Publish the canonical catalog only from the approved SHA-bound Linux PDFium lane, then materialize the verified artifact locally | The approved renderer is Linux-only; exact provenance and candidate equality preserve one truthful writer boundary | ✓ Shipped in Phase 130 |
 | Treat adoption as a dated, read-only conjunctive gate with unavailable evidence never coerced to zero | Keeps roadmap expansion demand-led without analytics, outreach, polling, or fabricated signals | ✓ Shipped in Phase 131 |
 | Bind release, HexDocs, verifier, and Phoenix journey evidence to exact v1.3.4 identities while preserving v1.3.0-v1.3.3 as immutable failed history | Recovery must remain auditable and fail closed rather than mutating or retrying historical incidents | ✓ Shipped in Phase 131 |
+| Make v2.14 an evidence-led quality milestone with no new product capability | The current product surface is broad and proven; maintainability and existing catalog quality have higher value than speculative expansion | — Pending |
+| Preserve public APIs and unrelated rendered bytes by default | Quality work should reduce future change cost without silently rewriting established contracts or deterministic evidence | — Pending |
+| Use hard checks where meaningful and documented human judgment for cohesion/readability | Arbitrary coverage, file-size, or complexity quotas invite churn and can misstate actual quality | — Pending |
+| Replace historical phase-number catalog routes with one exact-SHA purpose-named workflow | The catalog still needs bounded review/canonical generation, but milestone-specific branches should not accumulate in ordinary CI | — Pending |
+| Keep the catalog fixed at 32 cells and repair only six current visual-score gaps | v2.14 is a quality ratchet, not catalog expansion; twenty cells remain honestly unscored and dark output remains screen-oriented/non-print-safe | — Pending |
 | Embedded files live on the document in a dedicated registry, not on `metadata.custom` or in writer-owned state | Preserves the registry-backed authored-input pattern and keeps serialization separate from authoring state | ✓ Shipped in v1.9 |
 | Embedded-file metadata is validated in `Rendro.Pipeline.Validate` with tuple errors, not registration-time exceptions | Keeps malformed authored state in the standard validate-stage error envelope before writer work begins | ✓ Shipped in v1.9 |
 | Embedded files extend the existing writer allocation/build funnel; no inline serializer or separate PDF surface | Preserves one deterministic object-planning seam in the core writer | ✓ Shipped in v1.9 |
@@ -363,4 +383,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-26 after shipping and archiving v2.13.*
+*Last updated: 2026-08-26 after starting v2.14 Quality & Maintainability.*
