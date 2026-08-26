@@ -39,6 +39,18 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
     |> MapSet.new()
   end
 
+  defp discovered_signal_ids(snapshot) do
+    snapshot
+    |> signal_candidates()
+    |> Enum.map(& &1["id"])
+    |> Enum.sort()
+  end
+
+  defp classified_signal_ids(ledger) do
+    Regex.scan(~r/\*\*Signal:\*\* `(SIG-[A-Z]+-\d{3})`/, ledger, capture: :all_but_first)
+    |> List.flatten()
+  end
+
   test "one quality finding resolves through the ledger, snapshot, and schema" do
     assert File.exists?(@ledger_path)
     assert File.exists?(@schema_path)
@@ -176,7 +188,7 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
     assert ledger =~ "`repair`, `defer`, `reject_signal`, `accept_risk`, and `superseded`"
     assert ledger =~ "evidence_authority"
 
-    ids = Regex.scan(~r/QL-\d{3}/, ledger) |> List.flatten() |> Enum.uniq()
+    ids = Regex.scan(~r/^#### (QL-\d{3})/m, ledger, capture: :all_but_first) |> List.flatten()
     assert ids == Enum.sort(ids)
     assert ids == ["QL-001"]
 
@@ -202,5 +214,63 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
 
     refute ledger =~ ".planning/phases/"
     refute ledger =~ ".planning/milestones/"
+  end
+
+  test "every captured signal is classified exactly once in the durable ledger" do
+    snapshot = @snapshot_path |> File.read!() |> JSON.decode!()
+    ledger = File.read!(@ledger_path)
+    discovered = discovered_signal_ids(snapshot)
+    classified = classified_signal_ids(ledger)
+
+    assert discovered != []
+    assert classified != []
+    assert Enum.sort(classified) == discovered
+    assert Enum.uniq(classified) == classified
+
+    omitted =
+      String.replace(ledger, ~r/\n- \*\*Signal:\*\* `SIG-[A-Z]+-\d{3}`/, "", global: false)
+
+    duplicated = ledger <> "\n- **Signal:** `SIG-ARCH-001`\n"
+
+    refute Enum.sort(classified_signal_ids(omitted)) == discovered
+    refute Enum.uniq(classified_signal_ids(duplicated)) == classified_signal_ids(duplicated)
+  end
+
+  test "findings resolve evidence and retain complete qualitative disposition facts" do
+    snapshot = @snapshot_path |> File.read!() |> JSON.decode!()
+    ledger = File.read!(@ledger_path)
+    evidence_ids = snapshot["evidence_items"] |> Enum.map(& &1["id"]) |> MapSet.new()
+    finding_blocks = Regex.scan(~r/^#### QL-\d{3}.*?(?=^#### |\z)/ms, ledger) |> List.flatten()
+
+    assert finding_blocks != []
+
+    for block <- finding_blocks do
+      for label <- [
+            "Opened:",
+            "Evidence:",
+            "Impact:",
+            "Confidence:",
+            "Compatibility risk:",
+            "Evidence quality:",
+            "Priority:",
+            "Disposition:",
+            "Owner phase:",
+            "Verification:",
+            "Status:",
+            "Scope:",
+            "Trigger:",
+            "Closure:",
+            "Relationships/history:"
+          ] do
+        assert block =~ label
+      end
+
+      for evidence_id <- Regex.scan(~r/EV-[A-Z]+-\d{3}/, block) |> List.flatten() do
+        assert evidence_id in evidence_ids
+      end
+    end
+
+    assert ledger =~ "Phase 137 adds a separate final snapshot and a before/after comparison"
+    assert ledger =~ "None recorded"
   end
 end
