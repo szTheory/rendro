@@ -16,7 +16,10 @@
       "authority": "operational",
       "status": "preserved",
       "retention": "immutable",
-      "provenance": {"source_path": ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json", "import_reason": "preserved v1.3.4 public prerequisite facts"}
+      "provenance": {
+        "source_path": ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json",
+        "import_reason": "preserved v1.3.4 public prerequisite facts"
+      }
     },
     {
       "id": "RE-V134-RELEASE-IDENTITY",
@@ -28,7 +31,10 @@
       "authority": "historical",
       "status": "preserved",
       "retention": "immutable",
-      "provenance": {"source_path": ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-RELEASE-CANDIDATE.md", "import_reason": "preserved v1.3.4 release identity"}
+      "provenance": {
+        "source_path": ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-RELEASE-CANDIDATE.md",
+        "import_reason": "preserved v1.3.4 release identity"
+      }
     },
     {
       "id": "RE-V134-VALIDATION",
@@ -40,19 +46,25 @@
       "authority": "historical",
       "status": "preserved",
       "retention": "immutable",
-      "provenance": {"source_path": ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-VALIDATION.md", "import_reason": "preserved successful journey identities"}
+      "provenance": {
+        "source_path": ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-VALIDATION.md",
+        "import_reason": "preserved successful journey identities"
+      }
     },
     {
       "id": "RE-V134-JOURNEY-INDEX",
       "role": "journey_index",
       "path": "journey/index.json",
-      "sha256": "a2a1521ed2f7deac69fb27a5624492991d5f3412879c77d8117a7b907b8912ed",
+      "sha256": "1e92daff7a093bde8e7e933190e58c7cfef38c7f32bc58e01b3dce0d405d9bce",
       "media_type": "application/json",
       "lane": "advisory",
       "authority": "historical",
       "status": "preserved",
       "retention": "append_only",
-      "provenance": {"source_path": ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-VALIDATION.md", "import_reason": "prepared ordered attempt index"}
+      "provenance": {
+        "source_path": ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-VALIDATION.md",
+        "import_reason": "prepared ordered attempt index"
+      }
     },
     {
       "id": "RE-V134-JOURNEY-001",
@@ -64,7 +76,10 @@
       "authority": "historical",
       "status": "preserved",
       "retention": "immutable",
-      "provenance": {"source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_failed_attempt.json", "import_reason": "preserved first bounded clean-room failure"}
+      "provenance": {
+        "source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_failed_attempt.json",
+        "import_reason": "preserved first bounded clean-room failure"
+      }
     },
     {
       "id": "RE-V134-JOURNEY-002",
@@ -76,7 +91,10 @@
       "authority": "historical",
       "status": "preserved",
       "retention": "immutable",
-      "provenance": {"source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_second_failed_attempt.json", "import_reason": "preserved second bounded clean-room failure"}
+      "provenance": {
+        "source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_second_failed_attempt.json",
+        "import_reason": "preserved second bounded clean-room failure"
+      }
     },
     {
       "id": "RE-V134-JOURNEY-003",
@@ -88,7 +106,10 @@
       "authority": "historical",
       "status": "preserved",
       "retention": "immutable",
-      "provenance": {"source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_third_failed_attempt.json", "import_reason": "preserved third bounded clean-room failure"}
+      "provenance": {
+        "source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_third_failed_attempt.json",
+        "import_reason": "preserved third bounded clean-room failure"
+      }
     },
     {
       "id": "RE-V134-JOURNEY-004",
@@ -100,7 +121,85 @@
       "authority": "historical",
       "status": "preserved",
       "retention": "immutable",
-      "provenance": {"source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_fourth_failed_attempt.json", "import_reason": "preserved fourth bounded clean-room failure"}
+      "provenance": {
+        "source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_fourth_failed_attempt.json",
+        "import_reason": "preserved fourth bounded clean-room failure"
+      }
+    },
+    {
+      "id": "RE-V134-JOURNEY-005",
+      "role": "journey_attempt",
+      "path": "journey/journey-005.json",
+      "sha256": "10fdc4919bfcdeaddd040466af51cfa68afb0e354324a736a9c4dcc661ba3e9d",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {
+        "source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_fifth_failed_attempt.json",
+        "import_reason": "preserved fifth bounded clean-room failure"
+      }
+    },
+    {
+      "id": "RE-V134-JOURNEY-006",
+      "role": "journey_attempt",
+      "path": "journey/journey-006.json",
+      "sha256": "b8e881a8f61f1a8127d322447fda8840f314bc31a48f270c46bca74b5c486a43",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {
+        "source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_sixth_failed_attempt.json",
+        "import_reason": "preserved sixth bounded clean-room failure"
+      }
+    },
+    {
+      "id": "RE-V134-JOURNEY-007",
+      "role": "journey_attempt",
+      "path": "journey/journey-007.json",
+      "sha256": "43aa6fcde2e17076dc48615f1a74b87b41da29f0eb294ef9a2b4935db7579096",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {
+        "source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_pre_schema_success.json",
+        "import_reason": "preserved narrative-less pre-schema advisory success"
+      }
+    },
+    {
+      "id": "RE-V134-JOURNEY-008",
+      "role": "journey_attempt",
+      "path": "journey/journey-008.json",
+      "sha256": "b302d87d95ef24d8765fb7bc745bbd705f8655f5aaf823e4d1308619be0a9d61",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {
+        "source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_seventh_failed_attempt.json",
+        "import_reason": "preserved seventh bounded clean-room failure"
+      }
+    },
+    {
+      "id": "RE-V134-JOURNEY-009",
+      "role": "journey_attempt",
+      "path": "journey/journey-009.json",
+      "sha256": "ef77726045077c87a8d3e96af4059619af51e0efe0d39fb23f49d69a678631ce",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {
+        "source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4.json",
+        "import_reason": "preserved schema-complete advisory success"
+      }
     }
   ]
 }

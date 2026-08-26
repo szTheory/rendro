@@ -36,7 +36,6 @@ defmodule Rendro.RepositoryEvidenceTest do
       record = Enum.find(attempts, &(&1["id"] == id))
 
       assert File.regular?(json_path)
-      assert File.regular?(sidecar_path)
       assert record["path"] == Path.join("journey", stem <> ".json")
       assert record["sha256"] == sha256(json_path)
 
@@ -59,6 +58,7 @@ defmodule Rendro.RepositoryEvidenceTest do
           refute File.exists?(source_sidecar_path(attempt))
 
         _ ->
+          assert File.regular?(sidecar_path)
           assert attempt["narrative"]["role"] == "explanatory_sidecar"
           assert attempt["narrative"]["path"] == Path.join("journey", stem <> ".md")
           assert attempt["narrative"]["sha256"] == sha256(sidecar_path)
@@ -66,8 +66,17 @@ defmodule Rendro.RepositoryEvidenceTest do
       end
     end
 
-    assert length(Enum.filter(index["entries"], &(journey_has_sidecar?(&1, attempts)))) == 8
-    assert length(Enum.filter(index["entries"], &(not journey_has_sidecar?(&1, attempts)))) == 1
+    journey_records =
+      Enum.map(index["entries"], fn id ->
+        record = Enum.find(attempts, &(&1["id"] == id))
+        @capsule |> Path.join(record["path"]) |> File.read!() |> JSON.decode!()
+      end)
+
+    sidecar_attempts =
+      Enum.filter(journey_records, &(&1["narrative"]["role"] == "explanatory_sidecar"))
+
+    assert length(sidecar_attempts) == 8
+    assert length(journey_records) - length(sidecar_attempts) == 1
   end
 
   test "loads each sealed core role only through the manifest dispatch" do
@@ -252,12 +261,6 @@ defmodule Rendro.RepositoryEvidenceTest do
     |> String.replace_suffix(".json", ".md")
   end
 
-  defp journey_has_sidecar?(id, attempts) do
-    attempts
-    |> Enum.find(&(&1["id"] == id))
-    |> get_in(["narrative", "role"])
-    |> Kernel.==("explanatory_sidecar")
-  end
 
   defp sha256(path),
     do: :crypto.hash(:sha256, File.read!(path)) |> Base.encode16(case: :lower)
