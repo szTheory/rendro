@@ -45,6 +45,7 @@ The proof and advisory lanes remain separate commands (`mix ci.proofs`, `mix ci.
 | 132-01-02 | 01 | 1 | AUDIT-01 | T-132-01, T-132-02, T-132-04 | Normalized evidence retains source/lane/hash/redaction identity and cannot promote unavailable advisory evidence. | focused contract + command probes | `mix test test/quality/baseline_ledger_contract_test.exs` | ❌ W0 | ⬜ pending |
 | 132-01-03 | 01 | 1 | AUDIT-02, AUDIT-03, AUDIT-04 | T-132-03 | Every durable finding is unique, fully classified, owned, and governed by its disposition/closure rules. | static contract + human evidence review | `mix test test/quality/baseline_ledger_contract_test.exs` | ❌ W0 | ⬜ pending |
 | 132-02-01 | 02 | 2 | AUDIT-01, AUDIT-04 | T-132-02, T-132-04 | Full registered baseline results preserve lane authority and record unavailable remote/advisory evidence without fabrication. | integration/command evidence | `mix ci.fast` | ✅ | ⬜ pending |
+| 132-02-02 | 02 | 2 | AUDIT-02, AUDIT-03, AUDIT-04 | T-132-01, T-132-03 | Complete triage resolves every finding reference once and enforces disposition-specific proof, owner, and trigger rules. | focused contract + human evidence review | `mix test test/quality/baseline_ledger_contract_test.exs` | ✅ | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
