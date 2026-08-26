@@ -371,7 +371,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
     end
   end
 
-  defp run_once(root, options, prerequisite) do
+  defp run_once(root, _options, prerequisite) do
     env = isolated_env(root)
     app = Path.join(root, "clean_room")
 
