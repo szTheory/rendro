@@ -36,4 +36,44 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
     assert evidence["provenance"]["source_sha"] == snapshot["source_sha"]
     assert signal["source_evidence_id"] == evidence["id"]
   end
+
+  test "schema rejects malformed or duplicated evidence facts" do
+    snapshot = @snapshot_path |> File.read!() |> JSON.decode!()
+    schema = @schema_path |> File.read!() |> JSON.decode!() |> JSV.build!()
+    [evidence] = snapshot["evidence_items"]
+
+    for {path, value} <- [
+          {["source_sha"], "not-a-sha"},
+          {["evidence_items", Access.at(0), "id"], "EV-bad"},
+          {["evidence_items", Access.at(0), "lane"], "primary_ci"},
+          {["evidence_items", Access.at(0), "status"], "unknown"},
+          {["evidence_items", Access.at(0), "raw_output", "sha256"], "bad"},
+          {["evidence_items", Access.at(0), "signal_candidates", Access.at(0), "id"], "SIG-bad"}
+        ] do
+      mutated = put_in(snapshot, path, value)
+      refute match?({:ok, _}, JSV.validate(mutated, schema)), "#{inspect(path)} must fail"
+    end
+
+    unavailable =
+      put_in(snapshot, ["evidence_items"], [Map.put(evidence, "status", "unavailable")])
+
+    refute match?({:ok, _}, JSV.validate(unavailable, schema))
+
+    assert Enum.uniq_by(snapshot["evidence_items"], & &1["id"]) == snapshot["evidence_items"]
+
+    signals = Enum.flat_map(snapshot["evidence_items"], & &1["signal_candidates"])
+    assert Enum.uniq_by(signals, & &1["id"]) == signals
+  end
+
+  test "focused validation does not mutate the initial snapshot" do
+    original = File.read!(@snapshot_path)
+
+    assert {:ok, _} =
+             JSV.validate(
+               JSON.decode!(original),
+               @schema_path |> File.read!() |> JSON.decode!() |> JSV.build!()
+             )
+
+    assert File.read!(@snapshot_path) == original
+  end
 end

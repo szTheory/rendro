@@ -23,6 +23,8 @@ The public API and all unrelated rendered bytes are frozen compatibility contrac
 
 An **evidence item** records what ran, in which lane, with its authority and limit. A **finding** records the maintainer judgment: why it matters, its disposition, owner phase, verification, trigger, and closure. Finding IDs are permanent opaque `QL-NNN` values; never renumber or reuse them.
 
+The snapshot is immutable after capture: validation is read-only and capture/edit work is serialized. A competing or interrupted writer must fail before commit. Evidence IDs (`EV-*`) and signal IDs (`SIG-*`) are permanent within a snapshot; duplicates are rejected. Raw logs, PDFs, PNGs, reports, and caches are never committed as snapshot payloads.
+
 ## Active findings
 
 ### Medium

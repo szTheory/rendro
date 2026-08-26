@@ -5,10 +5,14 @@
   "captured_at_utc": "2026-08-26T18:17:16Z",
   "worktree": "dirty",
   "environment": {
+    "id": "ENV-LOCAL-001",
     "os": "Darwin 25.5.0 arm64",
     "toolchain": "Elixir 1.19.5 / OTP 28",
     "dependency_lock_sha256": "d918318e7a7374f04736dd431a5178a7dd50a71d22f74dc39be2da09f51575e7",
-    "renderer": "not applicable: Mix xref graph"
+    "renderer": {
+      "applicable": false,
+      "identity": "not applicable: Mix xref graph"
+    }
   },
   "evidence_items": [
     {
@@ -17,10 +21,20 @@
         {
           "id": "SIG-ARCH-001",
           "domain": "architecture",
-          "summary": "Compile-connected xref graph has five edges and no cycles."
+          "summary": "Compile-connected xref graph has five edges and no cycles.",
+          "source_evidence_id": "EV-ARCH-001"
         }
       ],
-      "command": "mix xref graph --format stats --label compile-connected",
+      "provenance": {
+        "source_sha": "a43e8f62ae04d6761d99be7959d6027b876c9373",
+        "captured_at_utc": "2026-08-26T18:17:16Z",
+        "worktree": "dirty",
+        "environment_id": "ENV-LOCAL-001"
+      },
+      "registered_command": {
+        "name": "compile-connected xref statistics",
+        "invocation": "mix xref graph --format stats --label compile-connected"
+      },
       "lane": "deterministic",
       "authority": "local_reproduction",
       "status": "passed",

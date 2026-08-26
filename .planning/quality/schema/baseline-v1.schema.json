@@ -18,22 +18,33 @@
     "environment": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["os", "toolchain", "dependency_lock_sha256", "renderer"],
+      "required": ["id", "os", "toolchain", "dependency_lock_sha256", "renderer"],
       "properties": {
+        "id": {"type": "string", "pattern": "^ENV-[A-Z]+-[0-9]{3}$"},
         "os": {"type": "string", "minLength": 1},
         "toolchain": {"type": "string", "minLength": 1},
         "dependency_lock_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "renderer": {"type": "string", "minLength": 1}
+        "renderer": {"$ref": "#/$defs/renderer_identity"}
+      }
+    },
+    "renderer_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["applicable", "identity"],
+      "properties": {
+        "applicable": {"type": "boolean"},
+        "identity": {"type": "string", "minLength": 1}
       }
     },
     "signal_candidate": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "domain", "summary"],
+      "required": ["id", "domain", "summary", "source_evidence_id"],
       "properties": {
         "id": {"type": "string", "pattern": "^SIG-[A-Z]+-[0-9]{3}$"},
         "domain": {"type": "string", "minLength": 1},
-        "summary": {"type": "string", "minLength": 1}
+        "summary": {"type": "string", "minLength": 1},
+        "source_evidence_id": {"type": "string", "pattern": "^EV-[A-Z]+-[0-9]{3}$"}
       }
     },
     "raw_output": {
@@ -50,11 +61,12 @@
     "evidence_item": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "signal_candidates", "command", "lane", "authority", "status", "normalized_result", "raw_output", "redaction"],
+      "required": ["id", "signal_candidates", "provenance", "registered_command", "lane", "authority", "status", "normalized_result", "raw_output", "redaction"],
       "properties": {
         "id": {"type": "string", "pattern": "^EV-[A-Z]+-[0-9]{3}$"},
         "signal_candidates": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/signal_candidate"}},
-        "command": {"type": "string", "minLength": 1},
+        "provenance": {"$ref": "#/$defs/provenance"},
+        "registered_command": {"$ref": "#/$defs/registered_command"},
         "lane": {"enum": ["deterministic", "proof", "advisory", "human_review"]},
         "authority": {"enum": ["local_reproduction", "primary_ci", "human_review"]},
         "status": {"enum": ["passed", "failed", "unavailable"]},
@@ -67,6 +79,26 @@
       "allOf": [
         {"if": {"properties": {"status": {"const": "unavailable"}}}, "then": {"required": ["unavailability_reason", "rerun_trigger"]}, "else": {"not": {"anyOf": [{"required": ["unavailability_reason"]}, {"required": ["rerun_trigger"]}]}}}
       ]
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_sha", "captured_at_utc", "worktree", "environment_id"],
+      "properties": {
+        "source_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "captured_at_utc": {"type": "string", "format": "date-time"},
+        "worktree": {"enum": ["clean", "dirty"]},
+        "environment_id": {"type": "string", "pattern": "^ENV-[A-Z]+-[0-9]{3}$"}
+      }
+    },
+    "registered_command": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "invocation"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "invocation": {"type": "string", "minLength": 1}
+      }
     }
   }
 }
