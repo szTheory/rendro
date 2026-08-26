@@ -24,7 +24,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-26)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 132 — Quality Baseline & Triage
+**Current focus:** Phase 133 — Repository & Evidence Hygiene
 
 ## Current Position
 
@@ -36,8 +36,8 @@ Last activity: 2026-08-26 — Phase 132 complete, transitioned to Phase 133
 ## Roadmap Snapshot (v2.14, Phases 132-137)
 
 ```text
-[........................................] 0% — 0/6 phases complete
-Phase 132 Quality Baseline & Triage ....................... Ready
+[#######.................................] 17% — 1/6 phases complete
+Phase 132 Quality Baseline & Triage ....................... Complete
 Phase 133 Repository & Evidence Hygiene ................... Pending
 Phase 134 Core Architecture & Readability ................. Pending
 Phase 135 Test & CI/CD Simplification ..................... Pending
@@ -60,10 +60,11 @@ Phase 137 Closure & Handoff ............................... Pending
 - Catalog CI converges on one generic read-only exact-SHA evidence workflow before Phase 126, 127, and 130 routes are removed.
 - Catalog scope remains 32 cells with 20 explicitly unscored; dark output remains screen-oriented and `print_safety: false`.
 - Catalog quality work is limited to Corporate Classic Invoice dark, Minimal Mono Statement dark, Swiss Payslip light/dark, and Brutalist Ticket light/dark.
-- [Phase ?]: QUALITY.md is human-first; normalized JSV evidence is companion-only and excluded from ordinary CI.
-- [Phase ?]: QL-001 records xref topology as a reject_signal until concrete harm meets its reopening trigger.
-- [Phase ?]: Phase 132 freezes a source-bound initial snapshot; later evidence requires a new dated snapshot.
-- [Phase ?]: Phase 132 routes archive evidence authority to 133, generic catalog parity to 135, and only six named visual cells to 136.
+- [Phase 132]: QUALITY.md is human-first; normalized JSV evidence is companion-only and excluded from ordinary tests and `ci.fast`.
+- [Phase 132]: QL-001 records xref topology as a `reject_signal` until concrete harm meets its reopening trigger.
+- [Phase 132]: The source-bound initial snapshot is immutable; later evidence requires a new dated snapshot.
+- [Phase 132]: Archive evidence authority routes to 133, generic catalog parity to 135, and only six named visual cells to 136.
+- [Phase 132]: Objective completion uses deterministic evidence, advisory feedback, or explicit deferral; no blocking human UAT state is permitted in active phase artifacts.
 
 ### Pending Todos
 
@@ -71,8 +72,8 @@ None outside the roadmap.
 
 ### Blockers/Concerns
 
-- Remote pinned-renderer parity and human visual review are advisory evidence and require live GitHub execution during Phases 135-136; unavailable evidence must remain explicitly unavailable.
-- Exact architecture extractions remain intentionally undecided until Phase 132 establishes evidence and compatibility risk.
+- Remote pinned-renderer parity and visual review remain advisory evidence during Phases 135-136; unavailable evidence must remain explicitly unavailable and non-blocking.
+- Exact architecture extractions remain intentionally undecided until Phase 134 demonstrates impact and compatibility-safe verification.
 - v1.3.0-v1.3.3 and failed Phase 131 release/control attempts are immutable historical evidence and must not be retried or rewritten.
 
 ## Deferred Items
@@ -86,19 +87,19 @@ None outside the roadmap.
 
 ## Session Continuity
 
-Last session: 2026-08-26T18:35:27.637Z
-Stopped at: Completed 132-02-PLAN.md
+Last session: 2026-08-26
+Stopped at: Completed and verified Phase 132 (4/4 plans)
 Resume file: None
 
 ## Next Steps
 
-1. Run `$gsd-discuss-phase 132` to resolve the quality-ledger schema, baseline evidence set, and risk rubric.
-2. Run `$gsd-plan-phase 132` after discussion is complete.
-3. Preserve the no-feature, public-contract, deterministic/advisory, and six-cell scope boundaries in every phase plan.
+1. Run `$gsd-discuss-phase 133` for repository and evidence hygiene.
+2. Plan Phase 133 from QL-002 and the ledger's exact archive-consumer evidence.
+3. Preserve the no-feature, public-contract, deterministic/advisory/explicit-deferral, and immutable-history boundaries.
 
 ## Operator Next Steps
 
-- Start with `$gsd-discuss-phase 132`.
+- Start with `$gsd-discuss-phase 133`.
 
 ## Performance Metrics
 
@@ -106,3 +107,5 @@ Resume file: None
 |------|----------|-------|-------|
 | Phase 132-quality-baseline-triage P01 | 7m | 3 tasks | 6 files |
 | Phase 132-quality-baseline-triage P02 | 31min | 2 tasks | 3 files |
+| Phase 132-quality-baseline-triage P03 | 34min | 2 tasks | 10 files |
+| Phase 132-quality-baseline-triage P04 | 29min | 2 tasks | 9 files |

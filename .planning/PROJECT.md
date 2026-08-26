@@ -29,7 +29,7 @@ All 12 requirements passed across phases 130-131. The milestone audit passed wit
 
 ## Current State
 
-**v2.14 is active as a conservative quality and maintainability ratchet.** The repository starts from a green deterministic baseline, a fixed 32-cell catalog, and proven public release/Phoenix evidence, but it also carries high-churn architectural seams, phase-specific CI machinery, durable tests coupled to archived planning evidence, loose historical planning artifacts, and six scored catalog cells with sub-threshold visual dimensions. This milestone audits before changing, preserves contracts by default, and records explicit evidence for every fix, deferral, or rejection. Studio, charts, and global text shaping remain demand-gated.
+**Phase 132 is complete; Phase 133 repository and evidence hygiene is next.** Rendro now has a source-bound eight-domain baseline, one durable risk-ranked quality ledger, and a fail-closed `mix quality.governance` command required through `ci-success`. Completion evidence is deterministic, advisory, or explicitly deferred; optional human feedback does not block phase closure. The remaining v2.14 work preserves public APIs and unrelated rendered bytes while addressing only evidence-backed findings. Studio, charts, and global text shaping remain demand-gated.
 
 <details>
 <summary>v2.12 phase-by-phase completion context</summary>
@@ -170,6 +170,8 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Validated
 
+- ✓ Rendro Phase 132 established the dated eight-domain baseline and durable quality ledger, pinned all QL/NS classifications to record-local evidence and explicit decision bases, added semantic prohibition and active-artifact governance, and rolled an independent `quality-governance` job into the sole `ci-success` required context. Final evidence: 12/12 truths, 1,919 tests with 0 failures, 0 Nyquist gaps, clean 12-file review, and 14/14 threats closed. — Phase 132
+
 - ✓ Rendro v2.13 shipped Quality Ratchet & Adoption Readiness: the fixed 32-cell catalog retains its deterministic and bounded-review contracts; a dated source-backed adoption snapshot records the family/composite decision without polling or outreach; and the public Rendro 1.3.4 Phoenix newcomer journey is bound to protected-main workflow-dispatch provenance, verified package/docs identity, and a machine-gated advisory clean-room proof. All 12 requirements passed across Phases 130–131; the milestone audit passed. Shipped 2026-08-26 and archived under `milestones/v2.13-*`. — v2.13
 - ✓ Rendro v2.12 shipped Style-Genre Presets, Public Catalog & Static Configurator (`SEED-004`): six strict genre presets, four provenance-bound curated fonts, twelve safe data-only brands, closure of all inherited v2.11 polish gaps, a bounded 32-cell deterministic catalog with honest quality dispositions, a zero-server URL-shareable configurator, canonical copy/codegen/Livebook source, and proof-backed checkout/Hex/ExDoc discovery. All 28 requirements satisfied; milestone audit `passed`. Shipped 2026-08-19 and archived under `milestones/v2.12-*`. — v2.12
 - ✓ Rendro v2.11 shipped Document Theming & Design-Token System (Milestone B / `SEED-003`): the public, deterministic `Rendro.Theme` contract on the adapter/Evolving tier (semantic color roles + materialized type scale + optional spacing/rules/radius/density), `theme:` threaded through all 7 recipes, role-derived `mode: :light | :dark` via a repeating full-page `:background` region (dark bounded as screen-oriented, no print/PDF-UA claim), a strong unbranded `Theme.default/0` that clears the Milestone-A rubric (Phase-118 SHOW-01 gap closed honestly, DATA-first, with human sign-off), orthogonal `brand:`/`from_brand/2`, the 11-row hash-checked gallery, and `guides/theming.md`. Un-themed calls reproduce v2.10 bytes exactly (PLUMB-03). All 21 requirements satisfied; milestone audit `passed`. Known carryover deferred to follow-up/Milestone C: WINDOWS ids 1-3 (Ticket hierarchy inversion + two dark-mode polish items). Shipped 2026-07-28 and archived under `milestones/v2.11-*`. — v2.11
@@ -200,7 +202,6 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-- [ ] Produce and maintain an evidence-backed quality ledger with risk-ranked dispositions and explicit next-review triggers.
 - [ ] Remove proven repository, evidence-boundary, architecture, readability, test, and CI/CD debt without changing public contracts or unrelated rendered bytes.
 - [ ] Replace historical phase-number catalog evidence routes with one secure, exact-SHA, purpose-named workflow.
 - [ ] Raise all visual dimensions to the accepted threshold for the six scored catalog cells that still have actual visual gaps, while preserving honest dark print boundaries.
@@ -224,7 +225,7 @@ As of v2.12 (2026-08-19), the Happy-Path program's realistic examples, theming, 
 
 As of v2.13 (2026-08-26), the twelve targeted catalog cells have current hash-bound human dispositions and the canonical catalog is candidate-identical and deterministically verified. The adoption gate remains below trigger, while exact public Rendro 1.3.4 and its Phoenix newcomer path are proven through protected release/HexDocs identity controls plus bounded advisory clean-room evidence.
 
-As v2.14 begins (2026-08-26), the project has no active feature gap authorized by demand. The quality baseline is strong—1,917 tests, strict Credo, Dialyzer, deterministic/advisory lane separation, and no open GSD artifacts—but maintainability signals justify a bounded audit: several multi-responsibility modules exceed one thousand lines, three runtime dependency cycles exist, release and newcomer checks consume archived planning files, and the main CI workflow retains historical Phase 126/127/130 catalog routes. These are investigation signals, not automatic defects; every change must be justified by concrete impact and verification.
+After Phase 132 (2026-08-26), the project has no active feature gap authorized by demand. The quality baseline is source-bound and reproducible; 1,919 tests, strict Credo, Dialyzer, semantic governance fixtures, and the required `quality-governance` CI member are green. The ledger routes archive-evidence authority to Phase 133, bounded CI/catalog parity work to Phase 135, and only six named visual cells to Phase 136. Architecture size/cycle observations remain diagnostic signals rather than automatic defects; every change still requires concrete impact and predeclared verification.
 
 ## Constraints
 
@@ -249,9 +250,9 @@ As v2.14 begins (2026-08-26), the project has no active feature gap authorized b
 | Publish the canonical catalog only from the approved SHA-bound Linux PDFium lane, then materialize the verified artifact locally | The approved renderer is Linux-only; exact provenance and candidate equality preserve one truthful writer boundary | ✓ Shipped in Phase 130 |
 | Treat adoption as a dated, read-only conjunctive gate with unavailable evidence never coerced to zero | Keeps roadmap expansion demand-led without analytics, outreach, polling, or fabricated signals | ✓ Shipped in Phase 131 |
 | Bind release, HexDocs, verifier, and Phoenix journey evidence to exact v1.3.4 identities while preserving v1.3.0-v1.3.3 as immutable failed history | Recovery must remain auditable and fail closed rather than mutating or retrying historical incidents | ✓ Shipped in Phase 131 |
-| Make v2.14 an evidence-led quality milestone with no new product capability | The current product surface is broad and proven; maintainability and existing catalog quality have higher value than speculative expansion | — Pending |
-| Preserve public APIs and unrelated rendered bytes by default | Quality work should reduce future change cost without silently rewriting established contracts or deterministic evidence | — Pending |
-| Use hard checks where meaningful and documented human judgment for cohesion/readability | Arbitrary coverage, file-size, or complexity quotas invite churn and can misstate actual quality | — Pending |
+| Make v2.14 an evidence-led quality milestone with no new product capability | The current product surface is broad and proven; maintainability and existing catalog quality have higher value than speculative expansion | ✓ Reinforced in Phase 132 |
+| Preserve public APIs and unrelated rendered bytes by default | Quality work should reduce future change cost without silently rewriting established contracts or deterministic evidence | ✓ Reinforced in Phase 132 |
+| Use deterministic checks for objective completion, keep optional human feedback advisory, and explicitly defer unsupported claims | Arbitrary metrics and blocking subjective gates can both misstate actual quality; every completion claim needs executable evidence or a truthful scope boundary | ✓ Established in Phase 132 |
 | Replace historical phase-number catalog routes with one exact-SHA purpose-named workflow | The catalog still needs bounded review/canonical generation, but milestone-specific branches should not accumulate in ordinary CI | — Pending |
 | Keep the catalog fixed at 32 cells and repair only six current visual-score gaps | v2.14 is a quality ratchet, not catalog expansion; twenty cells remain honestly unscored and dark output remains screen-oriented/non-print-safe | — Pending |
 | Embedded files live on the document in a dedicated registry, not on `metadata.custom` or in writer-owned state | Preserves the registry-backed authored-input pattern and keeps serialization separate from authoring state | ✓ Shipped in v1.9 |
@@ -383,4 +384,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-26 after starting v2.14 Quality & Maintainability.*
+*Last updated: 2026-08-26 after completing Phase 132 Quality Baseline & Triage.*
