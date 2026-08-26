@@ -7,6 +7,16 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
   @ledger_path ".planning/QUALITY.md"
   @schema_path ".planning/quality/schema/baseline-v1.schema.json"
   @snapshot_path ".planning/quality/baselines/132-initial.json"
+  @required_domains MapSet.new([
+                      "architecture",
+                      "dependency",
+                      "test",
+                      "ci_cd",
+                      "documentation",
+                      "packaging",
+                      "release_evidence",
+                      "catalog"
+                    ])
 
   defp valid_snapshot?(snapshot, schema) do
     evidence_items = snapshot["evidence_items"]
@@ -15,6 +25,18 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
     match?({:ok, _}, JSV.validate(snapshot, schema)) and
       Enum.uniq_by(evidence_items, & &1["id"]) == evidence_items and
       Enum.uniq_by(signal_candidates, & &1["id"]) == signal_candidates
+  end
+
+  defp signal_candidates(snapshot) do
+    snapshot["evidence_items"]
+    |> Enum.flat_map(& &1["signal_candidates"])
+  end
+
+  defp signal_domains(snapshot) do
+    snapshot
+    |> signal_candidates()
+    |> Enum.map(& &1["domain"])
+    |> MapSet.new()
   end
 
   test "one quality finding resolves through the ledger, snapshot, and schema" do
@@ -44,6 +66,49 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
 
     assert evidence["provenance"]["source_sha"] == snapshot["source_sha"]
     assert signal["source_evidence_id"] == evidence["id"]
+  end
+
+  test "baseline captures every required domain with stable, non-vacuous signals" do
+    snapshot = @snapshot_path |> File.read!() |> JSON.decode!()
+    evidence_items = snapshot["evidence_items"]
+    signals = signal_candidates(snapshot)
+
+    assert length(evidence_items) >= MapSet.size(@required_domains)
+    assert MapSet.subset?(@required_domains, signal_domains(snapshot))
+    assert signals != []
+    assert Enum.all?(signals, &String.match?(&1["id"], ~r/^SIG-[A-Z]+-\d{3}$/))
+    assert Enum.all?(signals, &(&1["source_evidence_id"] in Enum.map(evidence_items, fn item -> item["id"] end)))
+
+    Enum.each(evidence_items, fn evidence ->
+      assert evidence["provenance"]["source_sha"] == snapshot["source_sha"]
+      assert evidence["provenance"]["environment_id"] == snapshot["environment"]["id"]
+      assert evidence["registered_command"]["invocation"] != ""
+      assert evidence["raw_output"]["sha256"] =~ ~r/^[0-9a-f]{64}$/
+
+      if evidence["status"] == "unavailable" do
+        assert evidence["unavailability_reason"] != ""
+        assert evidence["rerun_trigger"] != ""
+      end
+    end)
+  end
+
+  test "baseline contract rejects a capture with a required domain or all signals removed" do
+    snapshot = @snapshot_path |> File.read!() |> JSON.decode!()
+    schema = @schema_path |> File.read!() |> JSON.decode!() |> JSV.build!()
+
+    without_catalog =
+      Map.update!(snapshot, "evidence_items", fn items ->
+        Enum.reject(items, fn item ->
+          Enum.any?(item["signal_candidates"], &(&1["domain"] == "catalog"))
+        end)
+      end)
+
+    without_signals =
+      put_in(snapshot, ["evidence_items", Access.at(0), "signal_candidates"], [])
+
+    assert valid_snapshot?(without_catalog, schema)
+    refute MapSet.subset?(@required_domains, signal_domains(without_catalog))
+    refute valid_snapshot?(without_signals, schema)
   end
 
   test "schema rejects malformed or duplicated evidence facts" do
