@@ -8,6 +8,15 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
   @schema_path ".planning/quality/schema/baseline-v1.schema.json"
   @snapshot_path ".planning/quality/baselines/132-initial.json"
 
+  defp valid_snapshot?(snapshot, schema) do
+    evidence_items = snapshot["evidence_items"]
+    signal_candidates = Enum.flat_map(evidence_items, & &1["signal_candidates"])
+
+    match?({:ok, _}, JSV.validate(snapshot, schema)) and
+      Enum.uniq_by(evidence_items, & &1["id"]) == evidence_items and
+      Enum.uniq_by(signal_candidates, & &1["id"]) == signal_candidates
+  end
+
   test "one quality finding resolves through the ledger, snapshot, and schema" do
     assert File.exists?(@ledger_path)
     assert File.exists?(@schema_path)
@@ -17,7 +26,7 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
     schema = @schema_path |> File.read!() |> JSON.decode!() |> JSV.build!()
     ledger = File.read!(@ledger_path)
 
-    assert {:ok, _} = JSV.validate(snapshot, schema)
+    assert valid_snapshot?(snapshot, schema)
     assert snapshot["snapshot_id"] == "baseline-132-initial"
     assert Enum.any?(snapshot["evidence_items"], &(&1["id"] == "EV-ARCH-001"))
     assert ledger =~ "QL-001"
@@ -59,20 +68,25 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
 
     refute match?({:ok, _}, JSV.validate(unavailable, schema))
 
-    assert Enum.uniq_by(snapshot["evidence_items"], & &1["id"]) == snapshot["evidence_items"]
+    duplicate_evidence = Map.put(snapshot, "evidence_items", [evidence, evidence])
+    refute valid_snapshot?(duplicate_evidence, schema)
 
-    signals = Enum.flat_map(snapshot["evidence_items"], & &1["signal_candidates"])
-    assert Enum.uniq_by(signals, & &1["id"]) == signals
+    duplicate_signal =
+      put_in(snapshot, ["evidence_items", Access.at(0), "signal_candidates"], [
+        hd(evidence["signal_candidates"]),
+        hd(evidence["signal_candidates"])
+      ])
+
+    refute valid_snapshot?(duplicate_signal, schema)
   end
 
   test "focused validation does not mutate the initial snapshot" do
     original = File.read!(@snapshot_path)
 
-    assert {:ok, _} =
-             JSV.validate(
-               JSON.decode!(original),
-               @schema_path |> File.read!() |> JSON.decode!() |> JSV.build!()
-             )
+    assert valid_snapshot?(
+             JSON.decode!(original),
+             @schema_path |> File.read!() |> JSON.decode!() |> JSV.build!()
+           )
 
     assert File.read!(@snapshot_path) == original
   end
