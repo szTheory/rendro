@@ -1,8 +1,8 @@
 ---
-status: awaiting_human_verify
+status: resolved
 trigger: "authorize-candidate-final-payload-investigation-and-fix"
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-08-26
 ---
 
 # Debug Session: Candidate Final Review Payload
@@ -119,3 +119,8 @@ verification:
 files_changed:
   - dev/rendro/catalog_review_payload.ex
   - test/rendro/catalog_review_payload_contract_test.exs
+
+- timestamp: 2026-08-26
+  checked: completed Phase 130 candidate evidence and milestone audit
+  found: Plan 130-04 accepted successful exact-source run 32417257428/job 96581121473 with 32 candidate PNGs, exactly 12 final review PNGs, four separate multipage proofs, and 317 focused deterministic tests passing; Plan 130-05 completed the identity-bound human review; the v2.13 milestone audit passed all requirements, integrations, and flows.
+  implication: the fresh exact-SHA verification that this checkpoint awaited was completed by the subsequent candidate-only route and consumed successfully by the reviewed milestone flow, so the session is resolved.
