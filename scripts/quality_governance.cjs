@@ -19,6 +19,10 @@ const humanStatePatterns = [
   /^\s*(?:-\s*)?human_verification(?:\s*:\s*true\b|\s*)$/im
 ];
 
+function hasProhibitedHumanState(text) {
+  return humanStatePatterns.some((pattern) => pattern.test(text));
+}
+
 function assertRepositoryRelative(relativePath) {
   if (typeof relativePath !== 'string' || path.isAbsolute(relativePath) || relativePath.split(/[\\/]/).includes('..')) {
     throw new Error('fixture path must be repository-relative without traversal');
@@ -180,21 +184,24 @@ function blockersForFile(file, stagingAllowed) {
     if (/PROH-132-\d{2}[\s\S]{0,500}check_kind:\s*(?:null|flagged|human)/i.test(text)) {
       blockers.push(`${rel}: descriptor-less prohibition`);
     }
+    if (hasProhibitedHumanState(text)) {
+      blockers.push(`${rel}: blocking human state remains active`);
+    }
   }
 
-  if (name.endsWith('-UAT.md') && (/(?:status:\s*)?(?:pending|awaiting)/i.test(text) || humanStatePatterns.some((pattern) => pattern.test(text)))) {
+  if (name.endsWith('-UAT.md') && (/(?:status:\s*)?(?:pending|awaiting)/i.test(text) || hasProhibitedHumanState(text))) {
     blockers.push(`${rel}: pending or human-needed UAT`);
   }
 
-  if (name.endsWith('-VALIDATION.md') && (/(pending|manual-only|awaiting)/i.test(text) || humanStatePatterns.some((pattern) => pattern.test(text)))) {
+  if (name.endsWith('-VALIDATION.md') && (/(pending|manual-only|awaiting)/i.test(text) || hasProhibitedHumanState(text))) {
     blockers.push(`${rel}: pending/manual validation sign-off`);
   }
 
-  if (name.endsWith('-VERIFICATION.md') && humanStatePatterns.some((pattern) => pattern.test(text)) && !stagingAllowed) {
+  if (name.endsWith('-VERIFICATION.md') && hasProhibitedHumanState(text) && !stagingAllowed) {
     blockers.push(`${rel}: human verification remains active`);
   }
 
-  if (name.endsWith('-SUMMARY.md') && humanStatePatterns.some((pattern) => pattern.test(text))) {
+  if (name.endsWith('-SUMMARY.md') && hasProhibitedHumanState(text)) {
     blockers.push(`${rel}: summary retains human-needed coverage`);
   }
 
@@ -264,6 +271,31 @@ if (process.argv[2] === '--check-active') {
       } finally {
         fs.rmSync(file, {force: true});
       }
+    }
+  });
+
+  test('CLI rejects every blocking human state in terminal artifacts without rejecting advisory prose', () => {
+    const phaseDirectory = path.join(phasesRoot, '133-governance-mutations');
+    fs.mkdirSync(phaseDirectory, {recursive: true});
+    const roles = ['PLAN', 'UAT', 'SUMMARY', 'VALIDATION', 'VERIFICATION'];
+    const states = ['human_judgment: true', 'human_needed: true', 'human_verification: true'];
+
+    try {
+      for (const role of roles) {
+        for (const state of states) {
+          const file = path.join(phaseDirectory, `133-GOVERNANCE-${role}.md`);
+          fs.writeFileSync(file, `${state}\n`);
+          const result = spawnSync(process.execPath, [__filename, '--check-active'], {cwd: root, shell: false, encoding: 'utf8'});
+          assert.notEqual(result.status, 0, `${role} ${state} must fail active governance`);
+          fs.rmSync(file, {force: true});
+        }
+      }
+
+      const advisory = path.join(phaseDirectory, '133-GOVERNANCE-SUMMARY.md');
+      fs.writeFileSync(advisory, 'Optional human feedback is advisory.\nhuman_needed: false\nhuman_verification: false\n');
+      assert.equal(spawnSync(process.execPath, [__filename, '--check-active'], {cwd: root, shell: false}).status, 0);
+    } finally {
+      fs.rmSync(phaseDirectory, {recursive: true, force: true});
     }
   });
 
