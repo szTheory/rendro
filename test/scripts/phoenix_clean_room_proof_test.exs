@@ -495,6 +495,13 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
     assert projected["lock_sha256"] == String.duplicate("b", 64)
   end
 
+  test "hashes verified prerequisite facts without treating the capsule sentinel as a file path" do
+    prerequisite = %{"candidate_commit_sha" => @candidate, "public_prerequisite" => "VERIFIED"}
+
+    assert PhoenixCleanRoomProof.prerequisite_sha256(prerequisite) ==
+             :crypto.hash(:sha256, Jason.encode!(prerequisite)) |> Base.encode16(case: :lower)
+  end
+
   test "extracts only resolver-selected Phoenix, Plug, and Bandit versions from atom-key locks" do
     lock = %{
       phoenix: {:hex, :phoenix, "1.8.5", "checksum", [:mix], [], "hexpm", "outer"},

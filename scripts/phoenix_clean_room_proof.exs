@@ -196,6 +196,14 @@ defmodule Rendro.PhoenixCleanRoomProof do
   end
 
   @doc false
+  def prerequisite_sha256(prerequisite) when is_map(prerequisite) do
+    prerequisite
+    |> Jason.encode!()
+    |> then(&:crypto.hash(:sha256, &1))
+    |> Base.encode16(case: :lower)
+  end
+
+  @doc false
   def resolved_versions(lock) when is_map(lock) do
     with {:ok, phoenix} <- hex_lock_version(lock, :phoenix),
          {:ok, plug} <- hex_lock_version(lock, :plug),
@@ -415,7 +423,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
         advisory: true,
         version: @version,
         candidate_sha: prerequisite["candidate_commit_sha"],
-        prerequisite_sha: sha256(options.prerequisite),
+        prerequisite_sha: prerequisite_sha256(prerequisite),
         elixir: System.version(),
         otp: System.otp_release(),
         phoenix: resolved.phoenix,
