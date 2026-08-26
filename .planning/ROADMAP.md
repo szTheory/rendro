@@ -57,7 +57,7 @@ Plans:
   3. Maintainers can inspect the phase archive and find no unexplained loose tracked phase files or ownerless tracked helper scripts.
   4. Package and hygiene checks prove internal evidence, local debris, and misplaced planning files cannot enter the published artifact unnoticed.
 
-**Plans**: 11/13 plans executed
+**Plans**: 12/13 plans executed
 
 Plans:
 **Wave 1**
@@ -91,7 +91,7 @@ Plans:
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
-- [ ] 133-12-PLAN.md — Apply exact package cleanup, PDF.js fixture relocation, and Mix/CI/release wiring.
+- [x] 133-12-PLAN.md — Apply exact package cleanup, PDF.js fixture relocation, and Mix/CI/release wiring.
 
 **Wave 8** *(blocked on Wave 7 completion)*
 
@@ -161,7 +161,7 @@ Plans:
 | Phase | Requirements | Plans Complete | Status | Completed |
 |-------|--------------|----------------|--------|-----------|
 | 132. Quality Baseline & Triage | 4 | 4/4 | Complete    | 2026-08-26 |
-| 133. Repository & Evidence Hygiene | 4 | 11/13 | In Progress|  |
+| 133. Repository & Evidence Hygiene | 4 | 12/13 | In Progress|  |
 | 134. Core Architecture & Readability | 4 | 0/TBD | Not started | — |
 | 135. Test & CI/CD Simplification | 7 | 0/TBD | Not started | — |
 | 136. Catalog Visual Quality | 4 | 0/TBD | Not started | — |
