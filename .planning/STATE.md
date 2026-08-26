@@ -5,15 +5,15 @@ milestone_name: Quality & Maintainability
 current_phase: 133
 current_phase_name: Repository & Evidence Hygiene
 status: executing
-stopped_at: Completed 133-11-PLAN.md
-last_updated: "2026-08-26T22:09:44.189Z"
+stopped_at: Completed 133-04-PLAN.md
+last_updated: "2026-08-26T22:18:09.236Z"
 last_activity: 2026-08-26
 last_activity_desc: Phase 133 execution started
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 17
-  completed_plans: 11
+  completed_plans: 12
   percent: 17
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-26)
 ## Current Position
 
 Phase: 133 (Repository & Evidence Hygiene) — EXECUTING
-Plan: 7 of 13
+Plan: 8 of 13
 Status: Ready to execute
 Last activity: 2026-08-26 — Phase 133 execution started
 
@@ -76,6 +76,8 @@ Phase 137 Closure & Handoff ............................... Pending
 - [Phase ?]: Only journey_attempt records may share a manifest role; IDs and paths remain globally unique while sealed core roles stay singleton.
 - [Phase ?]: The package manifest encodes the resolved Plan 12 package boundary now, while wiring/removal remains deliberately deferred.
 - [Phase ?]: Only scripts/quality_governance.cjs may inspect planning as gsd_tooling; product and evidence consumers are rejected.
+- [Phase ?]: [Phase 133]: The pre-schema success is preserved as a structured journey record with an explicit absent narrative; no Markdown is invented.
+- [Phase ?]: [Phase 133]: All nine journey records remain advisory and inert; active consumers remain restricted to sealed core roles.
 
 ### Pending Todos
 
@@ -98,8 +100,8 @@ None outside the roadmap.
 
 ## Session Continuity
 
-Last session: 2026-08-26T22:09:44.180Z
-Stopped at: Completed 133-11-PLAN.md
+Last session: 2026-08-26T22:18:09.228Z
+Stopped at: Completed 133-04-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -127,3 +129,4 @@ Resume file: None
 | Phase 133 P10 | 9min | 1 tasks | 4 files |
 | Phase 133 P03 | 10min | 1 tasks | 13 files |
 | Phase 133-repository-evidence-hygiene P11 | 20min | 1 tasks | 4 files |
+| Phase 133 P04 | 21min | 1 tasks | 13 files |
