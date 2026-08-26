@@ -39,7 +39,10 @@ defmodule Rendro.DocsContract.DxLocalReproducibilityClaimsTest do
     assert workflow =~ "tee /tmp/mix-test-output.log"
     assert workflow =~ "grep -A 25 'Top [0-9]* slowest' /tmp/mix-test-output.log"
     assert workflow =~ "ci-success:"
-    assert workflow =~ "needs: [test, configurator-browser, integration-proofs, quality-governance]"
+
+    assert workflow =~
+             "needs: [test, configurator-browser, integration-proofs, quality-governance]"
+
     assert workflow =~ "configurator-browser:"
 
     assert workflow =~
