@@ -1,6 +1,6 @@
 ---
 phase: 133-repository-evidence-hygiene
-reviewed: 2026-08-26T22:55:32Z
+reviewed: 2026-08-26T23:08:17Z
 depth: standard
 files_reviewed: 52
 files_reviewed_list:
@@ -57,54 +57,39 @@ files_reviewed_list:
   - test/scripts/public_release_verifier_test.exs
   - test/scripts/repository_evidence_test.exs
 findings:
-  critical: 1
-  warning: 3
+  critical: 0
+  warning: 1
   info: 0
-  total: 4
+  total: 1
 status: issues_found
 ---
 
 # Phase 133: Code Review Report
 
-**Reviewed:** 2026-08-26T22:55:32Z
+**Reviewed:** 2026-08-26T23:08:17Z
 **Depth:** standard
 **Files Reviewed:** 52
 **Status:** issues_found
 
 ## Summary
 
-The new repository evidence and hygiene paths were reviewed with the project’s pure-core, advisory-boundary, and documentation-contract conventions. The hygiene command and focused test suite execute, but the release advisory cannot report a successful proof, evidence loading leaves the claimed journey chain unverified, and the hygiene/documentation contracts have coverage gaps.
-
-## Critical Issues
-
-### CR-01: Successful Phoenix clean-room proofs crash while constructing evidence
-
-**File:** `scripts/phoenix_clean_room_proof.exs:418`
-**Issue:** `options.prerequisite` is always the atom `:capsule` (the only value produced by `parse_options/1`), but `sha256/1` at line 861 unconditionally passes its argument to `File.read!/1`. A proof that reaches the success branch therefore raises `File.Error` for `:capsule`; the outer rescue turns the run into failure. The release workflow consequently can never produce fresh successful advisory evidence even when every clean-room check passes.
-**Fix:** Hash the verified capsule file (or the canonical encoded prerequisite facts), rather than the option sentinel. For example, make `read_prerequisite/1` return the resolved path alongside its facts and call `sha256(path)`, or replace the field with a deterministic digest of `JSON.encode!(prerequisite)`.
+All 52 persisted-scope files were re-reviewed after `6415559`. The original clean-room digest blocker, journey-index integrity gap, shell archive-consumer gap, documentation-command mismatch, and the temporary-capsule directory-copy blocker are resolved. The evidence fixture and its mutation coverage now execute successfully. One compiler warning remains in a scoped helper script.
 
 ## Warnings
 
-### WR-01: Journey-index loading does not validate the journey records it claims
+### WR-01: Clean-room proof helper emits a compiler warning
 
-**File:** `dev/rendro/repository_evidence.ex:34-45`
-**Issue:** Loading `:journey_index` validates only the manifest and `journey/index.json`. It never resolves the IDs in `entries`, verifies that they map one-for-one and in-order to manifest `journey_attempt` records, checks their digests/schemas/release bindings, or verifies explanatory-sidecar digests. Thus a capsule can pass `load_role(:journey_index)` while its retained journey evidence is missing, altered, or unrelated to the index, defeating the stated digest-bound provenance boundary.
-**Fix:** Add a journey-specific validation step after loading the index: resolve every listed ID from manifest records, enforce exact ordered correspondence and uniqueness, validate each JSON digest/schema/release binding, and validate any referenced Markdown sidecar as a confined regular file with its declared SHA-256.
+**File:** `scripts/phoenix_clean_room_proof.exs:374`
+**Classification:** WARNING
+**Issue:** `run_once/3` accepts `options` but never uses it. Loading this script during the focused proof test emits an Elixir compiler warning, which obscures newly introduced warnings in the same advisory verification path.
+**Fix:** Mark the intentionally unused argument explicitly:
 
-### WR-02: Hygiene’s archive-consumer gate does not inspect tracked shell sources
-
-**File:** `dev/rendro/repository_hygiene.ex:178-180`
-**Issue:** `operational_source?/1` excludes `.sh` and `.bash`, although `executable_script?/1` explicitly treats shell scripts as tracked operational helpers. A new shell helper can therefore read `.planning/phases/…` and evade `check_operational_sources/1`, bypassing the repository’s no-runtime-evidence/planning-consumer boundary.
-**Fix:** Include `sh` and `bash` in the operational-source extension regex and add a test containing a shell archive reference, e.g. `scripts/example.sh => 'cat .planning/phases/131-old/131-FACTS.md'`.
-
-### WR-03: The documented Phoenix helper command is rejected by the helper
-
-**File:** `scripts/README.md:28`
-**Issue:** The inventory declares `--prerequisite PATH` as a supported invocation, but `parse_options/1` accepts only no arguments, `--output PATH`, and the two `--output/--root` orderings (lines 308-326 of `phoenix_clean_room_proof.exs`). Following the documented command immediately returns `:invalid_arguments`. This violates the project rule that documentation claims are contracts.
-**Fix:** Either restore a safe, validated `--prerequisite PATH` option and use it consistently, or update the inventory to document the capsule-only interface actually implemented.
+```elixir
+defp run_once(root, _options, prerequisite) do
+```
 
 ---
 
-_Reviewed: 2026-08-26T22:55:32Z_
+_Reviewed: 2026-08-26T23:08:17Z_
 _Reviewer: the agent (gsd-code-reviewer)_
 _Depth: standard_
