@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 12
+open_count: 13
 waived_count: 0
 fixed_count: 6
-total_count: 18
-last_updated: 2026-08-26T22:26:41.647Z
+total_count: 19
+last_updated: 2026-08-26T22:32:48.088Z
 ---
 
 # Broken Windows Ledger
@@ -33,6 +33,7 @@ last_updated: 2026-08-26T22:26:41.647Z
 | 16 | 131 | unrun-verify | .planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json |  | Plan 131-06 public prerequisite verifier intentionally not run: protected v1.3.3 release failed at unauthenticated Hex dry run before publication. | open |  | 2026-08-22T20:28:47.267Z |  |
 | 17 | 133 | deviation | .planning/phases/133-repository-evidence-hygiene/133-08-PLAN.md | 41 | Literal legacy-path grep includes intentional plan-local provenance records; active-consumer reference check passed. | open |  | 2026-08-26T21:48:10.729Z |  |
 | 18 | 133 | deviation | .planning/phases/133-repository-evidence-hygiene/133-05-PLAN.md |  | Mix 1.19 rejects the planned -x option; equivalent focused suite ran without it. | open |  | 2026-08-26T22:26:41.647Z |  |
+| 19 | 133 | deviation | test/scripts/repository_evidence_test.exs |  | Legacy source reads in the evidence test were replaced with fixed capsule provenance, fact, and sidecar digest contracts before deleting batch A. | open |  | 2026-08-26T22:32:48.088Z |  |
 
 ````json
 [
@@ -250,6 +251,18 @@ last_updated: 2026-08-26T22:26:41.647Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-26T22:26:41.647Z",
+    "resolved_at": null
+  },
+  {
+    "id": 19,
+    "kind": "deviation",
+    "phase": "133",
+    "file": "test/scripts/repository_evidence_test.exs",
+    "line": null,
+    "description": "Legacy source reads in the evidence test were replaced with fixed capsule provenance, fact, and sidecar digest contracts before deleting batch A.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-26T22:32:48.088Z",
     "resolved_at": null
   }
 ]
