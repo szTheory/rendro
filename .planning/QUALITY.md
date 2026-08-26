@@ -65,10 +65,10 @@ The initial snapshot is immutable after capture. Validation is read-only and cap
 - **Owner phase:** 133
 - **Scope:** replace active archive reads with durable repository-owned evidence without changing product behavior, public API, or rendered bytes.
 - **Verification:** focused archive-consumer scan returns no product, release, or regression consumer; run the relevant deterministic and proof gates.
-- **Status:** accepted
+- **Status:** closed
 - **Trigger:** work is mandatory before Phase 137; new archive consumption reopens the finding.
-- **Closure:** only the predeclared focused scan, compatibility review, and relevant gate evidence can close it.
-- **Relationships/history:** observed and triaged on 2026-08-26; no duplicate finding because scripts, workflow, and tests share one evidence-authority boundary.
+- **Closure:** closed 2026-08-26 after the predeclared terminal evidence contract passed. Resolution references: atomic consumer cutover `dda731e`; capsule/archive preservation plans 133-06 and 133-07; helper ownership `80fa85e`; hygiene policy `71b5743`; package/CI wiring `ef98618` and `13ca6df`; and the post-Wave-7 regression correction `44b99fb` were all present before terminal execution. The focused operational scan (`git grep -n -E '\\.planning/(phases|milestones)/' -- lib dev scripts .github`) found only the two exact owned structural `gsd_tooling` surfaces: `dev/rendro/repository_hygiene.ex` policy checks and `scripts/quality_governance.cjs` fixture assertions; it found no product, release, or ordinary-regression archive consumer. `mix quality.hygiene` passed with exact package member contract SHA-256 `41db3c276bdf1858925c443673560a42f20cfb46e6d58af99c6135d4c3b691b9`; the capsule manifest SHA-256 was `3f32c5c3f63837fa47a08e374dbb843c17b3f3343db9f411731d0c7298b5d8c2`. The focused capsule/consumer/hygiene suite passed (90 tests, 0 failures), and `mix ci.fast` passed. Compatibility review against the source-bound initial SHA `dcd7db62949f4089bded7878192ae1dafb0a4f46` proved `priv/public_api.json` remains byte-identical (SHA-256 `963e5caa5fea2b3e7b40d31a3d4c13d66fcf8896ff562c4a195327ba57a727af`), with zero `lib/`, `assets/rendro`, and `priv/examples` changes; the existing required-checks catalog-route contract remained green, so Phase 135 topology was not altered. Before: active release/newcomer paths could consume archived Phase 131 planning facts. After: active consumers read the validated v1.3.4 capsule while archived planning is provenance only. Separate proof result: `mix ci.proofs` passed (7 tests, 0 failures); its unavailable `pdfium-cli` viewer observations remain explicitly deferred under NS-006 with the existing exact-SHA CI/pinned-executable rerun trigger, not promoted to deterministic success.
+- **Relationships/history:** observed and triaged on 2026-08-26; repaired and closed on 2026-08-26 through the source-bound cutover and terminal evidence above. No duplicate finding because scripts, workflow, and tests shared one evidence-authority boundary; new operational archive consumption reopens this same ID.
 
 ### Medium
 
@@ -214,7 +214,7 @@ Closure uses the predeclared focused proof and compatibility evidence. Labels, s
 
 ## Resolved, rejected, deferred, and superseded findings
 
-None recorded as resolved, superseded, accepted-risk, or reopened. QL-001 and NS-001 through NS-005 are explicit rejected signals; NS-006 and NS-007 are explicit trigger-backed deferred evidence. `None recorded` means a category has no rows, not that risk is absent.
+QL-002 is resolved and closed on 2026-08-26 with its terminal evidence recorded in the finding. None recorded as superseded, accepted-risk, or reopened. QL-001 and NS-001 through NS-005 are explicit rejected signals; NS-006 and NS-007 are explicit trigger-backed deferred evidence. `None recorded` means a category has no rows, not that risk is absent.
 
 ## Baseline versus final
 
