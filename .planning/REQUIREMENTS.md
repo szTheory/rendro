@@ -76,7 +76,7 @@
 | AUDIT-04 | Phase 132 | Complete |
 | HYGIENE-01 | Phase 133 | Pending |
 | HYGIENE-02 | Phase 133 | Complete |
-| HYGIENE-03 | Phase 133 | Pending |
+| HYGIENE-03 | Phase 133 | Complete |
 | HYGIENE-04 | Phase 133 | Pending |
 | ARCH-01 | Phase 134 | Pending |
 | ARCH-02 | Phase 134 | Pending |
