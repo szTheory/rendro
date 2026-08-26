@@ -32,10 +32,11 @@ defmodule Rendro.RepositoryHygieneTest do
 
   test "member policy reports missing unexpected and forbidden paths in stable order" do
     manifest = %{"members" => ["README.md", "lib/rendro.ex"]}
+    quality_ledger = Path.join([".planning", "QUALITY.md"])
 
     assert {:error, diagnostics} =
              RepositoryHygiene.check_members(
-               [".planning/QUALITY.md", "README.md", "scripts/leak.exs"],
+               [quality_ledger, "README.md", "scripts/leak.exs"],
                manifest
              )
 
@@ -44,7 +45,7 @@ defmodule Rendro.RepositoryHygieneTest do
 
     assert Enum.any?(
              diagnostics,
-             &String.contains?(&1, "unexpected package member: .planning/QUALITY.md")
+             &String.contains?(&1, "unexpected package member: #{quality_ledger}")
            )
 
     assert Enum.any?(
