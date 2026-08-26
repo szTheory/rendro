@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "baseline-v1.schema.json",
+  "title": "Rendro normalized quality baseline v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "snapshot_id", "source_sha", "captured_at_utc", "worktree", "environment", "evidence_items"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "snapshot_id": {"const": "baseline-132-initial"},
+    "source_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "captured_at_utc": {"type": "string", "format": "date-time"},
+    "worktree": {"enum": ["clean", "dirty"]},
+    "environment": {"$ref": "#/$defs/environment"},
+    "evidence_items": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidence_item"}}
+  },
+  "$defs": {
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["os", "toolchain", "dependency_lock_sha256", "renderer"],
+      "properties": {
+        "os": {"type": "string", "minLength": 1},
+        "toolchain": {"type": "string", "minLength": 1},
+        "dependency_lock_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "renderer": {"type": "string", "minLength": 1}
+      }
+    },
+    "signal_candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "domain", "summary"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^SIG-[A-Z]+-[0-9]{3}$"},
+        "domain": {"type": "string", "minLength": 1},
+        "summary": {"type": "string", "minLength": 1}
+      }
+    },
+    "raw_output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "bytes", "location", "expires_at_utc"],
+      "properties": {
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "bytes": {"type": "integer", "minimum": 0},
+        "location": {"type": "string", "minLength": 1},
+        "expires_at_utc": {"type": "string", "format": "date-time"}
+      }
+    },
+    "evidence_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "signal_candidates", "command", "lane", "authority", "status", "normalized_result", "raw_output", "redaction"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^EV-[A-Z]+-[0-9]{3}$"},
+        "signal_candidates": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/signal_candidate"}},
+        "command": {"type": "string", "minLength": 1},
+        "lane": {"enum": ["deterministic", "proof", "advisory", "human_review"]},
+        "authority": {"enum": ["local_reproduction", "primary_ci", "human_review"]},
+        "status": {"enum": ["passed", "failed", "unavailable"]},
+        "normalized_result": {"type": "object", "additionalProperties": true},
+        "raw_output": {"$ref": "#/$defs/raw_output"},
+        "redaction": {"enum": ["none", "metadata_only", "redacted"]},
+        "unavailability_reason": {"type": "string", "minLength": 1},
+        "rerun_trigger": {"type": "string", "minLength": 1}
+      },
+      "allOf": [
+        {"if": {"properties": {"status": {"const": "unavailable"}}}, "then": {"required": ["unavailability_reason", "rerun_trigger"]}, "else": {"not": {"anyOf": [{"required": ["unavailability_reason"]}, {"required": ["rerun_trigger"]}]}}}
+      ]
+    }
+  }
+}
