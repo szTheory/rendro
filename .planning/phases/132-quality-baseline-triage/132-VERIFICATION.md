@@ -1,31 +1,25 @@
 ---
 phase: 132-quality-baseline-triage
-verified: 2026-08-26T18:43:04Z
-status: human_needed
-score: 10/10 must-haves verified
+verified: 2026-08-26T19:45:06Z
+status: passed
+score: 12/12 must-haves verified
 behavior_unverified: 0
 overrides_applied: 0
-human_verification:
-  - test: "Review QL-002 through QL-004 against their cited EV records and the D-17 qualitative rubric."
-    expected: "QL-002 remains a credible evidence-authority risk; QL-003 and QL-004 remain bounded repair work, with no metric-only repair decision."
-    why_human: "Priority and disposition are evidence-gated maintainer judgments; static checks can prove fields and links, not the appropriateness of the judgment."
-  - test: "Review unavailable EV-REL-001 and EV-ADV-001 alongside the ledger's authority-lane statements."
-    expected: "Neither local PDFium absence nor local/advisory evidence is treated as primary-CI proof, fabricated pass/failure, or a zero result."
-    why_human: "PROH-132-01 remains explicitly flagged-unverified in the plan and requires an authority judgment over the evidence claims."
-  - test: "Review the ledger-consumer boundary after inspecting its repository references."
-    expected: "Only the explicit maintenance contract reads QUALITY.md/snapshot data; product, package, release, and ordinary regression paths do not consume it, and the ledger has no active archive dependency."
-    why_human: "PROH-132-02 remains explicitly flagged-unverified in the plan; the current repository scan is strong evidence but cannot certify future operational intent."
-  - test: "Review QL-001 and NS-001 through NS-007 dispositions against the qualitative rubric and closure rules."
-    expected: "Diagnostic counts, labels, and unrelated green checks have not been used as repair authority or closure evidence without the predeclared compatibility proof."
-    why_human: "PROH-132-03 remains explicitly flagged-unverified in the plan and concerns qualitative maintenance judgment rather than a purely structural property."
+re_verification:
+  previous_status: prior non-terminal review gate
+  previous_score: 10/10
+  gaps_closed:
+    - "Qualitative triage, evidence authority, ledger-consumer, and metric-authority claims now have deterministic contracts."
+  gaps_remaining: []
+  regressions: []
 ---
 
 # Phase 132: Quality Baseline & Triage Verification Report
 
 **Phase Goal:** Maintainers have a dated, reproducible quality baseline and one durable ledger that distinguishes actionable risk from low-value cleanup signals.
-**Verified:** 2026-08-26T18:43:04Z
-**Status:** human_needed
-**Re-verification:** No — initial verification
+**Verified:** 2026-08-26T19:45:06Z
+**Status:** passed
+**Re-verification:** Yes — after deterministic gap closure
 
 ## Goal Achievement
 
@@ -33,101 +27,79 @@ human_verification:
 
 | # | Truth | Status | Evidence |
 | --- | --- | --- | --- |
-| 1 | A maintainer can reproduce the dated architecture, dependency, test, CI/CD, documentation, packaging, release-evidence, and catalog baseline with documented repository commands. | ✓ VERIFIED | `132-initial.json` is dated, source-SHA-bound (`dcd7db6…` exists), has all eight domains, registered commands, lanes, authority, status, provenance, raw-output identity, and explicit unavailable states. Its recorded SHA matches the ledger registry; `mix quality.baseline` passed twice without changing it. |
-| 2 | Every discovered signal is represented exactly once in the durable ledger with evidence, impact/confidence/compatibility/disposition/owner/verification/status/trigger facts where it is a finding. | ✓ VERIFIED | Independent record-boundary trace found 12 snapshot SIG IDs across 4 QL findings and 7 NS records: none missing or duplicated; every signal's source EV is present in that record and in the snapshot. QL-001 through QL-004 each contain every AUDIT-03 field. |
-| 3 | High risk is repair-owned or evidence-rejected; medium work is bounded or trigger-deferred; low-value observations do not create standalone churn. | ✓ VERIFIED | QL-002 is high/repair-owned by Phase 133; QL-003 and QL-004 are bounded medium repairs owned by Phases 135/136; QL-001 and NS-001–005 are `reject_signal`; NS-006–007 have owners and concrete refresh triggers. Human review remains required for the qualitative judgment. |
-| 4 | The ledger freezes the public API and unrelated rendered-byte contract for later phases. | ✓ VERIFIED | `QUALITY.md` names the freeze and limits visual work to the six Phase 136 cells; the phase commit range has no `lib/`, public API manifest, catalog, or rubric-score changes. |
-| 5 | The ledger is human-first, archive-independent maintainer state rather than executable product/package/release/ordinary-regression state. | ✓ VERIFIED | `QUALITY.md` states the boundary; repository references show only the purpose-tagged focused maintenance test reads the ledger/snapshot. The ledger contains no `.planning/phases/` or `.planning/milestones/` reference. |
-| 6 | Finding identities, deduplication, lifecycle, and recurrence rules are durable. | ✓ VERIFIED | `QUALITY.md` defines permanent sequential `QL-NNN` IDs, cause-plus-boundary deduplication, lifecycle branches, and reopen-versus-new-related-ID rules; QL headings are ordered QL-001..QL-004. |
-| 7 | Normalized evidence is schema-valid, immutable under validation, and keeps authority lanes and raw artifacts separate. | ✓ VERIFIED | Draft-2020-12 schema validates through JSV; the focused test mutates malformed/duplicate facts and unavailable-state combinations; the snapshot SHA stayed `f7a187…239be` across repeated validation; unavailable proof/advisory records carry reasons and rerun triggers. |
-| 8 | The qualitative rubric, closure contracts, owner routing, and maintainer vocabulary are exposed before later triage/repair phases. | ✓ VERIFIED | Ledger sections “Finding lifecycle and relationships”, “Qualitative rubric and dispositions”, “Routing and closure”, and “Maintainer guide” implement D-15–D-24, including Phase 133–137 routing. |
-| 9 | Re-running the maintenance validation does not append duplicate identities or overwrite the initial baseline. | ✓ VERIFIED | `mix quality.baseline` is read-only and passed twice; the pre/post snapshot SHA was identical. Schema/contract checks reject duplicate EV and SIG IDs. |
-| 10 | The initial baseline is not silently overwritten by later capture/comparison. | ✓ VERIFIED | Snapshot and ledger explicitly reserve a separate Phase 137 final snapshot/before-after comparison; `132-initial.json` remains bound to its recorded SHA and source identity. |
+| 1 | A maintainer can reproduce the recorded eight-domain baseline using documented repository commands. | ✓ VERIFIED | The immutable `baseline-132-initial` snapshot contains 11 evidence items and 12 signals spanning architecture, dependency, test, CI/CD, documentation, packaging, release evidence, and catalog. `mix quality.baseline` passed (11 tests). |
+| 2 | Every discovered finding appears once in the durable ledger with evidence, impact, confidence, compatibility risk, disposition, owner phase, verification method, and status. | ✓ VERIFIED | `QUALITY.md` contains the ordered QL-001..QL-004 and NS-001..NS-007 matrix; the focused contract validates record-bounded EV/SIG resolution, identity, fields, and lifecycle facts. |
+| 3 | High-risk work is repair-owned or rejected with evidence; medium work is bounded or trigger-deferred; low-value observations do not create churn. | ✓ VERIFIED | QL-002 is owned by Phase 133; QL-003/004 have bounded later-phase routing; QL-001 and NS-001..005 are explicit non-actions; NS-006/007 retain unavailable/deferred evidence with triggers. Decision-basis mutations reject metric-only authority. |
+| 4 | The ledger freezes the public API and unrelated rendered-byte compatibility contract for subsequent phases. | ✓ VERIFIED | `QUALITY.md` declares the freeze and narrowly bounds the visual work; phase artifacts and commits add governance/ledger infrastructure only, with no `lib/`, package list, dependency, public API manifest, rendered artifact, or catalog-output change. |
+| 5 | The phase remains maintenance-only: the ledger is not runtime, package, release, or ordinary-test state. | ✓ VERIFIED | `quality_ledger_contract` remains default-excluded; `mix quality.baseline` is explicit; the bounded consumer inventory and governance fixtures reject consumer leaks. |
+| 6 | Evidence lanes remain distinct and unavailable remote evidence cannot become fabricated authoritative proof. | ✓ VERIFIED | Schema and focused mutations enforce deterministic/proof/advisory/review lanes, unavailable reason/rerun fields, and authority eligibility; the closed authority-inflation fixture fails while its paired clean case passes. |
+| 7 | QL/NS classifications are record-bounded, unique, and evidence-local rather than global substring matches. | ✓ VERIFIED | The focused ExUnit contract has 11 passing tests covering malformed boundaries, duplicate/misplaced signals, empty or unknown evidence, and non-local evidence references. |
+| 8 | Every prohibition has an executable bad/clean descriptor and is independently exercised. | ✓ VERIFIED | Both closed manifests enumerate PROH-132-01 through PROH-132-03; `node --test scripts/quality_governance.cjs` passed all four tests, including three baseline-backed bad/clean pairs. |
+| 9 | Phase artifacts are terminal, automated, and preserve qualitative disposition safeguards. | ✓ VERIFIED | `132-VALIDATION.md` is `validated`, Nyquist-compliant, and wave-complete; `132-UAT.md` reports 4/4 passes with no outstanding items; Plan 02 coverage uses executable evidence. |
+| 10 | The initial baseline is immutable under validation and later capture cannot silently overwrite it. | ✓ VERIFIED | Snapshot SHA-256 was `f7a187ae4687cf0823e43786a0d58b8c571d94aded9fb79e540a998bd7b239be` before and after the focused commands. |
+| 11 | An independent fail-closed governance CI job gates the sole branch-protection roll-up. | ✓ VERIFIED | Workflow `quality-governance` runs `mix quality.governance`, is in `ci-success.needs`, and the guardrail test passed 28 tests while retaining `ci-success` as the only required context. |
+| 12 | Full governance accepts the regenerated phase state without staging flags. | ✓ VERIFIED | After this report replaced the stale report, unexceptioned `mix quality.governance` passed: it ran the 11-test baseline contract then the active-artifact scan with exit 0. |
 
-**Score:** 10/10 truths verified (0 present, behavior-unverified)
+**Score:** 12/12 truths verified (0 present, behavior-unverified)
 
 ### Required Artifacts
 
 | Artifact | Expected | Status | Details |
 | --- | --- | --- | --- |
-| `.planning/QUALITY.md` | Canonical current ledger and compatibility contract | ✓ VERIFIED | 214 substantive lines; current finding/non-action records, baseline registry, rubric, routing, and closure semantics are all present. |
-| `.planning/quality/schema/baseline-v1.schema.json` | Versioned normalized-evidence structural contract | ✓ VERIFIED | 104-line Draft 2020-12 schema with closed object definitions, required provenance/raw-output fields, lane/status enums, and unavailable conditional. Exercised by the focused JSV tests. |
-| `.planning/quality/baselines/132-initial.json` | Initial exact-source-SHA dated evidence snapshot | ✓ VERIFIED | 153-line snapshot, source SHA resolves in Git, eight required domains and 12 stable signal IDs; SHA-256 agrees with ledger. |
-| `test/quality/baseline_ledger_contract_test.exs` | Explicit maintenance contract | ✓ VERIFIED | 276-line tagged ExUnit test, wired only to `mix quality.baseline` as the locked purpose-named maintenance lane; nine tests passed. |
+| `.planning/QUALITY.md` | Canonical current ledger and compatibility contract | ✓ VERIFIED | Substantive QL/NS records, baseline registry, lifecycle, routing, rubric, and freeze contract. |
+| `.planning/quality/schema/baseline-v1.schema.json` | Versioned normalized-evidence contract | ✓ VERIFIED | Draft 2020-12 schema with closed definitions, required provenance/raw-output facts, lanes, status, and unavailable conditional. |
+| `.planning/quality/baselines/132-initial.json` | Dated source-bound baseline | ✓ VERIFIED | `baseline-132-initial`, source SHA `dcd7db62949f4089bded7878192ae1dafb0a4f46`, eight domains, 11 evidence items, and 12 signals. |
+| `test/quality/baseline_ledger_contract_test.exs` | Read-only maintenance contract | ✓ VERIFIED | Tagged, default-excluded 11-test ExUnit contract invoked only by `mix quality.baseline`. |
+| `scripts/quality_governance.cjs` | Shell-free fixture bridge and active-artifact scanner | ✓ VERIFIED | Uses list-form `spawnSync`, closed manifests, exact scanning, and an unexceptioned full mode. |
+| `test/quality/fixtures/governance-{violation,clean}.json` | Closed prohibition fixtures | ✓ VERIFIED | Each lists the three paired prohibition cases and is exercised by Node tests. |
+| `132-VALIDATION.md` and `132-UAT.md` | Terminal phase evidence | ✓ VERIFIED | Terminal states and all task/UAT rows are recorded as automated passes. |
+| `.github/workflows/ci.yml` and `test/guardrails/required_checks_contract_test.exs` | Governance CI topology and regression contract | ✓ VERIFIED | Dedicated always-running job, strict roll-up membership, and parsed topology assertions. |
 
 ### Key Link Verification
 
 | From | To | Via | Status | Details |
 | --- | --- | --- | --- | --- |
-| `QUALITY.md` | `132-initial.json` | Baseline registry and QL/NS evidence references | ✓ WIRED | Registry names the exact relative path and snapshot SHA; all 11 record blocks reference known EV IDs in the snapshot. |
-| `132-initial.json` | `baseline-v1.schema.json` | `schema_version: 1` plus JSV validation | ✓ WIRED | Focused test loads both paths and `JSV.validate/2` succeeds; malformed mutations fail. |
-| Contract test | `QUALITY.md` | Static governing-field and archive-independence checks | ✓ WIRED | The tagged test reads the ledger and checks headings/labels, QL ordering, and prohibited archive references. |
-| Contract test | `132-initial.json` | Coverage, identity, lane, and availability checks | ✓ WIRED | The tagged test reads the snapshot, checks all required domains/signals and rejects duplicate identity mutations. |
-| `QUALITY.md` | `.planning/ROADMAP.md` | Owner phases 133–137 and final comparison routing | ✓ WIRED | The ledger routes repairs to Phase 133/135/136 and final reconciliation to Phase 137, matching the milestone roadmap. |
+| `QUALITY.md` | `132-initial.json` | Registry plus QL/NS evidence references | ✓ WIRED | Plan 01/02 link query verified all six declared links; focused contract resolves the record-local EV/SIG graph. |
+| `132-initial.json` | `baseline-v1.schema.json` | `schema_version: 1` and JSV validation | ✓ WIRED | `mix quality.baseline` validates the snapshot and mutation cases. |
+| `mix.exs` | `scripts/quality_governance.cjs` | `quality.governance` alias | ✓ WIRED | Alias runs `quality.baseline` then `node scripts/quality_governance.cjs --check-active`; the final command passed. |
+| `scripts/quality_governance.cjs` | `mix.exs` | shell-free baseline invocation | ✓ WIRED | `spawnSync('mix', ['quality.baseline'], {shell: false})` is exercised by each closed fixture test. |
+| `132-VALIDATION.md` | governance commands | automated Plan 03/04 rows | ✓ WIRED | Rows name focused and staged/full commands and are terminal. |
+| CI workflow | `mix quality.governance` | `quality-governance` job and `ci-success` roll-up | ✓ WIRED | Parsed workflow contract confirms exact command, always-running topology, and roll-up membership. |
 
 ### Data-Flow Trace (Level 4)
 
-Not applicable: these are static maintainer records and a read-only validation contract, not runtime-rendered dynamic-data artifacts. The equivalent record-to-evidence trace was performed above.
+Not applicable to runtime rendering. The equivalent durable-data trace is exercised end-to-end: schema → source-bound snapshot → record-local ledger evidence → focused contract → governance command → CI roll-up.
 
 ### Behavioral Spot-Checks
 
 | Behavior | Command | Result | Status |
 | --- | --- | --- | --- |
-| Schema and ledger contract executes through its documented maintenance command | `mix quality.baseline` | 9 tests, 0 failures | ✓ PASS |
-| Validation leaves the immutable initial snapshot unchanged | SHA-256 before/after `mix quality.baseline` | `f7a187…239be` both times | ✓ PASS |
+| Schema, evidence, ledger, immutability, and record-boundary checks | `mix quality.baseline` | 11 tests, 0 failures | ✓ PASS |
+| Closed prohibition fixtures and active-artifact scanner behavior | `node --test scripts/quality_governance.cjs` | 4 tests, 0 failures | ✓ PASS |
+| CI topology / required-context contract | `mix test test/guardrails/required_checks_contract_test.exs` | 28 tests, 0 failures | ✓ PASS |
+| Formatting of changed executable contracts | `mix format --check-formatted mix.exs test/quality/baseline_ledger_contract_test.exs test/guardrails/required_checks_contract_test.exs` | exit 0 | ✓ PASS |
+| Unexceptioned maintenance governance | `mix quality.governance` | 11 baseline tests, then active scan; exit 0 | ✓ PASS |
 
 ### Probe Execution
 
-Step 7c: SKIPPED — no phase-declared or conventional `scripts/**/tests/probe-*.sh` probe exists.
+No phase-declared or conventional `scripts/**/tests/probe-*.sh` probe exists; probe execution is not applicable.
 
 ### Requirements Coverage
 
-| Requirement | Source Plan | Description | Status | Evidence |
+| Requirement | Source Plans | Description | Status | Evidence |
 | --- | --- | --- | --- |
-| AUDIT-01 | 132-01, 132-02 | Reproducible dated baseline across eight domains | ✓ SATISFIED | Source-bound, dated snapshot contains every required domain, commands, lanes, status, and availability facts; focused command passes. |
-| AUDIT-02 | 132-01, 132-02 | One durable current ledger without active completed-phase dependency | ✓ SATISFIED | Human-first `QUALITY.md` links the durable snapshot and contains active/rejected/deferred records; no archive path or product/release consumer was found. |
-| AUDIT-03 | 132-01, 132-02 | Complete evidence/risk/disposition/owner/verification/status/revisit facts | ✓ SATISFIED | Independent per-record trace confirms known EV links and every required QL field; triggers and closure facts are explicit. |
-| AUDIT-04 | 132-01, 132-02 | High-risk ownership/rejection, medium bounds/deferral, no low-value churn | ✓ SATISFIED | QL-002 high repair ownership, QL-003/004 bounded medium ownership, and explicit reject/defer non-action records meet the structural contract; the final qualitative judgment is in Human Verification. |
+| AUDIT-01 | 132-01 through 132-04 | Reproducible dated eight-domain baseline | ✓ SATISFIED | Source-bound snapshot, schema/immutability checks, and explicit `mix quality.baseline` command. |
+| AUDIT-02 | 132-01 through 132-04 | One durable current ledger without archival/runtime coupling | ✓ SATISFIED | Human-first ledger, bounded record parser, consumer allowlist, and active-artifact scan. |
+| AUDIT-03 | 132-01 through 132-04 | Complete evidence/risk/disposition/owner/verification/status facts | ✓ SATISFIED | Exact QL/NS matrix, field checks, evidence-local mutations, and governance fixtures. |
+| AUDIT-04 | 132-01 through 132-04 | Evidence-based risk routing without low-value churn | ✓ SATISFIED | Decision-basis eligibility, metric-only mutations, explicit non-actions, and bounded repair ownership. |
 
-No orphaned Phase 132 requirement IDs were found: both plans declare AUDIT-01 through AUDIT-04, exactly matching `REQUIREMENTS.md`.
+No orphaned Phase 132 requirement IDs were found.
 
-### Anti-Patterns and Review Findings
+### Anti-Patterns Found
 
-| File | Line | Pattern | Severity | Assessment |
-| --- | --- | --- | --- | --- |
-| `mix.exs`, `test/test_helper.exs` | 87–89; 9–17 | WR-01: contract is outside ordinary CI | ℹ️ Intentional, not a gap | D-03 and Plan 132-01 explicitly require default exclusion and prohibit adding `quality.baseline` to `ci`, `ci.fast`, package, or release aliases. The review's suggested fix would violate the locked boundary. |
-| `test/quality/baseline_ledger_contract_test.exs` | 49–52; 219–237 | WR-02: global signal scan is not record-bound | ⚠️ Warning confirmed | The test can be fooled by a stray Markdown signal line. Independent record-boundary verification proves the current ledger has the correct 12 one-time classifications, so this does not falsify the phase truth; it weakens future-regression protection. |
-| `test/quality/baseline_ledger_contract_test.exs` | 239–270 | WR-03: evidence is checked only when an `EV-*` token exists | ⚠️ Warning confirmed | A future QL record could have an empty/unparseable Evidence field and still pass. Current QL/NS records were independently traced to known evidence and every QL has the required fields, so no present missing-evidence finding was observed. |
-
-No `TBD`, `FIXME`, or `XXX` debt marker was found in phase-owned implementation/artifact files. The review warnings are documented test-hardening concerns, not evidence that a current roadmap truth is false.
-
-### Human Verification Required
-
-### 1. Qualitative triage judgment
-
-**Test:** Review QL-002 through QL-004 against their cited EV records and the D-17 rubric.
-**Expected:** High/medium priorities and repair dispositions are supported by demonstrated contract or bounded-maintenance impact, not a metric quota.
-**Why human:** This is a maintainer risk judgment, not a property grep or JSV can determine.
-
-### 2. Evidence-authority boundary
-
-**Test:** Review the unavailable proof/advisory records and their authority statements.
-**Expected:** They remain explicitly unavailable and non-authoritative; no local/advisory result is promoted to primary-CI proof.
-**Why human:** The plan deliberately leaves PROH-132-01 as flagged-unverified.
-
-### 3. Non-executable ledger boundary
-
-**Test:** Review current and intended consumers of the ledger/snapshot.
-**Expected:** The only consumer is the named maintenance contract; no product, package, release, or ordinary regression path makes it executable state.
-**Why human:** The plan deliberately leaves PROH-132-02 as flagged-unverified, despite a clean current repository scan.
-
-### 4. No diagnostic-as-authority shortcut
-
-**Test:** Review QL-001 and NS classifications against the evidence/rubric/closure rules.
-**Expected:** Counts, labels, and unrelated green checks have not created a repair decision or closure without predeclared compatibility proof.
-**Why human:** The plan deliberately leaves PROH-132-03 as flagged-unverified.
+No `TBD`, `FIXME`, `XXX`, placeholder, empty implementation, or hardcoded output marker was found in the phase-owned implementation and closure artifacts. The artifact/link utility reported escaped-regex misses for three Plan 03/04 links; direct source inspection and the passing behavioral commands above establish each connection.
 
 ---
 
-_Verified: 2026-08-26T18:43:04Z_
+_Verified: 2026-08-26T19:45:06Z_
 _Verifier: the agent (gsd-verifier)_
