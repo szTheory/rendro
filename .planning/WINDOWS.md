@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 11
+open_count: 12
 waived_count: 0
 fixed_count: 6
-total_count: 17
-last_updated: 2026-08-26T21:48:10.729Z
+total_count: 18
+last_updated: 2026-08-26T22:26:41.647Z
 ---
 
 # Broken Windows Ledger
@@ -32,6 +32,7 @@ last_updated: 2026-08-26T21:48:10.729Z
 | 15 | 130 | deviation | tmp/phase130-launch-reconcile |  | Detached-worktree dependency cache unavailable; no packages were installed and only artifact/hash fences were used. | open |  | 2026-08-20T15:34:07.633Z |  |
 | 16 | 131 | unrun-verify | .planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json |  | Plan 131-06 public prerequisite verifier intentionally not run: protected v1.3.3 release failed at unauthenticated Hex dry run before publication. | open |  | 2026-08-22T20:28:47.267Z |  |
 | 17 | 133 | deviation | .planning/phases/133-repository-evidence-hygiene/133-08-PLAN.md | 41 | Literal legacy-path grep includes intentional plan-local provenance records; active-consumer reference check passed. | open |  | 2026-08-26T21:48:10.729Z |  |
+| 18 | 133 | deviation | .planning/phases/133-repository-evidence-hygiene/133-05-PLAN.md |  | Mix 1.19 rejects the planned -x option; equivalent focused suite ran without it. | open |  | 2026-08-26T22:26:41.647Z |  |
 
 ````json
 [
@@ -237,6 +238,18 @@ last_updated: 2026-08-26T21:48:10.729Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-26T21:48:10.729Z",
+    "resolved_at": null
+  },
+  {
+    "id": 18,
+    "kind": "deviation",
+    "phase": "133",
+    "file": ".planning/phases/133-repository-evidence-hygiene/133-05-PLAN.md",
+    "line": null,
+    "description": "Mix 1.19 rejects the planned -x option; equivalent focused suite ran without it.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-26T22:26:41.647Z",
     "resolved_at": null
   }
 ]
