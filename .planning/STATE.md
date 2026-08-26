@@ -5,15 +5,15 @@ milestone_name: Quality & Maintainability
 current_phase: 133
 current_phase_name: Repository & Evidence Hygiene
 status: executing
-stopped_at: Completed 133-02-PLAN.md
-last_updated: "2026-08-26T21:44:33.995Z"
+stopped_at: Completed 133-08-PLAN.md
+last_updated: "2026-08-26T21:47:34.641Z"
 last_activity: 2026-08-26
 last_activity_desc: Phase 133 execution started
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 17
-  completed_plans: 6
+  completed_plans: 7
   percent: 17
 ---
 
@@ -38,7 +38,7 @@ Last activity: 2026-08-26 — Phase 133 execution started
 ```text
 [#######.................................] 17% — 1/6 phases complete
 Phase 132 Quality Baseline & Triage ....................... Complete
-Phase 133 Repository & Evidence Hygiene ................... Pending
+Phase 133 Repository & Evidence Hygiene ................... In Progress
 Phase 134 Core Architecture & Readability ................. Pending
 Phase 135 Test & CI/CD Simplification ..................... Pending
 Phase 136 Catalog Visual Quality .......................... Pending
@@ -68,6 +68,7 @@ Phase 137 Closure & Handoff ............................... Pending
 - [Phase 133]: Manifest is the sole v1.3.4 capsule entry point; the loader returns facts only after strict validation.
 - [Phase 133]: v1.3.4 clean-room facts remain advisory; Git history, protected branches, and release tags are authoritative.
 - [Phase ?]: Phase 133: All sealed v1.3.4 capsule roles dispatch through a fixed maintainer-only fail-closed loader; journey index starts empty and append-only.
+- [Phase 133]: Phase 5 Early Ecosystem Recipes context has one v1.0 archive home, preserved as a Git-recognizable rename; plan-local legacy paths are provenance records, not consumers.
 
 ### Pending Todos
 
@@ -90,8 +91,8 @@ None outside the roadmap.
 
 ## Session Continuity
 
-Last session: 2026-08-26T21:44:33.987Z
-Stopped at: Completed 133-02-PLAN.md
+Last session: 2026-08-26T21:47:34.635Z
+Stopped at: Completed 133-08-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -114,3 +115,4 @@ Resume file: None
 | Phase 132-quality-baseline-triage P04 | 29min | 2 tasks | 9 files |
 | Phase 133 P01 | 1m | 1 tasks | 6 files |
 | Phase 133 P02 | 8min | 1 tasks | 12 files |
+| Phase 133 P08 | 2min | 1 tasks | 1 files |
