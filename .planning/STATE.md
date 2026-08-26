@@ -5,15 +5,15 @@ milestone_name: Quality & Maintainability
 current_phase: 133
 current_phase_name: Repository & Evidence Hygiene
 status: executing
-stopped_at: Phase 133 context gathered
-last_updated: "2026-08-26T21:30:04.727Z"
+stopped_at: Completed 133-01-PLAN.md
+last_updated: "2026-08-26T21:36:29.612Z"
 last_activity: 2026-08-26
-last_activity_desc: Phase 132 complete, transitioned to Phase 133
+last_activity_desc: Phase 133 execution started
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 17
-  completed_plans: 4
+  completed_plans: 5
   percent: 17
 ---
 
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-08-26)
 
 ## Current Position
 
-Phase: 133 — Repository & Evidence Hygiene
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-08-26 — Phase 132 complete, transitioned to Phase 133
+Phase: 133 (Repository & Evidence Hygiene) — EXECUTING
+Plan: 2 of 13
+Status: Executing Phase 133
+Last activity: 2026-08-26 — Phase 133 execution started
 
 ## Roadmap Snapshot (v2.14, Phases 132-137)
 
@@ -65,6 +65,8 @@ Phase 137 Closure & Handoff ............................... Pending
 - [Phase 132]: The source-bound initial snapshot is immutable; later evidence requires a new dated snapshot.
 - [Phase 132]: Archive evidence authority routes to 133, generic catalog parity to 135, and only six named visual cells to 136.
 - [Phase 132]: Objective completion uses deterministic evidence, advisory feedback, or explicit deferral; no blocking human UAT state is permitted in active phase artifacts.
+- [Phase 133]: Manifest is the sole v1.3.4 capsule entry point; the loader returns facts only after strict validation.
+- [Phase 133]: v1.3.4 clean-room facts remain advisory; Git history, protected branches, and release tags are authoritative.
 
 ### Pending Todos
 
@@ -87,9 +89,9 @@ None outside the roadmap.
 
 ## Session Continuity
 
-Last session: 2026-08-26T20:42:41.922Z
-Stopped at: Phase 133 context gathered
-Resume file: .planning/phases/133-repository-evidence-hygiene/133-CONTEXT.md
+Last session: 2026-08-26T21:36:29.587Z
+Stopped at: Completed 133-01-PLAN.md
+Resume file: None
 
 ## Next Steps
 
@@ -109,3 +111,4 @@ Resume file: .planning/phases/133-repository-evidence-hygiene/133-CONTEXT.md
 | Phase 132-quality-baseline-triage P02 | 31min | 2 tasks | 3 files |
 | Phase 132-quality-baseline-triage P03 | 34min | 2 tasks | 10 files |
 | Phase 132-quality-baseline-triage P04 | 29min | 2 tasks | 9 files |
+| Phase 133 P01 | 1m | 1 tasks | 6 files |
