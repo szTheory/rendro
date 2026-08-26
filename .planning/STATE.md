@@ -5,15 +5,15 @@ milestone_name: Quality & Maintainability
 current_phase: 133
 current_phase_name: Repository & Evidence Hygiene
 status: executing
-stopped_at: Completed 133-06-PLAN.md
-last_updated: "2026-08-26T22:33:34.215Z"
+stopped_at: Completed 133-07-PLAN.md
+last_updated: "2026-08-26T22:36:23.726Z"
 last_activity: 2026-08-26
 last_activity_desc: Phase 133 execution started
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 17
-  completed_plans: 14
+  completed_plans: 15
   percent: 17
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-26)
 ## Current Position
 
 Phase: 133 (Repository & Evidence Hygiene) — EXECUTING
-Plan: 10 of 13
+Plan: 11 of 13
 Status: Ready to execute
 Last activity: 2026-08-26 — Phase 133 execution started
 
@@ -80,6 +80,7 @@ Phase 137 Closure & Handoff ............................... Pending
 - [Phase ?]: [Phase 133]: All nine journey records remain advisory and inert; active consumers remain restricted to sealed core roles.
 - [Phase ?]: [Phase 133]: Active clean-room and public-release consumers use the validated v1.3.4 capsule loader; the advisory workflow is v1.3.4-only.
 - [Phase ?]: Journey provenance contracts retain source path, source digest, source commit, facts digest, and sidecar digest as capsule assertions rather than reading deleted legacy files.
+- [Phase ?]: [Phase 133]: Legacy journey batch B was removed only after nine-attempt/eight-sidecar capsule preservation and zero-consumer cutover were re-proven.
 
 ### Pending Todos
 
@@ -102,8 +103,8 @@ None outside the roadmap.
 
 ## Session Continuity
 
-Last session: 2026-08-26T22:33:34.208Z
-Stopped at: Completed 133-06-PLAN.md
+Last session: 2026-08-26T22:36:23.719Z
+Stopped at: Completed 133-07-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -134,3 +135,4 @@ Resume file: None
 | Phase 133 P04 | 21min | 1 tasks | 13 files |
 | Phase 133 P05 | 25min | 1 tasks | 7 files |
 | Phase 133 P06 | 8min | 1 tasks | 9 files |
+| Phase 133 P07 | 1m | 1 tasks | 9 files |
