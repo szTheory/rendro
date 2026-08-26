@@ -145,7 +145,9 @@ Key implementation sources included:
 - Pattern: do not claim beyond evidence; separate CI-proven vs external/human/advisory.
 - Seen in: `accrue`, `sigra`, `threadline`, `rulestead`.
 - Rendro default:
-  - classify every verification row as deterministic, advisory, or human-required.
+  - classify completion coverage as `deterministic`, `advisory`, or `explicit_deferral`.
+  - optional human feedback enriches evidence but cannot block completion; preserve D-13 human review as evidence authority, not completion coverage.
+  - when an objective claim cannot be automated, state it as unsupported or explicitly deferred with its reason and next action rather than treating manual review as a passing gate.
 
 ## 3) Footguns to avoid in Rendro
 
