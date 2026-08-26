@@ -355,11 +355,11 @@ if (process.argv[2] === '--check-active') {
     const danglingLink = path.join(examplesRoot, '.quality-governance-dangling-link.ex');
     fs.writeFileSync(path.join(outsideTarget, 'consumer.ex'), '# .planning/QUALITY.md');
     fs.symlinkSync(path.join(outsideTarget, 'consumer.ex'), outsideLink, 'file');
-    fs.symlinkSync(path.join(examplesRoot, '.quality-governance-missing-target.ex'), danglingLink, 'file');
 
     try {
       assert.throws(() => checkActive([]), /outside-link\.ex: in-scope symlink resolves outside the repository/);
       fs.rmSync(outsideLink, {force: true});
+      fs.symlinkSync(path.join(examplesRoot, '.quality-governance-missing-target.ex'), danglingLink, 'file');
       assert.throws(() => checkActive([]), /dangling-link\.ex: in-scope symlink cannot be resolved/);
     } finally {
       fs.rmSync(outsideLink, {force: true});
