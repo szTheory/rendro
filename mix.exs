@@ -32,6 +32,7 @@ defmodule Rendro.MixProject do
     [
       preferred_envs: [
         ci: :test,
+        "quality.baseline": :test,
         "ci.fast": :test,
         "ci.proofs": :test,
         "ci.advisory": :test,
@@ -83,6 +84,9 @@ defmodule Rendro.MixProject do
       "rendro.catalog.check": [&catalog_check/1],
       "rendro.catalog.candidate": [&catalog_candidate/1],
       "rendro.configurator.gen": [&configurator_gen/1],
+      "quality.baseline": [
+        "test --include quality_ledger_contract --only quality_ledger_contract test/quality/baseline_ledger_contract_test.exs"
+      ],
       ci: ["ci.fast", "ci.proofs"],
       "ci.fast": [
         "format --check-formatted",
