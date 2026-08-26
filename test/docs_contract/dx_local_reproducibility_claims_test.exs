@@ -19,7 +19,8 @@ defmodule Rendro.DocsContract.DxLocalReproducibilityClaimsTest do
 
     assert Keyword.fetch!(aliases, :"ci.fast") == [
              "format --check-formatted",
-             "hex.build",
+             "quality.hygiene",
+             "cmd mix hex.build",
              "compile --warnings-as-errors",
              "test --exclude quarantine --slowest 10",
              "docs --warnings-as-errors",

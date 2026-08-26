@@ -12,7 +12,8 @@ defmodule Mix.Tasks.CiAliasContractTest do
 
     assert ci_fast_steps == [
              "format --check-formatted",
-             "hex.build",
+             "quality.hygiene",
+             "cmd mix hex.build",
              "compile --warnings-as-errors",
              "test --exclude quarantine --slowest 10",
              "docs --warnings-as-errors",
