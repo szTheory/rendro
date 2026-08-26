@@ -51,6 +51,29 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
     |> List.flatten()
   end
 
+  defp record_blocks(ledger, "QL") do
+    Regex.scan(~r/^#### (QL-\d{3})[^\n]*\n(.*?)(?=^#### QL-\d{3}|^### NS-\d{3}|^## |\z)/ms, ledger,
+      capture: :all_but_first
+    )
+  end
+
+  defp record_blocks(ledger, "NS") do
+    Regex.scan(~r/^### (NS-\d{3})[^\n]*\n(.*?)(?=^### NS-\d{3}|^## |\z)/ms, ledger,
+      capture: :all_but_first
+    )
+  end
+
+  defp field(block, label) do
+    case Regex.run(~r/^- \*\*#{Regex.escape(label)}:\*\* (.+)$/m, block, capture: :all_but_first) do
+      [value] -> value
+      nil -> nil
+    end
+  end
+
+  defp ids_in(value, prefix) do
+    Regex.scan(~r/#{prefix}-[A-Z]+-\d{3}/, value || "") |> List.flatten()
+  end
+
   test "one quality finding resolves through the ledger, snapshot, and schema" do
     assert File.exists?(@ledger_path)
     assert File.exists?(@schema_path)
@@ -272,5 +295,46 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
 
     assert ledger =~ "Phase 137 adds a separate final snapshot and a before/after comparison"
     assert ledger =~ "None recorded"
+  end
+
+  test "bounded QL and NS records pin decision bases and record-local evidence" do
+    ledger = File.read!(@ledger_path)
+
+    expected = %{
+      "QL-001" => {"reject_signal", "diagnostic_signal_only", ["EV-ARCH-001", "EV-ARCH-002"], ["SIG-ARCH-001", "SIG-ARCH-002"]},
+      "QL-002" => {"repair", "supported_contract_risk", ["EV-CI-001"], ["SIG-CI-001"]},
+      "QL-003" => {"repair", "bounded_maintenance_cost", ["EV-CI-002"], ["SIG-CI-002"]},
+      "QL-004" => {"repair", "supported_contract_risk", ["EV-CATALOG-001"], ["SIG-CATALOG-001"]},
+      "NS-001" => {"reject_signal", "diagnostic_signal_only", ["EV-DEP-001"], ["SIG-DEP-001"]},
+      "NS-002" => {"reject_signal", "diagnostic_signal_only", ["EV-TEST-001"], ["SIG-TEST-001"]},
+      "NS-003" => {"reject_signal", "diagnostic_signal_only", ["EV-CI-002"], ["SIG-CI-003"]},
+      "NS-004" => {"reject_signal", "diagnostic_signal_only", ["EV-DOC-001"], ["SIG-DOC-001"]},
+      "NS-005" => {"reject_signal", "diagnostic_signal_only", ["EV-PKG-001"], ["SIG-PKG-001"]},
+      "NS-006" => {"defer", "explicit_unavailability", ["EV-REL-001"], ["SIG-REL-001"]},
+      "NS-007" => {"defer", "explicit_unavailability", ["EV-ADV-001"], ["SIG-CATALOG-002"]}
+    }
+
+    records = record_blocks(ledger, "QL") ++ record_blocks(ledger, "NS")
+    assert Enum.map(records, &hd/1) == [
+             "QL-001",
+             "QL-002",
+             "QL-003",
+             "QL-004",
+             "NS-001",
+             "NS-002",
+             "NS-003",
+             "NS-004",
+             "NS-005",
+             "NS-006",
+             "NS-007"
+           ]
+
+    for [id, block] <- records do
+      {disposition, basis, evidence_ids, signal_ids} = Map.fetch!(expected, id)
+      assert field(block, "Disposition") == disposition
+      assert field(block, "Decision basis") == basis
+      assert ids_in(field(block, "Evidence"), "EV") == evidence_ids
+      assert ids_in(block, "SIG") == signal_ids
+    end
   end
 end
