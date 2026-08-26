@@ -19,7 +19,7 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert baseline["policy"] == "additive_only"
       assert baseline["since_milestone"] == "v2.3"
       assert baseline["required_contexts"] == Enum.sort(@required_contexts)
-      assert length(baseline["contexts"]) == 3
+      assert length(baseline["contexts"]) == 4
 
       assert baseline["supersedes_planning_refs"]["pitfalls_7_viewer_evidence_schema_required"] ==
                false
@@ -455,6 +455,60 @@ defmodule Guardrails.RequiredChecksContractTest do
       for context <- baseline["contexts"] ++ baseline["advisory_contexts"] do
         assert ci =~ "  #{context["ci_job"]}:"
       end
+    end
+  end
+
+  describe "quality governance CI topology" do
+    test "quality-governance is a fail-closed ci-success roll-up member" do
+      baseline = load_baseline!()
+      workflow = load_workflow!(@ci_path)
+      jobs = workflow["jobs"]
+      governance = Map.fetch!(jobs, "quality-governance")
+      roll_up = Map.fetch!(jobs, "ci-success")
+
+      context = Enum.find(baseline["contexts"], &(&1["name"] == "quality-governance"))
+      assert context["semantic_class"] == "deterministic"
+      assert context["ci_job"] == "quality-governance"
+      assert context["command"] == "mix quality.governance"
+      assert context["notes"] =~ "roll-up"
+
+      assert is_nil(governance["needs"])
+      assert is_nil(governance["if"])
+      refute Map.has_key?(governance, "continue-on-error")
+      assert governance["env"] == %{"MIX_ENV" => "test"}
+
+      assert Enum.any?(governance["steps"], &(&1["uses"] == "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10"))
+
+      assert Enum.any?(governance["steps"], fn step ->
+               step["uses"] == "erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7" and
+                 step["with"] == %{"otp-version" => "28", "elixir-version" => "1.19.5"}
+             end)
+
+      assert Enum.any?(governance["steps"], fn step ->
+               step["uses"] == "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e" and
+                 step["with"] == %{"node-version" => "22.14.0"}
+             end)
+
+      assert Enum.any?(governance["steps"], &(&1["run"] == "mix deps.get"))
+      assert Enum.any?(governance["steps"], &(&1["run"] == "mix quality.governance"))
+      assert "quality-governance" in roll_up["needs"]
+      assert roll_up["if"] == "always()"
+      refute "quality-governance" in baseline["required_contexts"]
+      assert baseline["required_contexts"] == @required_contexts
+    end
+
+    test "topology mutations reject governance weakening and required-context inflation" do
+      workflow = load_workflow!(@ci_path)
+      governance = Map.fetch!(workflow["jobs"], "quality-governance")
+      roll_up = Map.fetch!(workflow["jobs"], "ci-success")
+      baseline = load_baseline!()
+
+      refute Map.has_key?(governance, "needs")
+      refute Map.has_key?(governance, "if")
+      refute Map.has_key?(governance, "continue-on-error")
+      refute Enum.any?(governance["steps"], &Map.has_key?(&1, "continue-on-error"))
+      assert "quality-governance" in roll_up["needs"]
+      assert baseline["required_contexts"] == ["ci-success"]
     end
   end
 
