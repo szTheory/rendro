@@ -7,20 +7,25 @@ defmodule Rendro.RepositoryEvidenceTest do
   @roles [:public_prerequisite, :release_identity, :validation, :journey_index]
   @attempt_schema "priv/schemas/release_evidence_attempt.schema.json"
 
-  test "preserves the first four journey attempts as ordered paired records" do
+  test "preserves all nine journey attempts as ordered, digest-bound records" do
     assert {:ok, index} = RepositoryEvidence.load_role(:journey_index)
 
     assert index["entries"] == [
              "RE-V134-JOURNEY-001",
              "RE-V134-JOURNEY-002",
              "RE-V134-JOURNEY-003",
-             "RE-V134-JOURNEY-004"
+             "RE-V134-JOURNEY-004",
+             "RE-V134-JOURNEY-005",
+             "RE-V134-JOURNEY-006",
+             "RE-V134-JOURNEY-007",
+             "RE-V134-JOURNEY-008",
+             "RE-V134-JOURNEY-009"
            ]
 
     manifest = @capsule |> Path.join("manifest.json") |> File.read!() |> JSON.decode!()
     attempts = Enum.filter(manifest["records"], &(&1["role"] == "journey_attempt"))
     assert Enum.map(attempts, & &1["id"]) == index["entries"]
-    assert length(Enum.uniq(index["entries"])) == 4
+    assert length(Enum.uniq(index["entries"])) == 9
 
     schema = @attempt_schema |> File.read!() |> JSON.decode!() |> JSV.build!()
 
@@ -40,13 +45,29 @@ defmodule Rendro.RepositoryEvidenceTest do
       assert attempt["id"] == id
       assert attempt["source"]["sha256"] == sha256(attempt["source"]["path"])
       assert attempt["facts"] == source_facts(attempt)
-      assert attempt["narrative"]["role"] == "explanatory_sidecar"
-      assert attempt["narrative"]["path"] == Path.join("journey", stem <> ".md")
-      assert attempt["narrative"]["sha256"] == sha256(sidecar_path)
-      assert File.read!(sidecar_path) == File.read!(source_sidecar_path(attempt))
       assert attempt["redaction"]["classification"] == "none"
       assert attempt["supersedes"] == []
+
+      case number do
+        7 ->
+          assert attempt["narrative"] == %{
+                   "role" => "absent",
+                   "reason" => "The pre-schema source has no Markdown sidecar."
+                 }
+
+          refute File.exists?(sidecar_path)
+          refute File.exists?(source_sidecar_path(attempt))
+
+        _ ->
+          assert attempt["narrative"]["role"] == "explanatory_sidecar"
+          assert attempt["narrative"]["path"] == Path.join("journey", stem <> ".md")
+          assert attempt["narrative"]["sha256"] == sha256(sidecar_path)
+          assert File.read!(sidecar_path) == File.read!(source_sidecar_path(attempt))
+      end
     end
+
+    assert length(Enum.filter(index["entries"], &(journey_has_sidecar?(&1, attempts)))) == 8
+    assert length(Enum.filter(index["entries"], &(not journey_has_sidecar?(&1, attempts)))) == 1
   end
 
   test "loads each sealed core role only through the manifest dispatch" do
@@ -229,6 +250,13 @@ defmodule Rendro.RepositoryEvidenceTest do
   defp source_sidecar_path(attempt) do
     attempt["source"]["path"]
     |> String.replace_suffix(".json", ".md")
+  end
+
+  defp journey_has_sidecar?(id, attempts) do
+    attempts
+    |> Enum.find(&(&1["id"] == id))
+    |> get_in(["narrative", "role"])
+    |> Kernel.==("explanatory_sidecar")
   end
 
   defp sha256(path),
