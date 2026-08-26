@@ -1,6 +1,6 @@
 ---
 phase: 132-quality-baseline-triage
-verified: 2026-08-26T20:15:16Z
+verified: 2026-08-26T20:21:57Z
 status: passed
 score: 12/12 must-haves verified
 behavior_unverified: 0
@@ -9,7 +9,7 @@ re_verification:
   previous_status: passed
   previous_score: 12/12
   gaps_closed:
-    - "Review-fix commits, semantic fixtures, symlink handling, and security closure rechecked from source."
+    - "Final DX topology fixes, full deterministic/proof lanes, governance, and security closure rechecked from source."
   gaps_remaining: []
   regressions: []
 ---
@@ -17,7 +17,7 @@ re_verification:
 # Phase 132: Quality Baseline & Triage Verification Report
 
 **Phase Goal:** Maintainers have a dated, reproducible quality baseline and one durable ledger that distinguishes actionable risk from low-value cleanup signals.
-**Verified:** 2026-08-26T20:15:16Z
+**Verified:** 2026-08-26T20:21:57Z
 **Status:** passed
 **Re-verification:** Yes — final audit after review-fix commits `a120632`, `2b8037f`, `c4595f1`, `84b2fd5`, and `85500e0`
 
@@ -37,7 +37,7 @@ re_verification:
 | 8 | All three prohibitions have executable semantic bad/clean descriptors. | ✓ VERIFIED | Both closed manifests enumerate PROH-132-01..03 as concrete artifact/path/text cases; Node tests inject and reject authority, consumer, and metric-decision violations while paired clean cases pass. |
 | 9 | VALIDATION, UAT, and summaries are terminal automated evidence with no pending gate. | ✓ VERIFIED | `132-VALIDATION.md` is `validated`, Nyquist-compliant and wave-complete with all Plan 01–04 rows green; `132-UAT.md` reports 4/4 automated passes, zero outstanding/skipped/blocked; AUDIT-04 coverage is deterministic. |
 | 10 | The initial snapshot is immutable under validation and later capture cannot silently overwrite it. | ✓ VERIFIED | SHA-256 was `f7a187ae4687cf0823e43786a0d58b8c571d94aded9fb79e540a998bd7b239be` before and after fresh focused validation. |
-| 11 | Governance is an independent fail-closed CI member of the sole `ci-success` required context. | ✓ VERIFIED | CI defines always-running `quality-governance`, executes `mix quality.governance`, and includes it in `ci-success.needs`; required-context registry remains exactly `[ci-success]`. Parsed topology suite passed 28 tests. |
+| 11 | Governance is an independent fail-closed CI member of the sole `ci-success` required context. | ✓ VERIFIED | CI defines always-running `quality-governance`, executes `mix quality.governance`, and includes it in the exact four-job `ci-success.needs`; required-context registry remains exactly `[ci-success]`. Combined topology/DX contract passed 31 tests. |
 | 12 | Full governance accepts the regenerated terminal phase state with no staging exception. | ✓ VERIFIED | Fresh unexceptioned `mix quality.governance` passed; it ran the 11-test baseline contract then the active scan with exit 0. The same command passed again after this report was regenerated. |
 
 **Score:** 12/12 truths verified (0 present, behavior-unverified)
@@ -78,6 +78,9 @@ Not applicable to runtime rendering. Equivalent durable-data flow is covered end
 | Unexceptioned full governance | `mix quality.governance` | baseline contract then active scan, exit 0 | ✓ PASS |
 | Semantic prohibition fixtures, scanner, and symlink bypass cases | `node --test scripts/quality_governance.cjs` | 9 tests, 0 failures | ✓ PASS |
 | CI topology / required context contract | `mix test test/guardrails/required_checks_contract_test.exs` | 28 tests, 0 failures | ✓ PASS |
+| Combined CI topology and local-DX claims | `mix test test/guardrails/required_checks_contract_test.exs test/docs_contract/dx_local_reproducibility_claims_test.exs` | 31 tests, 0 failures | ✓ PASS |
+| Full deterministic lane | `mix ci.fast` | 1,919 tests, 0 failures; Credo and Dialyzer clean | ✓ PASS |
+| Proof lane | `mix ci.proofs` | 7 tests, 0 failures; unavailable PDFium evidence remained explicitly separate | ✓ PASS |
 | Changed executable-contract formatting | `mix format --check-formatted mix.exs test/quality/baseline_ledger_contract_test.exs test/guardrails/required_checks_contract_test.exs` | exit 0 | ✓ PASS |
 | Snapshot immutability | pre/post SHA around `mix quality.baseline` | identical SHA-256 | ✓ PASS |
 
@@ -98,7 +101,7 @@ The remaining remote-CI, pinned-renderer, visual-review, and qualitative-feedbac
 
 ### Security and Bypass Audit
 
-`132-SECURITY.md` is `status: verified` with `threats_open: 0`; its 14 registered threats are closed or explicitly accepted. Fresh governance execution exercised concrete fixture semantics rather than only manifest shape, rejects inserted authority/consumer/decision violations, follows regular-file symlinks under consumer paths, and fails closed for outside-root and dangling links. Generated directories are pruned before traversal, so generated-path symlinks do not create false consumers. CI topology remains an always-running `quality-governance` job inside strict `ci-success`, with `ci-success` the sole required context.
+`132-SECURITY.md` is `status: verified` with `threats_open: 0`; its 14 registered threats are closed or explicitly accepted. Fresh governance execution exercised concrete fixture semantics rather than only manifest shape, rejects inserted authority/consumer/decision violations, follows regular-file symlinks under consumer paths, and fails closed for outside-root and dangling links. Generated directories are pruned before traversal, so generated-path symlinks do not create false consumers. The final local-DX contract matches the exact four-job `ci-success.needs` topology. CI topology remains an always-running `quality-governance` job inside strict `ci-success`, with `ci-success` the sole required context.
 
 ### Anti-Patterns Found
 
@@ -106,5 +109,5 @@ No debt marker, placeholder, empty implementation, hardcoded output stub, active
 
 ---
 
-_Verified: 2026-08-26T20:15:16Z_
+_Verified: 2026-08-26T20:21:57Z_
 _Verifier: the agent (gsd-verifier)_
