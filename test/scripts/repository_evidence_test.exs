@@ -6,6 +6,23 @@ defmodule Rendro.RepositoryEvidenceTest do
   @capsule Path.expand("../../evidence/releases/v1.3.4", __DIR__)
   @roles [:public_prerequisite, :release_identity, :validation, :journey_index]
 
+  test "preserves the first four journey attempts as ordered paired records" do
+    assert {:ok, index} = RepositoryEvidence.load_role(:journey_index)
+
+    assert index["entries"] == [
+             "RE-V134-JOURNEY-001",
+             "RE-V134-JOURNEY-002",
+             "RE-V134-JOURNEY-003",
+             "RE-V134-JOURNEY-004"
+           ]
+
+    for number <- 1..4 do
+      stem = "journey-" <> String.pad_leading(Integer.to_string(number), 3, "0")
+      assert File.regular?(Path.join([@capsule, "journey", stem <> ".json"]))
+      assert File.regular?(Path.join([@capsule, "journey", stem <> ".md"]))
+    end
+  end
+
   test "loads each sealed core role only through the manifest dispatch" do
     for role <- @roles do
       assert {:ok, payload} = RepositoryEvidence.load_role(role)
