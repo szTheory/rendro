@@ -65,6 +65,15 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
     File.rm_rf!(directory)
   end
 
+  test "documents only the implemented capsule-only clean-room invocation" do
+    inventory = File.read!(Path.expand("../../scripts/README.md", __DIR__))
+
+    assert inventory =~
+             "mix run scripts/phoenix_clean_room_proof.exs -- --root PATH --output PATH"
+
+    refute inventory =~ "scripts/phoenix_clean_room_proof.exs -- --prerequisite"
+  end
+
   test "cleanup failures turn an otherwise-successful run into bounded failure" do
     root =
       Path.join(
