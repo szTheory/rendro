@@ -207,6 +207,34 @@ defmodule Rendro.RepositoryEvidenceTest do
     end
   end
 
+  test "fails closed when journey index records, payloads, or sidecars no longer match" do
+    for {name, mutate} <- [
+          {"duplicate index entry",
+           fn root ->
+             replace_payload(root, "journey/index.json", "entries", ["RE-V134-JOURNEY-001"])
+             sync_record_digest(root, "journey_index")
+           end},
+          {"journey payload ID",
+           fn root ->
+             replace_payload(root, "journey/journey-001.json", "id", "RE-V134-JOURNEY-999")
+             sync_record_digest(root, "journey_attempt")
+           end},
+          {"journey sidecar digest",
+           fn root ->
+             File.write!(journey_path(root, "journey-001.md"), "altered explanatory evidence")
+           end}
+        ] do
+      with_temporary_capsule(fn root ->
+        mutate.(root)
+
+        assert {:error, diagnostics} = RepositoryEvidence.load_role(:journey_index, root: root),
+               "#{name} must fail closed"
+
+        assert diagnostics == Enum.sort(diagnostics)
+      end)
+    end
+  end
+
   defp mutations do
     [
       {"requested role versus manifest role mismatch",
@@ -239,15 +267,14 @@ defmodule Rendro.RepositoryEvidenceTest do
   defp with_temporary_capsule(fun) do
     root = Path.join(System.tmp_dir!(), "rendro-evidence-#{System.unique_integer([:positive])}")
     destination = Path.join([root, "evidence", "releases", "v1.3.4"])
-    File.mkdir_p!(Path.join(destination, "journey"))
 
-    for path <- [
-          "manifest.json",
-          "public_prerequisite.json",
-          "release_identity.json",
-          "validation.json",
-          "journey/index.json"
-        ] do
+    for path <-
+          [
+            "manifest.json",
+            "public_prerequisite.json",
+            "release_identity.json",
+            "validation.json"
+          ] ++ journey_files() do
       target = Path.join(destination, path)
       File.mkdir_p!(Path.dirname(target))
       File.cp!(Path.join(@capsule, path), target)
@@ -309,6 +336,16 @@ defmodule Rendro.RepositoryEvidenceTest do
 
   defp manifest_path(root),
     do: Path.join([root, "evidence", "releases", "v1.3.4", "manifest.json"])
+
+  defp journey_files do
+    @capsule
+    |> Path.join("journey")
+    |> Path.wildcard()
+    |> Enum.map(&Path.relative_to(&1, @capsule))
+  end
+
+  defp journey_path(root, name),
+    do: Path.join([root, "evidence", "releases", "v1.3.4", "journey", name])
 
   defp sha256_json(value), do: value |> Jason.encode!() |> sha256_contents()
 

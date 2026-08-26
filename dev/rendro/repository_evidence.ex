@@ -42,7 +42,14 @@ defmodule Rendro.RepositoryEvidence do
          {:ok, payload} <- load_json(payload_path, requested_role),
          :ok <-
            validate_schema(payload, Map.fetch!(@role_schemas, requested_role), requested_role),
-         :ok <- validate_role_and_binding(manifest["release"], record, payload) do
+         :ok <- validate_role_and_binding(manifest["release"], record, payload),
+         :ok <-
+           validate_journey_records(
+             capsule_root,
+             manifest["release"],
+             manifest["records"],
+             payload
+           ) do
       {:ok, payload}
     else
       {:error, diagnostics} when is_list(diagnostics) -> {:error, Enum.sort(diagnostics)}
@@ -150,4 +157,66 @@ defmodule Rendro.RepositoryEvidence do
       {:error, "#{record["role"]} role or release/candidate/tag binding mismatch"}
     end
   end
+
+  defp validate_journey_records(_, _, _, %{"role" => role}) when role != "journey_index", do: :ok
+
+  defp validate_journey_records(capsule_root, release, records, %{"entries" => entries}) do
+    attempts = Enum.filter(records, &(&1["role"] == "journey_attempt"))
+
+    with :ok <- validate_journey_index_entries(entries, attempts) do
+      Enum.reduce_while(attempts, :ok, fn record, :ok ->
+        case validate_journey_record(capsule_root, release, record) do
+          :ok -> {:cont, :ok}
+          {:error, _} = error -> {:halt, error}
+        end
+      end)
+    end
+  end
+
+  defp validate_journey_index_entries(entries, attempts) do
+    attempt_ids = Enum.map(attempts, & &1["id"])
+
+    if entries == attempt_ids and length(entries) == length(Enum.uniq(entries)) do
+      :ok
+    else
+      {:error, "journey index entries must exactly match ordered manifest journey attempts"}
+    end
+  end
+
+  defp validate_journey_record(capsule_root, release, record) do
+    with :ok <- validate_record_media_type(record),
+         {:ok, path} <- confined_regular_path(capsule_root, record["path"]),
+         :ok <- verify_digest(path, record["sha256"]),
+         {:ok, payload} <- load_json(path, "journey attempt"),
+         :ok <-
+           validate_schema(
+             payload,
+             "priv/schemas/release_evidence_attempt.schema.json",
+             "journey attempt"
+           ),
+         :ok <- validate_journey_binding(release, record, payload),
+         :ok <- validate_journey_sidecar(capsule_root, payload) do
+      :ok
+    end
+  end
+
+  defp validate_journey_binding(release, record, payload) do
+    if payload["id"] == record["id"] do
+      validate_role_and_binding(release, record, payload)
+    else
+      {:error, "journey attempt ID does not match manifest record"}
+    end
+  end
+
+  defp validate_journey_sidecar(capsule_root, %{
+         "narrative" => %{"role" => "explanatory_sidecar", "path" => path, "sha256" => digest}
+       }) do
+    with {:ok, sidecar_path} <- confined_regular_path(capsule_root, path),
+         :ok <- verify_digest(sidecar_path, digest) do
+      :ok
+    end
+  end
+
+  defp validate_journey_sidecar(_, %{"narrative" => %{"role" => "absent"}}), do: :ok
+  defp validate_journey_sidecar(_, _), do: {:error, "journey attempt narrative is invalid"}
 end
