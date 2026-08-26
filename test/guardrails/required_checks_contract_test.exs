@@ -161,7 +161,7 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert ci_fast_steps == [
                "format --check-formatted",
                "quality.hygiene",
-               "hex.build",
+               "cmd mix hex.build",
                "compile --warnings-as-errors",
                "test --exclude quarantine --slowest 10",
                "docs --warnings-as-errors",
