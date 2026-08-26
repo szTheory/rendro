@@ -339,8 +339,9 @@ defmodule Rendro.RepositoryEvidenceTest do
 
   defp journey_files do
     @capsule
-    |> Path.join("journey")
+    |> Path.join("journey/*")
     |> Path.wildcard()
+    |> Enum.filter(&File.regular?/1)
     |> Enum.map(&Path.relative_to(&1, @capsule))
   end
 
