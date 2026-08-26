@@ -24,4 +24,16 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
     assert ledger =~ "EV-ARCH-001"
     assert ledger =~ @snapshot_path
   end
+
+  test "evidence and signal identities carry explicit provenance" do
+    snapshot = @snapshot_path |> File.read!() |> JSON.decode!()
+    [evidence] = snapshot["evidence_items"]
+    [signal] = evidence["signal_candidates"]
+
+    assert evidence["registered_command"]["invocation"] ==
+             "mix xref graph --format stats --label compile-connected"
+
+    assert evidence["provenance"]["source_sha"] == snapshot["source_sha"]
+    assert signal["source_evidence_id"] == evidence["id"]
+  end
 end
