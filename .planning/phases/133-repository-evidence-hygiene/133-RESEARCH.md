@@ -297,15 +297,15 @@ All findings are based on the locked phase context, repository source/history, o
 
 ## Open Questions
 
-1. **Exact current package member manifest**
-   - What we know: the package build succeeds and the explicit allowlist currently ships public adoption evidence; it also exposes `bench/results/raw/*` in the unpacked artifact. [VERIFIED: codebase scan]
-   - What's unclear: whether every benchmark raw JSON/PDF member is intentionally public under D-22/D-23.
-   - Recommendation: capture the full normalized current list, classify each non-runtime member with owner/reason, and remove raw proof artifacts unless the owner records a narrow public package exception.
+1. **Exact current package member manifest (RESOLVED)**
+   - Final classification: keep only `bench/results/comparison.json` and the five manifest-referenced JSON records (`raw/rendro.json`, `raw/chromic_pdf.json`, `raw/chromic_pdf_warm_pool.json`, `raw/pdf_generator.json`, and `raw/typst_cli.json`) as intentionally public package assets. Their narrow owner is the public comparison-guide evidence contract: every result is marked `public: true`, the guide names each JSON record as its evidence, and the docs-contract package test requires those manifest-referenced records in Hex. [VERIFIED: codebase scan]
+   - Must leave the package: every raw benchmark PDF (`chromic_pdf.pdf`, `chromic_pdf_warm_pool.pdf`, `pdf_generator.pdf`, `typst_cli.pdf`, and `rendro.pdf`), `plan01-static-fixture.json`, and `.gitkeep`. They are raw proof/test material rather than public claim inputs; `.gitkeep` is unnecessary once public JSON files remain. Move the current PDF.js fixture use of `raw/rendro.pdf` to a `test/fixtures/` copy and update its observer/contract references, so the package has no raw proof PDF exception. [VERIFIED: codebase scan]
+   - Recommendation: the versioned package-member manifest must list the six intentional comparison assets explicitly, assign them owner role `comparison evidence maintainer`, and reject all other `bench/results/raw/` members. [VERIFIED: codebase scan]
 
-2. **Retained script inventory ownership**
-   - What we know: `repo_hygiene_check.sh` and `render_logo.exs` have no current caller in the scanned workflow/Mix/docs/test surfaces; `audit_branch_protection.exs` also has no scanned caller. [VERIFIED: codebase scan]
-   - What's unclear: whether maintainers invoke any of these as undocumented operator procedures.
-   - Recommendation: document a current role/invocation/review trigger in `scripts/README.md` or remove each after the required entry-point/reference check; do not preserve legacy shell hygiene.
+2. **Retained script inventory ownership (RESOLVED)**
+   - Remove `scripts/repo_hygiene_check.sh`: it has no current caller, contradicts the D-26 local-debris boundary, and D-20 requires one canonical `mix quality.hygiene` command. No compatibility wrapper is justified because no documented caller exists. [VERIFIED: codebase scan]
+   - Remove `scripts/audit_branch_protection.exs` and `scripts/render_logo.exs`: neither has a current workflow, Mix alias/task, docs invocation, or focused test caller. The branch-protection script is only mentioned in historical planning and its stated Phase 72 close ritual is complete; the logo generator has no current caller. [VERIFIED: codebase scan]
+   - Retain every other tracked helper only with the explicit role/purpose/invocation/input-output/lane/caller/review-trigger row required by D-17. Current caller evidence supports: adoption snapshot (focused contract test); clean-room proof (release workflow and tests); viewer/signing fixtures (recorder, scripts, docs/tests); quality governance (Mix alias); release preflight (Mix/CI/tests); docs/livebook/public-URL verification (Mix/CI/tests); public-release verification (focused tests); and proof requirements/PDF.js/configurator support files (their active workflow or test callers). `scripts/README.md` is the authoritative inventory; absence from it or loss of the listed caller becomes a removal trigger. [VERIFIED: codebase scan]
 
 ## Environment Availability
 
