@@ -1,11 +1,11 @@
 ---
 phase: 130
 slug: catalog-quality-evidence-ratchet
-status: complete
+status: validated
 nyquist_compliant: true
 wave_0_complete: true
 created: 2026-08-19
-revised: 2026-08-21
+revised: 2026-08-26
 ---
 
 # Phase 130 — Validation Strategy
@@ -135,3 +135,17 @@ The prior formatting and Dialyzer gates were resolved through separately authori
 - [x] `nyquist_compliant: true` and `wave_0_complete: true` are withheld until every 130-11 gate is green.
 
 **Approval:** complete — final deterministic, advisory, human-evidence, and exact-cleanup closure recorded.
+
+## Validation Audit — 2026-08-26
+
+| Metric | Count |
+|---|---:|
+| Gaps found | 0 |
+| Resolved | 0 |
+| Escalated | 0 |
+
+- State A audit: the existing validation strategy, all eleven plans, and all eleven summaries were cross-referenced.
+- CATALOG-06 through CATALOG-09 each retain behavior-targeted automated coverage; the bounded full-size human judgments and pinned-PDFium evidence remain explicitly separate from deterministic authority.
+- Fresh deterministic closure: `mix ci.fast` passed with 12 doctests, 8 properties, 1,917 tests, 0 failures, and 28 excluded live/advisory tests; documentation, Credo, and Dialyzer also passed.
+- Fresh catalog closure: `mix rendro.catalog.check` returned `Catalog VERIFIED`; live cardinality remains 32 catalog cells and 12 scored dispositions.
+- No test files were generated because no requirement was classified PARTIAL or MISSING. Lifecycle metadata is now authoritative with `status: validated`.
