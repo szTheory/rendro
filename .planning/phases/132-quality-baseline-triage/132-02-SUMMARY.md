@@ -54,10 +54,9 @@ coverage:
     requirement: AUDIT-04
     verification:
       - kind: integration
-        ref: "mix quality.baseline"
+        ref: "mix quality.baseline; baseline_ledger_contract_test.exs Decision basis and metric-only authority mutations; node --test scripts/quality_governance.cjs"
         status: pass
-    human_judgment: true
-    rationale: "Priority and disposition remain evidence-gated maintainer judgment."
+    human_judgment: false
 duration: 31min
 completed: 2026-08-26
 status: complete
