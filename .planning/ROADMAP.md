@@ -17,7 +17,7 @@
 
 **Milestone Goal:** Raise Rendro's engineering, repository, CI/CD, test, documentation, and targeted catalog quality without changing supported capability scope, public contracts, or unrelated rendered bytes.
 
-- [ ] **Phase 132: Quality Baseline & Triage** — Establish the durable evidence ledger, compatibility contract, and risk-ranked finding set that governs all later work.
+- [x] **Phase 132: Quality Baseline & Triage** — Establish the durable evidence ledger, compatibility contract, and risk-ranked finding set that governs all later work. (completed 2026-08-26)
 - [ ] **Phase 133: Repository & Evidence Hygiene** — Remove active-product coupling to archived planning and make repository, package, and evidence boundaries durable.
 - [ ] **Phase 134: Core Architecture & Readability** — Resolve accepted high-value internal design, dead-code, specification, documentation, and comment findings conservatively.
 - [ ] **Phase 135: Test & CI/CD Simplification** — Preserve behavioral and authority coverage while consolidating brittle tests and milestone-specific workflow machinery.
@@ -122,7 +122,7 @@ Plans:
 
 | Phase | Requirements | Plans Complete | Status | Completed |
 |-------|--------------|----------------|--------|-----------|
-| 132. Quality Baseline & Triage | 4 | 2/2 | In Progress|  |
+| 132. Quality Baseline & Triage | 4 | 4/4 | Complete    | 2026-08-26 |
 | 133. Repository & Evidence Hygiene | 4 | 0/TBD | Not started | — |
 | 134. Core Architecture & Readability | 4 | 0/TBD | Not started | — |
 | 135. Test & CI/CD Simplification | 7 | 0/TBD | Not started | — |
