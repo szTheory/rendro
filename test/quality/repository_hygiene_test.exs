@@ -10,6 +10,7 @@ defmodule Rendro.RepositoryHygieneTest do
 
     assert manifest["version"] == 1
     assert manifest["members"] == Enum.sort(manifest["members"])
+
     assert Enum.filter(manifest["members"], &String.starts_with?(&1, "bench/results/")) == [
              "bench/results/comparison.json",
              "bench/results/raw/chromic_pdf.json",
@@ -40,8 +41,16 @@ defmodule Rendro.RepositoryHygieneTest do
 
     assert diagnostics == Enum.sort(diagnostics)
     assert Enum.any?(diagnostics, &String.contains?(&1, "missing package member: lib/rendro.ex"))
-    assert Enum.any?(diagnostics, &String.contains?(&1, "unexpected package member: .planning/QUALITY.md"))
-    assert Enum.any?(diagnostics, &String.contains?(&1, "forbidden package member: scripts/leak.exs"))
+
+    assert Enum.any?(
+             diagnostics,
+             &String.contains?(&1, "unexpected package member: .planning/QUALITY.md")
+           )
+
+    assert Enum.any?(
+             diagnostics,
+             &String.contains?(&1, "forbidden package member: scripts/leak.exs")
+           )
   end
 
   test "tracked placement is NUL-safe and permits only active or archived phase shapes" do
@@ -58,7 +67,8 @@ defmodule Rendro.RepositoryHygieneTest do
   test "operational scans reject archive consumers but allow the narrow gsd tooling exception" do
     sources = %{
       "lib/rendro.ex" => "File.read!(\".planning/phases/131-old/131-FACTS.md\")",
-      "scripts/quality_governance.cjs" => "const path = '.planning/phases/132-quality-baseline-triage';"
+      "scripts/quality_governance.cjs" =>
+        "const path = '.planning/phases/132-quality-baseline-triage';"
     }
 
     assert {:error, diagnostics} = RepositoryHygiene.check_operational_sources(sources)
@@ -83,25 +93,34 @@ defmodule Rendro.RepositoryHygieneTest do
 
   test "private runs use distinct temp roots, clean them after failure, and leave authoritative bytes unchanged" do
     authoritative = File.read!(@manifest)
-    parent = Path.join(System.tmp_dir!(), "rendro-hygiene-test-#{System.unique_integer([:positive])}")
+
+    parent =
+      Path.join(System.tmp_dir!(), "rendro-hygiene-test-#{System.unique_integer([:positive])}")
+
     on_exit(fn -> File.rm_rf(parent) end)
+    test_process = self()
 
     runner = fn root ->
       File.mkdir_p!(root)
-      send(self(), {:hygiene_root, root})
+      send(test_process, {:hygiene_root, root})
       {:error, ["forced failure"]}
     end
 
-    assert {:error, ["forced failure"]} =
-             RepositoryHygiene.run(build: runner, temp_parent: parent, skip_checks: true)
+    runs =
+      for _ <- 1..2 do
+        Task.async(fn ->
+          RepositoryHygiene.run(build: runner, temp_parent: parent, skip_checks: true)
+        end)
+      end
+
+    assert Enum.map(runs, &Task.await(&1, 5_000)) == [
+             {:error, ["forced failure"]},
+             {:error, ["forced failure"]}
+           ]
 
     assert_receive {:hygiene_root, first_root}
-    refute File.exists?(first_root)
-
-    assert {:error, ["forced failure"]} =
-             RepositoryHygiene.run(build: runner, temp_parent: parent, skip_checks: true)
-
     assert_receive {:hygiene_root, second_root}
+    refute File.exists?(first_root)
     refute first_root == second_root
     refute File.exists?(second_root)
     assert File.read!(@manifest) == authoritative
