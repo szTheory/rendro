@@ -5,6 +5,7 @@ defmodule Rendro.RepositoryEvidenceTest do
 
   @capsule Path.expand("../../evidence/releases/v1.3.4", __DIR__)
   @roles [:public_prerequisite, :release_identity, :validation, :journey_index]
+  @attempt_schema "priv/schemas/release_evidence_attempt.schema.json"
 
   test "preserves the first four journey attempts as ordered paired records" do
     assert {:ok, index} = RepositoryEvidence.load_role(:journey_index)
@@ -16,10 +17,35 @@ defmodule Rendro.RepositoryEvidenceTest do
              "RE-V134-JOURNEY-004"
            ]
 
-    for number <- 1..4 do
+    manifest = @capsule |> Path.join("manifest.json") |> File.read!() |> JSON.decode!()
+    attempts = Enum.filter(manifest["records"], &(&1["role"] == "journey_attempt"))
+    assert Enum.map(attempts, & &1["id"]) == index["entries"]
+    assert length(Enum.uniq(index["entries"])) == 4
+
+    schema = @attempt_schema |> File.read!() |> JSON.decode!() |> JSV.build!()
+
+    for {id, number} <- Enum.with_index(index["entries"], 1) do
       stem = "journey-" <> String.pad_leading(Integer.to_string(number), 3, "0")
-      assert File.regular?(Path.join([@capsule, "journey", stem <> ".json"]))
-      assert File.regular?(Path.join([@capsule, "journey", stem <> ".md"]))
+      json_path = Path.join([@capsule, "journey", stem <> ".json"])
+      sidecar_path = Path.join([@capsule, "journey", stem <> ".md"])
+      record = Enum.find(attempts, &(&1["id"] == id))
+
+      assert File.regular?(json_path)
+      assert File.regular?(sidecar_path)
+      assert record["path"] == Path.join("journey", stem <> ".json")
+      assert record["sha256"] == sha256(json_path)
+
+      attempt = json_path |> File.read!() |> JSON.decode!()
+      assert {:ok, _} = JSV.validate(attempt, schema)
+      assert attempt["id"] == id
+      assert attempt["source"]["sha256"] == sha256(attempt["source"]["path"])
+      assert attempt["facts"] == source_facts(attempt)
+      assert attempt["narrative"]["role"] == "explanatory_sidecar"
+      assert attempt["narrative"]["path"] == Path.join("journey", stem <> ".md")
+      assert attempt["narrative"]["sha256"] == sha256(sidecar_path)
+      assert File.read!(sidecar_path) == File.read!(source_sidecar_path(attempt))
+      assert attempt["redaction"]["classification"] == "none"
+      assert attempt["supersedes"] == []
     end
   end
 
@@ -193,4 +219,18 @@ defmodule Rendro.RepositoryEvidenceTest do
 
   defp manifest_path(root),
     do: Path.join([root, "evidence", "releases", "v1.3.4", "manifest.json"])
+
+  defp source_facts(attempt) do
+    attempt["source"]["path"]
+    |> File.read!()
+    |> JSON.decode!()
+  end
+
+  defp source_sidecar_path(attempt) do
+    attempt["source"]["path"]
+    |> String.replace_suffix(".json", ".md")
+  end
+
+  defp sha256(path),
+    do: :crypto.hash(:sha256, File.read!(path)) |> Base.encode16(case: :lower)
 end

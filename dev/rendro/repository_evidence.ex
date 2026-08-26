@@ -80,9 +80,17 @@ defmodule Rendro.RepositoryEvidence do
   end
 
   defp validate_record_uniqueness(records) do
+    singleton_roles =
+      records
+      |> Enum.reject(&(&1["role"] == "journey_attempt"))
+      |> Enum.map(& &1["role"])
+
     diagnostics =
-      for {key, label} <- [{"id", "ID"}, {"path", "path"}, {"role", "role"}],
-          values = Enum.map(records, & &1[key]),
+      for {values, label} <- [
+            {Enum.map(records, & &1["id"]), "ID"},
+            {Enum.map(records, & &1["path"]), "path"},
+            {singleton_roles, "role"}
+          ],
           length(values) != length(Enum.uniq(values)),
           do: "manifest has duplicate record #{label}"
 
