@@ -3,28 +3,54 @@ defmodule Rendro.RepositoryEvidence do
 
   @capsule ["evidence", "releases", "v1.3.4"]
   @manifest_schema "priv/schemas/release_evidence_manifest.schema.json"
-  @prerequisite_schema "priv/schemas/release_evidence_prerequisite.schema.json"
+  @role_schemas %{
+    "public_prerequisite" => "priv/schemas/release_evidence_prerequisite.schema.json",
+    "release_identity" => "priv/schemas/release_evidence_identity.schema.json",
+    "validation" => "priv/schemas/release_evidence_validation.schema.json",
+    "journey_index" => "priv/schemas/release_evidence_journey_index.schema.json"
+  }
+  @core_roles Map.keys(@role_schemas)
 
   @spec load_public_prerequisite(keyword()) :: {:ok, map()} | {:error, [String.t()]}
   def load_public_prerequisite(options \\ []) do
+    with {:ok, payload} <- load_role(:public_prerequisite, options) do
+      {:ok, payload["facts"]}
+    end
+  end
+
+  @spec load_role(
+          :public_prerequisite | :release_identity | :validation | :journey_index,
+          keyword()
+        ) ::
+          {:ok, map()} | {:error, [String.t()]}
+  def load_role(role, options \\ [])
+
+  def load_role(role, options)
+      when role in [:public_prerequisite, :release_identity, :validation, :journey_index] do
     root = options |> Keyword.get(:root, File.cwd!()) |> Path.expand()
     capsule_root = Path.join([root | @capsule])
+    requested_role = Atom.to_string(role)
 
     with {:ok, manifest} <- load_json(Path.join(capsule_root, "manifest.json"), "manifest"),
          :ok <- validate_schema(manifest, @manifest_schema, "manifest"),
          :ok <- validate_record_uniqueness(manifest["records"]),
-         {:ok, record} <- fetch_public_prerequisite(manifest["records"]),
+         :ok <- validate_core_roles(manifest["records"]),
+         {:ok, record} <- fetch_role(manifest["records"], requested_role),
+         :ok <- validate_record_media_type(record),
          {:ok, payload_path} <- confined_regular_path(capsule_root, record["path"]),
          :ok <- verify_digest(payload_path, record["sha256"]),
-         {:ok, payload} <- load_json(payload_path, "public prerequisite"),
-         :ok <- validate_schema(payload, @prerequisite_schema, "public prerequisite"),
-         :ok <- validate_binding(manifest["release"], payload) do
-      {:ok, payload["facts"]}
+         {:ok, payload} <- load_json(payload_path, requested_role),
+         :ok <-
+           validate_schema(payload, Map.fetch!(@role_schemas, requested_role), requested_role),
+         :ok <- validate_role_and_binding(manifest["release"], record, payload) do
+      {:ok, payload}
     else
       {:error, diagnostics} when is_list(diagnostics) -> {:error, Enum.sort(diagnostics)}
       {:error, diagnostic} -> {:error, [diagnostic]}
     end
   end
+
+  def load_role(_, _), do: {:error, ["unknown repository evidence role"]}
 
   defp load_json(path, label) do
     with {:ok, stat} <- File.lstat(path),
@@ -63,13 +89,22 @@ defmodule Rendro.RepositoryEvidence do
     if diagnostics == [], do: :ok, else: {:error, diagnostics}
   end
 
-  defp fetch_public_prerequisite(records) do
-    case Enum.filter(records, &(&1["role"] == "public_prerequisite")) do
+  defp validate_core_roles(records) do
+    present = MapSet.new(records, & &1["role"])
+    missing = Enum.reject(@core_roles, &MapSet.member?(present, &1))
+    if missing == [], do: :ok, else: {:error, Enum.map(missing, &"manifest has no #{&1} record")}
+  end
+
+  defp fetch_role(records, role) do
+    case Enum.filter(records, &(&1["role"] == role)) do
       [record] -> {:ok, record}
-      [] -> {:error, "manifest has no public_prerequisite record"}
+      [] -> {:error, "manifest has no #{role} record"}
       _ -> {:error, "manifest has duplicate record role"}
     end
   end
+
+  defp validate_record_media_type(%{"media_type" => "application/json"}), do: :ok
+  defp validate_record_media_type(_), do: {:error, "manifest record media type is unsupported"}
 
   defp confined_regular_path(root, relative_path) when is_binary(relative_path) do
     expanded = Path.expand(relative_path, root)
@@ -96,14 +131,15 @@ defmodule Rendro.RepositoryEvidence do
     if actual == expected, do: :ok, else: {:error, "manifest record digest mismatch"}
   end
 
-  defp validate_binding(release, payload) do
-    facts = payload["facts"]
+  defp validate_role_and_binding(release, record, payload) do
+    facts = payload["facts"] || %{}
+    candidate = payload["candidate_commit_sha"] || facts["candidate_commit_sha"]
 
-    if payload["release"] == release and facts["version"] == release["version"] and
-         facts["tag"] == release["tag"] do
+    if payload["role"] == record["role"] and payload["release"] == release and
+         candidate == release["candidate_commit_sha"] do
       :ok
     else
-      {:error, "public prerequisite release binding mismatch"}
+      {:error, "#{record["role"]} role or release/candidate/tag binding mismatch"}
     end
   end
 end

@@ -3,7 +3,8 @@
   "role": "public_prerequisite",
   "release": {
     "version": "1.3.4",
-    "tag": "v1.3.4"
+    "tag": "v1.3.4",
+    "candidate_commit_sha": "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
   },
   "facts": {
     "version": "1.3.4",

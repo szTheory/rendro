@@ -2,23 +2,57 @@
   "schema_version": 1,
   "release": {
     "version": "1.3.4",
-    "tag": "v1.3.4"
+    "tag": "v1.3.4",
+    "candidate_commit_sha": "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
   },
   "records": [
     {
       "id": "RE-V134-PUBLIC-PREREQUISITE",
       "role": "public_prerequisite",
       "path": "public_prerequisite.json",
-      "sha256": "317c7af5de09dd0851f6ce689adbc2c512ac8c5a51d5538ab3777da700a7776e",
+      "sha256": "6b8f90fdaa796f5d738c171db6648b327a0a2dee3703e0ad9e0eb5c3f5a8e6c0",
       "media_type": "application/json",
       "lane": "advisory",
       "authority": "operational",
       "status": "preserved",
       "retention": "immutable",
-      "provenance": {
-        "source_path": ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json",
-        "import_reason": "preserved v1.3.4 public prerequisite facts"
-      }
+      "provenance": {"source_path": ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json", "import_reason": "preserved v1.3.4 public prerequisite facts"}
+    },
+    {
+      "id": "RE-V134-RELEASE-IDENTITY",
+      "role": "release_identity",
+      "path": "release_identity.json",
+      "sha256": "31b8b0878c0a6abf292d440cbd08ef829143fd47c191010b349727302ddcdc6e",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {"source_path": ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-RELEASE-CANDIDATE.md", "import_reason": "preserved v1.3.4 release identity"}
+    },
+    {
+      "id": "RE-V134-VALIDATION",
+      "role": "validation",
+      "path": "validation.json",
+      "sha256": "30537a8ef8ca652d58f9b6af0a8f2877f5750c2b904a4482fc6fe24750c611a8",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {"source_path": ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-VALIDATION.md", "import_reason": "preserved successful journey identities"}
+    },
+    {
+      "id": "RE-V134-JOURNEY-INDEX",
+      "role": "journey_index",
+      "path": "journey/index.json",
+      "sha256": "c04bc97b27ec5accface1297efa809649f0c7302418ee3d35bd606d118c77b17",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "append_only",
+      "provenance": {"source_path": ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-VALIDATION.md", "import_reason": "prepared ordered attempt index"}
     }
   ]
 }
