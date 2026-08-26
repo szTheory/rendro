@@ -11,15 +11,22 @@ const verificationPath = path.join(phasesRoot, '132-quality-baseline-triage', '1
 const staleVerificationSha = '1ade3d2f9e772ff2871253c435662fb33b146d13f61c54d8422e2ec7d13b2dfd';
 const staleVerificationCommit = 'be640780df7852387b493b392b7eb148308ea01b';
 const ids = ['PROH-132-01', 'PROH-132-02', 'PROH-132-03'];
-const expectedKinds = {
-  violation: ['authority_inflation', 'consumer_leak', 'metric_only_authority'],
-  clean: ['unavailable_semantics', 'approved_consumer', 'evidence_gated_decision']
-};
+const ledgerReference = /\.planning\/(?:QUALITY\.md|quality\/baselines\/132-initial\.json)/;
+const approvedLedgerConsumers = new Set(['test/quality/baseline_ledger_contract_test.exs']);
+const humanStatePatterns = [
+  /^\s*(?:-\s*)?human_judgment\s*:\s*true\b/im,
+  /^\s*(?:-\s*)?human_needed(?:\s*:\s*true\b|\s*)$/im,
+  /^\s*(?:-\s*)?human_verification(?:\s*:\s*true\b|\s*)$/im
+];
 
-function readManifest(relativePath, flavor) {
-  if (path.isAbsolute(relativePath) || relativePath.split(/[\\/]/).includes('..')) {
+function assertRepositoryRelative(relativePath) {
+  if (typeof relativePath !== 'string' || path.isAbsolute(relativePath) || relativePath.split(/[\\/]/).includes('..')) {
     throw new Error('fixture path must be repository-relative without traversal');
   }
+}
+
+function readManifest(relativePath, flavor) {
+  assertRepositoryRelative(relativePath);
 
   const manifest = JSON.parse(fs.readFileSync(path.join(root, relativePath), 'utf8'));
   assert.deepEqual(Object.keys(manifest).sort(), ['cases', 'version']);
@@ -28,22 +35,44 @@ function readManifest(relativePath, flavor) {
 
   ids.forEach((id, index) => {
     const item = manifest.cases[id];
-    assert.deepEqual(Object.keys(item).sort(), ['kind']);
-    assert.equal(item.kind, expectedKinds[flavor][index]);
+    assert.deepEqual(Object.keys(item).sort(), ['artifact']);
+    assert.deepEqual(Object.keys(item.artifact).sort(), ['path', 'text']);
+    assertRepositoryRelative(item.artifact.path);
+    assert.equal(typeof item.artifact.text, 'string');
   });
 
   return manifest;
 }
 
-function validateVirtualArtifact(kind, flavor) {
-  const valid = new Set(expectedKinds[flavor]);
-  if (!valid.has(kind)) return false;
+function governanceMarkers(text) {
+  return [...text.matchAll(/<!--\s*quality-governance:\s*({[^>]*})\s*-->/g)].map((match) => JSON.parse(match[1]));
+}
 
-  if (flavor === 'violation') {
-    return false;
+function validateGovernanceMarker(marker, relativePath) {
+  assertRepositoryRelative(relativePath);
+  if (!marker || typeof marker !== 'object' || Array.isArray(marker)) return false;
+
+  if (marker.role === 'authority') {
+    return marker.basis === 'explicit_unavailability' && marker.primary_ci === false;
   }
 
-  return true;
+  if (marker.role === 'consumer') {
+    return marker.reference === '.planning/QUALITY.md' && approvedLedgerConsumers.has(relativePath);
+  }
+
+  if (marker.role === 'decision') {
+    return ['supported_contract_risk', 'bounded_maintenance_cost'].includes(marker.basis) &&
+      ['repair', 'closed'].includes(marker.disposition) && marker.evidence_gated === true;
+  }
+
+  return false;
+}
+
+function validateArtifact(artifact) {
+  assertRepositoryRelative(artifact.path);
+  if (typeof artifact.text !== 'string') return false;
+  const markers = governanceMarkers(artifact.text);
+  return markers.length === 1 && validateGovernanceMarker(markers[0], artifact.path);
 }
 
 function runBaseline() {
@@ -69,6 +98,46 @@ function markdownFiles(directory) {
   return fs.readdirSync(directory, {withFileTypes: true})
     .filter((entry) => entry.isFile() && entry.name.endsWith('.md'))
     .map((entry) => path.join(directory, entry.name));
+}
+
+function filesRecursively(directory) {
+  if (!fs.existsSync(directory)) return [];
+  return fs.readdirSync(directory, {withFileTypes: true}).flatMap((entry) => {
+    const candidate = path.join(directory, entry.name);
+    return entry.isDirectory() ? filesRecursively(candidate) : [candidate];
+  });
+}
+
+function consumerSurfaceFiles() {
+  return [
+    path.join(root, 'mix.exs'),
+    path.join(root, 'package.json'),
+    path.join(root, '.github', 'workflows', 'release.yml'),
+    ...filesRecursively(path.join(root, 'lib')),
+    ...filesRecursively(path.join(root, 'dev')),
+    ...filesRecursively(path.join(root, 'examples')),
+    ...filesRecursively(path.join(root, 'test')).filter((file) => {
+      const rel = path.relative(root, file);
+      return rel !== 'test/quality/baseline_ledger_contract_test.exs' && !rel.startsWith('test/quality/fixtures/');
+    })
+  ].filter((file) => fs.existsSync(file));
+}
+
+function consumerBlockers() {
+  return consumerSurfaceFiles().flatMap((file) => {
+    const text = fs.readFileSync(file, 'utf8');
+    if (!ledgerReference.test(text)) return [];
+    const rel = path.relative(root, file);
+    return validateGovernanceMarker({role: 'consumer', reference: '.planning/QUALITY.md'}, rel) ? [] :
+      [`${rel}: unapproved ledger consumer`];
+  });
+}
+
+function markerBlockers(file) {
+  const rel = path.relative(root, file);
+  return governanceMarkers(fs.readFileSync(file, 'utf8'))
+    .filter((marker) => !validateGovernanceMarker(marker, rel))
+    .map(() => `${rel}: prohibited governance state`);
 }
 
 function hasPinnedStaleVerificationException(args) {
@@ -113,19 +182,19 @@ function blockersForFile(file, stagingAllowed) {
     }
   }
 
-  if (name.endsWith('-UAT.md') && (/(?:status:\s*)?(?:pending|awaiting)/i.test(text) || /human_judgment:\s*true/i.test(text))) {
+  if (name.endsWith('-UAT.md') && (/(?:status:\s*)?(?:pending|awaiting)/i.test(text) || humanStatePatterns.some((pattern) => pattern.test(text)))) {
     blockers.push(`${rel}: pending or human-needed UAT`);
   }
 
-  if (name.endsWith('-VALIDATION.md') && /(pending|manual-only|human[_ -]?(?:needed|verification)|awaiting)/i.test(text)) {
+  if (name.endsWith('-VALIDATION.md') && (/(pending|manual-only|awaiting)/i.test(text) || humanStatePatterns.some((pattern) => pattern.test(text)))) {
     blockers.push(`${rel}: pending/manual validation sign-off`);
   }
 
-  if (name.endsWith('-VERIFICATION.md') && /human[_ -]?(?:needed|verification)/i.test(text) && !stagingAllowed) {
+  if (name.endsWith('-VERIFICATION.md') && humanStatePatterns.some((pattern) => pattern.test(text)) && !stagingAllowed) {
     blockers.push(`${rel}: human verification remains active`);
   }
 
-  if (name.endsWith('-SUMMARY.md') && /human_judgment:\s*true/i.test(text)) {
+  if (name.endsWith('-SUMMARY.md') && humanStatePatterns.some((pattern) => pattern.test(text))) {
     blockers.push(`${rel}: summary retains human-needed coverage`);
   }
 
@@ -140,7 +209,9 @@ function checkActive(args) {
 
   const blockers = activePhaseDirectories()
     .flatMap(markdownFiles)
-    .flatMap((file) => blockersForFile(file, stagingAllowed));
+    .flatMap((file) => [...blockersForFile(file, stagingAllowed), ...markerBlockers(file)]);
+
+  blockers.push(...consumerBlockers());
 
   if (blockers.length > 0) throw new Error(`active governance blockers:\n${blockers.join('\n')}`);
 }
@@ -166,15 +237,34 @@ if (process.argv[2] === '--check-active') {
 
     ids.forEach((id) => {
       runBaseline();
-      assert.equal(validateVirtualArtifact(violation.cases[id].kind, 'violation'), false);
-      assert.equal(validateVirtualArtifact(clean.cases[id].kind, 'clean'), true);
+      assert.equal(validateArtifact(violation.cases[id].artifact), false);
+      assert.equal(validateArtifact(clean.cases[id].artifact), true);
     });
   });
 
   test('fixtures reject unknown fields, missing pairs, traversal, and snapshot override inputs', () => {
     assert.throws(() => readManifest('../test/quality/fixtures/governance-clean.json', 'clean'));
-    assert.equal(validateVirtualArtifact('snapshot_write', 'clean'), false);
-    assert.equal(validateVirtualArtifact('override_source_sha', 'clean'), false);
+    assert.throws(() => validateArtifact({path: '../.planning/QUALITY.md', text: ''}));
+    assert.equal(validateArtifact({path: '.planning/quality/baselines/132-initial.json', text: '<!-- quality-governance: {"role":"snapshot_write"} -->'}), false);
+  });
+
+  test('CLI rejects inserted authority, consumer, and decision violations', () => {
+    const mutations = [
+      ['.planning/phases/132-quality-baseline-triage/132-GOVERNANCE-MUTATION.md', '<!-- quality-governance: {"role":"authority","basis":"local_advisory","primary_ci":true} -->'],
+      ['lib/rendro/governance_mutation.ex', '# .planning/QUALITY.md'],
+      ['.planning/phases/132-quality-baseline-triage/132-GOVERNANCE-MUTATION.md', '<!-- quality-governance: {"role":"decision","basis":"diagnostic_signal_only","disposition":"repair","evidence_gated":false} -->']
+    ];
+
+    for (const [relativePath, text] of mutations) {
+      const file = path.join(root, relativePath);
+      fs.writeFileSync(file, text);
+      try {
+        const result = spawnSync(process.execPath, [__filename, '--check-active'], {cwd: root, shell: false, encoding: 'utf8'});
+        assert.notEqual(result.status, 0, `${relativePath} mutation must fail active governance`);
+      } finally {
+        fs.rmSync(file, {force: true});
+      }
+    }
   });
 
   test('full mode accepts terminal phase artifacts without a stale exception', () => {
