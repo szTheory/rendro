@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "cases": {
+    "PROH-132-01": {"kind": "unavailable_semantics"},
+    "PROH-132-02": {"kind": "approved_consumer"},
+    "PROH-132-03": {"kind": "evidence_gated_decision"}
+  }
+}

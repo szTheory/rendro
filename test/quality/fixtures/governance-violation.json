@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "cases": {
+    "PROH-132-01": {"kind": "authority_inflation"},
+    "PROH-132-02": {"kind": "consumer_leak"},
+    "PROH-132-03": {"kind": "metric_only_authority"}
+  }
+}
