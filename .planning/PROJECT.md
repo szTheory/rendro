@@ -29,7 +29,7 @@ All 12 requirements passed across phases 130-131. The milestone audit passed wit
 
 ## Current State
 
-**Phase 132 is complete; Phase 133 repository and evidence hygiene is next.** Rendro now has a source-bound eight-domain baseline, one durable risk-ranked quality ledger, and a fail-closed `mix quality.governance` command required through `ci-success`. Completion evidence is deterministic, advisory, or explicitly deferred; optional human feedback does not block phase closure. The remaining v2.14 work preserves public APIs and unrelated rendered bytes while addressing only evidence-backed findings. Studio, charts, and global text shaping remain demand-gated.
+**Phase 133 is complete; Phase 134 architecture and readability work is next.** Rendro's release evidence is now version-scoped, fail-closed, and independent of archived planning paths; repository hygiene enforces the exact package, helper, and source-reference boundary. QL-002 is closed with public APIs and unrelated rendered bytes unchanged. Deterministic and advisory verification remain separate, with pinned-PDFium availability retained as the explicit NS-006 advisory deferral. The remaining v2.14 work continues to address only evidence-backed findings. Studio, charts, and global text shaping remain demand-gated.
 
 <details>
 <summary>v2.12 phase-by-phase completion context</summary>
@@ -170,6 +170,8 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Validated
 
+- ✓ Rendro Phase 133 replaced archive-coupled release proof with a version-scoped Rendro 1.3.4 evidence capsule, one schema-validating fail-closed loader, journey-chain integrity checks, and exact package/helper/source-reference hygiene. QL-002 is closed without public API or unrelated rendered-byte change; all 4 requirements and 13 plans passed, Nyquist coverage is complete, all 19 modeled threats are closed, and deterministic CI remains green. PDFium stays honestly separated as the NS-006 advisory deferral. — Phase 133
+
 - ✓ Rendro Phase 132 established the dated eight-domain baseline and durable quality ledger, pinned all QL/NS classifications to record-local evidence and explicit decision bases, added semantic prohibition and active-artifact governance, and rolled an independent `quality-governance` job into the sole `ci-success` required context. Final evidence: 12/12 truths, 1,919 tests with 0 failures, 0 Nyquist gaps, clean 12-file review, and 14/14 threats closed. — Phase 132
 
 - ✓ Rendro v2.13 shipped Quality Ratchet & Adoption Readiness: the fixed 32-cell catalog retains its deterministic and bounded-review contracts; a dated source-backed adoption snapshot records the family/composite decision without polling or outreach; and the public Rendro 1.3.4 Phoenix newcomer journey is bound to protected-main workflow-dispatch provenance, verified package/docs identity, and a machine-gated advisory clean-room proof. All 12 requirements passed across Phases 130–131; the milestone audit passed. Shipped 2026-08-26 and archived under `milestones/v2.13-*`. — v2.13
@@ -225,7 +227,7 @@ As of v2.12 (2026-08-19), the Happy-Path program's realistic examples, theming, 
 
 As of v2.13 (2026-08-26), the twelve targeted catalog cells have current hash-bound human dispositions and the canonical catalog is candidate-identical and deterministically verified. The adoption gate remains below trigger, while exact public Rendro 1.3.4 and its Phoenix newcomer path are proven through protected release/HexDocs identity controls plus bounded advisory clean-room evidence.
 
-After Phase 132 (2026-08-26), the project has no active feature gap authorized by demand. The quality baseline is source-bound and reproducible; 1,919 tests, strict Credo, Dialyzer, semantic governance fixtures, and the required `quality-governance` CI member are green. The ledger routes archive-evidence authority to Phase 133, bounded CI/catalog parity work to Phase 135, and only six named visual cells to Phase 136. Architecture size/cycle observations remain diagnostic signals rather than automatic defects; every change still requires concrete impact and predeclared verification.
+After Phase 133 (2026-08-26), the project has no active feature gap authorized by demand. The quality baseline remains source-bound and reproducible, while release proof now lives in a self-contained version-scoped capsule consumed through a fail-closed loader instead of archived planning files. Exact package contents, helper inventory, journey integrity, and forbidden source references are deterministic hygiene contracts; QL-002 is closed. Bounded CI/catalog parity work remains routed to Phase 135 and only six named visual cells to Phase 136. Architecture size/cycle observations remain diagnostic signals rather than automatic defects; every change still requires concrete impact and predeclared verification.
 
 ## Constraints
 
@@ -384,4 +386,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-26 after completing Phase 132 Quality Baseline & Triage.*
+*Last updated: 2026-08-26 after completing Phase 133 Repository & Evidence Hygiene.*
