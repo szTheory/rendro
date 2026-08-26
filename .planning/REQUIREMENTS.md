@@ -70,10 +70,10 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUDIT-01 | Phase 132 | Pending |
-| AUDIT-02 | Phase 132 | Pending |
-| AUDIT-03 | Phase 132 | Pending |
-| AUDIT-04 | Phase 132 | Pending |
+| AUDIT-01 | Phase 132 | Complete |
+| AUDIT-02 | Phase 132 | Complete |
+| AUDIT-03 | Phase 132 | Complete |
+| AUDIT-04 | Phase 132 | Complete |
 | HYGIENE-01 | Phase 133 | Pending |
 | HYGIENE-02 | Phase 133 | Pending |
 | HYGIENE-03 | Phase 133 | Pending |
