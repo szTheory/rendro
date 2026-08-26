@@ -176,7 +176,11 @@ defmodule Rendro.RepositoryHygiene do
   end
 
   defp operational_source?(path),
-    do: String.match?(path, ~r{^(lib|dev|scripts|\.github)/.+\.(ex|exs|js|cjs|mjs|yml|yaml)$})
+    do:
+      String.match?(
+        path,
+        ~r{^(lib|dev|scripts|\.github)/.+\.(ex|exs|js|cjs|mjs|sh|bash|yml|yaml)$}
+      )
 
   defp executable_script?(path), do: String.match?(path, ~r{\.(exs|sh|js|cjs|mjs)$})
   # These maintainer-only checks inspect planning structure as their explicit subject.

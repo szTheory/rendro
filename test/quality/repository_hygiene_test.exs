@@ -69,11 +69,13 @@ defmodule Rendro.RepositoryHygieneTest do
       "lib/rendro.ex" => "File.read!(\".planning/phases/131-old/131-FACTS.md\")",
       "scripts/quality_governance.cjs" =>
         "const path = '.planning/phases/132-quality-baseline-triage';",
+      "scripts/archive_reader.sh" => "cat .planning/phases/131-old/131-FACTS.md",
       "dev/rendro/repository_hygiene.ex" => "Regex.match?(~r{^\\.planning/phases/}, path)"
     }
 
     assert {:error, diagnostics} = RepositoryHygiene.check_operational_sources(sources)
     assert Enum.any?(diagnostics, &String.contains?(&1, "archive consumer"))
+    assert Enum.any?(diagnostics, &String.contains?(&1, "scripts/archive_reader.sh"))
     refute Enum.any?(diagnostics, &String.contains?(&1, "scripts/quality_governance.cjs"))
     refute Enum.any?(diagnostics, &String.contains?(&1, "dev/rendro/repository_hygiene.ex"))
   end
