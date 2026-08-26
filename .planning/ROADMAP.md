@@ -57,13 +57,15 @@ Plans:
   3. Maintainers can inspect the phase archive and find no unexplained loose tracked phase files or ownerless tracked helper scripts.
   4. Package and hygiene checks prove internal evidence, local debris, and misplaced planning files cannot enter the published artifact unnoticed.
 
-**Plans**: 3 plans
+**Plans**: 5 plans
 
 Plans:
 
-- [ ] 133-01-PLAN.md — Atomically replace active Phase 131 evidence dependencies with the durable v1.3.4 capsule and shared validator.
-- [ ] 133-02-PLAN.md — Archive loose Phase 5/45 history and establish complete tracked-helper ownership.
-- [ ] 133-03-PLAN.md — Enforce actual package, planning-placement, helper, and archive-consumer boundaries through `mix quality.hygiene`.
+- [ ] 133-01-PLAN.md — Prepare and validate the complete non-authoritative v1.3.4 capsule and shared loader tracer.
+- [ ] 133-02-PLAN.md — Atomically switch every active consumer to the capsule and remove legacy authority.
+- [ ] 133-03-PLAN.md — Relocate loose Phase 5/45 history into its proven milestone archives.
+- [ ] 133-04-PLAN.md — Inventory every retained helper and remove the three resolved ownerless scripts.
+- [ ] 133-05-PLAN.md — Enforce exact package, placement, helper, and archive-consumer boundaries through `mix quality.hygiene` and close QL-002 on evidence.
 
 ### Phase 134: Core Architecture & Readability
 
