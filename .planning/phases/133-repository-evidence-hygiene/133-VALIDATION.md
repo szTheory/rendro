@@ -54,7 +54,7 @@ created: 2026-08-26
 | 133-12-01 | 12 | 7 | HYGIENE-04 | T-133-17, T-133-18 | Real package membership and PDF.js fixture relocation satisfy resolved exact boundary | integration | `mix quality.hygiene && mix test test/quality/repository_hygiene_test.exs test/docs_contract/pdfjs_advisory_claims_test.exs test/docs_contract/comparison_claims_test.exs test/rendro/comparison_test.exs && mix ci.fast` | ✅ | ✅ green |
 | 133-13-01 | 13 | 8 | HYGIENE-01, HYGIENE-02, HYGIENE-03, HYGIENE-04 | T-133-19 | QL-002 lifecycle follows focused scan, compatibility, deterministic gates, and separate proof outcome | terminal | `mix quality.hygiene && mix test test/scripts/repository_evidence_test.exs test/quality/repository_hygiene_test.exs && mix ci.fast && mix ci.proofs && mix test --include quality_ledger_contract test/quality/baseline_ledger_contract_test.exs` | ✅ | ✅ green |
 
-*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+*Status: ⬜ not run · ✅ green · ❌ red · ⚠️ flaky*
 
 ---
 
@@ -67,7 +67,7 @@ created: 2026-08-26
 
 ---
 
-## Manual-Only Verifications
+## Explicit Deferrals
 
 No manual completion gate exists. `pdfium-cli` was unavailable during this audit, so its viewer/PDFium observation remains the existing explicit advisory deferral (NS-006) with its recorded rerun trigger; it neither satisfies nor blocks deterministic Phase 133 completion.
 
@@ -88,7 +88,7 @@ No manual completion gate exists. `pdfium-cli` was unavailable during this audit
 
 | Metric | Count |
 |--------|-------|
-| Draft/pending map rows audited | 13 |
+| Initial map rows audited | 13 |
 | Resolved deterministic rows | 13 |
 | New tests required | 0 |
 | Escalated implementation defects | 0 |
