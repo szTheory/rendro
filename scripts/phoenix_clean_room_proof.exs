@@ -1,6 +1,8 @@
 defmodule Rendro.PhoenixCleanRoomProof do
   @moduledoc false
 
+  alias Rendro.RepositoryEvidence
+
   @version "1.3.4"
   @candidate "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
   @phx_new_version "1.8.5"
@@ -304,20 +306,20 @@ defmodule Rendro.PhoenixCleanRoomProof do
   end
 
   defp parse_options(args) do
-    defaults = %{prerequisite: default_prerequisite(), output: nil, root: nil}
+    defaults = %{prerequisite: :capsule, output: nil, root: nil}
 
     case args do
       [] ->
         {:ok, defaults}
 
-      ["--prerequisite", prerequisite] ->
-        {:ok, %{defaults | prerequisite: prerequisite}}
+      ["--output", output] ->
+        {:ok, %{defaults | output: output}}
 
-      ["--prerequisite", prerequisite, "--output", output] ->
-        {:ok, %{defaults | prerequisite: prerequisite, output: output}}
+      ["--output", output, "--root", root] ->
+        {:ok, %{defaults | output: output, root: root}}
 
-      ["--prerequisite", prerequisite, "--output", output, "--root", root] ->
-        {:ok, %{defaults | prerequisite: prerequisite, output: output, root: root}}
+      ["--root", root, "--output", output] ->
+        {:ok, %{defaults | output: output, root: root}}
 
       _ ->
         {:error, :invalid_arguments}
@@ -325,21 +327,17 @@ defmodule Rendro.PhoenixCleanRoomProof do
   end
 
   defp options_output(["--" | args]), do: options_output(args)
-  defp options_output(["--prerequisite", _, "--output", output | _]), do: output
-  defp options_output(_), do: nil
 
-  defp default_prerequisite,
+  defp options_output(args),
     do:
-      Path.expand(
-        "../.planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json",
-        __DIR__
-      )
+      args
+      |> Enum.chunk_every(2)
+      |> Enum.find_value(fn
+        ["--output", output] -> output
+        _ -> nil
+      end)
 
-  defp read_prerequisite(path) do
-    with {:ok, contents} <- File.read(path),
-         {:ok, prerequisite} <- Jason.decode(contents),
-         do: {:ok, prerequisite}
-  end
+  defp read_prerequisite(:capsule), do: RepositoryEvidence.load_public_prerequisite()
 
   defp create_root(nil) do
     root =

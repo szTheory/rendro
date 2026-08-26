@@ -1,6 +1,8 @@
 defmodule Rendro.PublicReleaseVerifier do
   @moduledoc false
 
+  alias Rendro.RepositoryEvidence
+
   @required_archive_members [
     "mix.exs",
     "README.md",
@@ -31,7 +33,7 @@ defmodule Rendro.PublicReleaseVerifier do
 
   def run(argv, context \\ default_context()) do
     with {:ok, options} <- parse_args(argv),
-         {:ok, candidate} <- candidate_from_record(options.candidate_record),
+         {:ok, candidate} <- candidate_from_capsule(),
          :ok <- validate_candidate(candidate),
          :ok <- validate_tag(options.tag),
          {:ok, facts} <- context.collect.(options, candidate),
@@ -49,7 +51,6 @@ defmodule Rendro.PublicReleaseVerifier do
     {opts, positional, invalid} =
       OptionParser.parse(argv,
         strict: [
-          candidate_record: :string,
           tag: :string,
           release_run_id: :string,
           hexdocs_run_id: :string,
@@ -58,7 +59,7 @@ defmodule Rendro.PublicReleaseVerifier do
         ]
       )
 
-    required = [:candidate_record, :tag, :release_run_id, :hexdocs_run_id, :output]
+    required = [:tag, :release_run_id, :hexdocs_run_id, :output]
 
     cond do
       positional != [] ->
@@ -245,7 +246,7 @@ defmodule Rendro.PublicReleaseVerifier do
          {:ok, candidate_binding} <- candidate_binding_artifact(options),
          {:ok, hex} <- hex_release(options.tag),
          {:ok, archive} <- archive_facts(options.tag),
-         {:ok, sealed} <- candidate_evidence(options.candidate_record),
+         {:ok, sealed} <- candidate_evidence(),
          {:ok, docs} <- hexdocs_probes(options.tag),
          {:ok, incidents} <- collect_incident_facts(repository) do
       {:ok,
@@ -516,11 +517,11 @@ defmodule Rendro.PublicReleaseVerifier do
     end
   end
 
-  defp candidate_evidence(path) do
-    with {:ok, record} <- File.read(path),
-         {:ok, sealed_archive} <- record_digest(record, "sealed_archive_sha256"),
-         {:ok, manifest} <- record_digest(record, "sealed_manifest_sha256"),
-         {:ok, metadata} <- record_digest(record, "sealed_metadata_sha256") do
+  defp candidate_evidence do
+    with {:ok, facts} <- RepositoryEvidence.load_public_prerequisite(),
+         {:ok, sealed_archive} <- Map.fetch(facts, "sealed_archive_sha256"),
+         {:ok, manifest} <- Map.fetch(facts, "sealed_manifest_sha256"),
+         {:ok, metadata} <- Map.fetch(facts, "sealed_metadata_sha256") do
       {:ok,
        %{
          "sealed_archive_sha256" => sealed_archive,
@@ -529,13 +530,6 @@ defmodule Rendro.PublicReleaseVerifier do
        }}
     else
       _ -> {:error, "candidate record lacks sealed package evidence"}
-    end
-  end
-
-  defp record_digest(record, key) do
-    case Regex.run(~r/^#{key}:\s*([0-9a-f]{64})\s*$/m, record, capture: :all_but_first) do
-      [digest] -> {:ok, digest}
-      _ -> {:error, "missing digest"}
     end
   end
 
@@ -739,15 +733,12 @@ defmodule Rendro.PublicReleaseVerifier do
     end
   end
 
-  defp candidate_from_record(path) do
-    with {:ok, record} <- File.read(path),
-         [candidate] <-
-           Regex.run(~r/^candidate_commit_sha:\s*([0-9a-f]{40})\s*$/m, record,
-             capture: :all_but_first
-           ) do
+  defp candidate_from_capsule do
+    with {:ok, identity} <- RepositoryEvidence.load_role(:release_identity),
+         candidate when is_binary(candidate) <- identity["candidate_commit_sha"] do
       {:ok, candidate}
     else
-      _ -> {:error, "candidate record lacks an exact candidate_commit_sha"}
+      _ -> {:error, "release identity lacks an exact candidate_commit_sha"}
     end
   end
 

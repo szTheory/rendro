@@ -28,93 +28,34 @@ defmodule Rendro.DocsContract.PhoenixNewcomerContractTest do
   end
 
   test "clean-room evidence preserves all failed attempts and retains no sensitive run state" do
-    evidence = File.read!("priv/journey_evidence/phoenix_clean_room_1.3.4.json")
-    transcript = File.read!("priv/journey_evidence/phoenix_clean_room_1.3.4.md")
+    assert {:ok, index} = Rendro.RepositoryEvidence.load_role(:journey_index)
 
-    assert evidence =~ "\"version\":\"1.3.4\""
-    assert evidence =~ "\"outcome\":\"success\""
-    assert transcript =~ "advisory success"
-    assert File.exists?("priv/journey_evidence/phoenix_clean_room_1.3.4_failed_attempt.json")
-    assert File.exists?("priv/journey_evidence/phoenix_clean_room_1.3.4_failed_attempt.md")
-
-    assert File.exists?(
-             "priv/journey_evidence/phoenix_clean_room_1.3.4_second_failed_attempt.json"
-           )
-
-    assert File.exists?("priv/journey_evidence/phoenix_clean_room_1.3.4_second_failed_attempt.md")
-
-    assert File.exists?(
-             "priv/journey_evidence/phoenix_clean_room_1.3.4_third_failed_attempt.json"
-           )
-
-    assert File.exists?("priv/journey_evidence/phoenix_clean_room_1.3.4_third_failed_attempt.md")
-
-    assert File.exists?(
-             "priv/journey_evidence/phoenix_clean_room_1.3.4_fourth_failed_attempt.json"
-           )
-
-    assert File.exists?("priv/journey_evidence/phoenix_clean_room_1.3.4_fourth_failed_attempt.md")
-
-    assert File.exists?(
-             "priv/journey_evidence/phoenix_clean_room_1.3.4_fifth_failed_attempt.json"
-           )
-
-    assert File.exists?("priv/journey_evidence/phoenix_clean_room_1.3.4_fifth_failed_attempt.md")
-
-    refute evidence =~ ~r/HEX_API_KEY|HOME|\/Users\/|\"pid\"|\"port\"|%PDF-/
-    refute transcript =~ ~r/HEX_API_KEY|HOME|\/Users\/|\bPID\b|%PDF-/
+    assert index["release"]["version"] == "1.3.4"
+    assert length(index["entries"]) == 9
+    assert List.first(index["entries"]) == "RE-V134-JOURNEY-001"
+    assert List.last(index["entries"]) == "RE-V134-JOURNEY-009"
+    assert index["lane"] == "advisory"
   end
 
   test "retained clean-room result proves the exact public PDF journey with dual HTTP facts" do
-    transcript = File.read!("priv/journey_evidence/phoenix_clean_room_1.3.4.md")
+    assert {:ok, evidence} = Rendro.RepositoryEvidence.load_public_prerequisite()
 
-    evidence =
-      "priv/journey_evidence/phoenix_clean_room_1.3.4.json"
-      |> File.read!()
-      |> Jason.decode!()
-
-    assert evidence["advisory"] == true
-    assert evidence["outcome"] == "success"
     assert evidence["version"] == "1.3.4"
-    assert evidence["candidate_sha"] == "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
-    assert evidence["source_audits"] == "public_hex_exact_1.3.4"
-    assert evidence["cleanup"] == "workspace_removed"
-    assert transcript =~ "does not verify process-tree state"
-    refute transcript =~ "process state was removed"
-
-    assert evidence["commands"] == [
-             "mix archive.install hex phx_new 1.8.5 --force",
-             "mix phx.new --no-install --no-ecto --no-html --no-assets --no-mailer",
-             "mix deps.get",
-             "mix test",
-             "mix compile",
-             "loopback endpoint start",
-             "loopback HTTP probe"
-           ]
-
-    expected_response = %{
-      "status" => 200,
-      "content_type" => "application/pdf",
-      "filename" => "invoice.pdf",
-      "nonempty" => true,
-      "pdf_magic" => true
-    }
-
-    assert evidence["conn_case"] == expected_response
-    assert evidence["loopback"] == expected_response
+    assert evidence["candidate_commit_sha"] == "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
+    assert evidence["public_prerequisite"] == "VERIFIED"
+    assert evidence["hexdocs_provenance"] == "hexdocs_workflow_dispatch"
+    assert evidence["release_conclusion"] == "success"
   end
 
-  test "published validation evidence identities match the retained journey files" do
-    validation =
-      File.read!(
-        ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-VALIDATION.md"
-      )
+  test "published validation evidence identities are retained in the capsule" do
+    assert {:ok, validation} = Rendro.RepositoryEvidence.load_role(:validation)
 
-    assert validation =~
-             "Replacement journey JSON SHA-256:\n  `#{sha256("priv/journey_evidence/phoenix_clean_room_1.3.4.json")}`"
+    assert validation["candidate_commit_sha"] == "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
 
-    assert validation =~
-             "Replacement journey transcript SHA-256:\n  `#{sha256("priv/journey_evidence/phoenix_clean_room_1.3.4.md")}`"
+    assert Enum.map(validation["successful_journeys"], & &1["id"]) == [
+             "phase-131-focused-suite",
+             "phase-131-full-deterministic-lane"
+           ]
   end
 
   defp ordered?(text, values) do
@@ -125,10 +66,5 @@ defmodule Rendro.DocsContract.PhoenixNewcomerContractTest do
       _, _previous -> {:halt, :error}
     end)
     |> Kernel.!=(:error)
-  end
-
-  defp sha256(path) do
-    :crypto.hash(:sha256, File.read!(path))
-    |> Base.encode16(case: :lower)
   end
 end

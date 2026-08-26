@@ -177,7 +177,9 @@ defmodule Guardrails.RequiredChecksContractTest do
 
       assert advisory_block =~ "continue-on-error: true"
       assert advisory_block =~ "scripts/phoenix_clean_room_proof.exs"
-      assert advisory_block =~ "131-PUBLIC-PREREQUISITE.json"
+      refute advisory_block =~ "--prerequisite"
+      refute advisory_block =~ ".planning/"
+      assert advisory_block =~ "github.ref_name == 'v1.3.4'"
 
       assert advisory_block =~
                "PROOF_ROOT: /tmp/rendro-phoenix-clean-room-${{ github.run_id }}-${{ github.run_attempt }}"

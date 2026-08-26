@@ -8,10 +8,6 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
   alias Rendro.PublicReleaseVerifier
 
   @candidate "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
-  @prerequisite_path Path.expand(
-                       "../../.planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json",
-                       __DIR__
-                     )
 
   test "atomically emits a bounded failure when the harness exits unexpectedly" do
     directory =
@@ -21,15 +17,11 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
       )
 
     output = Path.join(directory, "result.json")
-    prerequisite = Path.join(directory, "prerequisite.json")
     File.mkdir_p!(directory)
-    File.write!(prerequisite, Jason.encode!(valid_prerequisite()))
 
     assert %{"outcome" => "failure", "next_action" => next_action} =
              PhoenixCleanRoomProof.main(
                [
-                 "--prerequisite",
-                 prerequisite,
                  "--output",
                  output,
                  "--root",
@@ -55,16 +47,12 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
       )
 
     output = Path.join(directory, "result.json")
-    prerequisite = Path.join(directory, "prerequisite.json")
     File.mkdir_p!(directory)
-    File.write!(prerequisite, Jason.encode!(valid_prerequisite()))
 
     assert %{"outcome" => "failure"} =
              PhoenixCleanRoomProof.main(
                [
                  "--",
-                 "--prerequisite",
-                 prerequisite,
                  "--output",
                  output,
                  "--root",
@@ -672,9 +660,10 @@ defmodule Rendro.PhoenixCleanRoomProofTest do
              )
   end
 
-  defp current_prerequisite, do: @prerequisite_path |> File.read!() |> Jason.decode!()
-
-  defp valid_prerequisite, do: current_prerequisite()
+  defp current_prerequisite do
+    {:ok, prerequisite} = Rendro.RepositoryEvidence.load_public_prerequisite()
+    prerequisite
+  end
 
   defp assert_rejected_by_both(prerequisite) do
     assert {:error, _} = PublicReleaseVerifier.validate(prerequisite)

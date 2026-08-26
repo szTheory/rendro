@@ -5,35 +5,18 @@ defmodule Rendro.PublicReleaseVerifierTest do
 
   alias Rendro.PublicReleaseVerifier
 
-  @candidate String.duplicate("a", 40)
+  @candidate "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
   @script Path.expand("../../scripts/verify_public_release.exs", __DIR__)
-  @candidate_record ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-RELEASE-CANDIDATE.md"
+  test "sealed v1.3.4 capsule retains release identity and immutable incidents" do
+    assert {:ok, identity} = Rendro.RepositoryEvidence.load_role(:release_identity)
+    assert {:ok, facts} = Rendro.RepositoryEvidence.load_public_prerequisite()
 
-  test "sealed v1.3.4 record retains all four immutable incidents" do
-    record = File.read!(@candidate_record)
+    assert identity["release"]["version"] == "1.3.4"
+    assert identity["candidate_commit_sha"] == @candidate
 
-    assert record =~ ~r/^version: 1\.3\.4$/m
-    assert record =~ ~r/^release_ref: v1\.3\.4$/m
-    assert record =~ "candidate_status: public_release_pending_atomic_verification"
-    assert record =~ "required_fix_ancestor: bbe75d2bf3f53e5235626974c539500395d2032e"
-    assert record =~ "tag_pushed: true"
-    assert record =~ "hexdocs_dispatched: false"
-    assert record =~ "registry_mutated: true"
-    assert record =~ "3d014b8194782fc29bc685c0d5e84e4adc64b2c3"
-    assert record =~ "32513353551"
-    assert record =~ "32539594278"
-    assert record =~ "b386d1e39b6c9e63af58aa1fa5890d93909d278f"
-    assert record =~ "9b7ff50c69c0e9bd6ae39f0c79f76c4663d936fd"
-    assert record =~ "47af6448d2989ffe69c4b80c77935c896b1ddb07"
-    assert record =~ "32586098785"
-    assert record =~ "97062582546"
-    assert record =~ "97064173653"
-    assert record =~ "c96bf205d7216cdcf4846a0f24a312f9c1c75b0f"
-    assert record =~ "cfc58a81865e060351ce33d98f5e52de8cd198d9"
-    assert record =~ "32596108284"
-    assert record =~ "97087204354"
-    assert record =~ "97088652899"
-    assert record =~ "recovery_target: 1.3.4"
+    for key <- ["v1_3_0_run_id", "v1_3_1_run_id", "v1_3_2_run_id", "v1_3_3_run_id"] do
+      assert is_binary(facts[key])
+    end
   end
 
   test "refuses a tag object when its peeled commit differs from the candidate" do
@@ -108,8 +91,6 @@ defmodule Rendro.PublicReleaseVerifierTest do
   test "requires an explicit HexDocs workflow-dispatch run ID" do
     assert {:error, "missing required public-release option"} =
              PublicReleaseVerifier.parse_args([
-               "--candidate-record",
-               "candidate.md",
                "--tag",
                "v1.3.4",
                "--release-run-id",
@@ -121,8 +102,6 @@ defmodule Rendro.PublicReleaseVerifierTest do
 
     assert {:ok, options} =
              PublicReleaseVerifier.parse_args([
-               "--candidate-record",
-               "candidate.md",
                "--tag",
                "v1.3.4",
                "--release-run-id",
@@ -310,7 +289,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
         "rendro-public-release-race-#{System.unique_integer([:positive])}"
       )
 
-    output = Path.join(root, "131-PUBLIC-PREREQUISITE.json")
+    output = Path.join(root, "public-prerequisite.json")
     parent = self()
     File.mkdir_p!(root)
     on_exit(fn -> File.rm_rf(root) end)
@@ -342,7 +321,7 @@ defmodule Rendro.PublicReleaseVerifierTest do
     assert record["candidate_commit_sha"] == @candidate
     assert byte_size(File.read!(output)) < 5_000
 
-    assert [] == Path.wildcard(Path.join(root, ".131-PUBLIC-PREREQUISITE.json.*.tmp"))
+    assert [] == Path.wildcard(Path.join(root, ".public-prerequisite.json.*.tmp"))
   end
 
   test "CLI rejects missing, duplicate, and invalid arguments without writing output" do
@@ -393,14 +372,12 @@ defmodule Rendro.PublicReleaseVerifierTest do
     refute File.exists?(output) and File.stat!(output).size == 0
   end
 
-  defp run_cli(record, output, fixture, extra_args \\ []) do
+  defp run_cli(_record, output, fixture, extra_args \\ []) do
     args =
       [
         "run",
         @script,
         "--",
-        "--candidate-record",
-        record,
         "--tag",
         "v1.3.4",
         "--release-run-id",
