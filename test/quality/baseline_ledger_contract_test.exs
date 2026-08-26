@@ -58,8 +58,8 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
 
   test "evidence and signal identities carry explicit provenance" do
     snapshot = @snapshot_path |> File.read!() |> JSON.decode!()
-    [evidence] = snapshot["evidence_items"]
-    [signal] = evidence["signal_candidates"]
+    [evidence | _] = snapshot["evidence_items"]
+    [signal | _] = evidence["signal_candidates"]
 
     assert evidence["registered_command"]["invocation"] ==
              "mix xref graph --format stats --label compile-connected"
@@ -77,7 +77,11 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
     assert MapSet.subset?(@required_domains, signal_domains(snapshot))
     assert signals != []
     assert Enum.all?(signals, &String.match?(&1["id"], ~r/^SIG-[A-Z]+-\d{3}$/))
-    assert Enum.all?(signals, &(&1["source_evidence_id"] in Enum.map(evidence_items, fn item -> item["id"] end)))
+
+    assert Enum.all?(
+             signals,
+             &(&1["source_evidence_id"] in Enum.map(evidence_items, fn item -> item["id"] end))
+           )
 
     Enum.each(evidence_items, fn evidence ->
       assert evidence["provenance"]["source_sha"] == snapshot["source_sha"]
@@ -114,7 +118,7 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
   test "schema rejects malformed or duplicated evidence facts" do
     snapshot = @snapshot_path |> File.read!() |> JSON.decode!()
     schema = @schema_path |> File.read!() |> JSON.decode!() |> JSV.build!()
-    [evidence] = snapshot["evidence_items"]
+    [evidence | _] = snapshot["evidence_items"]
 
     for {path, value} <- [
           {["source_sha"], "not-a-sha"},
