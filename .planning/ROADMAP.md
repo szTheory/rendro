@@ -57,15 +57,23 @@ Plans:
   3. Maintainers can inspect the phase archive and find no unexplained loose tracked phase files or ownerless tracked helper scripts.
   4. Package and hygiene checks prove internal evidence, local debris, and misplaced planning files cannot enter the published artifact unnoticed.
 
-**Plans**: 5 plans
+**Plans**: 13 plans
 
 Plans:
 
-- [ ] 133-01-PLAN.md — Prepare and validate the complete non-authoritative v1.3.4 capsule and shared loader tracer.
-- [ ] 133-02-PLAN.md — Atomically switch every active consumer to the capsule and remove legacy authority.
-- [ ] 133-03-PLAN.md — Relocate loose Phase 5/45 history into its proven milestone archives.
-- [ ] 133-04-PLAN.md — Inventory every retained helper and remove the three resolved ownerless scripts.
-- [ ] 133-05-PLAN.md — Enforce exact package, placement, helper, and archive-consumer boundaries through `mix quality.hygiene` and close QL-002 on evidence.
+- [ ] 133-01-PLAN.md — Trace manifest to validated prerequisite through the inert shared loader.
+- [ ] 133-02-PLAN.md — Add core release identity, validation, and journey-index roles.
+- [ ] 133-03-PLAN.md — Preserve journey attempts 001-004 with the strict attempt schema.
+- [ ] 133-04-PLAN.md — Preserve journey attempts 005-009 and seal complete capsule cardinality.
+- [ ] 133-05-PLAN.md — Atomically switch every active consumer to the complete capsule.
+- [ ] 133-06-PLAN.md — Remove redundant legacy journey source batch A after cutover.
+- [ ] 133-07-PLAN.md — Remove redundant legacy journey source batch B after cutover.
+- [ ] 133-08-PLAN.md — Archive loose Phase 5 history under v1.0.
+- [ ] 133-09-PLAN.md — Archive the seven-file Phase 45 set under v1.8.
+- [ ] 133-10-PLAN.md — Inventory retained helpers and remove three ownerless scripts.
+- [ ] 133-11-PLAN.md — Implement the isolated hygiene policy, command, expected manifest, and focused tests.
+- [ ] 133-12-PLAN.md — Apply exact package cleanup, PDF.js fixture relocation, and Mix/CI/release wiring.
+- [ ] 133-13-PLAN.md — Run terminal gates and close QL-002 only with its predeclared evidence.
 
 ### Phase 134: Core Architecture & Readability
 
