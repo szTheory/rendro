@@ -179,7 +179,11 @@ defmodule Rendro.RepositoryHygiene do
     do: String.match?(path, ~r{^(lib|dev|scripts|\.github)/.+\.(ex|exs|js|cjs|mjs|yml|yaml)$})
 
   defp executable_script?(path), do: String.match?(path, ~r{\.(exs|sh|js|cjs|mjs)$})
-  defp gsd_tooling?(path), do: path == "scripts/quality_governance.cjs"
+  # These maintainer-only checks inspect planning structure as their explicit subject.
+  # They are never package, runtime, release, or ordinary-regression consumers.
+  defp gsd_tooling?(path),
+    do: path in ["dev/rendro/repository_hygiene.ex", "scripts/quality_governance.cjs"]
+
   defp archive_reference?(contents), do: String.contains?(contents, ".planning/phases/")
   defp diagnostics(:ok), do: []
   defp diagnostics({:error, values}), do: values

@@ -47,6 +47,9 @@ jobs:
       - name: Run CI Checks
         run: mix ci
 
+      - name: Verify Repository Hygiene
+        run: mix quality.hygiene
+
       - name: Run Release Preflight
         run: mix release.preflight
 

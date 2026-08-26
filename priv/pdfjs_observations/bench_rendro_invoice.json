@@ -6,7 +6,7 @@
   "node_version": "v22.14.0",
   "recorded_at": "2026-06-13T03:15:27.884Z",
   "platform": "darwin-arm64; Darwin 25.5.0",
-  "fixture": "bench/results/raw/rendro.pdf",
+  "fixture": "test/fixtures/pdfjs-rendro.pdf",
   "page_count": 2,
   "pages": [
     {

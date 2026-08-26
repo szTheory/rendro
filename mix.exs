@@ -34,6 +34,7 @@ defmodule Rendro.MixProject do
         ci: :test,
         "quality.baseline": :test,
         "quality.governance": :test,
+        "quality.hygiene": :test,
         "ci.fast": :test,
         "ci.proofs": :test,
         "ci.advisory": :test,
@@ -92,9 +93,11 @@ defmodule Rendro.MixProject do
         "quality.baseline",
         "cmd node scripts/quality_governance.cjs --check-active"
       ],
+      "quality.hygiene": ["app.start", &Mix.Tasks.Quality.Hygiene.run/1],
       ci: ["ci.fast", "ci.proofs"],
       "ci.fast": [
         "format --check-formatted",
+        "quality.hygiene",
         "hex.build",
         "compile --warnings-as-errors",
         "test --exclude quarantine --slowest 10",
@@ -162,7 +165,12 @@ defmodule Rendro.MixProject do
         priv/adoption_evidence
         priv/examples
         priv/fonts
-        bench/results
+        bench/results/comparison.json
+        bench/results/raw/chromic_pdf.json
+        bench/results/raw/chromic_pdf_warm_pool.json
+        bench/results/raw/pdf_generator.json
+        bench/results/raw/rendro.json
+        bench/results/raw/typst_cli.json
         guides
         .formatter.exs
         mix.exs

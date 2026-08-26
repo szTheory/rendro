@@ -46,7 +46,7 @@
     "fixture": {
       "enum": [
         "test/fixtures/embedded_artifact_support_fixture.pdf",
-        "bench/results/raw/rendro.pdf"
+        "test/fixtures/pdfjs-rendro.pdf"
       ]
     },
     "page_count": {
