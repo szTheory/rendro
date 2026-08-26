@@ -76,4 +76,21 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
 
     assert File.read!(@snapshot_path) == original
   end
+
+  test "ledger exposes durable lifecycle, rubric, and closure governance" do
+    ledger = File.read!(@ledger_path)
+
+    for heading <- [
+          "## Finding lifecycle and relationships",
+          "## Qualitative rubric and dispositions",
+          "## Routing and closure",
+          "## Resolved, rejected, deferred, and superseded findings"
+        ] do
+      assert ledger =~ heading
+    end
+
+    assert ledger =~ "observed -> triaged -> accepted -> in_progress -> verified -> closed"
+    assert ledger =~ "`repair`, `defer`, `reject_signal`, `accept_risk`, and `superseded`"
+    assert ledger =~ "evidence_authority"
+  end
 end
