@@ -177,8 +177,8 @@ if (process.argv[2] === '--check-active') {
     assert.equal(validateVirtualArtifact('override_source_sha', 'clean'), false);
   });
 
-  test('full mode rejects the currently active governance backlog', () => {
-    assert.throws(() => checkActive([]), /active governance blockers/);
+  test('full mode accepts terminal phase artifacts without a stale exception', () => {
+    assert.doesNotThrow(() => checkActive([]));
     assert.deepEqual(blockersForFile(path.join(phasesRoot, '132-quality-baseline-triage', '132-03-PLAN.md'), false), []);
   });
 
