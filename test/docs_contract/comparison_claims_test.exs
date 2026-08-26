@@ -166,7 +166,7 @@ defmodule Rendro.DocsContract.ComparisonClaimsTest do
     assert guides_section =~ "First Invoice Livebook"
   end
 
-  test "hex package includes comparison guide, notebook, manifest, and raw artifacts" do
+  test "hex package includes comparison guide, notebook, manifest, and only resolved raw JSON evidence" do
     tarball = Rendro.Test.HexBuildCache.tarball_path!()
 
     {output, 0} = Rendro.Test.HexBuildCache.get_build_output()
@@ -185,6 +185,17 @@ defmodule Rendro.DocsContract.ComparisonClaimsTest do
 
     for path <- expected_paths do
       assert contents =~ path
+    end
+
+    for path <- [
+          "bench/results/raw/chromic_pdf.pdf",
+          "bench/results/raw/chromic_pdf_warm_pool.pdf",
+          "bench/results/raw/pdf_generator.pdf",
+          "bench/results/raw/rendro.pdf",
+          "bench/results/raw/typst_cli.pdf",
+          "bench/results/raw/plan01-static-fixture.json"
+        ] do
+      refute contents =~ path
     end
   end
 

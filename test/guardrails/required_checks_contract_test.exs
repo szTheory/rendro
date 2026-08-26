@@ -160,6 +160,7 @@ defmodule Guardrails.RequiredChecksContractTest do
 
       assert ci_fast_steps == [
                "format --check-formatted",
+               "quality.hygiene",
                "hex.build",
                "compile --warnings-as-errors",
                "test --exclude quarantine --slowest 10",
@@ -525,6 +526,7 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert release =~ "tags:"
       assert release =~ "'v*.*.*'"
       assert release =~ "mix release.preflight"
+      assert release =~ "mix quality.hygiene"
       assert release =~ "mix hex.publish --yes --no-docs"
       assert release =~ "HEX_API_KEY"
       refute release =~ "contents: write"

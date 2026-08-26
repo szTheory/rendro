@@ -1,8 +1,6 @@
 defmodule Rendro.ComparisonTest do
   use ExUnit.Case, async: true
 
-  @fixture_hash "8b8fbf820b7183fcc182f8c65714b618196f6d21bcbcd95661a7459034a3e0e9"
-
   test "read_manifest!/0 reads the comparison manifest" do
     assert %{} = Rendro.Comparison.read_manifest!()
   end
@@ -213,11 +211,20 @@ defmodule Rendro.ComparisonTest do
     refute source =~ ":httpc"
   end
 
-  test "scaffold raw artifact hash matches the manifest" do
-    assert @fixture_hash ==
-             "bench/results/raw/plan01-static-fixture.json"
-             |> File.read!()
-             |> then(&:crypto.hash(:sha256, &1))
-             |> Base.encode16(case: :lower)
+  test "comparison evidence uses only the five manifest-referenced raw JSON records" do
+    raw_artifacts =
+      Rendro.Comparison.read_manifest!()
+      |> Map.fetch!("results")
+      |> Enum.map(&Map.fetch!(&1, "raw_artifact"))
+      |> Enum.uniq()
+      |> Enum.sort()
+
+    assert raw_artifacts == [
+             "bench/results/raw/chromic_pdf.json",
+             "bench/results/raw/chromic_pdf_warm_pool.json",
+             "bench/results/raw/pdf_generator.json",
+             "bench/results/raw/rendro.json",
+             "bench/results/raw/typst_cli.json"
+           ]
   end
 end
