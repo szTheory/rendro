@@ -38,12 +38,12 @@
   3. Every high-risk finding is assigned for repair or rejected with evidence; medium-risk work is bounded or deferred with a trigger; low-value observations do not create standalone churn.
   4. The ledger freezes the public API and unrelated rendered-byte compatibility contract that every later phase must verify.
 
-**Plans**: 1/2 plans executed
+**Plans**: 2/2 plans executed
 
 Plans:
 
 - [x] 132-01-PLAN.md — Establish the schema-backed ledger/evidence tracer and complete governance contract.
-- [ ] 132-02-PLAN.md — Capture the full dated baseline and triage every signal into the durable ledger.
+- [x] 132-02-PLAN.md — Capture the full dated baseline and triage every signal into the durable ledger.
 
 ### Phase 133: Repository & Evidence Hygiene
 
@@ -122,7 +122,7 @@ Plans:
 
 | Phase | Requirements | Plans Complete | Status | Completed |
 |-------|--------------|----------------|--------|-----------|
-| 132. Quality Baseline & Triage | 4 | 1/2 | In Progress|  |
+| 132. Quality Baseline & Triage | 4 | 2/2 | In Progress|  |
 | 133. Repository & Evidence Hygiene | 4 | 0/TBD | Not started | — |
 | 134. Core Architecture & Readability | 4 | 0/TBD | Not started | — |
 | 135. Test & CI/CD Simplification | 7 | 0/TBD | Not started | — |
