@@ -20,6 +20,7 @@ Core value: Phoenix teams can generate reliable, auditable, deterministic PDFs f
 
 - Keep `rendro` core pure: no hard dependency on Phoenix, Oban, or admin tooling.
 - Preserve deterministic and advisory verification lane separation in CI and docs.
+- Classify completion coverage as deterministic, advisory, or explicit deferral; optional human feedback may enrich evidence but cannot block completion, and unautomatable objective claims must be unsupported or explicitly deferred with a reason and next action.
 - Treat documentation claims as contracts; do not claim unsupported capabilities.
 - Prefer optional dependency guards (`optional: true` + compile/runtime checks) for integrations.
 <!-- gsd-conventions-end -->

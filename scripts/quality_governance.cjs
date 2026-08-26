@@ -100,7 +100,7 @@ function blockersForFile(file, stagingAllowed) {
   const blockers = [];
 
   if (name.endsWith('-PLAN.md')) {
-    if (/<human-check\b/i.test(text) || /type="checkpoint:human-verify"/i.test(text)) {
+    if (/<verify>[\s\S]*?<human-check\b/i.test(text) || /type="checkpoint:human-verify"/i.test(text)) {
       blockers.push(`${rel}: unresolved human verification checkpoint`);
     }
     if (/gate="blocking(?:-human)?"/i.test(text) && /<task type="checkpoint/i.test(text)) {

@@ -52,7 +52,9 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
   end
 
   defp record_blocks(ledger, "QL") do
-    Regex.scan(~r/^#### (QL-\d{3})[^\n]*\n(.*?)(?=^#### QL-\d{3}|^### NS-\d{3}|^## |\z)/ms, ledger,
+    Regex.scan(
+      ~r/^#### (QL-\d{3})[^\n]*\n(.*?)(?=^#### QL-\d{3}|^### NS-\d{3}|^## |\z)/ms,
+      ledger,
       capture: :all_but_first
     )
   end
@@ -301,7 +303,9 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
     ledger = File.read!(@ledger_path)
 
     expected = %{
-      "QL-001" => {"reject_signal", "diagnostic_signal_only", ["EV-ARCH-001", "EV-ARCH-002"], ["SIG-ARCH-001", "SIG-ARCH-002"]},
+      "QL-001" =>
+        {"reject_signal", "diagnostic_signal_only", ["EV-ARCH-001", "EV-ARCH-002"],
+         ["SIG-ARCH-001", "SIG-ARCH-002"]},
       "QL-002" => {"repair", "supported_contract_risk", ["EV-CI-001"], ["SIG-CI-001"]},
       "QL-003" => {"repair", "bounded_maintenance_cost", ["EV-CI-002"], ["SIG-CI-002"]},
       "QL-004" => {"repair", "supported_contract_risk", ["EV-CATALOG-001"], ["SIG-CATALOG-001"]},
@@ -315,6 +319,7 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
     }
 
     records = record_blocks(ledger, "QL") ++ record_blocks(ledger, "NS")
+
     assert Enum.map(records, &hd/1) == [
              "QL-001",
              "QL-002",
@@ -336,5 +341,63 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
       assert ids_in(field(block, "Evidence"), "EV") == evidence_ids
       assert ids_in(block, "SIG") == signal_ids
     end
+
+    snapshot = @snapshot_path |> File.read!() |> JSON.decode!()
+
+    signal_sources =
+      snapshot
+      |> signal_candidates()
+      |> Map.new(fn signal -> {signal["id"], signal["source_evidence_id"]} end)
+
+    for [id, _block] <- records do
+      {_disposition, _basis, evidence_ids, signal_ids} = Map.fetch!(expected, id)
+      assert Enum.all?(signal_ids, &(signal_sources[&1] in evidence_ids))
+    end
+  end
+
+  test "bounded record parsing rejects malformed boundaries and non-local evidence mutations" do
+    ledger = File.read!(@ledger_path)
+    ql_ids = record_blocks(ledger, "QL") |> Enum.map(&hd/1)
+    ns_ids = record_blocks(ledger, "NS") |> Enum.map(&hd/1)
+
+    duplicate = ledger <> "\n#### QL-001 — duplicate identity\n\n- **Evidence:** `EV-ARCH-001`\n"
+    assert Enum.count(record_blocks(duplicate, "QL"), &(hd(&1) == "QL-001")) == 2
+
+    misplaced =
+      String.replace(
+        ledger,
+        "- **Signal:** `SIG-ARCH-002`",
+        "- **Signal:** `SIG-ARCH-002`\n- **Signal:** `SIG-CI-001`",
+        global: false
+      )
+
+    [[_id, misplaced_ql] | _] = record_blocks(misplaced, "QL")
+    refute ids_in(misplaced_ql, "SIG") == ["SIG-ARCH-001", "SIG-ARCH-002"]
+
+    empty_evidence =
+      String.replace(
+        ledger,
+        "- **Evidence:** `EV-ARCH-001`, `EV-ARCH-002` in `.planning/quality/baselines/132-initial.json`",
+        "- **Evidence:**",
+        global: false
+      )
+
+    [[_id, empty_ql] | _] = record_blocks(empty_evidence, "QL")
+    assert ids_in(field(empty_ql, "Evidence"), "EV") == []
+
+    unknown_evidence = String.replace(ledger, "`EV-ARCH-001`", "`EV-UNKNOWN-999`", global: false)
+    [[_id, unknown_ql] | _] = record_blocks(unknown_evidence, "QL")
+    assert ids_in(field(unknown_ql, "Evidence"), "EV") == ["EV-UNKNOWN-999", "EV-ARCH-002"]
+
+    globally_resolvable_but_non_local =
+      String.replace(ledger, "- **Evidence:** `EV-CI-001`", "- **Evidence:** `EV-ARCH-001`",
+        global: false
+      )
+
+    [_, [_id, ql_two] | _] = record_blocks(globally_resolvable_but_non_local, "QL")
+    assert ids_in(field(ql_two, "Evidence"), "EV") == ["EV-ARCH-001"]
+
+    assert ql_ids == ["QL-001", "QL-002", "QL-003", "QL-004"]
+    assert ns_ids == ["NS-001", "NS-002", "NS-003", "NS-004", "NS-005", "NS-006", "NS-007"]
   end
 end

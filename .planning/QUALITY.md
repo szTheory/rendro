@@ -41,6 +41,7 @@ The initial snapshot is immutable after capture. Validation is read-only and cap
 - **Evidence quality:** reproducible
 - **Priority:** low — five compile-connected edges and zero cycles do not demonstrate a supported-contract or maintenance harm.
 - **Disposition:** reject_signal
+- **Decision basis:** diagnostic_signal_only
 - **Owner phase:** 132 (classification)
 - **Scope:** baseline architecture topology only; no extraction or cleanup is authorized.
 - **Verification:** rerun the registered xref statistics and cycles commands against the recorded source boundary.
@@ -60,6 +61,7 @@ The initial snapshot is immutable after capture. Validation is read-only and cap
 - **Evidence quality:** reproducible
 - **Priority:** high — active consumers make archived planning artifacts operational evidence, risking stale or non-durable authority.
 - **Disposition:** repair
+- **Decision basis:** supported_contract_risk
 - **Owner phase:** 133
 - **Scope:** replace active archive reads with durable repository-owned evidence without changing product behavior, public API, or rendered bytes.
 - **Verification:** focused archive-consumer scan returns no product, release, or regression consumer; run the relevant deterministic and proof gates.
@@ -81,6 +83,7 @@ The initial snapshot is immutable after capture. Validation is read-only and cap
 - **Evidence quality:** reproducible
 - **Priority:** medium — the numbered routes are bounded workflow maintenance debt, but parity and authority must be preserved before removal.
 - **Disposition:** repair
+- **Decision basis:** bounded_maintenance_cost
 - **Owner phase:** 135
 - **Scope:** converge on one generic read-only exact-SHA catalog evidence workflow; do not alter catalog content or claim renderer authority locally.
 - **Verification:** prove generic workflow parity against retained Phase 126, 127, and 130 outputs and authority checks before deleting any route.
@@ -100,6 +103,7 @@ The initial snapshot is immutable after capture. Validation is read-only and cap
 - **Evidence quality:** independently_reviewed
 - **Priority:** medium — exactly six named catalog cells are `needs_work`; their bounded review supports repair but not a wider catalog rewrite.
 - **Disposition:** repair
+- **Decision basis:** supported_contract_risk
 - **Owner phase:** 136
 - **Scope:** only Corporate Classic Invoice dark, Minimal Mono Statement dark, Swiss Payslip light/dark, and Brutalist Ticket light/dark; all other cells and public API remain frozen.
 - **Verification:** exact-SHA pinned-renderer artifact plus full-size human review for each repaired cell, with deterministic byte/contract coverage where applicable.
@@ -117,6 +121,7 @@ Each record below is a classification surface, not a finding. It prevents a coll
 - **Evidence:** `EV-DEP-001`
 - **Signal:** `SIG-DEP-001`
 - **Disposition:** reject_signal
+- **Decision basis:** diagnostic_signal_only
 - **Rationale:** the locked dependency and toolchain identities are provenance facts; no incompatibility or supply-chain harm was demonstrated.
 - **Trigger:** create a related finding only on a failed reproducibility, security, or compatibility check.
 
@@ -125,6 +130,7 @@ Each record below is a classification surface, not a finding. It prevents a coll
 - **Evidence:** `EV-TEST-001`
 - **Signal:** `SIG-TEST-001`
 - **Disposition:** reject_signal
+- **Decision basis:** diagnostic_signal_only
 - **Rationale:** the existing coverage threshold failure and slow-test report do not identify a supported-contract break or bounded repair owner.
 - **Trigger:** reopen when a specific untested supported behavior, flaky failure, or measured latency regression is evidenced.
 
@@ -133,6 +139,7 @@ Each record below is a classification surface, not a finding. It prevents a coll
 - **Evidence:** `EV-CI-002`
 - **Signal:** `SIG-CI-003`
 - **Disposition:** reject_signal
+- **Decision basis:** diagnostic_signal_only
 - **Rationale:** the failure named only the new focused contract's formatting while it was under construction; it is not a repository behavior or CI-authority defect.
 - **Trigger:** reopen if a clean committed fast gate fails after the focused contract passes formatting.
 
@@ -141,6 +148,7 @@ Each record below is a classification surface, not a finding. It prevents a coll
 - **Evidence:** `EV-DOC-001`
 - **Signal:** `SIG-DOC-001`
 - **Disposition:** reject_signal
+- **Decision basis:** diagnostic_signal_only
 - **Rationale:** passing contracts establish a baseline and do not by themselves justify documentation churn.
 - **Trigger:** create a related finding when a specific public claim, manifest, or workflow contract fails.
 
@@ -149,6 +157,7 @@ Each record below is a classification surface, not a finding. It prevents a coll
 - **Evidence:** `EV-PKG-001`
 - **Signal:** `SIG-PKG-001`
 - **Disposition:** reject_signal
+- **Decision basis:** diagnostic_signal_only
 - **Rationale:** a successful Hex build does not demonstrate a packaging defect.
 - **Trigger:** reopen on a package-content, metadata, or release-preflight failure tied to an exact source identity.
 
@@ -157,6 +166,7 @@ Each record below is a classification surface, not a finding. It prevents a coll
 - **Evidence:** `EV-REL-001`
 - **Signal:** `SIG-REL-001`
 - **Disposition:** defer
+- **Decision basis:** explicit_unavailability
 - **Owner phase:** 137
 - **Rationale:** local proof tests passed, but skipped PDFium viewer evidence cannot be promoted without the pinned executable or exact CI artifact.
 - **Trigger:** attach an exact-SHA primary-CI PDFium artifact or rerun on a host with the pinned executable.
@@ -167,6 +177,7 @@ Each record below is a classification surface, not a finding. It prevents a coll
 - **Evidence:** `EV-ADV-001`
 - **Signal:** `SIG-CATALOG-002`
 - **Disposition:** defer
+- **Decision basis:** explicit_unavailability
 - **Owner phase:** 136
 - **Rationale:** this macOS host lacks `pdfium-cli`; local advisory output is unavailable and cannot substitute for primary-CI or human-review authority.
 - **Trigger:** make the pinned PDFium executable available or attach the exact-SHA advisory artifact.
