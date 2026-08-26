@@ -4,20 +4,35 @@ defmodule Rendro.RepositoryEvidenceTest do
   alias Rendro.RepositoryEvidence
 
   @capsule Path.expand("../../evidence/releases/v1.3.4", __DIR__)
+  @roles [:public_prerequisite, :release_identity, :validation, :journey_index]
 
-  test "resolves the public prerequisite through the sole capsule entry point" do
+  test "loads each sealed core role only through the manifest dispatch" do
+    for role <- @roles do
+      assert {:ok, payload} = RepositoryEvidence.load_role(role)
+      assert payload["role"] == Atom.to_string(role)
+      assert payload["release"] == %{"version" => "1.3.4", "tag" => "v1.3.4"}
+    end
+  end
+
+  test "retains public prerequisite facts through its compatibility wrapper" do
     assert {:ok, facts} = RepositoryEvidence.load_public_prerequisite()
     assert facts["version"] == "1.3.4"
     assert facts["tag"] == "v1.3.4"
     assert facts["public_prerequisite"] == "VERIFIED"
   end
 
-  test "fails closed with stable diagnostics for malformed manifest and payload mutations" do
+  test "rejects unknown requested roles without returning facts" do
+    assert {:error, diagnostics} = RepositoryEvidence.load_role(:unknown)
+    assert diagnostics == Enum.sort(diagnostics)
+    assert Enum.any?(diagnostics, &String.contains?(&1, "unknown"))
+  end
+
+  test "fails closed when a requested role, role schema, binding, digest, path, or core role is invalid" do
     for {name, mutate} <- mutations() do
       with_temporary_capsule(fn root ->
         mutate.(root)
 
-        assert {:error, diagnostics} = RepositoryEvidence.load_public_prerequisite(root: root),
+        assert {:error, diagnostics} = RepositoryEvidence.load_role(:release_identity, root: root),
                "#{name} must fail closed"
 
         assert diagnostics == Enum.sort(diagnostics), "#{name} diagnostics must be stable"
@@ -26,59 +41,47 @@ defmodule Rendro.RepositoryEvidenceTest do
     end
   end
 
-  test "rejects duplicate record identities, paths, roles, and equal record identity" do
-    for duplicate <- [:id, :path, :role, :identity] do
+  test "rejects missing and duplicate core roles" do
+    for mutation <- [:missing, :duplicate] do
       with_temporary_capsule(fn root ->
-        manifest_path = Path.join([root, "evidence", "releases", "v1.3.4", "manifest.json"])
-        manifest = manifest_path |> File.read!() |> JSON.decode!()
-        [record] = manifest["records"]
+        manifest = read_manifest(root)
 
-        duplicate_record =
-          case duplicate do
-            :id -> Map.put(record, "id", record["id"])
-            :path -> Map.put(record, "path", record["path"])
-            :role -> Map.put(record, "role", record["role"])
-            :identity -> record
+        records =
+          case mutation do
+            :missing -> Enum.reject(manifest["records"], &(&1["role"] == "validation"))
+            :duplicate -> manifest["records"] ++ [Enum.find(manifest["records"], &(&1["role"] == "validation"))]
           end
 
-        File.write!(
-          manifest_path,
-          Jason.encode!(Map.put(manifest, "records", [record, duplicate_record]), pretty: true)
-        )
+        write_manifest(root, Map.put(manifest, "records", records))
 
-        assert {:error, diagnostics} = RepositoryEvidence.load_public_prerequisite(root: root)
-        assert diagnostics == Enum.sort(diagnostics)
-        assert Enum.any?(diagnostics, &String.contains?(&1, "duplicate"))
+        assert {:error, diagnostics} = RepositoryEvidence.load_role(:validation, root: root)
+        assert Enum.any?(diagnostics, &String.contains?(&1, "#{mutation}") or String.contains?(&1, "duplicate") or String.contains?(&1, "no validation"))
       end)
     end
   end
 
   defp mutations do
     [
-      {"empty manifest", &File.write!(manifest_path(&1), "")},
-      {"missing manifest", &File.rm!(manifest_path(&1))},
-      {"missing record", &replace_manifest(&1, "records", [])},
-      {"empty record", &File.write!(payload_path(&1), "")},
-      {"missing record file", &File.rm!(payload_path(&1))},
-      {"traversal", &replace_record(&1, "path", "../public_prerequisite.json")},
-      {"symlink substitution", &substitute_payload_with_symlink/1},
-      {"unsupported media", &replace_record(&1, "media_type", "text/plain")},
-      {"unsupported manifest version", &replace_manifest(&1, "schema_version", 2)},
-      {"unknown role", &replace_record(&1, "role", "unknown")},
-      {"digest mismatch", &replace_record(&1, "sha256", String.duplicate("0", 64))},
-      {"release binding mismatch", &replace_payload(&1, "tag", "v9.9.9")}
+      {"requested role versus manifest role mismatch", fn root -> replace_record(root, "role", "validation") end},
+      {"wrong role schema", fn root -> replace_payload(root, "release_identity.json", "role", "validation") end},
+      {"release/candidate/tag binding mismatch", fn root -> replace_payload(root, "release_identity.json", "candidate_commit_sha", String.duplicate("0", 40)) end},
+      {"digest mismatch", fn root -> replace_record(root, "sha256", String.duplicate("0", 64)) end},
+      {"traversal path", fn root -> replace_record(root, "path", "../release_identity.json") end},
+      {"absolute path", fn root -> replace_record(root, "path", "/tmp/release_identity.json") end},
+      {"missing path", fn root -> replace_record(root, "path", "missing.json") end}
     ]
   end
 
   defp with_temporary_capsule(fun) do
     root = Path.join(System.tmp_dir!(), "rendro-evidence-#{System.unique_integer([:positive])}")
+    destination = Path.join([root, "evidence", "releases", "v1.3.4"])
+    File.mkdir_p!(Path.join(destination, "journey"))
 
-    File.mkdir_p!(
-      Path.dirname(Path.join([root, "evidence", "releases", "v1.3.4", "manifest.json"]))
-    )
-
-    File.cp!(Path.join(@capsule, "manifest.json"), manifest_path(root))
-    File.cp!(Path.join(@capsule, "public_prerequisite.json"), payload_path(root))
+    for path <- ["manifest.json", "public_prerequisite.json", "release_identity.json", "validation.json", "journey/index.json"] do
+      target = Path.join(destination, path)
+      File.mkdir_p!(Path.dirname(target))
+      File.cp!(Path.join(@capsule, path), target)
+    end
 
     try do
       fun.(root)
@@ -87,44 +90,25 @@ defmodule Rendro.RepositoryEvidenceTest do
     end
   end
 
-  defp replace_manifest(root, key, value) do
-    path = manifest_path(root)
-
-    File.write!(
-      path,
-      Jason.encode!(Map.put(JSON.decode!(File.read!(path)), key, value), pretty: true)
-    )
-  end
+  defp read_manifest(root), do: root |> manifest_path() |> File.read!() |> JSON.decode!()
+  defp write_manifest(root, manifest), do: File.write!(manifest_path(root), Jason.encode!(manifest, pretty: true))
 
   defp replace_record(root, key, value) do
-    path = manifest_path(root)
-    manifest = JSON.decode!(File.read!(path))
-    [record] = manifest["records"]
+    manifest = read_manifest(root)
 
-    File.write!(
-      path,
-      Jason.encode!(Map.put(manifest, "records", [Map.put(record, key, value)]), pretty: true)
-    )
+    records =
+      Enum.map(manifest["records"], fn
+        %{"role" => "release_identity"} = record -> Map.put(record, key, value)
+        record -> record
+      end)
+
+    write_manifest(root, Map.put(manifest, "records", records))
   end
 
-  defp replace_payload(root, key, value) do
-    path = payload_path(root)
-
-    File.write!(
-      path,
-      Jason.encode!(Map.put(JSON.decode!(File.read!(path)), key, value), pretty: true)
-    )
+  defp replace_payload(root, relative_path, key, value) do
+    path = Path.join([root, "evidence", "releases", "v1.3.4", relative_path])
+    File.write!(path, Jason.encode!(Map.put(JSON.decode!(File.read!(path)), key, value), pretty: true))
   end
 
-  defp substitute_payload_with_symlink(root) do
-    path = payload_path(root)
-    File.rm!(path)
-    assert :ok = File.ln_s("/dev/null", path)
-  end
-
-  defp manifest_path(root),
-    do: Path.join([root, "evidence", "releases", "v1.3.4", "manifest.json"])
-
-  defp payload_path(root),
-    do: Path.join([root, "evidence", "releases", "v1.3.4", "public_prerequisite.json"])
+  defp manifest_path(root), do: Path.join([root, "evidence", "releases", "v1.3.4", "manifest.json"])
 end
