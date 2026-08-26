@@ -100,7 +100,9 @@ function blockersForFile(file, stagingAllowed) {
   const blockers = [];
 
   if (name.endsWith('-PLAN.md')) {
-    if (/<verify>[\s\S]*?<human-check\b/i.test(text) || /type="checkpoint:human-verify"/i.test(text)) {
+    const verificationBlocks = [...text.matchAll(/<verify>([\s\S]*?)<\/verify>/gi)].map((match) => match[1]);
+
+    if (verificationBlocks.some((block) => /<human-check\b/i.test(block)) || /<task type="checkpoint:human-verify"/i.test(text)) {
       blockers.push(`${rel}: unresolved human verification checkpoint`);
     }
     if (/gate="blocking(?:-human)?"/i.test(text) && /<task type="checkpoint/i.test(text)) {
@@ -177,6 +179,7 @@ if (process.argv[2] === '--check-active') {
 
   test('full mode rejects the currently active governance backlog', () => {
     assert.throws(() => checkActive([]), /active governance blockers/);
+    assert.deepEqual(blockersForFile(path.join(phasesRoot, '132-quality-baseline-triage', '132-03-PLAN.md'), false), []);
   });
 
   test('staging mode accepts no arbitrary stale verification identity', () => {
