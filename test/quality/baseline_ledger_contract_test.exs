@@ -92,5 +92,32 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
     assert ledger =~ "observed -> triaged -> accepted -> in_progress -> verified -> closed"
     assert ledger =~ "`repair`, `defer`, `reject_signal`, `accept_risk`, and `superseded`"
     assert ledger =~ "evidence_authority"
+
+    ids = Regex.scan(~r/QL-\d{3}/, ledger) |> List.flatten() |> Enum.uniq()
+    assert ids == Enum.sort(ids)
+    assert ids == ["QL-001"]
+
+    for label <- [
+          "Opened:",
+          "Evidence:",
+          "Impact:",
+          "Confidence:",
+          "Compatibility risk:",
+          "Evidence quality:",
+          "Priority:",
+          "Disposition:",
+          "Owner phase:",
+          "Verification:",
+          "Status:",
+          "Scope:",
+          "Trigger:",
+          "Closure:",
+          "Relationships/history:"
+        ] do
+      assert ledger =~ label
+    end
+
+    refute ledger =~ ".planning/phases/"
+    refute ledger =~ ".planning/milestones/"
   end
 end

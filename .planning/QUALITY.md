@@ -55,6 +55,45 @@ None recorded.
 
 No resolved, deferred, reopened, superseded, or accepted-risk findings are recorded yet. `None recorded` means this category has no rows; it does not claim risk is absent.
 
+## Finding lifecycle and relationships
+
+`observed -> triaged -> accepted -> in_progress -> verified -> closed`
+
+From `triaged`, a finding may instead be `rejected`, `deferred`, `accepted_risk`, or `superseded`. Reopen the same ID only when new evidence invalidates its prior disposition. A distinct regression or recurrence receives a new related ID. Keep meaningful state changes, related/reopened/superseded links, and the resolution reference in the finding; Git remains the line-level history.
+
+Deduplicate only when the underlying cause **and** compatibility or ownership boundary are the same. Tool name, adjacency, or similar symptoms alone do not merge findings. At equal priority, display findings in ascending `QL-NNN` order.
+
+## Qualitative rubric and dispositions
+
+There is no composite quality score. Each finding independently states:
+
+| Field | Allowed vocabulary |
+| --- | --- |
+| Impact and confidence | `low`, `medium`, `high` |
+| Compatibility risk | `none`, `bounded_internal`, `public_api`, `rendered_bytes`, `evidence_authority` |
+| Evidence quality | `signal`, `reproducible`, `contract_backed`, `independently_reviewed` |
+| Disposition | `repair`, `defer`, `reject_signal`, `accept_risk`, and `superseded` |
+
+High priority is a credible threat to a supported contract, rendered-byte guarantee, security boundary, release/package correctness, CI authority, or truthful evidence. Medium priority is demonstrated bounded maintenance, test, documentation, or workflow cost without a current public-contract break. Low priority or a signal is an observation without demonstrated harm; it cannot authorize standalone churn.
+
+## Routing and closure
+
+Phase 132 classifies. Phase 133 owns repository/evidence hygiene; Phase 134 architecture/readability; Phase 135 tests and CI authority; Phase 136 the six catalog cells; and Phase 137 final evidence reconciliation.
+
+High findings must be repaired or rejected with evidence before Phase 137. Medium findings need a bounded repair or concrete trigger-backed deferral. Low/style signals may be addressed only inside an already-justified change.
+
+- A **repair** needs an owner phase, scope boundary, focused verification, relevant full gate, before/after statement, and resolution reference.
+- A **defer** needs an owner, concrete event trigger, and evidence-refresh rule.
+- A **reject_signal** records why evidence is insufficient and the reopening condition.
+- An **accept_risk** needs compensating evidence or control, an owner, and an expiry or review event.
+- A **superseded** finding links the replacement finding and preserves its history.
+
+Closure uses the predeclared focused proof and compatibility evidence. Labels, severity changes, improved diagnostic counts, or unrelated green tests do not close a finding.
+
+## Resolved, rejected, deferred, and superseded findings
+
+`QL-001` is the currently rejected signal. No resolved, deferred, accepted-risk, reopened, or superseded rows are recorded. This empty state is explicit and non-vacuous: it says no rows exist, not that risks or future findings are absent.
+
 ## Baseline versus final
 
 Phase 137 adds a separate final snapshot and a before/after comparison. It must not overwrite `baseline-132-initial`.
