@@ -7,8 +7,17 @@ defmodule Mix.Tasks.CiAliasContractTest do
     ci_steps = Keyword.fetch!(aliases, :ci)
     ci_fast_steps = Keyword.fetch!(aliases, :"ci.fast")
     ci_proofs_steps = Keyword.fetch!(aliases, :"ci.proofs")
+    ci_advisory_steps = Keyword.fetch!(aliases, :"ci.advisory")
+    governance_steps = Keyword.fetch!(aliases, :"quality.governance")
 
     assert ci_steps == ["ci.fast", "ci.proofs"]
+
+    assert governance_steps == [
+             "quality.baseline",
+             "cmd node --test scripts/quality_governance.cjs",
+             "quality.uat --all --check",
+             "cmd node scripts/quality_governance.cjs --check-active"
+           ]
 
     assert ci_fast_steps == [
              "format --check-formatted",
@@ -27,6 +36,17 @@ defmodule Mix.Tasks.CiAliasContractTest do
              "test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs",
              "run scripts/release_preflight_proof.exs --current-version-tag --skip-ci --skip-security-audits --worktree /tmp/rendro-release-proof"
            ]
+
+    assert ci_advisory_steps == [
+             "test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs",
+             "rendro.launch_artifacts.check",
+             "rendro.comparison.check",
+             "rendro.livebook.check",
+             "cmd npm ci --prefix scripts/pdfjs_observer",
+             "cmd node scripts/pdfjs_observer/observe.mjs --check",
+             "deps.audit",
+             "hex.audit"
+           ]
   end
 
   test "scoped ci aliases run in MIX_ENV=test for local parity" do
@@ -36,6 +56,7 @@ defmodule Mix.Tasks.CiAliasContractTest do
     assert Keyword.fetch!(preferred_envs, :"ci.fast") == :test
     assert Keyword.fetch!(preferred_envs, :"ci.proofs") == :test
     assert Keyword.fetch!(preferred_envs, :"ci.advisory") == :test
+    assert Keyword.fetch!(preferred_envs, :"quality.uat") == :test
     assert Keyword.fetch!(preferred_envs, :"verify.flake") == :test
     assert Keyword.fetch!(preferred_envs, :"test.all") == :test
   end

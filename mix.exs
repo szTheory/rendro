@@ -34,6 +34,7 @@ defmodule Rendro.MixProject do
         ci: :test,
         "quality.baseline": :test,
         "quality.governance": :test,
+        "quality.uat": :test,
         "quality.hygiene": :test,
         "ci.fast": :test,
         "ci.proofs": :test,
@@ -91,6 +92,8 @@ defmodule Rendro.MixProject do
       ],
       "quality.governance": [
         "quality.baseline",
+        "cmd node --test scripts/quality_governance.cjs",
+        "quality.uat --all --check",
         "cmd node scripts/quality_governance.cjs --check-active"
       ],
       "quality.hygiene": ["app.start", &Mix.Tasks.Quality.Hygiene.run/1],

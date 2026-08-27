@@ -96,7 +96,7 @@ defmodule Mix.Tasks.Quality.Uat do
     total: #{length(records)}
     passed: #{length(records)}
     issues: 0
-    pending: 0
+    remaining: 0
     skipped: 0
     blocked: 0
     """
