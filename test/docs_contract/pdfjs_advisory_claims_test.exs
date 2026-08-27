@@ -144,13 +144,21 @@ defmodule Rendro.DocsContract.PdfjsAdvisoryClaimsTest do
     assert embedded["page_count"] == 2
     assert Enum.map(embedded["pages"], &{&1["width"], &1["height"]}) == [{612, 792}, {612, 792}]
 
-    assert invoice["fixture"] == "bench/results/raw/rendro.pdf"
+    assert invoice["fixture"] == "test/fixtures/pdfjs-rendro.pdf"
     assert invoice["page_count"] == 2
 
     assert Enum.map(invoice["pages"], &{&1["width"], &1["height"]}) == [
              {595.28, 841.89},
              {595.28, 841.89}
            ]
+  end
+
+  test "PDF.js observation fixture is test-only and absent from the package boundary" do
+    fixture = "test/fixtures/pdfjs-rendro.pdf"
+    manifest = "priv/quality/package-members-v1.json" |> File.read!() |> JSON.decode!()
+
+    assert File.regular?(fixture)
+    refute fixture in manifest["members"]
   end
 
   test "public docs do not claim unqualified PDF.js support" do

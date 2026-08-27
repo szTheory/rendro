@@ -1,6 +1,8 @@
 defmodule Rendro.PhoenixCleanRoomProof do
   @moduledoc false
 
+  alias Rendro.RepositoryEvidence
+
   @version "1.3.4"
   @candidate "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
   @phx_new_version "1.8.5"
@@ -49,7 +51,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
         end
 
       case cleanup_root(root, cleanup) do
-        :ok -> mark_cleanup_removed(result)
+        :ok -> mark_workspace_removed(result)
         {:error, reason} -> failure({:cleanup_failed, reason})
       end
     else
@@ -68,20 +70,66 @@ defmodule Rendro.PhoenixCleanRoomProof do
       "release_name" => "Release to Hex",
       "release_conclusion" => "success",
       "release_publish_job_conclusion" => "success",
-      "hexdocs_provenance" => "protected_release_publish",
-      "docs_provenance_run_id" => "32763039854",
+      "hexdocs_provenance" => "hexdocs_workflow_dispatch",
+      "hexdocs_conclusion" => "success",
+      "hexdocs_event" => "workflow_dispatch",
+      "hexdocs_name" => "HexDocs",
       "v1_3_0_conclusion" => "failure",
       "v1_3_1_conclusion" => "cancelled",
       "v1_3_2_conclusion" => "failure",
       "v1_3_3_conclusion" => "failure"
     }
 
-    if Enum.all?(required, fn {key, value} -> Map.get(prerequisite, key) == value end),
+    with true <- Enum.all?(required, fn {key, value} -> Map.get(prerequisite, key) == value end),
+         :ok <- valid_sha?(prerequisite["hexdocs_head_sha"]),
+         :ok <- valid_numeric?(prerequisite["docs_provenance_run_id"]),
+         :ok <-
+           validate_candidate_binding(
+             prerequisite["hexdocs_candidate_binding"],
+             prerequisite["hexdocs_head_sha"],
+             prerequisite["docs_provenance_run_id"]
+           ) do
+      :ok
+    else
+      _ -> {:error, :invalid_public_prerequisite}
+    end
+  end
+
+  def validate_prerequisite(_), do: {:error, :invalid_public_prerequisite}
+
+  defp validate_candidate_binding(binding, control_sha, run_id) when is_map(binding) do
+    required = %{
+      "control_ref" => "refs/heads/main",
+      "control_sha" => control_sha,
+      "requested_artifact_sha" => @candidate,
+      "peeled_tag_sha" => @candidate,
+      "detached_artifact_head" => @candidate,
+      "tag" => "v#{@version}",
+      "workflow_name" => "HexDocs",
+      "workflow_event" => "workflow_dispatch",
+      "workflow_run_id" => run_id
+    }
+
+    if Enum.all?(required, fn {key, value} -> Map.get(binding, key) == value end),
       do: :ok,
       else: {:error, :invalid_public_prerequisite}
   end
 
-  def validate_prerequisite(_), do: {:error, :invalid_public_prerequisite}
+  defp validate_candidate_binding(_, _, _), do: {:error, :invalid_public_prerequisite}
+
+  defp valid_sha?(value) when is_binary(value) do
+    if Regex.match?(~r/^[0-9a-f]{40}$/, value),
+      do: :ok,
+      else: {:error, :invalid_public_prerequisite}
+  end
+
+  defp valid_sha?(_), do: {:error, :invalid_public_prerequisite}
+
+  defp valid_numeric?(value) when is_binary(value) do
+    if Regex.match?(~r/^\d+$/, value), do: :ok, else: {:error, :invalid_public_prerequisite}
+  end
+
+  defp valid_numeric?(_), do: {:error, :invalid_public_prerequisite}
 
   def audit_dependency_source!(source) when is_binary(source) do
     cond do
@@ -145,6 +193,14 @@ defmodule Rendro.PhoenixCleanRoomProof do
       :next_action
     ])
     |> Enum.into(%{}, fn {key, value} -> {Atom.to_string(key), redact(value)} end)
+  end
+
+  @doc false
+  def prerequisite_sha256(prerequisite) when is_map(prerequisite) do
+    prerequisite
+    |> Jason.encode!()
+    |> then(&:crypto.hash(:sha256, &1))
+    |> Base.encode16(case: :lower)
   end
 
   @doc false
@@ -258,20 +314,20 @@ defmodule Rendro.PhoenixCleanRoomProof do
   end
 
   defp parse_options(args) do
-    defaults = %{prerequisite: default_prerequisite(), output: nil, root: nil}
+    defaults = %{prerequisite: :capsule, output: nil, root: nil}
 
     case args do
       [] ->
         {:ok, defaults}
 
-      ["--prerequisite", prerequisite] ->
-        {:ok, %{defaults | prerequisite: prerequisite}}
+      ["--output", output] ->
+        {:ok, %{defaults | output: output}}
 
-      ["--prerequisite", prerequisite, "--output", output] ->
-        {:ok, %{defaults | prerequisite: prerequisite, output: output}}
+      ["--output", output, "--root", root] ->
+        {:ok, %{defaults | output: output, root: root}}
 
-      ["--prerequisite", prerequisite, "--output", output, "--root", root] ->
-        {:ok, %{defaults | prerequisite: prerequisite, output: output, root: root}}
+      ["--root", root, "--output", output] ->
+        {:ok, %{defaults | output: output, root: root}}
 
       _ ->
         {:error, :invalid_arguments}
@@ -279,21 +335,17 @@ defmodule Rendro.PhoenixCleanRoomProof do
   end
 
   defp options_output(["--" | args]), do: options_output(args)
-  defp options_output(["--prerequisite", _, "--output", output | _]), do: output
-  defp options_output(_), do: nil
 
-  defp default_prerequisite,
+  defp options_output(args),
     do:
-      Path.expand(
-        "../.planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json",
-        __DIR__
-      )
+      args
+      |> Enum.chunk_every(2)
+      |> Enum.find_value(fn
+        ["--output", output] -> output
+        _ -> nil
+      end)
 
-  defp read_prerequisite(path) do
-    with {:ok, contents} <- File.read(path),
-         {:ok, prerequisite} <- Jason.decode(contents),
-         do: {:ok, prerequisite}
-  end
+  defp read_prerequisite(:capsule), do: RepositoryEvidence.load_public_prerequisite()
 
   defp create_root(nil) do
     root =
@@ -319,91 +371,87 @@ defmodule Rendro.PhoenixCleanRoomProof do
     end
   end
 
-  defp run_once(root, options, prerequisite) do
+  defp run_once(root, _options, prerequisite) do
     env = isolated_env(root)
     app = Path.join(root, "clean_room")
 
-    try do
-      with :ok <- assert_empty_root(root),
-           :ok <- bootstrap_phx_new(root),
-           :ok <-
-             run_stage(
-               :generated_app,
-               "mix",
-               [
-                 "phx.new",
-                 app,
-                 "--no-install",
-                 "--no-ecto",
-                 "--no-html",
-                 "--no-assets",
-                 "--no-mailer",
-                 "--app",
-                 "clean_room",
-                 "--module",
-                 "CleanRoom"
-               ],
-               env,
-               root
-             ),
-           :ok <- write_consumer(app),
-           :ok <- audit_dependency_source!(File.read!(Path.join(app, "mix.exs")) |> rendro_dep()),
-           :ok <- run_stage(:deps_get, "mix", ["deps.get"], env, app),
-           {:ok, lock} <- read_lock(app),
-           :ok <- audit_lock!(lock),
-           {:ok, resolved} <- resolved_versions(lock),
-           :ok <-
-             run_stage(
-               :generated_consumer_test,
-               "mix",
-               ["test"],
-               [{"MIX_ENV", "test"} | env],
-               app
-             ),
-           :ok <- audit_public_source(app),
-           {:ok, loopback_port} <- reserve_port(),
-           :ok <- configure_loopback(app, loopback_port),
-           :ok <- compile_loopback(app, env),
-           {:ok, loopback} <- loopback_facts(app, env, loopback_port),
-           :ok <- assert_cleanup_candidate(root, app) do
-        project_evidence(%{
-          schema_version: 1,
-          lane: "advisory_external_evidence",
-          advisory: true,
-          version: @version,
-          candidate_sha: prerequisite["candidate_commit_sha"],
-          prerequisite_sha: sha256(options.prerequisite),
-          elixir: System.version(),
-          otp: System.otp_release(),
-          phoenix: resolved.phoenix,
-          plug: resolved.plug,
-          bandit: resolved.bandit,
-          hex: command_version("mix", ["hex.info"], env, app),
-          phx_new: command_version("mix", ["phx.new", "--version"], env, root),
-          phx_new_source: "isolated_mix_archive_phx_new_#{@phx_new_version}",
-          commands: [
-            "mix archive.install hex phx_new 1.8.5 --force",
-            "mix phx.new --no-install --no-ecto --no-html --no-assets --no-mailer",
-            "mix deps.get",
-            "mix test",
-            "mix compile",
-            "loopback endpoint start",
-            "loopback HTTP probe"
-          ],
-          lock_sha256: sha256(Path.join(app, "mix.lock")),
-          source_audits: "public_hex_exact_1.3.4",
-          conn_case: response_facts(),
-          loopback: loopback,
-          cleanup: "pending",
-          outcome: "success",
-          next_action: "none"
-        })
-      else
-        {:error, reason} ->
-          failure(reason)
-      end
-    after
-      terminate_process_tree(root)
+    with :ok <- assert_empty_root(root),
+         :ok <- bootstrap_phx_new(root),
+         :ok <-
+           run_stage(
+             :generated_app,
+             "mix",
+             [
+               "phx.new",
+               app,
+               "--no-install",
+               "--no-ecto",
+               "--no-html",
+               "--no-assets",
+               "--no-mailer",
+               "--app",
+               "clean_room",
+               "--module",
+               "CleanRoom"
+             ],
+             env,
+             root
+           ),
+         :ok <- write_consumer(app),
+         :ok <- audit_dependency_source!(File.read!(Path.join(app, "mix.exs")) |> rendro_dep()),
+         :ok <- run_stage(:deps_get, "mix", ["deps.get"], env, app),
+         {:ok, lock} <- read_lock(app),
+         :ok <- audit_lock!(lock),
+         {:ok, resolved} <- resolved_versions(lock),
+         :ok <-
+           run_stage(
+             :generated_consumer_test,
+             "mix",
+             ["test"],
+             [{"MIX_ENV", "test"} | env],
+             app
+           ),
+         :ok <- audit_public_source(app),
+         {:ok, loopback_port} <- reserve_port(),
+         :ok <- configure_loopback(app, loopback_port),
+         :ok <- compile_loopback(app, env),
+         {:ok, loopback} <- loopback_facts(app, env, loopback_port),
+         :ok <- assert_cleanup_candidate(root, app) do
+      project_evidence(%{
+        schema_version: 1,
+        lane: "advisory_external_evidence",
+        advisory: true,
+        version: @version,
+        candidate_sha: prerequisite["candidate_commit_sha"],
+        prerequisite_sha: prerequisite_sha256(prerequisite),
+        elixir: System.version(),
+        otp: System.otp_release(),
+        phoenix: resolved.phoenix,
+        plug: resolved.plug,
+        bandit: resolved.bandit,
+        hex: command_version("mix", ["hex.info"], env, app),
+        phx_new: command_version("mix", ["phx.new", "--version"], env, root),
+        phx_new_source: "isolated_mix_archive_phx_new_#{@phx_new_version}",
+        commands: [
+          "mix archive.install hex phx_new 1.8.5 --force",
+          "mix phx.new --no-install --no-ecto --no-html --no-assets --no-mailer",
+          "mix deps.get",
+          "mix test",
+          "mix compile",
+          "loopback endpoint start",
+          "loopback HTTP probe"
+        ],
+        lock_sha256: sha256(Path.join(app, "mix.lock")),
+        source_audits: "public_hex_exact_1.3.4",
+        conn_case: response_facts(),
+        loopback: loopback,
+        cleanup: "pending",
+        outcome: "success",
+        next_action: "none"
+      })
+    else
+      {:error, reason} ->
+        failure(reason)
     end
   end
 
@@ -793,11 +841,13 @@ defmodule Rendro.PhoenixCleanRoomProof do
   defp assert_cleanup_candidate(root, app),
     do: if(String.starts_with?(app, root), do: :ok, else: {:error, :unsafe_app_path})
 
-  defp terminate_process_tree(_root), do: :ok
-
   defp cleanup_root(root, cleanup) do
     try do
-      cleanup.(root)
+      case cleanup.(root) do
+        :ok -> if File.exists?(root), do: {:error, :workspace_still_exists}, else: :ok
+        {:error, _} = error -> error
+        other -> {:error, {:cleanup_invalid_result, other}}
+      end
     rescue
       error -> {:error, {:cleanup_exception, error.__struct__}}
     catch
@@ -806,9 +856,7 @@ defmodule Rendro.PhoenixCleanRoomProof do
   end
 
   defp cleanup_root(root) do
-    with :ok <- terminate_process_tree(root),
-         :ok <- remove_root(root),
-         do: :ok
+    remove_root(root)
   end
 
   defp remove_root(root) do
@@ -825,13 +873,13 @@ defmodule Rendro.PhoenixCleanRoomProof do
       project_evidence(%{
         outcome: "failure",
         next_action: bounded(inspect(reason)),
-        cleanup: "attempted"
+        cleanup: "workspace_cleanup_attempted"
       })
 
-  defp mark_cleanup_removed(%{"outcome" => "success"} = result),
-    do: Map.put(result, "cleanup", "removed")
+  defp mark_workspace_removed(%{"outcome" => "success"} = result),
+    do: Map.put(result, "cleanup", "workspace_removed")
 
-  defp mark_cleanup_removed(result), do: result
+  defp mark_workspace_removed(result), do: result
 
   defp emit(result, nil), do: IO.puts(Jason.encode!(result))
 

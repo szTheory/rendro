@@ -32,6 +32,10 @@ defmodule Rendro.MixProject do
     [
       preferred_envs: [
         ci: :test,
+        "quality.baseline": :test,
+        "quality.governance": :test,
+        "quality.uat": :test,
+        "quality.hygiene": :test,
         "ci.fast": :test,
         "ci.proofs": :test,
         "ci.advisory": :test,
@@ -83,10 +87,21 @@ defmodule Rendro.MixProject do
       "rendro.catalog.check": [&catalog_check/1],
       "rendro.catalog.candidate": [&catalog_candidate/1],
       "rendro.configurator.gen": [&configurator_gen/1],
+      "quality.baseline": [
+        "test --include quality_ledger_contract --only quality_ledger_contract test/quality/baseline_ledger_contract_test.exs"
+      ],
+      "quality.governance": [
+        "quality.baseline",
+        "cmd node --test scripts/quality_governance.cjs",
+        "quality.uat --all --check",
+        "cmd node scripts/quality_governance.cjs --check-active"
+      ],
+      "quality.hygiene": ["app.start", &Mix.Tasks.Quality.Hygiene.run/1],
       ci: ["ci.fast", "ci.proofs"],
       "ci.fast": [
         "format --check-formatted",
-        "hex.build",
+        "quality.hygiene",
+        "cmd mix hex.build",
         "compile --warnings-as-errors",
         "test --exclude quarantine --slowest 10",
         "docs --warnings-as-errors",
@@ -153,7 +168,12 @@ defmodule Rendro.MixProject do
         priv/adoption_evidence
         priv/examples
         priv/fonts
-        bench/results
+        bench/results/comparison.json
+        bench/results/raw/chromic_pdf.json
+        bench/results/raw/chromic_pdf_warm_pool.json
+        bench/results/raw/pdf_generator.json
+        bench/results/raw/rendro.json
+        bench/results/raw/typst_cli.json
         guides
         .formatter.exs
         mix.exs

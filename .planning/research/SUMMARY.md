@@ -1,150 +1,137 @@
 # Project Research Summary
 
-**Project:** Rendro v2.13 — Quality Ratchet & Adoption Readiness
-**Domain:** Pure-Elixir, Phoenix-first PDF library stewardship: evidence-bound catalog quality, adoption review, and newcomer validation
-**Researched:** 2026-08-19
+**Project:** Rendro
+**Domain:** Quality and maintainability ratchet for a mature deterministic Elixir library
+**Researched:** 2026-08-26
 **Confidence:** HIGH
 
 ## Executive Summary
 
-Rendro v2.13 is a stewardship milestone, not a rendering-feature release. The product already has the required machinery: a deterministic PDF pipeline, a fixed 32-cell catalog with a generator/checker, SHA-bound reviewer dispositions, a pinned advisory PDFium raster lane, a pull-based `ADOPTION.md` ledger, and a Phoenix 1.8 reference app. The recommendation is to strengthen those three existing evidence loops only: repair and re-review the twelve explicitly named `needs_work` catalog cells, record a dated adoption decision from live public sources, and prove one clean Phoenix newcomer journey from discovery through a customized verified PDF.
+Rendro does not need a new quality stack. It already has a strong deterministic baseline—compiler warnings as errors, 1,917 tests, strict Credo, Dialyzer, ExDoc warnings, package checks, vulnerability audits, and deliberately separate proof/advisory lanes. The next gain comes from applying these mechanisms to maintainability questions they do not answer automatically: cohesive module ownership, durable evidence boundaries, test brittleness, workflow authority, current comments/specs, and decision-ready debt tracking.
 
-The correct quality unit is an evidence-bound vertical slice: repair the underlying recipe/theme/fixture behavior, regenerate artifacts, verify deterministic identities, review the exact pinned-raster assets at readable size, then promote only with a human record tied to the current PDF/PNG hashes. Deterministic contracts prove artifact identity and completeness; advisory raster/network evidence and bounded human judgment remain distinct and must not become claims of accessibility, print safety, PDF/UA, WCAG, universal viewer compatibility, or general design certification. Dark cells remain screen-oriented and retain `print_safety: false`.
+The milestone should audit before changing and treat metrics as investigation signals. Current evidence identifies useful starting points: several high-churn multi-responsibility modules, three runtime (not compile-connected) dependency cycles, current tests/release paths coupled to archived Phase 131 files, loose historical planning files, and phase-number-specific catalog generation routes in the main CI workflow. None should be “fixed” solely because it exists; Phase 132 must establish impact, confidence, compatibility risk, and verification first.
 
-The main risks are score laundering or provenance drift, treating environment-specific tools as required truth, stale/miscounted adoption data, and a newcomer check that only proves the maintainer checkout. Mitigate them with hash joins and fail-closed contracts, the existing pinned advisory lane, dated read-only Hex/GitHub snapshots with an explicit `HOLD`/`ACCUMULATING`/`TRIGGER`, and a clean public path anchored to the existing Phoenix example. Do not add a runtime dependency, analytics, outreach, a new core capability family, a service/database, or a second tutorial application.
+The catalog track remains narrow. Repair six exact scored cells with actual visual gaps, retain the fixed 32-cell membership and twenty explicitly unscored entries, and keep dark output screen-oriented with `print_safety: false`. A generic exact-SHA catalog evidence workflow must exist before the new review so future quality windows do not add more milestone-specific CI branches.
 
 ## Key Findings
 
-### Recommended Stack
+### Stack
 
-No new runtime dependency is warranted. Keep Elixir 1.19.5/OTP 28, the existing dev-only `Rendro.Catalog` generator/checker and rubric schema, pinned `pdfium-cli` v0.11.0 for advisory raster evidence, and the existing Phoenix `~> 1.8` reference application. The static catalog and Phoenix example are evidence consumers of the one pure render engine, not alternate rendering paths.
+- Keep Elixir 1.19.5, OTP 28, ExUnit, Credo 1.7.17, Dialyxir 1.4.7, ExDoc, mix_audit, and existing schema tooling.
+- Use `mix xref`, coverage, slow-test output, package manifests, and workflow contracts diagnostically.
+- Add no runtime dependency and no quality dependency unless a trial proves a current false-negative that existing tools cannot express.
+- Treat GitHub caches as untrusted and catalog generation as read-only artifact production.
 
-**Core technologies:**
+### Table Stakes
 
-- `Rendro.Catalog`, `mix rendro.catalog.gen`, and `mix rendro.catalog.check` — regenerate and verify all 32 catalog cells, exact hashes, renderer pin, dispositions, and promotion evidence.
-- `priv/quality/rubric_scores.json` — reviewer-owned, SHA-bound record; a repaired cell passes only with supersession and concrete resolution references.
-- `pdfium-cli` v0.11.0 with the existing SHA pin — advisory, renderer-specific review PNGs; never a deterministic or universal-viewer authority.
-- `mix ci.fast` and existing docs/schema contracts — required deterministic verification without external visual tools.
-- `ADOPTION.md`, Hex API, and read-only `gh issue list` / `gh pr list` — dated snapshot evidence only; no polling, telemetry, or GitHub writes.
-- `examples/phoenix_example` — the sole repeatable Phoenix 1.8 integration anchor; a disposable `mix phx.new` run is acceptance evidence only, never another maintained app.
+- A durable current quality ledger with evidence and dispositions.
+- Public API and unrelated PDF-byte stability.
+- Product/release paths independent of archived planning.
+- Evidence-backed architecture/readability/spec/comment cleanup.
+- Tests that protect behavior rather than planning prose or implementation trivia.
+- One purpose-named exact-SHA catalog evidence workflow.
+- Six-cell visual closure with truthful dark boundaries.
+- Before/after reporting and next-review triggers.
 
-### Expected Features
+### Architecture
 
-**Must have (table stakes):**
-
-- Repair, regenerate, and re-score the exact twelve named cells: Invoice/Cedar Mutual/Corporate Classic, Statement/Signal Ledger/Minimal Mono, Receipt/Poppy & Grain/Humanist, Certificate/Meridian Arts Fellowship/Editorial, Payslip/Northline Logistics/Swiss, and Ticket/Aurora Live/Brutalist — each in light and dark.
-- Address the Humanist dark Receipt’s additional affordance, typography, and cohesion deficits; every target must reach hierarchy 5 and all applicable rubric gates while dark cells keep their screen-only/false-print-safety boundary.
-- Add or strengthen a fail-loud provenance/coverage guard so catalog ID, current PDF/PNG hashes, rubric scores, disposition, and human review cannot drift.
-- Refresh the existing adoption gate in one live review window and append source, timestamp, raw outcome, and explicit decisions for demand, downloads, contributor evidence, and the composite gate.
-- Prove one public Phoenix newcomer path: discover → install → choose Swiss/light Invoice → copy/configure canonical code → controller response → `application/pdf` and `%PDF-` verification; repair only the existing handoffs found broken.
-- Preserve truthful scope language in catalog, docs, configurator, and ledger.
-
-**Should have (only if it enables the required work):**
-
-- A dev/test-only full-size reviewer packet for the exact twelve cells, extending the existing raster review seam rather than creating a review product.
-
-**Defer (v2+):**
-
-- Global text shaping, RTL/bidi/cluster support unless the pre-existing conjunctive gate actually triggers.
-- Catalog expansion, new recipes/presets/document families, live Studio/server previews/accounts, automated/AI aesthetic scoring, compliance/accessibility/print certification, analytics, campaigns, and outreach.
-
-### Architecture Approach
-
-Keep three existing evidence flows and one render engine. Recipes/themes feed `build -> compose -> measure -> paginate -> render -> validate`, producing deterministic PDFs. The dev-only catalog binds those PDFs to pinned advisory PNGs and projects only hash-bound reviewer dispositions into the public manifest/configurator. Independently, dated public observations flow to `ADOPTION.md` and an explicit gate outcome; README/Livebook/recipe links flow to the optional Phoenix adapter and the executable example route. No new renderer, database, service, telemetry, or runtime integration belongs in this milestone.
-
-**Major components:**
-
-1. Recipes/themes/fixtures and the render pipeline — make the smallest targeted behavior repair; never add a catalog-specific rendering fork.
-2. Catalog tasks, artifact tree, and rubric manifest — regenerate/check exact artifacts and bind public quality state to reviewer-owned evidence.
-3. Deterministic tests/docs contracts plus advisory review support — fail closed on identity/provenance/claim drift while keeping visual review advisory and human.
-4. `ADOPTION.md` — immutable, reviewable public evidence snapshots and decision logic, without instrumentation.
-5. README, Livebook, and `examples/phoenix_example` — one connected, optional-adapter newcomer journey.
+The product pipeline remains untouched. v2.14 adds a maintainer control plane: official research and repository evidence feed the milestone quality ledger; accepted findings route to bounded phases; each change closes through focused and full verification. Durable release facts move to a versioned release-evidence directory. Ordinary CI validates committed state, while the generic catalog-evidence workflow produces checksum-bound review/canonical artifacts for an exact input SHA without repository write authority.
 
 ### Critical Pitfalls
 
-1. **Score laundering** — never edit a visible status or `passed` assertion; freeze thresholds, regenerate bytes, and require per-cell, hash-addressed human review.
-2. **Artifact/provenance drift** — generator output, rubric, sign-off, and configurator must join on current IDs/hashes; generated catalog fields are never hand-edited.
-3. **Advisory tools treated as portable truth** — Linux/pinned PDFium output is advisory evidence; tool absence is `SKIPPED`/unavailable, not core failure, and never supports compliance claims.
-4. **Stale or miscounted adoption evidence** — collect live Hex and GitHub inputs in the same window; record query/date/pagination/result and `UNAVAILABLE`, never infer zero or trigger from a partial family.
-5. **Scope/outreach creep and maintainer-only onboarding** — perform only read-only inbound review; prove a clean public Phoenix install/copy/customize/render path without widening core dependencies or relying on checkout/cache state.
+1. **Cleanup churn:** require evidence and verification before extraction, renaming, or deletion.
+2. **Metric gaming:** never substitute coverage, line count, or dependency count for behavioral proof and cohesion judgment.
+3. **Executable planning history:** machine-consumed facts must live in stable versioned evidence, not archived phase prose.
+4. **Authority loss during CI cleanup:** generic workflow inputs, permissions, renderer pin, HEAD equality, and artifact scope must be at least as strict as existing routes.
+5. **Weaker tests after consolidation:** inventory distinct behaviors/failures and prove replacement tests have teeth.
+6. **Visual overclaim:** improve screen scores without changing print/accessibility/viewer claims.
 
 ## Implications for Roadmap
 
-Based on research, use two phases with a hard evidence handoff.
+### Phase 132: Quality Baseline & Triage
 
-### Phase 130: Catalog Quality & Evidence Ratchet
+**Why first:** Later phases need a frozen, evidence-backed finding set and compatibility contract.
 
-**Rationale:** Catalog repair is the dependency root: the Phoenix journey must consume a stable, truthful catalog choice, and no label may be promoted before its deterministic artifact identity and human evidence agree.
+**Delivers:** the durable quality ledger, current metrics, finding dispositions, owner phases, and verification methods.
 
-**Delivers:** Targeted recipe/theme/fixture fixes for the twelve frozen cells; focused regressions; deterministic artifact regeneration; catalog/rubric/provenance contracts; a bounded pinned-raster reviewer packet if the existing seam is insufficient; per-cell human re-review and promotion only where thresholds/gates truly pass.
+### Phase 133: Repository & Evidence Hygiene
 
-**Addresses:** All twelve `needs_work` cells, especially Humanist dark Receipt; durable quality-evidence linkage.
+**Why second:** Stable evidence inputs and correct historical archives remove known brittle foundations before code/test/CI restructuring.
 
-**Avoids:** Score laundering, provenance drift, host-specific raster baselines, broad catalog cleanup, and dark-mode/print-safety overclaims.
+**Delivers:** versioned release evidence, no product/release dependency on archived planning, archived loose phase files, justified tracked helpers, and package/hygiene guards.
 
-### Phase 131: Adoption Snapshot & Phoenix Newcomer Proof
+### Phase 134: Core Architecture & Readability
 
-**Rationale:** This phase is independent of the repairs operationally but must use their final public state. It closes the evidence-to-adoption and documentation-to-working-app handoffs without inventing a growth program or new product surface.
+**Why third:** The accepted finding set and stable evidence boundary permit conservative internal cleanup with public/golden proof.
 
-**Delivers:** One dated, source-backed, read-only Hex/GitHub adoption refresh and explicit composite decision; deterministic ledger/claim guards as needed; a clean, reproducible Phoenix newcomer evaluation anchored to the existing example; documentation/integration fixes limited to proven handoff failures; recorded deterministic versus advisory boundaries.
+**Delivers:** closed high-impact architecture/readability/spec/comment/dead-code findings and bounded medium fixes.
 
-**Addresses:** Current adoption decision and one Swiss/light Invoice discover-to-customized-PDF path.
+### Phase 135: Test & CI/CD Simplification
 
-**Avoids:** Stale/miscounted signals, accidental outreach/telemetry, core Phoenix coupling, cache/checkout-only success, and exaggerated public claims.
+**Why fourth:** Tests can be consolidated after internal boundaries stabilize; generic catalog authority must land before visual review.
 
-### Phase Ordering Rationale
+**Delivers:** behavior-preserving test cleanup, smaller ordinary CI, and one secure exact-SHA catalog evidence workflow with historical routes retired after parity.
 
-- Freeze the twelve IDs and evidence shape before modifying recipes; repair → regenerate → rebind → human-review → promote is non-negotiable.
-- The full 32-cell generation/check confirms catalog-wide integrity, but human review remains bounded to the twelve targets plus existing multipage evidence; do not expand the review obligation.
-- Adoption collection may run in parallel with Phase 130 preparation, but its final ledger/docs closure and the newcomer journey should consume the final catalog state.
-- Required deterministic checks (`mix rendro.catalog.check`, focused regressions, `mix ci.fast`, docs/schema contracts) remain separate from advisory PDFium, Livebook, and Phoenix integration lanes.
+### Phase 136: Catalog Visual Quality
+
+**Why fifth:** Uses stable core/tests and the generic evidence workflow to repair and re-review six exact cells.
+
+**Delivers:** hierarchy 5 and other visual dimensions at least 4 for all six targets, with exact hashes/provenance and unchanged dark print boundary.
+
+### Phase 137: Closure & Handoff
+
+**Why last:** Measures committed results, closes/rejects every high finding, and makes deferred work actionable.
+
+**Delivers:** full verification, before/after ledger, ranked triggers, and next-milestone options in current project state.
+
+### Ordering Rationale
+
+- Audit before remediation prevents subjective scope drift.
+- Evidence hygiene before architecture/CI avoids rebuilding on archived planning paths.
+- Architecture before test consolidation keeps characterization coverage trustworthy.
+- Generic evidence CI before catalog repair prevents another phase-number route.
+- Catalog after engineering cleanup separates output changes from refactors.
+- Closure last preserves a truthful baseline/final comparison.
 
 ### Research Flags
 
-Phases likely needing deeper research during planning:
-
-- **Phase 130:** Medium research need — inspect the exact current catalog/rubric test seams and the pinned Linux-review workflow before deciding whether a narrow reviewer-packet helper is necessary; preserve renderer pin and historical-evidence semantics.
-- **Phase 131:** Medium research need — live Hex/GitHub data is time-sensitive and Phoenix clean-room validation must confirm current dependency/setup behavior. Research only the specific public APIs and released package path, then commit a dated snapshot.
-
-Phases with standard patterns (skip broad research-phase):
-
-- **Phase 130 deterministic repair/check work:** Existing repository generator, hash join, schema contracts, and focused recipe regression patterns are authoritative.
-- **Phase 131 ledger/docs contracts:** Existing `ADOPTION.md` rules and docs-contract patterns define the decision model; no analytics or external platform evaluation is required.
+- **Phase 132:** Medium—confirm the final finding rubric against actual source/test/workflow evidence; avoid turning initial signals into conclusions.
+- **Phase 133:** Medium—inventory every fact consumed from Phase 131 before defining the durable manifest schema.
+- **Phase 134:** High—each extraction target requires local pattern mapping and characterization tests; do not preselect splits from file size.
+- **Phase 135:** High—map all current catalog route authority checks and obtain remote artifact parity before deletion.
+- **Phase 136:** High—visual changes require exact current image review and human judgment.
+- **Phase 137:** Low—standard verification and lifecycle closure once preceding artifacts are complete.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Existing pinned toolchain, catalog tasks, and Phoenix fixture are repository-verified; external documentation is supplementary. |
-| Features | HIGH | Exact target cells, scores, deferred scope, and evidence gates are committed project facts. |
-| Architecture | HIGH | Existing component boundaries and data/evidence flows are directly documented in repository seams. |
-| Pitfalls | HIGH | Controls arise from current contracts, prior milestones, and known host/evidence boundaries; external API behavior is MEDIUM. |
+| Stack | HIGH | Current versions and commands are repository-verified; official docs support diagnostic boundaries |
+| Scope | HIGH | User approved exact compatibility, catalog, research, CI, comment, and completion decisions |
+| Architecture | HIGH | Current planning coupling, workflow topology, xref shape, and catalog evidence paths were inspected directly |
+| Pitfalls | HIGH | Risks follow from prior archive regressions and current authority boundaries |
 
 **Overall confidence:** HIGH
 
-### Gaps to Address
+### Gaps to Resolve During Planning
 
-- **Exact visual fixes:** Research identifies the failing scores, not the final design edits. Phase 130 must validate each minimal change against current artifacts and preserve unresolved status when evidence falls short.
-- **Review automation extent:** Only add a reviewer-packet helper if the existing raster-review test cannot produce the twelve exact full-size assets; keep it dev/test-only and advisory.
-- **Live adoption facts:** Download/issue/PR values are snapshots, not durable facts. Phase 131 must fetch and record raw dated observations; network failure is `UNAVAILABLE`, not a zero.
-- **Clean-room Phoenix evidence:** The committed example is repeatable evidence, while a disposable generated-app check validates public onboarding. Record versions/prerequisites/results without committing generated application code.
+- The exact core extractions are intentionally not preordained; Phase 132 evidence decides whether each hotspot is fixed, deferred, or rejected.
+- The durable v1.3.4 manifest fields must be derived exhaustively from current verifier/newcomer assertions before migration.
+- Generic catalog workflow parity requires a live remote run; local YAML/contracts alone cannot prove the Linux PDFium path.
+- Human review remains necessary for the six visual targets.
 
 ## Sources
 
-### Primary (HIGH confidence)
+### Primary
 
-- [STACK.md](STACK.md) — existing toolchain, pins, commands, adoption-snapshot and Phoenix-fixture recommendations.
-- [FEATURES.md](FEATURES.md) — exact twelve-cell scope, rubric outcomes, anti-features, and adoption/journey acceptance boundaries.
-- [ARCHITECTURE.md](ARCHITECTURE.md) — data/evidence flows, ownership boundaries, and dependency-aware build order.
-- [PITFALLS.md](PITFALLS.md) — failure modes, lane separation, scope controls, and verification hooks.
-- [PROJECT.md](../PROJECT.md), `ADOPTION.md`, `priv/quality/rubric_scores.json`, `assets/rendro/catalog.json`, and `examples/phoenix_example/` — project-authoritative constraints and existing evidence seams.
-
-### Secondary (MEDIUM confidence)
-
-- Phoenix official `mix phx.new` and setup documentation — clean-room validation guidance.
-- GitHub CLI documentation and GitHub REST pagination/rate-limit documentation — read-only snapshot collection behavior.
-- Hex Rendro package API — time-stamped download observation only.
+- [Mix xref](https://hexdocs.pm/elixir/1.19.5/Mix.Tasks.Xref.html)
+- [Mix test coverage](https://hexdocs.pm/mix/1.19.5/Mix.Tasks.Test.Coverage.html)
+- [Credo configuration](https://credo.hexdocs.pm/config_file.html)
+- [Dialyxir 1.4.7](https://dialyxir.hexdocs.pm/)
+- [GitHub reusable workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/reusing-workflow-configurations)
+- [GitHub dependency caching](https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching)
+- Rendro source, tests, workflows, catalog/rubric manifests, and archived v2.10-v2.13 artifacts
 
 ---
-*Research completed: 2026-08-19*
+*Research completed: 2026-08-26*
 *Ready for roadmap: yes*

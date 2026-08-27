@@ -1,8 +1,8 @@
 ---
-status: investigating
+status: resolved
 trigger: "authorize-candidate-zero-byte-stable-investigation-and-fix"
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-08-26
 ---
 
 # Debug Session: Candidate Zero Byte-Stable Cells
@@ -149,3 +149,8 @@ verification:
   - candidate/canonical matrix: 32/32 source-PDF drift plus 32/32 PNG drift; 0 raster-only rows; 0 unchanged rows.
   - `mix test` six recipe byte-identity suites: 15 tests, 0 failures.
 files_changed: []
+
+- timestamp: 2026-08-26
+  checked: Phase 130 policy outcome and canonical publication
+  found: Plan 130-04 truthfully accepted the 12 changed-scored / 20 changed-unscored / 0 byte-stable partition; Plan 130-05 completed review of the twelve scored identities; Plan 130-10 published the candidate-identical 32-cell catalog through the pinned-PDFium canonical route and passed Catalog VERIFIED plus 95 focused tests. The v2.13 milestone audit passed 12/12 requirements and all end-to-end flows.
+  implication: the requested policy decision was made in favor of reviewed canonical rebind while preserving the separate nil-theme byte-identity contract; no classifier mutation or fabricated stability was introduced, so the session is resolved.

@@ -32,7 +32,7 @@ const FIXTURES = [
     output: "priv/pdfjs_observations/embedded_artifact_support_fixture.json"
   },
   {
-    fixture: "bench/results/raw/rendro.pdf",
+    fixture: "test/fixtures/pdfjs-rendro.pdf",
     output: "priv/pdfjs_observations/bench_rendro_invoice.json"
   }
 ];

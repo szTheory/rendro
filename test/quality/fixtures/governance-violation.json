@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "cases": {
+    "PROH-132-01": {
+      "artifact": {
+        "path": ".planning/QUALITY.md",
+        "text": "<!-- quality-governance: {\"role\":\"authority\",\"basis\":\"local_advisory\",\"primary_ci\":true} -->"
+      }
+    },
+    "PROH-132-02": {
+      "artifact": {
+        "path": "test/rendro/ledger_consumer_test.exs",
+        "text": "<!-- quality-governance: {\"role\":\"consumer\",\"reference\":\".planning/QUALITY.md\"} -->"
+      }
+    },
+    "PROH-132-03": {
+      "artifact": {
+        "path": ".planning/QUALITY.md",
+        "text": "<!-- quality-governance: {\"role\":\"decision\",\"basis\":\"diagnostic_signal_only\",\"disposition\":\"repair\",\"evidence_gated\":false} -->"
+      }
+    }
+  }
+}

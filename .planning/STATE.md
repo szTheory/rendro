@@ -1,19 +1,19 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.13
-milestone_name: Quality Ratchet & Adoption Readiness
-current_phase: 131
-current_phase_name: Adoption Snapshot & Phoenix Newcomer Proof
+milestone: v2.14
+milestone_name: Quality & Maintainability
+current_phase: 135
+current_phase_name: Test & CI/CD Simplification
 status: executing
-stopped_at: "Stopped at 131-18 Task 3: protected main at 7e28826, required CI failed; no HexDocs dispatch"
-last_updated: "2026-08-25T19:08:15.000Z"
-last_activity: 2026-08-25
-last_activity_desc: Plan 131-18 control reached protected main, but exact-SHA required CI failed before HexDocs dispatch
+stopped_at: Completed 135-02-PLAN.md
+last_updated: "2026-08-27T16:34:16.095Z"
+last_activity: 2026-08-27
+last_activity_desc: Phase 135 execution started
 progress:
-  total_phases: 2
-  completed_phases: 1
-  total_plans: 28
-  completed_plans: 25
+  total_phases: 6
+  completed_phases: 3
+  total_plans: 25
+  completed_plans: 24
   percent: 50
 ---
 
@@ -21,132 +21,143 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-08-19)
+See: .planning/PROJECT.md (updated 2026-08-27)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 131 — Adoption Snapshot & Phoenix Newcomer Proof
+**Current focus:** Phase 135 — Test & CI/CD Simplification
 
 ## Current Position
 
-Phase: 131 (Adoption Snapshot & Phoenix Newcomer Proof) — EXECUTING
-Plan: 14 of 17 completed (131-18 paused at Task 3 remote CI failure)
-Status: Blocked pending a new control SHA, remote CI closure, revised approval, and fresh dispatch authority
-Last activity: 2026-08-25 — Plan 131-18 protected-main/HexDocs decision rejected; no external mutation
+Phase: 135 (Test & CI/CD Simplification) — EXECUTING
+Plan: 3 of 3
+Status: Ready to execute
+Last activity: 2026-08-27 — Phase 135 execution started
 
-Progress: [████████░░] 82% executable plans executed; 3 gap-closure plans ready
-
-## Roadmap Snapshot (v2.13, Phases 130-131)
+## Roadmap Snapshot (v2.14, Phases 132-137)
 
 ```text
-[████████████████████░░░░░░░░░░░░░░░░░░░░] 50% — 1/2 phases complete
-Phase 130 Catalog Quality & Evidence Ratchet .............. Complete (11/11 plans)
-Phase 131 Adoption Snapshot & Phoenix Newcomer Proof ...... Gap closure ready (14/17 executable plans executed)
+[####################....................] 50% — 3/6 phases complete
+Phase 132 Quality Baseline & Triage ....................... Complete
+Phase 133 Repository & Evidence Hygiene ................... Complete
+Phase 134 Core Architecture & Readability ................. Complete
+Phase 135 Test & CI/CD Simplification ..................... Pending
+Phase 136 Catalog Visual Quality .......................... Pending
+Phase 137 Closure & Handoff ............................... Pending
 ```
 
-**Locked sequencing:** 130 repairs, regenerates, and truthfully re-reviews the fixed twelve cells before 131 records final adoption evidence and validates the public newcomer path against that stable catalog state.
+**Locked sequencing:** baseline and triage → durable evidence hygiene → conservative core cleanup → behavior-preserving test/CI simplification → six-cell catalog repair → measured closure and handoff.
 
 ## Accumulated Context
 
 ### Decisions
 
-- v2.13 is a stewardship milestone: no new runtime dependency, core capability family, recipes, presets, catalog cells, analytics, outreach, or reviewer product.
-- Required deterministic checks remain separate from advisory PDFium/human/network evidence; dark catalog output remains screen-oriented and non-print-safe.
-- Phase 130 uses the existing catalog, rubric, hash, and pinned-raster machinery; no cell is promoted if its current evidence misses a threshold.
-- Phase 131 records a dated, read-only `HOLD`/`ACCUMULATING`/`TRIGGER` adoption decision and validates one clean Phoenix path through existing public surfaces only.
-- [Phase ?]: Receipt themes materialize one semantic table-cell set for both measurement and rendering while nil-theme bytes stay frozen.
-- [Phase ?]: Themed Invoice places an available due date beside Total Due only when the payment summary has a total.
-- [Phase ?]: Statement catalog_layout remains capacity-only; supplied-theme hierarchy is shared with ordinary public calls.
-- [Phase ?]: Public supplied themes carry Certificate, Payslip, and Ticket hierarchy; catalog_layout remains capacity-only.
-- [Phase ?]: Certificate centering and Payslip monetary alignment derive from the exact values emitted to render.
-- [Phase ?]: Ticket uses a public rectilinear placement rule while retaining placement > title > complete reference in both modes.
-- [Phase ?]: Candidate classification is a pure, file-I/O-free boundary and does not read canonical catalog assets, mutate evidence, or project quality data.
-- [Phase ?]: Only gsd/phase-130-catalog-review-<40 lowercase hex equal to GITHUB_SHA may produce the advisory artifacts.
-- [Phase ?]: Authorized exact two deterministic-only dark golden transitions in detached staging; this decision excludes launch artifacts, catalog scores, rubric evidence, and SIGN-OFF authority.
-- [Phase ?]: Accepted only the verified exact-SHA PDFium launch artifact into detached staging; quality review and publication remain separate gates.
-- [Phase ?]: Six changed light launch images were approved only through Jon's dated, hash-bound full-size records; dark and brand rows remain deterministic-only.
-- [Phase ?]: Plan 130-05 binds twelve human review records only through reconciliation SHA 1646eeb8875cc67d7d452d3f28bc2b0d6503f943a2a6775f7e256a3e51bb3f22.
-- [Phase ?]: Plan 130-05 promotes four light cells only; every dark cell remains needs_work while print_safety is false.
-- [Phase ?]: Published the exact reviewed 19-path launch and golden batch as one reversible commit after staging identity validation.
-- [Phase ?]: The sole successful canonical catalog writer ran in the SHA-bound CI PDFium lane; local publication only materialized its verified artifact.
-- [Phase ?]: Phase 130 Nyquist closure requires green deterministic gates while pinned renderer and human evidence remain separate.
-- [Phase ?]: Phase 130 temporary provenance is removed only after literal remote SHA, manifest, and publication-subset checks.
-- [Phase ?]: 2026-08-21 adoption snapshot is a read-only HOLD decision: Downloads ACCUMULATING; Demand and Contributor HOLD; composite is the minimum family state.
-- [Phase ?]: Dated adoption evidence is packaged and published atomically through an exclusive temporary output plus hard-link target creation.
-- [Phase ?]: Both protected version consumers now extract exactly one top-level @version declaration and fail closed on zero or multiple matches.
-- [Phase ?]: Private v1.3.1 candidate is bound to SHA 7afb1dd056bba234d1bd4ec1c4487f2ea8e308f1 with public docs still ~> 1.3.
-- [Phase ?]: v1.3.0 remains immutable failed-release evidence; no tag, dispatch, Hex, HexDocs, or registry mutation occurred in Plan 131-03.
-- [Phase 131]: D-35 makes exact v1.3.4 the fresh protected release/verifier/journey target on bbe75d2 ancestry; complete credential-free preflight is the validation gate and only actual protected publish receives HEX_API_KEY. v1.3.0 through v1.3.3 remain immutable failed history.
-- [Phase ?]: Exact 1.3.4 is the sole recovery target; v1.3.0-v1.3.3 remain immutable failed history.
-- [Phase ?]: Plan 10 owns the clean-room harness and evidence only after Plan 09 writes the public prerequisite.
-- [Phase ?]: f03c78bab54efe1cd1596d51cf3f28193232e2a3 is the sole private v1.3.4 candidate after fresh detached proof.
-- [Phase ?]: v1.3.4 approval remains pending_blocking_human; no v1.3.3 approval transfers.
-- [Phase ?]: Adoption snapshot publication uses an exclusive hard link as the no-replace authority and always cleans writer temporary files.
-- [Phase ?]: Contributor tables state the dated empty evidence explicitly; no account or PR was fabricated.
-- [Phase ?]: HexDocs identity validation is inline in the trusted workflow so the sealed candidate remains immutable while dispatcher, checkout, and peeled-tag identities must match it.
-- [Phase ?]: Use a synced exclusive temporary file plus hard-link publication so a public VERIFIED prerequisite cannot replace an authoritative target.
-- [Phase ?]: Keep --check-existing read-only: matching bounded facts are revalidated without changing the prerequisite bytes or mtime.
-- [Phase ?]: Literal approve-exact-control-and-docs authorizes only packet-bound Plan 131-15 protected-main fast-forward and one candidate-bound HexDocs dispatch.
+- v2.14 is a quality and maintainability milestone; it adds no runtime features, capability families, recipes, presets, or catalog cells.
+- Public APIs and unrelated rendered bytes are compatibility contracts; only the six named catalog cells may change visually.
+- Findings are risk-ranked using evidence, impact, confidence, compatibility risk, and verification; metrics are diagnostic signals, not quotas.
+- High-risk findings must be repaired or rejected with evidence, bounded medium findings must be repaired or explicitly deferred, and low-value observations do not justify standalone churn.
+- Comments explain non-obvious intent and constraints; stale narration and misleading specifications are removed or corrected.
+- Product, release, and current regression behavior must not depend on archived planning; GSD-planning tooling checks may retain an explicit exception.
+- Catalog CI converges on one generic read-only exact-SHA evidence workflow before Phase 126, 127, and 130 routes are removed.
+- Catalog scope remains 32 cells with 20 explicitly unscored; dark output remains screen-oriented and `print_safety: false`.
+- Catalog quality work is limited to Corporate Classic Invoice dark, Minimal Mono Statement dark, Swiss Payslip light/dark, and Brutalist Ticket light/dark.
+- [Phase 132]: QUALITY.md is human-first; normalized JSV evidence is companion-only and excluded from ordinary tests and `ci.fast`.
+- [Phase 132]: QL-001 records xref topology as a `reject_signal` until concrete harm meets its reopening trigger.
+- [Phase 132]: The source-bound initial snapshot is immutable; later evidence requires a new dated snapshot.
+- [Phase 132]: Archive evidence authority routes to 133, generic catalog parity to 135, and only six named visual cells to 136.
+- [Phase 132]: Objective completion uses deterministic evidence, advisory feedback, or explicit deferral; no blocking human UAT state is permitted in active phase artifacts.
+- [Phase 133]: Manifest is the sole v1.3.4 capsule entry point; the loader returns facts only after strict validation.
+- [Phase 133]: v1.3.4 clean-room facts remain advisory; Git history, protected branches, and release tags are authoritative.
+- [Phase ?]: Phase 133: All sealed v1.3.4 capsule roles dispatch through a fixed maintainer-only fail-closed loader; journey index starts empty and append-only.
+- [Phase 133]: Phase 5 Early Ecosystem Recipes context has one v1.0 archive home, preserved as a Git-recognizable rename; plan-local legacy paths are provenance records, not consumers.
+- [Phase ?]: Phase 45 belongs to the shipped v1.8 milestone; archive ownership is proven by its roadmap and Git history.
+- [Phase ?]: Archive verification excludes only plan-local and validation provenance records; active consumers use canonical v1.8 paths.
+- [Phase ?]: [Phase 133]: Retain scripts only with current callers and owner roles; gsd_tooling remains planning-structure-only.
+- [Phase ?]: The first four failed journey attempts retain source digests, source commits, exact facts, byte-identical Markdown sidecars, and separate import/redaction metadata.
+- [Phase ?]: Only journey_attempt records may share a manifest role; IDs and paths remain globally unique while sealed core roles stay singleton.
+- [Phase ?]: The package manifest encodes the resolved Plan 12 package boundary now, while wiring/removal remains deliberately deferred.
+- [Phase ?]: Only scripts/quality_governance.cjs may inspect planning as gsd_tooling; product and evidence consumers are rejected.
+- [Phase ?]: [Phase 133]: The pre-schema success is preserved as a structured journey record with an explicit absent narrative; no Markdown is invented.
+- [Phase ?]: [Phase 133]: All nine journey records remain advisory and inert; active consumers remain restricted to sealed core roles.
+- [Phase ?]: [Phase 133]: Active clean-room and public-release consumers use the validated v1.3.4 capsule loader; the advisory workflow is v1.3.4-only.
+- [Phase ?]: Journey provenance contracts retain source path, source digest, source commit, facts digest, and sidecar digest as capsule assertions rather than reading deleted legacy files.
+- [Phase ?]: [Phase 133]: Legacy journey batch B was removed only after nine-attempt/eight-sidecar capsule preservation and zero-consumer cutover were re-proven.
+- [Phase ?]: Package only comparison.json and the five manifest-referenced raw JSON records; keep D-07 adoption evidence separately owner-bearing.
+- [Phase ?]: Use a test-only PDF.js fixture so advisory observation does not require package-visible PDF proof.
+- [Phase ?]: Keep quality.hygiene deterministic and shared across local, ci.fast, and release clean checkout paths.
+- [Phase ?]: [Phase 133]: QL-002 closed only after terminal deterministic scan, compatibility review, and separately classified proof evidence.
+- [Phase 134]: Remove Analyzer and its solely-owned test only after zero-reference, xref, active-shaper, public-manifest, package, and deterministic recipe-byte proof; keep `Rendro.Text.Shaper.Simple` authoritative.
+- [Phase 134]: Delegate only characterized palette-resolution mechanics to the hidden helper; all seven recipes retain their own maps, private seams, precedence, failure behavior, and rendered bytes.
+- [Phase 134]: Keep QL-007 shaping fallback and QL-008 narration as evidence-backed `reject_signal` records without speculative source churn.
+- [Phase 134]: Project strict deterministic SUMMARY coverage into terminal UAT for Phase 134 onward; human feedback may enrich evidence but cannot block objective completion.
+- [Phase ?]: [Phase 135]: Catalog evidence stays dev/test-only with closed manifest-rooted bundles; parity validates per-side transport provenance independently of shared authority equality.
+- [Phase ?]: [Phase 135]: Catalog Evidence remains standalone workflow_dispatch evidence transport; ordinary CI and ci-success stay unchanged.
+- [Phase ?]: [Phase 135]: The trusted control checkout alone packages and validates detached candidate output before the sole 30-day upload.
 
 ### Pending Todos
 
-None yet.
+None outside the roadmap.
 
 ### Blockers/Concerns
 
-- Human re-review and network/Phoenix observations are evidence inputs, not deterministic proof; unavailable evidence must remain explicitly unavailable.
-- D-35 immutable v1.3.3 release incident: annotated tag object c96bf205d7216cdcf4846a0f24a312f9c1c75b0f peels to cfc58a81865e060351ce33d98f5e52de8cd198d9; run 32596108284 validate job 97087204354 passed version, CI, and complete preflight before the redundant unauthenticated standalone dry run failed; publish job 97088652899 skipped; Hex/HexDocs absent, with no docs dispatch/verifier. Fix bbe75d2 removes only that duplicate and confines HEX_API_KEY to actual protected publish. Exact v1.3.4 is the fresh target; v1.3.0 through v1.3.3 are immutable and must never be retried or mutated.
-- Plan 131-15 terminal failure: sole authorized HexDocs workflow_dispatch run 32877290266 failed in verify-docs-ready job 97899588380 because checkout lacked annotated v1.3.4 for docs-contract git rev-parse; publish job 97900969705 skipped and no binding artifact exists. No retry: new workflow control SHA, focused re-verification, and fresh human approvals are required.
-- Plan 131-18 protected-main control SHA `7e28826cf9f0832063ea9fd922d6bb065a920fc4` was integrated, but push-triggered CI run 32887354057 failed required `ci-success` job 97931741585. Primary CI exposed a tag-dependent structural test in the generic checkout; secondary toolchain setup and configurator screenshots also failed. No HexDocs dispatch occurred. A new control SHA and fresh approval are required.
-
-### Quick Tasks Completed
-
-| # | Description | Date | Commit | Status | Directory |
-|---|-------------|------|--------|--------|-----------|
-| 260820-tn3 | Format the Phase 130-10 rubric manifest contract test so mix ci.fast can close Phase 130-11 | 2026-08-20 | d81fe5f |  | [260820-tn3-format-the-phase-130-10-rubric-manifest-](./quick/260820-tn3-format-the-phase-130-10-rubric-manifest-/) |
-| 260820-trn | Remove unreachable Phase 130 catalog review fallbacks so Dialyzer and ci.fast pass | 2026-08-20 | 3ae636d |  | [260820-trn-remove-the-two-unreachable-phase-130-cat](./quick/260820-trn-remove-the-two-unreachable-phase-130-cat/) |
-| 260820-u73 | Reconcile all twelve Phase 130 catalog review justifications and SIGN-OFF evidence, then strengthen fail-closed evidence contracts | 2026-08-20 | a125928 | Verified | [260820-u73-reconcile-all-twelve-phase-130-catalog-r](./quick/260820-u73-reconcile-all-twelve-phase-130-catalog-r/) |
+- Remote pinned-renderer parity and visual review remain advisory evidence during Phases 135-136; unavailable evidence must remain explicitly unavailable and non-blocking.
+- v1.3.0-v1.3.3 and failed Phase 131 release/control attempts are immutable historical evidence and must not be retried or rewritten.
 
 ## Deferred Items
 
-| Category | Item | Status | Deferred At |
-|----------|------|--------|-------------|
-| Studio | Live server-rendered theme playground | Demand-gated | v2.11 scoping |
-| Typography | Global text shaping, RTL/bidi, and broader OpenType features | Demand-gated by refreshed conjunctive adoption gate | v2.13 scoping |
-| Catalog | New recipes, presets, and catalog expansion | Out of scope for fixed 32-cell quality ratchet | v2.13 scoping |
+| Category | Item | Status | Revisit Trigger |
+|----------|------|--------|-----------------|
+| Studio | Live server-rendered theme playground | Demand-gated | Existing Studio demand gate is met |
+| Typography | Global text shaping, RTL/bidi, broader OpenType | Demand-gated | Refreshed conjunctive adoption gate supports expansion |
+| Capabilities | Charts and other new document families | Deferred | Separately approved demand-backed milestone |
+| Catalog | New recipes, presets, cells, or scoring the twenty unscored cells | Deferred | Explicit future catalog milestone |
 
 ## Session Continuity
 
-Last session: 2026-08-25T19:08:15.000Z
-Stopped at: Stopped at 131-18 Task 3: protected main at 7e28826, required CI failed; no HexDocs dispatch
-Resume file: .planning/phases/131-adoption-snapshot-phoenix-newcomer-proof/131-HEXDOCS-RETRY-APPROVAL.md
+Last session: 2026-08-27T16:34:16.087Z
+Stopped at: Completed 135-02-PLAN.md
+Resume file: None
 
 ## Next Steps
 
-1. Correct the remote-only CI failures under a new Plan 131-18 control SHA, then obtain fresh protected-main and one-dispatch approval before resuming 131-18 -> 131-16 -> 131-17.
-2. Treat `131-15-TERMINAL-INCIDENT.md` as immutable incident evidence; never dispatch it again.
-3. Do not dispatch HexDocs from failed control `7e28826cf9f0832063ea9fd922d6bb065a920fc4`; the authorized dispatch remains unconsumed.
+1. Run `$gsd-discuss-phase 135` for behavior-preserving test and CI/CD simplification.
+2. Inventory preserved behaviors, authority checks, and the exact-SHA catalog evidence routes before consolidation.
+3. Preserve the no-feature, public-contract, deterministic/proof/advisory separation, and sole `ci-success` authority boundaries.
+
+## Operator Next Steps
+
+- Start with `$gsd-discuss-phase 135`.
+
+## Quick Tasks Completed
+
+| ID | Task | Date | Commit | Status | Directory |
+|----|------|------|--------|--------|-----------|
+| 260827-e02 | Implement zero-human verification for Phase 134 and future phases | 2026-08-27 | d699e6d | Verified | [260827-e02-implement-zero-human-verification-for-ph](./quick/260827-e02-implement-zero-human-verification-for-ph/) |
 
 ## Performance Metrics
 
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
-| Phase 130 P01 | 11m 28s | 3 tasks | 7 files |
-| Phase 130 P02 | 4m | 3 tasks | 6 files |
-| Phase 130 P03 | 6m | 2 tasks | 5 files |
-| Phase 130 P07 | 4m | 3 tasks | 2 files |
-| Phase 130 P08 | 17m | 2 tasks | 17 files |
-| Phase 130-catalog-quality-evidence-ratchet P09 | 1m | 1 tasks | 1 files |
-| Phase 130 P05 | 32min | 1 tasks | 1 files |
-| Phase 130 P06 | 13m | 1 tasks | 19 files |
-| Phase 130 P10 | ~45m | 2 tasks | 36 files |
-| Phase 130-catalog-quality-evidence-ratchet P11 | 19m | 2 tasks | 2 files |
-| Phase 131 P01 | 12m | 2 tasks | 6 files |
-| Phase 131 P02 | ~10m | 1 tasks | 3 files |
-| Phase 131-adoption-snapshot-phoenix-newcomer-proof P03 | ~45m | 1 tasks | 9 files |
-| Phase 131 P07 | 20min | 2 tasks | 6 files |
-| Phase 131-adoption-snapshot-phoenix-newcomer-proof P08 | 24min | 2 tasks | 4 files |
-| Phase 131-adoption-snapshot-phoenix-newcomer-proof P10 | ~90m | 2 tasks | 9 files |
-| Phase 131 P11 | 10m | 2 tasks | 3 files |
-| Phase 131 P12 | 18m | 1 tasks | 2 files |
-| Phase 131 P13 | 198s | 1 tasks | 2 files |
-| Phase 131 P14 | 6m | 2 tasks | 1 files |
+| Phase 132-quality-baseline-triage P01 | 7m | 3 tasks | 6 files |
+| Phase 132-quality-baseline-triage P02 | 31min | 2 tasks | 3 files |
+| Phase 132-quality-baseline-triage P03 | 34min | 2 tasks | 10 files |
+| Phase 132-quality-baseline-triage P04 | 29min | 2 tasks | 9 files |
+| Phase 133 P01 | 1m | 1 tasks | 6 files |
+| Phase 133 P02 | 8min | 1 tasks | 12 files |
+| Phase 133 P08 | 2min | 1 tasks | 1 files |
+| Phase 133 P09 | 5min | 1 tasks | 7 files |
+| Phase 133 P10 | 9min | 1 tasks | 4 files |
+| Phase 133 P03 | 10min | 1 tasks | 13 files |
+| Phase 133-repository-evidence-hygiene P11 | 20min | 1 tasks | 4 files |
+| Phase 133 P04 | 21min | 1 tasks | 13 files |
+| Phase 133 P05 | 25min | 1 tasks | 7 files |
+| Phase 133 P06 | 8min | 1 tasks | 9 files |
+| Phase 133 P07 | 1m | 1 tasks | 9 files |
+| Phase 133 P12 | 18min | 1 tasks | 18 files |
+| Phase 133 P13 | 10min | 1 tasks | 2 files |
+| Phase 134 P01 | 20m | 2 tasks | 4 files |
+| Phase 134 P02 | 14m | 2 tasks | 3 files |
+| Phase 134 P03 | 10m | 1 tasks | 3 files |
+| Phase 134 P04 | 4m | 2 tasks | 7 files |
+| Phase 134-core-architecture-readability P05 | 25m | 2 tasks | 3 files |
+| Phase 135 P01 | 7m | 3 tasks | 9 files |
+| Phase 135 P02 | 16m | 2 tasks | 6 files |

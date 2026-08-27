@@ -2,164 +2,207 @@
 
 ## Milestones
 
-- 📋 **v2.13 Quality Ratchet & Adoption Readiness** — Phases 130-131 (planned)
+- 📋 **v2.14 Quality & Maintainability** — Phases 132-137 (planned)
+- ✅ **v2.13 Quality Ratchet & Adoption Readiness** — Phases 130-131 (shipped 2026-08-26; [roadmap archive](milestones/v2.13-ROADMAP.md), [requirements](milestones/v2.13-REQUIREMENTS.md), [audit](milestones/v2.13-MILESTONE-AUDIT.md))
 - ✅ **v2.12 Style-Genre Presets, Public Catalog & Static Configurator** — Phases 125-129 (shipped 2026-08-19; [roadmap archive](milestones/v2.12-ROADMAP.md), [requirements](milestones/v2.12-REQUIREMENTS.md), [audit](milestones/v2.12-MILESTONE-AUDIT.md))
-- ✅ **v2.11 Document Theming & Design-Token System** — Phases 119-124 (shipped 2026-07-28; [archive](milestones/v2.11-ROADMAP.md))
-- ✅ **v2.10 Realistic Business-Document Examples & Anatomy** — Phases 114-118 (shipped 2026-07-19; [archive](milestones/v2.10-ROADMAP.md))
-- ✅ **C1 CI/CD Performance & Reliability** — Phases 108-113 (shipped 2026-07-11; [archive](milestones/C1-ROADMAP.md))
-- ✅ **B1 Brand System & Identity Lab** — Phases 101-107 (shipped 2026-06-14; [archive](milestones/B1-ROADMAP.md))
-- ✅ **v2.9 TOC & Document Navigation** — Phases 97-100 (shipped 2026-06-14; [archive](milestones/v2.9-ROADMAP.md))
+- ✅ **v2.11 Document Theming & Design-Token System** — Phases 119-124 (shipped 2026-07-28; [roadmap archive](milestones/v2.11-ROADMAP.md))
+- ✅ **v2.10 Realistic Business-Document Examples & Anatomy** — Phases 114-118 (shipped 2026-07-19; [roadmap archive](milestones/v2.10-ROADMAP.md))
+- ✅ **C1 CI/CD Performance & Reliability** — Phases 108-113 (shipped 2026-07-11; [roadmap archive](milestones/C1-ROADMAP.md))
+- ✅ **B1 Brand System & Identity Lab** — Phases 101-107 (shipped 2026-06-14; [roadmap archive](milestones/B1-ROADMAP.md))
+- ✅ **v2.9 TOC & Document Navigation** — Phases 97-100 (shipped 2026-06-14; [roadmap archive](milestones/v2.9-ROADMAP.md))
 
 ## Phases
 
-### 📋 v2.13 Quality Ratchet & Adoption Readiness (Phases 130-131)
+### 📋 v2.14 Quality & Maintainability (Phases 132-137)
 
-**Milestone Goal:** Strengthen the shipped catalog and adoption experience with current, bounded evidence—repairing and honestly re-reviewing the twelve existing `needs_work` catalog cells, recording an explicit demand-gate decision, and proving one clean Phoenix newcomer path—without expanding Rendro's runtime dependencies, core capability families, catalog, recipes, or presets.
+**Milestone Goal:** Raise Rendro's engineering, repository, CI/CD, test, documentation, and targeted catalog quality without changing supported capability scope, public contracts, or unrelated rendered bytes.
 
-- [x] **Phase 130: Catalog Quality & Evidence Ratchet** - Repair and re-review the exact twelve catalog cells through the existing deterministic and advisory evidence lanes. (completed 2026-08-20)
-- [ ] **Phase 131: Adoption Snapshot & Phoenix Newcomer Proof** - Record a dated demand decision and prove the public Swiss/light Invoice path in a clean Phoenix application.
+- [x] **Phase 132: Quality Baseline & Triage** — Establish the durable evidence ledger, compatibility contract, and risk-ranked finding set that governs all later work. (completed 2026-08-26)
+- [x] **Phase 133: Repository & Evidence Hygiene** — Remove active-product coupling to archived planning and make repository, package, and evidence boundaries durable. (completed 2026-08-26)
+- [x] **Phase 134: Core Architecture & Readability** — Resolve accepted high-value internal design, dead-code, specification, documentation, and comment findings conservatively. (completed 2026-08-27)
+- [ ] **Phase 135: Test & CI/CD Simplification** — Preserve behavioral and authority coverage while consolidating brittle tests and milestone-specific workflow machinery.
+- [ ] **Phase 136: Catalog Visual Quality** — Repair and re-review only the six scored catalog cells with actual visual gaps through the generic exact-SHA evidence lane.
+- [ ] **Phase 137: Closure & Handoff** — Re-run full evidence, close the ledger, and leave a ranked, durable next-milestone posture.
 
 ## Phase Details
 
-### Phase 130: Catalog Quality & Evidence Ratchet
+### Phase 132: Quality Baseline & Triage
 
-**Goal**: The exact twelve catalog cells currently marked `needs_work` have targeted, evidence-bound quality improvements and a truthful current disposition, while the fixed 32-cell catalog remains deterministic and its advisory human-review boundary remains intact.
-**Depends on**: Nothing (first phase of the milestone; builds on the shipped v2.12 catalog, rubric, and pinned-raster evidence seams)
-**Requirements**: CATALOG-06, CATALOG-07, CATALOG-08, CATALOG-09
+**Goal**: Maintainers have a dated, reproducible quality baseline and one durable ledger that distinguishes actionable risk from low-value cleanup signals.
+**Depends on**: Nothing (first phase of v2.14; builds on the shipped v2.13 baseline and v2.14 research)
+**Requirements**: AUDIT-01, AUDIT-02, AUDIT-03, AUDIT-04
 **Success Criteria** (what must be TRUE):
 
-  1. A reviewer can inspect improved renders for each of the six named family/brand/preset combinations in both light and dark modes—the exact twelve current `needs_work` cells—without any new recipe, preset, or catalog entry appearing.
-  2. The Humanist dark Receipt visibly resolves its recorded reader-affordance, typographic-craft, and cohesion deficits, while its catalog record continues to communicate screen-oriented use and `print_safety: false`.
-  3. Maintainers can regenerate the complete fixed 32-cell catalog and have its existing deterministic artifact, hash, schema, and coverage checks accept the current generated output.
-  4. A human can review the twelve exact full-size pinned-raster outputs and find every disposition bound to the current catalog ID and reviewed artifact hashes; any cell that misses the frozen threshold remains `needs_work` rather than being promoted.
+  1. A maintainer can reproduce the recorded architecture, dependency, test, CI/CD, documentation, packaging, release-evidence, and catalog baseline using documented repository commands.
+  2. Every discovered finding appears once in the durable ledger with evidence, impact, confidence, compatibility risk, disposition, owner phase, verification method, and status.
+  3. Every high-risk finding is assigned for repair or rejected with evidence; medium-risk work is bounded or deferred with a trigger; low-value observations do not create standalone churn.
+  4. The ledger freezes the public API and unrelated rendered-byte compatibility contract that every later phase must verify.
 
-**Plans**: 11/11 plans executed
+**Plans**: 2/2 plans executed
+
+Plans:
+
+- [x] 132-01-PLAN.md — Establish the schema-backed ledger/evidence tracer and complete governance contract.
+- [x] 132-02-PLAN.md — Capture the full dated baseline and triage every signal into the durable ledger.
+
+### Phase 133: Repository & Evidence Hygiene
+
+**Goal**: Current product, release, test, package, and workflow behavior depends only on current durable inputs while historical planning remains safely archived.
+**Depends on**: Phase 132
+**Requirements**: HYGIENE-01, HYGIENE-02, HYGIENE-03, HYGIENE-04
+**Success Criteria** (what must be TRUE):
+
+  1. Product code, release verification, current regression tests, and operational workflows run without reading archived planning artifacts; explicit GSD-planning tests remain clearly identified as tooling checks.
+  2. A versioned, schema-validated durable source supplies every v1.3.4 release and newcomer-journey fact currently consumed from Phase 131 evidence.
+  3. Maintainers can inspect the phase archive and find no unexplained loose tracked phase files or ownerless tracked helper scripts.
+  4. Package and hygiene checks prove internal evidence, local debris, and misplaced planning files cannot enter the published artifact unnoticed.
+
+**Plans**: 13/13 plans executed
 
 Plans:
 **Wave 1**
 
-- [x] 130-01-PLAN.md — Repair Humanist Receipt, Corporate-Classic Invoice, and Minimal-Mono Statement through public supplied-theme seams.
-- [x] 130-02-PLAN.md — Repair Editorial Certificate, Swiss Payslip, and Brutalist Ticket while preserving genre geometry.
+- [x] 133-01-PLAN.md — Trace manifest to validated prerequisite through the inert shared loader.
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [x] 130-03-PLAN.md — Define the candidate-driven twelve-image payload and full-SHA-bound advisory CI route.
+- [x] 133-02-PLAN.md — Add core release identity, validation, and journey-index roles.
+- [x] 133-08-PLAN.md — Archive loose Phase 5 history under v1.0.
+- [x] 133-09-PLAN.md — Archive the seven-file Phase 45 set under v1.8.
+- [x] 133-10-PLAN.md — Inventory retained helpers and remove three ownerless scripts.
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [x] 130-07-PLAN.md — Stage exact-HEAD downstream reconciliation and authorize only the two known dark golden transitions.
+- [x] 133-03-PLAN.md — Preserve journey attempts 001-004 with the strict attempt schema.
+- [x] 133-11-PLAN.md — Implement the isolated hygiene policy, command, expected manifest, and focused tests.
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [x] 130-08-PLAN.md — Generate/check and fence the pinned launch family entirely inside detached staging.
+- [x] 133-04-PLAN.md — Preserve journey attempts 005-009 and seal complete capsule cardinality.
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [x] 130-09-PLAN.md — Reauthorize the six changed light launch images full-size without owning binaries.
+- [x] 133-05-PLAN.md — Atomically switch every active consumer to the complete capsule.
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
-- [x] 130-04-PLAN.md — Generate and gate one isolated 32-cell candidate bundle with an authoritative actual diff.
+- [x] 133-06-PLAN.md — Remove redundant legacy journey source batch A after cutover.
+- [x] 133-07-PLAN.md — Remove redundant legacy journey source batch B after cutover.
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
-- [x] 130-05-PLAN.md — Perform the separate exact twelve-image full-size catalog review against candidate identities.
+- [x] 133-12-PLAN.md — Apply exact package cleanup, PDF.js fixture relocation, and Mix/CI/release wiring.
 
 **Wave 8** *(blocked on Wave 7 completion)*
 
-- [x] 130-06-PLAN.md — Atomically publish the reviewed golden/launch mechanical batch and six legacy light records.
+- [x] 133-13-PLAN.md — Run terminal gates and close QL-002 only with its predeclared evidence.
 
-**Wave 9** *(blocked on Wave 8 completion)*
+### Phase 134: Core Architecture & Readability
 
-- [x] 130-10-PLAN.md — Transcribe the twelve catalog records and run exactly one candidate-identical canonical catalog generation.
-
-**Wave 10** *(blocked on Wave 9 completion)*
-
-- [x] 130-11-PLAN.md — Run final validation/source audits and fail-closed temporary-provenance cleanup.
-
-### Phase 131: Adoption Snapshot & Phoenix Newcomer Proof
-
-**Goal**: Maintainers have a dated, source-backed adoption decision and newcomers can independently go from Rendro’s public discovery path to a customized, verified Swiss/light Invoice PDF in a clean Phoenix application.
-**Depends on**: Phase 130 (the journey and public evidence consume the catalog's final truthful state)
-**Requirements**: SIGNAL-02, SIGNAL-03, SIGNAL-04, SIGNAL-05, JOURNEY-01, JOURNEY-02, JOURNEY-03, JOURNEY-04
+**Goal**: Accepted high-value internal quality findings are closed with cohesive, self-documenting code and evidence that supported contracts remain stable.
+**Depends on**: Phase 133
+**Requirements**: ARCH-01, ARCH-02, ARCH-03, ARCH-04
 **Success Criteria** (what must be TRUE):
 
-  1. A maintainer can read one dated adoption-review entry containing the public Hex download source and raw totals, qualifying-demand issue review, and qualifying non-maintainer merged-contribution review; an unavailable source is recorded as unavailable rather than counted as zero.
-  2. The adoption ledger exposes an explicit `HOLD`, `ACCUMULATING`, or `TRIGGER` decision for downloads, demand, contributor activity, and their conjunctive composite gate, using the existing gate criteria without outreach, telemetry, or polling.
-  3. A newcomer in a clean Phoenix environment can follow public discovery material to install the public Rendro package, select the canonical Swiss/light Invoice, and customize it using the documented preset/configurator path without a repository checkout or warm dependency cache.
-  4. That clean Phoenix application responds through the optional Phoenix adapter with a successful `application/pdf` response whose bytes begin `%PDF-`, and the recorded journey states the exact versions, commands, results, and any repairs limited to existing handoffs.
+  1. Every accepted high-impact architecture, dead-code, dependency, duplication, and readability finding is repaired or rejected with evidence, and medium findings follow their recorded disposition.
+  2. Each extraction has a cohesive responsibility, a documented maintenance benefit, and characterization coverage; no change exists solely to reduce a size metric.
+  3. Public and boundary specifications, module documentation, and explanatory comments match current behavior and explain only non-obvious intent or constraints.
+  4. The public API manifest and rendered bytes outside explicitly approved catalog targets remain identical after the cleanup.
 
-**Plans**: 14/17 executable plans executed
+**Plans**: 5/5 plans executed
 
 Plans:
 
 **Wave 1**
 
-- [x] 131-01-PLAN.md — Capture one bounded adoption snapshot and project its source-backed gate decision.
+- [x] 134-01-PLAN.md — Trace every candidate into a durable disposition and establish palette Wave 0 characterization.
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [x] 131-02-PLAN.md — Repair both protected workflow version parsers and lock their deterministic regression contracts.
+- [x] 134-02-PLAN.md — Conditionally remove the obsolete Analyzer pair with public-contract proof.
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [x] 131-03-PLAN.md — Prepare and fully validate one private exact v1.3.1 version/docs/package/verifier candidate.
+- [x] 134-03-PLAN.md — Resolve the palette uniformity gate and conditionally make the hidden helper characterization green.
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [x] 131-04-PLAN.md — Close the v1.3.0/v1.3.1 incidents and seal the historical private v1.3.2 candidate after exact-SHA regression/preflight proof. *(completed; public v1.3.2 later failed complete protected preflight and remains immutable history)*
+- [x] 134-04-PLAN.md — Conditionally migrate all seven recipes to the proven palette owner under focused byte-identity proof.
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [x] 131-05-PLAN.md — Close the immutable v1.3.2 audit incident and seal an exact private v1.3.3 candidate through complete-audit detached proof.
+- [x] 134-05-PLAN.md — Audit truthfulness separately, then run terminal deterministic gates and close every Phase 134 ledger lifecycle.
 
-**Wave 6** *(blocked on Wave 5 completion)*
+### Phase 135: Test & CI/CD Simplification
 
-- [x] 131-06-PLAN.md — Repeat complete no-tag proof, obtain exact-SHA approval, and stop fail-closed at the immutable protected v1.3.3 incident.
+**Goal**: Rendro's tests and automation are easier to understand and maintain without weakening behavior coverage, trust boundaries, or the authoritative CI contract.
+**Depends on**: Phase 134
+**Requirements**: TEST-01, TEST-02, CI-01, CI-02, CI-03, CI-04, CI-05
+**Success Criteria** (what must be TRUE):
 
-**Wave 7** *(blocked on Wave 6 completion)*
+  1. Maintainers can trace each consolidated test group to an inventory of preserved behaviors and failure modes, including mutation-style proof that replacement tests detect broken contracts.
+  2. One purpose-named read-only workflow generates review or canonical catalog evidence for an explicit verified candidate SHA with the pinned renderer and bounded artifacts.
+  3. Recorded parity proves the generic workflow preserves the outputs and authority checks of the Phase 126, 127, and 130 routes before those milestone-specific branches disappear.
+  4. Ordinary CI still separates deterministic, proof, and advisory evidence and preserves the authoritative `ci-success` status while caches, permissions, secrets, and action pins obey documented trust rules.
+  5. A maintainer can reproduce each supported local and remote path from current documentation without consulting completed phase plans.
 
-- [x] 131-07-PLAN.md — Finish the committed exact v1.3.4 release/HexDocs/verifier/four-incident surfaces on the bbe75d2 boundary; defer clean-room creation to Plan 10.
+**Plans**: 2/3 plans executed
 
-**Wave 8** *(blocked on Wave 7 completion)*
+Plans:
+**Wave 1**
 
-- [x] 131-08-PLAN.md — Seal one exact private v1.3.4 candidate through complete detached no-tag proof.
+- [x] 135-01-PLAN.md — Build deterministic bundle/parity contracts and close the bounded recipe-test candidates.
 
-**Wave 9** *(blocked on Wave 8 completion)*
+**Wave 2** *(blocked on Wave 1 completion)*
 
-- [x] 131-09-PLAN.md — Repeat proof, obtain fresh exact-SHA approval, publish through protected paths, and atomically verify public v1.3.4.
+- [x] 135-02-PLAN.md — Add the secure standalone exact-SHA workflow and its current operator runbook.
 
-**Wave 10** *(blocked on Wave 9 completion)*
+**Wave 3** *(blocked on Wave 2 completion)*
 
-- [x] 131-10-PLAN.md — Run the isolated exact-public-1.3.4 Phoenix journey and retain bounded dual-HTTP proof plus all four failed-release incidents.
+- [ ] 135-03-PLAN.md — Record four same-SHA remote parity rows, then remove legacy routes in one rollback commit.
 
-**Wave 11** *(blocked on Wave 10 completion)*
+### Phase 136: Catalog Visual Quality
 
-- [x] 131-11-PLAN.md — Repair adoption snapshot single-writer publication and replace untracked ledger debt markers.
-- [x] 131-12-PLAN.md — Bind HexDocs publication to the immutable approved v1.3.4 candidate and peeled tag.
-- [x] 131-13-PLAN.md — Make public prerequisite publication exclusive under competing verifier processes.
+**Goal**: The six scored cells with current visual gaps meet the frozen rubric through exact, reviewable evidence without expanding catalog scope or dark-mode claims.
+**Depends on**: Phase 135
+**Requirements**: CATALOG-10, CATALOG-11, CATALOG-12, CATALOG-13
+**Success Criteria** (what must be TRUE):
 
-**Wave 12** *(blocked on Wave 11 completion)*
+  1. The only visually changed cells are Corporate Classic Invoice dark, Minimal Mono Statement dark, Swiss Payslip light and dark, and Brutalist Ticket light and dark.
+  2. Exact-SHA pinned-renderer evidence and human review give each target hierarchy 5 and every other scored visual dimension at least 4; any miss remains truthfully unpromoted.
+  3. The catalog still contains exactly 32 cells with 20 explicitly unscored entries, and every dark record remains screen-oriented with `print_safety: false`.
+  4. Every changed record is traceable through source SHA, renderer identity, artifact hashes, human review, and canonical publication provenance.
 
-- [x] 131-14-PLAN.md — Prepare and obtain exact authorization for the protected-main HexDocs control-plane repair.
+**Plans**: TBD
 
-**Wave 13** *(blocked on Wave 12 completion)*
+### Phase 137: Closure & Handoff
 
-- [ ] 131-18-PLAN.md — Correct the terminal 131-15 missing-tag failure, obtain fresh exact authority, and produce the trusted prerequisite through one new protected dispatch. *(131-15 is immutable incident evidence and must not be rerun)*
+**Goal**: v2.14 closes with fresh evidence, no ownerless accepted risk, and enough current context for the next maintainer to choose high-signal work immediately.
+**Depends on**: Phase 136
+**Requirements**: HANDOFF-01, HANDOFF-02, HANDOFF-03
+**Success Criteria** (what must be TRUE):
 
-Incident evidence (non-executable): `131-15-TERMINAL-INCIDENT.md` preserves the spent Plan 131-15 dispatch instructions and history losslessly.
+  1. Fresh deterministic, proof, advisory, documentation, package, and catalog checks are recorded beside the v2.14 baseline with any unavailable advisory evidence stated explicitly.
+  2. Every high-risk ledger item is closed or rejected with evidence, and every remaining medium item has an owner, disposition, and revisit trigger.
+  3. The quality ledger and current planning documents agree on delivered work, preserved boundaries, deferred opportunities, and ranked next-milestone options.
+  4. A fresh session can identify the current project posture and next recommended GSD action without reconstructing completed phase history.
 
-**Wave 14** *(blocked on Wave 13 completion)*
-
-- [ ] 131-16-PLAN.md — Align the clean-room prerequisite consumer with the current fail-closed verifier contract.
-
-**Wave 15** *(blocked on Wave 14 completion)*
-
-- [ ] 131-17-PLAN.md — Rerun the clean Phoenix journey and replace stale evidence with current bound proof.
+**Plans**: TBD
 
 ## Progress
 
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 130. Catalog Quality & Evidence Ratchet | 11/11 | Complete    | 2026-08-20 |
-| 131. Adoption Snapshot & Phoenix Newcomer Proof | 14/17 | In Progress|  |
+**Execution Order:** 132 → 133 → 134 → 135 → 136 → 137
+
+| Phase | Requirements | Plans Complete | Status | Completed |
+|-------|--------------|----------------|--------|-----------|
+| 132. Quality Baseline & Triage | 4 | 4/4 | Complete    | 2026-08-26 |
+| 133. Repository & Evidence Hygiene | 4 | 13/13 | Complete    | 2026-08-26 |
+| 134. Core Architecture & Readability | 4 | 5/5 | Complete    | 2026-08-27 |
+| 135. Test & CI/CD Simplification | 7 | 2/3 | In Progress|  |
+| 136. Catalog Visual Quality | 4 | 0/TBD | Not started | — |
+| 137. Closure & Handoff | 3 | 0/TBD | Not started | — |
+
+**Coverage:** 26/26 active requirements mapped exactly once.
+
+---
+*Roadmap created: 2026-08-26*

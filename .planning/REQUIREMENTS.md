@@ -1,97 +1,104 @@
-# Requirements: Rendro — v2.13 Quality Ratchet & Adoption Readiness
+# Requirements — Rendro v2.14 Quality & Maintainability
 
-**Defined:** 2026-08-19
-**Core Value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
+**Defined:** 2026-08-26
+**Status:** Active
+**Milestone Goal:** Raise Rendro's engineering, repository, CI/CD, test, documentation, and targeted catalog quality without changing supported capability scope, public contracts, or unrelated rendered bytes.
 
-This is a stewardship milestone. It strengthens the shipped catalog and public Phoenix evaluation path using current evidence, without adding a new core capability family, runtime dependency, or outreach program.
+## Audit & Triage
 
-## v2.13 Requirements
+- [ ] **AUDIT-01:** Maintainers can reproduce a dated baseline of the repository's architecture, dependencies, tests, CI/CD, documentation, packaging, release evidence, and catalog posture using existing project tooling.
+- [ ] **AUDIT-02:** Maintainers have one durable current quality ledger that records the baseline, accepted findings, rejected signals, deferred work, and closure evidence without requiring completed phase artifacts to remain active.
+- [ ] **AUDIT-03:** Every ledger finding records its evidence, impact, confidence, compatibility risk, disposition, owner phase, verification method, status, and revisit trigger where applicable.
+- [ ] **AUDIT-04:** Every high-risk finding is assigned for repair or rejected with evidence; bounded medium-risk findings are repaired or explicitly deferred; low-value observations do not create standalone churn.
 
-Requirements for this milestone. Each maps to exactly one roadmap phase.
+## Repository & Evidence Hygiene
 
-### Catalog Quality
+- [ ] **HYGIENE-01:** Product code, release verification, current regression tests, and operational workflows no longer require archived planning artifacts; tooling whose purpose is to validate GSD planning may retain an explicit, documented planning dependency.
+- [ ] **HYGIENE-02:** A versioned, schema-validated durable evidence source contains every release and newcomer-journey fact currently asserted from Phase 131 artifacts, and all current consumers use that source.
+- [ ] **HYGIENE-03:** Loose tracked phase files are moved to the correct historical archive, and obsolete tracked helper scripts are either removed with evidence or retained with an explicit current owner and purpose.
+- [ ] **HYGIENE-04:** Published packages exclude internal evidence and repository debris, and automated hygiene checks detect future regressions in package contents and tracked planning placement.
 
-- [x] **CATALOG-06**: Maintainer applies targeted visual-hierarchy improvements to all 12 currently scored `needs_work` catalog cells without adding recipes, presets, or catalog entries.
-- [x] **CATALOG-07**: The Humanist dark Receipt specifically addresses its recorded reader-affordance, typographic-craft, and cohesion deficits while retaining its screen-oriented, non-print-safe boundary.
-- [x] **CATALOG-08**: The complete 32-cell catalog regenerates deterministically and passes the existing artifact, hash, schema, and coverage checks after the visual changes.
-- [x] **CATALOG-09**: A human re-reviews all 12 current pinned-raster outputs at full size; each disposition is tied to the reviewed artifacts, and any cell that still misses a threshold remains honestly marked `needs_work`.
+## Core Architecture & Readability
 
-### Adoption Evidence
+- [ ] **ARCH-01:** The supported public API manifest and rendered bytes outside explicitly approved catalog targets remain unchanged throughout internal cleanup.
+- [ ] **ARCH-02:** Every accepted high-impact architecture, dead-code, dependency, duplication, and readability finding is repaired or rejected with evidence; bounded medium-impact findings follow the ledger disposition rules.
+- [ ] **ARCH-03:** A module or function is extracted only when the change creates a cohesive responsibility or measurable maintenance benefit, with characterization coverage; size alone is not sufficient justification.
+- [ ] **ARCH-04:** Public and boundary specs, module documentation, and explanatory comments accurately describe current behavior; stale narration and misleading private specifications are removed or corrected with documentation and Dialyzer proof.
 
-- [x] **SIGNAL-02**: Maintainer records a dated Hex download snapshot from the public package API, including source and raw totals.
-- [x] **SIGNAL-03**: Maintainer reviews public issues for qualifying text-shaping demand using the existing requester, organization, use-case, and blocking criteria.
-- [x] **SIGNAL-04**: Maintainer reviews merged contributions for a qualifying non-maintainer contributor signal using the existing exclusions.
-- [x] **SIGNAL-05**: `ADOPTION.md` records source-backed decisions for demand, downloads, contributor activity, and the conjunctive composite gate as `HOLD`, `ACCUMULATING`, or `TRIGGER`; unavailable evidence is never treated as zero.
+## Tests & CI/CD
 
-### Phoenix Newcomer Proof
+- [ ] **TEST-01:** Before overlapping tests are consolidated, maintainers inventory the distinct behaviors and failure modes they protect and demonstrate that replacement tests fail when those contracts are broken.
+- [ ] **TEST-02:** Planning-coupled, implementation-coupled, or duplicative brittle tests are consolidated without losing behavior, failure-mode, public-contract, or deterministic-output protection.
+- [x] **CI-01:** One purpose-named catalog evidence workflow accepts an explicit candidate SHA and review/canonical mode, checks out and verifies that exact SHA, uses the pinned renderer, has read-only repository permission, and uploads artifacts without mutating the repository.
+- [ ] **CI-02:** The generic catalog evidence workflow proves output and authority parity with the Phase 126, 127, and 130 routes before those milestone-specific routes are removed.
+- [x] **CI-03:** Ordinary CI preserves the deterministic, proof, and advisory lane separation and retains the existing authoritative `ci-success` contract while redundant workflow structure is simplified.
+- [x] **CI-04:** CI caches are treated as untrusted inputs, remain read-only in lower-trust contexts, do not expose secrets, and retain immutable action pins and least-privilege permissions.
+- [x] **CI-05:** Maintainer documentation states the supported local and remote reproduction commands, workflow inputs, authority checks, artifact identities, and failure boundaries for the simplified CI/CD paths.
 
-Execution control note (2026-08-22): D-35 preserves failed public
-`v1.3.0` through `v1.3.3` history and makes exact public `1.3.4` the JOURNEY
-verifier and clean-room target while documentation remains `~> 1.3`.
-JOURNEY-01 cannot advance until every existing release-bearing exact-version,
-package/docs, workflow, verifier, and incident surface is committed in a
-candidate containing `bbe75d2`, that exact SHA passes the
-complete detached no-tag proof with repeated CI, docs/package/tutorial checks,
-and both security audits, receives fresh exact-SHA approval, and succeeds
-through the existing protected tag/Hex/HexDocs paths. The complete preflight's
-credential-free Hex dry run is the validation gate; only the actual protected
-publish uses `HEX_API_KEY` and tests authorization. The clean-room harness and
-evidence are created only after the atomic public verifier succeeds; they are
-not required to exist in the pre-release candidate.
+## Catalog Visual Quality
 
-- [x] **JOURNEY-01**: A newcomer can install the public Rendro package in a clean Phoenix environment without relying on the repository checkout or warm dependency caches.
-- [x] **JOURNEY-02**: A newcomer can follow public discovery surfaces to select and customize the canonical Swiss/light Invoice using the documented preset/configurator path.
-- [ ] **JOURNEY-03**: The clean Phoenix application serves that customized document through the optional Phoenix adapter as a successful `application/pdf` response containing valid `%PDF-` bytes.
-- [x] **JOURNEY-04**: The journey records exact versions, commands, results, and any repaired documentation or integration handoff; fixes remain confined to existing surfaces.
+- [ ] **CATALOG-10:** Visual work is limited to the six scored catalog cells with current sub-threshold dimensions: Corporate Classic Invoice dark, Minimal Mono Statement dark, Swiss Payslip light and dark, and Brutalist Ticket light and dark.
+- [ ] **CATALOG-11:** Current exact-SHA pinned-renderer evidence and human review score hierarchy at 5 and every other scored visual dimension at 4 or higher for each of the six target cells; a miss remains truthfully recorded rather than promoted.
+- [ ] **CATALOG-12:** The catalog remains fixed at 32 cells with 20 explicitly unscored cells, and dark output remains screen-oriented with `print_safety: false` and no new print, accessibility, or viewer-support claim.
+- [ ] **CATALOG-13:** Each changed catalog record is bound to its exact source SHA, pinned renderer identity, artifact hashes, human review, and canonical publication provenance.
+
+## Closure & Handoff
+
+- [ ] **HANDOFF-01:** Maintainers can run fresh full deterministic, proof, advisory, documentation, package, and catalog checks and compare final results with the dated v2.14 baseline.
+- [ ] **HANDOFF-02:** Every high-risk ledger finding is closed or rejected with evidence, every accepted medium-risk finding has a recorded disposition, and no unresolved item lacks an owner or revisit trigger.
+- [ ] **HANDOFF-03:** The quality ledger, PROJECT, STATE, and ROADMAP leave a concise current posture, deferred-work triggers, and ranked next-milestone options for a fresh maintainer session.
 
 ## Future Requirements
 
-Deferred to future milestones. Tracked but not included in this roadmap.
-
-### Demand-Gated Capabilities
-
-- **SHAPE-01**: Productize global text shaping, RTL/bidi behavior, and broader OpenType support only if the refreshed conjunctive adoption gate triggers.
-- **STUDIO-01**: Build the optional Rendro Studio live playground only when adopter demand justifies a server-backed developer surface beyond the shipped static configurator.
-- **CHART-01**: Add deterministic chart primitives only after concrete reporting demand proves their product value.
+- **FUTURE-01:** Add a live server-rendered theme playground only when the existing Studio demand gate is met.
+- **FUTURE-02:** Add global text shaping, RTL/bidi, or broader OpenType support only when the refreshed conjunctive adoption gate supports that capability expansion.
+- **FUTURE-03:** Add charting or other new document capability families only through a separately scoped, demand-backed milestone.
+- **FUTURE-04:** Score or expand the twenty currently unscored catalog cells only through a future explicitly approved catalog milestone.
 
 ## Out of Scope
 
-Explicit exclusions for v2.13.
-
-| Feature | Reason |
-|---------|--------|
-| New runtime dependencies or a new core capability family | This milestone strengthens shipped surfaces; it does not widen the pure-core product contract. |
-| Analytics, scheduled polling, campaigns, or proactive outreach | Adoption remains quiet, pull-based, source-backed, and read-only. |
-| New recipes, presets, catalog entries, or catalog expansion | The quality target is the exact existing set of 12 `needs_work` cells inside the fixed 32-cell catalog. |
-| Automated aesthetic scoring or a generalized review product | Quality dispositions remain bounded human judgments; existing evidence machinery is sufficient unless execution proves a narrow helper necessary. |
-| Print-safety, accessibility, PDF/UA, WCAG, universal design-quality, or universal-viewer claims | Visual improvement and one Phoenix journey do not establish those broader guarantees. |
-| Broad planning or Windows-ledger cleanup | Cleanup is allowed only where it directly enables a committed requirement. |
+| Item | Reason |
+|------|--------|
+| New runtime features, document capability families, recipes, presets, or catalog cells | v2.14 is a quality ratchet, not a scope expansion |
+| Public API redesigns or intentional broad PDF-byte changes | Cleanup must preserve supported contracts and isolate the six approved visual targets |
+| Arbitrary coverage, module-size, dependency-count, or comment-count quotas | Metrics are investigation signals, not substitutes for behavioral evidence and cohesion judgment |
+| Global text shaping, Studio, charts, analytics, outreach, or reviewer product work | Existing demand gates remain authoritative |
+| Promoting dark output to print-safe | Dark catalog output remains intentionally screen-oriented |
+| Deleting ignored local artifacts | Untracked developer-local files are outside the milestone unless they become tracked or packaged |
 
 ## Traceability
 
-Roadmap mapping approved with the milestone roadmap.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CATALOG-06 | Phase 130 | Complete |
-| CATALOG-07 | Phase 130 | Complete |
-| CATALOG-08 | Phase 130 | Complete |
-| CATALOG-09 | Phase 130 | Complete |
-| SIGNAL-02 | Phase 131 | Gaps Found |
-| SIGNAL-03 | Phase 131 | Gaps Found |
-| SIGNAL-04 | Phase 131 | Gaps Found |
-| SIGNAL-05 | Phase 131 | Gaps Found |
-| JOURNEY-01 | Phase 131 | Gaps Found |
-| JOURNEY-02 | Phase 131 | Gaps Found |
-| JOURNEY-03 | Phase 131 | Gaps Found |
-| JOURNEY-04 | Phase 131 | Gaps Found |
+| AUDIT-01 | Phase 132 | Complete |
+| AUDIT-02 | Phase 132 | Complete |
+| AUDIT-03 | Phase 132 | Complete |
+| AUDIT-04 | Phase 132 | Complete |
+| HYGIENE-01 | Phase 133 | Complete |
+| HYGIENE-02 | Phase 133 | Complete |
+| HYGIENE-03 | Phase 133 | Complete |
+| HYGIENE-04 | Phase 133 | Complete |
+| ARCH-01 | Phase 134 | Complete |
+| ARCH-02 | Phase 134 | Complete |
+| ARCH-03 | Phase 134 | Complete |
+| ARCH-04 | Phase 134 | Complete |
+| TEST-01 | Phase 135 | Pending |
+| TEST-02 | Phase 135 | Pending |
+| CI-01 | Phase 135 | Complete |
+| CI-02 | Phase 135 | Pending |
+| CI-03 | Phase 135 | Complete |
+| CI-04 | Phase 135 | Complete |
+| CI-05 | Phase 135 | Complete |
+| CATALOG-10 | Phase 136 | Pending |
+| CATALOG-11 | Phase 136 | Pending |
+| CATALOG-12 | Phase 136 | Pending |
+| CATALOG-13 | Phase 136 | Pending |
+| HANDOFF-01 | Phase 137 | Pending |
+| HANDOFF-02 | Phase 137 | Pending |
+| HANDOFF-03 | Phase 137 | Pending |
 
-**Coverage:**
-
-- v2.13 requirements: 12 total
-- Mapped to phases: 12
-- Unmapped: 0
+**Coverage:** 26/26 active requirements mapped exactly once.
 
 ---
-*Requirements defined: 2026-08-19*
-*Last updated: 2026-08-22 after D-35 immutable v1.3.3 incident recovery planning*
+*Requirements defined: 2026-08-26*
+*Last updated: 2026-08-26 after v2.14 roadmap creation*

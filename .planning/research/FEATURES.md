@@ -1,116 +1,112 @@
 # Feature Research
 
-**Domain:** OSS quality stewardship and adoption readiness for a deterministic, Phoenix-first PDF library
-**Researched:** 2026-08-19
-**Confidence:** HIGH for shipped-surface and catalog findings; MEDIUM for live adoption evidence because public search snapshots are cached and a fresh gate review must use the live APIs.
+**Domain:** Maintainability and existing-catalog quality for a mature Elixir library
+**Researched:** 2026-08-26
+**Confidence:** HIGH
 
-## Scope and Evidence Boundary
+## Scope Boundary
 
-This is a ratchet on existing product surfaces, not a new feature family. Rendro already has a 32-cell public catalog, deterministic catalog generation/checking, a human rubric, six presets, static configurator/codegen/Livebook routes, a Phoenix example, and an adoption ledger. The outcome is trustworthy evidence that those surfaces work better for a newcomer today.
-
-The 12 flagship catalog cells are exactly the scored brand/preset light-dark pairs for Invoice/Corporate Classic, Statement/Minimal Mono, Receipt/Humanist, Certificate/Editorial, Payslip/Swiss, and Ticket/Brutalist. All 12 currently fail because `content_hierarchy` is 4 where the rubric requires 5. The Humanist dark Receipt additionally scores 2 for reader affordances and typographic craft and 3 for cohesion. Dark cells intentionally retain `print_safety: false`; that is a documented screen-oriented boundary, not a defect to conceal or a reason to claim print/accessibility compliance.
+This is a stewardship milestone, not a new capability milestone. “Features” below are maintainer and contributor outcomes: trustworthy findings, simpler change paths, durable evidence, reliable automation, and closure of known visual debt. Studio, charts, global shaping, new recipes, new presets, and catalog expansion remain outside v2.14.
 
 ## Feature Landscape
 
-### Table Stakes (Users Expect These)
+### Table Stakes
 
-| Feature / outcome | Why expected | Complexity | Testable acceptance boundary and shipped dependencies |
-|---|---|---:|---|
-| Improve and re-score all 12 named `Scored — needs work` cells | A public quality disposition invites a clear follow-through; leaving the identified flagship set unresolved makes the catalog feel provisional. | HIGH | For each exact `catalog_id`, update the underlying recipe/theme data only as needed; regenerate its catalog PNG/PDF hashes; preserve catalog schema; record a human re-review whose scores meet `content_hierarchy == 5`, other core dimensions `>= 4`, and applicable gates. Depends on the catalog generator/checker, `rubric_scores.json`, and current recipe/preset behavior. |
-| Fix the Humanist dark Receipt before declaring catalog closure | It is the only target with observed sub-4 reader affordance, typography, and cohesion—not just a conservative hierarchy score. | MEDIUM | Deterministic artifact and bounded full-size review show readable description text and scores of at least 4 in those three dimensions, plus hierarchy 5. Keep its dark screen-only disclosure and false print-safety gate. Depends on the Humanist preset, receipt recipe, and pinned advisory raster workflow. |
-| Evidence-backed review protocol, not score edits | A quality label is credible only when revised bytes, hashes, rubric entries, and reviewer sign-off identify the same cell. | MEDIUM | A contract test rejects missing/mismatched catalog disposition, hash, score, or review provenance; re-review is bounded to specified artifacts and never auto-generated. Depends on existing hash-checked catalog and rubric manifest contracts. |
-| Refresh every adoption gate and record an explicit decision | Quiet OSS projects still need a current, inspectable answer to “what changed?”; stale baseline evidence is not adoption evidence. | LOW-MEDIUM | In one review window, query the live Hex package API, the public issue labels, and merged-PR history; append dated sources/counts and a `HOLD`, `ACCUMULATING`, or `TRIGGER` decision for demand, downloads, and contributor gates. A zero-result is recorded as zero, not inferred. Depends on `ADOPTION.md` counting rules and public APIs/CLI access. |
-| Complete newcomer journey evaluation | A Phoenix-first library must prove that discovery leads to a working customized PDF, rather than merely linking to surfaces. | MEDIUM | Execute a clean-environment script/checklist: discover README/HexDocs → add dependency → compile → follow the canonical Swiss invoice route → choose/copy a configurator snippet → apply it in a runnable Phoenix controller/example → request a PDF and verify bytes/content headers. Record exact commands, versions, output, and any documentation repair. Depends on README, presets guide, configurator formatter, Phoenix adapter, and `examples/phoenix_example`. |
-| Honest result and scope messaging throughout | Users must not mistake a page-one preview or newcomer smoke test for a guarantee of design quality, WCAG, PDF/UA, all-viewer behavior, or print safety. | LOW | Journey and catalog copy preserve existing bounded disclosures. The test rejects newly broadened claims. Depends on docs-contract lanes and the published support-boundary guide. |
+| Outcome | Why expected | Complexity | Acceptance boundary |
+|---------|--------------|------------|---------------------|
+| Durable quality ledger | A broad quality effort otherwise becomes an unrepeatable review or a list of opinions | MEDIUM | Every finding has evidence, impact, confidence, disposition, owner phase, verification, status, and next trigger |
+| Evidence-led triage | Large files, cycles, coverage, or style preferences are not defects by themselves | MEDIUM | High findings are fixed or evidence-rejected; bounded medium findings are fixed; low/style findings do not cause standalone churn |
+| Stable public contracts | Mature library cleanup must not surprise users | HIGH | Public API manifest remains compatible and unrelated render goldens stay byte-identical |
+| Durable release evidence | Tests and release automation must not break when planning history is archived | MEDIUM | Product/release paths consume versioned repository evidence, not `.planning/milestones/` |
+| Repository hygiene | A fresh clone should not contain loose historical phase files or one-off tracked helpers without ownership | LOW-MEDIUM | Historical artifacts live in milestone archives; tracked helpers are referenced, documented, or removed |
+| Readable architecture | Contributors need cohesive change points and truthful comments/specs | HIGH | Accepted boundary/readability findings close with focused regression evidence; no line-count quota |
+| Trustworthy tests | Test volume must protect behavior rather than implementation trivia or frozen planning prose | HIGH | Duplicated/brittle tests are consolidated without losing failure modes; archival operations cannot break product tests |
+| Purpose-named catalog evidence CI | Existing catalog work still needs pinned rendering, but historical phase routes should not accumulate | HIGH | One exact-SHA workflow replaces Phase 126/127/130 generation branches after artifact parity is proven |
+| Existing catalog visual closure | Public scored gaps should not remain indefinitely | HIGH | Six named cells reach hierarchy 5 and all other visual dimensions at least 4, with dark print safety still false |
+| Decision-ready handoff | The next milestone should not rediscover current debt | LOW | Before/after summary and ranked triggers remain in the current quality ledger and project state |
 
-### Differentiators (Competitive Advantage)
+### Differentiators
 
-| Feature / outcome | Value proposition | Complexity | Notes |
-|---|---|---:|---|
-| A quality ratchet that closes named public evidence debt | The catalog does not merely display examples: it publishes a shortfall, repairs it, and retains artifact-level proof. This is unusually credible for an OSS PDF library. | HIGH | The differentiator is the linkage of deterministic byte evidence and human judgment, not an aesthetic certification. Do not broaden the review budget into universal quality scoring. |
-| One continuous Phoenix newcomer proof | Connects package discovery, a practical preset choice, copied canonical Elixir, and an actual controller response. It proves integration coherence across documentation rather than another isolated unit test. | MEDIUM | Use the canonical Invoice/Swiss/light path as the fixed happy path; test the configurator selection as a customization step. A schematic README snippet alone is explicitly insufficient. |
-| Pull-based adoption ledger with a decision even when nothing qualifies | Makes “we are not building global text shaping yet” a reasoned product decision backed by transparent criteria rather than a vague deferral. | LOW | A current HOLD is valuable. The gate stays conjunctive: none of demand, downloads, or contribution alone authorizes a new text-engine capability. |
-| Review tooling only where it reduces ambiguity | Full-size sequential review packaging can make the 12-cell decision auditable and repeatable without becoming an end-user visual Studio. | MEDIUM | Keep it an operator/reviewer aid, bounded to target artifacts and source hashes. |
+| Outcome | Value | Complexity | Notes |
+|---------|-------|------------|-------|
+| Quality changes carry proof of non-churn | Makes stewardship auditable rather than aesthetic | HIGH | Pair architecture/readability judgment with public API, golden, test, and package checks |
+| Deterministic and human quality stay separate | Preserves Rendro’s truthful evidence model even during visual polish | MEDIUM | Automation proves identity/scope; a named reviewer owns visual judgment |
+| One ledger spans code, CI, evidence, and catalog debt | Gives maintainers a coherent view without a hosted dashboard | MEDIUM | Keep it concise; archived phase artifacts retain detail |
+| Historical planning becomes non-executable | Milestone archival can no longer break current release/test behavior | MEDIUM | Planning may document history but cannot be a runtime authority |
 
-### Anti-Features (Explicitly Unnecessary)
+### Anti-Features
 
-| Anti-feature | Why it may be requested | Why unnecessary/problematic now | Better alternative |
-|---|---|---|---|
-| New recipes, presets, catalog expansion, or a new rendering capability | Quality work can tempt “more examples” as a visible milestone output. | The project has 32 cells and the task is to improve the 12 known weak flagship cells; adding cells expands evidence debt and obscures whether the ratchet closed. | Repair/review only the named cells and retain the existing catalog shape. |
-| Auto-scoring or AI-generated rubric verdicts | It reduces manual review effort. | The rubric is intentionally human judgment; automated scores would create an unsupported quality claim and erase accountable sign-off. | Automate coverage/hash/provenance checks; keep scoring and approval human. |
-| Treating dark mode as print-safe or as accessibility/PDF/UA/WCAG certified | Raising visual scores can be misread as a broader guarantee. | The catalog explicitly designates dark cells screen-oriented and currently records false print safety. Changing that requires a distinct compliance/print-evidence program. | Improve on-screen readability while preserving the dark boundary disclosure and gate value. |
-| Scheduled growth campaign, analytics, or social-counter adoption metrics | More numbers look like more adoption evidence. | The adopted policy is quiet and pull-based; private analytics and social metrics do not satisfy the text-shaping gate. | Refresh only qualifying public/anonymized evidence using the ledger’s specified sources and rules. |
-| Triggering global text shaping from download growth, a dependent package, or one issue | Recent public package evidence may look encouraging. | The gate requires all three threshold families in one review window, including six qualifying shaping signals and a qualifying non-maintainer PR. | Record the factual snapshot and an explicit HOLD/ACCUMULATING/TRIGGER outcome; start a later capability milestone only if the gate actually passes. |
-| Replacing the static configurator with hosted live rendering/account features | A newcomer may ask for arbitrary live previews or saved themes. | It widens a library stewardship milestone into deferred Studio/server/DB work and conflicts with the zero-server adoption path. | Validate browse → pick → copy against the existing static configurator and then run the copied code locally. |
+| Anti-feature | Why tempting | Why harmful | Better alternative |
+|--------------|--------------|-------------|--------------------|
+| Refactor every large file | Produces visible activity and smaller files | Can increase indirection and change risk without reducing cognitive load | Extract only a cohesive responsibility with evidence of coupling/churn |
+| Achieve a global coverage percentage | Creates an easy numeric target | Line coverage misses branch/assertion quality and can reward low-value tests | Use coverage to locate blind spots, then add behavior-focused tests |
+| Maximize `@spec` count | Looks rigorous | Redundant or over-broad private specs can obscure inferred success types | Keep public/boundary specs and private specs that improve analysis |
+| Rewrite all comments | Makes the diff look polished | Risks deleting non-obvious invariants or adding narration that rots | Keep “why” and boundary comments; remove stale history/restatement |
+| Add new quality dependencies by default | Suggests a comprehensive audit | Expands tool maintenance and may duplicate current checks | Trial only against a demonstrated gap before adoption |
+| Score all 32 catalog cells | Appears to finish the catalog | Multiplies human-review cost beyond the agreed problem | Repair the six actual visual gaps; keep twenty explicitly unscored |
+| Make dark PDFs print-safe | Could make all dark dispositions pass | Changes the product/evidence boundary into a print-design program | Improve screen readability while retaining `print_safety: false` |
+| Add Studio/charts/shaping | Converts stewardship into visible features | Breaks scope, adoption gates, and compatibility focus | Keep them demand-gated for a later milestone |
 
-## Feature Dependencies
+## Dependencies
 
-```
-Catalog repair (12 exact cells)
-    └──requires──> deterministic regeneration + hash update
-    └──requires──> bounded human re-review + rubric provenance
-    └──requires──> honest dark-cell boundary retained
-
-Humanist dark Receipt repair
-    └──blocks──> successful 12-cell quality closure
-
-Newcomer journey evaluation
-    └──requires──> canonical README/presets/configurator surfaces
-    └──requires──> runnable Phoenix adapter/example path
-    └──benefits from──> repaired catalog evidence (choice confidence)
-
-Adoption evidence refresh
-    └──requires──> live Hex/GitHub queries in the same review window
-    └──produces──> explicit gate decision
-    └──does not authorize──> text-shaping work unless all three gates pass
+```text
+Current research
+    -> Phase 132 baseline + ledger
+        -> accepted finding set
+            -> repository/evidence hygiene (133)
+            -> architecture/readability (134)
+            -> test + CI simplification (135)
+                -> generic catalog evidence authority
+                    -> catalog repairs/review (136)
+                        -> closure + next triggers (137)
 ```
 
-### Dependency Notes
+- **The audit precedes remediation:** prevents a moving target and gives every later change an owner and verification method.
+- **Evidence durability precedes test/CI cleanup:** tests and workflows need stable inputs before historical planning routes are removed.
+- **Generic catalog workflow precedes visual closure:** the six repaired cells require a non-phase-specific pinned renderer authority.
+- **Catalog follows core/CI cleanup:** visual changes should land after byte-identity and evidence gates are stable.
+- **Closure follows all work:** before/after reporting must measure the final committed state.
 
-- **Repair precedes sign-off:** a changed visual cell must be deterministically regenerated before a person scores it; otherwise the score describes stale bytes.
-- **The Humanist dark Receipt is the critical path:** every other target has only the strict hierarchy shortfall. Its low contrast/typographic observation needs an actual repair before its hierarchy review can credibly close the complete 12-cell set.
-- **Journey evaluation should follow catalog repair but must be independently executable:** the newcomer needs a working document even if they never use the catalog. The catalog validates discovery and choice; the Phoenix response validates integration.
-- **Adoption refresh is independent of catalog repair:** do not manufacture adoption demand from maintenance work. It can run in parallel and records the state found.
+## v2.14 Definition
 
-## Milestone Outcome Definition
+### Commit to
 
-### Launch With (v2.13)
+- [ ] Research current quality practices without adding speculative tools.
+- [ ] Create and use a durable quality ledger.
+- [ ] Fix or evidence-reject every accepted high-impact finding.
+- [ ] Fix bounded medium findings; defer the rest with explicit triggers.
+- [ ] Decouple current product/release verification from archived planning files.
+- [ ] Replace historical catalog evidence routes with a generic exact-SHA workflow.
+- [ ] Repair and re-review six exact catalog cells.
+- [ ] Publish verified before/after and next-milestone guidance.
 
-- [ ] All 12 named flagship cells move from `Scored — needs work` to a re-reviewed passing disposition, with regenerated deterministic artifacts/hashes and bounded human sign-off tied to each exact ID.
-- [ ] The Humanist dark Receipt clears its documented affordance, typography, and cohesion deficits without claiming print safety or compliance.
-- [ ] A machine-checkable provenance/coverage guard ensures the catalog, rubric disposition, and reviewer evidence cannot drift apart.
-- [ ] `ADOPTION.md` contains one dated, source-backed refresh and an explicit decision for demand, downloads, and contributor gates—even if the result is `HOLD` for all.
-- [ ] A clean Phoenix newcomer journey produces a customized, verified PDF and leaves a durable reproducible record or test; all discovered blockers are fixed in the existing docs/integration surfaces.
+### Defer
 
-### Defer (after evidence, not during v2.13)
+- Studio, charts, and global text shaping until their existing triggers are met.
+- Review of the twenty unscored catalog cells until a later explicitly funded review window.
+- Dependency upgrades not required to close a demonstrated v2.14 finding.
+- Broad performance optimization without a measured bottleneck.
 
-- [ ] Global text shaping, RTL/bidi/cluster support—only if the existing conjunctive adoption gate is actually met.
-- [ ] Rendro Studio, server-rendered previews, accounts, and arbitrary visual token editing.
-- [ ] Catalog growth, additional presets, charts, or new document families.
-- [ ] Compliance, accessibility, PDF/UA, WCAG, universal-viewer, or print-certification initiatives.
+## Prioritization
 
-## Feature Prioritization Matrix
-
-| Feature / outcome | User value | Implementation cost | Priority |
-|---|---:|---:|---|
-| Humanist dark Receipt repair + evidence | HIGH | MEDIUM | P1 |
-| Remaining 11 target-cell hierarchy ratchets + evidence | HIGH | HIGH | P1 |
-| Catalog/rubric/provenance fail-loud guard | HIGH | MEDIUM | P1 |
-| Complete clean Phoenix newcomer journey | HIGH | MEDIUM | P1 |
-| Adoption ledger refresh + explicit decisions | MEDIUM | LOW-MEDIUM | P1 |
-| Bounded reviewer ergonomics | MEDIUM | MEDIUM | P2, only if it directly enables the 12-cell review |
-| New capability/product surfaces | LOW for this milestone | HIGH | Out of scope |
+| Outcome | Maintainer/user value | Cost | Priority |
+|---------|-----------------------|------|----------|
+| Quality ledger and baseline | HIGH | MEDIUM | P1 |
+| Planning/evidence decoupling | HIGH | MEDIUM | P1 |
+| High-impact architecture/readability closure | HIGH | HIGH | P1 |
+| Generic catalog evidence workflow | HIGH | HIGH | P1 |
+| Six-cell visual closure | HIGH | HIGH | P1 |
+| Bounded medium cleanup | MEDIUM | MEDIUM | P2 |
+| Low/style cleanup | LOW | variable | P3/defer |
 
 ## Sources
 
-- `.planning/PROJECT.md` — v2.13 goal and no-new-capability constraint.
-- `.planning/ROADMAP.md` — current deferred Studio and review-tooling context.
-- `assets/rendro/catalog.json` — 32-cell catalog, exact target artifacts, hashes, and dark boundary disclosures.
-- `priv/quality/rubric_scores.json` and `priv/quality/SIGN-OFF.md` — rubric thresholds, 12 scored target cells, individual shortfalls, and bounded-human-review precedent.
-- `ADOPTION.md` — authoritative text-shaping gate thresholds, baseline, counting rules, and pull-based review policy.
-- `README.md`, `guides/presets.md`, and `examples/phoenix_example/` — existing discovery, configurator, canonical preset, and runnable Phoenix paths.
-- [Hex package/dependents listing](https://hex.pm/packages/rendro/dependents) — public adoption context only; search-result snapshots are not a substitute for the live API refresh. Confidence: MEDIUM.
+- User-approved v2.14 milestone summary and decisions (2026-08-26)
+- `.planning/PROJECT.md`, `.planning/STATE.md`, and archived v2.10-v2.13 roadmaps
+- `mix xref` repository baseline, module-size inventory, workflow topology, and planning-reference scan
+- `priv/quality/rubric_scores.json` and `assets/rendro/catalog.json`
+- Official tool sources listed in `STACK.md`
 
 ---
-*Feature research for: Rendro v2.13 Quality Ratchet & Adoption Readiness*
-*Researched: 2026-08-19*
+*Feature research for: v2.14 Quality & Maintainability*
+*Researched: 2026-08-26*

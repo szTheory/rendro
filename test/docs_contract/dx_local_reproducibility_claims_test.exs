@@ -19,7 +19,8 @@ defmodule Rendro.DocsContract.DxLocalReproducibilityClaimsTest do
 
     assert Keyword.fetch!(aliases, :"ci.fast") == [
              "format --check-formatted",
-             "hex.build",
+             "quality.hygiene",
+             "cmd mix hex.build",
              "compile --warnings-as-errors",
              "test --exclude quarantine --slowest 10",
              "docs --warnings-as-errors",
@@ -39,7 +40,10 @@ defmodule Rendro.DocsContract.DxLocalReproducibilityClaimsTest do
     assert workflow =~ "tee /tmp/mix-test-output.log"
     assert workflow =~ "grep -A 25 'Top [0-9]* slowest' /tmp/mix-test-output.log"
     assert workflow =~ "ci-success:"
-    assert workflow =~ "needs: [test, configurator-browser, integration-proofs]"
+
+    assert workflow =~
+             "needs: [test, configurator-browser, integration-proofs, quality-governance]"
+
     assert workflow =~ "configurator-browser:"
 
     assert workflow =~

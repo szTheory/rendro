@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "cases": {
+    "PROH-132-01": {
+      "artifact": {
+        "path": ".planning/QUALITY.md",
+        "text": "<!-- quality-governance: {\"role\":\"authority\",\"basis\":\"explicit_unavailability\",\"primary_ci\":false} -->"
+      }
+    },
+    "PROH-132-02": {
+      "artifact": {
+        "path": "test/quality/baseline_ledger_contract_test.exs",
+        "text": "<!-- quality-governance: {\"role\":\"consumer\",\"reference\":\".planning/QUALITY.md\"} -->"
+      }
+    },
+    "PROH-132-03": {
+      "artifact": {
+        "path": ".planning/QUALITY.md",
+        "text": "<!-- quality-governance: {\"role\":\"decision\",\"basis\":\"supported_contract_risk\",\"disposition\":\"repair\",\"evidence_gated\":true} -->"
+      }
+    }
+  }
+}

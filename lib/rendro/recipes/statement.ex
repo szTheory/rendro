@@ -458,22 +458,13 @@ defmodule Rendro.Recipes.Statement do
   # :palette-override)` keeps an explicit `:palette` as the winning layer
   # (D-01). Non-color numerics (band stroke `width: 0.75`) are NOT seamed.
   defp palette(opts) do
-    base =
-      case opts[:theme] do
-        nil ->
-          %{
-            ink: {0, 0, 0},
-            muted: {0, 0, 0},
-            background: {255, 255, 255},
-            surface: {245, 245, 245},
-            rule: {0, 0, 0}
-          }
-
-        theme ->
-          Rendro.Theme.resolve(theme).colors
-      end
-
-    Map.merge(base, Keyword.get(opts, :palette, %{}))
+    Rendro.Recipes.Palette.resolve(opts, %{
+      ink: {0, 0, 0},
+      muted: {0, 0, 0},
+      background: {255, 255, 255},
+      surface: {245, 245, 245},
+      rule: {0, 0, 0}
+    })
   end
 
   # ---------------------------------------------------------------------------

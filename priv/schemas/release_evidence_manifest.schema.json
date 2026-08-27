@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "release_evidence_manifest.schema.json",
+  "title": "Rendro release evidence manifest",
+  "type": "object",
+  "required": ["schema_version", "release", "records"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "release": {"$ref": "#/$defs/release"},
+    "records": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"$ref": "#/$defs/record"}}
+  },
+  "$defs": {
+    "release": {"type": "object", "required": ["version", "tag", "candidate_commit_sha"], "additionalProperties": false, "properties": {"version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"}, "tag": {"type": "string", "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$"}, "candidate_commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"}}},
+    "record": {"type": "object", "required": ["id", "role", "path", "sha256", "media_type", "lane", "authority", "status", "retention", "provenance"], "additionalProperties": false, "properties": {"id": {"type": "string", "pattern": "^RE-[A-Z0-9-]+$", "maxLength": 80}, "role": {"type": "string", "enum": ["public_prerequisite", "release_identity", "validation", "journey_index", "journey_attempt"]}, "path": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*\\.json$", "maxLength": 240}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "media_type": {"const": "application/json"}, "lane": {"type": "string", "enum": ["deterministic", "advisory"]}, "authority": {"type": "string", "enum": ["operational", "historical", "transport"]}, "status": {"type": "string", "enum": ["preserved", "superseded"]}, "retention": {"type": "string", "enum": ["immutable", "append_only"]}, "provenance": {"$ref": "#/$defs/provenance"}}},
+    "provenance": {"type": "object", "required": ["source_path", "import_reason"], "additionalProperties": false, "properties": {"source_path": {"type": "string", "minLength": 1, "maxLength": 240}, "import_reason": {"type": "string", "minLength": 1, "maxLength": 240}}}
+  }
+}

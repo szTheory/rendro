@@ -44,7 +44,7 @@ defmodule Rendro.Recipes.CertificateTypographyTest do
                Rendro.render(Certificate.document(sample_data(), theme: Rendro.Theme.default()))
     end
 
-    test "the themed render matches the no-theme render's centering (both :default → Helvetica)" do
+    test "themed and unthemed section construction both succeed" do
       data = sample_data()
       # Both paths resolve heading/body to :default → Helvetica metrics, so the
       # geometry-driven section build succeeds on both without raising.

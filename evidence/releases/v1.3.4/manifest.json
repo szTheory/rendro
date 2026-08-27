@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "release": {
+    "version": "1.3.4",
+    "tag": "v1.3.4",
+    "candidate_commit_sha": "f03c78bab54efe1cd1596d51cf3f28193232e2a3"
+  },
+  "records": [
+    {
+      "id": "RE-V134-PUBLIC-PREREQUISITE",
+      "role": "public_prerequisite",
+      "path": "public_prerequisite.json",
+      "sha256": "6b8f90fdaa796f5d738c171db6648b327a0a2dee3703e0ad9e0eb5c3f5a8e6c0",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "operational",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {
+        "source_path": ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-PUBLIC-PREREQUISITE.json",
+        "import_reason": "preserved v1.3.4 public prerequisite facts"
+      }
+    },
+    {
+      "id": "RE-V134-RELEASE-IDENTITY",
+      "role": "release_identity",
+      "path": "release_identity.json",
+      "sha256": "31b8b0878c0a6abf292d440cbd08ef829143fd47c191010b349727302ddcdc6e",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {
+        "source_path": ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-RELEASE-CANDIDATE.md",
+        "import_reason": "preserved v1.3.4 release identity"
+      }
+    },
+    {
+      "id": "RE-V134-VALIDATION",
+      "role": "validation",
+      "path": "validation.json",
+      "sha256": "30537a8ef8ca652d58f9b6af0a8f2877f5750c2b904a4482fc6fe24750c611a8",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {
+        "source_path": ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-VALIDATION.md",
+        "import_reason": "preserved successful journey identities"
+      }
+    },
+    {
+      "id": "RE-V134-JOURNEY-INDEX",
+      "role": "journey_index",
+      "path": "journey/index.json",
+      "sha256": "1e92daff7a093bde8e7e933190e58c7cfef38c7f32bc58e01b3dce0d405d9bce",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "append_only",
+      "provenance": {
+        "source_path": ".planning/milestones/v2.13-phases/131-adoption-snapshot-phoenix-newcomer-proof/131-VALIDATION.md",
+        "import_reason": "prepared ordered attempt index"
+      }
+    },
+    {
+      "id": "RE-V134-JOURNEY-001",
+      "role": "journey_attempt",
+      "path": "journey/journey-001.json",
+      "sha256": "260dbb7da5890b97c97f7f803b9dc8cd22c1e520951371f3f24e5cbb38c8a910",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {
+        "source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_failed_attempt.json",
+        "import_reason": "preserved first bounded clean-room failure"
+      }
+    },
+    {
+      "id": "RE-V134-JOURNEY-002",
+      "role": "journey_attempt",
+      "path": "journey/journey-002.json",
+      "sha256": "667380ee4d06939ea171134235188621c5543d3ddfb0a8e3f2dc66229efc862b",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {
+        "source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_second_failed_attempt.json",
+        "import_reason": "preserved second bounded clean-room failure"
+      }
+    },
+    {
+      "id": "RE-V134-JOURNEY-003",
+      "role": "journey_attempt",
+      "path": "journey/journey-003.json",
+      "sha256": "f7b85984588d76fadf28226a6b9287a0c10333556ff83b4324234d26cd9c9404",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {
+        "source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_third_failed_attempt.json",
+        "import_reason": "preserved third bounded clean-room failure"
+      }
+    },
+    {
+      "id": "RE-V134-JOURNEY-004",
+      "role": "journey_attempt",
+      "path": "journey/journey-004.json",
+      "sha256": "ba1b37b5cc71854f07d9e7120584113b3c76c3490586c90f1a197f4d848f08c6",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {
+        "source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_fourth_failed_attempt.json",
+        "import_reason": "preserved fourth bounded clean-room failure"
+      }
+    },
+    {
+      "id": "RE-V134-JOURNEY-005",
+      "role": "journey_attempt",
+      "path": "journey/journey-005.json",
+      "sha256": "10fdc4919bfcdeaddd040466af51cfa68afb0e354324a736a9c4dcc661ba3e9d",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {
+        "source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_fifth_failed_attempt.json",
+        "import_reason": "preserved fifth bounded clean-room failure"
+      }
+    },
+    {
+      "id": "RE-V134-JOURNEY-006",
+      "role": "journey_attempt",
+      "path": "journey/journey-006.json",
+      "sha256": "b8e881a8f61f1a8127d322447fda8840f314bc31a48f270c46bca74b5c486a43",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {
+        "source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_sixth_failed_attempt.json",
+        "import_reason": "preserved sixth bounded clean-room failure"
+      }
+    },
+    {
+      "id": "RE-V134-JOURNEY-007",
+      "role": "journey_attempt",
+      "path": "journey/journey-007.json",
+      "sha256": "43aa6fcde2e17076dc48615f1a74b87b41da29f0eb294ef9a2b4935db7579096",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {
+        "source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_pre_schema_success.json",
+        "import_reason": "preserved narrative-less pre-schema advisory success"
+      }
+    },
+    {
+      "id": "RE-V134-JOURNEY-008",
+      "role": "journey_attempt",
+      "path": "journey/journey-008.json",
+      "sha256": "b302d87d95ef24d8765fb7bc745bbd705f8655f5aaf823e4d1308619be0a9d61",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {
+        "source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4_seventh_failed_attempt.json",
+        "import_reason": "preserved seventh bounded clean-room failure"
+      }
+    },
+    {
+      "id": "RE-V134-JOURNEY-009",
+      "role": "journey_attempt",
+      "path": "journey/journey-009.json",
+      "sha256": "ef77726045077c87a8d3e96af4059619af51e0efe0d39fb23f49d69a678631ce",
+      "media_type": "application/json",
+      "lane": "advisory",
+      "authority": "historical",
+      "status": "preserved",
+      "retention": "immutable",
+      "provenance": {
+        "source_path": "priv/journey_evidence/phoenix_clean_room_1.3.4.json",
+        "import_reason": "preserved schema-complete advisory success"
+      }
+    }
+  ]
+}

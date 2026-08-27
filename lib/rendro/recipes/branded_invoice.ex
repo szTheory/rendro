@@ -310,24 +310,15 @@ defmodule Rendro.Recipes.BrandedInvoice do
   # footer text. The final `Map.merge(base, :palette-override)` keeps an
   # explicit `:palette` as the winning layer (D-01).
   defp palette(opts) do
-    base =
-      case opts[:theme] do
-        nil ->
-          %{
-            ink: {0, 0, 0},
-            muted: {0, 0, 0},
-            accent: {0, 0, 0},
-            on_accent: {0, 0, 0},
-            background: {255, 255, 255},
-            surface: {255, 255, 255},
-            rule: {0, 0, 0}
-          }
-
-        theme ->
-          Rendro.Theme.resolve(theme).colors
-      end
-
-    Map.merge(base, Keyword.get(opts, :palette, %{}))
+    Rendro.Recipes.Palette.resolve(opts, %{
+      ink: {0, 0, 0},
+      muted: {0, 0, 0},
+      accent: {0, 0, 0},
+      on_accent: {0, 0, 0},
+      background: {255, 255, 255},
+      surface: {255, 255, 255},
+      rule: {0, 0, 0}
+    })
   end
 
   # ---------------------------------------------------------------------------

@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "snapshot_id": "baseline-132-initial",
+  "source_sha": "dcd7db62949f4089bded7878192ae1dafb0a4f46",
+  "captured_at_utc": "2026-08-26T18:28:00Z",
+  "worktree": "clean",
+  "environment": {
+    "id": "ENV-LOCAL-001",
+    "os": "Darwin 25.5.0 arm64",
+    "toolchain": "Elixir 1.19.5 / OTP 28",
+    "dependency_lock_sha256": "d918318e7a7374f04736dd431a5178a7dd50a71d22f74dc39be2da09f51575e7",
+    "renderer": {"applicable": false, "identity": "pdfium-cli unavailable on this local host"}
+  },
+  "evidence_items": [
+    {
+      "id": "EV-ARCH-001",
+      "signal_candidates": [
+        {"id": "SIG-ARCH-001", "domain": "architecture", "summary": "Compile-connected xref graph has 135 nodes and five edges.", "source_evidence_id": "EV-ARCH-001"}
+      ],
+      "provenance": {"source_sha": "dcd7db62949f4089bded7878192ae1dafb0a4f46", "captured_at_utc": "2026-08-26T18:28:00Z", "worktree": "clean", "environment_id": "ENV-LOCAL-001"},
+      "registered_command": {"name": "compile-connected xref statistics", "invocation": "mix xref graph --format stats --label compile-connected"},
+      "lane": "deterministic", "authority": "local_reproduction", "status": "passed",
+      "normalized_result": {"tracked_files": 135, "compile_dependencies": 5},
+      "raw_output": {"sha256": "227d69177f3c797545660068ed171bb2823507b26f895eb8d334cf7841b21beb", "bytes": 1315, "location": "/tmp/rendro-132-capture-20260826T190000Z/xref_stats.log", "expires_at_utc": "2026-09-09T18:28:00Z"},
+      "redaction": "redacted"
+    },
+    {
+      "id": "EV-ARCH-002",
+      "signal_candidates": [
+        {"id": "SIG-ARCH-002", "domain": "architecture", "summary": "Compile-connected xref graph reports zero cycles.", "source_evidence_id": "EV-ARCH-002"}
+      ],
+      "provenance": {"source_sha": "dcd7db62949f4089bded7878192ae1dafb0a4f46", "captured_at_utc": "2026-08-26T18:28:00Z", "worktree": "clean", "environment_id": "ENV-LOCAL-001"},
+      "registered_command": {"name": "compile-connected xref cycles", "invocation": "mix xref graph --format cycles --label compile-connected"},
+      "lane": "deterministic", "authority": "local_reproduction", "status": "passed",
+      "normalized_result": {"compile_connected_cycles": 0},
+      "raw_output": {"sha256": "b1c3f14a360684308230855d49dfd13a16509d47c1e327b4f3d7a63d2f46e548", "bytes": 16, "location": "/tmp/rendro-132-capture-20260826T190000Z/xref_cycles.log", "expires_at_utc": "2026-09-09T18:28:00Z"},
+      "redaction": "none"
+    },
+    {
+      "id": "EV-DEP-001",
+      "signal_candidates": [
+        {"id": "SIG-DEP-001", "domain": "dependency", "summary": "Elixir and OTP identity plus mix.lock SHA-256 were captured for dependency reproduction.", "source_evidence_id": "EV-DEP-001"}
+      ],
+      "provenance": {"source_sha": "dcd7db62949f4089bded7878192ae1dafb0a4f46", "captured_at_utc": "2026-08-26T18:28:00Z", "worktree": "clean", "environment_id": "ENV-LOCAL-001"},
+      "registered_command": {"name": "toolchain and dependency-lock identity", "invocation": "elixir --version && shasum -a 256 mix.lock"},
+      "lane": "deterministic", "authority": "local_reproduction", "status": "passed",
+      "normalized_result": {"dependency_lock_sha256": "d918318e7a7374f04736dd431a5178a7dd50a71d22f74dc39be2da09f51575e7"},
+      "raw_output": {"sha256": "71f476a77bf51ec6eb7c9064c315f10890cb8072e847dceebcbcc4cb129e125a", "bytes": 148, "location": "/tmp/rendro-132-capture-20260826T190000Z/toolchain.log", "expires_at_utc": "2026-09-09T18:28:00Z"},
+      "redaction": "none"
+    },
+    {
+      "id": "EV-TEST-001",
+      "signal_candidates": [
+        {"id": "SIG-TEST-001", "domain": "test", "summary": "Coverage run measured 75.04 percent against the existing 90 percent threshold and emitted slow-test diagnostics.", "source_evidence_id": "EV-TEST-001"}
+      ],
+      "provenance": {"source_sha": "dcd7db62949f4089bded7878192ae1dafb0a4f46", "captured_at_utc": "2026-08-26T18:28:00Z", "worktree": "clean", "environment_id": "ENV-LOCAL-001"},
+      "registered_command": {"name": "coverage and slow-test diagnostics", "invocation": "mix test --cover --slowest 10"},
+      "lane": "deterministic", "authority": "local_reproduction", "status": "failed",
+      "normalized_result": {"coverage_percent": 75.04, "threshold_percent": 90, "slowest_diagnostics": true},
+      "raw_output": {"sha256": "9d6278a5e338637657fb71a0b4953912e067fb0bf5047b7a769b5a2b7b2b3545", "bytes": 456564, "location": "/tmp/rendro-132-capture-20260826T190000Z/test_coverage.log", "expires_at_utc": "2026-09-09T18:28:00Z"},
+      "redaction": "redacted"
+    },
+    {
+      "id": "EV-CI-001",
+      "signal_candidates": [
+        {"id": "SIG-CI-001", "domain": "ci_cd", "summary": "Active scripts, workflow, and tests consume Phase 131 archived planning evidence.", "source_evidence_id": "EV-CI-001"}
+      ],
+      "provenance": {"source_sha": "dcd7db62949f4089bded7878192ae1dafb0a4f46", "captured_at_utc": "2026-08-26T18:28:00Z", "worktree": "clean", "environment_id": "ENV-LOCAL-001"},
+      "registered_command": {"name": "archive-consumer scan", "invocation": "rg -n '131-|phase.?131|v2\\.13' --glob '!milestones/**' --glob '!.planning/phases/**' ."},
+      "lane": "deterministic", "authority": "local_reproduction", "status": "passed",
+      "normalized_result": {"active_consumers": 5, "boundary": "evidence_authority"},
+      "raw_output": {"sha256": "2539372043cdd1c396d3177e57dc1127afa18132372e4566ef970ecffd875041", "bytes": 1071, "location": "/tmp/rendro-132-capture-20260826T190000Z/archive_consumers.log", "expires_at_utc": "2026-09-09T18:28:00Z"},
+      "redaction": "redacted"
+    },
+    {
+      "id": "EV-CI-002",
+      "signal_candidates": [
+        {"id": "SIG-CI-002", "domain": "ci_cd", "summary": "Catalog workflow still contains milestone-numbered Phase 126, 127, and 130 routes pending generic parity evidence.", "source_evidence_id": "EV-CI-002"},
+        {"id": "SIG-CI-003", "domain": "ci_cd", "summary": "The initial local fast-gate capture stopped at a new test formatting violation rather than a runtime or product failure.", "source_evidence_id": "EV-CI-002"}
+      ],
+      "provenance": {"source_sha": "dcd7db62949f4089bded7878192ae1dafb0a4f46", "captured_at_utc": "2026-08-26T18:28:00Z", "worktree": "clean", "environment_id": "ENV-LOCAL-001"},
+      "registered_command": {"name": "catalog-route and fast-gate scan", "invocation": "rg -n 'Phase 12[6-7]|Phase 130|milestone.*catalog|catalog.*milestone' .github test scripts priv .planning/ROADMAP.md; mix ci.fast"},
+      "lane": "deterministic", "authority": "local_reproduction", "status": "failed",
+      "normalized_result": {"milestone_numbered_routes": true, "fast_gate_failure": "format check for new focused contract only"},
+      "raw_output": {"sha256": "0fddeaca58f4059974b650768f3111f3bc8347ba09c0f36bd140cfc73c9ee698", "bytes": 14823, "location": "/tmp/rendro-132-capture-20260826T190000Z/catalog_routes.log", "expires_at_utc": "2026-09-09T18:28:00Z"},
+      "redaction": "redacted"
+    },
+    {
+      "id": "EV-DOC-001",
+      "signal_candidates": [
+        {"id": "SIG-DOC-001", "domain": "documentation", "summary": "Public API, rubric, and workflow contract tests pass locally.", "source_evidence_id": "EV-DOC-001"}
+      ],
+      "provenance": {"source_sha": "dcd7db62949f4089bded7878192ae1dafb0a4f46", "captured_at_utc": "2026-08-26T18:28:00Z", "worktree": "clean", "environment_id": "ENV-LOCAL-001"},
+      "registered_command": {"name": "documentation and public-contract tests", "invocation": "mix test test/docs_contract/public_api_contract_test.exs test/rendro/public_api/manifest_test.exs test/docs_contract/rubric_manifest_contract_test.exs test/guardrails/required_checks_contract_test.exs"},
+      "lane": "deterministic", "authority": "local_reproduction", "status": "passed",
+      "normalized_result": {"public_api_contract": "passed", "rubric_contract": "passed", "workflow_contract": "passed"},
+      "raw_output": {"sha256": "6c551854b4267883f8aab9d5078a83e20df3149f1185063781b9d0e36c88b6be", "bytes": 5716, "location": "/tmp/rendro-132-capture-20260826T190000Z/public_api_contract.log", "expires_at_utc": "2026-09-09T18:28:00Z"},
+      "redaction": "redacted"
+    },
+    {
+      "id": "EV-PKG-001",
+      "signal_candidates": [
+        {"id": "SIG-PKG-001", "domain": "packaging", "summary": "Hex package build succeeds for version 1.3.4.", "source_evidence_id": "EV-PKG-001"}
+      ],
+      "provenance": {"source_sha": "dcd7db62949f4089bded7878192ae1dafb0a4f46", "captured_at_utc": "2026-08-26T18:28:00Z", "worktree": "clean", "environment_id": "ENV-LOCAL-001"},
+      "registered_command": {"name": "Hex package construction", "invocation": "mix hex.build"},
+      "lane": "deterministic", "authority": "local_reproduction", "status": "passed",
+      "normalized_result": {"version": "1.3.4", "package_checksum": "839f903cf5938b5223149032796be3db19688dbbca47d076665409856adbf2aa"},
+      "raw_output": {"sha256": "f939f3b3831ed39dd4581b804d7b1f3a0591090cb00bb7d68f44352b5a577bc0", "bytes": 14787, "location": "/tmp/rendro-132-capture-20260826T190000Z/hex_build.log", "expires_at_utc": "2026-09-09T18:28:00Z"},
+      "redaction": "redacted"
+    },
+    {
+      "id": "EV-REL-001",
+      "signal_candidates": [
+        {"id": "SIG-REL-001", "domain": "release_evidence", "summary": "Proof lane tests pass locally, while PDFium-backed viewer evidence remains unavailable because pdfium-cli is absent.", "source_evidence_id": "EV-REL-001"}
+      ],
+      "provenance": {"source_sha": "dcd7db62949f4089bded7878192ae1dafb0a4f46", "captured_at_utc": "2026-08-26T18:28:00Z", "worktree": "clean", "environment_id": "ENV-LOCAL-001"},
+      "registered_command": {"name": "proof lane", "invocation": "mix ci.proofs"},
+      "lane": "proof", "authority": "local_reproduction", "status": "unavailable",
+      "normalized_result": {"local_proof_tests": "passed", "pdfium_viewer_evidence": "unavailable"},
+      "raw_output": {"sha256": "7db523423598092bfa9cedbf58beee4e53fec8b141f98760cf97cbe2d5a392a1", "bytes": 722, "location": "/tmp/rendro-132-capture-20260826T190000Z/ci_proofs.log", "expires_at_utc": "2026-09-09T18:28:00Z"},
+      "redaction": "redacted",
+      "unavailability_reason": "pdfium-cli is not installed on this macOS host, so skipped viewer evidence cannot be promoted to proof authority.",
+      "rerun_trigger": "Attach an exact-SHA primary-CI PDFium artifact or rerun on a host with the pinned executable."
+    },
+    {
+      "id": "EV-CATALOG-001",
+      "signal_candidates": [
+        {"id": "SIG-CATALOG-001", "domain": "catalog", "summary": "The current catalog authority identifies exactly six named cells for Phase 136 repair and keeps other cells out of scope.", "source_evidence_id": "EV-CATALOG-001"}
+      ],
+      "provenance": {"source_sha": "dcd7db62949f4089bded7878192ae1dafb0a4f46", "captured_at_utc": "2026-08-26T18:28:00Z", "worktree": "clean", "environment_id": "ENV-LOCAL-001"},
+      "registered_command": {"name": "catalog rubric and human-review identity", "invocation": "mix test test/docs_contract/rubric_manifest_contract_test.exs && shasum -a 256 priv/quality/SIGN-OFF.md priv/quality/rubric_scores.json"},
+      "lane": "human_review", "authority": "human_review", "status": "passed",
+      "normalized_result": {"target_cells": ["invoice corporate-classic dark", "statement minimal-mono dark", "payslip swiss light", "payslip swiss dark", "ticket brutalist light", "ticket brutalist dark"], "review_record": "priv/quality/SIGN-OFF.md"},
+      "raw_output": {"sha256": "b5405ce3ab03bf23e67a67fcafee79c73c578bb03851740a67b880a99ca1a979", "bytes": 189, "location": "/tmp/rendro-132-capture-20260826T190000Z/catalog_human_review.log", "expires_at_utc": "2026-09-09T18:28:00Z"},
+      "redaction": "none"
+    },
+    {
+      "id": "EV-ADV-001",
+      "signal_candidates": [
+        {"id": "SIG-CATALOG-002", "domain": "catalog", "summary": "PDFium raster advisory lane is unavailable locally and remains non-authoritative.", "source_evidence_id": "EV-ADV-001"}
+      ],
+      "provenance": {"source_sha": "dcd7db62949f4089bded7878192ae1dafb0a4f46", "captured_at_utc": "2026-08-26T18:28:00Z", "worktree": "clean", "environment_id": "ENV-LOCAL-001"},
+      "registered_command": {"name": "advisory lane", "invocation": "mix ci.advisory"},
+      "lane": "advisory", "authority": "local_reproduction", "status": "unavailable",
+      "normalized_result": {"pdfium_raster_snapshot": "unavailable"},
+      "raw_output": {"sha256": "bba5a72a512fd7e666856eb9f06f1b4eab69a3905a1fe8380616c54a41980d20", "bytes": 3430, "location": "/tmp/rendro-132-capture-20260826T190000Z/ci_advisory.log", "expires_at_utc": "2026-09-09T18:28:00Z"},
+      "redaction": "redacted",
+      "unavailability_reason": "pdfium-cli is not installed on this host; advisory raster snapshots therefore cannot be produced.",
+      "rerun_trigger": "Run the advisory lane with the pinned PDFium executable or attach its exact-SHA CI artifact."
+    }
+  ]
+}

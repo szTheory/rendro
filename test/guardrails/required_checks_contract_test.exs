@@ -6,6 +6,7 @@ defmodule Guardrails.RequiredChecksContractTest do
   @hexdocs_path ".github/workflows/hexdocs.yml"
   @release_path ".github/workflows/release.yml"
   @verify_docs_path "scripts/verify_docs.exs"
+  @catalog_evidence_path ".github/workflows/catalog-evidence.yml"
 
   @required_contexts ~w(ci-success)
 
@@ -19,7 +20,7 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert baseline["policy"] == "additive_only"
       assert baseline["since_milestone"] == "v2.3"
       assert baseline["required_contexts"] == Enum.sort(@required_contexts)
-      assert length(baseline["contexts"]) == 3
+      assert length(baseline["contexts"]) == 4
 
       assert baseline["supersedes_planning_refs"]["pitfalls_7_viewer_evidence_schema_required"] ==
                false
@@ -90,6 +91,112 @@ defmodule Guardrails.RequiredChecksContractTest do
     end
   end
 
+  describe "Catalog Evidence workflow boundary" do
+    test "is a manual, read-only, exact-SHA-bound control plane with one expiring bundle" do
+      workflow = load_workflow!(@catalog_evidence_path)
+      source = File.read!(@catalog_evidence_path)
+      dispatch = workflow["on"]["workflow_dispatch"]
+      inputs = dispatch["inputs"]
+      job = workflow["jobs"]["catalog-evidence"]
+      steps = job["steps"]
+
+      assert workflow["name"] == "Catalog Evidence"
+      assert Map.keys(workflow["on"]) == ["workflow_dispatch"]
+      assert workflow["permissions"] == %{"contents" => "read"}
+      assert job["timeout-minutes"] == 45
+
+      assert inputs["candidate_sha"] == %{
+               "description" => "Full lowercase commit SHA to evaluate",
+               "required" => true,
+               "type" => "string"
+             }
+
+      assert inputs["operation"] == %{
+               "description" => "Evidence operation to run",
+               "options" => ["review", "canonical"],
+               "required" => true,
+               "type" => "choice"
+             }
+
+      assert job["env"]["CANDIDATE_SHA"] == "${{ inputs.candidate_sha }}"
+      assert job["env"]["OPERATION"] == "${{ inputs.operation }}"
+      assert job["env"]["CONTROL_SHA"] == "${{ github.sha }}"
+      assert source =~ "[[ \"${CANDIDATE_SHA}\" =~ ^[0-9a-f]{40}$ ]]"
+      assert source =~ "[[ \"${OPERATION}\" == \"review\" || \"${OPERATION}\" == \"canonical\" ]]"
+
+      assert source =~
+               "[[ \"$(git -C \"${CANDIDATE_DIR}\" rev-parse HEAD)\" == \"${CANDIDATE_SHA}\" ]]"
+
+      checkout_steps =
+        Enum.filter(steps, &String.contains?(&1["uses"] || "", "actions/checkout@"))
+
+      assert length(checkout_steps) == 2
+
+      assert Enum.all?(checkout_steps, fn step ->
+               step["uses"] == "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" and
+                 step["with"]["persist-credentials"] == false
+             end)
+
+      assert Enum.map(checkout_steps, & &1["with"]["path"]) == ["control", "candidate"]
+      assert hd(checkout_steps)["with"]["ref"] == "${{ env.CONTROL_SHA }}"
+      assert List.last(checkout_steps)["with"]["ref"] == "${{ env.CANDIDATE_SHA }}"
+
+      assert Enum.any?(
+               steps,
+               &(&1["uses"] == "erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7")
+             )
+
+      upload_steps =
+        Enum.filter(steps, &String.contains?(&1["uses"] || "", "actions/upload-artifact@"))
+
+      assert [upload] = upload_steps
+      assert upload["uses"] == "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02"
+
+      assert upload["with"]["name"] ==
+               "rendro-catalog-evidence--${{ inputs.operation }}--${{ inputs.candidate_sha }}--run-${{ github.run_id }}--attempt-${{ github.run_attempt }}"
+
+      assert upload["with"]["retention-days"] == 30
+      assert upload["with"]["if-no-files-found"] == "error"
+
+      assert source =~ "Rendro.CatalogEvidenceBundle.build"
+      assert source =~ "Rendro.CatalogEvidenceBundle.validate"
+      assert source =~ "priv/pdfium_pin.json"
+      assert source =~ "artifact-url"
+      assert source =~ "artifact-digest"
+
+      for forbidden <- [
+            "actions/cache",
+            "secrets.",
+            "contents: write",
+            "id-token:",
+            "attestations:",
+            "workflow_run:"
+          ] do
+        refute source =~ forbidden
+      end
+    end
+
+    test "keeps ordinary CI topology and the sole ci-success authority unchanged" do
+      ci = load_workflow!(@ci_path)
+      catalog = load_workflow!(@catalog_evidence_path)
+      ci_success = ci["jobs"]["ci-success"]
+
+      assert Enum.sort(Map.keys(ci["on"])) == ["pull_request", "push", "schedule"]
+
+      assert ci_success["needs"] == [
+               "test",
+               "configurator-browser",
+               "integration-proofs",
+               "quality-governance"
+             ]
+
+      refute Map.has_key?(ci["jobs"], "catalog-evidence")
+      refute Map.has_key?(catalog["jobs"]["catalog-evidence"], "needs")
+      refute "catalog-evidence" in ci_success["needs"]
+      assert load_baseline!()["required_contexts"] == @required_contexts
+    end
+  end
+
   describe "behavioral command wiring" do
     test "integration-proofs runs live_signing, live_pdf_tools, and release_preflight_proof" do
       ci = File.read!(@ci_path)
@@ -118,7 +225,7 @@ defmodule Guardrails.RequiredChecksContractTest do
   end
 
   describe "docs-contract lane count" do
-    test "verify_docs.exs registers exactly twenty-seven lanes including the preset public-claims and accessibility overclaim tripwire lanes" do
+    test "verify_docs.exs registers exactly twenty-eight lanes including the catalog evidence, preset public-claims, and accessibility overclaim tripwire lanes" do
       script = File.read!(@verify_docs_path)
 
       lane_entries =
@@ -127,7 +234,10 @@ defmodule Guardrails.RequiredChecksContractTest do
           script
         )
 
-      assert length(lane_entries) == 27
+      assert length(lane_entries) == 28
+
+      assert script =~
+               ~r/\{"Catalog evidence runbook lane",\s*\["test",\s*"test\/docs_contract\/catalog_evidence_runbook_test\.exs"\]\}/s
 
       assert script =~
                ~r/\{"Preset public-claims lane",\s*\["test",\s*"test\/docs_contract\/presets_claims_test\.exs"\]\}/s
@@ -160,7 +270,8 @@ defmodule Guardrails.RequiredChecksContractTest do
 
       assert ci_fast_steps == [
                "format --check-formatted",
-               "hex.build",
+               "quality.hygiene",
+               "cmd mix hex.build",
                "compile --warnings-as-errors",
                "test --exclude quarantine --slowest 10",
                "docs --warnings-as-errors",
@@ -171,6 +282,26 @@ defmodule Guardrails.RequiredChecksContractTest do
   end
 
   describe "required/advisory CI separation" do
+    test "release workflow runs and retains a fresh advisory Phoenix clean-room proof" do
+      release = File.read!(@release_path)
+      advisory_block = ci_job_block!(release, "phoenix-clean-room-advisory")
+
+      assert advisory_block =~ "continue-on-error: true"
+      assert advisory_block =~ "scripts/phoenix_clean_room_proof.exs"
+      refute advisory_block =~ "--prerequisite"
+      refute advisory_block =~ ".planning/"
+      assert advisory_block =~ "github.ref_name == 'v1.3.4'"
+
+      assert advisory_block =~
+               "PROOF_ROOT: /tmp/rendro-phoenix-clean-room-${{ github.run_id }}-${{ github.run_attempt }}"
+
+      refute advisory_block =~ "PROOF_ROOT: ${{ runner.temp }}"
+      assert advisory_block =~ "proof.outcome !== \"success\""
+      assert advisory_block =~ "proof.cleanup !== \"workspace_removed\""
+      assert advisory_block =~ "name: phoenix-clean-room-advisory"
+      assert advisory_block =~ "if-no-files-found: error"
+    end
+
     test "Phase 130 catalog review accepts only a full-SHA-bound candidate route" do
       ci = File.read!(@ci_path)
       advisory_block = ci_job_block!(ci, "advisory-checks")
@@ -440,6 +571,63 @@ defmodule Guardrails.RequiredChecksContractTest do
     end
   end
 
+  describe "quality governance CI topology" do
+    test "quality-governance is a fail-closed ci-success roll-up member" do
+      baseline = load_baseline!()
+      workflow = load_workflow!(@ci_path)
+      jobs = workflow["jobs"]
+      governance = Map.fetch!(jobs, "quality-governance")
+      roll_up = Map.fetch!(jobs, "ci-success")
+
+      context = Enum.find(baseline["contexts"], &(&1["name"] == "quality-governance"))
+      assert context["semantic_class"] == "deterministic"
+      assert context["ci_job"] == "quality-governance"
+      assert context["command"] == "mix quality.governance"
+      assert context["notes"] =~ "roll-up"
+
+      assert is_nil(governance["needs"])
+      assert is_nil(governance["if"])
+      refute Map.has_key?(governance, "continue-on-error")
+      assert governance["env"] == %{"MIX_ENV" => "test"}
+
+      assert Enum.any?(
+               governance["steps"],
+               &(&1["uses"] == "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10")
+             )
+
+      assert Enum.any?(governance["steps"], fn step ->
+               step["uses"] == "erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7" and
+                 step["with"] == %{"otp-version" => "28", "elixir-version" => "1.19.5"}
+             end)
+
+      assert Enum.any?(governance["steps"], fn step ->
+               step["uses"] == "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e" and
+                 step["with"] == %{"node-version" => "22.14.0"}
+             end)
+
+      assert Enum.any?(governance["steps"], &(&1["run"] == "mix deps.get"))
+      assert Enum.any?(governance["steps"], &(&1["run"] == "mix quality.governance"))
+      assert "quality-governance" in roll_up["needs"]
+      assert roll_up["if"] == "always()"
+      refute "quality-governance" in baseline["required_contexts"]
+      assert baseline["required_contexts"] == @required_contexts
+    end
+
+    test "topology mutations reject governance weakening and required-context inflation" do
+      workflow = load_workflow!(@ci_path)
+      governance = Map.fetch!(workflow["jobs"], "quality-governance")
+      roll_up = Map.fetch!(workflow["jobs"], "ci-success")
+      baseline = load_baseline!()
+
+      refute Map.has_key?(governance, "needs")
+      refute Map.has_key?(governance, "if")
+      refute Map.has_key?(governance, "continue-on-error")
+      refute Enum.any?(governance["steps"], &Map.has_key?(&1, "continue-on-error"))
+      assert "quality-governance" in roll_up["needs"]
+      assert baseline["required_contexts"] == ["ci-success"]
+    end
+  end
+
   describe "release workflow boundary" do
     test "release workflow stays tag-gated and publishes with Hex credentials only" do
       release = File.read!(@release_path)
@@ -448,6 +636,7 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert release =~ "tags:"
       assert release =~ "'v*.*.*'"
       assert release =~ "mix release.preflight"
+      assert release =~ "mix quality.hygiene"
       assert release =~ "mix hex.publish --yes --no-docs"
       assert release =~ "HEX_API_KEY"
       refute release =~ "contents: write"

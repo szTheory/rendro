@@ -7,7 +7,13 @@ Rendro.Test.HexBuildCache.start_link()
 # - :quarantine tests are known flakes, isolated to a nightly verify.flake lane.
 # - :live_pdf_tools, :live_signing, and :raster_snapshot are specialized tests excluded by default.
 ExUnit.configure(
-  exclude: [quarantine: true, live_pdf_tools: true, live_signing: true, raster_snapshot: true]
+  exclude: [
+    quarantine: true,
+    live_pdf_tools: true,
+    live_signing: true,
+    raster_snapshot: true,
+    quality_ledger_contract: true
+  ]
 )
 
 # Testing Strategy Documentation (TEST-05):

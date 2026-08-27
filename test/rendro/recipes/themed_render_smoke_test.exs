@@ -99,7 +99,22 @@ defmodule Rendro.Recipes.ThemedRenderSmokeTest do
       payment_method: "Direct Deposit ···· 4321"
     }
 
-    assert {:ok, _} = Rendro.render(Payslip.document(data, theme: @theme))
+    document = Payslip.document(data, theme: @theme)
+
+    assert {:ok, _} = Rendro.render(document, deterministic: true)
+
+    missing_fallback = %{
+      document
+      | font_registry: %{
+          document.font_registry
+          | fonts: Map.delete(document.font_registry.fonts, :payslip_sans),
+            default_font: :default
+        },
+        default_font: :default
+    }
+
+    assert {:error, %Rendro.Error{reason: {:unknown_text_font, :payslip_sans}}} =
+             Rendro.render(missing_fallback, deterministic: true)
   end
 
   test "Certificate renders {:ok, _} under the default theme" do

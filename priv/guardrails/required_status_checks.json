@@ -27,6 +27,13 @@
       "semantic_class": "behavioral_live_proof",
       "ci_job": "integration-proofs",
       "command": "mix test --include live_signing test/rendro/adapters/signing_live_test.exs && mix test --include live_pdf_tools test/rendro/adapters/signing_live_test.exs && mix run scripts/release_preflight_proof.exs --current-version-tag --skip-ci --skip-security-audits --worktree <isolated>"
+    },
+    {
+      "name": "quality-governance",
+      "semantic_class": "deterministic",
+      "ci_job": "quality-governance",
+      "command": "mix quality.governance",
+      "notes": "Always-running fail-closed governance check and ci-success roll-up member, without becoming a second required branch-protection context."
     }
   ],
   "advisory_contexts": [

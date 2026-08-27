@@ -1,150 +1,91 @@
 # Stack Research
 
-**Domain:** v2.13 quality ratchet and adoption-readiness for a pure-Elixir, Phoenix-first PDF library
-**Researched:** 2026-08-19
-**Confidence:** HIGH for the committed toolchain and current Hex snapshot; MEDIUM for the external-tool documentation lookup (the mandated Context7 provider was unavailable and official docs were used directly).
+**Domain:** Quality and maintainability ratchet for a mature pure-Elixir library
+**Researched:** 2026-08-26
+**Confidence:** HIGH
 
 ## Recommendation
 
-Add **no runtime dependencies, no database, no browser automation framework, and no telemetry/analytics service**. The repository already has the three needed toolchains: a deterministic catalog generator/checker, a pinned advisory raster lane, and a Phoenix 1.8 reference application. v2.13 should add only narrowly scoped test/fixture/process code where it closes a verification gap, then commit the resulting evidence. This preserves the core's pure-Elixir boundary and its deterministic/advisory evidence separation.
+Keep the existing runtime and quality stack. Rendro already has the right baseline tools; v2.14 should improve how they are applied and how findings are recorded, not add a second lint ecosystem. New dependencies require a demonstrated gap that cannot be covered by Elixir/Mix, the installed quality tools, or a small repository-owned contract.
 
 ## Recommended Stack
 
 ### Core Technologies
 
-| Technology | Version | Purpose | Why recommended |
-|---|---:|---|---|
-| Elixir + OTP | Elixir 1.19.5 / OTP 28 | Run catalog generation, catalog checks, and integration tests | Already the pinned project runtime; catalog tooling is dev/test-only (`dev/`) and does not widen the library's production compilation surface. |
-| `Rendro.Catalog` + `mix rendro.catalog.gen` / `mix rendro.catalog.check` | existing schema v1 | Rebuild and verify all 32 catalog cells and their rubric join | It already checks the exact `png_sha256` and source-PDF hash, renderer pin, disposition uniqueness, projected status, and promotion evidence. It is the right place to enforce the twelve repaired cells rather than inventing a review app. |
-| `priv/quality/rubric_scores.json` | schema v1 | Committed, reviewer-owned quality evidence | The existing `catalog_dispositions` row ties each cell to its exact hashes and requires a non-empty `supersedes_evidence_ref` and `resolution_ref` whenever a failed cell is promoted. Keep this as the durable human-review record. |
-| `pdfium-cli` | **v0.11.0**, SHA-256 `b1e7f3…e160a` | Advisory PNG rasterisation for visual review | The repository already pins and checksum-verifies this tool in CI. Retaining the exact pin makes before/after review reproducible while honestly limiting raster evidence to render proof, not GUI-viewer, accessibility, print-safety, or universal-design proof. |
-| Phoenix reference app | Phoenix `~> 1.8`; Plug `~> 1.18`; Bandit `~> 1.0` | Newcomer-journey validation | `examples/phoenix_example` is a runnable controller integration with route tests. It should be the journey fixture; adding another scaffold duplicates the truth source and risks testing a path users cannot actually follow. |
+| Technology | Version | Purpose | v2.14 posture |
+|------------|---------|---------|---------------|
+| Elixir | 1.19.5 | Core language, compiler diagnostics, ExUnit, Mix tasks, xref, line-coverage diagnostics | Keep; use compiler and xref output as evidence rather than introducing a parallel analyzer |
+| Erlang/OTP | 28 | Runtime, BEAM tooling, Dialyzer engine | Keep; preserve the supported CI matrix and inspect dependency direction before changing module boundaries |
+| ExUnit | bundled | Behavioral, property, docs-contract, and integration verification | Keep; improve test ownership and reduce brittle evidence coupling without imposing a raw coverage quota |
+| GitHub Actions | current service | Required, proof, advisory, release, and catalog-evidence automation | Keep; separate purpose-named workflows and minimize permissions/cross-trigger authority |
 
-### Supporting Tools
+### Existing Quality Tools
 
-| Tool | Version | Purpose | When to use |
-|---|---:|---|---|
-| `mix ci.fast` | existing alias | Required deterministic lane | Run after each catalog or newcomer-path change: formatting, build, compile, tests, docs, Credo, Dialyzer. |
-| `mix rendro.catalog.check --pdfium /path/to/pdfium-cli` | existing task | Verify catalog artifacts without writing | Run after generating candidate repair artifacts and again in CI. The supplied binary must match `priv/pdfium_pin.json`. |
-| `mix test --include raster_snapshot test/rendro/catalog_raster_review_test.exs` | existing | Advisory review-image production/check | Use for the twelve cells' bounded full-size reviewer packet only; do not promote it into the deterministic required lane. |
-| `gh` | local `2.95.0` | Pull-based GitHub issue/PR evidence snapshots | Use `gh issue list` and `gh pr list` with explicit JSON fields from `ADOPTION.md`; GitHub CLI documents both commands and their structured JSON output. |
-| Hex package API | public `https://hex.pm/api/packages/rendro` | Current download snapshot | Fetch only during an inbound-signal review or milestone planning; record the returned `downloads` object and the UTC timestamp in `ADOPTION.md`. |
-| Phoenix generator | current Phoenix 1.8 line (official docs currently show 1.8.9) | One clean-room validation run | Use `mix phx.new` only for a disposable, isolated confirmation that the dependency/install instructions work. The committed example remains the repeatable CI fixture. |
+| Tool | Version | Purpose | Recommendation |
+|------|---------|---------|----------------|
+| Credo | 1.7.17 | Consistency, readability, refactor, design, and warning checks | Retain `--strict`; add or tune checks only when Phase 132 demonstrates a recurring gap |
+| Dialyxir | 1.4.7 | Dialyzer integration and type/spec diagnostics | Retain zero-warning policy; audit suppressions and spec value rather than maximizing spec count |
+| ExDoc | 0.40.1 | Public documentation and warning gate | Retain warnings-as-errors and review skip lists for stale exemptions |
+| mix_audit | 2.1.x | Dependency vulnerability audit | Retain in advisory/nightly and release surfaces; keep ignore entries evidence-backed |
+| JSV / yaml_elixir | existing lock | JSON/YAML contract validation | Reuse for quality-ledger/evidence/workflow contracts where machine validation adds value |
 
-## Required Process Additions
+### Built-in Diagnostic Tools
 
-### 1. Catalog quality ratchet
+| Tool | Use | Boundary |
+|------|-----|----------|
+| `mix xref graph --format stats` | Baseline runtime/export/compile dependency shape and cycles | Counts and cycles are investigation signals, not automatic failures |
+| `mix xref graph --format stats --label compile-connected` | Compile-health check recommended by Mix documentation | Preserve the current zero compile-connected cycle posture |
+| `mix test --cover` / `mix test.coverage` | Find unexecuted areas and test-suite blind spots | Diagnostic only; line coverage cannot prove branch behavior or assertion quality |
+| `mix test --slowest` | Identify high-cost tests and fixtures | Optimize only repeatable bottlenecks that affect local/CI feedback |
+| `mix hex.build` | Verify package contents | Continue exact allowlist checks and explicitly exclude internal release evidence |
 
-No library is required. Add a **single reviewer packet/test seam** only if the existing `catalog_raster_review_test.exs` cannot emit exactly the twelve named `needs_work` cells at readable size. Keep the inputs and expected identifiers literal.
+## GitHub Actions Design
 
-Current committed scope is exactly these 12 `quality.status: needs_work` cells, all rendered by `pdfium-cli v0.11.0`:
-
-- Invoice / Cedar Mutual / Corporate Classic: light, dark
-- Statement / Signal Ledger / Minimal Mono: light, dark
-- Receipt / Poppy & Grain / Humanist: light, dark
-- Certificate / Meridian Arts Fellowship / Editorial: light, dark
-- Payslip / Northline Logistics / Swiss: light, dark
-- Ticket / Aurora Live / Brutalist: light, dark
-
-For each repaired row, regenerate through the existing catalog task, perform bounded human review of the exact SHA-bound PNG, and update its scored disposition. A promotion to `passes` must record the old evidence reference and concrete behavioral resolution. Do not alter the rubric threshold, replace the pin, or treat an unscored cell as a pass.
-
-Reproducible commands:
-
-```bash
-# deterministic artifact + evidence-join verification
-mix rendro.catalog.check --pdfium /absolute/path/to/pdfium-cli
-mix ci.fast
-
-# advisory visual lane; still a bounded human review, never a universal claim
-mix test --include raster_snapshot test/rendro/catalog_raster_review_test.exs
-mix ci.advisory
-```
-
-### 2. Current adoption evidence
-
-Keep two evidence classes separate:
-
-| Class | Source of truth | What v2.13 should do |
-|---|---|---|
-| **Committed local evidence** | `ADOPTION.md` ledger, date, thresholds, reviewer decision, public URLs/anonymized reports | Update it with one explicit `HOLD`, `ACCUMULATING`, or `TRIGGER` decision after applying existing counting rules. This is reviewable historical evidence. |
-| **External current data** | Hex API response and GitHub issue/PR results at the time of review | Fetch live, record raw values plus date/URL/command result, then commit the assessed snapshot. Never assume prior counts remain current. |
-
-At research time, the live Hex package API reported `downloads.all: 3014` and `downloads.week: 162`; the committed 2026-06-13 snapshot is 877 / 117. That is an external point-in-time observation, not a claim that the demand or contributor gate has triggered: the other threshold families still require a checked issue/PR review under `ADOPTION.md`'s rules.
-
-Use existing commands, with a project-explicit repository target in automation:
-
-```bash
-curl -fsSL https://hex.pm/api/packages/rendro | jq '.downloads'
-
-gh issue list --repo szTheory/rendro --state all --label 'adoption:signal' \
-  --json number,title,author,createdAt,url,labels --limit 100
-
-gh issue list --repo szTheory/rendro --state all --label 'area:text-shaping' \
-  --json number,title,author,createdAt,url,labels --limit 100
-
-gh pr list --repo szTheory/rendro --state merged \
-  --search 'merged:>=2026-06-12 -author:szTheory' \
-  --json number,title,author,mergedAt,url --limit 100
-```
-
-Do not schedule polling, add product analytics, scrape stars/forks, or introduce a metrics database. The project deliberately uses quiet, pull-based demand gates; those alternatives would change the adopted evidence model rather than validate it.
-
-### 3. Phoenix newcomer journey
-
-Use two complementary checks, neither requiring a new dependency:
-
-1. **Committed repeatable path:** run the existing example app’s dependency install and test suite. It validates the adapter, routes, PDF headers, and PDF magic bytes as a Phoenix 1.8 consumer.
-2. **One clean-room acceptance path:** in a disposable directory, create a Phoenix 1.8 app, add the released Rendro dependency plus optional Phoenix adapter prerequisites, render an invoice through `Rendro.Adapters.Phoenix`, and assert download and inline-preview headers. Capture the exact versions/commands and a brief outcome in a committed milestone evidence file. Do not commit the generated application.
-
-```bash
-# repeatable project fixture
-(cd examples/phoenix_example && mix deps.get && mix test)
-
-# interactive manual acceptance after booting the example fixture
-(cd examples/phoenix_example && mix phx.server)
-curl -fsSI http://localhost:4000/download
-curl -fsSI http://localhost:4000/preview
-```
-
-The existing `example-phoenix` workflow is intentionally advisory. Preserve that status: it detects newcomer drift without allowing ecosystem-install noise to block Rendro’s deterministic release gate.
+- Keep ordinary CI responsible for committed-state validation.
+- Move catalog generation/review/canonical artifact production into a purpose-named workflow with `workflow_dispatch` inputs `candidate_sha` and `operation` (`review` or `canonical`).
+- Validate `candidate_sha` as exactly forty lowercase hexadecimal characters, check out that SHA, and compare `git rev-parse HEAD` literally before any renderer work.
+- Keep top-level `contents: read`; grant no write permission or secret to catalog evidence generation.
+- Treat caches as untrusted inputs. Restore from low-trust triggers, save only on trusted triggers, and never cache credentials or evidence claimed as authoritative.
+- Use artifacts for generated evidence and caches only for reproducible dependencies/build intermediates.
 
 ## Alternatives Considered
 
-| Recommended | Alternative | Why not for v2.13 |
-|---|---|---|
-| Existing JSON rubric + SHA-bound PNG/PDF evidence | Visual-regression SaaS or AI aesthetic scorer | Adds cost, non-determinism, and an opaque new authority without replacing the required human quality judgment. |
-| Existing pinned PDFium advisory lane | Playwright/Puppeteer screenshot pipeline | Browser screenshots answer a different question and would blur deterministic rendering with GUI-viewer evidence. |
-| `gh` + Hex API snapshots committed to `ADOPTION.md` | GitHub/Hex analytics warehouse | Over-engineered for a pull-based, low-volume adoption gate; creates privacy and maintenance scope. |
-| Existing Phoenix 1.8 example + clean-room checklist | A second maintained tutorial app | Duplicates integration logic and provides a second route for documentation drift. |
+| Recommended | Alternative | Decision |
+|-------------|-------------|----------|
+| Existing Credo + repository contracts | Add a broad new style/complexity tool | Defer unless Phase 132 proves a gap with a concrete false-negative example |
+| Built-in line coverage as diagnostic | Enforce a global coverage percentage | Reject; the number is easy to game and does not measure assertion or branch quality |
+| Evidence ledger with human disposition | Automated maintainability score | Reject; opaque composite scores would turn judgment into unsupported precision |
+| Purpose-named catalog workflow | Continue accumulating phase-number branch routes in `ci.yml` | Replace after parity and security checks pass |
+| Cohesive internal extraction | Split every large module by line count | Reject; size alone does not prove a better boundary |
 
-## What NOT to Add
+## What Not to Add
 
 | Avoid | Why | Use instead |
-|---|---|---|
-| Any core runtime dependency | This milestone improves evidence and adoption readiness, not rendering capability; it would violate the pure-core scope. | Existing dev/test-only tasks and fixtures. |
-| Phoenix as a non-optional core dependency | Reverses the optional-adapter boundary. | Keep `{:phoenix, "~> 1.7", optional: true}` in core and Phoenix `~> 1.8` in the example app. |
-| Node/browser test framework for catalog review | Adds a second raster/viewer model and maintenance lane. | SHA-pinned `pdfium-cli` advisory raster evidence. |
-| Scheduled download collection or private analytics | Contradicts the quiet pull-based adoption policy and produces data that does not meet the demand gate. | Dated, manual Hex/GitHub snapshots tied to a review decision. |
-| PDFium upgrade in this milestone | A renderer upgrade invalidates all visual baselines and creates work unrelated to the quality repairs. | Retain v0.11.0; schedule a separate, explicit re-baselining decision if an upgrade becomes necessary. |
+|-------|-----|-------------|
+| Runtime dependencies for quality tooling | Violates the pure-core boundary and expands the shipped package for maintainer-only work | Dev/test tools or repository-owned scripts/contracts |
+| Blanket Dialyzer warning flags without a trial | Some optional warning classes can be noisy and create misleading spec churn | Evaluate each flag against the current code and record false-positive cost |
+| Mutation-testing or complexity services by default | Adds operational cost before a concrete coverage problem is identified | Focused regression tests, property tests, xref, and evidence-backed review |
+| Hosted quality dashboards | Creates another stateful truth source and maintenance surface | `.planning/QUALITY.md` plus reproducible commands and committed evidence |
 
 ## Version Compatibility
 
-| Component | Compatible with | Notes |
-|---|---|---|
-| Core Elixir `~> 1.19` | OTP 28 | Current local toolchain is Elixir 1.19.5 / OTP 28; keep it for reproducible commands. |
-| Core optional Phoenix dependency `~> 1.7` | Phoenix 1.8 example consumer | The example pins Phoenix `~> 1.8`, Plug `~> 1.18`, and Bandit `~> 1.0`; the adapter is already compiled and exercised under that newer consumer surface. |
-| Catalog manifest schema 1 | rubric schema 1 + pinned PDFium v0.11.0 | Hash joins mean a repair must update catalog artifact and its reviewer disposition together; do not manually edit only the public projection. |
-| GitHub CLI 2.95.0 | GitHub CLI documented `--json` fields | Pin no `gh` dependency in `mix.exs`; CI/manual review should request documented fields and record results. |
+| Component | Compatibility decision |
+|-----------|------------------------|
+| Elixir 1.19.5 / OTP 28 | Authoritative local and primary CI quality environment |
+| Optional dependency matrix | Preserve existing supported pairs; quality refactors cannot make optional adapters mandatory |
+| Credo 1.7.17 / Dialyxir 1.4.7 | Use currently locked semantics for the milestone; dependency upgrades are separate work unless required for correctness |
+| GitHub Actions | Keep third-party actions SHA-pinned and validate workflow syntax through repository contracts |
 
 ## Sources
 
-- [Phoenix `mix phx.new` documentation](https://phoenix.hexdocs.pm/Mix.Tasks.Phx.New.html) — current Phoenix 1.8 generator syntax and options (MEDIUM; direct official lookup after Context7 was unavailable).
-- [Phoenix Up and Running](https://phoenix.hexdocs.pm/up_and_running.html) — installation and standard project startup path (MEDIUM; direct official lookup).
-- [GitHub CLI: `gh issue list`](https://cli.github.com/manual/gh_issue_list) and [GitHub CLI: `gh pr list`](https://cli.github.com/manual/gh_pr_list) — structured list commands and JSON fields (HIGH, primary documentation).
-- [Hex package API: Rendro](https://hex.pm/api/packages/rendro) — live package/download snapshot, fetched 2026-08-19 (HIGH for this time-stamped response only).
-- Local committed evidence: `mix.exs`, `dev/rendro/catalog.ex`, `priv/pdfium_pin.json`, `assets/rendro/catalog.json`, `priv/quality/rubric_scores.json`, `ADOPTION.md`, and `examples/phoenix_example/` (HIGH).
+- [Mix xref documentation](https://hexdocs.pm/elixir/1.19.5/Mix.Tasks.Xref.html) — dependency labels, cycle analysis, and compile-connected health guidance
+- [Mix test coverage documentation](https://hexdocs.pm/mix/1.19.5/Mix.Tasks.Test.Coverage.html) — built-in coverage and its limitations
+- [Credo configuration](https://credo.hexdocs.pm/config_file.html) — strict mode, enabled checks, and custom configuration
+- [Dialyxir 1.4.7 documentation](https://dialyxir.hexdocs.pm/) — warning flags, explanations, PLTs, and ignore handling
+- [GitHub reusable workflow reference](https://docs.github.com/en/actions/reference/workflows-and-actions/reusing-workflow-configurations) — workflow reuse and permission propagation
+- [GitHub dependency caching reference](https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching) — cache scope and poisoning guidance
+- Rendro `mix.exs`, `.credo.exs`, `.github/workflows/*.yml`, and `priv/guardrails/required_status_checks.json` — repository-specific stack and authority boundaries
 
 ---
-
-*Stack research for: Rendro v2.13 Quality Ratchet & Adoption Readiness*
-*Researched: 2026-08-19*
+*Stack research for: v2.14 Quality & Maintainability*
+*Researched: 2026-08-26*
