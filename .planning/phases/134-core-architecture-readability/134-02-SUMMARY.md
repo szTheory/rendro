@@ -32,6 +32,24 @@ metrics:
   files_changed: 3
 completed: "2026-08-26"
 status: complete
+requirements-completed: [ARCH-01, ARCH-02]
+coverage:
+  - id: D1
+    description: "The dormant Analyzer implementation and isolated test are absent without altering public API or deterministic recipe bytes."
+    requirement: ARCH-01
+    verification:
+      - kind: test
+        ref: "mix test test/rendro/public_api/manifest_test.exs test/rendro/recipes/*_byte_identity_test.exs"
+        status: pass
+    human_judgment: false
+  - id: D2
+    description: "Analyzer closure retains evidence-backed ledger lifecycle and zero-consumer proof."
+    requirement: ARCH-02
+    verification:
+      - kind: test
+        ref: "mix quality.baseline"
+        status: pass
+    human_judgment: false
 ---
 
 # Phase 134 Plan 02: Analyzer Closure Summary

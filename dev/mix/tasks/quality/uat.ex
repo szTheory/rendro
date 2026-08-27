@@ -17,16 +17,18 @@ defmodule Mix.Tasks.Quality.Uat do
     {opts, positional, invalid} =
       OptionParser.parse(args, strict: [all: :boolean, check: :boolean, write: :boolean])
 
-    if invalid != [] or (opts[:all] && positional != []) or
-         (!opts[:all] && length(positional) != 1) or
-         (opts[:check] && opts[:write]) do
+    if invalid != [] or (opts[:all] == true and positional != []) or
+         (opts[:all] != true and length(positional) != 1) or
+         (opts[:check] == true and opts[:write] == true) do
       Mix.raise(
         "usage: mix quality.uat PHASE --write | mix quality.uat PHASE --check | mix quality.uat --all --check"
       )
     end
 
-    if opts[:all] && !opts[:check], do: Mix.raise("--all requires --check")
-    if !opts[:all] && !opts[:check] && !opts[:write], do: Mix.raise("choose --write or --check")
+    if opts[:all] == true and opts[:check] != true, do: Mix.raise("--all requires --check")
+
+    if opts[:all] != true and opts[:check] != true and opts[:write] != true,
+      do: Mix.raise("choose --write or --check")
 
     root = File.cwd!()
     phases_root = Path.join(root, ".planning/phases")

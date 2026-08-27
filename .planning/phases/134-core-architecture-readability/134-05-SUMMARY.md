@@ -35,6 +35,24 @@ metrics:
   tasks_completed: 2
   files_changed: 3
 status: complete
+requirements-completed: [ARCH-01, ARCH-02, ARCH-03, ARCH-04]
+coverage:
+  - id: D1
+    description: "QL-006 terminal closure preserves public manifest, package boundary, deterministic recipe bytes, and governed truthfulness evidence."
+    requirement: ARCH-04
+    verification:
+      - kind: test
+        ref: "mix ci.fast"
+        status: pass
+    human_judgment: false
+  - id: D2
+    description: "Terminal Phase 134 deterministic compatibility evidence is recorded without human-gated completion claims."
+    requirement: ARCH-01
+    verification:
+      - kind: test
+        ref: "mix test test/rendro/public_api/manifest_test.exs test/rendro/recipes/*_byte_identity_test.exs"
+        status: pass
+    human_judgment: false
 ---
 
 # Phase 134 Plan 05: Truthfulness Audit and Terminal Ledger Closure Summary

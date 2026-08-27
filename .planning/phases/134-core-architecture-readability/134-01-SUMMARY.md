@@ -36,6 +36,24 @@ metrics:
   files_changed: 4
 completed: "2026-08-26"
 status: complete
+requirements-completed: [ARCH-02, ARCH-03, ARCH-04]
+coverage:
+  - id: D1
+    description: "Permanent ledger dispositions and the Wave 0 palette characterization are recorded with deterministic contracts."
+    requirement: ARCH-03
+    verification:
+      - kind: test
+        ref: "mix quality.baseline"
+        status: pass
+    human_judgment: false
+  - id: D2
+    description: "The evidence tracer baseline is read-only repeatable and rejects duplicate identity or invalid lifecycle mutations."
+    requirement: ARCH-02
+    verification:
+      - kind: test
+        ref: "mix test test/quality/baseline_ledger_contract_test.exs --include quality_ledger_contract"
+        status: pass
+    human_judgment: false
 ---
 
 # Phase 134 Plan 01: Evidence Tracer and Palette Wave 0 Summary

@@ -22,6 +22,16 @@ metrics:
   tasks_completed: 1
   files_changed: 3
 status: complete
+requirements-completed: [ARCH-01, ARCH-02, ARCH-03]
+coverage:
+  - id: D1
+    description: "The hidden Palette resolver preserves characterized default, theme, merge, and failure behavior."
+    requirement: ARCH-03
+    verification:
+      - kind: test
+        ref: "mix test test/rendro/recipes/palette_test.exs"
+        status: pass
+    human_judgment: false
 ---
 
 # Phase 134 Plan 03: Palette Helper Contract Summary
