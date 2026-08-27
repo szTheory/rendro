@@ -3,9 +3,9 @@ phase: 135
 slug: test-ci-cd-simplification
 # status lifecycle: draft (seeded by plan-phase) → validated (set by validate-phase §6)
 # audit-milestone §5.5 distinguishes NOT-VALIDATED (draft) from PARTIAL (validated + nyquist_compliant: false)
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: validated
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-08-27
 ---
 
@@ -40,24 +40,26 @@ created: 2026-08-27
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 135-W0-01 | 135-01 | 0 | TEST-01, TEST-02 | T-135-01 | Inventory has exactly the two authorized ordered D-05 rows, required columns, and valid result states; only the proven duplicate assertion is removed | docs contract/regression | `mix test test/docs_contract/phase_135_test_inventory_contract_test.exs test/rendro/recipes/themed_render_smoke_test.exs test/rendro/recipes/payslip_opts_threading_test.exs test/rendro/recipes/certificate*_test.exs --max-failures 1` | ❌ Wave 0 | ⬜ pending |
-| 135-W0-02 | TBD | 0 | CI-01, CI-04 | T-135-02, T-135-03 | Closed inputs, exact SHA/HEAD binding, safe paths, read-only permissions, pinned actions, no secrets/caches, and one valid bundle fail closed | unit/workflow contract | `mix test test/rendro/catalog_evidence_bundle_test.exs test/guardrails/required_checks_contract_test.exs --max-failures 1` | ❌ Wave 0 | ⬜ pending |
-| 135-W0-03 | 135-01, 135-03 | 0 | CI-02 | T-135-04 | Comparator equates only shared semantic/authority facts; it accepts different valid per-side run/attempt/artifact/digest provenance and rejects missing, malformed, or misbound provenance; inventory contract pins exactly four route rows/states | unit + docs contract + remote parity | `mix test test/rendro/catalog_evidence_parity_test.exs test/docs_contract/phase_135_test_inventory_contract_test.exs --max-failures 1` plus paired remote dispatches | ❌ Wave 0 | ⬜ pending |
-| 135-W0-04 | TBD | 0 | CI-03 | T-135-05 | Deterministic, proof, and advisory lanes plus authoritative `ci-success` topology remain unchanged | guardrail | `mix test test/guardrails/required_checks_contract_test.exs --max-failures 1` | ✅ extend existing | ⬜ pending |
-| 135-W0-05 | TBD | 0 | CI-05 | T-135-06 | Current runbook exposes supported commands, identities, limits, authority, and failure recovery without requiring archived plans | docs contract | `mix test test/docs_contract/catalog_evidence_runbook_test.exs --max-failures 1` | ❌ Wave 0 | ⬜ pending |
+| 135-01-01 | 135-01 | 1 | CI-01, CI-04 | T-135-01, T-135-02, T-135-03 | Closed manifest bundle rejects invalid operation/SHA/HEAD, unsafe role/path, incorrect record count, payload hash drift, and review approval claims | unit | `mix test test/rendro/catalog_evidence_bundle_test.exs --max-failures 1` | ✅ | ✅ green |
+| 135-01-02 | 135-01 | 1 | CI-02 | T-135-04 | Sealed provenance record rejects malformed/misbound transport facts, duplicate IDs, hash/cardinality drift, scalar role records, and fabricated statuses | unit | `mix test test/rendro/catalog_evidence_parity_test.exs --max-failures 1` | ✅ | ✅ green |
+| 135-01-03 | 135-01 | 1 | TEST-01, TEST-02, CI-02 | T-135-01, T-135-04 | Inventory uses exactly two ordered recipe rows and four ordered, same-SHA parity rows; every one of the 16 parity columns is bound to the sealed-record projection and each one-cell mutation fails | docs contract | `mix test test/docs_contract/phase_135_test_inventory_contract_test.exs --max-failures 1` | ✅ | ✅ green |
+| 135-01-04 | 135-01 | 1 | TEST-01, TEST-02 | T-135-01 | Retained Payslip smoke owner rejects a removed fallback registry while distinct opts, typography, deterministic-byte, and Certificate construction contracts remain | regression | `mix test test/rendro/recipes/themed_render_smoke_test.exs test/rendro/recipes/payslip_opts_threading_test.exs test/rendro/recipes/payslip_typography_test.exs test/rendro/recipes/certificate_typography_test.exs --max-failures 1` | ✅ | ✅ green |
+| 135-02-01 | 135-02 | 2 | CI-01, CI-03, CI-04 | T-135-02, T-135-03, T-135-05 | Parsed workflow guardrails enforce workflow_dispatch-only exact-SHA isolation, credential-free checkouts, immutable pins, no secrets/cache/write/bridge, bounded uploads, unchanged CI lanes and sole `ci-success`; post-cutover retired routes are absent | workflow contract | `mix test test/guardrails/required_checks_contract_test.exs --max-failures 1` | ✅ | ✅ green |
+| 135-02-02 | 135-02 | 2 | CI-05 | T-135-06 | One current adjacent runbook contains dispatch/download/validation/reproduction/recovery commands and explicit non-authority boundaries; its docs lane and helper link are registered exactly once | docs contract | `mix test test/docs_contract/catalog_evidence_runbook_test.exs && mix run scripts/verify_docs.exs` | ✅ | ✅ green |
+| 135-03-01 | 135-03 | 3 | CI-02, CI-03, CI-04 | T-135-04, T-135-05 | Four sealed legacy/generic records have the same full candidate SHA and matched status; local comparator and inventory contracts validate role/count/hash authority and distinct bound provenance before cutover | unit + docs contract + sealed remote evidence | `mix test test/rendro/catalog_evidence_parity_test.exs test/docs_contract/phase_135_test_inventory_contract_test.exs test/guardrails/required_checks_contract_test.exs --max-failures 1` | ✅ | ✅ green |
 
-*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+*Terminal audit status: every listed check is ✅ green.*
 
 ---
 
 ## Wave 0 Requirements
 
-- [ ] `test/rendro/catalog_evidence_bundle_test.exs` — bundle schema, path confinement, checksum, cardinality, duplicate, unsafe-path, SHA-binding, and operation-negative controls for CI-01/CI-04.
-- [ ] `test/rendro/catalog_evidence_parity_test.exs` — normalized role/hash/authority comparator with a deliberately mismatched fixture for CI-02.
-- [ ] `test/docs_contract/phase_135_test_inventory_contract_test.exs` — exact two-row D-05 recipe schema/order/state and four-row D-18 parity route/order/state contract.
-- [ ] `test/docs_contract/catalog_evidence_runbook_test.exs` — supported operator commands and truthful authority/limit claims for CI-05.
-- [ ] Extend `test/guardrails/required_checks_contract_test.exs` — generic-workflow security, unchanged `ci-success` topology, and post-cutover legacy-route absence.
-- [ ] `135-test-inventory.md` — bounded TEST-01/TEST-02 owner-oracle-failure-negative-control inventory and four-row remote parity matrix consumed by the focused contract.
+- [x] `test/rendro/catalog_evidence_bundle_test.exs` — bundle schema, path confinement, checksum, cardinality, unsafe-path, SHA-binding, and operation-negative controls for CI-01/CI-04.
+- [x] `test/rendro/catalog_evidence_parity_test.exs` — normalized role/hash/authority comparator with malformed, mismatched, misbound, duplicate, cardinality, and scalar-role negative controls for CI-02.
+- [x] `test/docs_contract/phase_135_test_inventory_contract_test.exs` — exact two-row D-05 and four-row D-18 schema/order/state contract, sealed provenance projection, and all 16 per-column mutation controls.
+- [x] `test/docs_contract/catalog_evidence_runbook_test.exs` — supported operator commands and truthful authority/limit claims for CI-05.
+- [x] `test/guardrails/required_checks_contract_test.exs` — generic-workflow security/isolation, unchanged `ci-success` topology, and post-cutover retired-route absence.
+- [x] `135-test-inventory.md` plus `135-parity-comparator-record.json` — bounded TEST-01/TEST-02 owner-oracle-failure inventory and sealed four-row same-SHA remote parity matrix consumed by the focused contracts.
 
 ---
 
@@ -85,12 +87,29 @@ created: 2026-08-27
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies.
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify.
-- [ ] Wave 0 covers all missing test references.
-- [ ] No watch-mode flags.
-- [ ] Focused deterministic feedback latency stays under 30 seconds.
-- [ ] Four required remote parity rows bind to one exact full candidate SHA before route deletion.
-- [ ] `nyquist_compliant: true` is set after execution evidence is captured.
+- [x] All tasks have automated verification.
+- [x] Sampling continuity: no three consecutive tasks lack automated verification.
+- [x] Every former Wave 0 reference exists and is green at current HEAD.
+- [x] No watch-mode flags.
+- [x] Focused deterministic suite completed in under 30 seconds (70 tests, 0 failures).
+- [x] Four required remote parity rows bind to `643e407508d744d11b919a8af929855d06e608d4` before the recorded cutover.
+- [x] `nyquist_compliant: true` is supported by current-head execution evidence.
 
-**Approval:** pending
+**Approval:** validated
+
+## Validation Audit 2026-08-27
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 0 |
+| Resolved | 0 |
+| Escalated | 0 |
+
+### Current-head evidence
+
+- `mix test test/rendro/catalog_evidence_bundle_test.exs test/rendro/catalog_evidence_parity_test.exs test/docs_contract/phase_135_test_inventory_contract_test.exs test/guardrails/required_checks_contract_test.exs test/docs_contract/catalog_evidence_runbook_test.exs test/rendro/recipes/themed_render_smoke_test.exs test/rendro/recipes/payslip_opts_threading_test.exs test/rendro/recipes/payslip_typography_test.exs test/rendro/recipes/certificate_typography_test.exs --max-failures 1` — **70 tests, 0 failures**.
+- `actionlint .github/workflows/catalog-evidence.yml .github/workflows/ci.yml` — **passed**.
+- `mix run scripts/verify_docs.exs` — **28 explicit docs-contract lanes passed**, including Catalog evidence runbook.
+- `mix ci.fast` — **passed**.
+
+The audit also confirmed the clean post-review scalar-role malformed-input regression, exact 16-column sealed-inventory projection, route normalization and separate provenance binding, workflow control/candidate isolation, immutable pins/read-only permissions/no secret-cache-write bridge, runbook limits, and retired Phase 126/127/130 route absence. No new tests were necessary.

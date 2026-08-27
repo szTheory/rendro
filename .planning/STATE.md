@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.14
 milestone_name: Quality & Maintainability
-current_phase: 135
-current_phase_name: Test & CI/CD Simplification
-status: verifying
+current_phase: 136
+current_phase_name: Catalog Visual Quality
+status: planning
 stopped_at: Completed 135-03-PLAN.md
-last_updated: "2026-08-27T20:19:00.058Z"
+last_updated: "2026-08-27T21:46:48.598Z"
 last_activity: 2026-08-27
-last_activity_desc: Phase 135 execution started
+last_activity_desc: Phase 135 complete, transitioned to Phase 136
 progress:
   total_phases: 6
   completed_phases: 4
@@ -24,23 +24,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-27)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 135 — Test & CI/CD Simplification
+**Current focus:** Phase 136 — Catalog Visual Quality
 
 ## Current Position
 
-Phase: 135 (Test & CI/CD Simplification) — EXECUTING
-Plan: 3 of 3
-Status: Phase complete — ready for verification
-Last activity: 2026-08-27 — Phase 135 execution started
+Phase: 136 — Catalog Visual Quality
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-08-27 — Phase 135 complete, transitioned to Phase 136
 
 ## Roadmap Snapshot (v2.14, Phases 132-137)
 
 ```text
-[####################....................] 50% — 3/6 phases complete
+[###########################.............] 67% — 4/6 phases complete
 Phase 132 Quality Baseline & Triage ....................... Complete
 Phase 133 Repository & Evidence Hygiene ................... Complete
 Phase 134 Core Architecture & Readability ................. Complete
-Phase 135 Test & CI/CD Simplification ..................... Pending
+Phase 135 Test & CI/CD Simplification ..................... Complete
 Phase 136 Catalog Visual Quality .......................... Pending
 Phase 137 Closure & Handoff ............................... Pending
 ```
@@ -121,13 +121,13 @@ Resume file: None
 
 ## Next Steps
 
-1. Run `$gsd-discuss-phase 135` for behavior-preserving test and CI/CD simplification.
-2. Inventory preserved behaviors, authority checks, and the exact-SHA catalog evidence routes before consolidation.
-3. Preserve the no-feature, public-contract, deterministic/proof/advisory separation, and sole `ci-success` authority boundaries.
+1. Run `$gsd-discuss-phase 136` for the bounded six-cell catalog visual-quality repair.
+2. Use the standalone exact-SHA Catalog Evidence workflow for review payloads; do not restore retired milestone-specific routes.
+3. Preserve the fixed 32-cell catalog, twenty explicitly unscored cells, dark screen-only boundary, and Phase 135 authority separation.
 
 ## Operator Next Steps
 
-- Start with `$gsd-discuss-phase 135`.
+- Start with `$gsd-discuss-phase 136`.
 
 ## Quick Tasks Completed
 

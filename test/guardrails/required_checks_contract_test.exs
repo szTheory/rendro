@@ -92,18 +92,21 @@ defmodule Guardrails.RequiredChecksContractTest do
   end
 
   describe "Catalog Evidence workflow boundary" do
-    test "is a manual, read-only, exact-SHA-bound control plane with one expiring bundle" do
+    test "is a manual, read-only, exact-SHA-bound artifact-isolated control plane" do
       workflow = load_workflow!(@catalog_evidence_path)
       source = File.read!(@catalog_evidence_path)
       dispatch = workflow["on"]["workflow_dispatch"]
       inputs = dispatch["inputs"]
+      candidate_job = workflow["jobs"]["candidate-generation"]
       job = workflow["jobs"]["catalog-evidence"]
       steps = job["steps"]
 
       assert workflow["name"] == "Catalog Evidence"
       assert Map.keys(workflow["on"]) == ["workflow_dispatch"]
       assert workflow["permissions"] == %{"contents" => "read"}
+      assert candidate_job["timeout-minutes"] == 45
       assert job["timeout-minutes"] == 45
+      assert job["needs"] == "candidate-generation"
 
       assert inputs["candidate_sha"] == %{
                "description" => "Full lowercase commit SHA to evaluate",
@@ -118,17 +121,20 @@ defmodule Guardrails.RequiredChecksContractTest do
                "type" => "choice"
              }
 
-      assert job["env"]["CANDIDATE_SHA"] == "${{ inputs.candidate_sha }}"
-      assert job["env"]["OPERATION"] == "${{ inputs.operation }}"
+      assert candidate_job["env"]["CANDIDATE_SHA"] == "${{ inputs.candidate_sha }}"
+      assert candidate_job["env"]["OPERATION"] == "${{ inputs.operation }}"
       assert job["env"]["CONTROL_SHA"] == "${{ github.sha }}"
       assert source =~ "[[ \"${CANDIDATE_SHA}\" =~ ^[0-9a-f]{40}$ ]]"
       assert source =~ "[[ \"${OPERATION}\" == \"review\" || \"${OPERATION}\" == \"canonical\" ]]"
 
       assert source =~
-               "[[ \"$(git -C \"${CANDIDATE_DIR}\" rev-parse HEAD)\" == \"${CANDIDATE_SHA}\" ]]"
+               "[[ \"$(git rev-parse HEAD)\" == \"${CANDIDATE_SHA}\" ]]"
 
       checkout_steps =
-        Enum.filter(steps, &String.contains?(&1["uses"] || "", "actions/checkout@"))
+        workflow["jobs"]
+        |> Map.values()
+        |> Enum.flat_map(& &1["steps"])
+        |> Enum.filter(&String.contains?(&1["uses"] || "", "actions/checkout@"))
 
       assert length(checkout_steps) == 2
 
@@ -137,9 +143,10 @@ defmodule Guardrails.RequiredChecksContractTest do
                  step["with"]["persist-credentials"] == false
              end)
 
-      assert Enum.map(checkout_steps, & &1["with"]["path"]) == ["control", "candidate"]
-      assert hd(checkout_steps)["with"]["ref"] == "${{ env.CONTROL_SHA }}"
-      assert List.last(checkout_steps)["with"]["ref"] == "${{ env.CANDIDATE_SHA }}"
+      assert Enum.map(checkout_steps, & &1["with"]["ref"]) |> Enum.sort() == [
+               "${{ env.CANDIDATE_SHA }}",
+               "${{ env.CONTROL_SHA }}"
+             ]
 
       assert Enum.any?(
                steps,
@@ -147,10 +154,19 @@ defmodule Guardrails.RequiredChecksContractTest do
              )
 
       upload_steps =
-        Enum.filter(steps, &String.contains?(&1["uses"] || "", "actions/upload-artifact@"))
+        workflow["jobs"]
+        |> Map.values()
+        |> Enum.flat_map(& &1["steps"])
+        |> Enum.filter(&String.contains?(&1["uses"] || "", "actions/upload-artifact@"))
 
-      assert [upload] = upload_steps
-      assert upload["uses"] == "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02"
+      assert length(upload_steps) == 2
+
+      assert Enum.all?(
+               upload_steps,
+               &(&1["uses"] == "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02")
+             )
+
+      upload = Enum.find(upload_steps, &(&1["id"] == "evidence_upload"))
 
       assert upload["with"]["name"] ==
                "rendro-catalog-evidence--${{ inputs.operation }}--${{ inputs.candidate_sha }}--run-${{ github.run_id }}--attempt-${{ github.run_attempt }}"
@@ -161,15 +177,14 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert source =~ "Rendro.CatalogEvidenceBundle.build"
       assert source =~ "Rendro.CatalogEvidenceBundle.validate"
       assert source =~ "priv/pdfium_pin.json"
-      assert source =~ "artifact-url"
-      assert source =~ "artifact-digest"
+      assert source =~ "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093"
       assert source =~ "RENDRO_PRESET_RASTER_REVIEW_DIR"
       assert source =~ "test/rendro/theme/preset_raster_snapshot_test.exs"
       assert source =~ "preset-review/preset.json"
       assert source =~ "-printf '%f\\n'"
-      assert source =~ "(.images | length) == 12"
-      assert source =~ "([.images[].id] | length == (unique | length))"
-      assert source =~ "^[0-9a-f]{64}$"
+      assert source =~ "test \"$(jq '.images | length'"
+      assert source =~ "multipage-checksums.sha256"
+      assert source =~ "actions/download-artifact@"
 
       for forbidden <- [
             "actions/cache",
@@ -198,7 +213,7 @@ defmodule Guardrails.RequiredChecksContractTest do
              ]
 
       refute Map.has_key?(ci["jobs"], "catalog-evidence")
-      refute Map.has_key?(catalog["jobs"]["catalog-evidence"], "needs")
+      assert catalog["jobs"]["catalog-evidence"]["needs"] == "candidate-generation"
       refute "catalog-evidence" in ci_success["needs"]
       assert load_baseline!()["required_contexts"] == @required_contexts
     end

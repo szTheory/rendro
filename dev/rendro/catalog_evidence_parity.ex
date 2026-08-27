@@ -1,143 +1,469 @@
 defmodule Rendro.CatalogEvidenceParity do
   @moduledoc false
 
+  # This is deliberately an extractor, not a comparison of caller supplied
+  # summaries.  The only accepted inputs are an unpacked retained artifact, or
+  # a versioned sealed record retained with this phase.
   @routes ~w(phase126_preset_review phase127_catalog_review phase130_review phase130_canonical)a
+  @sha ~r/\A[0-9a-f]{64}\z/
+  @git_sha ~r/\A[0-9a-f]{40}\z/
+  @selected_presets ~w(
+    brutalist_payslip_dark_page_1 corporate_classic_invoice_dark_page_1
+    editorial_ticket_dark_page_1 humanist_payslip_dark_page_1
+    minimal_mono_ticket_dark_page_1 swiss_invoice_light_page_1
+  )
 
   @spec compare(map(), map(), atom() | String.t()) :: {:ok, map()} | {:error, [atom()]}
-  def compare(legacy_root, generic_root, route)
-      when is_map(legacy_root) and is_map(generic_root) do
-    route = normalize_route(route)
-
-    with :ok <- validate_route(route),
-         :ok <- validate_root(legacy_root),
-         :ok <- validate_root(generic_root),
-         :ok <- compare_authority(legacy_root, generic_root) do
-      {:ok,
-       %{
-         "route" => Atom.to_string(route),
-         "shared" => shared_facts(legacy_root),
-         "legacy" => provenance(legacy_root),
-         "generic" => provenance(generic_root)
-       }}
-    else
-      {:error, reasons} -> {:error, reasons}
+  def compare(%{"root" => legacy}, %{"root" => generic}, route)
+      when is_binary(legacy) and is_binary(generic) do
+    with {:ok, route} <- route(route),
+         {:ok, left} <- extract(legacy, :legacy, route),
+         {:ok, right} <- extract(generic, :generic, route) do
+      result(route, left, right)
     end
   end
 
-  def compare(_legacy_root, _generic_root, _route), do: {:error, [:invalid_parity_input]}
+  # A durable record is accepted only through this explicit sealed boundary;
+  # compare/3 never treats arbitrary payload maps as evidence.
+  def compare(%{"sealed_record" => record}, %{"sealed_record" => record}, route),
+    do: verify_record(record, route)
 
-  defp validate_route(route) when route in @routes, do: :ok
-  defp validate_route(_route), do: {:error, [:invalid_route]}
+  def compare(_, _, _), do: {:error, [:invalid_parity_input]}
 
-  defp validate_root(root) do
-    reasons =
-      []
-      |> invalid_unless(
-        valid_sha?(root["candidate_sha"]) and root["candidate_sha"] == root["checked_out_head"],
-        :invalid_identity
-      )
-      |> invalid_unless(valid_renderer?(root["renderer"]), :invalid_renderer)
-      |> invalid_unless(valid_payloads?(root["payloads"]), :invalid_payloads)
-      |> invalid_unless(
-        valid_actions?(root["actions"]) and valid_permissions?(root["permissions"]),
-        :invalid_control_plane
-      )
-      |> invalid_unless(valid_reviewer?(root["reviewer"]), :invalid_reviewer)
-      |> Kernel.++(provenance_errors(root))
+  @spec verify_record(map(), atom() | String.t()) :: {:ok, map()} | {:error, [atom()]}
+  def verify_record(record, requested_route \\ nil)
 
-    if reasons == [], do: :ok, else: {:error, Enum.uniq(reasons)}
+  def verify_record(record, requested_route) when is_map(record) do
+    with :ok <- validate_record(record),
+         {:ok, routes} <- record_routes(record, requested_route) do
+      routes
+      |> Enum.map(fn {route, facts} ->
+        with :ok <- candidate_identity?(record["transport"], facts),
+             :ok <- valid_side?(facts["legacy"]),
+             :ok <- valid_side?(facts["generic"]),
+             {:ok, status} <- result(route, facts["legacy"]["roles"], facts["generic"]["roles"]),
+             true <- status["status"] == facts["status"] do
+          {:ok, {Atom.to_string(route), status}}
+        else
+          false -> {:error, :fabricated_status}
+          {:error, reason} -> {:error, reason}
+        end
+      end)
+      |> collect()
+      |> case do
+        {:ok, values} when is_nil(requested_route) -> {:ok, Map.new(values)}
+        {:ok, [{_, value}]} -> {:ok, value}
+        error -> error
+      end
+    end
   end
 
-  defp compare_authority(legacy, generic) do
-    if shared_facts(legacy) == shared_facts(generic),
-      do: :ok,
-      else: {:error, [:shared_authority_mismatch]}
+  def verify_record(_, _), do: {:error, [:invalid_sealed_record]}
+
+  @spec inventory_row(map(), atom() | String.t()) :: {:ok, map()} | {:error, [atom()]}
+  def inventory_row(record, route) when is_map(record) do
+    with {:ok, route} <- route(route),
+         {:ok, _} <- verify_record(record, route) do
+      facts = record["routes"][Atom.to_string(route)]
+      legacy = facts["legacy"]["transport"]
+      generic = facts["generic"]["transport"]
+
+      {:ok,
+       %{
+         "candidate_sha" => record["transport"]["candidate_sha"],
+         "legacy_run_url" => legacy["run_url"],
+         "legacy_run_id" => legacy["run_id"],
+         "legacy_attempt" => to_string(legacy["run_attempt"]),
+         "legacy_artifact_identity" => artifact_identities_text(legacy["artifacts"]),
+         "legacy_upload_digest" => artifact_digests_text(legacy["artifacts"]),
+         "generic_run_url" => generic["run_url"],
+         "generic_run_id" => generic["run_id"],
+         "generic_attempt" => to_string(generic["run_attempt"]),
+         "generic_artifact_identity" => artifact_identities_text(generic["artifacts"]),
+         "generic_upload_digest" => artifact_digests_text(generic["artifacts"]),
+         "renderer" => renderer_text(generic["renderer"]),
+         "normalized_role_count_hash" => roles_text(facts["generic"]["roles"]),
+         "action_pin_permission" =>
+           "checkout=#{generic["actions"]["checkout"]}; contents=#{generic["permissions"]["contents"]}; reviewer-required=#{generic["reviewer_required"]}",
+         "status" => facts["status"]
+       }}
+    end
   end
 
-  defp shared_facts(root) do
-    Map.take(
-      root,
-      ~w(candidate_sha checked_out_head renderer payloads actions permissions reviewer)
-    )
+  defp extract(root, side, route) do
+    case {side, route} do
+      {:generic, :phase126_preset_review} ->
+        json_role(root, "preset-review/preset.json", @selected_presets)
+
+      {:generic, :phase127_catalog_review} ->
+        generic_review(root)
+
+      {:generic, :phase130_review} ->
+        generic_review(root)
+
+      {:generic, :phase130_canonical} ->
+        json_role(root, "canonical/catalog.json", :all)
+
+      {:legacy, :phase126_preset_review} ->
+        png_role(root, "review", @selected_presets)
+
+      {:legacy, :phase127_catalog_review} ->
+        legacy_flat_review(root)
+
+      {:legacy, :phase130_review} ->
+        legacy_flat_review(root)
+
+      {:legacy, :phase130_canonical} ->
+        canonical_manifest(root)
+    end
   end
 
-  defp provenance(root) do
-    Map.take(
-      root,
-      ~w(run_id run_attempt run_url artifact_identity upload_digest provenance_candidate_sha)
-    )
+  defp generic_review(root) do
+    with {:ok, candidate} <- json_role(root, "candidate/catalog.json", :all),
+         {:ok, final} <- json_role(root, "final-review/final.json", :all),
+         {:ok, multipage} <- checksum_role(root, "multipage-review/multipage.json") do
+      {:ok,
+       %{
+         "candidate32" => candidate["candidate32"],
+         "final12" => final["final12"],
+         "multipage4" => multipage["multipage4"]
+       }}
+    end
   end
 
-  defp provenance_errors(root) do
-    provenance = provenance(root)
+  # The historical artifacts used underscores in file names and did not retain
+  # the current role directories.  Normalize only that documented spelling
+  # difference; never infer identifiers from arbitrary caller strings.
+  defp legacy_flat_review(root) do
+    with {:ok, files} <- regular_files(root),
+         candidate = Enum.filter(files, &String.ends_with?(&1, ".png")),
+         true <- candidate != [] do
+      records = Enum.map(candidate, &file_record(root, &1))
 
-    []
-    |> invalid_unless(
-      is_binary(provenance["run_id"]) and
-        Regex.match?(~r/\A[A-Za-z0-9._-]+\z/, provenance["run_id"] || ""),
-      :invalid_provenance
-    )
-    |> invalid_unless(
-      is_integer(provenance["run_attempt"]) and provenance["run_attempt"] > 0,
-      :invalid_provenance
-    )
-    |> invalid_unless(
-      is_binary(provenance["run_url"]) and
-        String.starts_with?(provenance["run_url"] || "", "https://"),
-      :invalid_provenance
-    )
-    |> invalid_unless(
-      is_binary(provenance["artifact_identity"]) and
-        String.trim(provenance["artifact_identity"] || "") != "",
-      :invalid_provenance
-    )
-    |> invalid_unless(valid_sha256?(provenance["upload_digest"]), :invalid_provenance)
-    |> invalid_unless(
-      provenance["provenance_candidate_sha"] == root["candidate_sha"],
-      :misbound_provenance
-    )
-    |> Enum.reverse()
+      {multi, finals} =
+        Enum.split_with(records, &String.contains?(&1["id"], "line-items-60-plus-page"))
+
+      {:ok, %{"candidate32" => records, "final12" => finals, "multipage4" => multi}}
+    else
+      false -> {:error, [:missing_legacy_files]}
+      error -> error
+    end
   end
 
-  defp valid_renderer?(%{"version" => version, "binary_sha256" => binary_sha, "dpi" => dpi}),
+  defp canonical_manifest(root) do
+    path = Path.join(root, "manifest.txt")
+
+    with {:ok, text} <- File.read(path),
+         lines <- Regex.scan(~r/([0-9a-f]{64})  assets\/rendro\/catalog\/(.+\.png)/, text),
+         true <- lines != [],
+         {:ok, records} <- canonical_records(lines) do
+      {:ok, %{"canonical32" => records}}
+    else
+      false -> {:error, [:invalid_legacy_manifest]}
+      _ -> {:error, [:invalid_legacy_manifest]}
+    end
+  end
+
+  defp png_role(root, dir, selected) do
+    with {:ok, files} <- regular_files(Path.join(root, dir)) do
+      records =
+        Enum.map(files, fn file ->
+          %{
+            "id" => file |> Path.basename() |> Path.rootname(),
+            "sha256" =>
+              file
+              |> File.read!()
+              |> then(&:crypto.hash(:sha256, &1))
+              |> Base.encode16(case: :lower)
+          }
+        end)
+
+      selected_records = Enum.filter(records, &(&1["id"] in selected))
+
+      if length(selected_records) == length(selected),
+        do: {:ok, %{"preset6" => selected_records}},
+        else: {:error, [:preset_selection_mismatch]}
+    end
+  end
+
+  defp json_role(root, relative, selected) do
+    with {:ok, json} <- root |> Path.join(relative) |> File.read(),
+         {:ok, decoded} <- Jason.decode(json),
+         entries when is_list(entries) <- decoded["images"] || decoded["cells"],
+         true <- Enum.all?(entries, &is_map/1) do
+      records =
+        Enum.map(entries, fn e ->
+          %{"id" => e["id"] || e["catalog_id"], "sha256" => e["sha256"] || e["png_sha256"]}
+        end)
+
+      records =
+        if selected == :all, do: records, else: Enum.filter(records, &(&1["id"] in selected))
+
+      if valid_records?(records) and (selected == :all or length(records) == length(selected)),
+        do: {:ok, %{role(relative) => records}},
+        else: {:error, [:invalid_json_role]}
+    else
+      _ -> {:error, [:invalid_json_role]}
+    end
+  end
+
+  defp checksum_role(root, relative) do
+    with {:ok, text} <- root |> Path.join(relative) |> File.read() do
+      records =
+        for [_, sha, path] <- Regex.scan(~r/([0-9a-f]{64})  (.+)/, text),
+            do: %{"id" => id(path), "sha256" => sha}
+
+      if valid_records?(records),
+        do: {:ok, %{role(relative) => records}},
+        else: {:error, [:invalid_checksum_role]}
+    end
+  end
+
+  defp result(route, legacy, generic) when is_map(legacy) and is_map(generic) do
+    expected = expected(route)
+
+    with :ok <- expected_roles(legacy, expected), :ok <- expected_roles(generic, expected) do
+      status = if canonical(legacy) == canonical(generic), do: "matched", else: "mismatch"
+
+      {:ok,
+       %{"route" => Atom.to_string(route), "status" => status, "roles" => canonical(generic)}}
+    end
+  end
+
+  defp result(_, _, _), do: {:error, [:invalid_normalized_evidence]}
+
+  defp expected(:phase126_preset_review), do: %{"preset6" => 6}
+  defp expected(:phase130_canonical), do: %{"canonical32" => 32}
+  defp expected(_), do: %{"candidate32" => 32, "final12" => 12, "multipage4" => 4}
+
+  defp expected_roles(value, expected),
     do:
-      is_binary(version) and version != "" and valid_sha256?(binary_sha) and is_integer(dpi) and
-        dpi > 0
+      if(
+        Map.keys(value) |> Enum.sort() == Map.keys(expected) |> Enum.sort() and
+          Enum.all?(expected, fn {k, n} -> valid_records?(value[k]) and length(value[k]) == n end),
+        do: :ok,
+        else: {:error, [:route_cardinality_mismatch]}
+      )
 
-  defp valid_renderer?(_renderer), do: false
+  defp canonical(value),
+    do:
+      value
+      |> Enum.map(fn {role, records} -> {role, Enum.sort_by(records, & &1["id"])} end)
+      |> Enum.sort()
 
-  defp valid_payloads?(payloads) when is_list(payloads) and payloads != [] do
-    roles = Enum.map(payloads, &Map.get(&1, "role"))
+  defp roles_text(roles) do
+    roles
+    |> canonical()
+    |> Enum.map(fn {role, records} ->
+      "#{role}:#{length(records)}@#{records |> Jason.encode!() |> sha256()}"
+    end)
+    |> Enum.join("; ")
+  end
 
-    roles == Enum.sort(roles) and length(roles) == length(Enum.uniq(roles)) and
-      Enum.all?(payloads, fn payload ->
-        is_binary(payload["role"]) and valid_sha256?(payload["sha256"]) and
-          is_integer(payload["count"]) and payload["count"] > 0
+  defp renderer_text(%{"version" => version, "dpi" => dpi, "binary_sha256" => sha}),
+    do: "pdfium #{version}; dpi=#{dpi}; sha256:#{sha}"
+
+  defp artifact_identities_text(artifacts),
+    do: Enum.map_join(artifacts, "; ", & &1["identity"])
+
+  defp artifact_digests_text(artifacts),
+    do: Enum.map_join(artifacts, "; ", &("sha256:" <> &1["archive_sha256"]))
+
+  defp sha256(value), do: :crypto.hash(:sha256, value) |> Base.encode16(case: :lower)
+
+  defp valid_record?(record) do
+    record["schema_version"] == 2 and record["sealed"] == true and
+      valid_transport?(record["transport"]) and is_map(record["routes"])
+  end
+
+  defp validate_record(record) do
+    if valid_record?(record), do: :ok, else: {:error, [:invalid_sealed_record]}
+  end
+
+  defp candidate_identity?(%{"candidate_sha" => candidate}, %{
+         "legacy" => legacy,
+         "generic" => generic
+       }) do
+    if get_in(legacy, ["transport", "candidate_sha"]) == candidate and
+         get_in(generic, ["transport", "candidate_sha"]) == candidate,
+       do: :ok,
+       else: {:error, :candidate_identity_mismatch}
+  end
+
+  defp candidate_identity?(_, _), do: {:error, :candidate_identity_mismatch}
+
+  defp valid_side?(%{"transport" => transport, "roles" => roles}) when is_map(roles) do
+    if valid_transport?(transport), do: :ok, else: {:error, :invalid_transport}
+  end
+
+  defp valid_side?(_), do: {:error, :invalid_side}
+
+  defp valid_transport?(
+         transport = %{
+           "candidate_sha" => sha,
+           "run_url" => url,
+           "run_id" => run_id,
+           "run_attempt" => attempt,
+           "artifacts" => artifacts,
+           "renderer" => renderer,
+           "actions" => %{"checkout" => pin},
+           "reviewer_required" => false,
+           "permissions" => %{"contents" => "read"}
+         }
+       ) do
+    valid_transport_keys?(transport) and Regex.match?(@git_sha, sha) and
+      Regex.match?(@git_sha, pin) and valid_artifacts?(artifacts) and
+      is_binary(url) and String.starts_with?(url, "https://github.com/") and is_binary(run_id) and
+      Regex.match?(~r/\A\d+\z/, run_id) and is_integer(attempt) and attempt > 0 and
+      valid_renderer?(renderer)
+  end
+
+  defp valid_transport?(_), do: false
+
+  defp valid_transport_keys?(transport) do
+    Enum.sort(Map.keys(transport)) ==
+      ~w(actions artifacts candidate_sha permissions renderer reviewer_required run_attempt run_id run_url)
+  end
+
+  defp valid_artifacts?(artifacts) when is_list(artifacts) and artifacts != [] do
+    artifacts == Enum.uniq(artifacts) and
+      length(Enum.uniq_by(artifacts, & &1["identity"])) == length(artifacts) and
+      Enum.all?(artifacts, fn
+        artifact = %{"identity" => identity, "archive_sha256" => digest} ->
+          Enum.sort(Map.keys(artifact)) == ~w(archive_sha256 identity) and is_binary(identity) and
+            identity != "" and
+            not String.contains?(identity, ";") and
+            is_binary(digest) and Regex.match?(@sha, digest)
+
+        _ ->
+          false
       end)
   end
 
-  defp valid_payloads?(_payloads), do: false
+  defp valid_artifacts?(_), do: false
 
-  defp valid_actions?(%{"checkout" => pin}),
-    do: is_binary(pin) and Regex.match?(~r/\A[0-9a-f]{40}\z/, pin)
+  defp valid_renderer?(%{"version" => v, "binary_sha256" => sha, "dpi" => dpi}),
+    do: is_binary(v) and Regex.match?(@sha, sha) and is_integer(dpi) and dpi > 0
 
-  defp valid_actions?(_actions), do: false
-  defp valid_permissions?(%{"contents" => "read"}), do: true
-  defp valid_permissions?(_permissions), do: false
-  defp valid_reviewer?(%{"required" => required}) when is_boolean(required), do: true
-  defp valid_reviewer?(_reviewer), do: false
+  defp valid_renderer?(_), do: false
+  defp record_routes(record, nil), do: record_routes(record, :all)
 
-  defp valid_sha?(value), do: is_binary(value) and Regex.match?(~r/\A[0-9a-f]{40}\z/, value)
-  defp valid_sha256?(value), do: is_binary(value) and Regex.match?(~r/\A[0-9a-f]{64}\z/, value)
+  defp record_routes(record, :all) do
+    routes =
+      for route <- @routes,
+          facts = record["routes"][Atom.to_string(route)],
+          do: {route, facts}
 
-  defp invalid_unless(reasons, true, _reason), do: reasons
-  defp invalid_unless(reasons, false, reason), do: [reason | reasons]
-
-  defp normalize_route(route) when route in @routes, do: route
-
-  defp normalize_route(route) when is_binary(route) do
-    Enum.find(@routes, &(Atom.to_string(&1) == route)) || :invalid
+    {:ok, routes}
   end
 
-  defp normalize_route(_route), do: :invalid
+  defp record_routes(record, requested),
+    do:
+      with(
+        {:ok, route} <- route(requested),
+        facts when is_map(facts) <- record["routes"][Atom.to_string(route)],
+        do: {:ok, [{route, facts}]},
+        else: (_ -> {:error, [:missing_route_record]})
+      )
+
+  defp route(route) when route in @routes, do: {:ok, route}
+
+  defp route(route) when is_binary(route),
+    do:
+      Enum.find_value(@routes, {:error, [:invalid_route]}, fn r ->
+        if Atom.to_string(r) == route, do: {:ok, r}
+      end)
+
+  defp route(_), do: {:error, [:invalid_route]}
+
+  defp collect(results),
+    do:
+      if(Enum.all?(results, &match?({:ok, _}, &1)),
+        do: {:ok, Enum.map(results, fn {:ok, v} -> v end)},
+        else:
+          {:error,
+           results
+           |> Enum.find_value(fn x ->
+             case x do
+               {:error, e} -> e
+               _ -> nil
+             end
+           end)
+           |> List.wrap()}
+      )
+
+  defp regular_files(root),
+    do:
+      if(File.dir?(root),
+        do: {:ok, root |> Path.join("**/*") |> Path.wildcard() |> Enum.filter(&File.regular?/1)},
+        else: {:error, [:missing_artifact_root]}
+      )
+
+  defp file_record(root, path),
+    do: %{
+      "id" => id(Path.relative_to(path, root)),
+      "sha256" =>
+        path |> File.read!() |> then(&:crypto.hash(:sha256, &1)) |> Base.encode16(case: :lower)
+    }
+
+  defp id(path),
+    do:
+      path
+      |> Path.basename()
+      |> Path.rootname()
+      |> String.replace("_page_1", "")
+      |> String.replace("_", "-")
+
+  # Canonical manifests retain recipe/scenario/preset-theme as path segments.
+  # Those segments are semantic identity: collapsing to a basename merges
+  # otherwise distinct records such as invoice/default/default-light.
+  defp canonical_records(lines) do
+    Enum.reduce_while(lines, {:ok, []}, fn [_, sha, file], {:ok, records} ->
+      case canonical_id(file) do
+        {:ok, id} -> {:cont, {:ok, [%{"id" => id, "sha256" => sha} | records]}}
+        {:error, _} = error -> {:halt, error}
+      end
+    end)
+    |> case do
+      {:ok, records} -> {:ok, Enum.reverse(records)}
+      error -> error
+    end
+  end
+
+  defp canonical_id(path) do
+    case path |> Path.rootname() |> String.split("/", trim: true) do
+      [recipe, scenario, preset_theme]
+      when recipe != "" and scenario != "" and preset_theme != "" ->
+        if Regex.match?(~r/\A.+-(?:dark|light)\z/, preset_theme) do
+          {:ok,
+           Enum.join(
+             [recipe, scenario, String.replace(preset_theme, ~r/-([^-]+)$/, "--\\1")],
+             "--"
+           )}
+        else
+          {:error, [:invalid_legacy_manifest]}
+        end
+
+      _ ->
+        {:error, [:invalid_legacy_manifest]}
+    end
+  end
+
+  defp role("candidate/catalog.json"), do: "candidate32"
+  defp role("final-review/final.json"), do: "final12"
+  defp role("multipage-review/multipage.json"), do: "multipage4"
+  defp role("preset-review/preset.json"), do: "preset6"
+  defp role("canonical/catalog.json"), do: "canonical32"
+
+  defp valid_records?(records) when is_list(records) and records != [] do
+    Enum.all?(records, &valid_record_entry?/1) and
+      length(Enum.uniq_by(records, & &1["id"])) == length(records)
+  end
+
+  defp valid_records?(_), do: false
+
+  defp valid_record_entry?(%{"id" => id, "sha256" => sha}),
+    do: is_binary(id) and id != "" and is_binary(sha) and Regex.match?(@sha, sha)
+
+  defp valid_record_entry?(_), do: false
 end

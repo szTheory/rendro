@@ -4,10 +4,10 @@ Run one bounded, read-only evidence job for one immutable Rendro commit. The
 workflow is manual only. It does not join ordinary CI, `ci-success`, merge
 approval, or release authority.
 
-The job checks out two separate trees. The default-branch workflow commit is
-the control plane. The requested candidate commit is detached, credential-free
-input. The control plane packages and validates the candidate output before the
-workflow uploads one bundle.
+Candidate generation and default-branch control packaging run in separate jobs
+on separate runners. The requested candidate is credential-free input; it can
+only cross into the trusted default-branch control job through a bounded,
+validated artifact handoff. The final job uploads one 30-day evidence bundle.
 
 ## Request evidence for one immutable commit
 
@@ -18,7 +18,7 @@ SHA.
 FULL_SHA="$(git rev-parse HEAD)"
 git rev-parse --verify "${FULL_SHA}^{commit}"
 
-gh workflow run catalog-evidence.yml -f candidate_sha=FULL_SHA -f operation=review
+gh workflow run catalog-evidence.yml -f "candidate_sha=${FULL_SHA}" -f operation=review
 ```
 
 Use `review` to collect candidate, final-review, and multipage-review evidence.
@@ -29,7 +29,7 @@ local, human-authorized materialization:
 
 ```bash
 FULL_SHA="$(git rev-parse HEAD)"
-gh workflow run catalog-evidence.yml -f candidate_sha=FULL_SHA -f operation=canonical
+gh workflow run catalog-evidence.yml -f "candidate_sha=${FULL_SHA}" -f operation=canonical
 ```
 
 The workflow records this limit exactly: Canonical evidence — materialize only after the catalog check passes.
@@ -59,6 +59,16 @@ Read the root README and manifest before opening any payload file. Text and
 manifest facts carry status; color, icons, thumbnails, and screenshots do not.
 
 Next: download the one bundle, then validate its root manifest and checksums.
+Copy the **Artifact URL** from the completed GitHub Actions run's artifact entry
+when you need a durable operator reference; use its run ID with `gh run download`
+for the supported retrieval command below. Record the **Archive digest** from the
+run artifacts API beside that URL so later evidence checks can verify the exact
+downloaded archive rather than trusting its name:
+
+```bash
+gh api "repos/OWNER/REPO/actions/runs/RUN_ID/artifacts" \
+  --jq '.artifacts[] | {id, name, digest, archive_download_url}'
+```
 
 ```bash
 mkdir -p /tmp/rendro-catalog-evidence
@@ -87,14 +97,12 @@ Run it with explicit values:
 BUNDLE_ROOT=/tmp/rendro-catalog-evidence/EXTRACTED_ROOT OPERATION=review mix run -e 'Code.require_file("dev/rendro/catalog_evidence_bundle.ex"); IO.inspect(Rendro.CatalogEvidenceBundle.validate(System.fetch_env!("BUNDLE_ROOT"), System.fetch_env!("OPERATION")))'
 ```
 
-Check these textual facts against the run summary and the bundle manifest:
+Check these textual facts against the downloaded bundle manifest:
 
-- control SHA, candidate SHA, and checked-out HEAD are the same requested full
-  candidate identity where the manifest requires it;
-- `priv/pdfium_pin.json` supplies the PDFium version and binary SHA-256, and the
-  summary records that pin;
-- operation, run ID, run attempt, payload roles, counts, per-file hashes,
-  Artifact URL, and Archive digest are present;
+- candidate SHA and checked-out HEAD are the same requested full candidate
+  identity; control SHA is the distinct default-branch control-plane identity;
+- `priv/pdfium_pin.json` supplies the PDFium version and binary SHA-256;
+- operation, run ID, run attempt, payload roles, counts, and per-file hashes are present;
 - `review` has candidate-only authority with no reviewer approval recorded;
 - `canonical` is evidence transport, not repository mutation or publication.
 

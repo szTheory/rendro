@@ -106,6 +106,17 @@ defmodule Rendro.CatalogEvidenceBundleTest do
     assert :payload_hash_mismatch in reasons
   end
 
+  test "derives every closed role count from its actual payload records" do
+    root = temporary_root("actual-count")
+    sources = review_sources(root)
+
+    candidate = List.first(sources)
+    File.write!(candidate.source, images_json(31))
+
+    assert {:error, reasons} = CatalogEvidenceBundle.build(:review, sources, provenance(), root)
+    assert :invalid_payload_counts in reasons
+  end
+
   defp provenance do
     %{
       candidate_sha: @sha,
@@ -120,10 +131,10 @@ defmodule Rendro.CatalogEvidenceBundleTest do
 
   defp review_sources(root) do
     [
-      {"candidate/catalog.json", "candidate", 32},
-      {"final-review/final.json", "final", 12},
-      {"multipage-review/multipage.json", "multipage", 4},
-      {"preset-review/preset.json", "preset", 12}
+      {"candidate/catalog.json", images_json(32), 32},
+      {"final-review/final.json", images_json(12), 12},
+      {"multipage-review/multipage.json", checksums(4), 4},
+      {"preset-review/preset.json", images_json(12), 12}
     ]
     |> Enum.map(fn {role, contents, count} ->
       %{
@@ -139,7 +150,7 @@ defmodule Rendro.CatalogEvidenceBundleTest do
     [
       %{
         role: "canonical/catalog.json",
-        source: write_source(root, "canonical", "catalog"),
+        source: write_source(root, "canonical", images_json(32)),
         media_type: "application/json",
         count: 32
       }
@@ -151,6 +162,15 @@ defmodule Rendro.CatalogEvidenceBundleTest do
     File.mkdir_p!(Path.dirname(path))
     File.write!(path, contents)
     path
+  end
+
+  defp images_json(count),
+    do: Jason.encode!(%{"images" => Enum.map(1..count, &%{"id" => "item-#{&1}"})})
+
+  defp checksums(count) do
+    Enum.map_join(1..count, "\n", fn index ->
+      "#{String.duplicate("a", 64)}  page-#{index}.png"
+    end) <> "\n"
   end
 
   defp temporary_root(label) do

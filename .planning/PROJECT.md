@@ -29,7 +29,7 @@ All 12 requirements passed across phases 130-131. The milestone audit passed wit
 
 ## Current State
 
-**Phase 134 is complete; Phase 135 test and CI/CD simplification is next.** Rendro removed the proven-dead Analyzer pair, extracted one characterized internal palette-resolution owner across all seven recipes, and retained public API and unrelated rendered-byte identity. QL-005 and QL-006 are closed under their original identities; shaping and narration signals remain evidence-backed rejections. Deterministic completion for Phase 134 and later is now projected from strict structured coverage into terminal UAT and enforced without a blocking human-verification state. Studio, charts, and global text shaping remain demand-gated.
+**Phase 135 is complete; Phase 136 catalog visual quality is next.** Rendro now has one standalone, read-only, exact-SHA Catalog Evidence workflow with isolated candidate/control jobs, bounded artifacts, route-specific semantic parity, and a sealed typed evidence record. Four retained Phase 126/127/130 route pairs reproduce as matched before the milestone-specific CI branches were removed; ordinary deterministic, proof, and advisory lanes remain separate and `ci-success` remains the sole merge authority. Test consolidation is bounded by preserved-oracle and mutation contracts. Phase 136 may repair only the six named scored catalog cells; Studio, charts, global text shaping, new recipes, and broader catalog scope remain demand-gated.
 
 <details>
 <summary>v2.12 phase-by-phase completion context</summary>
@@ -393,4 +393,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-27 after completing Phase 134 Core Architecture & Readability.*
+*Last updated: 2026-08-27 after completing Phase 135 Test & CI/CD Simplification.*

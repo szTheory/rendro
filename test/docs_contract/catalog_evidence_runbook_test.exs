@@ -20,8 +20,8 @@ defmodule Rendro.DocsContract.CatalogEvidenceRunbookTest do
 
     for command <- [
           "git rev-parse HEAD",
-          "gh workflow run catalog-evidence.yml -f candidate_sha=FULL_SHA -f operation=review",
-          "gh workflow run catalog-evidence.yml -f candidate_sha=FULL_SHA -f operation=canonical",
+          "gh workflow run catalog-evidence.yml -f \"candidate_sha=${FULL_SHA}\" -f operation=review",
+          "gh workflow run catalog-evidence.yml -f \"candidate_sha=${FULL_SHA}\" -f operation=canonical",
           "gh run watch RUN_ID",
           "gh run download RUN_ID",
           "Rendro.CatalogEvidenceBundle.validate",
