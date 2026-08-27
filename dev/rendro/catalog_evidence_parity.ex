@@ -155,14 +155,9 @@ defmodule Rendro.CatalogEvidenceParity do
 
     with {:ok, text} <- File.read(path),
          lines <- Regex.scan(~r/([0-9a-f]{64})  assets\/rendro\/catalog\/(.+\.png)/, text),
-         true <- lines != [] do
-      {:ok,
-       %{
-         "canonical32" =>
-           Enum.map(lines, fn [_, sha, file] ->
-             %{"id" => canonical_id(file), "sha256" => sha}
-           end)
-       }}
+         true <- lines != [],
+         {:ok, records} <- canonical_records(lines) do
+      {:ok, %{"canonical32" => records}}
     else
       false -> {:error, [:invalid_legacy_manifest]}
       _ -> {:error, [:invalid_legacy_manifest]}
@@ -422,14 +417,37 @@ defmodule Rendro.CatalogEvidenceParity do
   # Canonical manifests retain recipe/scenario/preset-theme as path segments.
   # Those segments are semantic identity: collapsing to a basename merges
   # otherwise distinct records such as invoice/default/default-light.
-  defp canonical_id(path),
-    do:
-      path
-      |> Path.rootname()
-      |> String.split("/")
-      |> then(fn [recipe, scenario, preset_theme] ->
-        Enum.join([recipe, scenario, String.replace(preset_theme, ~r/-([^-]+)$/, "--\\1")], "--")
-      end)
+  defp canonical_records(lines) do
+    Enum.reduce_while(lines, {:ok, []}, fn [_, sha, file], {:ok, records} ->
+      case canonical_id(file) do
+        {:ok, id} -> {:cont, {:ok, [%{"id" => id, "sha256" => sha} | records]}}
+        {:error, _} = error -> {:halt, error}
+      end
+    end)
+    |> case do
+      {:ok, records} -> {:ok, Enum.reverse(records)}
+      error -> error
+    end
+  end
+
+  defp canonical_id(path) do
+    case path |> Path.rootname() |> String.split("/", trim: true) do
+      [recipe, scenario, preset_theme]
+      when recipe != "" and scenario != "" and preset_theme != "" ->
+        if Regex.match?(~r/\A.+-(?:dark|light)\z/, preset_theme) do
+          {:ok,
+           Enum.join(
+             [recipe, scenario, String.replace(preset_theme, ~r/-([^-]+)$/, "--\\1")],
+             "--"
+           )}
+        else
+          {:error, [:invalid_legacy_manifest]}
+        end
+
+      _ ->
+        {:error, [:invalid_legacy_manifest]}
+    end
+  end
 
   defp role("candidate/catalog.json"), do: "candidate32"
   defp role("final-review/final.json"), do: "final12"

@@ -130,6 +130,18 @@ defmodule Rendro.CatalogEvidenceParityTest do
                %{"root" => generic_root},
                "phase130_canonical"
              )
+
+    File.write!(
+      Path.join(legacy_root, "manifest.txt"),
+      "#{String.duplicate("a", 64)}  assets/rendro/catalog/one-segment.png\n"
+    )
+
+    assert {:error, [:invalid_legacy_manifest]} =
+             CatalogEvidenceParity.compare(
+               %{"root" => legacy_root},
+               %{"root" => generic_root},
+               "phase130_canonical"
+             )
   end
 
   test "fails closed for each route's duplicate identifier, changed hash, and cardinality" do
