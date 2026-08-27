@@ -18,7 +18,7 @@ SHA.
 FULL_SHA="$(git rev-parse HEAD)"
 git rev-parse --verify "${FULL_SHA}^{commit}"
 
-gh workflow run catalog-evidence.yml -f candidate_sha=FULL_SHA -f operation=review
+gh workflow run catalog-evidence.yml -f "candidate_sha=${FULL_SHA}" -f operation=review
 ```
 
 Use `review` to collect candidate, final-review, and multipage-review evidence.
@@ -29,7 +29,7 @@ local, human-authorized materialization:
 
 ```bash
 FULL_SHA="$(git rev-parse HEAD)"
-gh workflow run catalog-evidence.yml -f candidate_sha=FULL_SHA -f operation=canonical
+gh workflow run catalog-evidence.yml -f "candidate_sha=${FULL_SHA}" -f operation=canonical
 ```
 
 The workflow records this limit exactly: Canonical evidence — materialize only after the catalog check passes.
@@ -89,8 +89,8 @@ BUNDLE_ROOT=/tmp/rendro-catalog-evidence/EXTRACTED_ROOT OPERATION=review mix run
 
 Check these textual facts against the run summary and the bundle manifest:
 
-- control SHA, candidate SHA, and checked-out HEAD are the same requested full
-  candidate identity where the manifest requires it;
+- candidate SHA and checked-out HEAD are the same requested full candidate
+  identity; control SHA is the distinct default-branch control-plane identity;
 - `priv/pdfium_pin.json` supplies the PDFium version and binary SHA-256, and the
   summary records that pin;
 - operation, run ID, run attempt, payload roles, counts, per-file hashes,
