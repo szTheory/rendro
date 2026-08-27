@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.14
 milestone_name: Quality & Maintainability
-current_phase: 134
-current_phase_name: core-architecture-readability
-status: verifying
-stopped_at: Completed 134-05-PLAN.md
-last_updated: "2026-08-27T02:52:05.206Z"
-last_activity: 2026-08-26
-last_activity_desc: Phase 134 execution started
+current_phase: 135
+current_phase_name: Test & CI/CD Simplification
+status: planning
+stopped_at: Phase 134 complete, ready to plan Phase 135
+last_updated: "2026-08-27T14:54:17.850Z"
+last_activity: 2026-08-27
+last_activity_desc: Phase 134 complete, transitioned to Phase 135
 progress:
   total_phases: 6
   completed_phases: 3
@@ -21,25 +21,25 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-08-26)
+See: .planning/PROJECT.md (updated 2026-08-27)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 134 — core-architecture-readability
+**Current focus:** Phase 135 — Test & CI/CD Simplification
 
 ## Current Position
 
-Phase: 134 (core-architecture-readability) — EXECUTING
-Plan: 5 of 5
-Status: Phase complete — ready for verification
-Last activity: 2026-08-26 — Phase 134 execution started
+Phase: 135 — Test & CI/CD Simplification
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-08-27 — Phase 134 complete, transitioned to Phase 135
 
 ## Roadmap Snapshot (v2.14, Phases 132-137)
 
 ```text
-[#######.................................] 17% — 1/6 phases complete
+[####################....................] 50% — 3/6 phases complete
 Phase 132 Quality Baseline & Triage ....................... Complete
-Phase 133 Repository & Evidence Hygiene ................... In Progress
-Phase 134 Core Architecture & Readability ................. Pending
+Phase 133 Repository & Evidence Hygiene ................... Complete
+Phase 134 Core Architecture & Readability ................. Complete
 Phase 135 Test & CI/CD Simplification ..................... Pending
 Phase 136 Catalog Visual Quality .......................... Pending
 Phase 137 Closure & Handoff ............................... Pending
@@ -85,15 +85,10 @@ Phase 137 Closure & Handoff ............................... Pending
 - [Phase ?]: Use a test-only PDF.js fixture so advisory observation does not require package-visible PDF proof.
 - [Phase ?]: Keep quality.hygiene deterministic and shared across local, ci.fast, and release clean checkout paths.
 - [Phase ?]: [Phase 133]: QL-002 closed only after terminal deterministic scan, compatibility review, and separately classified proof evidence.
-- [Phase ?]: QL-005 accepts isolated Analyzer removal after zero-caller and compatibility proof.
-- [Phase ?]: QL-006 allows a palette helper only after its fail-first Wave 0 contract.
-- [Phase ?]: QL-007 shaping fallback and QL-008 narration remain reject_signal records without code churn.
-- [Phase ?]: QL-005 closed only after zero-reference, xref, active-shaper, public-manifest, and deterministic recipe-byte evidence all passed.
-- [Phase ?]: Rendro.I18n.Analyzer and its solely-owned test are removed together; Rendro.Text.Shaper.Simple remains the authoritative active shaping gate.
-- [Phase ?]: [Phase 134]: QL-006 helper is green but remains in_progress until Plans 04-05 complete migrations and terminal compatibility gates.
-- [Phase ?]: All seven recipe palette seams delegate only uniform resolution mechanics to the hidden helper while retaining recipe-owned maps and private boundaries.
-- [Phase ?]: QL-008 remains reject_signal after a bounded line-specific provenance audit; no narration repair is authorized without contradictory current behavior and focused proof.
-- [Phase ?]: QL-006 closes only with original-ID focused proof, unchanged public-manifest and rendered-byte compatibility, package hygiene, and fast-CI evidence.
+- [Phase 134]: Remove Analyzer and its solely-owned test only after zero-reference, xref, active-shaper, public-manifest, package, and deterministic recipe-byte proof; keep `Rendro.Text.Shaper.Simple` authoritative.
+- [Phase 134]: Delegate only characterized palette-resolution mechanics to the hidden helper; all seven recipes retain their own maps, private seams, precedence, failure behavior, and rendered bytes.
+- [Phase 134]: Keep QL-007 shaping fallback and QL-008 narration as evidence-backed `reject_signal` records without speculative source churn.
+- [Phase 134]: Project strict deterministic SUMMARY coverage into terminal UAT for Phase 134 onward; human feedback may enrich evidence but cannot block objective completion.
 
 ### Pending Todos
 
@@ -102,7 +97,6 @@ None outside the roadmap.
 ### Blockers/Concerns
 
 - Remote pinned-renderer parity and visual review remain advisory evidence during Phases 135-136; unavailable evidence must remain explicitly unavailable and non-blocking.
-- Exact architecture extractions remain intentionally undecided until Phase 134 demonstrates impact and compatibility-safe verification.
 - v1.3.0-v1.3.3 and failed Phase 131 release/control attempts are immutable historical evidence and must not be retried or rewritten.
 
 ## Deferred Items
@@ -116,19 +110,25 @@ None outside the roadmap.
 
 ## Session Continuity
 
-Last session: 2026-08-27T02:52:05.199Z
-Stopped at: Completed 134-05-PLAN.md
+Last session: 2026-08-27T14:54:17.850Z
+Stopped at: Phase 134 complete, ready to plan Phase 135
 Resume file: None
 
 ## Next Steps
 
-1. Run `$gsd-discuss-phase 133` for repository and evidence hygiene.
-2. Plan Phase 133 from QL-002 and the ledger's exact archive-consumer evidence.
-3. Preserve the no-feature, public-contract, deterministic/advisory/explicit-deferral, and immutable-history boundaries.
+1. Run `$gsd-discuss-phase 135` for behavior-preserving test and CI/CD simplification.
+2. Inventory preserved behaviors, authority checks, and the exact-SHA catalog evidence routes before consolidation.
+3. Preserve the no-feature, public-contract, deterministic/proof/advisory separation, and sole `ci-success` authority boundaries.
 
 ## Operator Next Steps
 
-- Start with `$gsd-discuss-phase 133`.
+- Start with `$gsd-discuss-phase 135`.
+
+## Quick Tasks Completed
+
+| ID | Task | Date | Commit | Status | Directory |
+|----|------|------|--------|--------|-----------|
+| 260827-e02 | Implement zero-human verification for Phase 134 and future phases | 2026-08-27 | d699e6d | Verified | [260827-e02-implement-zero-human-verification-for-ph](./quick/260827-e02-implement-zero-human-verification-for-ph/) |
 
 ## Performance Metrics
 

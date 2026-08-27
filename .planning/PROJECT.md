@@ -29,7 +29,7 @@ All 12 requirements passed across phases 130-131. The milestone audit passed wit
 
 ## Current State
 
-**Phase 133 is complete; Phase 134 architecture and readability work is next.** Rendro's release evidence is now version-scoped, fail-closed, and independent of archived planning paths; repository hygiene enforces the exact package, helper, and source-reference boundary. QL-002 is closed with public APIs and unrelated rendered bytes unchanged. Deterministic and advisory verification remain separate, with pinned-PDFium availability retained as the explicit NS-006 advisory deferral. The remaining v2.14 work continues to address only evidence-backed findings. Studio, charts, and global text shaping remain demand-gated.
+**Phase 134 is complete; Phase 135 test and CI/CD simplification is next.** Rendro removed the proven-dead Analyzer pair, extracted one characterized internal palette-resolution owner across all seven recipes, and retained public API and unrelated rendered-byte identity. QL-005 and QL-006 are closed under their original identities; shaping and narration signals remain evidence-backed rejections. Deterministic completion for Phase 134 and later is now projected from strict structured coverage into terminal UAT and enforced without a blocking human-verification state. Studio, charts, and global text shaping remain demand-gated.
 
 <details>
 <summary>v2.12 phase-by-phase completion context</summary>
@@ -170,6 +170,8 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Validated
 
+- ✓ Rendro Phase 134 closed accepted architecture/readability work conservatively: the zero-consumer Analyzer pair was removed, one hidden palette resolver now owns the characterized nil/theme/default/override contract for all seven recipes, and QL-007/QL-008 remained evidence-backed rejections without speculative churn. Public-manifest and unrelated rendered-byte identity held; canonical verification passed 10/10, Nyquist validation is terminal, all 9 modeled threats are closed, and Phase-134-forward UAT is deterministic and non-human-blocking. — Phase 134
+
 - ✓ Rendro Phase 133 replaced archive-coupled release proof with a version-scoped Rendro 1.3.4 evidence capsule, one schema-validating fail-closed loader, journey-chain integrity checks, and exact package/helper/source-reference hygiene. QL-002 is closed without public API or unrelated rendered-byte change; all 4 requirements and 13 plans passed, Nyquist coverage is complete, all 19 modeled threats are closed, and deterministic CI remains green. PDFium stays honestly separated as the NS-006 advisory deferral. — Phase 133
 
 - ✓ Rendro Phase 132 established the dated eight-domain baseline and durable quality ledger, pinned all QL/NS classifications to record-local evidence and explicit decision bases, added semantic prohibition and active-artifact governance, and rolled an independent `quality-governance` job into the sole `ci-success` required context. Final evidence: 12/12 truths, 1,919 tests with 0 failures, 0 Nyquist gaps, clean 12-file review, and 14/14 threats closed. — Phase 132
@@ -204,7 +206,7 @@ Rendro ships a queued render lifecycle, artifact metadata, persistence/sink cont
 
 ### Active
 
-- [ ] Remove proven repository, evidence-boundary, architecture, readability, test, and CI/CD debt without changing public contracts or unrelated rendered bytes.
+- [ ] Simplify proven test and CI/CD debt without weakening behavior coverage, evidence authority, public contracts, or unrelated rendered bytes.
 - [ ] Replace historical phase-number catalog evidence routes with one secure, exact-SHA, purpose-named workflow.
 - [ ] Raise all visual dimensions to the accepted threshold for the six scored catalog cells that still have actual visual gaps, while preserving honest dark print boundaries.
 - [ ] Close v2.14 with verified before/after reporting and a decision-ready handoff for the next milestone.
@@ -228,6 +230,8 @@ As of v2.12 (2026-08-19), the Happy-Path program's realistic examples, theming, 
 As of v2.13 (2026-08-26), the twelve targeted catalog cells have current hash-bound human dispositions and the canonical catalog is candidate-identical and deterministically verified. The adoption gate remains below trigger, while exact public Rendro 1.3.4 and its Phoenix newcomer path are proven through protected release/HexDocs identity controls plus bounded advisory clean-room evidence.
 
 After Phase 133 (2026-08-26), the project has no active feature gap authorized by demand. The quality baseline remains source-bound and reproducible, while release proof now lives in a self-contained version-scoped capsule consumed through a fail-closed loader instead of archived planning files. Exact package contents, helper inventory, journey integrity, and forbidden source references are deterministic hygiene contracts; QL-002 is closed. Bounded CI/catalog parity work remains routed to Phase 135 and only six named visual cells to Phase 136. Architecture size/cycle observations remain diagnostic signals rather than automatic defects; every change still requires concrete impact and predeclared verification.
+
+After Phase 134 (2026-08-27), accepted internal cleanup is closed without widening product scope: Analyzer has no remaining consumer, palette resolution has one hidden characterized owner, recipe-owned defaults and failure boundaries remain intact, and public-manifest plus deterministic rendered-byte contracts are unchanged. Structured deterministic coverage now generates canonical terminal UAT for Phase 134 and later; governance rejects stale, malformed, unsafe, fabricated, human-gated, or non-passing evidence before transition. Advisory feedback remains optional and unsupported objective claims must be explicitly deferred.
 
 ## Constraints
 
@@ -255,6 +259,9 @@ After Phase 133 (2026-08-26), the project has no active feature gap authorized b
 | Make v2.14 an evidence-led quality milestone with no new product capability | The current product surface is broad and proven; maintainability and existing catalog quality have higher value than speculative expansion | ✓ Reinforced in Phase 132 |
 | Preserve public APIs and unrelated rendered bytes by default | Quality work should reduce future change cost without silently rewriting established contracts or deterministic evidence | ✓ Reinforced in Phase 132 |
 | Use deterministic checks for objective completion, keep optional human feedback advisory, and explicitly defer unsupported claims | Arbitrary metrics and blocking subjective gates can both misstate actual quality; every completion claim needs executable evidence or a truthful scope boundary | ✓ Established in Phase 132 |
+| Remove `Rendro.I18n.Analyzer` only after zero-consumer, active-shaper, manifest, package, and rendered-byte proof | Dead-code removal is valuable only when every supported and operational boundary remains intact | ✓ Shipped in Phase 134 |
+| Centralize only palette resolution mechanics in a hidden helper while retaining recipe-owned defaults and private seams | The seven sites share a characterized responsibility, but their compatibility maps and rendering ownership remain recipe-specific | ✓ Shipped in Phase 134 |
+| Generate Phase-134-forward terminal UAT from strict executable SUMMARY coverage and make human feedback non-blocking | Completion should be reproducible from repository facts; stale, fabricated, or subjective evidence cannot advance a phase | ✓ Established after Phase 134 |
 | Replace historical phase-number catalog routes with one exact-SHA purpose-named workflow | The catalog still needs bounded review/canonical generation, but milestone-specific branches should not accumulate in ordinary CI | — Pending |
 | Keep the catalog fixed at 32 cells and repair only six current visual-score gaps | v2.14 is a quality ratchet, not catalog expansion; twenty cells remain honestly unscored and dark output remains screen-oriented/non-print-safe | — Pending |
 | Embedded files live on the document in a dedicated registry, not on `metadata.custom` or in writer-owned state | Preserves the registry-backed authored-input pattern and keeps serialization separate from authoring state | ✓ Shipped in v1.9 |
@@ -386,4 +393,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-26 after completing Phase 133 Repository & Evidence Hygiene.*
+*Last updated: 2026-08-27 after completing Phase 134 Core Architecture & Readability.*

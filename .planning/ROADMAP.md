@@ -19,7 +19,7 @@
 
 - [x] **Phase 132: Quality Baseline & Triage** — Establish the durable evidence ledger, compatibility contract, and risk-ranked finding set that governs all later work. (completed 2026-08-26)
 - [x] **Phase 133: Repository & Evidence Hygiene** — Remove active-product coupling to archived planning and make repository, package, and evidence boundaries durable. (completed 2026-08-26)
-- [ ] **Phase 134: Core Architecture & Readability** — Resolve accepted high-value internal design, dead-code, specification, documentation, and comment findings conservatively.
+- [x] **Phase 134: Core Architecture & Readability** — Resolve accepted high-value internal design, dead-code, specification, documentation, and comment findings conservatively. (completed 2026-08-27)
 - [ ] **Phase 135: Test & CI/CD Simplification** — Preserve behavioral and authority coverage while consolidating brittle tests and milestone-specific workflow machinery.
 - [ ] **Phase 136: Catalog Visual Quality** — Repair and re-review only the six scored catalog cells with actual visual gaps through the generic exact-SHA evidence lane.
 - [ ] **Phase 137: Closure & Handoff** — Re-run full evidence, close the ledger, and leave a ranked, durable next-milestone posture.
@@ -184,7 +184,7 @@ Plans:
 |-------|--------------|----------------|--------|-----------|
 | 132. Quality Baseline & Triage | 4 | 4/4 | Complete    | 2026-08-26 |
 | 133. Repository & Evidence Hygiene | 4 | 13/13 | Complete    | 2026-08-26 |
-| 134. Core Architecture & Readability | 4 | 5/5 | In Progress|  |
+| 134. Core Architecture & Readability | 4 | 5/5 | Complete    | 2026-08-27 |
 | 135. Test & CI/CD Simplification | 7 | 0/TBD | Not started | — |
 | 136. Catalog Visual Quality | 4 | 0/TBD | Not started | — |
 | 137. Closure & Handoff | 3 | 0/TBD | Not started | — |
