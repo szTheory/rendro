@@ -4,8 +4,8 @@
 
 | row_id | old_test | retained_replacement_owner | preserved_behavior | preserved_failure_mode | authority_lane | oracle | negative_control | focused_command | result |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| payslip_cr01_duplicate | Payslip CR-01 targeted full render | themed_render_smoke_test | masked-middot and accented Payslip rendering | unknown payslip_sans font | deterministic regression | exact error and render success | remove fallback registry | mix test test/rendro/recipes/themed_render_smoke_test.exs | pending |
-| certificate_construction_name | Certificate construction name | certificate_typography_test | themed and unthemed construction succeeds | existing render and override guards | deterministic regression | no raise | existing guard failures | mix test test/rendro/recipes/certificate_typography_test.exs | pending |
+| payslip_cr01_duplicate | Payslip CR-01 targeted full render | themed_render_smoke_test | masked-middot and accented Payslip rendering | unknown payslip_sans font | deterministic regression | exact error and render success | remove fallback registry | mix test test/rendro/recipes/themed_render_smoke_test.exs | retained-owner-proven |
+| certificate_construction_name | Certificate construction name | certificate_typography_test | themed and unthemed construction succeeds | existing render and override guards | deterministic regression | no raise | existing guard failures | mix test test/rendro/recipes/certificate_typography_test.exs | rename-only |
 
 ## Remote Route Parity Matrix
 
