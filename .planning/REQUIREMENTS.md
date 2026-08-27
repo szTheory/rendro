@@ -29,11 +29,11 @@
 
 - [ ] **TEST-01:** Before overlapping tests are consolidated, maintainers inventory the distinct behaviors and failure modes they protect and demonstrate that replacement tests fail when those contracts are broken.
 - [ ] **TEST-02:** Planning-coupled, implementation-coupled, or duplicative brittle tests are consolidated without losing behavior, failure-mode, public-contract, or deterministic-output protection.
-- [ ] **CI-01:** One purpose-named catalog evidence workflow accepts an explicit candidate SHA and review/canonical mode, checks out and verifies that exact SHA, uses the pinned renderer, has read-only repository permission, and uploads artifacts without mutating the repository.
+- [x] **CI-01:** One purpose-named catalog evidence workflow accepts an explicit candidate SHA and review/canonical mode, checks out and verifies that exact SHA, uses the pinned renderer, has read-only repository permission, and uploads artifacts without mutating the repository.
 - [ ] **CI-02:** The generic catalog evidence workflow proves output and authority parity with the Phase 126, 127, and 130 routes before those milestone-specific routes are removed.
-- [ ] **CI-03:** Ordinary CI preserves the deterministic, proof, and advisory lane separation and retains the existing authoritative `ci-success` contract while redundant workflow structure is simplified.
-- [ ] **CI-04:** CI caches are treated as untrusted inputs, remain read-only in lower-trust contexts, do not expose secrets, and retain immutable action pins and least-privilege permissions.
-- [ ] **CI-05:** Maintainer documentation states the supported local and remote reproduction commands, workflow inputs, authority checks, artifact identities, and failure boundaries for the simplified CI/CD paths.
+- [x] **CI-03:** Ordinary CI preserves the deterministic, proof, and advisory lane separation and retains the existing authoritative `ci-success` contract while redundant workflow structure is simplified.
+- [x] **CI-04:** CI caches are treated as untrusted inputs, remain read-only in lower-trust contexts, do not expose secrets, and retain immutable action pins and least-privilege permissions.
+- [x] **CI-05:** Maintainer documentation states the supported local and remote reproduction commands, workflow inputs, authority checks, artifact identities, and failure boundaries for the simplified CI/CD paths.
 
 ## Catalog Visual Quality
 
@@ -84,11 +84,11 @@
 | ARCH-04 | Phase 134 | Complete |
 | TEST-01 | Phase 135 | Pending |
 | TEST-02 | Phase 135 | Pending |
-| CI-01 | Phase 135 | Pending |
+| CI-01 | Phase 135 | Complete |
 | CI-02 | Phase 135 | Pending |
-| CI-03 | Phase 135 | Pending |
-| CI-04 | Phase 135 | Pending |
-| CI-05 | Phase 135 | Pending |
+| CI-03 | Phase 135 | Complete |
+| CI-04 | Phase 135 | Complete |
+| CI-05 | Phase 135 | Complete |
 | CATALOG-10 | Phase 136 | Pending |
 | CATALOG-11 | Phase 136 | Pending |
 | CATALOG-12 | Phase 136 | Pending |

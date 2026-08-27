@@ -5,15 +5,15 @@ milestone_name: Quality & Maintainability
 current_phase: 135
 current_phase_name: Test & CI/CD Simplification
 status: executing
-stopped_at: Completed 135-01-PLAN.md
-last_updated: "2026-08-27T16:16:59.918Z"
+stopped_at: Completed 135-02-PLAN.md
+last_updated: "2026-08-27T16:34:16.095Z"
 last_activity: 2026-08-27
 last_activity_desc: Phase 135 execution started
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 25
-  completed_plans: 23
+  completed_plans: 24
   percent: 50
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-27)
 ## Current Position
 
 Phase: 135 (Test & CI/CD Simplification) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-08-27 — Phase 135 execution started
 
@@ -90,6 +90,8 @@ Phase 137 Closure & Handoff ............................... Pending
 - [Phase 134]: Keep QL-007 shaping fallback and QL-008 narration as evidence-backed `reject_signal` records without speculative source churn.
 - [Phase 134]: Project strict deterministic SUMMARY coverage into terminal UAT for Phase 134 onward; human feedback may enrich evidence but cannot block objective completion.
 - [Phase ?]: [Phase 135]: Catalog evidence stays dev/test-only with closed manifest-rooted bundles; parity validates per-side transport provenance independently of shared authority equality.
+- [Phase ?]: [Phase 135]: Catalog Evidence remains standalone workflow_dispatch evidence transport; ordinary CI and ci-success stay unchanged.
+- [Phase ?]: [Phase 135]: The trusted control checkout alone packages and validates detached candidate output before the sole 30-day upload.
 
 ### Pending Todos
 
@@ -111,8 +113,8 @@ None outside the roadmap.
 
 ## Session Continuity
 
-Last session: 2026-08-27T16:16:59.908Z
-Stopped at: Completed 135-01-PLAN.md
+Last session: 2026-08-27T16:34:16.087Z
+Stopped at: Completed 135-02-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -158,3 +160,4 @@ Resume file: None
 | Phase 134 P04 | 4m | 2 tasks | 7 files |
 | Phase 134-core-architecture-readability P05 | 25m | 2 tasks | 3 files |
 | Phase 135 P01 | 7m | 3 tasks | 9 files |
+| Phase 135 P02 | 16m | 2 tasks | 6 files |
