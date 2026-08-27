@@ -32,6 +32,32 @@ metrics:
   tasks_completed: 2
   files_changed: 6
 status: complete
+requirements-completed: [CI-01, CI-03, CI-04, CI-05]
+coverage:
+  - id: D1
+    description: "The manual Catalog Evidence workflow is exact-SHA-bound, graph-disconnected from ordinary CI, and constrained to read-only pinned actions and one manifest-rooted upload."
+    requirement: CI-01
+    verification:
+      - kind: integration
+        ref: "mix test test/guardrails/required_checks_contract_test.exs"
+        status: pass
+    human_judgment: false
+  - id: D2
+    description: "The adjacent Catalog Evidence runbook exposes supported dispatch, authority limits, validation, materialization, and recovery paths through deterministic documentation contracts."
+    requirement: CI-05
+    verification:
+      - kind: integration
+        ref: "mix test test/docs_contract/catalog_evidence_runbook_test.exs"
+        status: pass
+    human_judgment: false
+  - id: D3
+    description: "The deterministic fast CI lane validates the additive workflow and documentation changes without changing ordinary CI topology."
+    requirement: CI-03
+    verification:
+      - kind: integration
+        ref: "mix ci.fast"
+        status: pass
+    human_judgment: false
 ---
 
 # Phase 135 Plan 02: Catalog Evidence Workflow and Runbook Summary

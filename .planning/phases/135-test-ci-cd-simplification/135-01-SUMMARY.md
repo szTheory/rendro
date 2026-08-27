@@ -36,6 +36,24 @@ metrics:
   tasks_completed: 3
   files_changed: 9
 status: complete
+requirements-completed: [TEST-01, TEST-02]
+coverage:
+  - id: D1
+    description: "Closed catalog evidence bundle, four-route parity, and bounded inventory contracts reject malformed authority and inventory inputs."
+    requirement: TEST-01
+    verification:
+      - kind: integration
+        ref: "mix test test/rendro/catalog_evidence_bundle_test.exs test/rendro/catalog_evidence_parity_test.exs test/docs_contract/phase_135_test_inventory_contract_test.exs"
+        status: pass
+    human_judgment: false
+  - id: D2
+    description: "The retained recipe smoke owner proves the only authorized duplicate cleanup while distinct options and typography contracts remain covered."
+    requirement: TEST-02
+    verification:
+      - kind: integration
+        ref: "mix test test/rendro/recipes/themed_render_smoke_test.exs test/rendro/recipes/payslip_opts_threading_test.exs test/rendro/recipes/certificate_typography_test.exs"
+        status: pass
+    human_judgment: false
 ---
 
 # Phase 135 Plan 01: Deterministic Evidence and Recipe-Test Cleanup Summary
