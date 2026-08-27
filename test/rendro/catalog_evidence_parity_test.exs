@@ -41,6 +41,18 @@ defmodule Rendro.CatalogEvidenceParityTest do
     end
   end
 
+  test "rejects an incorrect role schema or count for every route" do
+    for route <- @routes do
+      legacy = evidence("legacy", route)
+      malformed = put_in(legacy, ["payloads", Access.at(0), "count"], 1)
+
+      assert {:error, reasons} =
+               CatalogEvidenceParity.compare(malformed, evidence("generic", route), route)
+
+      assert :invalid_payloads in reasons
+    end
+  end
+
   test "rejects missing, malformed, and misbound side-specific provenance" do
     generic = evidence("generic", :phase130_review)
 
@@ -71,11 +83,10 @@ defmodule Rendro.CatalogEvidenceParityTest do
         "binary_sha256" => String.duplicate("b", 64),
         "dpi" => 96
       },
-      "payloads" => [%{"role" => "catalog", "sha256" => String.duplicate("c", 64), "count" => 32}],
+      "payloads" => payloads(route),
       "actions" => %{"checkout" => "df4cb1c069e1874edd31b4311f1884172cec0e10"},
       "permissions" => %{"contents" => "read"},
-      "reviewer" =>
-        if(route == :phase130_canonical, do: %{"required" => true}, else: %{"required" => false}),
+      "reviewer" => %{"required" => false},
       "run_id" => "#{side}-12345",
       "run_attempt" => if(side == "legacy", do: 1, else: 2),
       "run_url" => "https://example.invalid/#{side}/12345",
@@ -84,4 +95,33 @@ defmodule Rendro.CatalogEvidenceParityTest do
       "provenance_candidate_sha" => String.duplicate("a", 40)
     }
   end
+
+  defp payloads(:phase126_preset_review),
+    do: [
+      %{
+        "role" => "preset-review/preset.json",
+        "sha256" => String.duplicate("c", 64),
+        "count" => 12
+      }
+    ]
+
+  defp payloads(:phase130_canonical),
+    do: [
+      %{"role" => "canonical/catalog.json", "sha256" => String.duplicate("c", 64), "count" => 32}
+    ]
+
+  defp payloads(_route),
+    do: [
+      %{"role" => "candidate/catalog.json", "sha256" => String.duplicate("c", 64), "count" => 32},
+      %{
+        "role" => "final-review/final.json",
+        "sha256" => String.duplicate("d", 64),
+        "count" => 12
+      },
+      %{
+        "role" => "multipage-review/multipage.json",
+        "sha256" => String.duplicate("e", 64),
+        "count" => 4
+      }
+    ]
 end

@@ -2,6 +2,20 @@ defmodule Rendro.CatalogEvidenceParity do
   @moduledoc false
 
   @routes ~w(phase126_preset_review phase127_catalog_review phase130_review phase130_canonical)a
+  @route_schemas %{
+    phase126_preset_review: [%{"role" => "preset-review/preset.json", "count" => 12}],
+    phase127_catalog_review: [
+      %{"role" => "candidate/catalog.json", "count" => 32},
+      %{"role" => "final-review/final.json", "count" => 12},
+      %{"role" => "multipage-review/multipage.json", "count" => 4}
+    ],
+    phase130_review: [
+      %{"role" => "candidate/catalog.json", "count" => 32},
+      %{"role" => "final-review/final.json", "count" => 12},
+      %{"role" => "multipage-review/multipage.json", "count" => 4}
+    ],
+    phase130_canonical: [%{"role" => "canonical/catalog.json", "count" => 32}]
+  }
 
   @spec compare(map(), map(), atom() | String.t()) :: {:ok, map()} | {:error, [atom()]}
   def compare(legacy_root, generic_root, route)
@@ -9,8 +23,8 @@ defmodule Rendro.CatalogEvidenceParity do
     route = normalize_route(route)
 
     with :ok <- validate_route(route),
-         :ok <- validate_root(legacy_root),
-         :ok <- validate_root(generic_root),
+         :ok <- validate_root(legacy_root, route),
+         :ok <- validate_root(generic_root, route),
          :ok <- compare_authority(legacy_root, generic_root) do
       {:ok,
        %{
@@ -29,7 +43,7 @@ defmodule Rendro.CatalogEvidenceParity do
   defp validate_route(route) when route in @routes, do: :ok
   defp validate_route(_route), do: {:error, [:invalid_route]}
 
-  defp validate_root(root) do
+  defp validate_root(root, route) do
     reasons =
       []
       |> invalid_unless(
@@ -37,12 +51,12 @@ defmodule Rendro.CatalogEvidenceParity do
         :invalid_identity
       )
       |> invalid_unless(valid_renderer?(root["renderer"]), :invalid_renderer)
-      |> invalid_unless(valid_payloads?(root["payloads"]), :invalid_payloads)
+      |> invalid_unless(valid_payloads?(root["payloads"], route), :invalid_payloads)
       |> invalid_unless(
         valid_actions?(root["actions"]) and valid_permissions?(root["permissions"]),
         :invalid_control_plane
       )
-      |> invalid_unless(valid_reviewer?(root["reviewer"]), :invalid_reviewer)
+      |> invalid_unless(valid_reviewer?(root["reviewer"], route), :invalid_reviewer)
       |> Kernel.++(provenance_errors(root))
 
     if reasons == [], do: :ok, else: {:error, Enum.uniq(reasons)}
@@ -106,17 +120,19 @@ defmodule Rendro.CatalogEvidenceParity do
 
   defp valid_renderer?(_renderer), do: false
 
-  defp valid_payloads?(payloads) when is_list(payloads) and payloads != [] do
-    roles = Enum.map(payloads, &Map.get(&1, "role"))
+  defp valid_payloads?(payloads, route) when is_list(payloads) do
+    expected = Map.fetch!(@route_schemas, route)
 
-    roles == Enum.sort(roles) and length(roles) == length(Enum.uniq(roles)) and
-      Enum.all?(payloads, fn payload ->
-        is_binary(payload["role"]) and valid_sha256?(payload["sha256"]) and
-          is_integer(payload["count"]) and payload["count"] > 0
-      end)
+    Enum.map(payloads, &Map.take(&1, ["role", "count"])) == expected and
+      Enum.all?(payloads, &valid_payload_hash?/1)
   end
 
-  defp valid_payloads?(_payloads), do: false
+  defp valid_payloads?(_payloads, _route), do: false
+
+  defp valid_payload_hash?(%{"role" => role, "sha256" => sha, "count" => count}),
+    do: is_binary(role) and valid_sha256?(sha) and is_integer(count)
+
+  defp valid_payload_hash?(_payload), do: false
 
   defp valid_actions?(%{"checkout" => pin}),
     do: is_binary(pin) and Regex.match?(~r/\A[0-9a-f]{40}\z/, pin)
@@ -124,8 +140,8 @@ defmodule Rendro.CatalogEvidenceParity do
   defp valid_actions?(_actions), do: false
   defp valid_permissions?(%{"contents" => "read"}), do: true
   defp valid_permissions?(_permissions), do: false
-  defp valid_reviewer?(%{"required" => required}) when is_boolean(required), do: true
-  defp valid_reviewer?(_reviewer), do: false
+  defp valid_reviewer?(%{"required" => false}, _route), do: true
+  defp valid_reviewer?(_reviewer, _route), do: false
 
   defp valid_sha?(value), do: is_binary(value) and Regex.match?(~r/\A[0-9a-f]{40}\z/, value)
   defp valid_sha256?(value), do: is_binary(value) and Regex.match?(~r/\A[0-9a-f]{64}\z/, value)
