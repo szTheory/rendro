@@ -23,7 +23,9 @@ defmodule Rendro.CatalogEvidenceBundleTest do
              "preset-review/preset.json"
            ]
 
-    checksums = root |> Path.join("checksums.sha256") |> File.read!() |> String.split("\n", trim: true)
+    checksums =
+      root |> Path.join("checksums.sha256") |> File.read!() |> String.split("\n", trim: true)
+
     assert checksums == Enum.sort(checksums)
   end
 
@@ -45,17 +47,39 @@ defmodule Rendro.CatalogEvidenceBundleTest do
     assert :invalid_operation in reasons
 
     assert {:error, reasons} =
-             CatalogEvidenceBundle.build(:review, review_sources(root), %{provenance() | candidate_sha: "A" <> String.duplicate("a", 39)}, root)
+             CatalogEvidenceBundle.build(
+               :review,
+               review_sources(root),
+               %{provenance() | candidate_sha: "A" <> String.duplicate("a", 39)},
+               root
+             )
 
     assert :invalid_candidate_sha in reasons
 
     assert {:error, reasons} =
-             CatalogEvidenceBundle.build(:review, [%{role: "../escape.json", source: write_source(root, "bad", "x"), media_type: "application/json", count: 1}], provenance(), root)
+             CatalogEvidenceBundle.build(
+               :review,
+               [
+                 %{
+                   role: "../escape.json",
+                   source: write_source(root, "bad", "x"),
+                   media_type: "application/json",
+                   count: 1
+                 }
+               ],
+               provenance(),
+               root
+             )
 
     assert :invalid_payload_roles in reasons
 
     assert {:error, reasons} =
-             CatalogEvidenceBundle.build(:review, review_sources(root), Map.put(provenance(), :reviewer_approval, true), root)
+             CatalogEvidenceBundle.build(
+               :review,
+               review_sources(root),
+               Map.put(provenance(), :reviewer_approval, true),
+               root
+             )
 
     assert :candidate_reviewer_approval_forbidden in reasons
   end
@@ -102,23 +126,40 @@ defmodule Rendro.CatalogEvidenceBundleTest do
       {"preset-review/preset.json", "preset", 12}
     ]
     |> Enum.map(fn {role, contents, count} ->
-      %{role: role, source: write_source(root, role, contents), media_type: "application/json", count: count}
+      %{
+        role: role,
+        source: write_source(root, role, contents),
+        media_type: "application/json",
+        count: count
+      }
     end)
   end
 
   defp canonical_sources(root) do
-    [%{role: "canonical/catalog.json", source: write_source(root, "canonical", "catalog"), media_type: "application/json", count: 32}]
+    [
+      %{
+        role: "canonical/catalog.json",
+        source: write_source(root, "canonical", "catalog"),
+        media_type: "application/json",
+        count: 32
+      }
+    ]
   end
 
   defp write_source(root, name, contents) do
-    path = Path.join([root, "sources", name])
+    path = Path.join([root <> "-inputs", name])
     File.mkdir_p!(Path.dirname(path))
     File.write!(path, contents)
     path
   end
 
   defp temporary_root(label) do
-    root = Path.join(System.tmp_dir!(), "rendro-catalog-evidence-#{label}-#{System.unique_integer([:positive])}")
+    root =
+      Path.join(
+        System.tmp_dir!(),
+        "rendro-catalog-evidence-#{label}-#{System.unique_integer([:positive])}"
+      )
+
     File.mkdir_p!(root)
     root
   end
