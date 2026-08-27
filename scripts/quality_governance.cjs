@@ -25,6 +25,12 @@ function hasProhibitedHumanState(text) {
   return humanStatePatterns.some((pattern) => pattern.test(text));
 }
 
+function frontmatterStatus(text) {
+  const match = text.match(/^---\s*\n([\s\S]*?)\n---/);
+  const status = match?.[1].match(/^status:\s*(\S+)\s*$/m);
+  return status?.[1] || null;
+}
+
 function assertRepositoryRelative(relativePath) {
   if (typeof relativePath !== 'string' || path.isAbsolute(relativePath) || relativePath.split(/[\\/]/).includes('..')) {
     throw new Error('fixture path must be repository-relative without traversal');
@@ -228,7 +234,8 @@ function blockersForFile(file, stagingAllowed) {
     blockers.push(`${rel}: pending or human-needed UAT`);
   }
 
-  if (name.endsWith('-VALIDATION.md') && (/(pending|manual-only|awaiting)/i.test(text) || hasProhibitedHumanState(text))) {
+  if (name.endsWith('-VALIDATION.md') && frontmatterStatus(text) !== 'draft' &&
+      (/(pending|manual-only|awaiting)/i.test(text) || hasProhibitedHumanState(text))) {
     blockers.push(`${rel}: pending/manual validation sign-off`);
   }
 

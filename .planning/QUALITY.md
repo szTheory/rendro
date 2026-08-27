@@ -112,6 +112,86 @@ The initial snapshot is immutable after capture. Validation is read-only and cap
 - **Closure:** exact named-cell before/after evidence and human review are required; an improved rubric aggregate cannot close it.
 - **Relationships/history:** observed and triaged on 2026-08-26; catalog scope is separate from workflow authority in QL-003.
 
+#### QL-005 — Uncalled I18n Analyzer is a bounded dead-code repair candidate
+
+- **Opened:** 2026-08-26
+- **Evidence:** `EV-ARCH-001`, `EV-ARCH-002` in `.planning/quality/baselines/132-initial.json`; current 2026-08-26 source/reference scan; `mix xref callers Rendro.I18n.Analyzer` (no callers); focused shaper, error, public-manifest, and documentation-contract tests (56 tests, 0 failures).
+- **Signal:** current zero-caller analyzer ownership scan
+- **Impact:** medium
+- **Confidence:** high
+- **Compatibility risk:** bounded_internal
+- **Evidence quality:** reproducible
+- **Priority:** medium — the authoritative shaping gate superseded this private module in Phase 83, and its isolated implementation/test pair has no current production, public, or compiled caller.
+- **Disposition:** repair
+- **Decision basis:** bounded_maintenance_cost
+- **Owner phase:** 134
+- **Scope:** remove only `lib/rendro/i18n/analyzer.ex` and its isolated test after the predeclared zero-reference, focused-shaping/error, public-manifest, and deterministic-byte compatibility checks; do not change the active shaping path.
+- **Verification:** `rg -n 'Rendro\\.I18n\\.Analyzer|I18n\\.Analyzer' lib test guides README.md priv/public_api.json`, `mix xref callers Rendro.I18n.Analyzer`, focused shaper/error/public-contract tests, all recipe byte-identity tests, and the public manifest byte comparison.
+- **Status:** accepted
+- **Trigger:** begin repair only while the no-caller proof remains true; any public, dynamic, or compiled caller reopens triage on this same ID.
+- **Closure:** record removal commit, zero-reference/xref proof, focused and compatibility results, and a before/after statement that the active `Rendro.Text.Shaper` behavior and public manifest remain unchanged.
+- **Relationships/history:** Phase 83 recorded the analyzer as dormant after `Rendro.Text.Shaper.Simple` became the authoritative gate; this is distinct from QL-001 because it is a concrete unused ownership boundary rather than a graph count.
+
+#### QL-006 — Recipe palette resolution has one cohesive, characterization-gated drift surface
+
+- **Opened:** 2026-08-26
+- **Evidence:** `EV-ARCH-001`, `EV-ARCH-002` in `.planning/quality/baselines/132-initial.json`; current source-body scan shows five byte-identical `palette/1` bodies and two algorithmically identical variants with only legacy defaults changed; Phase 120 review WR-02; current public-manifest/documentation-contract tests (56 tests, 0 failures).
+- **Signal:** current seven-site palette-resolution body comparison
+- **Impact:** medium
+- **Confidence:** high
+- **Compatibility risk:** rendered_bytes
+- **Evidence quality:** contract_backed
+- **Priority:** medium — seven copied resolution sites share theme/nil/override semantics, so a future change can drift across recipes; a helper is authorized only if Wave 0 proves every legacy default shape and the existing failure boundary.
+- **Disposition:** repair
+- **Decision basis:** bounded_maintenance_cost
+- **Owner phase:** 134
+- **Scope:** add one private `Rendro.Recipes.Palette.resolve/2` helper and replace only the seven recipe resolution bodies, preserving each exact legacy default map, `Rendro.Theme.resolve(theme).colors`, `Map.merge/2` precedence, existing error shape, public manifest, and deterministic bytes.
+- **Verification:** fail-first `test/rendro/recipes/palette_test.exs` covering all defaults/nil/theme/override/failure cases; then focused helper tests, all affected byte-identity and option-threading tests, themed smoke coverage, public-manifest/documentation contracts, and `mix ci.fast` before closure.
+- **Status:** accepted
+- **Trigger:** Wave 0 must first prove one uniform contract for all seven maps; any recipe-specific behavior, changed byte golden, changed failure shape, or manifest movement reopens triage and suppresses the extraction.
+- **Closure:** record the Wave 0 red contract, helper/migration commits, passing focused and compatibility results, and a before/after statement that no-theme bytes and public API remained identical.
+- **Relationships/history:** Phase 120 WR-02 identified the same owner/semantics boundary; it is distinct from QL-005 because palette resolution is a shared recipe behavior rather than dead code.
+
+#### QL-007 — Shaping-hint fallback overlap is a signal, not a current repair
+
+- **Opened:** 2026-08-26
+- **Evidence:** `EV-ARCH-001`, `EV-ARCH-002` in `.planning/quality/baselines/132-initial.json`; current `lib/rendro/text/shaper/simple.ex`, `lib/rendro/error.ex`, and focused shaper/error tests (56 tests, 0 failures).
+- **Signal:** current producer/fallback shaping-guidance comparison
+- **Impact:** low
+- **Confidence:** high
+- **Compatibility risk:** bounded_internal
+- **Evidence quality:** reproducible
+- **Priority:** low — `Simple` is the only production producer and emits the contextual three-tuple, while `Rendro.Error` retains a tested two-tuple fallback; no inconsistent emitted guidance or responsibility collision was demonstrated.
+- **Disposition:** reject_signal
+- **Decision basis:** diagnostic_signal_only
+- **Owner phase:** 134
+- **Scope:** no code change; retain the producer-specific hint and the error fallback exactly as they are.
+- **Verification:** rerun focused shaper/error tests and the producer scan for `{:shaping_required, script}` / `{:shaping_required, script, hint}` before reconsideration.
+- **Status:** rejected
+- **Trigger:** reopen only if a new two-tuple producer appears or a user-observable mismatch is demonstrated between emitted shaping reasons and actionable guidance.
+- **Closure:** rejected because superficial fallback overlap does not establish harm, and factoring it could discard context-sensitive built-in-font guidance.
+- **Relationships/history:** distinct from QL-005 because the active shaper is a live behavior contract, not dormant code.
+
+#### QL-008 — Runtime phase/date narration has no line-specific stale claim
+
+- **Opened:** 2026-08-26
+- **Evidence:** `EV-ARCH-001`, `EV-ARCH-002` in `.planning/quality/baselines/132-initial.json`; current 2026-08-26 runtime-source narration scan; Phase 134 context D-08 and D-16.
+- **Signal:** current bounded phase/date narration scan
+- **Impact:** low
+- **Confidence:** high
+- **Compatibility risk:** none
+- **Evidence quality:** reproducible
+- **Priority:** low — matches are current feature history, immutable provenance, or planning metadata; no individual runtime/doc/comment line was shown to contradict current behavior.
+- **Disposition:** reject_signal
+- **Decision basis:** diagnostic_signal_only
+- **Owner phase:** 134
+- **Scope:** no narration, specification, documentation, or comment edit is authorized by this record.
+- **Verification:** repeat the bounded phase/date scan and identify a concrete misleading line plus contradictory current behavior before any edit.
+- **Status:** rejected
+- **Trigger:** reopen only with a line-specific stale implementation-history claim, a bounded correction, and focused truthfulness/contract proof that preserves provenance.
+- **Closure:** rejected because search matches alone are not stale narration evidence; Phase 134 may close without a narration repair.
+- **Relationships/history:** distinct from QL-001 topology and QL-007 shaping because provenance preservation is a separate truthfulness boundary.
+
 ## Explicit rejected and deferred non-action signals
 
 Each record below is a classification surface, not a finding. It prevents a collected signal from silently disappearing and does not authorize standalone churn.
