@@ -181,7 +181,7 @@ defmodule Guardrails.RequiredChecksContractTest do
       catalog = load_workflow!(@catalog_evidence_path)
       ci_success = ci["jobs"]["ci-success"]
 
-      assert Map.keys(ci["on"]) == ["push", "pull_request", "schedule"]
+      assert Enum.sort(Map.keys(ci["on"])) == ["pull_request", "push", "schedule"]
 
       assert ci_success["needs"] == [
                "test",

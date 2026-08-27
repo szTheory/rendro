@@ -1,0 +1,171 @@
+name: Catalog Evidence
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_sha:
+        description: Full lowercase commit SHA to evaluate
+        required: true
+        type: string
+      operation:
+        description: Evidence operation to run
+        required: true
+        type: choice
+        options:
+          - review
+          - canonical
+
+permissions:
+  contents: read
+
+jobs:
+  catalog-evidence:
+    name: Catalog Evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CONTROL_SHA: ${{ github.sha }}
+      CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+      OPERATION: ${{ inputs.operation }}
+      RUN_ID: ${{ github.run_id }}
+      RUN_ATTEMPT: ${{ github.run_attempt }}
+      CONTROL_DIR: ${{ github.workspace }}/control
+      CANDIDATE_DIR: ${{ github.workspace }}/candidate
+
+    steps:
+      - name: Check out trusted control plane
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: ${{ env.CONTROL_SHA }}
+          path: control
+          persist-credentials: false
+
+      - name: Validate closed dispatch inputs
+        shell: bash
+        run: |
+          [[ "${CANDIDATE_SHA}" =~ ^[0-9a-f]{40}$ ]]
+          [[ "${OPERATION}" == "review" || "${OPERATION}" == "canonical" ]]
+          [[ "$(git -C "${CONTROL_DIR}" rev-parse HEAD)" == "${CONTROL_SHA}" ]]
+
+      - name: Check out detached candidate
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: ${{ env.CANDIDATE_SHA }}
+          path: candidate
+          persist-credentials: false
+
+      - name: Bind candidate checkout to requested SHA
+        shell: bash
+        run: |
+          [[ "$(git -C "${CANDIDATE_DIR}" rev-parse HEAD)" == "${CANDIDATE_SHA}" ]]
+          cmp --silent "${CONTROL_DIR}/priv/pdfium_pin.json" "${CANDIDATE_DIR}/priv/pdfium_pin.json"
+
+      - name: Set up Beam
+        uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
+        with:
+          otp-version: '28'
+          elixir-version: '1.19.5'
+
+      - name: Install pinned PDFium
+        shell: bash
+        run: |
+          expected_sha="$(jq -r '.sha256' "${CONTROL_DIR}/priv/pdfium_pin.json")"
+          version="$(jq -r '.version' "${CONTROL_DIR}/priv/pdfium_pin.json")"
+          curl -fsSL -o pdfium-cli "https://github.com/klippa-app/pdfium-cli/releases/download/${version}/pdfium-webassembly-linux-amd64"
+          echo "${expected_sha}  pdfium-cli" | sha256sum --check
+          chmod +x pdfium-cli
+          sudo mv pdfium-cli /usr/local/bin/pdfium-cli
+
+      - name: Generate bounded candidate evidence
+        shell: bash
+        run: |
+          cd "${CANDIDATE_DIR}"
+          mix deps.get
+          actual_sha="$(sha256sum "$(command -v pdfium-cli)" | cut -d ' ' -f 1)"
+          expected_sha="$(jq -r '.sha256' priv/pdfium_pin.json)"
+          test "${actual_sha}" = "${expected_sha}"
+
+          if [[ "${OPERATION}" == "review" ]]; then
+            mix rendro.catalog.candidate
+            export RENDRO_CATALOG_REVIEW_DIR="${CANDIDATE_DIR}/tmp/catalog-evidence-review"
+            mix test --include raster_snapshot test/rendro/catalog_raster_review_test.exs
+            test -f tmp/phase130-candidate/candidate-manifest.json
+            test -f "${RENDRO_CATALOG_REVIEW_DIR}/final/identity-manifest.json"
+            test "$(find "${RENDRO_CATALOG_REVIEW_DIR}/multipage" -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = "4"
+            find "${RENDRO_CATALOG_REVIEW_DIR}/multipage" -maxdepth 1 -type f -name '*.png' -print0 | sort -z | xargs -0 sha256sum > tmp/phase130-candidate/multipage-checksums.sha256
+          else
+            mix rendro.catalog.gen
+            mix rendro.catalog.check
+            test "$(find assets/rendro/catalog -type f -name '*.png' | wc -l | tr -d ' ')" = "32"
+          fi
+
+      - name: Build and validate manifest-rooted bundle in control plane
+        shell: bash
+        run: |
+          cd "${CONTROL_DIR}"
+          mix deps.get
+          export BUNDLE_ROOT="${RUNNER_TEMP}/rendro-catalog-evidence"
+          mix run -e '
+            Code.require_file("dev/rendro/catalog_evidence_bundle.ex")
+
+            operation = String.to_existing_atom(System.fetch_env!("OPERATION"))
+            candidate_dir = System.fetch_env!("CANDIDATE_DIR")
+
+            sources =
+              case operation do
+                :review ->
+                  [
+                    %{role: "candidate/catalog.json", source: Path.join(candidate_dir, "tmp/phase130-candidate/candidate-manifest.json"), media_type: "application/json", count: 32},
+                    %{role: "final-review/final.json", source: Path.join(candidate_dir, "tmp/catalog-evidence-review/final/identity-manifest.json"), media_type: "application/json", count: 12},
+                    %{role: "multipage-review/multipage.json", source: Path.join(candidate_dir, "tmp/phase130-candidate/multipage-checksums.sha256"), media_type: "text/plain", count: 4}
+                  ]
+
+                :canonical ->
+                  [%{role: "canonical/catalog.json", source: Path.join(candidate_dir, "assets/rendro/catalog.json"), media_type: "application/json", count: 32}]
+              end
+
+            provenance = %{
+              candidate_sha: System.fetch_env!("CANDIDATE_SHA"),
+              checked_out_head: System.fetch_env!("CANDIDATE_SHA"),
+              control_sha: System.fetch_env!("CONTROL_SHA"),
+              event: "workflow_dispatch",
+              run_id: System.fetch_env!("RUN_ID"),
+              run_attempt: String.to_integer(System.fetch_env!("RUN_ATTEMPT")),
+              dpi: 96
+            }
+
+            with :ok <- Rendro.CatalogEvidenceBundle.build(operation, sources, provenance, System.fetch_env!("BUNDLE_ROOT")),
+                 :ok <- Rendro.CatalogEvidenceBundle.validate(System.fetch_env!("BUNDLE_ROOT"), operation) do
+              :ok
+            else
+              {:error, reasons} -> Mix.raise("Catalog evidence bundle failed validation: #{inspect(reasons)}")
+            end
+          '
+
+      - name: Upload bounded catalog evidence bundle
+        id: evidence_upload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rendro-catalog-evidence--${{ inputs.operation }}--${{ inputs.candidate_sha }}--run-${{ github.run_id }}--attempt-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/rendro-catalog-evidence
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Summarize textual transport facts
+        shell: bash
+        env:
+          ARTIFACT_URL: ${{ steps.evidence_upload.outputs.artifact-url }}
+          ARTIFACT_DIGEST: ${{ steps.evidence_upload.outputs.artifact-digest }}
+        run: |
+          pdfium_pin="$(jq -r '.version + " / " + .sha256' "${CONTROL_DIR}/priv/pdfium_pin.json")"
+          {
+            printf '%s\n' "# Rendro Catalog Evidence"
+            printf '%s\n' "Operation: ${OPERATION}"
+            printf '%s\n' "Control SHA: ${CONTROL_SHA}"
+            printf '%s\n' "Candidate SHA: ${CANDIDATE_SHA}"
+            printf '%s\n' "PDFium pin: ${pdfium_pin}"
+            printf '%s\n' "Bundle: rendro-catalog-evidence--${OPERATION}--${CANDIDATE_SHA}--run-${RUN_ID}--attempt-${RUN_ATTEMPT}"
+            printf '%s\n' "Artifact URL: ${ARTIFACT_URL}"
+            printf '%s\n' "Archive digest: ${ARTIFACT_DIGEST}"
+            printf '%s\n' "Next: download the one bundle and validate its manifest before interpreting payload facts."
+          } >> "$GITHUB_STEP_SUMMARY"
