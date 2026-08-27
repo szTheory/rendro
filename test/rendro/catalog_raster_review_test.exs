@@ -86,7 +86,13 @@ defmodule Rendro.CatalogRasterReviewTest do
       Jason.encode!(reconciliation, pretty: true) <> "\n"
     )
 
-    assert final_dir |> File.ls!() |> Enum.count(&String.ends_with?(&1, ".png")) == 12
+    assert final_dir |> File.ls!() |> Enum.count(&String.ends_with?(&1, ".png")) == 0
+
+    assert final_dir
+           |> Path.join("pngs")
+           |> File.ls!()
+           |> Enum.count(&String.ends_with?(&1, ".png")) == 12
+
     assert multipage_dir |> File.ls!() |> Enum.count(&String.ends_with?(&1, ".png")) == 4
     assert_final_bundle!(final_dir, final)
     assert_reconciliation!(final_dir, final)
