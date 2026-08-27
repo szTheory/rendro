@@ -146,7 +146,12 @@ Plans:
   4. Ordinary CI still separates deterministic, proof, and advisory evidence and preserves the authoritative `ci-success` status while caches, permissions, secrets, and action pins obey documented trust rules.
   5. A maintainer can reproduce each supported local and remote path from current documentation without consulting completed phase plans.
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 135-01-PLAN.md — Build deterministic bundle/parity contracts and close the bounded recipe-test candidates.
+- [ ] 135-02-PLAN.md — Add the secure standalone exact-SHA workflow and its current operator runbook.
+- [ ] 135-03-PLAN.md — Record four same-SHA remote parity rows, then remove legacy routes in one rollback commit.
 
 ### Phase 136: Catalog Visual Quality
 
