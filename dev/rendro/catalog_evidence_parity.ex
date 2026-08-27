@@ -38,7 +38,8 @@ defmodule Rendro.CatalogEvidenceParity do
          {:ok, routes} <- record_routes(record, requested_route) do
       routes
       |> Enum.map(fn {route, facts} ->
-        with :ok <- valid_side?(facts["legacy"]),
+        with :ok <- candidate_identity?(record["transport"], facts),
+             :ok <- valid_side?(facts["legacy"]),
              :ok <- valid_side?(facts["generic"]),
              {:ok, status} <- result(route, facts["legacy"]["roles"], facts["generic"]["roles"]),
              true <- status["status"] == facts["status"] do
@@ -232,6 +233,18 @@ defmodule Rendro.CatalogEvidenceParity do
   defp validate_record(record) do
     if valid_record?(record), do: :ok, else: {:error, [:invalid_sealed_record]}
   end
+
+  defp candidate_identity?(%{"candidate_sha" => candidate}, %{
+         "legacy" => legacy,
+         "generic" => generic
+       }) do
+    if get_in(legacy, ["transport", "candidate_sha"]) == candidate and
+         get_in(generic, ["transport", "candidate_sha"]) == candidate,
+       do: :ok,
+       else: {:error, :candidate_identity_mismatch}
+  end
+
+  defp candidate_identity?(_, _), do: {:error, :candidate_identity_mismatch}
 
   defp valid_side?(%{"transport" => transport, "roles" => roles}) when is_map(roles) do
     if valid_transport?(transport), do: :ok, else: {:error, :invalid_transport}

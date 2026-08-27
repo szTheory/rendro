@@ -46,6 +46,17 @@ defmodule Rendro.CatalogEvidenceParityTest do
         do: assert({:error, _} = CatalogEvidenceParity.verify_record(mutated))
   end
 
+  test "rejects a syntactically valid route-side candidate SHA that differs from the sealed candidate" do
+    mutated =
+      put_in(
+        record(),
+        ["routes", "phase127_catalog_review", "legacy", "transport", "candidate_sha"],
+        String.duplicate("b", 40)
+      )
+
+    assert {:error, [:candidate_identity_mismatch]} = CatalogEvidenceParity.verify_record(mutated)
+  end
+
   test "fails closed for each route's duplicate identifier, changed hash, and cardinality" do
     record = record()
 
