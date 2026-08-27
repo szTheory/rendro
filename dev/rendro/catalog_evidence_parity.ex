@@ -194,7 +194,8 @@ defmodule Rendro.CatalogEvidenceParity do
   defp json_role(root, relative, selected) do
     with {:ok, json} <- root |> Path.join(relative) |> File.read(),
          {:ok, decoded} <- Jason.decode(json),
-         entries when is_list(entries) <- decoded["images"] || decoded["cells"] do
+         entries when is_list(entries) <- decoded["images"] || decoded["cells"],
+         true <- Enum.all?(entries, &is_map/1) do
       records =
         Enum.map(entries, fn e ->
           %{"id" => e["id"] || e["catalog_id"], "sha256" => e["sha256"] || e["png_sha256"]}
@@ -302,17 +303,19 @@ defmodule Rendro.CatalogEvidenceParity do
 
   defp valid_side?(_), do: {:error, :invalid_side}
 
-  defp valid_transport?(transport = %{
-         "candidate_sha" => sha,
-         "run_url" => url,
-         "run_id" => run_id,
-         "run_attempt" => attempt,
-         "artifacts" => artifacts,
-         "renderer" => renderer,
-         "actions" => %{"checkout" => pin},
-         "reviewer_required" => false,
-         "permissions" => %{"contents" => "read"}
-       }) do
+  defp valid_transport?(
+         transport = %{
+           "candidate_sha" => sha,
+           "run_url" => url,
+           "run_id" => run_id,
+           "run_attempt" => attempt,
+           "artifacts" => artifacts,
+           "renderer" => renderer,
+           "actions" => %{"checkout" => pin},
+           "reviewer_required" => false,
+           "permissions" => %{"contents" => "read"}
+         }
+       ) do
     valid_transport_keys?(transport) and Regex.match?(@git_sha, sha) and
       Regex.match?(@git_sha, pin) and valid_artifacts?(artifacts) and
       is_binary(url) and String.starts_with?(url, "https://github.com/") and is_binary(run_id) and
@@ -434,15 +437,15 @@ defmodule Rendro.CatalogEvidenceParity do
   defp role("preset-review/preset.json"), do: "preset6"
   defp role("canonical/catalog.json"), do: "canonical32"
 
-  defp valid_records?(records),
-    do:
-      is_list(records) and records != [] and
-        length(Enum.uniq_by(records, & &1["id"])) == length(records) and
-        Enum.all?(records, fn
-          %{"id" => id, "sha256" => sha} ->
-            is_binary(id) and id != "" and is_binary(sha) and Regex.match?(@sha, sha)
+  defp valid_records?(records) when is_list(records) and records != [] do
+    Enum.all?(records, &valid_record_entry?/1) and
+      length(Enum.uniq_by(records, & &1["id"])) == length(records)
+  end
 
-          _ ->
-            false
-        end)
+  defp valid_records?(_), do: false
+
+  defp valid_record_entry?(%{"id" => id, "sha256" => sha}),
+    do: is_binary(id) and id != "" and is_binary(sha) and Regex.match?(@sha, sha)
+
+  defp valid_record_entry?(_), do: false
 end

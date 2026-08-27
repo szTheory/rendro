@@ -96,6 +96,42 @@ defmodule Rendro.CatalogEvidenceParityTest do
     assert {:error, [:candidate_identity_mismatch]} = CatalogEvidenceParity.verify_record(mutated)
   end
 
+  @tag :tmp_dir
+  test "malformed scalar records fail closed at sealed and raw artifact boundaries", %{
+    tmp_dir: tmp_dir
+  } do
+    malformed =
+      put_in(
+        record(),
+        ["routes", "phase130_canonical", "legacy", "roles", "canonical32"],
+        [42]
+      )
+
+    assert {:error, _} = CatalogEvidenceParity.verify_record(malformed)
+
+    legacy_root = Path.join(tmp_dir, "legacy")
+    generic_root = Path.join(tmp_dir, "generic")
+    File.mkdir_p!(legacy_root)
+    File.mkdir_p!(Path.join(generic_root, "canonical"))
+
+    File.write!(
+      Path.join(legacy_root, "manifest.txt"),
+      "#{String.duplicate("a", 64)}  assets/rendro/catalog/invoice/default/default-light.png\n"
+    )
+
+    File.write!(
+      Path.join(generic_root, "canonical/catalog.json"),
+      Jason.encode!(%{"images" => [42]})
+    )
+
+    assert {:error, [:invalid_json_role]} =
+             CatalogEvidenceParity.compare(
+               %{"root" => legacy_root},
+               %{"root" => generic_root},
+               "phase130_canonical"
+             )
+  end
+
   test "fails closed for each route's duplicate identifier, changed hash, and cardinality" do
     record = record()
 
