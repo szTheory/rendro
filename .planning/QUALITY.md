@@ -87,7 +87,7 @@ The initial snapshot is immutable after capture. Validation is read-only and cap
 - **Owner phase:** 135
 - **Scope:** converge on one generic read-only exact-SHA catalog evidence workflow; do not alter catalog content or claim renderer authority locally.
 - **Verification:** prove generic workflow parity against retained Phase 126, 127, and 130 outputs and authority checks before deleting any route.
-- **Status:** accepted
+- **Status:** in_progress
 - **Trigger:** complete before the old routes disappear; a failed parity comparison blocks closure.
 - **Closure:** record focused parity evidence, relevant CI proof, and before/after route inventory; count reduction alone is insufficient.
 - **Relationships/history:** observed and triaged on 2026-08-26; distinct from QL-002 because remediation and owner boundary are catalog CI rather than archive consumption.
@@ -130,7 +130,7 @@ The initial snapshot is immutable after capture. Validation is read-only and cap
 - **Status:** accepted
 - **Trigger:** begin repair only while the no-caller proof remains true; any public, dynamic, or compiled caller reopens triage on this same ID.
 - **Closure:** record removal commit, zero-reference/xref proof, focused and compatibility results, and a before/after statement that the active `Rendro.Text.Shaper` behavior and public manifest remain unchanged.
-- **Relationships/history:** Phase 83 recorded the analyzer as dormant after `Rendro.Text.Shaper.Simple` became the authoritative gate; this is distinct from QL-001 because it is a concrete unused ownership boundary rather than a graph count.
+- **Relationships/history:** Phase 83 recorded the analyzer as dormant after `Rendro.Text.Shaper.Simple` became the authoritative gate; this is distinct from QL-001 because it is a concrete unused ownership boundary rather than a graph count. Plan 134-02 re-ran the source, guide, task, dynamic, package, manifest, and `mix xref callers Rendro.I18n.Analyzer` checks before removal; all returned no Analyzer consumer, and the focused active-shaper/error/i18n/measure plus deterministic recipe byte-identity suite passed (90 tests, 0 failures). The atomic implementation/test removal is in progress pending public-contract compatibility closure.
 
 #### QL-006 — Recipe palette resolution has one cohesive, characterization-gated drift surface
 
