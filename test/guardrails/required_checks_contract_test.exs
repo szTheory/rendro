@@ -388,8 +388,24 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert advisory_block =~ "$REVIEW_DIR/final/identity-manifest.json"
       assert advisory_block =~ "$REVIEW_DIR/multipage"
 
+      assert advisory_block =~ "cp -R \"$REVIEW_DIR/final/pngs/.\" \"$ARTIFACT_DIR/review/\""
+
+      for {source, destination} <- [
+            {"invoice-line-items-60-plus-page-first.png",
+             "invoice_line_items_60_plus_page_first.png"},
+            {"invoice-line-items-60-plus-page-final.png",
+             "invoice_line_items_60_plus_page_final.png"},
+            {"statement-line-items-60-plus-page-first.png",
+             "statement_line_items_60_plus_page_first.png"},
+            {"statement-line-items-60-plus-page-final.png",
+             "statement_line_items_60_plus_page_final.png"}
+          ] do
+        assert advisory_block =~ "$REVIEW_DIR/multipage/#{source}"
+        assert advisory_block =~ "$ARTIFACT_DIR/review/#{destination}"
+      end
+
       assert advisory_block =~
-               "find \"$REVIEW_DIR/final/pngs\" \"$REVIEW_DIR/multipage\" -maxdepth 1 -type f -name '*.png'"
+               "find \"$ARTIFACT_DIR/review\" -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')\" = \"16\""
 
       assert advisory_block =~ "name: phase-127-catalog-bless"
       assert advisory_block =~ "if-no-files-found: error"
@@ -401,6 +417,10 @@ defmodule Guardrails.RequiredChecksContractTest do
       for path <- [
             "assets/rendro/catalog.json",
             "assets/rendro/catalog",
+            "invoice-line-items-60-plus-page-first.png",
+            "invoice-line-items-60-plus-page-final.png",
+            "statement-line-items-60-plus-page-first.png",
+            "statement-line-items-60-plus-page-final.png",
             "invoice_line_items_60_plus_page_first.png",
             "invoice_line_items_60_plus_page_final.png",
             "statement_line_items_60_plus_page_first.png",
