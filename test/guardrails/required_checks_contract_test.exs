@@ -225,7 +225,7 @@ defmodule Guardrails.RequiredChecksContractTest do
   end
 
   describe "docs-contract lane count" do
-    test "verify_docs.exs registers exactly twenty-seven lanes including the preset public-claims and accessibility overclaim tripwire lanes" do
+    test "verify_docs.exs registers exactly twenty-eight lanes including the catalog evidence, preset public-claims, and accessibility overclaim tripwire lanes" do
       script = File.read!(@verify_docs_path)
 
       lane_entries =
@@ -234,7 +234,10 @@ defmodule Guardrails.RequiredChecksContractTest do
           script
         )
 
-      assert length(lane_entries) == 27
+      assert length(lane_entries) == 28
+
+      assert script =~
+               ~r/\{"Catalog evidence runbook lane",\s*\["test",\s*"test\/docs_contract\/catalog_evidence_runbook_test\.exs"\]\}/s
 
       assert script =~
                ~r/\{"Preset public-claims lane",\s*\["test",\s*"test\/docs_contract\/presets_claims_test\.exs"\]\}/s
