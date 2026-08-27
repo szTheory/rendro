@@ -3,6 +3,35 @@ defmodule Mix.Tasks.Quality.UatTest do
 
   alias Mix.Tasks.Quality.Uat
 
+  setup do
+    root = Path.join(System.tmp_dir!(), "rendro-uat-#{System.unique_integer([:positive])}")
+    File.mkdir_p!(Path.join(root, ".planning/phases"))
+    on_exit(fn -> File.rm_rf(root) end)
+    %{root: root}
+  end
+
+  defp write_phase(root, name, uat? \\ true) do
+    dir = Path.join([root, ".planning", "phases", name])
+    File.mkdir_p!(dir)
+    File.write!(Path.join(dir, "134-01-SUMMARY.md"), summary("D1"))
+
+    if uat?,
+      do:
+        File.write!(
+          Path.join(dir, "134-UAT.md"),
+          Uat.render(134, "core", [
+            %{
+              id: "D1",
+              description: "deterministic proof D1",
+              verification: [%{"ref" => "mix test test/mix/tasks/quality_uat_test.exs"}],
+              source: "134-01-SUMMARY.md"
+            }
+          ])
+        )
+
+    dir
+  end
+
   defp summary(id, opts \\ []) do
     requirement = Keyword.get(opts, :requirement, "ARCH-01")
 
@@ -126,5 +155,25 @@ defmodule Mix.Tasks.Quality.UatTest do
   test "full phase slug resolves through the public Mix task" do
     Mix.Task.reenable("quality.uat")
     assert :ok = Mix.Tasks.Quality.Uat.run(["134-core-architecture-readability", "--check"])
+  end
+
+  test "temporary root accepts numeric and full slug and rejects missing or stale UAT", %{
+    root: root
+  } do
+    dir = write_phase(root, "134-core")
+    assert :ok = Uat.run(["134", "--check"], root)
+    assert :ok = Uat.run(["134-core", "--check"], root)
+    File.rm!(Path.join(dir, "134-UAT.md"))
+    assert_raise Mix.Error, fn -> Uat.run(["134", "--check"], root) end
+  end
+
+  test "temporary root rejects ambiguity and unsafe selectors", %{root: root} do
+    write_phase(root, "134-one")
+    write_phase(root, "134-two")
+    assert_raise Mix.Error, fn -> Uat.run(["134", "--check"], root) end
+
+    for selector <- ["/tmp/no", "../134", "134/foo", "134\\foo"] do
+      assert_raise Mix.Error, fn -> Uat.run([selector, "--check"], root) end
+    end
   end
 end

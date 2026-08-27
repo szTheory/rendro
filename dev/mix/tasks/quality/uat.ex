@@ -21,7 +21,9 @@ defmodule Mix.Tasks.Quality.Uat do
                       ])
 
   @impl Mix.Task
-  def run(args) do
+  def run(args), do: run(args, File.cwd!())
+
+  def run(args, root) when is_binary(root) do
     {opts, positional, invalid} =
       OptionParser.parse(args, strict: [all: :boolean, check: :boolean, write: :boolean])
 
@@ -38,7 +40,6 @@ defmodule Mix.Tasks.Quality.Uat do
     if opts[:all] != true and opts[:check] != true and opts[:write] != true,
       do: Mix.raise("choose --write or --check")
 
-    root = File.cwd!()
     phases_root = Path.join(root, ".planning/phases")
 
     dirs =
@@ -48,7 +49,8 @@ defmodule Mix.Tasks.Quality.Uat do
 
     Enum.each(dirs, fn dir ->
       {number, slug} = phase_identity!(dir)
-      records = summaries!(dir)
+      contained!(root, dir)
+      records = summaries!(dir, root)
       canonical = render(number, slug, records)
       uat_path = Path.join(dir, "#{number}-UAT.md")
 
@@ -115,9 +117,12 @@ defmodule Mix.Tasks.Quality.Uat do
     |> File.ls!()
     |> Enum.filter(&Regex.match?(~r/^\d+-/, &1))
     |> Enum.map(&Path.join(phases_root, &1))
-    |> Enum.reject(&symlink?/1)
     |> Enum.filter(fn dir ->
       {number, _} = phase_identity!(dir)
+
+      if number >= 134 and symlink?(dir),
+        do: Mix.raise("symlinked phase directory is not allowed: #{dir}")
+
       number >= 134 and summaries_present?(dir)
     end)
     |> Enum.sort()
@@ -155,12 +160,15 @@ defmodule Mix.Tasks.Quality.Uat do
     end
   end
 
-  defp summaries!(dir) do
+  defp summaries!(dir, root) do
     dir
     |> Path.join("*-SUMMARY.md")
     |> Path.wildcard()
     |> Enum.sort()
     |> Enum.flat_map(fn path ->
+      contained!(root, path)
+      if symlink?(path), do: Mix.raise("symlinked summary is not allowed: #{path}")
+
       case parse_summary(Path.basename(path), File.read!(path)) do
         {:ok, records} -> records
         {:error, message} -> Mix.raise(message)
@@ -174,6 +182,15 @@ defmodule Mix.Tasks.Quality.Uat do
 
   defp summaries_present?(dir), do: Path.wildcard(Path.join(dir, "*-SUMMARY.md")) != []
   defp symlink?(path), do: match?({:ok, %File.Stat{type: :symlink}}, File.lstat(path))
+
+  defp contained!(root, path) do
+    root = Path.expand(root)
+    expanded = Path.expand(path)
+
+    if expanded == root or String.starts_with?(expanded, root <> "/"),
+      do: :ok,
+      else: Mix.raise("path escapes repository root: #{path}")
+  end
 
   defp frontmatter("---\n" <> rest) do
     case String.split(rest, "\n---\n", parts: 2) do
