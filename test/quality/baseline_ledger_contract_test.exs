@@ -212,7 +212,7 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
     assert File.read!(@snapshot_path) == original
   end
 
-  test "lifecycle transitions and durable identities reject invalid mutations" do
+  test "disposition/status contradictions and durable identities reject invalid mutations" do
     ledger = File.read!(@ledger_path)
     assert valid_ledger?(ledger)
 

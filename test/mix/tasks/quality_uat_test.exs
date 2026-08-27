@@ -11,20 +11,22 @@ defmodule Mix.Tasks.Quality.UatTest do
   end
 
   defp write_phase(root, name, uat? \\ true) do
+    [_, number, slug] = Regex.run(~r/^(\d+)-(.+)$/, name)
     dir = Path.join([root, ".planning", "phases", name])
     File.mkdir_p!(dir)
-    File.write!(Path.join(dir, "134-01-SUMMARY.md"), summary("D1"))
+    summary_name = "#{number}-01-SUMMARY.md"
+    File.write!(Path.join(dir, summary_name), summary("D1", phase: "#{number}-#{slug}"))
 
     if uat?,
       do:
         File.write!(
-          Path.join(dir, "134-UAT.md"),
-          Uat.render(134, "core", [
+          Path.join(dir, "#{number}-UAT.md"),
+          Uat.render(String.to_integer(number), slug, [
             %{
               id: "D1",
               description: "deterministic proof D1",
               verification: [%{"ref" => "mix test test/mix/tasks/quality_uat_test.exs"}],
-              source: "134-01-SUMMARY.md"
+              source: summary_name
             }
           ])
         )
@@ -34,6 +36,7 @@ defmodule Mix.Tasks.Quality.UatTest do
 
   defp summary(id, opts \\ []) do
     requirement = Keyword.get(opts, :requirement, "ARCH-01")
+    phase = Keyword.get(opts, :phase, "134-core")
 
     coverage =
       Keyword.get(opts, :coverage, """
@@ -49,7 +52,7 @@ defmodule Mix.Tasks.Quality.UatTest do
 
     """
     ---
-    phase: 134-core
+    phase: #{phase}
     plan: \"01\"
     status: complete
     requirements-completed: [#{requirement}]
@@ -163,6 +166,22 @@ defmodule Mix.Tasks.Quality.UatTest do
     dir = write_phase(root, "134-core")
     assert :ok = Uat.run(["134", "--check"], root)
     assert :ok = Uat.run(["134-core", "--check"], root)
+
+    File.write!(Path.join(dir, "134-UAT.md"), "stale\n")
+    assert_raise Mix.Error, fn -> Uat.run(["134", "--check"], root) end
+
+    File.write!(
+      Path.join(dir, "134-UAT.md"),
+      Uat.render(134, "core", [
+        %{
+          id: "D1",
+          description: "deterministic proof D1",
+          verification: [%{"ref" => "mix test test/mix/tasks/quality_uat_test.exs"}],
+          source: "134-01-SUMMARY.md"
+        }
+      ])
+    )
+
     File.rm!(Path.join(dir, "134-UAT.md"))
     assert_raise Mix.Error, fn -> Uat.run(["134", "--check"], root) end
   end
@@ -174,6 +193,63 @@ defmodule Mix.Tasks.Quality.UatTest do
 
     for selector <- ["/tmp/no", "../134", "134/foo", "134\\foo"] do
       assert_raise Mix.Error, fn -> Uat.run([selector, "--check"], root) end
+    end
+  end
+
+  test "all-mode ignores pre-134 phases and check mode performs no writes", %{root: root} do
+    write_phase(root, "132-legacy", false)
+    dir = write_phase(root, "134-core")
+    summary_path = Path.join(dir, "134-01-SUMMARY.md")
+    uat_path = Path.join(dir, "134-UAT.md")
+    before = {File.read!(summary_path), File.read!(uat_path), Enum.sort(File.ls!(dir))}
+
+    assert :ok = Uat.run(["--all", "--check"], root)
+    assert {File.read!(summary_path), File.read!(uat_path), Enum.sort(File.ls!(dir))} == before
+  end
+
+  test "phase and summary symlinks fail closed, including outside-root targets", %{root: root} do
+    outside =
+      Path.join(System.tmp_dir!(), "rendro-uat-outside-#{System.unique_integer([:positive])}")
+
+    File.mkdir_p!(outside)
+    on_exit(fn -> File.rm_rf(outside) end)
+
+    outside_phase = Path.join(outside, "phase")
+    File.mkdir_p!(outside_phase)
+    phase_link = Path.join([root, ".planning", "phases", "134-linked"])
+    File.ln_s!(outside_phase, phase_link)
+
+    assert_raise Mix.Error, ~r/symlinked phase directory/, fn ->
+      Uat.run(["134-linked", "--check"], root)
+    end
+
+    assert_raise Mix.Error, ~r/symlinked phase directory/, fn ->
+      Uat.run(["--all", "--check"], root)
+    end
+
+    File.rm!(phase_link)
+    dir = write_phase(root, "134-core")
+    summary_path = Path.join(dir, "134-01-SUMMARY.md")
+    outside_summary = Path.join(outside, "134-01-SUMMARY.md")
+    File.write!(outside_summary, File.read!(summary_path))
+    File.rm!(summary_path)
+    File.ln_s!(outside_summary, summary_path)
+
+    assert_raise Mix.Error, ~r/symlinked summary/, fn ->
+      Uat.run(["134", "--check"], root)
+    end
+  end
+
+  test "symlinked UAT cannot satisfy check mode", %{root: root} do
+    dir = write_phase(root, "134-core")
+    uat_path = Path.join(dir, "134-UAT.md")
+    target = Path.join(root, "outside-uat.md")
+    File.write!(target, File.read!(uat_path))
+    File.rm!(uat_path)
+    File.ln_s!(target, uat_path)
+
+    assert_raise Mix.Error, ~r/symlinked UAT/, fn ->
+      Uat.run(["134", "--check"], root)
     end
   end
 end

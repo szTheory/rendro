@@ -53,6 +53,10 @@ defmodule Mix.Tasks.Quality.Uat do
       records = summaries!(dir, root)
       canonical = render(number, slug, records)
       uat_path = Path.join(dir, "#{number}-UAT.md")
+      contained!(root, uat_path)
+
+      if File.exists?(uat_path) and symlink?(uat_path),
+        do: Mix.raise("symlinked UAT is not allowed: #{uat_path}")
 
       cond do
         opts[:write] -> atomic_write!(uat_path, canonical)
@@ -306,6 +310,8 @@ defmodule Mix.Tasks.Quality.Uat do
       end
   end
 
+  defp executable_ref?(_), do: false
+
   defp known_refs do
     [
       "mix quality.baseline",
@@ -316,8 +322,6 @@ defmodule Mix.Tasks.Quality.Uat do
       "mix test test/rendro/recipes/*_byte_identity_test.exs test/rendro/recipes/themed_render_smoke_test.exs"
     ]
   end
-
-  defp executable_ref?(_), do: false
 
   defp valid_mix_test_args?(args) do
     {targets, switches} = Enum.split_with(args, &String.starts_with?(&1, "test/"))
