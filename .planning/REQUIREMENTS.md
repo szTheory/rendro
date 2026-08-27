@@ -27,8 +27,8 @@
 
 ## Tests & CI/CD
 
-- [ ] **TEST-01:** Before overlapping tests are consolidated, maintainers inventory the distinct behaviors and failure modes they protect and demonstrate that replacement tests fail when those contracts are broken.
-- [ ] **TEST-02:** Planning-coupled, implementation-coupled, or duplicative brittle tests are consolidated without losing behavior, failure-mode, public-contract, or deterministic-output protection.
+- [x] **TEST-01:** Before overlapping tests are consolidated, maintainers inventory the distinct behaviors and failure modes they protect and demonstrate that replacement tests fail when those contracts are broken.
+- [x] **TEST-02:** Planning-coupled, implementation-coupled, or duplicative brittle tests are consolidated without losing behavior, failure-mode, public-contract, or deterministic-output protection.
 - [x] **CI-01:** One purpose-named catalog evidence workflow accepts an explicit candidate SHA and review/canonical mode, checks out and verifies that exact SHA, uses the pinned renderer, has read-only repository permission, and uploads artifacts without mutating the repository.
 - [ ] **CI-02:** The generic catalog evidence workflow proves output and authority parity with the Phase 126, 127, and 130 routes before those milestone-specific routes are removed.
 - [x] **CI-03:** Ordinary CI preserves the deterministic, proof, and advisory lane separation and retains the existing authoritative `ci-success` contract while redundant workflow structure is simplified.
@@ -82,10 +82,10 @@
 | ARCH-02 | Phase 134 | Complete |
 | ARCH-03 | Phase 134 | Complete |
 | ARCH-04 | Phase 134 | Complete |
-| TEST-01 | Phase 135 | Pending |
-| TEST-02 | Phase 135 | Pending |
+| TEST-01 | Phase 135 | Complete |
+| TEST-02 | Phase 135 | Complete |
 | CI-01 | Phase 135 | Complete |
-| CI-02 | Phase 135 | Pending |
+| CI-02 | Phase 135 | Complete |
 | CI-03 | Phase 135 | Complete |
 | CI-04 | Phase 135 | Complete |
 | CI-05 | Phase 135 | Complete |

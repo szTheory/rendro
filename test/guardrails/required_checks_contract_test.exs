@@ -309,212 +309,33 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert advisory_block =~ "if-no-files-found: error"
     end
 
-    test "Phase 130 catalog review accepts only a full-SHA-bound candidate route" do
+    test "retires legacy Phase 126/127/130 routes without weakening ordinary CI authority" do
       ci = File.read!(@ci_path)
       advisory_block = ci_job_block!(ci, "advisory-checks")
       test_block = ci_job_block!(ci, "test")
 
-      assert ci =~ "      - 'gsd/phase-130-catalog-review-*'"
-      assert advisory_block =~ "^gsd/phase-130-catalog-review-([0-9a-f]{40})$"
-      assert advisory_block =~ "[[ \"${BASH_REMATCH[1]}\" == \"${GITHUB_SHA}\" ]]"
-      assert advisory_block =~ "mix rendro.catalog.candidate"
-
-      assert advisory_block =~
-               "mix test --include raster_snapshot test/rendro/catalog_raster_review_test.exs"
-
-      assert advisory_block =~ "priv/pdfium_pin.json"
-      assert advisory_block =~ "name: phase-130-catalog-candidate"
-      assert advisory_block =~ "name: phase-130-catalog-final"
-      assert advisory_block =~ "name: phase-130-catalog-multipage"
-      assert advisory_block =~ "tmp/phase130-candidate"
-      assert advisory_block =~ "tmp/phase130-review/final"
-      assert advisory_block =~ "tmp/phase130-review/final/pngs"
-      assert advisory_block =~ "tmp/phase130-review/multipage"
-
-      assert advisory_block =~
-               "find tmp/phase130-candidate -type f -name '*.png' ! -path 'tmp/phase130-candidate/multipage/*'"
-
-      refute advisory_block =~ "tmp/phase130-candidate/catalog"
-
-      refute test_block =~ "phase-130-catalog-review"
-      refute test_block =~ "rendro.catalog.candidate"
-      refute test_block =~ "RENDRO_CATALOG_REVIEW_DIR"
-    end
-
-    test "Phase 130 canonical catalog route is SHA-bound, pinned, and advisory-only" do
-      ci = File.read!(@ci_path)
-      advisory_block = ci_job_block!(ci, "advisory-checks")
-      test_block = ci_job_block!(ci, "test")
-
-      assert ci =~ "      - 'gsd/phase-130-catalog-canonical-*'"
-      assert advisory_block =~ "^gsd/phase-130-catalog-canonical-([0-9a-f]{40})$"
-      assert advisory_block =~ "mix rendro.catalog.gen"
-      assert advisory_block =~ "mix rendro.catalog.check"
-      assert advisory_block =~ "name: phase-130-catalog-canonical"
-      assert advisory_block =~ "phase130_catalog_canonical"
-      assert advisory_block =~ "PAYLOAD_SHA256:"
-      assert advisory_block =~ ".generated_by == \"mix rendro.catalog.gen\""
-      assert advisory_block =~ "(.cells | length) == 32"
-      assert advisory_block =~ "actual_sha"
-      assert advisory_block =~ "expected_sha"
-
-      refute test_block =~ "phase-130-catalog-canonical"
-    end
-
-    test "Phase 127 catalog blessing is isolated, bounded, and absent from required CI" do
-      ci = File.read!(@ci_path)
-      advisory_block = ci_job_block!(ci, "advisory-checks")
-      test_block = ci_job_block!(ci, "test")
-
-      assert ci =~ "      - 'gsd/phase-127-catalog-bless-*'"
-
-      guard =
-        "github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-127-catalog-bless-')"
-
-      assert advisory_block =~ guard
-      assert advisory_block =~ "mix rendro.catalog.gen"
-      assert advisory_block =~ "mix rendro.catalog.candidate"
-      assert advisory_block =~ "mix rendro.catalog.check"
-      assert advisory_block =~ "mix rendro.catalog.check"
-
-      assert advisory_block =~
-               "Skipping catalog check only for the initial isolated hash-capture run."
-
-      assert advisory_block =~
-               "jq -er '.catalog_dispositions | length' priv/quality/rubric_scores.json"
-
-      assert advisory_block =~ "\"${disposition_count}\" -lt 32"
-
-      assert advisory_block =~
-               "RENDRO_CATALOG_REVIEW_DIR: ${{ runner.temp }}/rendro_phase127_review"
-
-      assert advisory_block =~ "$REVIEW_DIR/final/pngs"
-      assert advisory_block =~ "$REVIEW_DIR/final/identity-manifest.json"
-      assert advisory_block =~ "$REVIEW_DIR/multipage"
-
-      assert advisory_block =~ "cp -R \"$REVIEW_DIR/final/pngs/.\" \"$ARTIFACT_DIR/review/\""
-
-      for {source, destination} <- [
-            {"invoice-line-items-60-plus-page-first.png",
-             "invoice_line_items_60_plus_page_first.png"},
-            {"invoice-line-items-60-plus-page-final.png",
-             "invoice_line_items_60_plus_page_final.png"},
-            {"statement-line-items-60-plus-page-first.png",
-             "statement_line_items_60_plus_page_first.png"},
-            {"statement-line-items-60-plus-page-final.png",
-             "statement_line_items_60_plus_page_final.png"}
+      for retired <- [
+            "phase-126-raster-bless",
+            "phase-127-catalog-bless",
+            "phase-130-catalog-review",
+            "phase-130-catalog-canonical",
+            "phase126_preset_raster_bless",
+            "phase127_catalog_bless",
+            "phase130_catalog_candidate",
+            "phase130_catalog_final",
+            "phase130_catalog_multipage",
+            "phase130_catalog_canonical"
           ] do
-        assert advisory_block =~ "$REVIEW_DIR/multipage/#{source}"
-        assert advisory_block =~ "$ARTIFACT_DIR/review/#{destination}"
+        refute ci =~ retired
       end
 
-      assert advisory_block =~
-               "find \"$ARTIFACT_DIR/review\" -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')\" = \"16\""
-
-      assert advisory_block =~ "name: phase-127-catalog-bless"
-      assert advisory_block =~ "if-no-files-found: error"
-      assert advisory_block =~ "GITHUB_SHA=${GITHUB_SHA}"
-      assert advisory_block =~ "GITHUB_RUN_ID=${GITHUB_RUN_ID}"
-      assert advisory_block =~ "PDFIUM_VERSION=$(jq -r '.version' priv/pdfium_pin.json)"
-      assert advisory_block =~ "PDFIUM_SHA256=$(jq -r '.sha256' priv/pdfium_pin.json)"
-
-      for path <- [
-            "assets/rendro/catalog.json",
-            "assets/rendro/catalog",
-            "invoice-line-items-60-plus-page-first.png",
-            "invoice-line-items-60-plus-page-final.png",
-            "statement-line-items-60-plus-page-first.png",
-            "statement-line-items-60-plus-page-final.png",
-            "invoice_line_items_60_plus_page_first.png",
-            "invoice_line_items_60_plus_page_final.png",
-            "statement_line_items_60_plus_page_first.png",
-            "statement_line_items_60_plus_page_final.png"
-          ] do
-        assert advisory_block =~ path
-      end
-
-      refute test_block =~ "rendro.catalog.gen"
-      refute test_block =~ "rendro.catalog.check"
-      refute test_block =~ "RENDRO_CATALOG_REVIEW_DIR"
-      refute test_block =~ "phase-127-catalog-bless"
-      refute advisory_block =~ ~r/^\s+needs:/m
-    end
-
-    test "Phase 126 raster blessing accepts only the isolated guarded push ref" do
-      ci = File.read!(@ci_path)
-      advisory_block = ci_job_block!(ci, "advisory-checks")
-      test_block = ci_job_block!(ci, "test")
-
-      assert ci =~ "  push:\n    branches:\n      - main\n      - 'gsd/phase-126-raster-bless-*'"
+      assert ci =~ "  push:\n    branches:\n      - main"
       assert ci =~ "  pull_request:\n    branches:\n      - main"
       assert ci =~ "  schedule:\n    - cron: '0 2 * * *'"
       refute ci =~ "workflow_dispatch:"
-
-      assert advisory_block =~
-               "mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs"
-
-      assert advisory_block =~ "MIX_RASTER_BLESS: \"false\""
-
-      adapter_step = ci_step_block!(advisory_block, "Run Raster Snapshot Tests")
-      assert adapter_step =~ "continue-on-error: true"
-      assert adapter_step =~ "MIX_RASTER_BLESS: \"false\""
-
-      assert advisory_block =~
-               "mix test --include raster_snapshot test/rendro/theme/preset_raster_snapshot_test.exs"
-
-      blessing_guard =
-        "github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-126-raster-bless-')"
-
-      assert advisory_block =~
-               "MIX_RASTER_BLESS: ${{ github.event_name == 'push' && startsWith(github.ref_name, 'gsd/phase-126-raster-bless-') && 'true' || 'false' }}"
-
-      assert advisory_block =~
-               "RENDRO_PRESET_RASTER_REVIEW_DIR: ${{ runner.temp }}/rendro_phase126_review"
-
-      assert advisory_block =~ blessing_guard
-      assert advisory_block =~ "ARTIFACT_DIR: ${{ runner.temp }}/phase126_preset_raster_bless"
-      assert advisory_block =~ "name: phase-126-preset-raster-bless"
-      assert advisory_block =~ "path: ${{ runner.temp }}/phase126_preset_raster_bless"
-      assert advisory_block =~ "if-no-files-found: error"
-      assert advisory_block =~ "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02"
-
-      hash_paths = [
-        "priv/raster_refs/presets/swiss/light.sha256",
-        "priv/raster_refs/presets/corporate_classic/dark.sha256",
-        "priv/raster_refs/presets/editorial/dark.sha256",
-        "priv/raster_refs/presets/minimal_mono/dark.sha256",
-        "priv/raster_refs/presets/humanist/dark.sha256",
-        "priv/raster_refs/presets/brutalist/dark.sha256"
-      ]
-
-      review_paths = [
-        "swiss_invoice_light_page_1.png",
-        "corporate_classic_invoice_dark_page_1.png",
-        "editorial_ticket_dark_page_1.png",
-        "minimal_mono_ticket_dark_page_1.png",
-        "humanist_payslip_dark_page_1.png",
-        "brutalist_payslip_dark_page_1.png"
-      ]
-
-      for path <- hash_paths do
-        assert advisory_block =~ path
-        assert advisory_block =~ "$ARTIFACT_DIR/#{path}"
-      end
-
-      for path <- review_paths do
-        assert advisory_block =~ "$REVIEW_DIR/#{path}"
-        assert advisory_block =~ "$ARTIFACT_DIR/review/#{path}"
-      end
-
-      assert advisory_block =~ "GITHUB_SHA=${GITHUB_SHA}"
-      assert advisory_block =~ "GITHUB_RUN_ID=${GITHUB_RUN_ID}"
-      assert advisory_block =~ "PDFIUM_VERSION=$(jq -r '.version' priv/pdfium_pin.json)"
-      assert advisory_block =~ "PDFIUM_SHA256=$(jq -r '.sha256' priv/pdfium_pin.json)"
-      assert advisory_block =~ "(cd \"$ARTIFACT_DIR\" && find priv review -type f | sort)"
-      refute test_block =~ "MIX_RASTER_BLESS"
-      refute test_block =~ "RENDRO_PRESET_RASTER_REVIEW_DIR"
-      refute test_block =~ "phase126_preset_raster_bless"
-      refute test_block =~ "phase-126-preset-raster-bless"
+      refute advisory_block =~ ~r/^\s+needs:/m
+      refute test_block =~ "rendro.catalog.candidate"
+      refute test_block =~ "RENDRO_CATALOG_REVIEW_DIR"
     end
 
     test "required test job runs only the deterministic mix ci lane" do
@@ -558,18 +379,11 @@ defmodule Guardrails.RequiredChecksContractTest do
       adapter_step = ci_step_block!(advisory_block, "Run Raster Snapshot Tests")
       preset_step = ci_step_block!(advisory_block, "Run Preset Raster Snapshot Tests")
 
-      staging_step =
-        ci_step_block!(advisory_block, "Stage Phase 126 preset raster blessing evidence")
-
-      upload_step =
-        ci_step_block!(advisory_block, "Upload Phase 126 preset raster blessing evidence")
-
       refute advisory_block =~ ~r/^    continue-on-error:/m
       assert adapter_step =~ "continue-on-error: true"
       assert adapter_step =~ "MIX_RASTER_BLESS: \"false\""
       refute preset_step =~ "continue-on-error"
-      refute staging_step =~ "continue-on-error"
-      refute upload_step =~ "continue-on-error"
+      refute advisory_block =~ "Phase 126 preset raster blessing"
 
       assert advisory_block =~
                "mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs"

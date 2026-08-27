@@ -4,17 +4,17 @@ milestone: v2.14
 milestone_name: Quality & Maintainability
 current_phase: 135
 current_phase_name: Test & CI/CD Simplification
-status: executing
-stopped_at: Completed 135-02-PLAN.md
-last_updated: "2026-08-27T16:34:16.095Z"
+status: verifying
+stopped_at: Completed 135-03-PLAN.md
+last_updated: "2026-08-27T20:19:00.058Z"
 last_activity: 2026-08-27
 last_activity_desc: Phase 135 execution started
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 25
-  completed_plans: 24
-  percent: 50
+  completed_plans: 25
+  percent: 67
 ---
 
 # Project State
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-08-27)
 
 Phase: 135 (Test & CI/CD Simplification) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-08-27 — Phase 135 execution started
 
 ## Roadmap Snapshot (v2.14, Phases 132-137)
@@ -92,6 +92,8 @@ Phase 137 Closure & Handoff ............................... Pending
 - [Phase ?]: [Phase 135]: Catalog evidence stays dev/test-only with closed manifest-rooted bundles; parity validates per-side transport provenance independently of shared authority equality.
 - [Phase ?]: [Phase 135]: Catalog Evidence remains standalone workflow_dispatch evidence transport; ordinary CI and ci-success stay unchanged.
 - [Phase ?]: [Phase 135]: The trusted control checkout alone packages and validates detached candidate output before the sole 30-day upload.
+- [Phase ?]: Four complete same-SHA remote parity rows are the mandatory predecessor to legacy catalog-route removal.
+- [Phase ?]: Commit 8a2292f is the rollback-sized legacy catalog-route cutover; generic evidence stays standalone and ci-success remains sole authority.
 
 ### Pending Todos
 
@@ -113,8 +115,8 @@ None outside the roadmap.
 
 ## Session Continuity
 
-Last session: 2026-08-27T16:34:16.087Z
-Stopped at: Completed 135-02-PLAN.md
+Last session: 2026-08-27T20:19:00.050Z
+Stopped at: Completed 135-03-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -161,3 +163,4 @@ Resume file: None
 | Phase 134-core-architecture-readability P05 | 25m | 2 tasks | 3 files |
 | Phase 135 P01 | 7m | 3 tasks | 9 files |
 | Phase 135 P02 | 16m | 2 tasks | 6 files |
+| Phase 135 P03 | 7m | 2 tasks | 4 files |
