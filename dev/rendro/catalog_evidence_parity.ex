@@ -31,7 +31,9 @@ defmodule Rendro.CatalogEvidenceParity do
   def compare(_, _, _), do: {:error, [:invalid_parity_input]}
 
   @spec verify_record(map(), atom() | String.t()) :: {:ok, map()} | {:error, [atom()]}
-  def verify_record(record, requested_route \\ nil) when is_map(record) do
+  def verify_record(record, requested_route \\ nil)
+
+  def verify_record(record, requested_route) when is_map(record) do
     with :ok <- valid_record?(record),
          {:ok, routes} <- record_routes(record, requested_route) do
       routes
@@ -140,9 +142,14 @@ defmodule Rendro.CatalogEvidenceParity do
         Enum.map(files, fn file ->
           %{
             "id" => file |> Path.basename() |> Path.rootname(),
-            "sha256" => file |> File.read!() |> then(&:crypto.hash(:sha256, &1)) |> Base.encode16(case: :lower)
+            "sha256" =>
+              file
+              |> File.read!()
+              |> then(&:crypto.hash(:sha256, &1))
+              |> Base.encode16(case: :lower)
           }
         end)
+
       selected_records = Enum.filter(records, &(&1["id"] in selected))
 
       if length(selected_records) == length(selected),

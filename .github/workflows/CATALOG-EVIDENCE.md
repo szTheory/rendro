@@ -59,6 +59,9 @@ Read the root README and manifest before opening any payload file. Text and
 manifest facts carry status; color, icons, thumbnails, and screenshots do not.
 
 Next: download the one bundle, then validate its root manifest and checksums.
+Copy the **Artifact URL** from the completed GitHub Actions run's artifact entry
+when you need a durable operator reference; use its run ID with `gh run download`
+for the supported retrieval command below.
 
 ```bash
 mkdir -p /tmp/rendro-catalog-evidence
@@ -91,8 +94,7 @@ Check these textual facts against the downloaded bundle manifest:
 
 - candidate SHA and checked-out HEAD are the same requested full candidate
   identity; control SHA is the distinct default-branch control-plane identity;
-- `priv/pdfium_pin.json` supplies the PDFium version and binary SHA-256, and the
-  summary records that pin;
+- `priv/pdfium_pin.json` supplies the PDFium version and binary SHA-256;
 - operation, run ID, run attempt, payload roles, counts, and per-file hashes are present;
 - `review` has candidate-only authority with no reviewer approval recorded;
 - `canonical` is evidence transport, not repository mutation or publication.
