@@ -146,12 +146,12 @@ Plans:
   4. Ordinary CI still separates deterministic, proof, and advisory evidence and preserves the authoritative `ci-success` status while caches, permissions, secrets, and action pins obey documented trust rules.
   5. A maintainer can reproduce each supported local and remote path from current documentation without consulting completed phase plans.
 
-**Plans**: 3 plans
+**Plans**: 1/3 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 135-01-PLAN.md — Build deterministic bundle/parity contracts and close the bounded recipe-test candidates.
+- [x] 135-01-PLAN.md — Build deterministic bundle/parity contracts and close the bounded recipe-test candidates.
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -198,7 +198,7 @@ Plans:
 | 132. Quality Baseline & Triage | 4 | 4/4 | Complete    | 2026-08-26 |
 | 133. Repository & Evidence Hygiene | 4 | 13/13 | Complete    | 2026-08-26 |
 | 134. Core Architecture & Readability | 4 | 5/5 | Complete    | 2026-08-27 |
-| 135. Test & CI/CD Simplification | 7 | 0/TBD | Not started | — |
+| 135. Test & CI/CD Simplification | 7 | 1/3 | In Progress|  |
 | 136. Catalog Visual Quality | 4 | 0/TBD | Not started | — |
 | 137. Closure & Handoff | 3 | 0/TBD | Not started | — |
 

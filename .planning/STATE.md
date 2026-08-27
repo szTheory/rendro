@@ -5,15 +5,15 @@ milestone_name: Quality & Maintainability
 current_phase: 135
 current_phase_name: Test & CI/CD Simplification
 status: executing
-stopped_at: Phase 135 context gathered
-last_updated: "2026-08-27T16:06:35.100Z"
+stopped_at: Completed 135-01-PLAN.md
+last_updated: "2026-08-27T16:16:59.918Z"
 last_activity: 2026-08-27
-last_activity_desc: Phase 134 complete, transitioned to Phase 135
+last_activity_desc: Phase 135 execution started
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 25
-  completed_plans: 22
+  completed_plans: 23
   percent: 50
 ---
 
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-08-27)
 
 ## Current Position
 
-Phase: 135 — Test & CI/CD Simplification
-Plan: Not started
+Phase: 135 (Test & CI/CD Simplification) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-08-27 — Phase 134 complete, transitioned to Phase 135
+Last activity: 2026-08-27 — Phase 135 execution started
 
 ## Roadmap Snapshot (v2.14, Phases 132-137)
 
@@ -89,6 +89,7 @@ Phase 137 Closure & Handoff ............................... Pending
 - [Phase 134]: Delegate only characterized palette-resolution mechanics to the hidden helper; all seven recipes retain their own maps, private seams, precedence, failure behavior, and rendered bytes.
 - [Phase 134]: Keep QL-007 shaping fallback and QL-008 narration as evidence-backed `reject_signal` records without speculative source churn.
 - [Phase 134]: Project strict deterministic SUMMARY coverage into terminal UAT for Phase 134 onward; human feedback may enrich evidence but cannot block objective completion.
+- [Phase ?]: [Phase 135]: Catalog evidence stays dev/test-only with closed manifest-rooted bundles; parity validates per-side transport provenance independently of shared authority equality.
 
 ### Pending Todos
 
@@ -110,9 +111,9 @@ None outside the roadmap.
 
 ## Session Continuity
 
-Last session: 2026-08-27T15:20:54.742Z
-Stopped at: Phase 135 context gathered
-Resume file: .planning/phases/135-test-ci-cd-simplification/135-CONTEXT.md
+Last session: 2026-08-27T16:16:59.908Z
+Stopped at: Completed 135-01-PLAN.md
+Resume file: None
 
 ## Next Steps
 
@@ -156,3 +157,4 @@ Resume file: .planning/phases/135-test-ci-cd-simplification/135-CONTEXT.md
 | Phase 134 P03 | 10m | 1 tasks | 3 files |
 | Phase 134 P04 | 4m | 2 tasks | 7 files |
 | Phase 134-core-architecture-readability P05 | 25m | 2 tasks | 3 files |
+| Phase 135 P01 | 7m | 3 tasks | 9 files |
