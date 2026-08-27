@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "candidate_sha": "643e407508d744d11b919a8af929855d06e608d4",
+  "verified_at": "2026-08-27T20:55:00Z",
+  "artifact_archive_sha256": {
+    "9662393317": "11a9d2842db7ac4f04657c8787a60e0b5a2c81c2eb2a67b25935776259d277b9",
+    "9662548280": "dc83ae243d88f178d604aa75574ba19e5b26eab8d9bab6eb0347bf21f193c0e5",
+    "9662521723": "fab437e023cdb7278c32c3896d93b2d5cd195645b63d32e11987fed80675e621",
+    "9662522666": "31467549d65a626059c581183130f5de5e5e4a78ddb56bd996b75d0af219efe9",
+    "9662523530": "e23cec3c6b545f818e352a0d088eccfbad3bef21c5e4c990b818209a313f944f",
+    "9662429840": "e220fd87912d7d5737ae3982b34d16964458e1a7933eb6b3a4c4c868a4063818",
+    "9662581705": "135a498791e4404e625459c2e619b936870f599c65f8dcfdef63fde18e4ce726",
+    "9662505690": "79022df3fa65f2f6bcb1262318fb283f931fec193d935da4d9f1d552b93d2b11"
+  },
+  "routes": {
+    "phase126_preset_review": {"status": "mismatch", "reason": "legacy archive has 6 preset records; generic bundle has 12"},
+    "phase127_catalog_review": {"status": "mismatch", "reason": "retained legacy payload layout cannot satisfy the exact generic role/hash schema"},
+    "phase130_review": {"status": "mismatch", "reason": "retained legacy payload hashes differ from generic normalized hashes"},
+    "phase130_canonical": {"status": "matched", "normalized_role_count_hash": "canonical/catalog:32@59754ecdaedd03bd8f01a7c21fa985fa192b567904a3b4f1dc63ea84cea41047"}
+  }
+}

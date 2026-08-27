@@ -96,5 +96,5 @@ _Depth: standard_
 - CR-01: fixed in `6843e03`
 - CR-02: fixed in `a39ff7e`
 - CR-03: fixed in `2d67ab7`
-- CR-04: unresolved, fail-closed pending retained artifact payloads or a rerun
+- CR-04: resolved fail-closed in `135-parity-comparator-record.json`; archive digests were verified and only canonical parity matched
 - WR-01: fixed in `e473936`

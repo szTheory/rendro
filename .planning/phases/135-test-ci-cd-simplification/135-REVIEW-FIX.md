@@ -41,7 +41,7 @@ Runbook dispatch commands now expand the validated full SHA.
 
 ### CR-04: Durable parity-ledger comparator evidence
 
-**Reason:** retained remote artifact payloads and a durable prior comparator output are not available locally. The committed matrix contains transport facts, but its `matched` state cannot truthfully be independently recomputed from those facts alone. It must be changed only after the retained legacy and generic artifacts are restored or the four routes are rerun and their normalized comparator records are durably retained.
+**Resolved fail-closed:** retained artifacts were downloaded read-only, and every archive SHA-256 matched the ledger. The sealed comparator record preserves those typed archive facts. It proves only `phase130_canonical` as matched; the remaining routes are mismatches under the explicit schemas and must not authorize deletion.
 
 ---
 
