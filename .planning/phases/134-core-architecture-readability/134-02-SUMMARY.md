@@ -38,7 +38,7 @@ coverage:
     description: "The dormant Analyzer implementation and isolated test are absent without altering public API or deterministic recipe bytes."
     requirement: ARCH-01
     verification:
-      - kind: test
+      - kind: integration
         ref: "mix test test/rendro/public_api/manifest_test.exs test/rendro/recipes/*_byte_identity_test.exs"
         status: pass
     human_judgment: false
@@ -46,7 +46,7 @@ coverage:
     description: "Analyzer closure retains evidence-backed ledger lifecycle and zero-consumer proof."
     requirement: ARCH-02
     verification:
-      - kind: test
+      - kind: integration
         ref: "mix quality.baseline"
         status: pass
     human_judgment: false

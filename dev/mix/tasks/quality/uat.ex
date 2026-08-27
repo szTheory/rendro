@@ -11,6 +11,14 @@ defmodule Mix.Tasks.Quality.Uat do
                    "human_judgment"
                  ])
   @verification_keys MapSet.new(["kind", "ref", "status"])
+  @verification_kinds MapSet.new([
+                        "unit",
+                        "integration",
+                        "e2e",
+                        "automated_ui",
+                        "manual_procedural",
+                        "other"
+                      ])
 
   @impl Mix.Task
   def run(args) do
@@ -121,11 +129,17 @@ defmodule Mix.Tasks.Quality.Uat do
       Mix.raise("unsafe phase selector: #{inspect(phase)}")
     end
 
-    matches =
-      File.ls!(phases_root)
-      |> Enum.filter(&String.starts_with?(&1, "#{phase}-"))
-      |> Enum.map(&Path.join(phases_root, &1))
-      |> Enum.reject(&symlink?/1)
+    names = File.ls!(phases_root)
+
+    matching_names =
+      if Regex.match?(~r/^\d+$/, phase),
+        do: Enum.filter(names, &String.starts_with?(&1, "#{phase}-")),
+        else: Enum.filter(names, &(&1 == phase))
+
+    matches = Enum.map(matching_names, &Path.join(phases_root, &1))
+
+    if Enum.any?(matches, &symlink?/1),
+      do: Mix.raise("symlinked phase directory is not allowed: #{phase}")
 
     case matches do
       [dir] -> dir
@@ -246,8 +260,8 @@ defmodule Mix.Tasks.Quality.Uat do
     if is_list(verifications) and verifications != [] and
          Enum.all?(verifications, fn verification ->
            is_map(verification) and MapSet.new(Map.keys(verification)) == @verification_keys and
-             is_binary(verification["kind"]) and is_binary(verification["ref"]) and
-             String.trim(verification["ref"]) != "" and verification["status"] == "pass"
+             verification["kind"] in @verification_kinds and executable_ref?(verification["ref"]) and
+             verification["status"] == "pass"
          end) do
       {:ok,
        %{
@@ -260,6 +274,13 @@ defmodule Mix.Tasks.Quality.Uat do
       {:error, "#{source}: coverage.verification must contain only passing executable maps"}
     end
   end
+
+  defp executable_ref?(ref) when is_binary(ref) do
+    String.trim(ref) == ref and ref != "" and not String.contains?(ref, ["\n", "\r", "\t"]) and
+      Regex.match?(~r/^(mix|node|elixir|git|sh|bash)\s+/, ref)
+  end
+
+  defp executable_ref?(_), do: false
 
   defp atomic_write!(path, contents) do
     temp = path <> ".tmp-#{System.unique_integer([:positive])}"

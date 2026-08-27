@@ -41,7 +41,7 @@ coverage:
     description: "QL-006 terminal closure preserves public manifest, package boundary, deterministic recipe bytes, and governed truthfulness evidence."
     requirement: ARCH-04
     verification:
-      - kind: test
+      - kind: integration
         ref: "mix ci.fast"
         status: pass
     human_judgment: false
@@ -49,7 +49,7 @@ coverage:
     description: "Terminal Phase 134 deterministic compatibility evidence is recorded without human-gated completion claims."
     requirement: ARCH-01
     verification:
-      - kind: test
+      - kind: integration
         ref: "mix test test/rendro/public_api/manifest_test.exs test/rendro/recipes/*_byte_identity_test.exs"
         status: pass
     human_judgment: false

@@ -197,6 +197,29 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
     assert File.read!(@snapshot_path) == original
   end
 
+  test "lifecycle transitions and durable identities reject invalid mutations" do
+    ledger = File.read!(@ledger_path)
+    lifecycle = ["observed", "triaged", "accepted", "in_progress", "verified", "closed"]
+
+    assert ledger =~ Enum.join(lifecycle, " -> ")
+
+    assert Enum.uniq(Regex.scan(~r/^#### QL-\d{3}/m, ledger)) ==
+             Regex.scan(~r/^#### QL-\d{3}/m, ledger)
+
+    assert Enum.uniq(Regex.scan(~r/\*\*Signal:\*\* `SIG-[A-Z]+-\d{3}`/, ledger)) ==
+             Regex.scan(~r/\*\*Signal:\*\* `SIG-[A-Z]+-\d{3}`/, ledger)
+
+    invalid_transition =
+      String.replace(
+        ledger,
+        "observed -> triaged -> accepted -> in_progress -> verified -> closed",
+        "observed -> closed",
+        global: false
+      )
+
+    refute invalid_transition =~ Enum.join(lifecycle, " -> ")
+  end
+
   test "ledger exposes durable lifecycle, rubric, and closure governance" do
     ledger = File.read!(@ledger_path)
 

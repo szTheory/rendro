@@ -32,7 +32,7 @@ coverage:
     requirement: ARCH-03
     verification:
       - kind: integration
-        ref: "mix test test/rendro/recipes/palette_test.exs and focused recipe option-threading suites"
+        ref: "mix test test/rendro/recipes/palette_test.exs test/rendro/recipes/*_opts_threading_test.exs"
         status: pass
     human_judgment: false
   - id: D2
@@ -40,7 +40,7 @@ coverage:
     requirement: ARCH-01
     verification:
       - kind: integration
-        ref: "mix test focused recipe byte-identity suites and test/rendro/recipes/themed_render_smoke_test.exs"
+        ref: "mix test test/rendro/recipes/*_byte_identity_test.exs test/rendro/recipes/themed_render_smoke_test.exs"
         status: pass
     human_judgment: false
 metrics:

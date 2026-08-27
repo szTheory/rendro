@@ -87,4 +87,30 @@ defmodule Mix.Tasks.Quality.UatTest do
     assert {:error, message} = Uat.parse_summary("134-01-SUMMARY.md", duplicate)
     assert message =~ "duplicate coverage id"
   end
+
+  test "installed GSD classifier accepts every Phase 134 summary as automated coverage" do
+    summaries =
+      Path.wildcard(".planning/phases/134-core-architecture-readability/134-*-SUMMARY.md")
+
+    for summary_path <- summaries do
+      {output, 0} =
+        System.cmd("node", [
+          "/Users/jon/.codex/gsd-core/bin/gsd-tools.cjs",
+          "uat",
+          "classify-coverage",
+          "--summary",
+          summary_path
+        ])
+
+      classified = JSON.decode!(output)
+      assert classified["mode"] == "coverage"
+      assert classified["errors"] == []
+      assert classified["all_auto_covered"] == true
+    end
+  end
+
+  test "full phase slug resolves through the public Mix task" do
+    Mix.Task.reenable("quality.uat")
+    assert :ok = Mix.Tasks.Quality.Uat.run(["134-core-architecture-readability", "--check"])
+  end
 end

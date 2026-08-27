@@ -409,4 +409,16 @@ if (process.argv[2] === '--check-active') {
     assert.equal(hasPinnedStaleVerificationException(['--allow-stale-verification-sha', '0'.repeat(64), '--allow-stale-verification-source-commit', staleVerificationCommit]), false);
     assert.equal(hasPinnedStaleVerificationException(['--allow-stale-verification-sha', staleVerificationSha, '--allow-stale-verification-source-commit', '0'.repeat(40)]), false);
   });
+
+  test('quality baseline is process-repeatable without changing authoritative bytes', () => {
+    const ledger = path.join(root, '.planning', 'QUALITY.md');
+    const snapshot = path.join(root, '.planning', 'quality', 'baselines', '132-initial.json');
+    const before = [fs.readFileSync(ledger), fs.readFileSync(snapshot)];
+
+    for (let run = 0; run < 2; run++) {
+      const result = spawnSync('mix', ['quality.baseline'], {cwd: root, shell: false, encoding: 'utf8'});
+      assert.equal(result.status, 0, result.stderr);
+      assert.deepEqual([fs.readFileSync(ledger), fs.readFileSync(snapshot)], before);
+    }
+  });
 }

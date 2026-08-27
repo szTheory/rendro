@@ -42,7 +42,7 @@ coverage:
     description: "Permanent ledger dispositions and the Wave 0 palette characterization are recorded with deterministic contracts."
     requirement: ARCH-03
     verification:
-      - kind: test
+      - kind: integration
         ref: "mix quality.baseline"
         status: pass
     human_judgment: false
@@ -50,7 +50,7 @@ coverage:
     description: "The evidence tracer baseline is read-only repeatable and rejects duplicate identity or invalid lifecycle mutations."
     requirement: ARCH-02
     verification:
-      - kind: test
+      - kind: integration
         ref: "mix test test/quality/baseline_ledger_contract_test.exs --include quality_ledger_contract"
         status: pass
     human_judgment: false

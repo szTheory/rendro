@@ -28,7 +28,7 @@ coverage:
     description: "The hidden Palette resolver preserves characterized default, theme, merge, and failure behavior."
     requirement: ARCH-03
     verification:
-      - kind: test
+      - kind: integration
         ref: "mix test test/rendro/recipes/palette_test.exs"
         status: pass
     human_judgment: false
