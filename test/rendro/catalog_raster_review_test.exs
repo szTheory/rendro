@@ -22,6 +22,7 @@ defmodule Rendro.CatalogRasterReviewTest do
              CatalogReviewPayload.classify(manifest, Map.fetch!(manifest, "multipage"))
 
     File.mkdir_p!(final_dir)
+    File.mkdir_p!(Path.join(final_dir, "pngs"))
     File.mkdir_p!(multipage_dir)
 
     for identity <- final do
@@ -33,7 +34,7 @@ defmodule Rendro.CatalogRasterReviewTest do
       assert {:ok, [png]} = Pdfium.render(pdf, dpi: 96, pages: "1")
       assert sha256(png) == identity["png_sha256"]
 
-      File.write!(Path.join(final_dir, "#{identity["catalog_id"]}_page_1.png"), png)
+      File.write!(Path.join([final_dir, "pngs", "#{identity["catalog_id"]}_page_1.png"]), png)
     end
 
     for proof <- multipage do
@@ -123,7 +124,7 @@ defmodule Rendro.CatalogRasterReviewTest do
     assert identity_manifest == %{"images" => final}
 
     for identity <- final do
-      path = Path.join(final_dir, "#{identity["catalog_id"]}_page_1.png")
+      path = Path.join([final_dir, "pngs", "#{identity["catalog_id"]}_page_1.png"])
       assert {:ok, png} = File.read(path)
       assert sha256(png) == identity["png_sha256"]
       assert identity["commit_sha"] =~ ~r/\A[0-9a-f]{40}\z/
