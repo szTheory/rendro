@@ -87,7 +87,7 @@ The initial snapshot is immutable after capture. Validation is read-only and cap
 - **Owner phase:** 135
 - **Scope:** converge on one generic read-only exact-SHA catalog evidence workflow; do not alter catalog content or claim renderer authority locally.
 - **Verification:** prove generic workflow parity against retained Phase 126, 127, and 130 outputs and authority checks before deleting any route.
-- **Status:** in_progress
+- **Status:** accepted
 - **Trigger:** complete before the old routes disappear; a failed parity comparison blocks closure.
 - **Closure:** record focused parity evidence, relevant CI proof, and before/after route inventory; count reduction alone is insufficient.
 - **Relationships/history:** observed and triaged on 2026-08-26; distinct from QL-002 because remediation and owner boundary are catalog CI rather than archive consumption.
@@ -127,10 +127,10 @@ The initial snapshot is immutable after capture. Validation is read-only and cap
 - **Owner phase:** 134
 - **Scope:** remove only `lib/rendro/i18n/analyzer.ex` and its isolated test after the predeclared zero-reference, focused-shaping/error, public-manifest, and deterministic-byte compatibility checks; do not change the active shaping path.
 - **Verification:** `rg -n 'Rendro\\.I18n\\.Analyzer|I18n\\.Analyzer' lib test guides README.md priv/public_api.json`, `mix xref callers Rendro.I18n.Analyzer`, focused shaper/error/public-contract tests, all recipe byte-identity tests, and the public manifest byte comparison.
-- **Status:** accepted
+- **Status:** closed
 - **Trigger:** begin repair only while the no-caller proof remains true; any public, dynamic, or compiled caller reopens triage on this same ID.
-- **Closure:** record removal commit, zero-reference/xref proof, focused and compatibility results, and a before/after statement that the active `Rendro.Text.Shaper` behavior and public manifest remain unchanged.
-- **Relationships/history:** Phase 83 recorded the analyzer as dormant after `Rendro.Text.Shaper.Simple` became the authoritative gate; this is distinct from QL-001 because it is a concrete unused ownership boundary rather than a graph count. Plan 134-02 re-ran the source, guide, task, dynamic, package, manifest, and `mix xref callers Rendro.I18n.Analyzer` checks before removal; all returned no Analyzer consumer, and the focused active-shaper/error/i18n/measure plus deterministic recipe byte-identity suite passed (90 tests, 0 failures). The atomic implementation/test removal is in progress pending public-contract compatibility closure.
+- **Closure:** verified then closed 2026-08-26 after atomic removal commit `196981a`. Exact zero-reference proof found no `Rendro.I18n.Analyzer`/`I18n.Analyzer` source, guide, README, manifest, or test reference; `mix xref callers Rendro.I18n.Analyzer` returned no callers. The active-shaper/error/i18n/measure plus every deterministic recipe byte-identity test passed (90 tests, 0 failures); public-manifest and documentation-contract tests plus the byte suite passed (32 tests, 0 failures). `priv/public_api.json` remained unedited and byte-identical to the fresh generated manifest (SHA-256 `963e5caa5fea2b3e7b40d31a3d4c13d66fcf8896ff562c4a195327ba57a727af`). Before: dormant private Analyzer implementation/test pair remained beside the authoritative `Rendro.Text.Shaper.Simple` gate. After: both sole-owner files are absent; active shaper behavior, public API, and deterministic rendered bytes remain unchanged.
+- **Relationships/history:** Phase 83 recorded the analyzer as dormant after `Rendro.Text.Shaper.Simple` became the authoritative gate; this is distinct from QL-001 because it is a concrete unused ownership boundary rather than a graph count. Plan 134-02 re-ran the source, guide, task, dynamic, package, manifest, and `mix xref callers Rendro.I18n.Analyzer` checks before removal; all returned no Analyzer consumer. The same permanent ID advanced through `in_progress` and `verified` to this closed state; reopening requires a new public, dynamic, or compiled Analyzer consumer.
 
 #### QL-006 — Recipe palette resolution has one cohesive, characterization-gated drift surface
 
