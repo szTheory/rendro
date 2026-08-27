@@ -52,6 +52,7 @@ Established fail-closed, dev/test-only catalog evidence and parity primitives wh
 
 - `mix test test/rendro/catalog_evidence_bundle_test.exs test/rendro/catalog_evidence_parity_test.exs test/docs_contract/phase_135_test_inventory_contract_test.exs test/rendro/recipes/themed_render_smoke_test.exs test/rendro/recipes/payslip_opts_threading_test.exs test/rendro/recipes/payslip_typography_test.exs test/rendro/recipes/certificate_typography_test.exs --max-failures 1` — 34 tests, 0 failures.
 - `mix format --check-formatted` for all changed Elixir files — passed.
+- `mix dialyzer` — passed with 0 errors after the post-wave integration repair.
 - `mix ci.fast` — passed.
 
 ## Decisions Made
@@ -72,7 +73,15 @@ Established fail-closed, dev/test-only catalog evidence and parity primitives wh
 - **Verification:** Focused bundle contract passes all positive and negative controls.
 - **Commit:** c8eaa13
 
-**Total deviations:** 1 auto-fixed (Rule 1).
+2. [Rule 1 - Bug] Removed Dialyzer-unreachable control-flow branches
+- **Found during:** Post-wave integration gate
+- **Issue:** Full CI reported an unreachable `false` branch in the bundle's already-binary output-root helper and a redundant unreachable parity error-wrapper clause.
+- **Fix:** Retained fail-closed checksum failure behavior in an explicit helper, relied on the public binary guard for the private output-root check, and returned the established parity error-list shape directly.
+- **Files modified:** `dev/rendro/catalog_evidence_bundle.ex`, `dev/rendro/catalog_evidence_parity.ex`
+- **Verification:** Focused 34-test suite, `mix dialyzer`, and `mix ci.fast` all passed.
+- **Commit:** de98b23
+
+**Total deviations:** 2 auto-fixed (Rule 1).
 
 ## Known Stubs
 
@@ -81,5 +90,5 @@ None. The four remote ledger rows are intentionally `pending` evidence records, 
 ## Self-Check: PASSED
 
 - All six new evidence/inventory files exist on disk.
-- Task commits `d760b53`, `c8eaa13`, `ab9cafe`, `418cc97`, and `ec0387b` are present in Git history.
-- Current focused test evidence is 34 tests passing, and the full deterministic `mix ci.fast` lane passed.
+- Task commits `d760b53`, `c8eaa13`, `ab9cafe`, `418cc97`, `ec0387b`, and `de98b23` are present in Git history.
+- Current focused test evidence is 34 tests passing; `mix dialyzer` reports 0 errors; and the full deterministic `mix ci.fast` lane passed.
