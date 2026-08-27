@@ -166,6 +166,10 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert source =~ "RENDRO_PRESET_RASTER_REVIEW_DIR"
       assert source =~ "test/rendro/theme/preset_raster_snapshot_test.exs"
       assert source =~ "preset-review/preset.json"
+      assert source =~ "-printf '%f\\n'"
+      assert source =~ "(.images | length) == 12"
+      assert source =~ "([.images[].id] | length == (unique | length))"
+      assert source =~ "^[0-9a-f]{64}$"
 
       for forbidden <- [
             "actions/cache",
