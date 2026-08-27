@@ -40,10 +40,13 @@ created: 2026-08-26
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 134-01-01 | 01 | 1 | ARCH-02, ARCH-03 | T-134-01 | Historical candidates receive evidence-backed ledger dispositions before repair | governance/xref | `mix quality.governance && mix xref callers Rendro.I18n.Analyzer` | ✅ governance | ⬜ pending |
-| 134-02-01 | 02 | 2 | ARCH-01, ARCH-02 | T-134-02 | Dead-code removal cannot delete a public, dynamic, or compiled production dependency | contract/focused | `mix test test/rendro/public_api/manifest_test.exs test/docs_contract/public_api_contract_test.exs test/rendro/i18n_test.exs` | ✅ | ⬜ pending |
-| 134-03-01 | 03 | 2 | ARCH-01, ARCH-03 | T-134-03 | Palette defaults, theme resolution, and `:palette` last-wins precedence stay exact | unit/render | `mix test test/rendro/recipes/palette_test.exs test/rendro/recipes/*_byte_identity_test.exs` | ❌ W0 palette test | ⬜ pending |
-| 134-04-01 | 04 | 3 | ARCH-01, ARCH-04 | T-134-04 | Truthful docs/spec/comment cleanup preserves public surface, types, bytes, and provenance | docs/static/type/terminal | `mix docs --warnings-as-errors && mix credo --strict && mix dialyzer && mix ci.fast` | ✅ infrastructure | ⬜ pending |
+| 134-01-01 | 01 | 1 | ARCH-02, ARCH-03, ARCH-04 | T-134-01 | Historical candidates receive evidence-backed ledger dispositions before repair | governance/xref | `mix quality.governance && mix xref callers Rendro.I18n.Analyzer` | ✅ governance | ⬜ pending |
+| 134-01-02 | 01 | 1 | ARCH-01, ARCH-03 | T-134-03 | Accepted palette extraction receives a targeted fail-first characterization before implementation | unit/RED | `mix test test/rendro/recipes/palette_test.exs` must fail for the missing helper contract | ❌ W0 palette test | ⬜ pending |
+| 134-02-01 | 02 | 2 | ARCH-01, ARCH-02 | T-134-04 | Dead-code removal cannot delete a public, dynamic, or compiled production dependency | focused | `mix test test/rendro/text/shaper_test.exs test/rendro/error_test.exs test/rendro/i18n_test.exs test/rendro/pipeline/measure_test.exs` | ✅ | ⬜ pending |
+| 134-02-02 | 02 | 2 | ARCH-01, ARCH-02 | T-134-05 | Analyzer closure matches public-manifest identity and the repository's final pair state | contract/governance | `mix test test/rendro/public_api/manifest_test.exs test/docs_contract/public_api_contract_test.exs && mix quality.governance` | ✅ | ⬜ pending |
+| 134-03-01 | 03 | 3 | ARCH-02, ARCH-03 | T-134-06 | Palette defaults, theme resolution, failure shape, and `:palette` last-wins precedence stay exact | unit/GREEN | `mix test test/rendro/recipes/palette_test.exs` | ❌ W0 palette test | ⬜ pending |
+| 134-03-02 | 03 | 3 | ARCH-01, ARCH-03 | T-134-06 | First four recipe migrations retain exact deterministic and option contracts | render/contract | focused byte-identity and opts-threading tests for Invoice, Receipt, BrandedInvoice, and Payslip | ✅ | ⬜ pending |
+| 134-03-03 | 03 | 3 | ARCH-01, ARCH-02, ARCH-03, ARCH-04 | T-134-08, T-134-09 | Remaining recipes, truthfulness audit, provenance, types, and all terminal contracts close together | docs/static/type/terminal | `mix quality.governance && mix docs --warnings-as-errors && mix credo --strict && mix dialyzer && mix ci.fast` | ✅ infrastructure | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -64,10 +67,10 @@ All Phase 134 completion claims have automated verification. Optional maintainer
 
 ## Threat Model References
 
-- **T-134-01:** A diagnostic or historical note is promoted into repair work without current concrete harm. Mitigation: ledger disposition before repair and explicit `reject_signal`/deferral paths.
-- **T-134-02:** Dead-code deletion removes a public, dynamic, compile-time, or documentation consumer. Mitigation: source/xref/manifest/docs checks before deletion plus focused active-path tests.
-- **T-134-03:** Shared palette resolution changes a legacy default or override precedence. Mitigation: Wave 0 characterization and affected byte-identity tests.
-- **T-134-04:** Comment/spec cleanup erases operational provenance or changes a public contract. Mitigation: line-specific evidence, public-manifest identity, docs warnings-as-errors, Credo, Dialyzer, and full deterministic CI.
+- **T-134-01–T-134-03:** Candidate intake, provenance, and palette Wave 0 authorization are gated by current evidence and explicit ledger dispositions.
+- **T-134-04–T-134-05:** Analyzer deletion and closure require zero-consumer proof, active-shaper tests, public-manifest identity, and agreement between ledger and repository state.
+- **T-134-06–T-134-07:** Shared palette resolution preserves every legacy default, merge tie-break, invalid-input failure, and affected deterministic byte golden.
+- **T-134-08–T-134-09:** Comment/spec truthfulness and terminal ledger closure preserve provenance and require line-specific evidence plus docs, Credo, Dialyzer, governance, and full deterministic CI.
 
 ---
 

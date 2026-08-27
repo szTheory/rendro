@@ -109,7 +109,13 @@ Plans:
   3. Public and boundary specifications, module documentation, and explanatory comments match current behavior and explain only non-obvious intent or constraints.
   4. The public API manifest and rendered bytes outside explicitly approved catalog targets remain identical after the cleanup.
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+
+- [ ] 134-01-PLAN.md — Trace every candidate into a durable disposition and establish palette Wave 0 characterization.
+- [ ] 134-02-PLAN.md — Conditionally remove the obsolete Analyzer pair with public-contract proof.
+- [ ] 134-03-PLAN.md — Conditionally extract palette resolution and close truthfulness, compatibility, and ledger evidence.
 
 ### Phase 135: Test & CI/CD Simplification
 
