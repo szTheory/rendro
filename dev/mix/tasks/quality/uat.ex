@@ -10,7 +10,7 @@ defmodule Mix.Tasks.Quality.Uat do
                    "verification",
                    "human_judgment"
                  ])
-  @verification_keys MapSet.new(["kind", "ref", "status"])
+  @verification_keys ["kind", "ref", "status"]
   @verification_kinds MapSet.new([
                         "unit",
                         "integration",
@@ -280,7 +280,7 @@ defmodule Mix.Tasks.Quality.Uat do
 
     if is_list(verifications) and verifications != [] and
          Enum.all?(verifications, fn verification ->
-           is_map(verification) and MapSet.new(Map.keys(verification)) == @verification_keys and
+           is_map(verification) and Enum.sort(Map.keys(verification)) == @verification_keys and
              verification["kind"] in @verification_kinds and executable_ref?(verification["ref"]) and
              verification["status"] == "pass"
          end) do
