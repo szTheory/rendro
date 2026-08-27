@@ -4,10 +4,10 @@ Run one bounded, read-only evidence job for one immutable Rendro commit. The
 workflow is manual only. It does not join ordinary CI, `ci-success`, merge
 approval, or release authority.
 
-The job checks out two separate trees. The default-branch workflow commit is
-the control plane. The requested candidate commit is detached, credential-free
-input. The control plane packages and validates the candidate output before the
-workflow uploads one bundle.
+Candidate generation and default-branch control packaging run in separate jobs
+on separate runners. The requested candidate is credential-free input; it can
+only cross into the trusted default-branch control job through a bounded,
+validated artifact handoff. The final job uploads one 30-day evidence bundle.
 
 ## Request evidence for one immutable commit
 
@@ -87,14 +87,13 @@ Run it with explicit values:
 BUNDLE_ROOT=/tmp/rendro-catalog-evidence/EXTRACTED_ROOT OPERATION=review mix run -e 'Code.require_file("dev/rendro/catalog_evidence_bundle.ex"); IO.inspect(Rendro.CatalogEvidenceBundle.validate(System.fetch_env!("BUNDLE_ROOT"), System.fetch_env!("OPERATION")))'
 ```
 
-Check these textual facts against the run summary and the bundle manifest:
+Check these textual facts against the downloaded bundle manifest:
 
 - candidate SHA and checked-out HEAD are the same requested full candidate
   identity; control SHA is the distinct default-branch control-plane identity;
 - `priv/pdfium_pin.json` supplies the PDFium version and binary SHA-256, and the
   summary records that pin;
-- operation, run ID, run attempt, payload roles, counts, per-file hashes,
-  Artifact URL, and Archive digest are present;
+- operation, run ID, run attempt, payload roles, counts, and per-file hashes are present;
 - `review` has candidate-only authority with no reviewer approval recorded;
 - `canonical` is evidence transport, not repository mutation or publication.
 

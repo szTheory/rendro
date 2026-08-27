@@ -81,11 +81,13 @@ jobs:
           retention-days: 1
 
   catalog-evidence:
+    # A dispatch from any other ref cannot select its workflow/helper as control.
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     needs: candidate-generation
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      CONTROL_SHA: ${{ github.sha }}
+      CONTROL_REF: ${{ github.event.repository.default_branch }}
       CANDIDATE_SHA: ${{ inputs.candidate_sha }}
       OPERATION: ${{ inputs.operation }}
       RUN_ID: ${{ github.run_id }}
@@ -93,8 +95,16 @@ jobs:
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
-          ref: ${{ env.CONTROL_SHA }}
+          ref: ${{ env.CONTROL_REF }}
           persist-credentials: false
+      - name: Bind trusted control to default branch
+        id: control
+        shell: bash
+        run: |
+          [[ "${GITHUB_REF}" == "refs/heads/${CONTROL_REF}" ]]
+          control_sha="$(git rev-parse HEAD)"
+          [[ "${control_sha}" == "${GITHUB_SHA}" ]]
+          printf 'sha=%s\n' "${control_sha}" >> "$GITHUB_OUTPUT"
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: rendro-catalog-evidence-handoff--${{ inputs.operation }}--${{ inputs.candidate_sha }}--run-${{ github.run_id }}--attempt-${{ github.run_attempt }}
@@ -105,8 +115,19 @@ jobs:
           elixir-version: '1.19.5'
       - name: Validate and package artifact-only candidate handoff
         shell: bash
+        env:
+          CONTROL_SHA: ${{ steps.control.outputs.sha }}
         run: |
           [[ "$(git rev-parse HEAD)" == "${CONTROL_SHA}" ]]
+          [[ "$(find candidate-handoff -type l -o ! -type f | wc -l | tr -d ' ')" = 0 ]]
+          [[ "$(find candidate-handoff -type f | wc -l | tr -d ' ')" -le 5 ]]
+          [[ "$(du -sk candidate-handoff | cut -f1)" -le 20480 ]]
+          actual_files="$(find candidate-handoff -type f -printf '%f\n' | sort | tr '\n' ' ')"
+          if [[ "${OPERATION}" == review ]]; then
+            [[ "${actual_files}" == "candidate-manifest.json final-manifest.json multipage-checksums.sha256 pdfium_pin.json preset-review-manifest.json " ]]
+          else
+            [[ "${actual_files}" == "catalog.json pdfium_pin.json " ]]
+          fi
           cmp --silent priv/pdfium_pin.json candidate-handoff/pdfium_pin.json
           mix deps.get
           export BUNDLE_ROOT="$RUNNER_TEMP/rendro-catalog-evidence"
