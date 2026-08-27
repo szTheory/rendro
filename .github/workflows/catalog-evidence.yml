@@ -103,7 +103,7 @@ jobs:
               --arg renderer_version "$(jq -r '.version' priv/pdfium_pin.json)" \
               --arg renderer_sha256 "$(jq -r '.sha256' priv/pdfium_pin.json)" \
               --argjson images "$(
-                find "${RENDRO_PRESET_RASTER_REVIEW_DIR}" -maxdepth 1 -type f -name '*.png' -printf '%f\\n' \
+                find "${RENDRO_PRESET_RASTER_REVIEW_DIR}" -maxdepth 1 -type f -name '*.png' -printf '%f\n' \
                   | sort \
                   | while IFS= read -r name; do
                     path="${RENDRO_PRESET_RASTER_REVIEW_DIR}/${name}"
@@ -114,6 +114,11 @@ jobs:
               )" \
               '{candidate_sha: $candidate_sha, renderer: {version: $renderer_version, sha256: $renderer_sha256}, images: $images}' \
               > tmp/phase130-candidate/preset-review-manifest.json
+            jq -e '
+              (.images | length) == 12 and
+              ([.images[].id] | length == (unique | length)) and
+              all(.images[]; (.id | type == "string" and length > 0) and (.sha256 | test("^[0-9a-f]{64}$")))
+            ' tmp/phase130-candidate/preset-review-manifest.json
           else
             mix rendro.catalog.gen
             mix rendro.catalog.check
