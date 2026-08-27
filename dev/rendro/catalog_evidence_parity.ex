@@ -60,6 +60,36 @@ defmodule Rendro.CatalogEvidenceParity do
 
   def verify_record(_, _), do: {:error, [:invalid_sealed_record]}
 
+  @spec inventory_row(map(), atom() | String.t()) :: {:ok, map()} | {:error, [atom()]}
+  def inventory_row(record, route) when is_map(record) do
+    with {:ok, route} <- route(route),
+         {:ok, _} <- verify_record(record, route) do
+      facts = record["routes"][Atom.to_string(route)]
+      legacy = facts["legacy"]["transport"]
+      generic = facts["generic"]["transport"]
+
+      {:ok,
+       %{
+         "candidate_sha" => record["transport"]["candidate_sha"],
+         "legacy_run_url" => legacy["run_url"],
+         "legacy_run_id" => legacy["run_id"],
+         "legacy_attempt" => to_string(legacy["run_attempt"]),
+         "legacy_artifact_identity" => legacy["artifact_identity"],
+         "legacy_upload_digest" => "sha256:" <> legacy["archive_sha256"],
+         "generic_run_url" => generic["run_url"],
+         "generic_run_id" => generic["run_id"],
+         "generic_attempt" => to_string(generic["run_attempt"]),
+         "generic_artifact_identity" => generic["artifact_identity"],
+         "generic_upload_digest" => "sha256:" <> generic["archive_sha256"],
+         "renderer" => renderer_text(generic["renderer"]),
+         "normalized_role_count_hash" => roles_text(facts["generic"]["roles"]),
+         "action_pin_permission" =>
+           "checkout=#{generic["actions"]["checkout"]}; contents=read; reviewer-required=false",
+         "status" => facts["status"]
+       }}
+    end
+  end
+
   defp extract(root, side, route) do
     case {side, route} do
       {:generic, :phase126_preset_review} ->
@@ -224,6 +254,20 @@ defmodule Rendro.CatalogEvidenceParity do
       value
       |> Enum.map(fn {role, records} -> {role, Enum.sort_by(records, & &1["id"])} end)
       |> Enum.sort()
+
+  defp roles_text(roles) do
+    roles
+    |> canonical()
+    |> Enum.map(fn {role, records} ->
+      "#{role}:#{length(records)}@#{records |> Jason.encode!() |> sha256()}"
+    end)
+    |> Enum.join("; ")
+  end
+
+  defp renderer_text(%{"version" => version, "dpi" => dpi, "binary_sha256" => sha}),
+    do: "pdfium #{version}; dpi=#{dpi}; sha256:#{sha}"
+
+  defp sha256(value), do: :crypto.hash(:sha256, value) |> Base.encode16(case: :lower)
 
   defp valid_record?(record) do
     record["schema_version"] == 2 and record["sealed"] == true and
