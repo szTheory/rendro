@@ -1,23 +1,25 @@
 ---
 phase: 134-core-architecture-readability
-verified: 2026-08-27T13:36:30Z
-status: human_needed
-score: 9/10 must-haves verified
-behavior_unverified: 1
+verified: 2026-08-27T14:50:39Z
+status: passed
+score: 10/10 must-haves verified
+behavior_unverified: 0
 overrides_applied: 0
-behavior_unverified_items:
-  - truth: "The evidence tracer is restart-safe: interruption preserves unique permanent IDs and rerunning validation updates rather than duplicates them."
-    test: "Interrupt a tracer run after it has allocated or updated a Phase 134 ledger record, rerun it, then compare the resulting record IDs and lifecycle transitions."
-    expected: "The original permanent IDs remain unique; the rerun updates the same records and creates no duplicate finding or lifecycle state."
-    why_human: "The repository has ledger uniqueness/shape tests, but no executable tracer or test simulates interruption and rerun behavior. Presence and current ledger state cannot prove this process invariant."
+re_verification:
+  previous_status: human_needed
+  previous_score: 9/10
+  gaps_closed:
+    - "Replaced the non-contractual tracer interruption/restart claim with the specified, executable read-only baseline repeatability and invalid-ledger rejection invariant."
+  gaps_remaining: []
+  regressions: []
 ---
 
 # Phase 134: Core Architecture & Readability Verification Report
 
 **Phase Goal:** Accepted high-value internal quality findings are closed with cohesive, self-documenting code and evidence that supported contracts remain stable.
-**Verified:** 2026-08-27T13:36:30Z
-**Status:** human_needed
-**Re-verification:** No — initial verification
+**Verified:** 2026-08-27T14:50:39Z
+**Status:** passed
+**Re-verification:** Yes — canonical contract correction
 
 ## Goal Achievement
 
@@ -25,91 +27,83 @@ behavior_unverified_items:
 
 | # | Truth | Status | Evidence |
 | --- | --- | --- | --- |
-| 1 | Every accepted high-impact architecture, dead-code, dependency, duplication, and readability finding is repaired or rejected with evidence; medium findings follow their recorded disposition. | ✓ VERIFIED | `.planning/QUALITY.md` contains complete QL-005 through QL-008 records: QL-005 and QL-006 are `closed`; QL-007 and QL-008 are trigger-backed `rejected`; explicit NS dependency/CI signals are likewise dispositioned. `mix quality.governance` passed 11 contract tests. |
-| 2 | Candidate evaluation is bounded, evidence-led, and does not turn size/xref or narration signals into speculative repairs. | ✓ VERIFIED | QL-005/006 record demonstrated bounded maintenance concerns; QL-007/008 retain `reject_signal` dispositions, scope limits, and reopening triggers. Phase diff contains no Writer/Paginate split, dependency upgrade, adapter coupling, or pipeline replacement. |
-| 3 | The accepted palette extraction has one cohesive internal responsibility with characterization before migration. | ✓ VERIFIED | `lib/rendro/recipes/palette.ex` is a 13-line hidden, pure `resolve/2` owner for only nil/theme base selection and final `Map.merge/2`; seven recipe-local private boundaries retain their exact maps. `palette_test.exs` covers the three actual legacy map shapes spanning all seven call sites plus nil, theme, precedence, and failure shape. |
-| 4 | Default, explicit-nil, themed, equal-value, last-wins, and invalid-palette behavior remain stable across the migration. | ✓ VERIFIED | The five focused `Palette.resolve/2` tests pass. The independently run palette/manifest/all-seven byte-identity/themed-render selection passed 44 tests with 0 failures. |
-| 5 | Analyzer was removed only after no-consumer proof, while the active shaper contract remains intact. | ✓ VERIFIED | `lib/rendro/i18n/analyzer.ex` and its isolated test are absent; `rg` found no residual Analyzer references in production, tests, guides, README, or manifest; `mix xref callers Rendro.I18n.Analyzer` returned no callers. Focused shaper/error tests passed 42 tests plus 1 property. |
-| 6 | The public API manifest and rendered bytes outside approved catalog targets remain identical after cleanup. | ✓ VERIFIED | Current and pre-phase `priv/public_api.json` SHA-256 are both `963e5caa5fea2b3e7b40d31a3d4c13d66fcf8896ff562c4a195327ba57a727af`; no fixture golden changed in the phase range. Fresh-manifest and all selected deterministic byte-identity tests passed. |
-| 7 | Public/boundary specs, module docs, and non-obvious explanatory comments match current behavior without erasing provenance. | ✓ VERIFIED | QL-008 records each bounded phase/date location, surrounding-context judgment, and a line-specific reopening trigger; source/runtime docs were not changed without a separately accepted finding. Public contract tests passed; the hidden Palette module is confirmed `@moduledoc false` and `:untagged`. |
-| 8 | Accepted findings close under their original IDs only after focused proof, manifest/render compatibility, before/after facts, and resolution references. | ✓ VERIFIED | QL-005 and QL-006 each retain original IDs, closure evidence, SHA, before/after statements, and named resolution commits. The Plan 05 truthfulness commit `de5d2c6` precedes terminal closure `8381515`, after product-repair commits. |
-| 9 | Rejected/deferred observations retain evidence and reopening triggers; a no-repair result is a valid outcome. | ✓ VERIFIED | QL-007/008 use `reject_signal` with exact scope and trigger; NS-006/007 are explicit `defer` records with owner phases and evidence-refresh rules. No observation is silently omitted from the Phase 134 candidate set. |
-| 10 | The evidence tracer is restart-safe: interruption preserves unique permanent IDs and rerunning validation updates rather than duplicates them. | ⚠️ PRESENT_BEHAVIOR_UNVERIFIED | `baseline_ledger_contract_test.exs` rejects duplicate IDs and malformed records, and the current ledger IDs are unique. However, no executable tracer or interruption/rerun test exercises the claimed state transition. |
+| 1 | Every Phase 134 candidate has a permanent, evidence-backed disposition before repair; accepted and rejected candidates retain separate identities. | ✓ VERIFIED | `.planning/QUALITY.md` contains complete QL-005 through QL-008 records in permanent order. QL-005/006 are `repair`/`closed`; QL-007/008 are `reject_signal`/`rejected`, each with evidence, scope, owner, verification, trigger, closure, and relationship history. Fresh `mix quality.baseline` passed 12 ledger-contract tests. |
+| 2 | Candidate evaluation is bounded and evidence-led: Analyzer precedes palette, while shaping fallback and narration remain non-repair signals absent demonstrated harm. | ✓ VERIFIED | QL-005 documents the isolated dead-code concern, QL-006 the seven-site resolution drift surface, and QL-007/008 explicit evidence-backed rejections. No Writer/Paginate split, dependency change, adapter coupling, pipeline replacement, or unrelated cleanup appears in the Phase 134 product diff. |
+| 3 | The evidence tracer is read-only repeatable and rejects duplicate QL/SIG identities and contradictory disposition/status states. | ✓ VERIFIED | Two fresh `mix quality.baseline` runs both passed (12 tests, 0 failures). SHA-256 bytes before, between, and after were identical for `QUALITY.md` (`af82fa…7514d`) and `132-initial.json` (`f7a187…39be`). `baseline_ledger_contract_test.exs` explicitly rejects duplicate QL-001, duplicate SIG-ARCH-001, and an invalid `reject_signal`/`closed` state. |
+| 4 | Analyzer was removed only after no-consumer proof, with the active shaping contract preserved. | ✓ VERIFIED | `lib/rendro/i18n/analyzer.ex` and its isolated test are absent; a fresh repository scan found no residual Analyzer references and `mix xref callers Rendro.I18n.Analyzer` exited successfully with no callers. Fresh shaper/error/i18n/measure tests passed 72 tests plus 1 property. |
+| 5 | Palette extraction has one cohesive, hidden resolution responsibility and characterization coverage rather than a size-metric-only change. | ✓ VERIFIED | `Rendro.Recipes.Palette.resolve/2` contains only nil/theme base selection and final `Map.merge/2`. The five direct characterization tests cover all three legacy map shapes, explicit nil, theme resolution, override precedence, and `BadMapError`; all passed. |
+| 6 | All seven recipe call sites delegate only resolution mechanics while retaining their exact recipe-owned defaults and private `palette/1` boundaries. | ✓ VERIFIED | A fresh source trace found exactly seven `Rendro.Recipes.Palette.resolve(opts, defaults)` calls — one each in Invoice, Receipt, BrandedInvoice, Payslip, Ticket, Statement, and Certificate. Each resolved map flows to live `colors = palette(opts)` rendering paths. |
+| 7 | Default, explicit-nil, themed, equal-value, last-wins override, and invalid-palette behavior remain stable. | ✓ VERIFIED | Fresh focused palette/public-manifest/docs-contract/all recipe byte-identity/themed-render tests passed 44 tests, 0 failures. The characterization test directly asserts each listed branch and failure boundary. |
+| 8 | Public API and unaffected rendered-byte contracts remain unchanged. | ✓ VERIFIED | Pre-phase and current `priv/public_api.json` SHA-256 are both `963e5caa5fea2b3e7b40d31a3d4c13d66fcf8896ff562c4a195327ba57a727af`; `git diff ec1b4cd^..8381515` is empty for it and `priv/goldens/**`. Fresh manifest and deterministic-byte tests passed, as did `mix ci.fast`. |
+| 9 | Public/boundary specs, module documentation, and non-obvious comments remain truthful without erasing provenance. | ✓ VERIFIED | QL-008 records the bounded line-specific audit and `reject_signal` result: each examined phase/date match is current provenance, a boundary, or example data. The phase made no speculative source/doc/comment repair; fresh documentation-contract tests and full deterministic lane passed. |
+| 10 | Accepted findings close under their original IDs after their focused compatibility proof; rejected observations retain evidence and reopening triggers. | ✓ VERIFIED | QL-005 and QL-006 are closed under their original IDs with before/after facts, resolution commits, manifest and byte evidence. QL-007/008 retain explicit rejected status and reopen triggers. Fresh `mix quality.governance` passed its 12 ExUnit and 10 Node governance checks. |
 
-**Score:** 9/10 truths verified (1 present, behavior-unverified)
+**Score:** 10/10 truths verified (0 present, behavior-unverified)
 
 ### Required Artifacts
 
 | Artifact | Expected | Status | Details |
 | --- | --- | --- | --- |
-| `.planning/QUALITY.md` | Permanent evidence-backed dispositions and terminal lifecycles | ✓ VERIFIED | Substantive QL-005–008 records include evidence, scope, verification, status, trigger, closure/history; governance test passes. |
-| `test/rendro/recipes/palette_test.exs` | Characterization of legacy palette semantics | ✓ VERIFIED | Five non-stub assertions exercise defaults, nil, theme, override precedence, and `BadMapError`. |
-| `lib/rendro/recipes/palette.ex` | Hidden cohesive `resolve/2` owner | ✓ VERIFIED | Implements only legacy base selection and `Map.merge/2`; seven callers use it and it remains absent from public API docs. |
-| Seven recipe modules | Recipe-owned private palette boundaries with exact defaults | ✓ VERIFIED | Each has exactly one `defp palette(opts)` and exactly one call to `Rendro.Recipes.Palette.resolve(opts, defaults)`. |
-| `priv/quality/package-members-v1.json` | Package boundary reflects removed Analyzer and added Palette source | ✓ VERIFIED | Includes `lib/rendro/recipes/palette.ex`; contains no Analyzer source entry. |
+| `.planning/QUALITY.md` | Permanent evidence-backed Phase 134 dispositions and closures | ✓ VERIFIED | Substantive QL-005–008 records pass the focused validity, identity, local-evidence, and lifecycle contract. |
+| `test/quality/baseline_ledger_contract_test.exs` | Read-only repeatability and invalid-ledger rejection contract | ✓ VERIFIED | Defines `valid_ledger?/1`, immutable snapshot check, duplicate identity mutations, and contradictory state mutation; run by `mix quality.baseline`. |
+| `lib/rendro/recipes/palette.ex` | Hidden cohesive `resolve/2` owner | ✓ VERIFIED | 13-line pure internal module; no coercion, validation, rescue, geometry, or public API surface. |
+| `test/rendro/recipes/palette_test.exs` | Characterization of legacy palette semantics | ✓ VERIFIED | Five substantive direct tests bind expected default/theme/override/failure semantics to `Palette.resolve/2`. |
+| Seven recipe modules | Recipe-owned defaults delegated to the shared resolver | ✓ VERIFIED | Each private `palette/1` supplies its own literal default map to the resolver; output is consumed by document rendering. |
 
 ### Key Link Verification
 
 | From | To | Via | Status | Details |
 | --- | --- | --- | --- | --- |
-| `.planning/QUALITY.md` | Phase context | Candidate IDs and governed scope/closure | ✓ WIRED | Artifact query verified both Plan 01 links; QL records cite Phase 134 evidence and triggers. |
-| `palette_test.exs` | `palette.ex` | Direct `Palette.resolve/2` calls | ✓ WIRED | Alias and five direct behavioral tests bind expectations to implementation. |
-| Seven recipe `palette/1` functions | `palette.ex` | `resolve(opts, defaults)` | ✓ WIRED | Manual source trace found exactly seven calls, one per required recipe. |
-| Recipe rendering functions | recipe `palette(opts)` | `colors = palette(opts)` | ✓ WIRED | Every migrated recipe consumes resolved colors in rendering paths; deterministic render contracts pass. |
-| Shaper tests | `Rendro.Text.Shaper.Simple` | `shaping_required` behavior | ✓ WIRED | Targeted shaper/error suite passed 43 checks. |
-| Ledger closure | public manifest / byte tests | closure evidence and deterministic tests | ✓ WIRED | QL-005/006 record public-manifest SHA and byte-identity proof; independently rerun selected suite passes. |
+| `mix.exs` | `baseline_ledger_contract_test.exs` | `quality.baseline` alias | ✓ WIRED | Alias runs the exact tagged contract file; two independent baseline executions passed. |
+| Ledger contract | `QUALITY.md` and initial snapshot | `File.read!` plus schema/ledger validation | ✓ WIRED | Tests read the authoritative files and evaluate mutation cases in memory, keeping validation read-only. |
+| Palette tests | `palette.ex` | direct `Palette.resolve/2` calls | ✓ WIRED | Five focused tests executed successfully. |
+| Seven recipe `palette/1` functions | `palette.ex` | `Rendro.Recipes.Palette.resolve(opts, defaults)` | ✓ WIRED | Manual trace found exactly seven calls, matching the seven planned modules. |
+| Recipe render paths | resolved palette | `colors = palette(opts)` | ✓ WIRED | Every migrated recipe uses the returned map in rendering paths; byte-identity and themed tests passed. |
+| Shaper tests | `Rendro.Text.Shaper.Simple` | active shaping/error/i18n/measure contracts | ✓ WIRED | Fresh focused suite passed 72 tests plus 1 property after Analyzer removal. |
 
 ### Data-Flow Trace (Level 4)
 
 | Artifact | Data Variable | Source | Produces Real Data | Status |
 | --- | --- | --- | --- | --- |
-| `Rendro.Recipes.Palette.resolve/2` | `base` / returned palette | caller `opts[:theme]`, recipe-owned default map, optional caller palette override | Yes — seven private callers pass live render options and literal compatibility maps; result flows to `colors` consumed in recipe rendering | ✓ FLOWING |
+| `Rendro.Recipes.Palette.resolve/2` | `base` and returned palette | live recipe opts, recipe-owned compatibility map, optional theme and `:palette` override | Yes — each caller passes render opts and its own map; returned map becomes rendered `colors` | ✓ FLOWING |
+| Baseline ledger contract | snapshot and ledger bytes | committed authoritative paths | Yes — reads are validated and mutation rejection occurs in-memory; repeated command leaves bytes unchanged | ✓ FLOWING |
 
 ### Behavioral Spot-Checks
 
 | Behavior | Command | Result | Status |
 | --- | --- | --- | --- |
-| Ledger contract and unique governed records | `mix quality.governance` | 11 tests, 0 failures | ✓ PASS |
-| Palette semantics, public manifest, all migrated byte contracts, themed rendering | selected `mix test` invocation for palette, all 7 byte-identity files, themed smoke, manifest, docs contract | 44 tests, 0 failures | ✓ PASS |
-| Active shaping/error contract after Analyzer deletion | `mix test test/rendro/text/shaper_test.exs test/rendro/error_test.exs` | 42 tests + 1 property, 0 failures | ✓ PASS |
-| No remaining compiled Analyzer consumer | `mix xref callers Rendro.I18n.Analyzer` | No callers | ✓ PASS |
+| Read-only baseline repeatability and invalid identity/state rejection | `mix quality.baseline` twice with SHA-256 comparison | Both runs: 12 tests, 0 failures; both authoritative files byte-identical before/between/after | ✓ PASS |
+| Full ledger governance | `mix quality.governance` | 12 ExUnit tests plus 10 Node governance tests, 0 failures | ✓ PASS |
+| Palette semantics plus manifest/render compatibility | focused `mix test` command for palette, manifest, docs contract, byte identity, themed smoke | 44 tests, 0 failures | ✓ PASS |
+| Active shaping path and no compiled Analyzer caller | focused shaper/error/i18n/measure tests; `mix xref callers Rendro.I18n.Analyzer` | 72 tests + 1 property, 0 failures; no callers | ✓ PASS |
+| Full deterministic lane | `mix ci.fast` | exited 0; repository hygiene, package build, format/docs/static checks, and suite completed | ✓ PASS |
 
 ### Probe Execution
 
-Step 7c: SKIPPED — this phase declares no probe scripts or PASS-marker probe contract.
+Step 7c: SKIPPED — Phase 134 declares no `probe-*.sh` contract, and no phase probe path exists.
 
 ### Requirements Coverage
 
 | Requirement | Source Plans | Description | Status | Evidence |
 | --- | --- | --- | --- | --- |
-| ARCH-01 | 01–05 | Public API manifest and unaffected rendered bytes remain unchanged | ✓ SATISFIED | Pre-phase/current manifest hashes match; no golden diff; manifest and selected deterministic render tests pass. |
-| ARCH-02 | 01–05 | Every accepted finding is repaired/rejected with evidence; medium findings follow ledger rules | ✓ SATISFIED | QL-005–008 and NS records are complete, durable dispositions; governance passes. |
-| ARCH-03 | 01, 03–05 | Extractions require cohesive responsibility/maintenance benefit plus characterization | ✓ SATISFIED | QL-006 defines the drift surface; Wave 0 characterization, hidden owner, seven call sites, and behavior tests prove the limited extraction. |
-| ARCH-04 | 01, 05 | Public/boundary specs, docs, and comments accurately state behavior | ✓ SATISFIED | QL-008 line-specific audit rejects speculative changes while preserving provenance; public contract tests pass. |
+| ARCH-01 | 01–05 | Public API manifest and unaffected rendered bytes remain unchanged | ✓ SATISFIED | Matching pre-phase/current manifest hash, no golden diff, focused compatibility suite, and fresh `mix ci.fast` pass. |
+| ARCH-02 | 01–05 | Accepted findings are repaired/rejected with evidence and bounded medium work follows ledger disposition | ✓ SATISFIED | Complete QL-005–008 lifecycle records, mutable-invalid ledger cases rejected, and governance pass. |
+| ARCH-03 | 01, 03–05 | Extraction requires cohesive responsibility/maintenance benefit and characterization coverage | ✓ SATISFIED | QL-006 bounded-drift rationale, one hidden resolver, seven exact call sites, and direct characterization plus render contracts. |
+| ARCH-04 | 01, 05 | Public/boundary specifications, docs, and comments accurately describe current behavior | ✓ SATISFIED | QL-008's line-specific truthfulness audit preserves valid provenance; documentation contracts and full deterministic lane pass. |
 
-All four requirement IDs declared by Plan frontmatter are mapped above. No Phase 134 requirement is orphaned in `.planning/REQUIREMENTS.md`.
+No Phase 134 requirement is orphaned: all four requirements in `.planning/REQUIREMENTS.md` are declared by plans and verified above.
 
 ### Anti-Patterns Found
 
 | File | Line | Pattern | Severity | Impact |
 | --- | --- | --- | --- | --- |
-| None | — | No unreferenced `TBD`/`FIXME`/`XXX`, placeholder implementation, or user-visible hardcoded-empty data found in Phase 134 implementation files. | ℹ️ | The `return []` matches in `scripts/quality_governance.cjs` are ordinary empty-directory/reference collection paths, not stubs. |
-
-### Human Verification Required
-
-### 1. Evidence tracer interruption/restart invariant
-
-**Test:** Interrupt a tracer run after its Phase 134 ledger update has begun; rerun the same validation/workflow and inspect the ledger records.
-
-**Expected:** Existing QL IDs remain unique and the original record lifecycle is updated rather than duplicated.
-
-**Why human:** The quality-governance suite validates ledger shape and duplicate rejection, but this repository does not expose a runnable tracer or a test that exercises interruption/restart behavior.
+| None | — | No unreferenced `TBD`/`FIXME`/`XXX`, placeholder implementation, empty render path, or hardcoded-empty runtime data found in Phase 134 implementation artifacts. | ℹ️ | No blocker. |
 
 ### Gaps Summary
 
-No implementation gap was found. The phase cannot receive a fully automated `passed` verdict until the untested tracer restart invariant is either exercised by a deterministic test/workflow or explicitly accepted by a developer. This is an escalation gate, not a claim that supported public or rendering contracts failed.
+None. The former interruption/restart item was not a Phase 134 must-have and has no executable tracer implementation to verify. The specified contract is instead directly covered by the repeated read-only baseline command and its duplicate/contradictory-ledger mutation tests; both pass.
 
 ---
 
-_Verified: 2026-08-27T13:36:30Z_
+_Verified: 2026-08-27T14:50:39Z_
 _Verifier: the agent (gsd-verifier)_
