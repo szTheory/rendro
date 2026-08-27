@@ -74,17 +74,17 @@ defmodule Rendro.CatalogEvidenceParity do
          "legacy_run_url" => legacy["run_url"],
          "legacy_run_id" => legacy["run_id"],
          "legacy_attempt" => to_string(legacy["run_attempt"]),
-         "legacy_artifact_identity" => legacy["artifact_identity"],
-         "legacy_upload_digest" => "sha256:" <> legacy["archive_sha256"],
+         "legacy_artifact_identity" => artifact_identities_text(legacy["artifacts"]),
+         "legacy_upload_digest" => artifact_digests_text(legacy["artifacts"]),
          "generic_run_url" => generic["run_url"],
          "generic_run_id" => generic["run_id"],
          "generic_attempt" => to_string(generic["run_attempt"]),
-         "generic_artifact_identity" => generic["artifact_identity"],
-         "generic_upload_digest" => "sha256:" <> generic["archive_sha256"],
+         "generic_artifact_identity" => artifact_identities_text(generic["artifacts"]),
+         "generic_upload_digest" => artifact_digests_text(generic["artifacts"]),
          "renderer" => renderer_text(generic["renderer"]),
          "normalized_role_count_hash" => roles_text(facts["generic"]["roles"]),
          "action_pin_permission" =>
-           "checkout=#{generic["actions"]["checkout"]}; contents=read; reviewer-required=false",
+           "checkout=#{generic["actions"]["checkout"]}; contents=#{generic["permissions"]["contents"]}; reviewer-required=#{generic["reviewer_required"]}",
          "status" => facts["status"]
        }}
     end
@@ -267,6 +267,12 @@ defmodule Rendro.CatalogEvidenceParity do
   defp renderer_text(%{"version" => version, "dpi" => dpi, "binary_sha256" => sha}),
     do: "pdfium #{version}; dpi=#{dpi}; sha256:#{sha}"
 
+  defp artifact_identities_text(artifacts),
+    do: Enum.map_join(artifacts, "; ", & &1["identity"])
+
+  defp artifact_digests_text(artifacts),
+    do: Enum.map_join(artifacts, "; ", &("sha256:" <> &1["archive_sha256"]))
+
   defp sha256(value), do: :crypto.hash(:sha256, value) |> Base.encode16(case: :lower)
 
   defp valid_record?(record) do
@@ -296,24 +302,47 @@ defmodule Rendro.CatalogEvidenceParity do
 
   defp valid_side?(_), do: {:error, :invalid_side}
 
-  defp valid_transport?(%{
+  defp valid_transport?(transport = %{
          "candidate_sha" => sha,
          "run_url" => url,
          "run_id" => run_id,
          "run_attempt" => attempt,
-         "artifact_identity" => identity,
-         "archive_sha256" => digest,
+         "artifacts" => artifacts,
          "renderer" => renderer,
          "actions" => %{"checkout" => pin},
+         "reviewer_required" => false,
          "permissions" => %{"contents" => "read"}
        }) do
-    Regex.match?(@git_sha, sha) and Regex.match?(@git_sha, pin) and Regex.match?(@sha, digest) and
+    valid_transport_keys?(transport) and Regex.match?(@git_sha, sha) and
+      Regex.match?(@git_sha, pin) and valid_artifacts?(artifacts) and
       is_binary(url) and String.starts_with?(url, "https://github.com/") and is_binary(run_id) and
       Regex.match?(~r/\A\d+\z/, run_id) and is_integer(attempt) and attempt > 0 and
-      is_binary(identity) and identity != "" and valid_renderer?(renderer)
+      valid_renderer?(renderer)
   end
 
   defp valid_transport?(_), do: false
+
+  defp valid_transport_keys?(transport) do
+    Enum.sort(Map.keys(transport)) ==
+      ~w(actions artifacts candidate_sha permissions renderer reviewer_required run_attempt run_id run_url)
+  end
+
+  defp valid_artifacts?(artifacts) when is_list(artifacts) and artifacts != [] do
+    artifacts == Enum.uniq(artifacts) and
+      length(Enum.uniq_by(artifacts, & &1["identity"])) == length(artifacts) and
+      Enum.all?(artifacts, fn
+        artifact = %{"identity" => identity, "archive_sha256" => digest} ->
+          Enum.sort(Map.keys(artifact)) == ~w(archive_sha256 identity) and is_binary(identity) and
+            identity != "" and
+            not String.contains?(identity, ";") and
+            is_binary(digest) and Regex.match?(@sha, digest)
+
+        _ ->
+          false
+      end)
+  end
+
+  defp valid_artifacts?(_), do: false
 
   defp valid_renderer?(%{"version" => v, "binary_sha256" => sha, "dpi" => dpi}),
     do: is_binary(v) and Regex.match?(@sha, sha) and is_integer(dpi) and dpi > 0

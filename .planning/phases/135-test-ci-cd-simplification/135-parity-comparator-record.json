@@ -7,8 +7,12 @@
     "run_url": "https://github.com/szTheory/rendro/actions/runs/33110490597",
     "run_id": "33110490597",
     "run_attempt": 1,
-    "artifact_identity": "rendro-catalog-evidence--review--643e407508d744d11b919a8af929855d06e608d4--run-33110490597--attempt-1#9662581705",
-    "archive_sha256": "135a498791e4404e625459c2e619b936870f599c65f8dcfdef63fde18e4ce726",
+    "artifacts": [
+      {
+        "identity": "rendro-catalog-evidence--review--643e407508d744d11b919a8af929855d06e608d4--run-33110490597--attempt-1#9662581705",
+        "archive_sha256": "135a498791e4404e625459c2e619b936870f599c65f8dcfdef63fde18e4ce726"
+      }
+    ],
     "renderer": {
       "version": "v0.11.0",
       "binary_sha256": "b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a",
@@ -17,6 +21,7 @@
     "actions": {
       "checkout": "df4cb1c069e1874edd31b4311f1884172cec0e10"
     },
+    "reviewer_required": false,
     "permissions": {
       "contents": "read"
     }
@@ -29,8 +34,12 @@
           "run_url": "https://github.com/szTheory/rendro/actions/runs/33110485344",
           "run_id": "33110485344",
           "run_attempt": 1,
-          "artifact_identity": "phase-126-preset-raster-bless#9662393317",
-          "archive_sha256": "11a9d2842db7ac4f04657c8787a60e0b5a2c81c2eb2a67b25935776259d277b9",
+          "artifacts": [
+            {
+              "identity": "phase-126-preset-raster-bless#9662393317",
+              "archive_sha256": "11a9d2842db7ac4f04657c8787a60e0b5a2c81c2eb2a67b25935776259d277b9"
+            }
+          ],
           "renderer": {
             "version": "v0.11.0",
             "binary_sha256": "b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a",
@@ -39,6 +48,7 @@
           "actions": {
             "checkout": "df4cb1c069e1874edd31b4311f1884172cec0e10"
           },
+          "reviewer_required": false,
           "permissions": {
             "contents": "read"
           }
@@ -78,8 +88,12 @@
           "run_url": "https://github.com/szTheory/rendro/actions/runs/33110490597",
           "run_id": "33110490597",
           "run_attempt": 1,
-          "artifact_identity": "rendro-catalog-evidence--review--643e407508d744d11b919a8af929855d06e608d4--run-33110490597--attempt-1#9662581705",
-          "archive_sha256": "135a498791e4404e625459c2e619b936870f599c65f8dcfdef63fde18e4ce726",
+          "artifacts": [
+            {
+              "identity": "rendro-catalog-evidence--review--643e407508d744d11b919a8af929855d06e608d4--run-33110490597--attempt-1#9662581705",
+              "archive_sha256": "135a498791e4404e625459c2e619b936870f599c65f8dcfdef63fde18e4ce726"
+            }
+          ],
           "renderer": {
             "version": "v0.11.0",
             "binary_sha256": "b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a",
@@ -88,6 +102,7 @@
           "actions": {
             "checkout": "df4cb1c069e1874edd31b4311f1884172cec0e10"
           },
+          "reviewer_required": false,
           "permissions": {
             "contents": "read"
           }
@@ -130,8 +145,12 @@
           "run_url": "https://github.com/szTheory/rendro/actions/runs/33110486826",
           "run_id": "33110486826",
           "run_attempt": 1,
-          "artifact_identity": "phase-127-catalog-bless#9662548280",
-          "archive_sha256": "dc83ae243d88f178d604aa75574ba19e5b26eab8d9bab6eb0347bf21f193c0e5",
+          "artifacts": [
+            {
+              "identity": "phase-127-catalog-bless#9662548280",
+              "archive_sha256": "dc83ae243d88f178d604aa75574ba19e5b26eab8d9bab6eb0347bf21f193c0e5"
+            }
+          ],
           "renderer": {
             "version": "v0.11.0",
             "binary_sha256": "b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a",
@@ -140,6 +159,7 @@
           "actions": {
             "checkout": "df4cb1c069e1874edd31b4311f1884172cec0e10"
           },
+          "reviewer_required": false,
           "permissions": {
             "contents": "read"
           }
@@ -351,8 +371,12 @@
           "run_url": "https://github.com/szTheory/rendro/actions/runs/33110490597",
           "run_id": "33110490597",
           "run_attempt": 1,
-          "artifact_identity": "rendro-catalog-evidence--review--643e407508d744d11b919a8af929855d06e608d4--run-33110490597--attempt-1#9662581705",
-          "archive_sha256": "135a498791e4404e625459c2e619b936870f599c65f8dcfdef63fde18e4ce726",
+          "artifacts": [
+            {
+              "identity": "rendro-catalog-evidence--review--643e407508d744d11b919a8af929855d06e608d4--run-33110490597--attempt-1#9662581705",
+              "archive_sha256": "135a498791e4404e625459c2e619b936870f599c65f8dcfdef63fde18e4ce726"
+            }
+          ],
           "renderer": {
             "version": "v0.11.0",
             "binary_sha256": "b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a",
@@ -361,6 +385,7 @@
           "actions": {
             "checkout": "df4cb1c069e1874edd31b4311f1884172cec0e10"
           },
+          "reviewer_required": false,
           "permissions": {
             "contents": "read"
           }
@@ -575,8 +600,20 @@
           "run_url": "https://github.com/szTheory/rendro/actions/runs/33110489293",
           "run_id": "33110489293",
           "run_attempt": 1,
-          "artifact_identity": "phase-130-catalog-candidate#9662521723",
-          "archive_sha256": "fab437e023cdb7278c32c3896d93b2d5cd195645b63d32e11987fed80675e621",
+          "artifacts": [
+            {
+              "identity": "phase-130-catalog-candidate#9662521723",
+              "archive_sha256": "fab437e023cdb7278c32c3896d93b2d5cd195645b63d32e11987fed80675e621"
+            },
+            {
+              "identity": "phase-130-catalog-final#9662522666",
+              "archive_sha256": "31467549d65a626059c581183130f5de5e5e4a78ddb56bd996b75d0af219efe9"
+            },
+            {
+              "identity": "phase-130-catalog-multipage#9662523530",
+              "archive_sha256": "e23cec3c6b545f818e352a0d088eccfbad3bef21c5e4c990b818209a313f944f"
+            }
+          ],
           "renderer": {
             "version": "v0.11.0",
             "binary_sha256": "b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a",
@@ -585,6 +622,7 @@
           "actions": {
             "checkout": "df4cb1c069e1874edd31b4311f1884172cec0e10"
           },
+          "reviewer_required": false,
           "permissions": {
             "contents": "read"
           }
@@ -796,8 +834,12 @@
           "run_url": "https://github.com/szTheory/rendro/actions/runs/33110490597",
           "run_id": "33110490597",
           "run_attempt": 1,
-          "artifact_identity": "rendro-catalog-evidence--review--643e407508d744d11b919a8af929855d06e608d4--run-33110490597--attempt-1#9662581705",
-          "archive_sha256": "135a498791e4404e625459c2e619b936870f599c65f8dcfdef63fde18e4ce726",
+          "artifacts": [
+            {
+              "identity": "rendro-catalog-evidence--review--643e407508d744d11b919a8af929855d06e608d4--run-33110490597--attempt-1#9662581705",
+              "archive_sha256": "135a498791e4404e625459c2e619b936870f599c65f8dcfdef63fde18e4ce726"
+            }
+          ],
           "renderer": {
             "version": "v0.11.0",
             "binary_sha256": "b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a",
@@ -806,6 +848,7 @@
           "actions": {
             "checkout": "df4cb1c069e1874edd31b4311f1884172cec0e10"
           },
+          "reviewer_required": false,
           "permissions": {
             "contents": "read"
           }
@@ -1020,8 +1063,12 @@
           "run_url": "https://github.com/szTheory/rendro/actions/runs/33110490906",
           "run_id": "33110490906",
           "run_attempt": 1,
-          "artifact_identity": "phase-130-catalog-canonical#9662429840",
-          "archive_sha256": "e220fd87912d7d5737ae3982b34d16964458e1a7933eb6b3a4c4c868a4063818",
+          "artifacts": [
+            {
+              "identity": "phase-130-catalog-canonical#9662429840",
+              "archive_sha256": "e220fd87912d7d5737ae3982b34d16964458e1a7933eb6b3a4c4c868a4063818"
+            }
+          ],
           "renderer": {
             "version": "v0.11.0",
             "binary_sha256": "b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a",
@@ -1030,6 +1077,7 @@
           "actions": {
             "checkout": "df4cb1c069e1874edd31b4311f1884172cec0e10"
           },
+          "reviewer_required": false,
           "permissions": {
             "contents": "read"
           }
@@ -1173,8 +1221,12 @@
           "run_url": "https://github.com/szTheory/rendro/actions/runs/33110492328",
           "run_id": "33110492328",
           "run_attempt": 1,
-          "artifact_identity": "rendro-catalog-evidence--canonical--643e407508d744d11b919a8af929855d06e608d4--run-33110492328--attempt-1#9662505690",
-          "archive_sha256": "79022df3fa65f2f6bcb1262318fb283f931fec193d935da4d9f1d552b93d2b11",
+          "artifacts": [
+            {
+              "identity": "rendro-catalog-evidence--canonical--643e407508d744d11b919a8af929855d06e608d4--run-33110492328--attempt-1#9662505690",
+              "archive_sha256": "79022df3fa65f2f6bcb1262318fb283f931fec193d935da4d9f1d552b93d2b11"
+            }
+          ],
           "renderer": {
             "version": "v0.11.0",
             "binary_sha256": "b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a",
@@ -1183,6 +1235,7 @@
           "actions": {
             "checkout": "df4cb1c069e1874edd31b4311f1884172cec0e10"
           },
+          "reviewer_required": false,
           "permissions": {
             "contents": "read"
           }

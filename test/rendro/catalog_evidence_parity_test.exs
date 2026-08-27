@@ -31,19 +31,58 @@ defmodule Rendro.CatalogEvidenceParityTest do
       ),
       put_in(
         record,
-        ["routes", "phase130_review", "legacy", "transport", "artifact_identity"],
+        [
+          "routes",
+          "phase130_review",
+          "legacy",
+          "transport",
+          "artifacts",
+          Access.at(0),
+          "identity"
+        ],
         ""
       ),
       put_in(
         record,
-        ["routes", "phase130_canonical", "generic", "transport", "archive_sha256"],
+        [
+          "routes",
+          "phase130_canonical",
+          "generic",
+          "transport",
+          "artifacts",
+          Access.at(0),
+          "archive_sha256"
+        ],
         "bad"
+      ),
+      put_in(
+        record,
+        ["routes", "phase126_preset_review", "generic", "transport", "reviewer_required"],
+        true
       ),
       put_in(record, ["routes", "phase130_review", "status"], "matched-but-fabricated")
     ]
 
     for mutated <- mutations,
         do: assert({:error, _} = CatalogEvidenceParity.verify_record(mutated))
+  end
+
+  test "rejects missing and duplicate typed transport artifact entries" do
+    record = record()
+    path = ["routes", "phase130_review", "legacy", "transport", "artifacts"]
+    artifacts = get_in(record, path)
+
+    assert {:error, [:invalid_transport]} =
+             CatalogEvidenceParity.verify_record(
+               put_in(record, path, []),
+               "phase130_review"
+             )
+
+    assert {:error, [:invalid_transport]} =
+             CatalogEvidenceParity.verify_record(
+               put_in(record, path, [hd(artifacts) | artifacts]),
+               "phase130_review"
+             )
   end
 
   test "rejects a syntactically valid route-side candidate SHA that differs from the sealed candidate" do

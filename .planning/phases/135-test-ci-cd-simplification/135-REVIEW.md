@@ -98,3 +98,10 @@ _Depth: standard_
 - CR-03: fixed in `2d67ab7`
 - CR-04: resolved fail-closed in `135-parity-comparator-record.json`; archive digests were verified and only canonical parity matched
 - WR-01: fixed in `e473936`
+
+## Fix Resolution (Iteration 3)
+
+- The schema-v2 sealed candidate identity is enforced across the root and every route side.
+- Every named parity-inventory cell is projected through `Rendro.CatalogEvidenceParity.inventory_row/2` and compared exactly, including transport, renderer, normalized role/count/hash, authority, and status facts.
+- Transport evidence uses a validated ordered artifact array, preserving all three Phase 130 legacy artifacts/digests, and retains explicit reviewer-required authority in the sealed record.
+- The inventory contract rejects a one-cell mutation in each column as well as changed headers, reordered routes, extra routes, and missing routes.
