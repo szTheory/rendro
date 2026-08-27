@@ -1,0 +1,90 @@
+defmodule Mix.Tasks.Quality.UatTest do
+  use ExUnit.Case, async: true
+
+  alias Mix.Tasks.Quality.Uat
+
+  defp summary(id, opts \\ []) do
+    requirement = Keyword.get(opts, :requirement, "ARCH-01")
+
+    coverage =
+      Keyword.get(opts, :coverage, """
+        - id: #{id}
+          description: deterministic proof #{id}
+          requirement: #{requirement}
+          verification:
+            - kind: integration
+              ref: mix test test/example_test.exs
+              status: pass
+          human_judgment: false
+      """)
+
+    """
+    ---
+    phase: 134-core
+    plan: \"01\"
+    status: complete
+    requirements-completed: [#{requirement}]
+    coverage:
+    #{coverage}
+    ---
+    # Summary
+
+    Advisory review remains outside coverage and cannot become a UAT item.
+    """
+  end
+
+  test "parses installed deterministic coverage and renders terminal UAT" do
+    assert {:ok, records} = Uat.parse_summary("134-01-SUMMARY.md", summary("D1"))
+    assert [%{id: "D1", source: "134-01-SUMMARY.md"}] = records
+
+    output = Uat.render("134", "core", records)
+    assert output =~ "status: terminal"
+    assert output =~ "### 1. D1 — deterministic proof D1"
+    assert output =~ "result: pass\n"
+    assert output =~ "passed: 1"
+  end
+
+  test "rejects malformed coverage shapes with precise diagnostics" do
+    mutations = [
+      {"legacy scalar", String.replace(summary("D1"), "coverage:\n", "coverage: legacy\n")},
+      {"human", String.replace(summary("D1"), "human_judgment: false", "human_judgment: true")},
+      {"nonpass", String.replace(summary("D1"), "status: pass", "status: pending")},
+      {"unknown key",
+       String.replace(
+         summary("D1"),
+         "human_judgment: false",
+         "extra: nope\n  human_judgment: false"
+       )},
+      {"duplicate",
+       String.replace(
+         summary("D1"),
+         "human_judgment: false",
+         "human_judgment: false\n" <>
+           String.trim_leading(
+             summary("D1"),
+             "---\nphase: 134-core\nplan: \"01\"\nstatus: complete\nrequirements-completed: [ARCH-01]\ncoverage:\n"
+           )
+       )}
+    ]
+
+    for {name, document} <- mutations do
+      assert {:error, message} = Uat.parse_summary("134-01-SUMMARY.md", document), name
+      assert message =~ "134-01-SUMMARY.md"
+    end
+  end
+
+  test "accepts same coverage id from distinct summaries but not one source" do
+    assert {:ok, _} = Uat.parse_summary("134-01-SUMMARY.md", summary("D1"))
+    assert {:ok, _} = Uat.parse_summary("134-02-SUMMARY.md", summary("D1"))
+
+    duplicate =
+      String.replace(
+        summary("D1"),
+        "human_judgment: false",
+        "human_judgment: false\n  - id: D1\n    description: duplicate\n    verification:\n      - kind: test\n        ref: mix test\n        status: pass\n    human_judgment: false"
+      )
+
+    assert {:error, message} = Uat.parse_summary("134-01-SUMMARY.md", duplicate)
+    assert message =~ "duplicate coverage id"
+  end
+end
