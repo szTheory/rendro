@@ -379,18 +379,11 @@ defmodule Guardrails.RequiredChecksContractTest do
       adapter_step = ci_step_block!(advisory_block, "Run Raster Snapshot Tests")
       preset_step = ci_step_block!(advisory_block, "Run Preset Raster Snapshot Tests")
 
-      staging_step =
-        ci_step_block!(advisory_block, "Stage Phase 126 preset raster blessing evidence")
-
-      upload_step =
-        ci_step_block!(advisory_block, "Upload Phase 126 preset raster blessing evidence")
-
       refute advisory_block =~ ~r/^    continue-on-error:/m
       assert adapter_step =~ "continue-on-error: true"
       assert adapter_step =~ "MIX_RASTER_BLESS: \"false\""
       refute preset_step =~ "continue-on-error"
-      refute staging_step =~ "continue-on-error"
-      refute upload_step =~ "continue-on-error"
+      refute advisory_block =~ "Phase 126 preset raster blessing"
 
       assert advisory_block =~
                "mix test --include raster_snapshot test/rendro/adapters/pdfium_raster_snapshot_test.exs"
