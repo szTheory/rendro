@@ -270,6 +270,7 @@ jobs:
         run: |
           [[ "${GITHUB_REF_NAME}" =~ ^gsd/phase-127-catalog-bless-[0-9a-f]{12}$ ]]
           mix rendro.catalog.gen
+          mix rendro.catalog.candidate
           mix test --include raster_snapshot test/rendro/catalog_raster_review_test.exs
 
       - name: Stage Phase 127 catalog blessing evidence
@@ -280,15 +281,17 @@ jobs:
         run: |
           [[ "${GITHUB_REF_NAME}" =~ ^gsd/phase-127-catalog-bless-[0-9a-f]{12}$ ]]
           test "$(find assets/rendro/catalog -type f -name '*.png' | wc -l | tr -d ' ')" = "32"
-          test "$(find "$REVIEW_DIR" -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = "16"
-          test -f "$REVIEW_DIR/invoice_line_items_60_plus_page_first.png"
-          test -f "$REVIEW_DIR/invoice_line_items_60_plus_page_final.png"
-          test -f "$REVIEW_DIR/statement_line_items_60_plus_page_first.png"
-          test -f "$REVIEW_DIR/statement_line_items_60_plus_page_final.png"
+          test "$(find "$REVIEW_DIR/final/pngs" -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = "12"
+          test "$(find "$REVIEW_DIR/multipage" -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = "4"
+          test -f "$REVIEW_DIR/final/identity-manifest.json"
+          test -f "$REVIEW_DIR/multipage/invoice_line_items_60_plus_page_first.png"
+          test -f "$REVIEW_DIR/multipage/invoice_line_items_60_plus_page_final.png"
+          test -f "$REVIEW_DIR/multipage/statement_line_items_60_plus_page_first.png"
+          test -f "$REVIEW_DIR/multipage/statement_line_items_60_plus_page_final.png"
           mkdir -p "$ARTIFACT_DIR/assets/rendro" "$ARTIFACT_DIR/review"
           cp assets/rendro/catalog.json "$ARTIFACT_DIR/assets/rendro/catalog.json"
           cp -R assets/rendro/catalog "$ARTIFACT_DIR/assets/rendro/catalog"
-          find "$REVIEW_DIR" -maxdepth 1 -type f -name '*.png' -print0 | sort -z | xargs -0 -I{} cp "{}" "$ARTIFACT_DIR/review/"
+          find "$REVIEW_DIR/final/pngs" "$REVIEW_DIR/multipage" -maxdepth 1 -type f -name '*.png' -print0 | sort -z | xargs -0 -I{} cp "{}" "$ARTIFACT_DIR/review/"
           {
             echo "GITHUB_SHA=${GITHUB_SHA}"
             echo "GITHUB_RUN_ID=${GITHUB_RUN_ID}"
@@ -353,7 +356,7 @@ jobs:
         run: |
           [[ "${GITHUB_REF_NAME}" =~ ^gsd/phase-130-catalog-review-([0-9a-f]{40})$ ]]
           [[ "${BASH_REMATCH[1]}" == "${GITHUB_SHA}" ]]
-          test "$(find tmp/phase130-review/final -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = "12"
+          test "$(find tmp/phase130-review/final/pngs -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = "12"
           test -f tmp/phase130-review/final/identity-manifest.json
           mkdir -p "${ARTIFACT_DIR}"
           cp -R tmp/phase130-review/final/. "${ARTIFACT_DIR}/"
