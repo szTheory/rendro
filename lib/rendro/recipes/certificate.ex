@@ -511,21 +511,12 @@ defmodule Rendro.Recipes.Certificate do
   # still wins over the frame default downstream (precedence: border color >
   # :palette > :theme rule > literal {34,34,34}).
   defp palette(opts) do
-    base =
-      case opts[:theme] do
-        nil ->
-          %{
-            ink: {0, 0, 0},
-            muted: {0, 0, 0},
-            background: {255, 255, 255},
-            rule: {34, 34, 34}
-          }
-
-        theme ->
-          Rendro.Theme.resolve(theme).colors
-      end
-
-    Map.merge(base, Keyword.get(opts, :palette, %{}))
+    Rendro.Recipes.Palette.resolve(opts, %{
+      ink: {0, 0, 0},
+      muted: {0, 0, 0},
+      background: {255, 255, 255},
+      rule: {34, 34, 34}
+    })
   end
 
   # ---------------------------------------------------------------------------
