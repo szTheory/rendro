@@ -13,7 +13,7 @@ defmodule Mix.Tasks.Quality.UatTest do
           requirement: #{requirement}
           verification:
             - kind: integration
-              ref: mix test test/example_test.exs
+              ref: mix test test/mix/tasks/quality_uat_test.exs
               status: pass
           human_judgment: false
       """)
@@ -86,6 +86,20 @@ defmodule Mix.Tasks.Quality.UatTest do
 
     assert {:error, message} = Uat.parse_summary("134-01-SUMMARY.md", duplicate)
     assert message =~ "duplicate coverage id"
+  end
+
+  test "rejects prose, missing targets, shell syntax, and traversal in automated refs" do
+    for ref <- [
+          "mix test imaginary and focused prose",
+          "mix test test/missing_test.exs",
+          "mix test test/mix/tasks/quality_uat_test.exs; rm x",
+          "mix test test/../mix/tasks/quality_uat_test.exs"
+        ] do
+      document =
+        String.replace(summary("D1"), "mix test test/mix/tasks/quality_uat_test.exs", ref)
+
+      assert {:error, _} = Uat.parse_summary("fixture.md", document)
+    end
   end
 
   test "installed GSD classifier accepts every Phase 134 summary as automated coverage" do

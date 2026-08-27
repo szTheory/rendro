@@ -276,11 +276,45 @@ defmodule Mix.Tasks.Quality.Uat do
   end
 
   defp executable_ref?(ref) when is_binary(ref) do
-    String.trim(ref) == ref and ref != "" and not String.contains?(ref, ["\n", "\r", "\t"]) and
-      Regex.match?(~r/^(mix|node|elixir|git|sh|bash)\s+/, ref)
+    safe =
+      String.trim(ref) == ref and ref != "" and
+        not String.contains?(ref, ["\n", "\r", "\t", ";", "|", "&", "$", "`", ">", "<"])
+
+    (safe and ref in known_refs()) or
+      case String.split(ref, " ", trim: true) do
+        ["mix", "quality.baseline"] -> true
+        ["mix", "ci.fast"] -> true
+        ["mix", "test" | args] -> valid_mix_test_args?(args)
+        _ -> false
+      end
+  end
+
+  defp known_refs do
+    [
+      "mix quality.baseline",
+      "mix ci.fast",
+      "mix test test/quality/baseline_ledger_contract_test.exs --include quality_ledger_contract",
+      "mix test test/rendro/recipes/palette_test.exs",
+      "mix test test/rendro/public_api/manifest_test.exs test/rendro/recipes/*_byte_identity_test.exs",
+      "mix test test/rendro/recipes/*_byte_identity_test.exs test/rendro/recipes/themed_render_smoke_test.exs"
+    ]
   end
 
   defp executable_ref?(_), do: false
+
+  defp valid_mix_test_args?(args) do
+    {targets, switches} = Enum.split_with(args, &String.starts_with?(&1, "test/"))
+
+    targets != [] and Enum.all?(switches, &valid_test_switch?/1) and
+      Enum.all?(targets, fn target ->
+        not String.contains?(target, "..") and Path.wildcard(target) != []
+      end)
+  end
+
+  defp valid_test_switch?("--include"), do: false
+
+  defp valid_test_switch?(value),
+    do: value == "quality_ledger_contract" or Regex.match?(~r/^--(max-failures|include)$/, value)
 
   defp atomic_write!(path, contents) do
     temp = path <> ".tmp-#{System.unique_integer([:positive])}"

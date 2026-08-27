@@ -76,6 +76,21 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
     Regex.scan(~r/#{prefix}-[A-Z]+-\d{3}/, value || "") |> List.flatten()
   end
 
+  defp valid_ledger?(ledger) do
+    records = record_blocks(ledger, "QL")
+    ids = Enum.map(records, &hd/1)
+    signals = classified_signal_ids(ledger)
+
+    Enum.uniq(ids) == ids and Enum.uniq(signals) == signals and
+      Enum.all?(records, fn [_id, block] ->
+        case {field(block, "Disposition"), field(block, "Status")} do
+          {"repair", status} -> status in ["accepted", "in_progress", "verified", "closed"]
+          {"reject_signal", "rejected"} -> true
+          _ -> false
+        end
+      end)
+  end
+
   test "one quality finding resolves through the ledger, snapshot, and schema" do
     assert File.exists?(@ledger_path)
     assert File.exists?(@schema_path)
@@ -199,25 +214,20 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
 
   test "lifecycle transitions and durable identities reject invalid mutations" do
     ledger = File.read!(@ledger_path)
-    lifecycle = ["observed", "triaged", "accepted", "in_progress", "verified", "closed"]
+    assert valid_ledger?(ledger)
 
-    assert ledger =~ Enum.join(lifecycle, " -> ")
+    refute valid_ledger?(
+             ledger <>
+               "\n#### QL-001 duplicate\n- **Disposition:** repair\n- **Status:** closed\n"
+           )
 
-    assert Enum.uniq(Regex.scan(~r/^#### QL-\d{3}/m, ledger)) ==
-             Regex.scan(~r/^#### QL-\d{3}/m, ledger)
+    refute valid_ledger?(ledger <> "\n- **Signal:** `SIG-ARCH-001`\n")
 
-    assert Enum.uniq(Regex.scan(~r/\*\*Signal:\*\* `SIG-[A-Z]+-\d{3}`/, ledger)) ==
-             Regex.scan(~r/\*\*Signal:\*\* `SIG-[A-Z]+-\d{3}`/, ledger)
-
-    invalid_transition =
-      String.replace(
-        ledger,
-        "observed -> triaged -> accepted -> in_progress -> verified -> closed",
-        "observed -> closed",
-        global: false
-      )
-
-    refute invalid_transition =~ Enum.join(lifecycle, " -> ")
+    refute valid_ledger?(
+             String.replace(ledger, "- **Status:** rejected", "- **Status:** closed",
+               global: false
+             )
+           )
   end
 
   test "ledger exposes durable lifecycle, rubric, and closure governance" do

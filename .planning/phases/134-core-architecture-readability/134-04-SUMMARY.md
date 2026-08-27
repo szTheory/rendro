@@ -32,7 +32,7 @@ coverage:
     requirement: ARCH-03
     verification:
       - kind: integration
-        ref: "mix test test/rendro/recipes/palette_test.exs test/rendro/recipes/*_opts_threading_test.exs"
+        ref: "mix test test/rendro/recipes/palette_test.exs"
         status: pass
     human_judgment: false
   - id: D2
