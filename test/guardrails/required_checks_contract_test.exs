@@ -6,6 +6,7 @@ defmodule Guardrails.RequiredChecksContractTest do
   @hexdocs_path ".github/workflows/hexdocs.yml"
   @release_path ".github/workflows/release.yml"
   @verify_docs_path "scripts/verify_docs.exs"
+  @catalog_evidence_path ".github/workflows/catalog-evidence.yml"
 
   @required_contexts ~w(ci-success)
 
@@ -87,6 +88,112 @@ defmodule Guardrails.RequiredChecksContractTest do
       for context <- @required_contexts do
         assert ci =~ "  #{context}:"
       end
+    end
+  end
+
+  describe "Catalog Evidence workflow boundary" do
+    test "is a manual, read-only, exact-SHA-bound control plane with one expiring bundle" do
+      workflow = load_workflow!(@catalog_evidence_path)
+      source = File.read!(@catalog_evidence_path)
+      dispatch = workflow["on"]["workflow_dispatch"]
+      inputs = dispatch["inputs"]
+      job = workflow["jobs"]["catalog-evidence"]
+      steps = job["steps"]
+
+      assert workflow["name"] == "Catalog Evidence"
+      assert Map.keys(workflow["on"]) == ["workflow_dispatch"]
+      assert workflow["permissions"] == %{"contents" => "read"}
+      assert job["timeout-minutes"] == 45
+
+      assert inputs["candidate_sha"] == %{
+               "description" => "Full lowercase commit SHA to evaluate",
+               "required" => true,
+               "type" => "string"
+             }
+
+      assert inputs["operation"] == %{
+               "description" => "Evidence operation to run",
+               "options" => ["review", "canonical"],
+               "required" => true,
+               "type" => "choice"
+             }
+
+      assert job["env"]["CANDIDATE_SHA"] == "${{ inputs.candidate_sha }}"
+      assert job["env"]["OPERATION"] == "${{ inputs.operation }}"
+      assert job["env"]["CONTROL_SHA"] == "${{ github.sha }}"
+      assert source =~ "[[ \"${CANDIDATE_SHA}\" =~ ^[0-9a-f]{40}$ ]]"
+      assert source =~ "[[ \"${OPERATION}\" == \"review\" || \"${OPERATION}\" == \"canonical\" ]]"
+
+      assert source =~
+               "[[ \"$(git -C \"${CANDIDATE_DIR}\" rev-parse HEAD)\" == \"${CANDIDATE_SHA}\" ]]"
+
+      checkout_steps =
+        Enum.filter(steps, &String.contains?(&1["uses"] || "", "actions/checkout@"))
+
+      assert length(checkout_steps) == 2
+
+      assert Enum.all?(checkout_steps, fn step ->
+               step["uses"] == "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" and
+                 step["with"]["persist-credentials"] == false
+             end)
+
+      assert Enum.map(checkout_steps, & &1["with"]["path"]) == ["control", "candidate"]
+      assert hd(checkout_steps)["with"]["ref"] == "${{ env.CONTROL_SHA }}"
+      assert List.last(checkout_steps)["with"]["ref"] == "${{ env.CANDIDATE_SHA }}"
+
+      assert Enum.any?(
+               steps,
+               &(&1["uses"] == "erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7")
+             )
+
+      upload_steps =
+        Enum.filter(steps, &String.contains?(&1["uses"] || "", "actions/upload-artifact@"))
+
+      assert [upload] = upload_steps
+      assert upload["uses"] == "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02"
+
+      assert upload["with"]["name"] ==
+               "rendro-catalog-evidence--${{ inputs.operation }}--${{ inputs.candidate_sha }}--run-${{ github.run_id }}--attempt-${{ github.run_attempt }}"
+
+      assert upload["with"]["retention-days"] == 30
+      assert upload["with"]["if-no-files-found"] == "error"
+
+      assert source =~ "Rendro.CatalogEvidenceBundle.build"
+      assert source =~ "Rendro.CatalogEvidenceBundle.validate"
+      assert source =~ "priv/pdfium_pin.json"
+      assert source =~ "artifact-url"
+      assert source =~ "artifact-digest"
+
+      for forbidden <- [
+            "actions/cache",
+            "secrets.",
+            "contents: write",
+            "id-token:",
+            "attestations:",
+            "workflow_run:"
+          ] do
+        refute source =~ forbidden
+      end
+    end
+
+    test "keeps ordinary CI topology and the sole ci-success authority unchanged" do
+      ci = load_workflow!(@ci_path)
+      catalog = load_workflow!(@catalog_evidence_path)
+      ci_success = ci["jobs"]["ci-success"]
+
+      assert Map.keys(ci["on"]) == ["push", "pull_request", "schedule"]
+
+      assert ci_success["needs"] == [
+               "test",
+               "configurator-browser",
+               "integration-proofs",
+               "quality-governance"
+             ]
+
+      refute Map.has_key?(ci["jobs"], "catalog-evidence")
+      refute Map.has_key?(catalog["jobs"]["catalog-evidence"], "needs")
+      refute "catalog-evidence" in ci_success["needs"]
+      assert load_baseline!()["required_contexts"] == @required_contexts
     end
   end
 
