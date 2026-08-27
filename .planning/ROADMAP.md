@@ -109,13 +109,14 @@ Plans:
   3. Public and boundary specifications, module documentation, and explanatory comments match current behavior and explain only non-obvious intent or constraints.
   4. The public API manifest and rendered bytes outside explicitly approved catalog targets remain identical after the cleanup.
 
-**Plans**: 3 plans
+**Plans**: 4 plans
 
 Plans:
 
 - [ ] 134-01-PLAN.md — Trace every candidate into a durable disposition and establish palette Wave 0 characterization.
 - [ ] 134-02-PLAN.md — Conditionally remove the obsolete Analyzer pair with public-contract proof.
-- [ ] 134-03-PLAN.md — Conditionally extract palette resolution and close truthfulness, compatibility, and ledger evidence.
+- [ ] 134-03-PLAN.md — Conditionally extract palette resolution and migrate all seven recipes under focused byte-identity proof.
+- [ ] 134-04-PLAN.md — Audit truthfulness separately, then run terminal deterministic gates and close every Phase 134 ledger lifecycle.
 
 ### Phase 135: Test & CI/CD Simplification
 
@@ -168,7 +169,7 @@ Plans:
 |-------|--------------|----------------|--------|-----------|
 | 132. Quality Baseline & Triage | 4 | 4/4 | Complete    | 2026-08-26 |
 | 133. Repository & Evidence Hygiene | 4 | 13/13 | Complete    | 2026-08-26 |
-| 134. Core Architecture & Readability | 4 | 0/TBD | Not started | — |
+| 134. Core Architecture & Readability | 4 | 0/4 | Not started | — |
 | 135. Test & CI/CD Simplification | 7 | 0/TBD | Not started | — |
 | 136. Catalog Visual Quality | 4 | 0/TBD | Not started | — |
 | 137. Closure & Handoff | 3 | 0/TBD | Not started | — |
