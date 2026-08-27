@@ -10,7 +10,7 @@ defmodule Rendro.CatalogEvidenceParityTest do
     record = record()
 
     assert {:ok, results} = CatalogEvidenceParity.verify_record(record)
-    assert Map.keys(results) == @routes
+    assert Enum.sort(Map.keys(results)) == Enum.sort(@routes)
     assert Enum.all?(results, fn {_route, result} -> result["status"] == "matched" end)
   end
 
@@ -65,8 +65,7 @@ defmodule Rendro.CatalogEvidenceParityTest do
 
       assert {:error, _} = CatalogEvidenceParity.verify_record(duplicate, route)
 
-      assert {:ok, %{"status" => "mismatch"}} =
-               CatalogEvidenceParity.verify_record(changed, route)
+      assert {:error, [:fabricated_status]} = CatalogEvidenceParity.verify_record(changed, route)
     end
   end
 

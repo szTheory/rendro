@@ -61,7 +61,14 @@ manifest facts carry status; color, icons, thumbnails, and screenshots do not.
 Next: download the one bundle, then validate its root manifest and checksums.
 Copy the **Artifact URL** from the completed GitHub Actions run's artifact entry
 when you need a durable operator reference; use its run ID with `gh run download`
-for the supported retrieval command below.
+for the supported retrieval command below. Record the **Archive digest** from the
+run artifacts API beside that URL so later evidence checks can verify the exact
+downloaded archive rather than trusting its name:
+
+```bash
+gh api "repos/OWNER/REPO/actions/runs/RUN_ID/artifacts" \
+  --jq '.artifacts[] | {id, name, digest, archive_download_url}'
+```
 
 ```bash
 mkdir -p /tmp/rendro-catalog-evidence

@@ -34,7 +34,7 @@ defmodule Rendro.CatalogEvidenceParity do
   def verify_record(record, requested_route \\ nil)
 
   def verify_record(record, requested_route) when is_map(record) do
-    with :ok <- valid_record?(record),
+    with :ok <- validate_record(record),
          {:ok, routes} <- record_routes(record, requested_route) do
       routes
       |> Enum.map(fn {route, facts} ->
@@ -128,7 +128,9 @@ defmodule Rendro.CatalogEvidenceParity do
       {:ok,
        %{
          "canonical32" =>
-           Enum.map(lines, fn [_, sha, file] -> %{"id" => id(file), "sha256" => sha} end)
+           Enum.map(lines, fn [_, sha, file] ->
+             %{"id" => canonical_id(file), "sha256" => sha}
+           end)
        }}
     else
       false -> {:error, [:invalid_legacy_manifest]}
@@ -227,6 +229,10 @@ defmodule Rendro.CatalogEvidenceParity do
       valid_transport?(record["transport"]) and is_map(record["routes"])
   end
 
+  defp validate_record(record) do
+    if valid_record?(record), do: :ok, else: {:error, [:invalid_sealed_record]}
+  end
+
   defp valid_side?(%{"transport" => transport, "roles" => roles}) when is_map(roles) do
     if valid_transport?(transport), do: :ok, else: {:error, :invalid_transport}
   end
@@ -323,6 +329,18 @@ defmodule Rendro.CatalogEvidenceParity do
       |> Path.rootname()
       |> String.replace("_page_1", "")
       |> String.replace("_", "-")
+
+  # Canonical manifests retain recipe/scenario/preset-theme as path segments.
+  # Those segments are semantic identity: collapsing to a basename merges
+  # otherwise distinct records such as invoice/default/default-light.
+  defp canonical_id(path),
+    do:
+      path
+      |> Path.rootname()
+      |> String.split("/")
+      |> then(fn [recipe, scenario, preset_theme] ->
+        Enum.join([recipe, scenario, String.replace(preset_theme, ~r/-([^-]+)$/, "--\\1")], "--")
+      end)
 
   defp role("candidate/catalog.json"), do: "candidate32"
   defp role("final-review/final.json"), do: "final12"
