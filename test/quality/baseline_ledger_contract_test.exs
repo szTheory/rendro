@@ -332,8 +332,21 @@ defmodule Rendro.Quality.BaselineLedgerContractTest do
           assert ids_in(block, "SIG") == signal_ids
 
         :error ->
-          assert field(block, "Disposition") in ["repair", "defer", "reject_signal", "accept_risk", "superseded"]
-          assert field(block, "Decision basis") in ["supported_contract_risk", "bounded_maintenance_cost", "diagnostic_signal_only", "explicit_unavailability"]
+          assert field(block, "Disposition") in [
+                   "repair",
+                   "defer",
+                   "reject_signal",
+                   "accept_risk",
+                   "superseded"
+                 ]
+
+          assert field(block, "Decision basis") in [
+                   "supported_contract_risk",
+                   "bounded_maintenance_cost",
+                   "diagnostic_signal_only",
+                   "explicit_unavailability"
+                 ]
+
           assert ids_in(field(block, "Evidence"), "EV") != []
       end
     end
