@@ -2,6 +2,7 @@ defmodule Rendro.DocsContract.Phase135TestInventoryContractTest do
   use ExUnit.Case, async: true
 
   @path ".planning/phases/135-test-ci-cd-simplification/135-test-inventory.md"
+  @record_path ".planning/phases/135-test-ci-cd-simplification/135-parity-comparator-record.json"
   @recipe_ids ["payslip_cr01_duplicate", "certificate_construction_name"]
   @route_ids ~w(phase126_preset_review phase127_catalog_review phase130_review phase130_canonical)
   @recipe_columns ~w(row_id old_test retained_replacement_owner preserved_behavior preserved_failure_mode authority_lane oracle negative_control focused_command result)
@@ -30,6 +31,13 @@ defmodule Rendro.DocsContract.Phase135TestInventoryContractTest do
            )
 
     assert parity_rows |> Enum.map(&Enum.at(&1, 1)) |> Enum.uniq() |> length() == 1
+
+    record = @record_path |> File.read!() |> Jason.decode!()
+    assert record["schema_version"] == 2
+    assert record["sealed"] == true
+
+    assert Map.new(parity_rows, fn row -> {hd(row), List.last(row)} end) ==
+             Map.new(record["routes"], fn {route, facts} -> {route, facts["status"]} end)
   end
 
   defp table_columns(markdown, heading),

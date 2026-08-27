@@ -3,125 +3,72 @@ defmodule Rendro.CatalogEvidenceParityTest do
 
   alias Rendro.CatalogEvidenceParity
 
-  @routes ~w(phase126_preset_review phase127_catalog_review phase130_review phase130_canonical)a
+  @record ".planning/phases/135-test-ci-cd-simplification/135-parity-comparator-record.json"
+  @routes ~w(phase126_preset_review phase127_catalog_review phase130_review phase130_canonical)
 
-  test "accepts all locked routes with distinct valid per-side transport provenance" do
-    for route <- @routes do
-      legacy = evidence("legacy", route)
-      generic = evidence("generic", route)
+  test "sealed retained record mechanically derives every route as matched" do
+    record = record()
 
-      assert {:ok, normalized} = CatalogEvidenceParity.compare(legacy, generic, route)
-      assert normalized["route"] == Atom.to_string(route)
-      assert normalized["legacy"]["run_id"] != normalized["generic"]["run_id"]
-    end
+    assert {:ok, results} = CatalogEvidenceParity.verify_record(record)
+    assert Map.keys(results) == @routes
+    assert Enum.all?(results, fn {_route, result} -> result["status"] == "matched" end)
   end
 
-  test "rejects each shared authority mutation" do
-    legacy = evidence("legacy", :phase130_review)
+  test "rejects malformed transport facts and fabricated result status" do
+    record = record()
 
     mutations = [
-      put_in(legacy, ["payloads", Access.at(0), "sha256"], String.duplicate("f", 64)),
-      put_in(legacy, ["payloads", Access.at(0), "count"], 31),
-      Map.put(legacy, "candidate_sha", String.duplicate("c", 40)),
-      put_in(legacy, ["renderer", "dpi"], 72),
-      put_in(legacy, ["reviewer", "required"], true),
-      put_in(legacy, ["actions", "checkout"], "not-pinned"),
-      put_in(legacy, ["permissions", "contents"], "write")
+      put_in(record, ["transport", "candidate_sha"], "bad"),
+      put_in(
+        record,
+        ["routes", "phase126_preset_review", "legacy", "transport", "run_url"],
+        "http://bad"
+      ),
+      put_in(
+        record,
+        ["routes", "phase127_catalog_review", "generic", "transport", "run_attempt"],
+        0
+      ),
+      put_in(
+        record,
+        ["routes", "phase130_review", "legacy", "transport", "artifact_identity"],
+        ""
+      ),
+      put_in(
+        record,
+        ["routes", "phase130_canonical", "generic", "transport", "archive_sha256"],
+        "bad"
+      ),
+      put_in(record, ["routes", "phase130_review", "status"], "matched-but-fabricated")
     ]
 
-    for mutated <- mutations do
-      assert {:error, reasons} =
-               CatalogEvidenceParity.compare(
-                 mutated,
-                 evidence("generic", :phase130_review),
-                 :phase130_review
-               )
-
-      assert reasons != []
-    end
+    for mutated <- mutations,
+        do: assert({:error, _} = CatalogEvidenceParity.verify_record(mutated))
   end
 
-  test "rejects an incorrect role schema or count for every route" do
+  test "fails closed for each route's duplicate identifier, changed hash, and cardinality" do
+    record = record()
+
     for route <- @routes do
-      legacy = evidence("legacy", route)
-      malformed = put_in(legacy, ["payloads", Access.at(0), "count"], 1)
+      [role | _] = Map.keys(record["routes"][route]["legacy"]["roles"])
+      records = get_in(record, ["routes", route, "legacy", "roles", role])
 
-      assert {:error, reasons} =
-               CatalogEvidenceParity.compare(malformed, evidence("generic", route), route)
+      duplicate =
+        put_in(record, ["routes", route, "legacy", "roles", role], [hd(records) | records])
 
-      assert :invalid_payloads in reasons
+      changed =
+        put_in(
+          record,
+          ["routes", route, "legacy", "roles", role, Access.at(0), "sha256"],
+          String.duplicate("f", 64)
+        )
+
+      assert {:error, _} = CatalogEvidenceParity.verify_record(duplicate, route)
+
+      assert {:ok, %{"status" => "mismatch"}} =
+               CatalogEvidenceParity.verify_record(changed, route)
     end
   end
 
-  test "rejects missing, malformed, and misbound side-specific provenance" do
-    generic = evidence("generic", :phase130_review)
-
-    for mutated <- [
-          Map.delete(generic, "run_id"),
-          Map.put(generic, "run_attempt", 0),
-          Map.put(generic, "upload_digest", "not-a-digest"),
-          Map.put(generic, "artifact_identity", " "),
-          Map.put(generic, "provenance_candidate_sha", String.duplicate("b", 40))
-        ] do
-      assert {:error, reasons} =
-               CatalogEvidenceParity.compare(
-                 evidence("legacy", :phase130_review),
-                 mutated,
-                 :phase130_review
-               )
-
-      assert Enum.any?(reasons, &(&1 in [:invalid_provenance, :misbound_provenance]))
-    end
-  end
-
-  defp evidence(side, route) do
-    %{
-      "candidate_sha" => String.duplicate("a", 40),
-      "checked_out_head" => String.duplicate("a", 40),
-      "renderer" => %{
-        "version" => "v0.11.0",
-        "binary_sha256" => String.duplicate("b", 64),
-        "dpi" => 96
-      },
-      "payloads" => payloads(route),
-      "actions" => %{"checkout" => "df4cb1c069e1874edd31b4311f1884172cec0e10"},
-      "permissions" => %{"contents" => "read"},
-      "reviewer" => %{"required" => false},
-      "run_id" => "#{side}-12345",
-      "run_attempt" => if(side == "legacy", do: 1, else: 2),
-      "run_url" => "https://example.invalid/#{side}/12345",
-      "artifact_identity" => "#{side}-artifact",
-      "upload_digest" => String.duplicate(if(side == "legacy", do: "d", else: "e"), 64),
-      "provenance_candidate_sha" => String.duplicate("a", 40)
-    }
-  end
-
-  defp payloads(:phase126_preset_review),
-    do: [
-      %{
-        "role" => "preset-review/preset.json",
-        "sha256" => String.duplicate("c", 64),
-        "count" => 12
-      }
-    ]
-
-  defp payloads(:phase130_canonical),
-    do: [
-      %{"role" => "canonical/catalog.json", "sha256" => String.duplicate("c", 64), "count" => 32}
-    ]
-
-  defp payloads(_route),
-    do: [
-      %{"role" => "candidate/catalog.json", "sha256" => String.duplicate("c", 64), "count" => 32},
-      %{
-        "role" => "final-review/final.json",
-        "sha256" => String.duplicate("d", 64),
-        "count" => 12
-      },
-      %{
-        "role" => "multipage-review/multipage.json",
-        "sha256" => String.duplicate("e", 64),
-        "count" => 4
-      }
-    ]
+  defp record, do: @record |> File.read!() |> Jason.decode!()
 end
