@@ -90,3 +90,11 @@ Also correct the identity check at lines 92-93: candidate SHA and checked-out HE
 _Reviewed: 2026-08-27T20:40:37Z_
 _Reviewer: the agent (gsd-code-reviewer)_
 _Depth: standard_
+
+## Fix Resolution (Iteration 1)
+
+- CR-01: fixed in `6843e03`
+- CR-02: fixed in `a39ff7e`
+- CR-03: fixed in `2d67ab7`
+- CR-04: unresolved, fail-closed pending retained artifact payloads or a rerun
+- WR-01: fixed in `e473936`
