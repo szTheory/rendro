@@ -47,7 +47,7 @@ coverage:
         status: pass
     human_judgment: false
   - id: D2
-    description: "The evidence tracer baseline is read-only repeatable and rejects duplicate identity or invalid lifecycle mutations."
+    description: "The evidence tracer baseline is read-only repeatable and rejects duplicate identities or contradictory disposition/status states."
     requirement: ARCH-02
     verification:
       - kind: integration
