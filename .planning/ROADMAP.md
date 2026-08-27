@@ -109,7 +109,7 @@ Plans:
   3. Public and boundary specifications, module documentation, and explanatory comments match current behavior and explain only non-obvious intent or constraints.
   4. The public API manifest and rendered bytes outside explicitly approved catalog targets remain identical after the cleanup.
 
-**Plans**: 3/5 plans executed
+**Plans**: 4/5 plans executed
 
 Plans:
 
@@ -127,7 +127,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 134-04-PLAN.md — Conditionally migrate all seven recipes to the proven palette owner under focused byte-identity proof.
+- [x] 134-04-PLAN.md — Conditionally migrate all seven recipes to the proven palette owner under focused byte-identity proof.
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
@@ -184,7 +184,7 @@ Plans:
 |-------|--------------|----------------|--------|-----------|
 | 132. Quality Baseline & Triage | 4 | 4/4 | Complete    | 2026-08-26 |
 | 133. Repository & Evidence Hygiene | 4 | 13/13 | Complete    | 2026-08-26 |
-| 134. Core Architecture & Readability | 4 | 3/5 | In Progress|  |
+| 134. Core Architecture & Readability | 4 | 4/5 | In Progress|  |
 | 135. Test & CI/CD Simplification | 7 | 0/TBD | Not started | — |
 | 136. Catalog Visual Quality | 4 | 0/TBD | Not started | — |
 | 137. Closure & Handoff | 3 | 0/TBD | Not started | — |
