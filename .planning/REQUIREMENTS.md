@@ -85,7 +85,7 @@
 | TEST-01 | Phase 135 | Pending |
 | TEST-02 | Phase 135 | Pending |
 | CI-01 | Phase 135 | Complete |
-| CI-02 | Phase 135 | Pending |
+| CI-02 | Phase 135 | Complete |
 | CI-03 | Phase 135 | Complete |
 | CI-04 | Phase 135 | Complete |
 | CI-05 | Phase 135 | Complete |
