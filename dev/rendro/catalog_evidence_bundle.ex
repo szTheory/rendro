@@ -12,6 +12,13 @@ defmodule Rendro.CatalogEvidenceBundle do
     ],
     canonical: ["canonical/catalog.json"]
   }
+  @role_counts %{
+    "candidate/catalog.json" => 32,
+    "final-review/final.json" => 12,
+    "multipage-review/multipage.json" => 4,
+    "preset-review/preset.json" => 12,
+    "canonical/catalog.json" => 32
+  }
 
   @spec build(atom() | String.t(), [map()], map(), Path.t()) :: :ok | {:error, [atom()]}
   def build(operation, payload_sources, provenance, output_root)
@@ -60,6 +67,7 @@ defmodule Rendro.CatalogEvidenceBundle do
       )
       |> invalid_unless(safe_output_root?(output_root), :unsafe_output_root)
       |> invalid_unless(valid_sources?(sources, operation), :invalid_payload_roles)
+      |> invalid_unless(valid_source_record_counts?(sources), :invalid_payload_counts)
       |> invalid_unless(
         operation != :review or not Map.has_key?(provenance, :reviewer_approval),
         :candidate_reviewer_approval_forbidden
@@ -170,6 +178,7 @@ defmodule Rendro.CatalogEvidenceBundle do
         :unexpected_bundle_files
       )
       |> Kernel.++(payload_file_errors(output_root, payloads))
+      |> Kernel.++(payload_record_count_errors(output_root, payloads))
 
     if reasons == [], do: :ok, else: {:error, Enum.uniq(reasons)}
   end
@@ -208,6 +217,13 @@ defmodule Rendro.CatalogEvidenceBundle do
       end)
   end
 
+  defp valid_source_record_counts?(sources) do
+    Enum.all?(sources, fn source ->
+      source.count == Map.get(@role_counts, source.role) and
+        record_count(source.role, source.source) == {:ok, source.count}
+    end)
+  end
+
   defp valid_source?(%{role: role, source: source, media_type: media_type, count: count}) do
     is_binary(role) and is_binary(source) and is_binary(media_type) and is_integer(count) and
       count > 0 and
@@ -216,16 +232,15 @@ defmodule Rendro.CatalogEvidenceBundle do
 
   defp valid_source?(_source), do: false
 
-  defp valid_payloads?(payloads, expected_roles, operation) when is_list(payloads) do
+  defp valid_payloads?(payloads, expected_roles, _operation) when is_list(payloads) do
     Enum.map(payloads, &Map.get(&1, "role")) == expected_roles and
       Enum.all?(payloads, fn payload ->
         payload["path"] == payload["role"] and
           Path.safe_relative(payload["path"] || "") != :error and
-          valid_sha256?(payload["sha256"]) and is_integer(payload["count"]) and
-          payload["count"] > 0 and
+          valid_sha256?(payload["sha256"]) and
+          payload["count"] == Map.get(@role_counts, payload["role"]) and
           is_binary(payload["media_type"])
-      end) and
-      (operation != :canonical or get_in(payloads, [Access.at(0), "count"]) == 32)
+      end)
   end
 
   defp valid_payloads?(_payloads, _expected_roles, _operation), do: false
@@ -253,6 +268,46 @@ defmodule Rendro.CatalogEvidenceBundle do
       end
     end)
   end
+
+  defp payload_record_count_errors(output_root, payloads) do
+    Enum.flat_map(payloads, fn payload ->
+      count = payload["count"]
+
+      case record_count(payload["role"], Path.join(output_root, payload["path"])) do
+        {:ok, ^count} -> []
+        _ -> [:payload_count_mismatch]
+      end
+    end)
+  end
+
+  # Counts come from the closed record collection in each payload, not metadata.
+  defp record_count("multipage-review/multipage.json", path) do
+    with {:ok, contents} <- File.read(path) do
+      records = String.split(contents, "\n", trim: true)
+
+      if Enum.all?(records, &Regex.match?(~r/\A[0-9a-f]{64}  .+\z/, &1)),
+        do: {:ok, length(records)},
+        else: :error
+    end
+  end
+
+  defp record_count(role, path)
+       when role in [
+              "candidate/catalog.json",
+              "final-review/final.json",
+              "preset-review/preset.json",
+              "canonical/catalog.json"
+            ] do
+    with {:ok, contents} <- File.read(path),
+         {:ok, decoded} <- Jason.decode(contents),
+         records when is_list(records) <- Map.get(decoded, "images", decoded) do
+      {:ok, length(records)}
+    else
+      _ -> :error
+    end
+  end
+
+  defp record_count(_role, _path), do: :error
 
   defp payloads(sources, output_root) do
     Enum.map(sources, fn source ->
