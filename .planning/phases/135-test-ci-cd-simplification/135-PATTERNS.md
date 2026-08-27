@@ -150,7 +150,7 @@ Use crypto SHA-256 plus lowercase hex from line 871. Do not retain old tmp/phase
 
 **Analog:** dev/rendro/catalog_review_reconciliation.ex
 
-Normalize evidence then compare ordered roles, payload hashes, candidate/HEAD, renderer pin, counts, candidate-only reviewer-field absence, action pins/permissions, and run/attempt. ZIP digest and incidental path are not payload parity authority.
+Normalize evidence, then compare only shared ordered roles, payload hashes/counts, candidate/HEAD, renderer pin, candidate-only reviewer-field absence, and required action pins/permissions. Validate and retain each side's run ID, attempt, run URL, artifact identity, and upload digest independently for presence, format, and binding; different valid legacy/generic provenance values are expected and must not fail parity. ZIP digest and incidental path are not semantic payload parity authority.
 
 **Layered validation** (lines 7-30):
 
@@ -384,4 +384,3 @@ State what happened, where evidence is, why authority is bounded, and the next c
 **Analog search scope:** .github/workflows, dev/rendro, dev/mix/tasks, test/rendro, test/guardrails, test/docs_contract, scripts, brand
 **Files scanned:** 17 primary analogs and supporting config surfaces
 **Pattern extraction date:** 2026-08-27
-

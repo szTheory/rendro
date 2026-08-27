@@ -37,6 +37,7 @@
 #### Parity Proof and Legacy-Route Retirement
 - **D-18:** Require one committed four-row route-by-route parity matrix before deleting any legacy route: Phase 126 preset raster blessing to generic `review`; Phase 127 catalog blessing to generic `review`; Phase 130 candidate/final/multipage review to generic `review`; and Phase 130 canonical generation to generic `canonical`.
 - **D-19:** For each row, run the legacy route and generic workflow remotely on the same full candidate SHA while both implementations still exist. Compare normalized evidence roles and per-file SHA-256 values, not archive ZIP digests or incidental filenames. Preserve candidate/HEAD identity, PDFium version and binary hash, bounded file counts, candidate-only reviewer-field absence, action pins, permission rules, run ID/attempt, and upload digest. A deliberate layout/name change is acceptable only when the normalized role set and every authority check remain equivalent.
+  - **Resolved comparator interpretation:** Equality applies to the shared candidate/HEAD SHA, renderer identity, semantic roles, per-file hashes/counts, required pins/permissions, and applicable reviewer fields. Legacy and generic run IDs, attempts, artifact identities, URLs, and upload digests are distinct per-side provenance: validate each for presence, format, and internal binding and record both, but do not require cross-side equality. [RESOLVED: checker clarification of D-19]
 - **D-20:** One matching old/new run per matrix row is the decisive parity gate. One optional repeat of each generic operation may corroborate reproducibility, but repeated new-workflow runs cannot substitute for legacy parity. Missing, extra, mismatched, unavailable, or unexplained evidence blocks retirement and remains recorded truthfully.
 - **D-21:** Separate proof by authority. Local deterministic tests validate input enums, full-SHA binding, permissions, action pins, no-cache/no-secret rules, manifest schema, path confinement, comparator negative controls, Mix generation/check behavior, documentation, and unchanged `ci-success` topology. Remote Ubuntu/PDFium runs alone prove pinned-renderer payload identity. Neither proves human visual quality; Phase 136 retains that authority.
 - **D-22:** Land the generic workflow and parity machinery before deletion. Keep old and new routes side by side until all four rows pass, then use one dedicated cutover commit to remove only the Phase 126/127/130 branch patterns, conditional generation/staging/upload steps, and legacy string assertions. Replace them with generic workflow, parity, and route-absence contracts while leaving `ci-success` and deterministic/proof/advisory membership intact. That deletion commit is the rollback unit if a post-cutover defect appears.
@@ -177,6 +178,7 @@ test/guardrails/
 └── required_checks_contract_test.exs     # CI topology and generic-workflow contracts
 test/docs_contract/
 └── catalog_evidence_runbook_test.exs     # current operator claims and commands
+└── phase_135_test_inventory_contract_test.exs # exact D-05/D-18 inventory schema/order/state contract
 .planning/phases/135-test-ci-cd-simplification/
 └── 135-test-inventory.md                 # compact, durable TEST-01/02 inventory + parity matrix
 ```
@@ -318,22 +320,21 @@ end
 
 | # | Claim | Section | Risk if Wrong |
 |---|---|---|---|
-| A1 | `CatalogEvidenceBundle`, `CatalogEvidenceParity`, and `.github/workflows/CATALOG-EVIDENCE.md` are the selected final names. | Open Questions | Naming churn only; behavior-first tests and the locked adjacent-runbook requirement remain valid. |
+| A1 | Final names are resolved as `Rendro.CatalogEvidenceBundle`, `Rendro.CatalogEvidenceParity`, `.github/workflows/CATALOG-EVIDENCE.md`, `Rendro.DocsContract.CatalogEvidenceRunbookTest`, and `Rendro.DocsContract.Phase135TestInventoryContractTest`. | Open Questions (RESOLVED) | Plans 135-01/02 already select these repository-owned names; execution must use them consistently. |
 | A2 | Thirty days is an appropriate research freshness interval for the repository architecture; action metadata should be rechecked at implementation. | Metadata | A changed third-party action contract could invalidate a pin/output assumption. |
 
 No unverified package or platform claim is required for planning.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Exact chosen helper and runbook names**
-   - What we know: names are delegated but must be repository-owned, dependency-free, and workflow-adjacent/discoverable. [VERIFIED: `135-CONTEXT.md`]
-   - What's unclear: final module/file naming.
-   - Recommendation: select names matching `CatalogEvidenceBundle`, `CatalogEvidenceParity`, and `.github/workflows/CATALOG-EVIDENCE.md`; test behavior rather than names. [ASSUMED]
+1. **Exact chosen helper, runbook, and test-contract names — resolved**
+   - Use `Rendro.CatalogEvidenceBundle` in `dev/rendro/catalog_evidence_bundle.ex`, `Rendro.CatalogEvidenceParity` in `dev/rendro/catalog_evidence_parity.ex`, `.github/workflows/CATALOG-EVIDENCE.md`, `Rendro.DocsContract.CatalogEvidenceRunbookTest` in `test/docs_contract/catalog_evidence_runbook_test.exs`, and `Rendro.DocsContract.Phase135TestInventoryContractTest` in `test/docs_contract/phase_135_test_inventory_contract_test.exs`. These are the exact names selected by Plans 135-01/02. [RESOLVED: plan contracts]
+   - `scripts/README.md` links its touched helper inventory to `.github/workflows/CATALOG-EVIDENCE.md` per D-23. [RESOLVED: checker-required discoverability contract]
 
-2. **Remote parity availability during execution**
+2. **Remote parity availability during execution — resolved execution-time gate**
    - What we know: local macOS has no `pdfium-cli`, while the current Ubuntu workflow installs the pinned binary. [VERIFIED: local environment probe; `.github/workflows/ci.yml`]
-   - What's unclear: whether all four paired historic routes can be dispatched/accessed when implementation reaches the parity step.
-   - Recommendation: retain unavailable rows as explicit blocked evidence and do not execute D-22 cutover until all four are matching. [VERIFIED: `135-CONTEXT.md`]
+   - At execution, Plan 135-03 must probe whether all four paired historic routes can be dispatched and their artifacts accessed. Any unavailable row is recorded truthfully and blocks only Plan 135-03's D-22 legacy-route cutover. It never blocks the additive local tooling, test cleanup, workflow, runbook, or docs-contract work in Plans 135-01/02. [RESOLVED: `135-CONTEXT.md`; D-20, D-22]
+   - Do not execute D-22 cutover until all four rows are matched; there is no local substitute for that remote gate. [VERIFIED: `135-CONTEXT.md`]
 
 ## Environment Availability
 
@@ -365,10 +366,10 @@ No unverified package or platform claim is required for planning.
 
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |---|---|---|---|---|
-| TEST-01 | Inventory records owner/oracle/failure/negative control; replacement fails on one broken fixture/field | contract + unit | `mix test test/rendro/recipes/themed_render_smoke_test.exs test/rendro/recipes/payslip_opts_threading_test.exs --max-failures 1` | ⚠️ inventory Wave 0 |
+| TEST-01 | Inventory records exactly two ordered owner/oracle/failure/negative-control rows with required D-05 columns/states; replacement fails on one broken fixture/field | contract + unit | `mix test test/docs_contract/phase_135_test_inventory_contract_test.exs test/rendro/recipes/themed_render_smoke_test.exs test/rendro/recipes/payslip_opts_threading_test.exs --max-failures 1` | ❌ Wave 0 |
 | TEST-02 | Only proven duplicate target assertion removed; retained smoke/opts/byte contracts stay green | focused regression | `mix test test/rendro/recipes/themed_render_smoke_test.exs test/rendro/recipes/payslip*_test.exs test/rendro/recipes/certificate*_test.exs --max-failures 1` | ✅ source owners; ⚠️ inventory test/report |
 | CI-01 | Closed inputs, full-SHA/HEAD binding, read-only pins/no secrets/caches, one valid bundle | static workflow + bundle integration | `mix test test/rendro/catalog_evidence_bundle_test.exs test/guardrails/required_checks_contract_test.exs --max-failures 1` | ❌ Wave 0 |
-| CI-02 | Four normalized legacy/generic pairs compare roles/hashes/authority facts; mismatch fails | comparator unit + remote evidence | `mix test test/rendro/catalog_evidence_parity_test.exs --max-failures 1`; remote paired dispatches | ❌ Wave 0 + remote matrix |
+| CI-02 | Four normalized pairs compare only shared semantic/authority facts; distinct valid per-side run/attempt/artifact/digest provenance passes while missing/malformed/misbound provenance fails | comparator + inventory contract + remote evidence | `mix test test/rendro/catalog_evidence_parity_test.exs test/docs_contract/phase_135_test_inventory_contract_test.exs --max-failures 1`; remote paired dispatches | ❌ Wave 0 + remote matrix |
 | CI-03 | `ci-success` dependencies and lane separation unchanged | guardrail | `mix test test/guardrails/required_checks_contract_test.exs --max-failures 1` | ✅ extend |
 | CI-04 | No cache/secrets/writes/privilege bridge; full SHA pins, safe paths | security workflow + bundle contracts | `mix test test/rendro/catalog_evidence_bundle_test.exs test/guardrails/required_checks_contract_test.exs --max-failures 1` | ❌/✅ Wave 0 |
 | CI-05 | Runbook contains supported commands, identities, artifact/authority/failure language | docs contract | `mix test test/docs_contract/catalog_evidence_runbook_test.exs --max-failures 1` | ❌ Wave 0 |
@@ -384,9 +385,10 @@ No unverified package or platform claim is required for planning.
 
 - [ ] `test/rendro/catalog_evidence_bundle_test.exs` — bundle schema/path/checksum/count/duplicate/unsafe-path and operation-negative controls for CI-01/CI-04.
 - [ ] `test/rendro/catalog_evidence_parity_test.exs` — normalized role/hash/authority comparator plus mismatch fixtures for CI-02.
+- [ ] `test/docs_contract/phase_135_test_inventory_contract_test.exs` — exactly two authorized ordered D-05 recipe rows with required columns/valid results and exactly four ordered D-18 route rows with valid statuses.
 - [ ] `test/docs_contract/catalog_evidence_runbook_test.exs` — supported operator commands and truthful authority/limit claims for CI-05.
 - [ ] Extend `test/guardrails/required_checks_contract_test.exs` — generic-workflow security, `ci-success` topology, and post-cutover route absence.
-- [ ] `135-test-inventory.md` — compact TEST-01/02 inventory and four-row remote parity matrix, updated only for this bounded candidate set.
+- [ ] `135-test-inventory.md` — compact TEST-01/02 inventory and four-row remote parity matrix, updated only for this bounded candidate set and parsed by the focused contract above.
 
 ## Security Domain
 

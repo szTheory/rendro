@@ -21,7 +21,7 @@ created: 2026-08-27
 |----------|-------|
 | **Framework** | ExUnit bundled with Elixir 1.19.5 |
 | **Config file** | `test/test_helper.exs` |
-| **Quick run command** | `mix test test/rendro/catalog_evidence_bundle_test.exs test/rendro/catalog_evidence_parity_test.exs test/guardrails/required_checks_contract_test.exs --max-failures 1` |
+| **Quick run command** | `mix test test/rendro/catalog_evidence_bundle_test.exs test/rendro/catalog_evidence_parity_test.exs test/docs_contract/phase_135_test_inventory_contract_test.exs test/guardrails/required_checks_contract_test.exs --max-failures 1` |
 | **Full suite command** | `mix ci.fast` |
 | **Estimated runtime** | Focused checks under 30 seconds; remote paired evidence runs separately on GitHub-hosted Ubuntu with pinned PDFium |
 
@@ -40,9 +40,9 @@ created: 2026-08-27
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 135-W0-01 | TBD | 0 | TEST-01, TEST-02 | T-135-01 | Consolidation inventory names owner, oracle, failure, and negative control; only the proven duplicate assertion is removed | contract/regression | `mix test test/rendro/recipes/themed_render_smoke_test.exs test/rendro/recipes/payslip_opts_threading_test.exs test/rendro/recipes/certificate*_test.exs --max-failures 1` | ⚠️ inventory missing | ⬜ pending |
+| 135-W0-01 | 135-01 | 0 | TEST-01, TEST-02 | T-135-01 | Inventory has exactly the two authorized ordered D-05 rows, required columns, and valid result states; only the proven duplicate assertion is removed | docs contract/regression | `mix test test/docs_contract/phase_135_test_inventory_contract_test.exs test/rendro/recipes/themed_render_smoke_test.exs test/rendro/recipes/payslip_opts_threading_test.exs test/rendro/recipes/certificate*_test.exs --max-failures 1` | ❌ Wave 0 | ⬜ pending |
 | 135-W0-02 | TBD | 0 | CI-01, CI-04 | T-135-02, T-135-03 | Closed inputs, exact SHA/HEAD binding, safe paths, read-only permissions, pinned actions, no secrets/caches, and one valid bundle fail closed | unit/workflow contract | `mix test test/rendro/catalog_evidence_bundle_test.exs test/guardrails/required_checks_contract_test.exs --max-failures 1` | ❌ Wave 0 | ⬜ pending |
-| 135-W0-03 | TBD | 0 | CI-02 | T-135-04 | Comparator accepts all four normalized role/hash/authority matches and rejects a semantic mismatch | unit + remote parity | `mix test test/rendro/catalog_evidence_parity_test.exs --max-failures 1` plus paired remote dispatches | ❌ Wave 0 | ⬜ pending |
+| 135-W0-03 | 135-01, 135-03 | 0 | CI-02 | T-135-04 | Comparator equates only shared semantic/authority facts; it accepts different valid per-side run/attempt/artifact/digest provenance and rejects missing, malformed, or misbound provenance; inventory contract pins exactly four route rows/states | unit + docs contract + remote parity | `mix test test/rendro/catalog_evidence_parity_test.exs test/docs_contract/phase_135_test_inventory_contract_test.exs --max-failures 1` plus paired remote dispatches | ❌ Wave 0 | ⬜ pending |
 | 135-W0-04 | TBD | 0 | CI-03 | T-135-05 | Deterministic, proof, and advisory lanes plus authoritative `ci-success` topology remain unchanged | guardrail | `mix test test/guardrails/required_checks_contract_test.exs --max-failures 1` | ✅ extend existing | ⬜ pending |
 | 135-W0-05 | TBD | 0 | CI-05 | T-135-06 | Current runbook exposes supported commands, identities, limits, authority, and failure recovery without requiring archived plans | docs contract | `mix test test/docs_contract/catalog_evidence_runbook_test.exs --max-failures 1` | ❌ Wave 0 | ⬜ pending |
 
@@ -54,9 +54,10 @@ created: 2026-08-27
 
 - [ ] `test/rendro/catalog_evidence_bundle_test.exs` — bundle schema, path confinement, checksum, cardinality, duplicate, unsafe-path, SHA-binding, and operation-negative controls for CI-01/CI-04.
 - [ ] `test/rendro/catalog_evidence_parity_test.exs` — normalized role/hash/authority comparator with a deliberately mismatched fixture for CI-02.
+- [ ] `test/docs_contract/phase_135_test_inventory_contract_test.exs` — exact two-row D-05 recipe schema/order/state and four-row D-18 parity route/order/state contract.
 - [ ] `test/docs_contract/catalog_evidence_runbook_test.exs` — supported operator commands and truthful authority/limit claims for CI-05.
 - [ ] Extend `test/guardrails/required_checks_contract_test.exs` — generic-workflow security, unchanged `ci-success` topology, and post-cutover legacy-route absence.
-- [ ] `135-test-inventory.md` — bounded TEST-01/TEST-02 owner-oracle-failure-negative-control inventory and the four-row remote parity matrix.
+- [ ] `135-test-inventory.md` — bounded TEST-01/TEST-02 owner-oracle-failure-negative-control inventory and four-row remote parity matrix consumed by the focused contract.
 
 ---
 
@@ -65,7 +66,7 @@ created: 2026-08-27
 | Evidence | Authority | Completion Semantics | Rule |
 |----------|-----------|----------------------|------|
 | Local ExUnit/workflow contracts | deterministic | blocking | Must reject malformed bundles, unsafe workflow structure, mismatched parity fixtures, and false documentation claims. |
-| GitHub-hosted Ubuntu/PDFium paired runs | remote proof/advisory | blocks legacy-route deletion only | Compare legacy and generic routes on the same full candidate SHA and commit one passing row for Phase 126 bless, Phase 127 bless, Phase 130 review, and Phase 130 canonical. |
+| GitHub-hosted Ubuntu/PDFium paired runs | remote proof/advisory | blocks Plan 135-03 legacy-route deletion only; never Plans 135-01/02 | Compare shared semantic/authority facts on the same full candidate SHA, validate distinct per-side provenance independently, and commit one passing row for Phase 126 bless, Phase 127 bless, Phase 130 review, and Phase 130 canonical. |
 | Repeated generic remote runs | corroborating | non-substitutive | May enrich confidence but cannot replace any required route-specific parity row. |
 | Qualitative maintainer feedback | advisory | non-blocking | May improve operator ergonomics but cannot satisfy deterministic or remote parity claims. |
 
@@ -76,7 +77,7 @@ created: 2026-08-27
 - **T-135-01:** Similar test wording can conceal distinct oracles; inventory and focused regression checks prevent accidental behavior loss.
 - **T-135-02:** The default-branch workflow definition is trusted control plane while checked-out candidate code is untrusted input; exact SHA/HEAD binding and environment-mediated inputs prevent substitution and script injection.
 - **T-135-03:** Read-only permissions, no secrets, no caches, no privilege bridge, safe path handling, and full-SHA action pins contain workflow and supply-chain risk.
-- **T-135-04:** Semantic per-file role hashes and authority facts prevent byte-packaging noise from masquerading as parity.
+- **T-135-04:** Shared semantic role/hash/count and authority equality plus independent per-side run/attempt/artifact/digest validation prevent both packaging noise and misbound provenance from masquerading as parity.
 - **T-135-05:** The new evidence workflow remains disconnected from `ci-success`; existing deterministic, proof, and advisory authorities cannot collapse.
 - **T-135-06:** One current adjacent runbook with concrete what/where/why/next microcopy prevents archived planning artifacts or backend implementation details from becoming the operator interface.
 
