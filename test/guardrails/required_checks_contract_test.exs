@@ -163,6 +163,9 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert source =~ "priv/pdfium_pin.json"
       assert source =~ "artifact-url"
       assert source =~ "artifact-digest"
+      assert source =~ "RENDRO_PRESET_RASTER_REVIEW_DIR"
+      assert source =~ "test/rendro/theme/preset_raster_snapshot_test.exs"
+      assert source =~ "preset-review/preset.json"
 
       for forbidden <- [
             "actions/cache",
