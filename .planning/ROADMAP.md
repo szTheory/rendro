@@ -149,8 +149,16 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 135-01-PLAN.md — Build deterministic bundle/parity contracts and close the bounded recipe-test candidates.
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 135-02-PLAN.md — Add the secure standalone exact-SHA workflow and its current operator runbook.
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 135-03-PLAN.md — Record four same-SHA remote parity rows, then remove legacy routes in one rollback commit.
 
 ### Phase 136: Catalog Visual Quality
