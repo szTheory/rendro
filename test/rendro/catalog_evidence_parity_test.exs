@@ -21,15 +21,21 @@ defmodule Rendro.CatalogEvidenceParityTest do
 
     mutations = [
       put_in(legacy, ["payloads", Access.at(0), "sha256"], String.duplicate("f", 64)),
+      put_in(legacy, ["payloads", Access.at(0), "count"], 31),
       Map.put(legacy, "candidate_sha", String.duplicate("c", 40)),
       put_in(legacy, ["renderer", "dpi"], 72),
+      put_in(legacy, ["reviewer", "required"], true),
       put_in(legacy, ["actions", "checkout"], "not-pinned"),
       put_in(legacy, ["permissions", "contents"], "write")
     ]
 
     for mutated <- mutations do
       assert {:error, reasons} =
-               CatalogEvidenceParity.compare(mutated, evidence("generic", :phase130_review), :phase130_review)
+               CatalogEvidenceParity.compare(
+                 mutated,
+                 evidence("generic", :phase130_review),
+                 :phase130_review
+               )
 
       assert reasons != []
     end
@@ -46,7 +52,11 @@ defmodule Rendro.CatalogEvidenceParityTest do
           Map.put(generic, "provenance_candidate_sha", String.duplicate("b", 40))
         ] do
       assert {:error, reasons} =
-               CatalogEvidenceParity.compare(evidence("legacy", :phase130_review), mutated, :phase130_review)
+               CatalogEvidenceParity.compare(
+                 evidence("legacy", :phase130_review),
+                 mutated,
+                 :phase130_review
+               )
 
       assert Enum.any?(reasons, &(&1 in [:invalid_provenance, :misbound_provenance]))
     end
@@ -56,11 +66,16 @@ defmodule Rendro.CatalogEvidenceParityTest do
     %{
       "candidate_sha" => String.duplicate("a", 40),
       "checked_out_head" => String.duplicate("a", 40),
-      "renderer" => %{"version" => "v0.11.0", "binary_sha256" => String.duplicate("b", 64), "dpi" => 96},
+      "renderer" => %{
+        "version" => "v0.11.0",
+        "binary_sha256" => String.duplicate("b", 64),
+        "dpi" => 96
+      },
       "payloads" => [%{"role" => "catalog", "sha256" => String.duplicate("c", 64), "count" => 32}],
       "actions" => %{"checkout" => "df4cb1c069e1874edd31b4311f1884172cec0e10"},
       "permissions" => %{"contents" => "read"},
-      "reviewer" => if(route == :phase130_canonical, do: %{"required" => true}, else: %{"required" => false}),
+      "reviewer" =>
+        if(route == :phase130_canonical, do: %{"required" => true}, else: %{"required" => false}),
       "run_id" => "#{side}-12345",
       "run_attempt" => if(side == "legacy", do: 1, else: 2),
       "run_url" => "https://example.invalid/#{side}/12345",

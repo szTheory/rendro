@@ -16,14 +16,25 @@ defmodule Rendro.DocsContract.Phase135TestInventoryContractTest do
     assert table_ids(markdown, "Remote Route Parity Matrix") == @route_ids
 
     recipe_rows = table_rows(markdown, "Recipe Test Inventory")
-    assert Enum.all?(recipe_rows, &List.last(&1) in ["pending", "retained-owner-proven", "rename-only"])
+
+    assert Enum.all?(
+             recipe_rows,
+             &(List.last(&1) in ["pending", "retained-owner-proven", "rename-only"])
+           )
 
     parity_rows = table_rows(markdown, "Remote Route Parity Matrix")
-    assert Enum.all?(parity_rows, &List.last(&1) in ["pending", "matched", "mismatch", "unavailable"])
+
+    assert Enum.all?(
+             parity_rows,
+             &(List.last(&1) in ["pending", "matched", "mismatch", "unavailable"])
+           )
+
     assert parity_rows |> Enum.map(&Enum.at(&1, 1)) |> Enum.uniq() |> length() == 1
   end
 
-  defp table_columns(markdown, heading), do: markdown |> table(heading) |> hd() |> Enum.map(&String.trim/1)
+  defp table_columns(markdown, heading),
+    do: markdown |> table(heading) |> hd() |> Enum.map(&String.trim/1)
+
   defp table_ids(markdown, heading), do: markdown |> table_rows(heading) |> Enum.map(&hd/1)
 
   defp table_rows(markdown, heading) do
@@ -39,6 +50,8 @@ defmodule Rendro.DocsContract.Phase135TestInventoryContractTest do
     |> String.split("\n\n", parts: 2)
     |> hd()
     |> String.split("\n", trim: true)
-    |> Enum.map(fn row -> row |> String.trim("|") |> String.split("|") |> Enum.map(&String.trim/1) end)
+    |> Enum.map(fn row ->
+      row |> String.trim("|") |> String.split("|") |> Enum.map(&String.trim/1)
+    end)
   end
 end
