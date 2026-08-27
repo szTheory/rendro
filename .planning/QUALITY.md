@@ -147,10 +147,10 @@ The initial snapshot is immutable after capture. Validation is read-only and cap
 - **Owner phase:** 134
 - **Scope:** add one private `Rendro.Recipes.Palette.resolve/2` helper and replace only the seven recipe resolution bodies, preserving each exact legacy default map, `Rendro.Theme.resolve(theme).colors`, `Map.merge/2` precedence, existing error shape, public manifest, and deterministic bytes.
 - **Verification:** fail-first `test/rendro/recipes/palette_test.exs` covering all defaults/nil/theme/override/failure cases; then focused helper tests, all affected byte-identity and option-threading tests, themed smoke coverage, public-manifest/documentation contracts, and `mix ci.fast` before closure.
-- **Status:** accepted
+- **Status:** in_progress
 - **Trigger:** Wave 0 must first prove one uniform contract for all seven maps; any recipe-specific behavior, changed byte golden, changed failure shape, or manifest movement reopens triage and suppresses the extraction.
 - **Closure:** record the Wave 0 red contract, helper/migration commits, passing focused and compatibility results, and a before/after statement that no-theme bytes and public API remained identical.
-- **Relationships/history:** Phase 120 WR-02 identified the same owner/semantics boundary; it is distinct from QL-005 because palette resolution is a shared recipe behavior rather than dead code.
+- **Relationships/history:** Phase 120 WR-02 identified the same owner/semantics boundary; it is distinct from QL-005 because palette resolution is a shared recipe behavior rather than dead code. Plan 134-03 advanced this record to `in_progress` after the seven-source Wave 0 contract remained uniformly red only because its planned hidden owner did not yet exist; its focused helper tests prove exact nil/theme/override and failure semantics before any recipe call-site migration.
 
 #### QL-007 — Shaping-hint fallback overlap is a signal, not a current repair
 

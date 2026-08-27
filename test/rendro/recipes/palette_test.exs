@@ -46,7 +46,8 @@ defmodule Rendro.Recipes.PaletteTest do
     test "resolves a supplied theme before palette overrides" do
       theme = %{colors: %{ink: {1, 2, 3}, rule: {4, 5, 6}}}
 
-      assert Palette.resolve([theme: theme], @certificate_defaults) == Rendro.Theme.resolve(theme).colors
+      assert Palette.resolve([theme: theme], @certificate_defaults) ==
+               Rendro.Theme.resolve(theme).colors
     end
 
     test "lets palette overrides win key-by-key over legacy and themed bases" do
