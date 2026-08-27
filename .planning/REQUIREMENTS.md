@@ -78,10 +78,10 @@
 | HYGIENE-02 | Phase 133 | Complete |
 | HYGIENE-03 | Phase 133 | Complete |
 | HYGIENE-04 | Phase 133 | Complete |
-| ARCH-01 | Phase 134 | Pending |
-| ARCH-02 | Phase 134 | Pending |
-| ARCH-03 | Phase 134 | Pending |
-| ARCH-04 | Phase 134 | Pending |
+| ARCH-01 | Phase 134 | Complete |
+| ARCH-02 | Phase 134 | Complete |
+| ARCH-03 | Phase 134 | Complete |
+| ARCH-04 | Phase 134 | Complete |
 | TEST-01 | Phase 135 | Pending |
 | TEST-02 | Phase 135 | Pending |
 | CI-01 | Phase 135 | Pending |
