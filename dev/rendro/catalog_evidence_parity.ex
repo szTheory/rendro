@@ -20,8 +20,7 @@ defmodule Rendro.CatalogEvidenceParity do
          "generic" => provenance(generic_root)
        }}
     else
-      {:error, reasons} when is_list(reasons) -> {:error, reasons}
-      {:error, reason} -> {:error, [reason]}
+      {:error, reasons} -> {:error, reasons}
     end
   end
 

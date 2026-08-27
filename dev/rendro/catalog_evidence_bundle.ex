@@ -181,15 +181,13 @@ defmodule Rendro.CatalogEvidenceBundle do
     checksum_path = Path.join(output_root, "checksums.sha256")
 
     with {:ok, contents} <- File.read(checksum_path),
-         {:ok, entries} <- parse_checksums(contents),
-         true <- Enum.sort(Enum.map(entries, &elem(&1, 1))) == Enum.sort(expected_paths),
-         true <-
-           Enum.all?(entries, fn {digest, path} ->
-             digest == sha256_file!(Path.join(output_root, path))
-           end) do
-      :ok
+         {:ok, entries} <- parse_checksums(contents) do
+      if valid_checksum_entries?(entries, expected_paths, output_root) do
+        :ok
+      else
+        {:error, [:checksum_mismatch]}
+      end
     else
-      false -> {:error, [:checksum_mismatch]}
       {:error, _reason} -> {:error, [:invalid_checksums]}
     end
   end
@@ -308,8 +306,7 @@ defmodule Rendro.CatalogEvidenceBundle do
       is_integer(provenance[:dpi])
   end
 
-  defp safe_output_root?(path),
-    do: is_binary(path) and path != "" and not String.contains?(path, "\0")
+  defp safe_output_root?(path), do: path != "" and not String.contains?(path, "\0")
 
   defp valid_sha?(value), do: is_binary(value) and Regex.match?(~r/\A[0-9a-f]{40}\z/, value)
   defp valid_sha256?(value), do: is_binary(value) and Regex.match?(~r/\A[0-9a-f]{64}\z/, value)
@@ -341,6 +338,13 @@ defmodule Rendro.CatalogEvidenceBundle do
     |> then(fn entries ->
       if :invalid in entries, do: {:error, :invalid}, else: {:ok, entries}
     end)
+  end
+
+  defp valid_checksum_entries?(entries, expected_paths, output_root) do
+    Enum.sort(Enum.map(entries, &elem(&1, 1))) == Enum.sort(expected_paths) and
+      Enum.all?(entries, fn {digest, path} ->
+        digest == sha256_file!(Path.join(output_root, path))
+      end)
   end
 
   defp first_error(results) do
