@@ -387,6 +387,7 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert advisory_block =~ "$REVIEW_DIR/final/pngs"
       assert advisory_block =~ "$REVIEW_DIR/final/identity-manifest.json"
       assert advisory_block =~ "$REVIEW_DIR/multipage"
+
       assert advisory_block =~
                "find \"$REVIEW_DIR/final/pngs\" \"$REVIEW_DIR/multipage\" -maxdepth 1 -type f -name '*.png'"
 
