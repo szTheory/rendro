@@ -299,17 +299,17 @@ assert resolve([theme: theme, palette: %{ink: {1, 2, 3}}], defaults).ink == {1, 
 
 All material recommendations are verified against repository-local evidence or cited official Mix documentation; no execution decision depends on an unverified assumption.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Does the palette characterization expose a recipe-specific behavior beyond the current resolution matrix?**
+1. **Does the palette characterization expose a recipe-specific behavior beyond the current resolution matrix? — RESOLVED CONDITIONALLY**
    - What we know: five bodies are byte-identical and the two variants differ only in legacy defaults. [VERIFIED: source-body hashes]
    - What's unclear: whether a focused test reveals an implicit caller reliance not represented by existing golden fixtures.
-   - Recommendation: make this the first extraction Wave 0 gate; reject the extraction if characterization cannot be stated uniformly.
+   - Resolution: Wave 0 uniform characterization is the execution-time decision gate. Palette extraction proceeds only when one exact defaults/theme/override/failure-shape contract passes for all seven recipes; any recipe-specific behavior that prevents a uniform contract resolves the candidate to `reject_signal` or a trigger-backed deferral with no helper or recipe edits. This conditional outcome is locked by D-03, D-04, D-06, D-09, and D-11 and requires no further planning decision.
 
-2. **Does the phase-number audit find a concrete misleading runtime claim?**
+2. **Does the phase-number audit find a concrete misleading runtime claim? — RESOLVED CONDITIONALLY**
    - What we know: source matches include legitimate feature history and viewer-evidence provenance. [VERIFIED: current source scan]
    - What's unclear: whether any individual line is stale rather than provenance.
-   - Recommendation: audit with a bounded ledger entry; do not create a broad doc/comment cleanup task without a line-specific defect.
+   - Resolution: narration edits require a line-specific accepted finding that identifies the misleading runtime claim, current contradictory behavior, bounded repair scope, focused proof, and preserved provenance. Without that evidence the audit is a no-op and the original candidate becomes `reject_signal` or a trigger-backed deferral; no runtime source, spec, doc, or comment is edited. This conditional outcome is locked by D-02, D-03, D-04, D-08, D-10, and D-13 through D-16 and requires no further planning decision.
 
 ## Environment Availability
 

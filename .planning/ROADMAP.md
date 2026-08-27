@@ -109,14 +109,29 @@ Plans:
   3. Public and boundary specifications, module documentation, and explanatory comments match current behavior and explain only non-obvious intent or constraints.
   4. The public API manifest and rendered bytes outside explicitly approved catalog targets remain identical after the cleanup.
 
-**Plans**: 4 plans
+**Plans**: 5 plans
 
 Plans:
 
+**Wave 1**
+
 - [ ] 134-01-PLAN.md — Trace every candidate into a durable disposition and establish palette Wave 0 characterization.
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 134-02-PLAN.md — Conditionally remove the obsolete Analyzer pair with public-contract proof.
-- [ ] 134-03-PLAN.md — Conditionally extract palette resolution and migrate all seven recipes under focused byte-identity proof.
-- [ ] 134-04-PLAN.md — Audit truthfulness separately, then run terminal deterministic gates and close every Phase 134 ledger lifecycle.
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 134-03-PLAN.md — Resolve the palette uniformity gate and conditionally make the hidden helper characterization green.
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 134-04-PLAN.md — Conditionally migrate all seven recipes to the proven palette owner under focused byte-identity proof.
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 134-05-PLAN.md — Audit truthfulness separately, then run terminal deterministic gates and close every Phase 134 ledger lifecycle.
 
 ### Phase 135: Test & CI/CD Simplification
 
@@ -169,7 +184,7 @@ Plans:
 |-------|--------------|----------------|--------|-----------|
 | 132. Quality Baseline & Triage | 4 | 4/4 | Complete    | 2026-08-26 |
 | 133. Repository & Evidence Hygiene | 4 | 13/13 | Complete    | 2026-08-26 |
-| 134. Core Architecture & Readability | 4 | 0/4 | Not started | — |
+| 134. Core Architecture & Readability | 4 | 0/5 | Not started | — |
 | 135. Test & CI/CD Simplification | 7 | 0/TBD | Not started | — |
 | 136. Catalog Visual Quality | 4 | 0/TBD | Not started | — |
 | 137. Closure & Handoff | 3 | 0/TBD | Not started | — |
