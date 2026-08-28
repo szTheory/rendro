@@ -110,7 +110,7 @@ Phase 137 Closure & Handoff ............................... Pending
 
 ### Pending Todos
 
-None outside the roadmap.
+- 1 pending: Unify catalog recipe visual design system (`$gsd-capture --list`).
 
 ### Blockers/Concerns
 
