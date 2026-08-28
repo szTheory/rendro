@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "receipt_id": "phase-136-12-unavailable-7c2d9e0b-d75c-4dc8-94f3-2101d0726a58",
+  "status": "unavailable",
+  "candidate": {
+    "sha": "211abe046c7cecb31f29ec6795594a12ea4e6346"
+  },
+  "control": {
+    "ref": "refs/heads/main",
+    "sha": "215d7c0f9b0cff8ac54760b6447c2c92c1107e99"
+  },
+  "run": {
+    "id": "33211438276",
+    "attempt": 1
+  },
+  "renderer": null,
+  "artifacts": null,
+  "failure": {
+    "stage": "candidate_generation",
+    "code": "control_workflow_gallery_contract_mismatch",
+    "message": "Run 33211438276 attempt 1 failed because the default-branch control workflow invoked the repaired candidate's gallery task without the required candidate and final manifests; the task returned `Choose exactly one complete catalog gallery operation`, and no artifacts were uploaded.",
+    "expected": {
+      "candidate_sha": "211abe046c7cecb31f29ec6795594a12ea4e6346",
+      "control_ref": "refs/heads/main",
+      "control_sha": "215d7c0f9b0cff8ac54760b6447c2c92c1107e99",
+      "run_id": "33211438276",
+      "run_attempt": 1,
+      "gallery_command": "mix rendro.catalog.gallery --candidate-manifest tmp/phase130-candidate/candidate-manifest.json --final-manifest handoff/final-manifest.json --output tmp/catalog-reviewer-packet",
+      "artifact_kinds": [
+        "authoritative_closed_evidence",
+        "authority_none_eight_image_reviewer_packet"
+      ]
+    },
+    "observed": {
+      "run_conclusion": "failure",
+      "failed_job": "candidate-generation",
+      "failed_step": "Bind candidate and generate closed handoff",
+      "gallery_command": "mix rendro.catalog.gallery --output $PWD/tmp/catalog-visual-gallery",
+      "gallery_error": "Choose exactly one complete catalog gallery operation",
+      "artifact_count": 0,
+      "artifact_names": []
+    },
+    "next_action": "Update only the default-branch Catalog Evidence control workflow to the committed Plan 136-14 dual-artifact command and topology, rerun Plans 136-09 through 136-11 and 136-14 deterministic validation for a new immutable candidate when needed, then rerun Plan 136-12 with a fresh workflow run and two fresh downloads."
+  },
+  "targets_unpromoted": [
+    "invoice--cedar-mutual--corporate-classic--dark",
+    "statement--signal-ledger--minimal-mono--dark",
+    "payslip--northline-logistics--swiss--light",
+    "payslip--northline-logistics--swiss--dark",
+    "ticket--aurora-live--brutalist--light",
+    "ticket--aurora-live--brutalist--dark"
+  ],
+  "review_images": [],
+  "revision_gate": {
+    "iteration": 1,
+    "cap": 3,
+    "status": "retry_required",
+    "prior_receipt_ids": []
+  }
+}
