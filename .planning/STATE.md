@@ -1,19 +1,20 @@
 ---
 gsd_state_version: 1.0
 milestone: v2.14
-milestone_name: Quality & Maintainability
+milestone_name: Quality & Maintainability (Phases 132-137)
 current_phase: 136
 current_phase_name: catalog-visual-quality
 status: executing
-stopped_at: Completed 136-07-PLAN.md
-last_updated: "2026-08-28T13:55:32.588Z"
+stopped_at: Completed 136-08-PLAN.md with evidence deferral; CATALOG-10 through CATALOG-13 remain open
+last_updated: "2026-08-28T17:37:06.789Z"
 last_activity: 2026-08-28
 last_activity_desc: Phase 136 execution started
+state_head: 13917d73313b20587ea1e1a38f950331fb0f3ece
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 33
-  completed_plans: 32
+  completed_plans: 33
   percent: 67
 ---
 
@@ -107,6 +108,8 @@ Phase 137 Closure & Handoff ............................... Pending
 - [Phase ?]: Phase 136 review eligibility requires full bundle provenance validation before image interpretation.
 - [Phase ?]: Phase 136 canonical promotion is ineligible until the exact candidate SHA has one validated closed review bundle and six complete named records.
 - [Phase ?]: Published only the authorized exact candidate ref and recorded the failed dynamic review run as unavailable evidence with no review or canonical claim.
+- [Phase 136]: Run 33177154682 is unavailable review evidence; the six targets remain unpromoted and canonical publication is ineligible.
+- [Phase 136]: Convenience-gallery LGTM is advisory only and cannot become exact target review evidence.
 
 ### Pending Todos
 
@@ -128,8 +131,8 @@ Phase 137 Closure & Handoff ............................... Pending
 
 ## Session Continuity
 
-Last session: 2026-08-28T13:55:32.581Z
-Stopped at: Completed 136-07-PLAN.md
+Last session: 2026-08-28T17:37:06.559Z
+Stopped at: Completed 136-08-PLAN.md with evidence deferral; CATALOG-10 through CATALOG-13 remain open
 Resume file: None
 
 ## Next Steps
@@ -184,3 +187,4 @@ Resume file: None
 | Phase 136-catalog-visual-quality P05 | 9min | 2 tasks | 6 files |
 | Phase 136 P06 | 13min | 2 tasks | 1 files |
 | Phase 136-catalog-visual-quality P07 | 401s | 2 tasks | 1 files |
+| Phase 136 P08 | 14m | 1 tasks | 2 files |
