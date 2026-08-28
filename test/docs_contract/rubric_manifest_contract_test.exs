@@ -438,4 +438,22 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
            "disjointness must not pass vacuously — the imported stress-fixture set " <>
              "must be the full 62 :applies cells"
   end
+
+  test "Phase 136 canonical eligibility fails closed for unavailable review evidence without changing canonical artifacts" do
+    catalog = JSON.decode!(File.read!("assets/rendro/catalog.json"))
+    sign_off = File.read!(@sign_off_path)
+
+    assert {:canonical_ineligible,
+            [
+              "missing validated closed review bundle for d547bbfa60760d43f19a15372d88a2d159bfa327",
+              "missing six complete named reviewer records",
+              "next action: publish the exact candidate object to a remote-reachable ref, dispatch review, validate the closed bundle, then collect six records"
+            ]} = phase136_canonical_eligibility(manifest(), catalog, sign_off)
+
+    assert Enum.count(catalog["cells"], &(&1["quality"]["status"] == "unscored")) == 20
+
+    for cell <- catalog["cells"], String.ends_with?(cell["id"], "--dark") do
+      assert cell["print_safety"] == false
+    end
+  end
 end
