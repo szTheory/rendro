@@ -487,6 +487,28 @@ defmodule Rendro.Recipes.PayslipTest do
     end
   end
 
+  describe "sequential measured ledger profile" do
+    test "renders independent full-width Earnings then Deductions tables for the Swiss profile" do
+      sections =
+        Payslip.sections(fixture_data(),
+          theme: Rendro.Theme.preset(:swiss, accent: "#2C6BED"),
+          presentation_profile: %{ledger_layout: :sequential_measured}
+        )
+
+      body = Enum.find(sections, &(&1.region == :body))
+      tables = Enum.filter(body.content, &is_struct(&1.content, Rendro.Table))
+
+      assert Enum.map(tables, & &1.content.header) == [
+               ["Earnings", "Current", "YTD"],
+               ["Deductions", "Current", "YTD"]
+             ]
+
+      assert Enum.all?(tables, fn block ->
+               block.content.columns |> length() |> Kernel.==(3)
+             end)
+    end
+  end
+
   # ---------------------------------------------------------------------------
   # Recursive %Rendro.Text{} size/content collectors — reused by Task 3's
   # table assertions (a table's header/rows/cells may wrap Rendro.Block/
