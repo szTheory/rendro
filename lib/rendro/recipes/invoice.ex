@@ -227,7 +227,7 @@ defmodule Rendro.Recipes.Invoice do
     # and sections/2 so the header region is always tall enough for
     # whichever anatomy fields `data` actually carries (never just the
     # frozen 2-line toy height) — see computed_header_height/1.
-    opts = Keyword.put_new(opts, :header_height, computed_header_height(data))
+    opts = Keyword.put_new(opts, :header_height, computed_header_height(data, opts))
     template = page_template(opts)
     secs = sections(data, opts)
 
@@ -259,21 +259,28 @@ defmodule Rendro.Recipes.Invoice do
     # anatomy fields still render only when present, as NEW blocks around this
     # base pair.
     base_content = [
-      Rendro.block(Rendro.text("INVOICE ##{id}", header_title_options(opts, colors, type))),
+      Rendro.block(
+        Rendro.text("INVOICE ##{id}", header_title_options(opts, colors, type)),
+        semantic_header_block_options(opts)
+      ),
       Rendro.block(
         Rendro.text(
           "Date: #{date}",
           header_label_options(opts, colors, type)
-        )
+        ),
+        semantic_header_block_options(opts)
       )
     ]
 
     content =
       base_content
-      |> maybe_prepend(Map.get(data, :issuer), &issuer_block(&1, colors, type))
-      |> maybe_append(Map.get(data, :customer), &customer_block(&1, colors, type))
-      |> maybe_append(header_due_date(data, opts), &due_date_block(&1, colors, type, fmt_date))
-      |> maybe_append(Map.get(data, :terms), &terms_block(&1, colors, type))
+      |> maybe_prepend(Map.get(data, :issuer), &issuer_block(&1, opts, colors, type))
+      |> maybe_append(Map.get(data, :customer), &customer_block(&1, opts, colors, type))
+      |> maybe_append(
+        header_due_date(data, opts),
+        &due_date_block(&1, opts, colors, type, fmt_date)
+      )
+      |> maybe_append(Map.get(data, :terms), &terms_block(&1, opts, colors, type))
 
     Rendro.section(
       name: :invoice_header,
@@ -331,7 +338,7 @@ defmodule Rendro.Recipes.Invoice do
     # call (explicit opts override, or computed_header_height/1's
     # data-derived default) so body capacity accounting matches the actual
     # rendered header region — never the stale frozen constant.
-    resolved_header_height = Keyword.get(opts, :header_height, computed_header_height(data))
+    resolved_header_height = Keyword.get(opts, :header_height, computed_header_height(data, opts))
     body_height = @page_height - 2 * @margin - resolved_header_height - @footer_height
 
     # INV-03 "kept with the last rows" — the ONE place Invoice must exceed a
@@ -439,8 +446,16 @@ defmodule Rendro.Recipes.Invoice do
   # preserving INV-01. Conservative flat per-field budgets (not exact text
   # measurement) mirror totals_reserved_height/1's idiom: issuer/customer
   # can each render 2 lines (name + address), due_date/terms are always 1.
-  @spec computed_header_height(map()) :: number()
-  defp computed_header_height(data) do
+  @spec computed_header_height(map(), keyword()) :: number()
+  defp computed_header_height(data, opts) do
+    if primary_secondary_semantic_ink?(opts) do
+      measured_semantic_header_height(data, opts)
+    else
+      legacy_header_height(data)
+    end
+  end
+
+  defp legacy_header_height(data) do
     @default_header_height
     |> add_if_present(Map.get(data, :issuer), 30)
     |> add_if_present(Map.get(data, :customer), 30)
@@ -450,6 +465,23 @@ defmodule Rendro.Recipes.Invoice do
 
   defp add_if_present(height, nil, _extra), do: height
   defp add_if_present(height, _present, extra), do: height + extra
+
+  defp measured_semantic_header_height(data, opts) do
+    type = typography(opts)
+    measurement_fonts = Map.take(type.fonts, [:heading, :body, :mono])
+
+    document =
+      opts
+      |> measurement_document(measurement_fonts)
+      |> Rendro.Theme.Presets.register_metric_fonts(Map.values(measurement_fonts))
+
+    rows = data |> header_section(opts) |> Map.fetch!(:content) |> Enum.map(&[&1])
+
+    {_header_height, row_heights} =
+      Rendro.measure_rows(rows, @content_width, document, columns: [{:fixed, @content_width}])
+
+    max(@default_header_height, Float.ceil(Enum.sum(row_heights) + @row_epsilon, 1))
+  end
 
   # 118-08: legacy bare-number :price renders unchanged ("$#{price}", the
   # frozen INV-01 toy path); a %Decimal{} :price is formatted via
@@ -490,7 +522,7 @@ defmodule Rendro.Recipes.Invoice do
   defp maybe_append(content, nil, _fun), do: content
   defp maybe_append(content, value, fun), do: content ++ [fun.(value)]
 
-  defp issuer_block(issuer, colors, type) when is_map(issuer) do
+  defp issuer_block(issuer, opts, colors, type) when is_map(issuer) do
     name = Map.get(issuer, :name, "")
     address = Map.get(issuer, :address)
     text = if address in [nil, ""], do: name, else: "#{name}\n#{address}"
@@ -503,11 +535,12 @@ defmodule Rendro.Recipes.Invoice do
         widows: type.widows,
         orphans: type.orphans,
         color: colors.ink
-      )
+      ),
+      semantic_header_block_options(opts)
     )
   end
 
-  defp customer_block(customer, colors, type) when is_map(customer) do
+  defp customer_block(customer, opts, colors, type) when is_map(customer) do
     name = Map.get(customer, :name, "")
     address = Map.get(customer, :address)
     text = if address in [nil, ""], do: "Bill To: #{name}", else: "Bill To: #{name}\n#{address}"
@@ -520,11 +553,12 @@ defmodule Rendro.Recipes.Invoice do
         widows: type.widows,
         orphans: type.orphans,
         color: colors.muted
-      )
+      ),
+      semantic_header_block_options(opts)
     )
   end
 
-  defp due_date_block(due_date, colors, type, fmt_date) do
+  defp due_date_block(due_date, opts, colors, type, fmt_date) do
     Rendro.block(
       Rendro.text("Due: #{fmt_date.(due_date)}",
         size: type.scale.body,
@@ -533,11 +567,12 @@ defmodule Rendro.Recipes.Invoice do
         widows: type.widows,
         orphans: type.orphans,
         color: colors.muted
-      )
+      ),
+      semantic_header_block_options(opts)
     )
   end
 
-  defp terms_block(terms, colors, type) do
+  defp terms_block(terms, opts, colors, type) do
     Rendro.block(
       Rendro.text("Terms: #{terms}",
         size: type.scale.body,
@@ -546,7 +581,8 @@ defmodule Rendro.Recipes.Invoice do
         widows: type.widows,
         orphans: type.orphans,
         color: colors.muted
-      )
+      ),
+      semantic_header_block_options(opts)
     )
   end
 
@@ -635,7 +671,7 @@ defmodule Rendro.Recipes.Invoice do
 
   defp totals_due_date(data, opts, colors, type, fmt_date, total_block) do
     if themed_payment_summary?(data, opts) and total_block != [] do
-      [due_date_block(Map.fetch!(data, :due_date), colors, type, fmt_date)]
+      [due_date_block(Map.fetch!(data, :due_date), opts, colors, type, fmt_date)]
     else
       []
     end
@@ -702,6 +738,10 @@ defmodule Rendro.Recipes.Invoice do
 
   defp primary_secondary_semantic_ink?(opts) do
     match?(%{semantic_ink: :primary_secondary}, opts[:presentation_profile])
+  end
+
+  defp semantic_header_block_options(opts) do
+    if primary_secondary_semantic_ink?(opts), do: [width: @content_width], else: []
   end
 
   defp footer_ink(opts, colors) do
