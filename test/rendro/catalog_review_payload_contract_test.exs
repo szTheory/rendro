@@ -64,6 +64,8 @@ defmodule Rendro.CatalogReviewPayloadContractTest do
       put_in(manifest, ["cells", Access.at(0), "renderer_sha256"], String.duplicate("f", 64)),
       put_in(manifest, ["cells", Access.at(0), "source_pdf_sha256"], "not-a-sha"),
       put_in(manifest, ["candidate", "commit_sha"], "short"),
+      put_in(manifest, ["candidate", "commit_sha"], "A" <> String.duplicate("a", 39)),
+      put_in(manifest, ["candidate", "commit_sha"], String.duplicate("a", 39)),
       put_in(manifest, ["candidate", "run_id"], " "),
       put_in(manifest, ["cells", Access.at(0), "quality"], %{"status" => "passed"}),
       put_in(manifest, ["candidate", "scores"], %{"content_hierarchy" => 5})

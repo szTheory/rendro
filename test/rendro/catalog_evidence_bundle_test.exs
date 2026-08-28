@@ -82,6 +82,16 @@ defmodule Rendro.CatalogEvidenceBundleTest do
              )
 
     assert :candidate_reviewer_approval_forbidden in reasons
+
+    assert {:error, reasons} =
+             CatalogEvidenceBundle.build(
+               :review,
+               review_sources(root),
+               %{provenance() | run_id: "", run_attempt: 0},
+               root
+             )
+
+    assert :invalid_provenance in reasons
   end
 
   test "fails closed on manifest, role, count, and payload hash drift" do
