@@ -260,7 +260,6 @@ defmodule Rendro.CatalogVisualGallery do
       :ok
     else
       {:error, reasons} when is_list(reasons) -> {:error, reasons}
-      {:error, reason} -> {:error, [reason]}
     end
   end
 

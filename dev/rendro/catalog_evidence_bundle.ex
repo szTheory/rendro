@@ -517,8 +517,6 @@ defmodule Rendro.CatalogEvidenceBundle do
     _ -> false
   end
 
-  defp valid_candidate_payload?(_payload, _provenance, _pin), do: false
-
   defp valid_candidate_cell?(cell, pin) when is_map(cell) do
     id = cell["id"]
 
@@ -564,8 +562,6 @@ defmodule Rendro.CatalogEvidenceBundle do
       not authority_bearing?(payload)
   end
 
-  defp valid_final_payload?(_payload, _provenance, _pin), do: false
-
   defp valid_final_image?(image, provenance, pin) when is_map(image) do
     id = image["catalog_id"]
     mode = id && List.last(String.split(id, "--"))
@@ -590,8 +586,6 @@ defmodule Rendro.CatalogEvidenceBundle do
       Enum.all?(entries, fn {digest, path} -> valid_sha256?(digest) and safe_relative?(path) end)
   end
 
-  defp valid_multipage_payload?(_entries), do: false
-
   defp valid_preset_payload?(payload, provenance, pin) when is_map(payload) do
     images = payload["images"]
 
@@ -605,8 +599,6 @@ defmodule Rendro.CatalogEvidenceBundle do
           valid_sha256?(image["sha256"])
       end) and not authority_bearing?(payload)
   end
-
-  defp valid_preset_payload?(_payload, _provenance, _pin), do: false
 
   defp valid_canonical_payload?(payload, provenance, pin) when is_map(payload) do
     cells = payload["cells"]
@@ -624,8 +616,6 @@ defmodule Rendro.CatalogEvidenceBundle do
   rescue
     _ -> false
   end
-
-  defp valid_canonical_payload?(_payload, _provenance, _pin), do: false
 
   defp cross_payloads_match?(candidate, final, multipage) do
     cells = Map.new(candidate["cells"] || [], &{&1["id"], &1})
