@@ -1,46 +1,55 @@
 {
   "schema_version": 1,
-  "receipt_id": "phase-136-12-unavailable-7c2d9e0b-d75c-4dc8-94f3-2101d0726a58",
+  "receipt_id": "phase-136-12-unavailable-549c8cbc-914b-4c8a-a6e5-eec304da7b87",
   "status": "unavailable",
   "candidate": {
     "sha": "211abe046c7cecb31f29ec6795594a12ea4e6346"
   },
   "control": {
     "ref": "refs/heads/main",
-    "sha": "215d7c0f9b0cff8ac54760b6447c2c92c1107e99"
+    "sha": "ad06b46aa4bda53b74ca77bb70ca40a6c42104bf"
   },
   "run": {
-    "id": "33211438276",
+    "id": "33214738055",
     "attempt": 1
   },
-  "renderer": null,
+  "renderer": {
+    "version": "v0.11.0",
+    "binary_sha256": "b1e7f3dd8d6c77e0eb8e67c6a33de4efa5de9f38d87263c151acb88994ae160a",
+    "dpi": 96
+  },
   "artifacts": null,
   "failure": {
     "stage": "candidate_generation",
-    "code": "control_workflow_gallery_contract_mismatch",
-    "message": "Run 33211438276 attempt 1 failed because the default-branch control workflow invoked the repaired candidate's gallery task without the required candidate and final manifests; the task returned `Choose exactly one complete catalog gallery operation`, and no artifacts were uploaded.",
+    "code": "reviewer_packet_gallery_manifest_validation_failed",
+    "message": "Fresh run 33214738055 attempt 1 used repaired control ad06b46aa4bda53b74ca77bb70ca40a6c42104bf and exact candidate 211abe046c7cecb31f29ec6795594a12ea4e6346, but the three-argument gallery command rejected the generated candidate and final manifests with `Catalog gallery operation failed: :invalid_gallery_input`; both artifact uploads were skipped and no artifacts exist.",
     "expected": {
       "candidate_sha": "211abe046c7cecb31f29ec6795594a12ea4e6346",
       "control_ref": "refs/heads/main",
-      "control_sha": "215d7c0f9b0cff8ac54760b6447c2c92c1107e99",
-      "run_id": "33211438276",
+      "control_sha": "ad06b46aa4bda53b74ca77bb70ca40a6c42104bf",
+      "run_id": "33214738055",
       "run_attempt": 1,
-      "gallery_command": "mix rendro.catalog.gallery --candidate-manifest tmp/phase130-candidate/candidate-manifest.json --final-manifest handoff/final-manifest.json --output tmp/catalog-reviewer-packet",
+      "run_conclusion": "success",
+      "gallery_command": "mix rendro.catalog.gallery --candidate-manifest tmp/phase130-candidate/candidate-manifest.json --final-manifest handoff/final-manifest.json --output $PWD/tmp/catalog-reviewer-packet",
       "artifact_kinds": [
         "authoritative_closed_evidence",
         "authority_none_eight_image_reviewer_packet"
-      ]
+      ],
+      "artifact_count": 2
     },
     "observed": {
       "run_conclusion": "failure",
       "failed_job": "candidate-generation",
       "failed_step": "Bind candidate and generate closed handoff",
-      "gallery_command": "mix rendro.catalog.gallery --output $PWD/tmp/catalog-visual-gallery",
-      "gallery_error": "Choose exactly one complete catalog gallery operation",
+      "renderer_binary_check": "passed",
+      "candidate_raster_test": "1 test, 0 failures",
+      "gallery_error": "Catalog gallery operation failed: :invalid_gallery_input",
+      "evidence_upload": "skipped",
+      "reviewer_packet_upload": "skipped",
       "artifact_count": 0,
       "artifact_names": []
     },
-    "next_action": "Update only the default-branch Catalog Evidence control workflow to the committed Plan 136-14 dual-artifact command and topology, rerun Plans 136-09 through 136-11 and 136-14 deterministic validation for a new immutable candidate when needed, then rerun Plan 136-12 with a fresh workflow run and two fresh downloads."
+    "next_action": "Isolate the exact candidate/final manifest predicate rejected by Rendro.CatalogVisualGallery, change only the evidence-path implementation and its directly owned contracts, create a new immutable candidate, rerun Plans 136-09 through 136-11 and 136-14 deterministic validation, then obtain authorization for a new non-force candidate ref and fresh workflow run. The current instruction forbids creating another branch, PR, or run in this execution."
   },
   "targets_unpromoted": [
     "invoice--cedar-mutual--corporate-classic--dark",
@@ -52,9 +61,11 @@
   ],
   "review_images": [],
   "revision_gate": {
-    "iteration": 1,
+    "iteration": 2,
     "cap": 3,
     "status": "retry_required",
-    "prior_receipt_ids": []
+    "prior_receipt_ids": [
+      "phase-136-12-unavailable-7c2d9e0b-d75c-4dc8-94f3-2101d0726a58"
+    ]
   }
 }
