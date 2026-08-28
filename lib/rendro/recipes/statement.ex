@@ -301,6 +301,7 @@ defmodule Rendro.Recipes.Statement do
   @spec document(map(), keyword()) :: Rendro.Document.t()
   def document(data, opts \\ []) do
     validate_data!(data)
+    opts = maybe_put_measured_header_height(data, opts)
     template = page_template(opts)
     secs = sections(data, opts)
 
@@ -357,7 +358,8 @@ defmodule Rendro.Recipes.Statement do
           widows: type.widows,
           orphans: type.orphans,
           color: colors.muted
-        )
+        ),
+        semantic_header_block_options(opts)
       )
 
     # The SOLE `display`-anchored element on the Statement (D-01) — the "one
@@ -371,7 +373,8 @@ defmodule Rendro.Recipes.Statement do
           widows: type.widows,
           orphans: type.orphans,
           color: colors.ink
-        )
+        ),
+        semantic_header_block_options(opts)
       )
 
     Rendro.section(
@@ -386,7 +389,8 @@ defmodule Rendro.Recipes.Statement do
             widows: type.widows,
             orphans: type.orphans,
             color: colors.ink
-          )
+          ),
+          semantic_header_block_options(opts)
         ),
         Rendro.block(
           Rendro.text(period_str,
@@ -396,7 +400,8 @@ defmodule Rendro.Recipes.Statement do
             widows: type.widows,
             orphans: type.orphans,
             color: colors.muted
-          )
+          ),
+          semantic_header_block_options(opts)
         ),
         Rendro.block(
           Rendro.text(ob_str,
@@ -406,7 +411,8 @@ defmodule Rendro.Recipes.Statement do
             widows: type.widows,
             orphans: type.orphans,
             color: colors.muted
-          )
+          ),
+          semantic_header_block_options(opts)
         ),
         closing_backdrop,
         closing_label,
@@ -423,11 +429,40 @@ defmodule Rendro.Recipes.Statement do
   # type scale + 1.35 leading actually needs (see @themed_header_height).
   # ---------------------------------------------------------------------------
   defp header_height(opts) do
-    case {opts[:theme], opts[:catalog_layout]} do
-      {nil, _} -> @header_height
-      {_theme, true} -> @catalog_themed_header_height
-      {_theme, _} -> @themed_header_height
+    case Keyword.get(opts, :header_height) do
+      height when is_number(height) ->
+        height
+
+      nil ->
+        case {opts[:theme], opts[:catalog_layout]} do
+          {nil, _} -> @header_height
+          {_theme, true} -> @catalog_themed_header_height
+          {_theme, _} -> @themed_header_height
+        end
     end
+  end
+
+  defp maybe_put_measured_header_height(data, opts) do
+    if primary_secondary_semantic_ink?(opts) do
+      Keyword.put_new(opts, :header_height, measured_semantic_header_height(data, opts))
+    else
+      opts
+    end
+  end
+
+  defp measured_semantic_header_height(data, opts) do
+    type = typography(opts)
+
+    document =
+      Rendro.Document.new()
+      |> Rendro.Theme.Presets.register_metric_fonts(Map.values(type.fonts))
+
+    rows = data |> header_section(opts) |> Map.fetch!(:content) |> Enum.map(&[&1])
+
+    {_header_height, row_heights} =
+      Rendro.measure_rows(rows, @content_width, document, columns: [{:fixed, @content_width}])
+
+    max(header_height(opts), Float.ceil(Enum.sum(row_heights) + @row_epsilon, 1))
   end
 
   # Preserve the frozen no-theme band while allowing supplied themes to add
@@ -700,6 +735,10 @@ defmodule Rendro.Recipes.Statement do
 
   defp primary_secondary_semantic_ink?(opts) do
     match?(%{semantic_ink: :primary_secondary}, opts[:presentation_profile])
+  end
+
+  defp semantic_header_block_options(opts) do
+    if primary_secondary_semantic_ink?(opts), do: [width: @content_width], else: []
   end
 
   defp footer_section(_data, opts) do
