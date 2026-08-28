@@ -302,7 +302,8 @@ defmodule Rendro.CatalogTest do
              %{"review_status" => "scored", "gate_results" => %{"print_safety" => false}} ->
                true
 
-             %{"review_status" => "unscored", "reason" => reason} when is_binary(reason) ->
+             %{"review_status" => "unscored", "print_safety" => false, "reason" => reason}
+             when is_binary(reason) ->
                true
 
              _ ->

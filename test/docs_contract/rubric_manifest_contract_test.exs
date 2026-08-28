@@ -105,6 +105,22 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
     |> JSON.decode!()
   end
 
+  defp schema_ready_non_prose_fixture do
+    justifications_by_id =
+      manifest()["catalog_dispositions"]
+      |> Map.new(&{&1["catalog_id"], &1["justifications"]})
+
+    update_in(non_prose_fixture(), ["catalog_dispositions"], fn dispositions ->
+      Enum.map(dispositions, fn
+        %{"review_status" => "scored"} = disposition ->
+          Map.put(disposition, "justifications", justifications_by_id[disposition["catalog_id"]])
+
+        disposition ->
+          disposition
+      end)
+    end)
+  end
+
   defp replace_catalog_disposition(dispositions, replacement) do
     Enum.map(dispositions, fn disposition ->
       if disposition["catalog_id"] == replacement["catalog_id"],
@@ -166,6 +182,71 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
   test "schema validation: checked-in manifest validates against rubric_scores.schema.json" do
     assert {:ok, _} = JSV.validate(manifest(), rubric_schema()),
            "#{@manifest_path} failed validation against #{@schema_path}"
+
+    assert {:ok, _} = JSV.validate(schema_ready_non_prose_fixture(), rubric_schema()),
+           "#{@non_prose_fixture_path} dispositions failed validation against #{@schema_path} " <>
+             "after restoring the canonical scored-record prose intentionally stripped by the fixture"
+  end
+
+  test "dark unscored print safety is an explicit false scope boundary, never review evidence" do
+    for source <- [manifest(), non_prose_fixture()] do
+      dark_unscored =
+        Enum.filter(source["catalog_dispositions"], fn disposition ->
+          disposition["mode"] == "dark" and disposition["review_status"] == "unscored"
+        end)
+
+      assert length(dark_unscored) == 7
+
+      for disposition <- dark_unscored do
+        assert disposition["print_safety"] == false
+
+        refute Enum.any?(
+                 ~w(dimension_scores gate_results passed signed_off_by signed_off_at justifications resolution_ref supersedes_evidence_ref),
+                 &Map.has_key?(disposition, &1)
+               )
+      end
+
+      for disposition <- source["catalog_dispositions"],
+          disposition["mode"] == "light" and disposition["review_status"] == "unscored" do
+        refute Map.has_key?(disposition, "print_safety")
+      end
+    end
+  end
+
+  test "schema rejects missing or non-false dark-unscored print safety and reviewer-owned fields" do
+    m = manifest()
+
+    record =
+      Enum.find(m["catalog_dispositions"], fn disposition ->
+        disposition["mode"] == "dark" and disposition["review_status"] == "unscored"
+      end)
+
+    mutations = [
+      Map.delete(record, "print_safety"),
+      Map.put(record, "print_safety", true),
+      Map.put(record, "print_safety", "false"),
+      Map.put(record, "print_safety", nil),
+      Map.put(record, "dimension_scores", %{}),
+      Map.put(record, "gate_results", %{"reading_order" => true, "print_safety" => false}),
+      Map.put(record, "passed", false),
+      Map.put(record, "signed_off_by", "reviewer"),
+      Map.put(record, "signed_off_at", "2026-08-28"),
+      Map.put(record, "justifications", %{}),
+      Map.put(record, "resolution_ref", "review-owned-resolution"),
+      Map.put(record, "supersedes_evidence_ref", "review-owned-evidence")
+    ]
+
+    for mutated_record <- mutations do
+      mutated =
+        put_in(
+          m,
+          ["catalog_dispositions"],
+          replace_catalog_disposition(m["catalog_dispositions"], mutated_record)
+        )
+
+      refute match?({:ok, _}, JSV.validate(mutated, rubric_schema())),
+             "dark unscored mutation must fail: #{inspect(Map.keys(mutated_record))}"
+    end
   end
 
   test "schema rejects incomplete scored evidence for both passing and failed Phase 130 rows" do
@@ -521,7 +602,10 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
   end
 
   defp phase136_canonical_eligibility(_rubric, _catalog, sign_off) when is_binary(sign_off) do
-    if Regex.match?(~r/`review` dispatch, GitHub Actions run `33177154682` attempt `1`.*?:invalid_candidate_scope/s, sign_off) do
+    if Regex.match?(
+         ~r/`review` dispatch, GitHub Actions run `33177154682` attempt `1`.*?:invalid_candidate_scope/s,
+         sign_off
+       ) do
       {:canonical_ineligible,
        [
          "missing validated closed review bundle for d547bbfa60760d43f19a15372d88a2d159bfa327",
@@ -710,14 +794,24 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
   end
 
   defp dark_print_safety?(%{
+         "mode" => "dark",
          "catalog_id" => id,
          "review_status" => "scored",
          "gate_results" => gates
        })
        when is_binary(id) and is_map(gates),
-       do: not String.ends_with?(id, "--dark") or gates["print_safety"] == false
+       do: String.ends_with?(id, "--dark") and gates["print_safety"] == false
 
-  defp dark_print_safety?(%{"review_status" => "unscored"}), do: true
+  defp dark_print_safety?(%{
+         "mode" => "dark",
+         "review_status" => "unscored",
+         "print_safety" => false
+       }),
+       do: true
+
+  defp dark_print_safety?(%{"mode" => "light"} = disposition),
+    do: not Map.has_key?(disposition, "print_safety")
+
   defp dark_print_safety?(_), do: false
 
   defp exact_sha?(value, size) when is_binary(value),
