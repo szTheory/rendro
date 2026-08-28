@@ -62,5 +62,19 @@ defmodule Rendro.Recipes.PayslipByteIdentityTest do
                "If this drift is an intentional, human-approved change, " <>
                "recompute @toy_golden_sha256 and update it deliberately."
     end
+
+    test "sequential light and dark profiles are each deterministic" do
+      profile = [presentation_profile: %{ledger_layout: :sequential_measured}]
+
+      for theme <- [
+            Rendro.Theme.preset(:swiss, accent: "#2C6BED"),
+            Rendro.Theme.dark(Rendro.Theme.preset(:swiss, accent: "#2C6BED"))
+          ] do
+        doc = Payslip.document(fixture_data(), [theme: theme] ++ profile)
+        assert {:ok, pdf1} = Rendro.render(doc, deterministic: true)
+        assert {:ok, pdf2} = Rendro.render(doc, deterministic: true)
+        assert pdf1 == pdf2
+      end
+    end
   end
 end
