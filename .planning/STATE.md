@@ -5,16 +5,16 @@ milestone_name: Quality & Maintainability (Phases 132-137)
 current_phase: 136
 current_phase_name: Catalog Visual Quality
 status: executing
-stopped_at: Completed 136-11-PLAN.md
-last_updated: "2026-08-28T20:29:45.587Z"
+stopped_at: Completed 136-14-PLAN.md
+last_updated: "2026-08-28T20:51:10.397Z"
 last_activity: 2026-08-28
 last_activity_desc: Phase 136 execution started
-state_head: 7c013b04aedac61deed7ac331d8d3f4c8132530f
+state_head: 947393a7cfcddda5951e481336944d0a5926c06f
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 40
-  completed_plans: 36
+  completed_plans: 37
   percent: 67
 ---
 
@@ -116,6 +116,9 @@ Phase 137 Closure & Handoff ............................... Pending
 - [Phase 136]: Phase 136 held-out recipe tests establish deterministic text, pagination, and geometry invariants only; they do not create aesthetic, accessibility, or print-safety approval.
 - [Phase 136]: The reviewer packet is fixed to eight family-paired roles in D-21 order and remains authority-none; only the separately validated closed bundle supplies evidence identity.
 - [Phase 136]: Receipt shape remains separate from eligibility; complete and qualified gates recheck fresh archives, bundle/packet bytes, parent identity, and independent intake.
+- [Phase 136]: A baseline commit is trusted only when its full Git SHA resolves and its catalog manifest blob byte-matches the clean checked-in baseline.
+- [Phase 136]: Canonical publication tracks both backups and installed replacements so rollback never deletes untouched canonical paths.
+- [Phase 136]: Closed evidence and the authority-none eight-image packet remain separate artifacts with independent archive digests and evidence-first validation.
 
 ### Pending Todos
 
@@ -137,8 +140,8 @@ Phase 137 Closure & Handoff ............................... Pending
 
 ## Session Continuity
 
-Last session: 2026-08-28T20:29:45.343Z
-Stopped at: Completed 136-11-PLAN.md
+Last session: 2026-08-28T20:51:10.165Z
+Stopped at: Completed 136-14-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -197,3 +200,4 @@ Resume file: None
 | Phase 136 P09 | 14min | 2 tasks | 8 files |
 | Phase 136 P10 | 24min | 3 tasks | 9 files |
 | Phase 136-catalog-visual-quality P11 | 29min | 2 tasks | 5 files |
+| Phase 136-catalog-visual-quality P14 | 17min | 2 tasks | 6 files |

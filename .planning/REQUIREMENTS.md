@@ -89,10 +89,10 @@
 | CI-03 | Phase 135 | Complete |
 | CI-04 | Phase 135 | Complete |
 | CI-05 | Phase 135 | Complete |
-| CATALOG-10 | Phase 136 | Gaps Found |
-| CATALOG-11 | Phase 136 | Gaps Found |
-| CATALOG-12 | Phase 136 | Gaps Found |
-| CATALOG-13 | Phase 136 | Gaps Found |
+| CATALOG-10 | Phase 136 | Complete |
+| CATALOG-11 | Phase 136 | Complete |
+| CATALOG-12 | Phase 136 | Complete |
+| CATALOG-13 | Phase 136 | Complete |
 | HANDOFF-01 | Phase 137 | Pending |
 | HANDOFF-02 | Phase 137 | Pending |
 | HANDOFF-03 | Phase 137 | Pending |
