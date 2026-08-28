@@ -748,7 +748,7 @@ defmodule Rendro.Recipes.Payslip do
         [
           cell_text(line.description, colors, type),
           cell_text(fmt_amount.(line.amount), colors, type),
-          cell_text(fmt_amount.(line.ytd), colors, type)
+          cell_text(fmt_amount_or_blank(Map.get(line, :ytd), fmt_amount), colors, type)
         ]
       end)
 
@@ -799,7 +799,13 @@ defmodule Rendro.Recipes.Payslip do
     tokens =
       [lbl.(:amount), lbl.(:ytd_amount)] ++
         Enum.flat_map([data.earnings, data.deductions], fn lines ->
-          Enum.flat_map(lines, &[fmt_amount.(&1.amount), fmt_amount.(&1.ytd)])
+          Enum.flat_map(
+            lines,
+            &[
+              fmt_amount.(&1.amount),
+              fmt_amount_or_blank(Map.get(&1, :ytd), fmt_amount)
+            ]
+          )
         end)
 
     widest =
