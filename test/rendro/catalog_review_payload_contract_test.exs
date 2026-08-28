@@ -37,9 +37,14 @@ defmodule Rendro.CatalogReviewPayloadContractTest do
 
     assert Enum.all?(final, fn identity ->
              Enum.all?(
-               ~w(catalog_id mode png_path png_sha256 source_pdf_sha256 renderer_version renderer_sha256 commit_sha run_id),
+               ~w(catalog_id mode png_path png_sha256 source_pdf_sha256 renderer_version renderer_sha256 commit_sha control_sha run_id run_attempt),
                &Map.has_key?(identity, &1)
              )
+           end)
+
+    assert Enum.all?(final ++ multipage, fn identity ->
+             identity["control_sha"] == String.duplicate("c", 40) and
+               identity["run_attempt"] == 2
            end)
 
     refute Enum.any?(
@@ -66,7 +71,11 @@ defmodule Rendro.CatalogReviewPayloadContractTest do
       put_in(manifest, ["candidate", "commit_sha"], "short"),
       put_in(manifest, ["candidate", "commit_sha"], "A" <> String.duplicate("a", 39)),
       put_in(manifest, ["candidate", "commit_sha"], String.duplicate("a", 39)),
+      Map.update!(manifest, "candidate", &Map.delete(&1, "baseline_commit_sha")),
+      put_in(manifest, ["candidate", "baseline_commit_sha"], "short"),
       put_in(manifest, ["candidate", "run_id"], " "),
+      Map.update!(manifest, "candidate", &Map.delete(&1, "run_attempt")),
+      put_in(manifest, ["candidate", "run_attempt"], 0),
       put_in(manifest, ["cells", Access.at(0), "quality"], %{"status" => "passed"}),
       put_in(manifest, ["candidate", "scores"], %{"content_hierarchy" => 5})
     ]
@@ -100,7 +109,9 @@ defmodule Rendro.CatalogReviewPayloadContractTest do
     %{
       "candidate" => %{
         "commit_sha" => String.duplicate("a", 40),
+        "baseline_commit_sha" => String.duplicate("c", 40),
         "run_id" => "130-03-contract-run",
+        "run_attempt" => 2,
         "renderer" => %{
           "version" => "v0.11.0",
           "sha256" => String.duplicate("b", 64)

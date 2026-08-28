@@ -1,7 +1,7 @@
 defmodule Rendro.CatalogVisualGalleryTest do
   use ExUnit.Case, async: false
 
-  alias Rendro.CatalogVisualGallery
+  alias Rendro.{CatalogReviewPayload, CatalogVisualGallery}
 
   @targets [
     "invoice--cedar-mutual--corporate-classic--dark",
@@ -70,7 +70,7 @@ defmodule Rendro.CatalogVisualGalleryTest do
     manifest_path = Path.join(candidate_root, "candidate-manifest.json")
     File.write!(manifest_path, Jason.encode!(manifest))
     final_path = Path.join(candidate_root, "final-manifest.json")
-    File.write!(final_path, Jason.encode!(final_manifest(manifest)))
+    File.write!(final_path, Jason.encode!(classified_final_manifest(manifest)))
 
     assert {:ok, ^root} = CatalogVisualGallery.build(manifest_path, final_path, root)
 
@@ -471,6 +471,20 @@ defmodule Rendro.CatalogVisualGalleryTest do
             "run_attempt" => 1
           }
         end)
+    }
+  end
+
+  defp classified_final_manifest(manifest) do
+    assert {:ok, %{final: images}} =
+             CatalogReviewPayload.classify(manifest, manifest["multipage"])
+
+    %{
+      "candidate_sha" => get_in(manifest, ["candidate", "commit_sha"]),
+      "control_sha" => get_in(manifest, ["candidate", "baseline_commit_sha"]),
+      "run_id" => get_in(manifest, ["candidate", "run_id"]),
+      "run_attempt" => get_in(manifest, ["candidate", "run_attempt"]),
+      "renderer" => %{"version" => pin_version(), "sha256" => pin_sha()},
+      "images" => images
     }
   end
 
