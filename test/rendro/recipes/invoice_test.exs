@@ -128,7 +128,7 @@ defmodule Rendro.Recipes.InvoiceTest do
   end
 
   describe "private semantic ink presentation profile" do
-    test "primary_secondary gives header labels semantic primary ink without changing Total Due accent" do
+    test "primary_secondary gives every Invoice role semantic ink without changing the Total Due anchor" do
       data =
         sample_data()
         |> Map.put(:totals, %{subtotal: Decimal.new("1100"), total: Decimal.new("1100")})
@@ -146,6 +146,15 @@ defmodule Rendro.Recipes.InvoiceTest do
 
       header = Enum.find(sections, &(&1.region == :header))
       body = Enum.find(sections, &(&1.region == :body))
+      footer = Enum.find(sections, &(&1.region == :footer))
+
+      assert %Rendro.Block{
+               content: %Rendro.Text{content: "INVOICE #INV-042", color: ^primary_ink}
+             } =
+               Enum.find(header.content, fn
+                 %Rendro.Block{content: %Rendro.Text{content: "INVOICE #INV-042"}} -> true
+                 _ -> false
+               end)
 
       assert %Rendro.Block{
                content: %Rendro.Text{content: "Date: 2026-04-30", color: ^primary_ink}
@@ -165,6 +174,12 @@ defmodule Rendro.Recipes.InvoiceTest do
                end)
 
       assert String.starts_with?(total, "Total Due:")
+
+      assert %Rendro.Block{
+               content: %Rendro.Text{content: "Thank you for your business!", color: muted}
+             } = hd(footer.content)
+
+      assert muted == colors.muted
     end
   end
 
