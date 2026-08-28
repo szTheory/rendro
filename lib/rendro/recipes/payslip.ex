@@ -716,7 +716,7 @@ defmodule Rendro.Recipes.Payslip do
         doc_for_measure,
         current_width,
         ytd_width,
-        true
+        false
       )
 
     reconciliation_blocks =

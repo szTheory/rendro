@@ -76,5 +76,26 @@ defmodule Rendro.Recipes.PayslipByteIdentityTest do
         assert pdf1 == pdf2
       end
     end
+
+    test "sequential light and dark profiles retain identical table geometry" do
+      profile = [presentation_profile: %{ledger_layout: :sequential_measured}]
+      light = Rendro.Theme.preset(:swiss, accent: "#2C6BED")
+      dark = Rendro.Theme.dark(light)
+
+      assert ledger_geometry(Payslip.document(fixture_data(), [theme: light] ++ profile)) ==
+               ledger_geometry(Payslip.document(fixture_data(), [theme: dark] ++ profile))
+    end
   end
+
+  defp ledger_geometry(doc) do
+    body = Enum.find(doc.sections, &(&1.region == :body))
+
+    for %Rendro.Block{content: %Rendro.Table{} = table} <- body.content do
+      {table.columns, table.cell_align, table.header |> Enum.map(&text_content/1),
+       table.rows |> Enum.map(fn row -> Enum.map(row, &text_content/1) end)}
+    end
+  end
+
+  defp text_content(%Rendro.Block{content: %Rendro.Text{content: content}}), do: content
+  defp text_content(content) when is_binary(content), do: content
 end
