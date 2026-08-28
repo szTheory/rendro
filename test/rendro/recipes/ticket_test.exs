@@ -214,9 +214,11 @@ defmodule Rendro.Recipes.TicketTest do
           ]
         )
 
+      theme = Rendro.Theme.preset(:brutalist, accent: "#C78600", mode: :light)
+
       main =
         Ticket.sections(data,
-          theme: Rendro.Theme.preset(:brutalist, accent: "#C78600", mode: :light),
+          theme: theme,
           catalog_layout: true,
           presentation_profile: %{locator_layout: :atomic_equal_share}
         )
@@ -226,6 +228,7 @@ defmodule Rendro.Recipes.TicketTest do
       table = grid_block.content
 
       assert table.columns == List.duplicate({:share, 1}, 4)
+      assert table.header_fill == theme.colors.surface
       assert Enum.map(table.header, &cell_text/1) == ["SECTION", "ROW", "SEAT", "GATE"]
       assert [value_cells] = table.rows
       assert Enum.map(value_cells, &cell_text/1) == ["GA", "H", "24", "B"]
