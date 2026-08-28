@@ -227,17 +227,17 @@ Keep ordering literal and compare both candidate PDF and PNG identity through th
 
 All plan-relevant claims were verified against the local codebase, locked context, current brand guidance, or cited primary documentation; no user confirmation is needed for an assumed implementation decision.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Exact numeric widths/tones/font sizes**
    - What we know: the decisions intentionally delegate these values; the engine can measure rows and themes expose semantic roles.
-   - What's unclear: the specific values that score 4+/5 on the immutable candidate raster.
-   - Recommendation: make values profile-private, cover their invariant behavior with ExUnit, and iterate only against a single validated exact-SHA review bundle.
+   - Resolution: exact values remain profile-private implementation details and are tuned only against one deterministically validated exact-SHA candidate bundle. ExUnit must first enforce the locked typography roles, measured geometry, default/no-profile bytes, target-pair parity, and six/26 scope. Raster iteration may change only the six target profiles; it may not alter public API, default/no-theme behavior, unrelated themes, global Theme/preset tokens, caller data, the render pipeline, or the 26 controls. A reviewer miss triggers another bounded candidate SHA rather than widening the blast radius.
+   - Status: RESOLVED — Plans 01-04 own invariant-safe profile tuning; Plans 05-06 own exact-SHA validation and promotion gates.
 
 2. **Human score/provenance authoring after the first candidate**
    - What we know: candidate evidence cannot carry reviewer fields; current rubric schema/projection accepts reviewer-owned binding fields.
-   - What's unclear: the final score values, reviewer/date, and external artifact URL/digest because they do not exist until review.
-   - Recommendation: dedicate a post-review plan task to update only `priv/quality/rubric_scores.json`, `priv/quality/SIGN-OFF.md`, and generated canonical assets after the evidence packet is validated.
+   - Resolution: score values, reviewer/date, rationale, and artifact URL/digest are authored only by the named advisory human record after deterministic validation of the exact candidate SHA, renderer, run/attempt, PDF/PNG hashes, closed roles, and counts. Generator/candidate code never creates, rounds, clamps, infers, or edits those values. If review is absent, incomplete, or misses, the cell stays unreviewed/unpromoted with an explicit deferral and next action; deterministic execution continues and canonical artifacts remain unchanged. Canonical materialization is a later task and requires six complete threshold-meeting records plus exact six/26 proof.
+   - Status: RESOLVED — Plan 05 owns non-blocking advisory intake/deferral; Plan 06 owns deterministic eligibility and conditional canonical materialization.
 
 ## Environment Availability
 
