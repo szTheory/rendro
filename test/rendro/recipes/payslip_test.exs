@@ -488,6 +488,47 @@ defmodule Rendro.Recipes.PayslipTest do
   end
 
   describe "sequential measured ledger profile" do
+    test "omitted and nil YTD values render as blank while present values keep money formatting" do
+      data =
+        fixture_data(
+          earnings: [
+            %{description: "Omitted YTD", amount: Decimal.new("100.00")},
+            %{description: "Nil YTD", amount: Decimal.new("200.00"), ytd: nil},
+            %{description: "Zero YTD", amount: Decimal.new("300.00"), ytd: Decimal.new("0.00")}
+          ],
+          deductions: [
+            %{
+              description: "Present YTD",
+              amount: Decimal.new("50.00"),
+              ytd: Decimal.new("625.00")
+            }
+          ]
+        )
+
+      opts = [
+        theme: Rendro.Theme.preset(:swiss, accent: "#2C6BED"),
+        presentation_profile: %{ledger_layout: :sequential_measured}
+      ]
+
+      document = Payslip.document(data, opts)
+      assert {:ok, first_pdf} = Rendro.render(document, deterministic: true)
+      assert {:ok, second_pdf} = Rendro.render(document, deterministic: true)
+      assert first_pdf == second_pdf
+
+      body = Enum.find(document.sections, &(&1.region == :body))
+      [earnings, deductions] = Enum.filter(body.content, &is_struct(&1.content, Rendro.Table))
+
+      assert Enum.map(earnings.content.rows, &collect_content_from_row/1) == [
+               ["Omitted YTD", "$100.00", ""],
+               ["Nil YTD", "$200.00", ""],
+               ["Zero YTD", "$300.00", "$0.00"]
+             ]
+
+      assert Enum.map(deductions.content.rows, &collect_content_from_row/1) == [
+               ["Present YTD", "$50.00", "$625.00"]
+             ]
+    end
+
     test "renders independent full-width Earnings then Deductions tables for the Swiss profile" do
       sections =
         Payslip.sections(fixture_data(),
