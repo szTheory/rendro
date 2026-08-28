@@ -181,6 +181,7 @@ defmodule Rendro.Catalog do
 
       result =
         with {:ok, renderer_version} <- Rendro.Adapters.Pdfium.version(),
+             {:ok, source_commit_sha} <- current_commit_sha(),
              :ok <- File.mkdir_p(@canonical_staging_root),
              {:ok, cells} <-
                build_cells(renderer_version, @canonical_staging_root, @asset_root),
@@ -188,7 +189,8 @@ defmodule Rendro.Catalog do
              :ok <-
                File.write(
                  @canonical_manifest_staging_path,
-                 encode_manifest(build_manifest(cells, renderer_version)) <> "\n"
+                 encode_manifest(canonical_manifest(cells, renderer_version, source_commit_sha)) <>
+                   "\n"
                ),
              :ok <- publish_canonical_staging() do
           :ok
@@ -216,6 +218,7 @@ defmodule Rendro.Catalog do
              :ok <- File.mkdir_p(@candidate_staging_root),
              baseline <- read_manifest!(),
              :ok <- valid_candidate_baseline(baseline),
+             {:ok, baseline_commit_sha} <- baseline_commit_sha(),
              {:ok, cells} <-
                build_cells(renderer_version, @candidate_staging_root, @candidate_root),
              :ok <- validate_candidate_staging(cells),
@@ -227,7 +230,8 @@ defmodule Rendro.Catalog do
                  read_rubric_scores(),
                  renderer_version,
                  current_commit_sha!(),
-                 multipage
+                 multipage,
+                 baseline_commit_sha
                ),
              :ok <-
                File.write(
@@ -265,10 +269,39 @@ defmodule Rendro.Catalog do
   def candidate_manifest(cells, baseline, rubric, renderer_version, commit_sha, multipage)
       when is_list(cells) and is_map(baseline) and is_map(rubric) and is_binary(renderer_version) and
              is_binary(commit_sha) and is_list(multipage) do
+    with {:ok, baseline_commit_sha} <- baseline_commit_sha() do
+      candidate_manifest(
+        cells,
+        baseline,
+        rubric,
+        renderer_version,
+        commit_sha,
+        multipage,
+        baseline_commit_sha
+      )
+    end
+  end
+
+  def candidate_manifest(_cells, _baseline, _rubric, _renderer_version, _commit_sha, _multipage),
+    do: {:error, :invalid_candidate_manifest_input}
+
+  @doc false
+  def candidate_manifest(
+        cells,
+        baseline,
+        rubric,
+        renderer_version,
+        commit_sha,
+        multipage,
+        baseline_commit_sha
+      )
+      when is_list(cells) and is_map(baseline) and is_map(rubric) and is_binary(renderer_version) and
+             is_binary(commit_sha) and is_list(multipage) and is_binary(baseline_commit_sha) do
     with :ok <- valid_candidate_baseline(baseline),
          :ok <- valid_candidate_cells(cells),
          :ok <- valid_candidate_multipage(multipage),
-         true <- Regex.match?(~r/\A[0-9a-f]{40}\z/, commit_sha) do
+         true <- full_commit_sha?(commit_sha),
+         true <- full_commit_sha?(baseline_commit_sha) do
       baseline_by_id = Map.new(baseline["cells"], &{&1["id"], &1})
       dispositions = Map.new(rubric["catalog_dispositions"] || [], &{&1["catalog_id"], &1})
       pin = read_pdfium_pin()
@@ -309,8 +342,9 @@ defmodule Rendro.Catalog do
              "generated_by" => @candidate_generated_by,
              "candidate" => %{
                "commit_sha" => commit_sha,
-               "baseline_commit_sha" => commit_sha,
+               "baseline_commit_sha" => baseline_commit_sha,
                "run_id" => System.get_env("GITHUB_RUN_ID") || "local-#{commit_sha}",
+               "run_attempt" => workflow_run_attempt(),
                "renderer" => %{
                  "kind" => @renderer_kind,
                  "version" => renderer_version,
@@ -340,8 +374,65 @@ defmodule Rendro.Catalog do
     end
   end
 
-  def candidate_manifest(_cells, _baseline, _rubric, _renderer_version, _commit_sha, _multipage),
-    do: {:error, :invalid_candidate_manifest_input}
+  def candidate_manifest(
+        _cells,
+        _baseline,
+        _rubric,
+        _renderer_version,
+        _commit_sha,
+        _multipage,
+        _baseline_commit_sha
+      ),
+      do: {:error, :invalid_candidate_manifest_input}
+
+  @doc false
+  @spec baseline_commit_sha(keyword()) :: {:ok, String.t()} | {:error, atom()}
+  def baseline_commit_sha(opts \\ []) do
+    repo_root = opts |> Keyword.get(:repo_root, File.cwd!()) |> Path.expand()
+
+    manifest_path =
+      opts
+      |> Keyword.get(:manifest_path, @manifest_path)
+      |> then(&Path.expand(&1, repo_root))
+
+    with {:ok, manifest_bytes} <- read_baseline_manifest(manifest_path),
+         {:ok, repo_path} <- baseline_repo_path(repo_root, manifest_path),
+         :ok <- baseline_path_is_tracked(repo_root, repo_path),
+         :ok <- baseline_path_is_clean(repo_root, repo_path),
+         {:ok, commit_sha} <- resolve_baseline_commit(repo_root, repo_path, opts),
+         :ok <- validate_full_commit_sha(commit_sha),
+         {:ok, blob} <- read_commit_blob(repo_root, commit_sha, repo_path),
+         true <- blob == manifest_bytes do
+      {:ok, commit_sha}
+    else
+      false -> {:error, :baseline_manifest_mismatch}
+      {:error, _reason} = error -> error
+    end
+  end
+
+  @doc false
+  @spec canonical_manifest([map()], String.t(), String.t()) :: map()
+  def canonical_manifest(cells, renderer_version, source_commit_sha)
+      when is_list(cells) and is_binary(renderer_version) and is_binary(source_commit_sha) do
+    unless full_commit_sha?(source_commit_sha),
+      do: raise(ArgumentError, "canonical source_commit_sha must be a full lowercase Git SHA")
+
+    pin = read_pdfium_pin()
+
+    %{
+      "schema_version" => @schema_version,
+      "generated_by" => @generated_by,
+      "source_commit_sha" => source_commit_sha,
+      "renderer" => %{
+        "kind" => @renderer_kind,
+        "version" => renderer_version,
+        "dpi" => @dpi,
+        "pin_path" => @pdfium_pin_path,
+        "pin_sha256" => pin["sha256"]
+      },
+      "cells" => cells
+    }
+  end
 
   @spec check(keyword()) :: :ok | {:error, [String.t()]}
   def check(opts \\ []) do
@@ -544,23 +635,6 @@ defmodule Rendro.Catalog do
       end
     end)
     |> split_results()
-  end
-
-  defp build_manifest(cells, renderer_version) do
-    pin = read_pdfium_pin()
-
-    %{
-      "schema_version" => @schema_version,
-      "generated_by" => @generated_by,
-      "renderer" => %{
-        "kind" => @renderer_kind,
-        "version" => renderer_version,
-        "dpi" => @dpi,
-        "pin_path" => @pdfium_pin_path,
-        "pin_sha256" => pin["sha256"]
-      },
-      "cells" => cells
-    }
   end
 
   defp rendered_contract_errors(manifest) do
@@ -1150,39 +1224,293 @@ defmodule Rendro.Catalog do
   end
 
   defp publish_canonical_staging do
-    catalog_backup = @asset_root <> ".previous"
-    manifest_backup = @manifest_path <> ".previous"
+    publish_canonical_staging(%{
+      asset_root: @asset_root,
+      manifest_path: @manifest_path,
+      asset_staging_root: @canonical_staging_root,
+      manifest_staging_path: @canonical_manifest_staging_path,
+      asset_backup_root: @asset_root <> ".previous",
+      manifest_backup_path: @manifest_path <> ".previous"
+    })
+  end
 
-    File.rm_rf!(catalog_backup)
-    File.rm_rf!(manifest_backup)
+  @doc false
+  def publish_canonical_staging(paths, opts \\ [])
 
-    with :ok <- move_if_present(@asset_root, catalog_backup),
-         :ok <- move_if_present(@manifest_path, manifest_backup),
-         :ok <- File.rename(@canonical_staging_root, @asset_root),
-         :ok <- File.rename(@canonical_manifest_staging_path, @manifest_path) do
-      File.rm_rf!(catalog_backup)
-      File.rm_rf!(manifest_backup)
-      :ok
-    else
-      {:error, reason} ->
-        File.rm_rf!(@asset_root)
-        File.rm_rf!(@manifest_path)
-        move_if_present(catalog_backup, @asset_root)
-        move_if_present(manifest_backup, @manifest_path)
-        {:error, reason}
+  def publish_canonical_staging(paths, opts) when is_map(paths) and is_list(opts) do
+    with {:ok, staged} <- staged_generation(paths),
+         :ok <- backups_are_absent(paths) do
+      state = %{
+        asset_backed_up: false,
+        manifest_backed_up: false,
+        asset_installed: false,
+        manifest_installed: false
+      }
+
+      case run_publication_steps(paths, staged, state, opts) do
+        {:ok, _state} ->
+          cleanup_publication_backups(paths)
+
+        {:error, reason, failed_state} ->
+          case rollback_publication(paths, failed_state) do
+            :ok -> {:error, reason}
+            {:error, rollback_errors} -> {:error, {:rollback_failed, reason, rollback_errors}}
+          end
+      end
     end
   end
 
-  defp move_if_present(source, target) do
-    if File.exists?(source), do: File.rename(source, target), else: :ok
+  def publish_canonical_staging(_paths, _opts), do: {:error, :invalid_publication_paths}
+
+  defp staged_generation(paths) do
+    with {:ok, assets} <- directory_snapshot(paths.asset_staging_root),
+         true <- map_size(assets) > 0,
+         {:ok, manifest} <- File.read(paths.manifest_staging_path),
+         true <- byte_size(manifest) > 0 do
+      {:ok, %{assets: assets, manifest: manifest}}
+    else
+      false -> {:error, :incomplete_canonical_staging}
+      {:error, _reason} -> {:error, :incomplete_canonical_staging}
+    end
+  end
+
+  defp backups_are_absent(paths) do
+    if File.exists?(paths.asset_backup_root) or File.exists?(paths.manifest_backup_path),
+      do: {:error, :ambiguous_canonical_backup},
+      else: :ok
+  end
+
+  defp run_publication_steps(paths, staged, initial_state, opts) do
+    steps = [
+      {:backup_assets,
+       &backup_if_present(&1, paths.asset_root, paths.asset_backup_root, :asset_backed_up)},
+      {:backup_manifest,
+       &backup_if_present(
+         &1,
+         paths.manifest_path,
+         paths.manifest_backup_path,
+         :manifest_backed_up
+       )},
+      {:install_assets,
+       &install_staging(&1, paths.asset_staging_root, paths.asset_root, :asset_installed)},
+      {:install_manifest,
+       &install_staging(
+         &1,
+         paths.manifest_staging_path,
+         paths.manifest_path,
+         :manifest_installed
+       )},
+      {:verify_assets, &verify_installed_assets(&1, paths.asset_root, staged.assets)},
+      {:verify_manifest, &verify_installed_manifest(&1, paths.manifest_path, staged.manifest)}
+    ]
+
+    Enum.reduce_while(steps, {:ok, initial_state}, fn {step, operation}, {:ok, state} ->
+      if Keyword.get(opts, :fail_at) == step do
+        {:halt, {:error, {:injected_failure, step}, state}}
+      else
+        case operation.(state) do
+          {:ok, next_state} -> {:cont, {:ok, next_state}}
+          {:error, reason} -> {:halt, {:error, {step, reason}, state}}
+        end
+      end
+    end)
+  end
+
+  defp backup_if_present(state, source, target, state_key) do
+    if File.exists?(source) do
+      case File.rename(source, target) do
+        :ok -> {:ok, Map.put(state, state_key, true)}
+        {:error, reason} -> {:error, reason}
+      end
+    else
+      {:ok, state}
+    end
+  end
+
+  defp install_staging(state, source, target, state_key) do
+    case File.rename(source, target) do
+      :ok -> {:ok, Map.put(state, state_key, true)}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp verify_installed_assets(state, root, expected) do
+    case directory_snapshot(root) do
+      {:ok, ^expected} -> {:ok, state}
+      {:ok, _other} -> {:error, :installed_assets_mismatch}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp verify_installed_manifest(state, path, expected) do
+    case File.read(path) do
+      {:ok, ^expected} -> {:ok, state}
+      {:ok, _other} -> {:error, :installed_manifest_mismatch}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp rollback_publication(paths, state) do
+    errors =
+      []
+      |> maybe_remove_installed(state.asset_installed, paths.asset_root)
+      |> maybe_remove_installed(state.manifest_installed, paths.manifest_path)
+      |> maybe_restore_backup(state.asset_backed_up, paths.asset_backup_root, paths.asset_root)
+      |> maybe_restore_backup(
+        state.manifest_backed_up,
+        paths.manifest_backup_path,
+        paths.manifest_path
+      )
+      |> remove_transaction_path(paths.asset_staging_root)
+      |> remove_transaction_path(paths.manifest_staging_path)
+      |> remove_transaction_path(paths.asset_backup_root)
+      |> remove_transaction_path(paths.manifest_backup_path)
+
+    if errors == [], do: :ok, else: {:error, errors}
+  end
+
+  defp cleanup_publication_backups(paths) do
+    errors =
+      []
+      |> remove_transaction_path(paths.asset_backup_root)
+      |> remove_transaction_path(paths.manifest_backup_path)
+
+    if errors == [], do: :ok, else: {:error, {:backup_cleanup_failed, errors}}
+  end
+
+  defp maybe_remove_installed(errors, false, _path), do: errors
+  defp maybe_remove_installed(errors, true, path), do: remove_transaction_path(errors, path)
+
+  defp maybe_restore_backup(errors, false, _backup, _target), do: errors
+
+  defp maybe_restore_backup(errors, true, backup, target) do
+    case File.rename(backup, target) do
+      :ok -> errors
+      {:error, reason} -> errors ++ [{:restore_failed, backup, target, reason}]
+    end
+  end
+
+  defp remove_transaction_path(errors, path) do
+    case File.rm_rf(path) do
+      {:ok, _removed} -> errors
+      {:error, reason, failed_path} -> errors ++ [{:remove_failed, failed_path, reason}]
+    end
+  end
+
+  defp directory_snapshot(root) do
+    if File.dir?(root) do
+      assets =
+        root
+        |> Path.join("**/*")
+        |> Path.wildcard(match_dot: true)
+        |> Enum.filter(&File.regular?/1)
+        |> Map.new(fn path -> {Path.relative_to(path, root), File.read!(path)} end)
+
+      {:ok, assets}
+    else
+      {:error, :missing_directory}
+    end
+  rescue
+    _ -> {:error, :unreadable_directory}
   end
 
   defp current_commit_sha! do
-    case System.cmd("git", ["rev-parse", "HEAD"], stderr_to_stdout: true) do
-      {sha, 0} -> String.trim(sha)
-      {reason, _} -> raise "candidate commit identity unavailable: #{String.trim(reason)}"
+    case current_commit_sha() do
+      {:ok, sha} -> sha
+      {:error, reason} -> raise "candidate commit identity unavailable: #{inspect(reason)}"
     end
   end
+
+  defp current_commit_sha do
+    case System.cmd("git", ["rev-parse", "HEAD"], stderr_to_stdout: true) do
+      {sha, 0} ->
+        sha = String.trim(sha)
+        if full_commit_sha?(sha), do: {:ok, sha}, else: {:error, :invalid_candidate_identity}
+
+      {_reason, _status} ->
+        {:error, :candidate_commit_identity_unavailable}
+    end
+  end
+
+  defp read_baseline_manifest(path) do
+    case File.read(path) do
+      {:ok, bytes} -> {:ok, bytes}
+      {:error, :enoent} -> {:error, :baseline_manifest_missing}
+      {:error, _reason} -> {:error, :baseline_manifest_unreadable}
+    end
+  end
+
+  defp baseline_repo_path(repo_root, manifest_path) do
+    relative = Path.relative_to(manifest_path, repo_root)
+
+    if relative == ".." or String.starts_with?(relative, "../"),
+      do: {:error, :baseline_manifest_outside_repository},
+      else: {:ok, relative}
+  end
+
+  defp baseline_path_is_tracked(repo_root, repo_path) do
+    case git(repo_root, ["ls-files", "--error-unmatch", "--", repo_path]) do
+      {:ok, _output} -> :ok
+      {:error, _status, _output} -> {:error, :baseline_manifest_untracked}
+    end
+  end
+
+  defp baseline_path_is_clean(repo_root, repo_path) do
+    case git(repo_root, ["status", "--porcelain=v1", "--", repo_path]) do
+      {:ok, ""} -> :ok
+      {:ok, _changes} -> {:error, :baseline_manifest_dirty}
+      {:error, _status, _output} -> {:error, :baseline_git_unavailable}
+    end
+  end
+
+  defp resolve_baseline_commit(repo_root, repo_path, opts) do
+    case Keyword.get(opts, :commit_sha) || System.get_env("RENDRO_CATALOG_BASELINE_COMMIT_SHA") do
+      nil ->
+        case git(repo_root, ["log", "-1", "--format=%H", "--", repo_path]) do
+          {:ok, ""} -> {:error, :baseline_commit_unavailable}
+          {:ok, sha} -> {:ok, sha}
+          {:error, _status, _output} -> {:error, :baseline_commit_unavailable}
+        end
+
+      sha when is_binary(sha) ->
+        {:ok, sha}
+
+      _other ->
+        {:error, :invalid_baseline_commit_sha}
+    end
+  end
+
+  defp validate_full_commit_sha(sha) do
+    if full_commit_sha?(sha), do: :ok, else: {:error, :invalid_baseline_commit_sha}
+  end
+
+  defp read_commit_blob(repo_root, commit_sha, repo_path) do
+    case git(repo_root, ["show", "#{commit_sha}:#{repo_path}"], trim: false) do
+      {:ok, blob} -> {:ok, blob}
+      {:error, _status, _output} -> {:error, :baseline_commit_unavailable}
+    end
+  end
+
+  defp git(repo_root, args, opts \\ []) do
+    case System.cmd("git", args, cd: repo_root, stderr_to_stdout: true) do
+      {output, 0} ->
+        output = if Keyword.get(opts, :trim, true), do: String.trim(output), else: output
+        {:ok, output}
+
+      {output, status} ->
+        {:error, status, String.trim(output)}
+    end
+  end
+
+  defp workflow_run_attempt do
+    case Integer.parse(System.get_env("GITHUB_RUN_ATTEMPT") || "1") do
+      {attempt, ""} when attempt > 0 -> attempt
+      _ -> 1
+    end
+  end
+
+  defp full_commit_sha?(value),
+    do: is_binary(value) and Regex.match?(~r/\A[0-9a-f]{40}\z/, value)
 
   defp sha256?(value), do: is_binary(value) and Regex.match?(~r/\A[0-9a-f]{64}\z/, value)
 

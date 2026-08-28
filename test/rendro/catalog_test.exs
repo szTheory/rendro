@@ -417,12 +417,46 @@ defmodule Rendro.CatalogTest do
 
     assert candidate["candidate"]["commit_sha"] == candidate_sha
     assert candidate["candidate"]["baseline_commit_sha"] == baseline_sha
+    assert candidate["candidate"]["run_attempt"] == 1
     refute candidate["candidate"]["baseline_commit_sha"] == candidate_sha
 
-    canonical = Catalog.canonical_manifest(baseline["cells"], "v0.11.0", candidate_sha)
-    assert canonical["source_commit_sha"] == candidate_sha
+    source_sha = git!(File.cwd!(), ["rev-parse", "HEAD"])
+    canonical = Catalog.canonical_manifest(baseline["cells"], "v0.11.0", source_sha)
+    assert canonical["source_commit_sha"] == source_sha
     assert canonical["renderer"]["kind"] == "pdfium-render"
     assert canonical["renderer"]["version"] == "v0.11.0"
+
+    root = temp_root!("canonical-bundle")
+    source = Path.join(root, "catalog.json")
+    bundle = Path.join(root, "bundle")
+    File.write!(source, Jason.encode!(canonical))
+
+    provenance = %{
+      candidate_sha: source_sha,
+      checked_out_head: source_sha,
+      control_sha: source_sha,
+      event: "workflow_dispatch",
+      run_id: "12345",
+      run_attempt: 1,
+      dpi: 96
+    }
+
+    assert :ok =
+             Rendro.CatalogEvidenceBundle.build(
+               :canonical,
+               [
+                 %{
+                   role: "canonical/catalog.json",
+                   source: source,
+                   media_type: "application/json",
+                   count: 32
+                 }
+               ],
+               provenance,
+               bundle
+             )
+
+    assert :ok = Rendro.CatalogEvidenceBundle.validate(bundle, :canonical, source_sha)
   end
 
   test "canonical publication restores the complete old generation at every injected boundary" do
