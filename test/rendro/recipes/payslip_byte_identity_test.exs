@@ -62,5 +62,40 @@ defmodule Rendro.Recipes.PayslipByteIdentityTest do
                "If this drift is an intentional, human-approved change, " <>
                "recompute @toy_golden_sha256 and update it deliberately."
     end
+
+    test "sequential light and dark profiles are each deterministic" do
+      profile = [presentation_profile: %{ledger_layout: :sequential_measured}]
+
+      for theme <- [
+            Rendro.Theme.preset(:swiss, accent: "#2C6BED"),
+            Rendro.Theme.dark(Rendro.Theme.preset(:swiss, accent: "#2C6BED"))
+          ] do
+        doc = Payslip.document(fixture_data(), [theme: theme] ++ profile)
+        assert {:ok, pdf1} = Rendro.render(doc, deterministic: true)
+        assert {:ok, pdf2} = Rendro.render(doc, deterministic: true)
+        assert pdf1 == pdf2
+      end
+    end
+
+    test "sequential light and dark profiles retain identical table geometry" do
+      profile = [presentation_profile: %{ledger_layout: :sequential_measured}]
+      light = Rendro.Theme.preset(:swiss, accent: "#2C6BED")
+      dark = Rendro.Theme.dark(light)
+
+      assert ledger_geometry(Payslip.document(fixture_data(), [theme: light] ++ profile)) ==
+               ledger_geometry(Payslip.document(fixture_data(), [theme: dark] ++ profile))
+    end
   end
+
+  defp ledger_geometry(doc) do
+    body = Enum.find(doc.sections, &(&1.region == :body))
+
+    for %Rendro.Block{content: %Rendro.Table{} = table} <- body.content do
+      {table.columns, table.cell_align, table.header |> Enum.map(&text_content/1),
+       table.rows |> Enum.map(fn row -> Enum.map(row, &text_content/1) end)}
+    end
+  end
+
+  defp text_content(%Rendro.Block{content: %Rendro.Text{content: content}}), do: content
+  defp text_content(content) when is_binary(content), do: content
 end
