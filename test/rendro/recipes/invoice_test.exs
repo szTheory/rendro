@@ -147,7 +147,9 @@ defmodule Rendro.Recipes.InvoiceTest do
       header = Enum.find(sections, &(&1.region == :header))
       body = Enum.find(sections, &(&1.region == :body))
 
-      assert %Rendro.Block{content: %Rendro.Text{content: "Date: 2026-04-30", color: ^primary_ink}} =
+      assert %Rendro.Block{
+               content: %Rendro.Text{content: "Date: 2026-04-30", color: ^primary_ink}
+             } =
                Enum.find(header.content, fn
                  %Rendro.Block{content: %Rendro.Text{content: "Date: 2026-04-30"}} -> true
                  _ -> false

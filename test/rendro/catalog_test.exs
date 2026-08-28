@@ -46,8 +46,14 @@ defmodule Rendro.CatalogTest do
     ]
 
     assert source =~ "@visual_target_profiles"
-    assert Enum.map(expected_ids, &String.split(source, &1, parts: 2) |> hd() |> byte_size()) ==
-             Enum.sort(Enum.map(expected_ids, &String.split(source, &1, parts: 2) |> hd() |> byte_size()))
+
+    assert Enum.map(expected_ids, &(String.split(source, &1, parts: 2) |> hd() |> byte_size())) ==
+             Enum.sort(
+               Enum.map(
+                 expected_ids,
+                 &(String.split(source, &1, parts: 2) |> hd() |> byte_size())
+               )
+             )
 
     assert Enum.all?(expected_ids, &String.contains?(source, &1))
     assert length(Regex.scan(~r/--(?:dark|light)"\s*=>\s*%\{/, source)) == 6
@@ -56,10 +62,16 @@ defmodule Rendro.CatalogTest do
 
   test "only the Corporate Classic Invoice dark catalog render receives generic semantic ink" do
     target =
-      Enum.find(Catalog.catalog_specs(), &(&1.id == "invoice--cedar-mutual--corporate-classic--dark"))
+      Enum.find(
+        Catalog.catalog_specs(),
+        &(&1.id == "invoice--cedar-mutual--corporate-classic--dark")
+      )
 
     control =
-      Enum.find(Catalog.catalog_specs(), &(&1.id == "invoice--cedar-mutual--corporate-classic--light"))
+      Enum.find(
+        Catalog.catalog_specs(),
+        &(&1.id == "invoice--cedar-mutual--corporate-classic--light")
+      )
 
     target_doc = Catalog.source_document_for(target)
     control_doc = Catalog.source_document_for(control)

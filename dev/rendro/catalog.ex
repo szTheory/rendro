@@ -86,6 +86,17 @@ defmodule Rendro.Catalog do
      :brutalist}
   ]
 
+  # The catalog owns the exact, ordered visual-change allowlist. Recipes only
+  # receive these generic private presentation values, never catalog identity.
+  @visual_target_profiles %{
+    "invoice--cedar-mutual--corporate-classic--dark" => %{semantic_ink: :primary_secondary},
+    "statement--signal-ledger--minimal-mono--dark" => %{semantic_ink: :primary_secondary},
+    "payslip--northline-logistics--swiss--light" => %{ledger_layout: :sequential},
+    "payslip--northline-logistics--swiss--dark" => %{ledger_layout: :sequential},
+    "ticket--aurora-live--brutalist--light" => %{locator_layout: :one_row_clear},
+    "ticket--aurora-live--brutalist--dark" => %{locator_layout: :one_row_clear}
+  }
+
   @spec asset_root() :: String.t()
   def asset_root, do: @asset_root
 
@@ -131,12 +142,27 @@ defmodule Rendro.Catalog do
       fixture_ref |> Rendro.Examples.load!() |> then(&Rendro.ExamplesData.transform(family, &1))
 
     theme = theme_for(spec)
-    doc = Map.fetch!(spec, :recipe_module).document(data, theme: theme, catalog_layout: true)
+    opts = recipe_options(spec, theme)
+    doc = Map.fetch!(spec, :recipe_module).document(data, opts)
 
     if preset = Map.get(spec, :preset_atom),
       do: Rendro.Theme.Presets.register_fonts(doc, preset),
       else: doc
   end
+
+  defp recipe_options(spec, theme) do
+    [theme: theme, catalog_layout: true]
+    |> maybe_put_presentation_profile(presentation_profile(spec))
+  end
+
+  defp presentation_profile(spec) do
+    Map.get(@visual_target_profiles, spec.id)
+  end
+
+  defp maybe_put_presentation_profile(opts, nil), do: opts
+
+  defp maybe_put_presentation_profile(opts, profile),
+    do: Keyword.put(opts, :presentation_profile, profile)
 
   @spec render_source_pdf(map()) :: {:ok, binary()} | {:error, term()}
   def render_source_pdf(spec) do
