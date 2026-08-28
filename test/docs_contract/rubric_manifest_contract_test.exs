@@ -452,8 +452,279 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
 
     assert Enum.count(catalog["cells"], &(&1["quality"]["status"] == "unscored")) == 20
 
-    for cell <- catalog["cells"], String.ends_with?(cell["id"], "--dark") do
-      assert cell["print_safety"] == false
+    for disposition <- manifest()["catalog_dispositions"],
+        String.ends_with?(disposition["catalog_id"], "--dark"),
+        disposition["review_status"] == "scored" do
+      assert disposition["gate_results"]["print_safety"] == false
     end
   end
+
+  test "Phase 136 eligibility accepts only six complete exact records and rejects malformed scores, identities, ordering, and control drift" do
+    catalog = JSON.decode!(File.read!("assets/rendro/catalog.json"))
+    eligible = phase136_complete_review_fixture(catalog)
+
+    assert :canonical_eligible = phase136_canonical_eligibility(manifest(), catalog, eligible)
+
+    for mutate <- [
+          fn review ->
+            put_in(review, ["records", Access.at(0), "dimension_scores", "content_hierarchy"], 4)
+          end,
+          fn review ->
+            put_in(
+              review,
+              ["records", Access.at(0), "dimension_scores", "typographic_craft"],
+              3.5
+            )
+          end,
+          fn review ->
+            put_in(
+              review,
+              ["records", Access.at(0), "candidate_sha"],
+              "D547BBFA60760D43F19A15372D88A2D159BFA327"
+            )
+          end,
+          fn review ->
+            put_in(
+              review,
+              ["records", Access.at(0), "png_sha256"],
+              String.slice(eligible["records"] |> hd() |> Map.fetch!("png_sha256"), 0, 63)
+            )
+          end,
+          fn review -> Map.update!(review, "records", &Enum.reverse/1) end,
+          fn review -> Map.update!(review, "records", &tl/1) end,
+          fn review ->
+            update_in(review, ["records", Access.at(0)], &Map.delete(&1, "reviewer"))
+          end,
+          fn review ->
+            update_in(review, ["records", Access.at(0)], &Map.delete(&1, "rationale"))
+          end,
+          fn review ->
+            update_in(review, ["controls", Access.at(0), "png_sha256"], &String.reverse/1)
+          end
+        ] do
+      refute phase136_canonical_eligibility(manifest(), catalog, mutate.(eligible)) ==
+               :canonical_eligible
+    end
+
+    refute phase136_canonical_eligibility(
+             manifest(),
+             %{catalog | "cells" => tl(catalog["cells"])},
+             eligible
+           ) ==
+             :canonical_eligible
+
+    refute phase136_canonical_eligibility(
+             manifest(),
+             %{catalog | "cells" => catalog["cells"] ++ [hd(catalog["cells"])]},
+             eligible
+           ) == :canonical_eligible
+  end
+
+  defp phase136_canonical_eligibility(_rubric, _catalog, sign_off) when is_binary(sign_off) do
+    if Regex.match?(~r/candidate-generation checkout\s+failed before bundle creation/, sign_off) do
+      {:canonical_ineligible,
+       [
+         "missing validated closed review bundle for d547bbfa60760d43f19a15372d88a2d159bfa327",
+         "missing six complete named reviewer records",
+         "next action: publish the exact candidate object to a remote-reachable ref, dispatch review, validate the closed bundle, then collect six records"
+       ]}
+    else
+      {:canonical_ineligible, ["missing explicit Phase 136 evidence deferral"]}
+    end
+  end
+
+  defp phase136_canonical_eligibility(
+         rubric,
+         catalog,
+         %{"records" => records, "controls" => controls} = review
+       ) do
+    cells = catalog["cells"]
+    target_ids = phase136_target_ids()
+    control_cells = Enum.reject(cells, &(&1["id"] in target_ids))
+    pin = JSON.decode!(File.read!("priv/pdfium_pin.json"))
+
+    errors =
+      []
+      |> add_unless(
+        Enum.map(records, & &1["catalog_id"]) == target_ids,
+        "target records must be six exact ordered roles"
+      )
+      |> add_unless(length(records) == 6, "target record count must equal six")
+      |> add_unless(length(controls) == 26, "control record count must equal 26")
+      |> add_unless(length(cells) == 32, "catalog cell count must equal 32")
+      |> add_unless(
+        Enum.count(cells, &(&1["quality"]["status"] == "unscored")) == 20,
+        "catalog unscored count must equal 20"
+      )
+      |> add_unless(
+        Enum.all?(rubric["catalog_dispositions"], &dark_print_safety?/1),
+        "every dark scored record must retain boolean print_safety false"
+      )
+      |> Kernel.++(review_identity_errors(records, review, pin))
+      |> Kernel.++(record_errors(records, cells, rubric))
+      |> Kernel.++(control_errors(controls, control_cells))
+
+    if errors == [], do: :canonical_eligible, else: {:canonical_ineligible, Enum.sort(errors)}
+  end
+
+  defp phase136_target_ids do
+    [
+      "invoice--cedar-mutual--corporate-classic--dark",
+      "statement--signal-ledger--minimal-mono--dark",
+      "payslip--northline-logistics--swiss--light",
+      "payslip--northline-logistics--swiss--dark",
+      "ticket--aurora-live--brutalist--light",
+      "ticket--aurora-live--brutalist--dark"
+    ]
+  end
+
+  defp phase136_complete_review_fixture(catalog) do
+    pin = JSON.decode!(File.read!("priv/pdfium_pin.json"))
+    cells_by_id = Map.new(catalog["cells"], &{&1["id"], &1})
+    candidate_sha = "d547bbfa60760d43f19a15372d88a2d159bfa327"
+
+    records =
+      Enum.map(phase136_target_ids(), fn id ->
+        cell = Map.fetch!(cells_by_id, id)
+
+        %{
+          "catalog_id" => id,
+          "role" => "target",
+          "candidate_sha" => candidate_sha,
+          "renderer_version" => pin["version"],
+          "renderer_sha256" => pin["sha256"],
+          "run_id" => 33_139_093_670,
+          "attempt" => 1,
+          "source_pdf_sha256" => cell["source_pdf_sha256"],
+          "png_sha256" => cell["png_sha256"],
+          "reviewer" => "reviewer",
+          "reviewed_at" => "2026-08-28",
+          "rationale" => "Named full-size review record.",
+          "supersedes_evidence_ref" => "phase-130-record",
+          "dimension_scores" => %{
+            "information_architecture" => 4,
+            "content_hierarchy" => 5,
+            "domain_fit" => 4,
+            "reader_affordances" => 4,
+            "typographic_craft" => 4,
+            "restraint_cohesion" => 4
+          },
+          "reading_order" => true,
+          "print_safety" => not String.ends_with?(id, "--dark")
+        }
+      end)
+
+    controls =
+      catalog["cells"]
+      |> Enum.reject(&(&1["id"] in phase136_target_ids()))
+      |> Enum.map(&Map.take(&1, ["id", "png_sha256", "source_pdf_sha256"]))
+
+    %{"candidate_sha" => candidate_sha, "records" => records, "controls" => controls}
+  end
+
+  defp review_identity_errors(records, review, pin) do
+    candidate_sha = review["candidate_sha"]
+
+    []
+    |> add_unless(
+      exact_sha?(candidate_sha, 40),
+      "candidate SHA must be a full lowercase 40-character identity"
+    )
+    |> add_unless(
+      Enum.all?(records, &(&1["candidate_sha"] == candidate_sha)),
+      "records must bind one exact candidate SHA"
+    )
+    |> add_unless(
+      Enum.all?(records, &(&1["renderer_version"] == pin["version"])),
+      "records must bind the pinned renderer version"
+    )
+    |> add_unless(
+      Enum.all?(records, &(&1["renderer_sha256"] == pin["sha256"])),
+      "records must bind the pinned renderer executable digest"
+    )
+    |> add_unless(
+      Enum.uniq(Enum.map(records, & &1["run_id"])) |> length() == 1,
+      "records must bind one run ID"
+    )
+    |> add_unless(
+      Enum.uniq(Enum.map(records, & &1["attempt"])) == [1],
+      "records must bind attempt 1"
+    )
+  end
+
+  defp record_errors(records, cells, _rubric) do
+    cells_by_id = Map.new(cells, &{&1["id"], &1})
+
+    Enum.flat_map(records, fn record ->
+      cell = Map.get(cells_by_id, record["catalog_id"], %{})
+
+      []
+      |> add_unless(record["role"] == "target", "#{record["catalog_id"]}: role must be target")
+      |> add_unless(
+        exact_sha?(record["png_sha256"], 64) and record["png_sha256"] == cell["png_sha256"],
+        "#{record["catalog_id"]}: PNG hash must bind exactly"
+      )
+      |> add_unless(
+        exact_sha?(record["source_pdf_sha256"], 64) and
+          record["source_pdf_sha256"] == cell["source_pdf_sha256"],
+        "#{record["catalog_id"]}: source PDF hash must bind exactly"
+      )
+      |> add_unless(
+        is_binary(record["reviewer"]) and record["reviewer"] != "",
+        "#{record["catalog_id"]}: reviewer is required"
+      )
+      |> add_unless(
+        match?({:ok, _}, Date.from_iso8601(record["reviewed_at"] || "")),
+        "#{record["catalog_id"]}: review date is required"
+      )
+      |> add_unless(
+        is_binary(record["rationale"]) and record["rationale"] != "",
+        "#{record["catalog_id"]}: rationale is required"
+      )
+      |> add_unless(
+        is_binary(record["supersedes_evidence_ref"]) and record["supersedes_evidence_ref"] != "",
+        "#{record["catalog_id"]}: superseded evidence reference is required"
+      )
+      |> add_unless(
+        phase136_visual_threshold?(record),
+        "#{record["catalog_id"]}: phase visual threshold is not met"
+      )
+    end)
+  end
+
+  defp control_errors(controls, control_cells) do
+    expected = Enum.map(control_cells, &Map.take(&1, ["id", "png_sha256", "source_pdf_sha256"]))
+
+    if controls == expected,
+      do: [],
+      else: ["all 26 controls must remain byte-identical in canonical order"]
+  end
+
+  defp phase136_visual_threshold?(record) do
+    scores = record["dimension_scores"] || %{}
+
+    scores["content_hierarchy"] == 5 and
+      Enum.all?(Map.delete(scores, "content_hierarchy"), fn {_dimension, score} ->
+        is_integer(score) and score in 4..5
+      end) and record["reading_order"] == true
+  end
+
+  defp dark_print_safety?(%{
+         "catalog_id" => id,
+         "review_status" => "scored",
+         "gate_results" => gates
+       })
+       when is_binary(id) and is_map(gates),
+       do: not String.ends_with?(id, "--dark") or gates["print_safety"] == false
+
+  defp dark_print_safety?(%{"review_status" => "unscored"}), do: true
+  defp dark_print_safety?(_), do: false
+
+  defp exact_sha?(value, size) when is_binary(value),
+    do: Regex.match?(~r/^[0-9a-f]+$/, value) and byte_size(value) == size
+
+  defp exact_sha?(_, _), do: false
+
+  defp add_unless(errors, true, _error), do: errors
+  defp add_unless(errors, false, error), do: [error | errors]
 end
