@@ -48,10 +48,13 @@ defmodule Rendro.CatalogReviewPayload do
 
   defp validate_candidate(%{
          "commit_sha" => commit_sha,
+         "baseline_commit_sha" => control_sha,
          "run_id" => run_id,
+         "run_attempt" => run_attempt,
          "renderer" => %{"version" => version, "sha256" => renderer_sha}
        }) do
-    if sha?(commit_sha, 40) and valid_run_id?(run_id) and valid_version?(version) and
+    if sha?(commit_sha, 40) and sha?(control_sha, 40) and valid_run_id?(run_id) and
+         is_integer(run_attempt) and run_attempt > 0 and valid_version?(version) and
          sha?(renderer_sha, 64) do
       :ok
     else
@@ -117,7 +120,9 @@ defmodule Rendro.CatalogReviewPayload do
     )
     |> Map.put("catalog_id", cell["id"])
     |> Map.put("commit_sha", candidate["commit_sha"])
+    |> Map.put("control_sha", candidate["baseline_commit_sha"])
     |> Map.put("run_id", candidate["run_id"])
+    |> Map.put("run_attempt", candidate["run_attempt"])
   end
 
   defp proof_identity(proof, candidate) do
@@ -126,7 +131,9 @@ defmodule Rendro.CatalogReviewPayload do
     |> Map.put("renderer_version", get_in(candidate, ["renderer", "version"]))
     |> Map.put("renderer_sha256", get_in(candidate, ["renderer", "sha256"]))
     |> Map.put("commit_sha", candidate["commit_sha"])
+    |> Map.put("control_sha", candidate["baseline_commit_sha"])
     |> Map.put("run_id", candidate["run_id"])
+    |> Map.put("run_attempt", candidate["run_attempt"])
   end
 
   defp safe_candidate_path?(path) when is_binary(path) do
