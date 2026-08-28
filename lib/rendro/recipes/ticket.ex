@@ -743,8 +743,21 @@ defmodule Rendro.Recipes.Ticket do
         %{placement: type.scale.title, title: type.scale.subtitle, reference: type.scale.display}
 
       _theme ->
-        %{placement: type.scale.display, title: type.scale.title, reference: type.scale.caption}
+        %{
+          placement: locator_value_size(opts, type),
+          title: type.scale.title,
+          reference: type.scale.caption
+        }
     end
+  end
+
+  # The private atomic locator profile preserves a dominant value role while
+  # keeping the widest fixed target token ("GA") on one line in an equal-share
+  # four-column row. Other themed and un-themed paths retain their exact role.
+  defp locator_value_size(opts, type) do
+    if atomic_locator?(opts),
+      do: min(type.scale.display, type.scale.title * 1.5),
+      else: type.scale.display
   end
 
   # Catalog tooling may opt into the existing one-row locator archetype with

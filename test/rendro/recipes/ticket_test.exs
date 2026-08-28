@@ -235,7 +235,7 @@ defmodule Rendro.Recipes.TicketTest do
       assert Enum.all?(value_cells, &match?(%Rendro.Cell{split_policy: :atomic}, &1))
       refute Enum.any?(value_cells, &(cell_text(&1) == "24B"))
       assert Enum.all?(value_cells, &(cell_text(&1) in ["GA", "H", "24", "B"]))
-      assert Enum.all?(value_cells, &(cell_size(&1) == 34))
+      assert Enum.all?(value_cells, &(cell_size(&1) == 30.0))
     end
 
     test "semantic locator header fill is gated to the atomic equal-share profile" do
