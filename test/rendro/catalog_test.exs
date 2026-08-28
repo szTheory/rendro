@@ -33,6 +33,63 @@ defmodule Rendro.CatalogTest do
     end
   end
 
+  test "the dev-only visual target map contains only the six ordered target IDs" do
+    source = File.read!("dev/rendro/catalog.ex")
+
+    expected_ids = [
+      "invoice--cedar-mutual--corporate-classic--dark",
+      "statement--signal-ledger--minimal-mono--dark",
+      "payslip--northline-logistics--swiss--light",
+      "payslip--northline-logistics--swiss--dark",
+      "ticket--aurora-live--brutalist--light",
+      "ticket--aurora-live--brutalist--dark"
+    ]
+
+    assert source =~ "@visual_target_profiles"
+    assert Enum.map(expected_ids, &String.split(source, &1, parts: 2) |> hd() |> byte_size()) ==
+             Enum.sort(Enum.map(expected_ids, &String.split(source, &1, parts: 2) |> hd() |> byte_size()))
+
+    assert Enum.all?(expected_ids, &String.contains?(source, &1))
+    assert length(Regex.scan(~r/--(?:dark|light)"\s*=>\s*%\{/, source)) == 6
+    assert source =~ "Map.get(@visual_target_profiles, spec.id)"
+  end
+
+  test "only the Corporate Classic Invoice dark catalog render receives generic semantic ink" do
+    target =
+      Enum.find(Catalog.catalog_specs(), &(&1.id == "invoice--cedar-mutual--corporate-classic--dark"))
+
+    control =
+      Enum.find(Catalog.catalog_specs(), &(&1.id == "invoice--cedar-mutual--corporate-classic--light"))
+
+    target_doc = Catalog.source_document_for(target)
+    control_doc = Catalog.source_document_for(control)
+
+    assert inspect(target_doc, limit: :infinity, printable_limit: :infinity) =~ "Date:"
+    assert inspect(control_doc, limit: :infinity, printable_limit: :infinity) =~ "Date:"
+
+    assert {:ok, first} = Catalog.render_source_pdf(target)
+    assert {:ok, second} = Catalog.render_source_pdf(target)
+    assert first == second
+  end
+
+  test "catalog identity literals remain outside core recipes" do
+    recipe_sources =
+      Path.wildcard("lib/rendro/recipes/*.ex")
+      |> Enum.map(&File.read!/1)
+      |> Enum.join("\n")
+
+    for id <- [
+          "invoice--cedar-mutual--corporate-classic--dark",
+          "statement--signal-ledger--minimal-mono--dark",
+          "payslip--northline-logistics--swiss--light",
+          "payslip--northline-logistics--swiss--dark",
+          "ticket--aurora-live--brutalist--light",
+          "ticket--aurora-live--brutalist--dark"
+        ] do
+      refute recipe_sources =~ id
+    end
+  end
+
   test "catalog paths reject traversal before I/O" do
     assert_raise ArgumentError, ~r/unsafe catalog/, fn ->
       Catalog.source_document_for(%{
