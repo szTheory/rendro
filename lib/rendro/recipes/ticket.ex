@@ -351,12 +351,7 @@ defmodule Rendro.Recipes.Ticket do
         )
       end)
 
-    grid =
-      Rendro.table([value_cells],
-        header: header_cells,
-        columns: List.duplicate({:share, 1}, length(data.placement)),
-        borders: :none
-      )
+    grid = Rendro.table([value_cells], locator_table_opts(header_cells, colors, opts))
 
     subtitle_blocks =
       case Map.get(data, :subtitle) do
@@ -761,6 +756,18 @@ defmodule Rendro.Recipes.Ticket do
 
   defp dark_atomic_locator?(opts) do
     atomic_locator?(opts) and match?(%{mode: :dark}, opts[:theme])
+  end
+
+  defp locator_table_opts(header_cells, colors, opts) do
+    table_opts = [
+      header: header_cells,
+      columns: List.duplicate({:share, 1}, length(header_cells)),
+      borders: :none
+    ]
+
+    if atomic_locator?(opts),
+      do: Keyword.put(table_opts, :header_fill, colors.surface),
+      else: table_opts
   end
 
   defp locator_cell(content, opts) do

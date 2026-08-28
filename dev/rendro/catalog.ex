@@ -276,7 +276,7 @@ defmodule Rendro.Catalog do
       {candidate_cells, diff} =
         Enum.map_reduce(
           cells,
-          %{changed_scored: [], changed_unscored: [], byte_stable: []},
+          %{changed_targets: [], changed_scored: [], changed_unscored: [], byte_stable: []},
           fn cell, acc ->
             baseline_cell = Map.fetch!(baseline_by_id, cell["id"])
 
@@ -290,7 +290,14 @@ defmodule Rendro.Catalog do
               |> Map.put("renderer_sha256", pin["sha256"])
               |> maybe_put_candidate_hashes(status, baseline_cell)
 
-            {candidate_cell, Map.update!(acc, bucket, &(&1 ++ [cell["id"]]))}
+            acc = Map.update!(acc, bucket, &(&1 ++ [cell["id"]]))
+
+            acc =
+              if bucket == :byte_stable,
+                do: acc,
+                else: Map.update!(acc, :changed_targets, &(&1 ++ [cell["id"]]))
+
+            {candidate_cell, acc}
           end
         )
 
@@ -944,11 +951,15 @@ defmodule Rendro.Catalog do
   defp valid_candidate_cells(cells) do
     expected_ids = Enum.map(catalog_specs(), & &1.id)
 
-    if Enum.map(cells, & &1["id"]) == expected_ids and
-         Enum.all?(cells, &valid_candidate_cell?/1) do
-      :ok
-    else
-      {:error, :invalid_candidate_cells}
+    cond do
+      not Enum.all?(cells, &valid_candidate_cell?/1) ->
+        {:error, :invalid_candidate_cells}
+
+      Enum.map(cells, & &1["id"]) != expected_ids ->
+        {:error, :invalid_candidate_scope}
+
+      true ->
+        :ok
     end
   end
 
@@ -1059,15 +1070,25 @@ defmodule Rendro.Catalog do
   end
 
   defp valid_candidate_diff(%{
+         changed_targets: changed_targets,
          changed_scored: changed_scored,
-         changed_unscored: [],
+         changed_unscored: changed_unscored,
          byte_stable: byte_stable
        }) do
     target_ids = visual_target_ids()
     control_ids = Enum.reject(Enum.map(catalog_specs(), & &1.id), &(&1 in target_ids))
 
-    if map_size(@visual_target_profiles) == 6 and changed_scored == target_ids and
-         byte_stable == control_ids do
+    descriptive_targets =
+      Enum.filter(target_ids, &(&1 in changed_scored or &1 in changed_unscored))
+
+    descriptive_buckets_are_ordered =
+      changed_scored == Enum.filter(target_ids, &(&1 in changed_scored)) and
+        changed_unscored == Enum.filter(target_ids, &(&1 in changed_unscored))
+
+    if map_size(@visual_target_profiles) == 6 and changed_targets == target_ids and
+         descriptive_targets == target_ids and
+         length(changed_scored) + length(changed_unscored) == length(target_ids) and
+         descriptive_buckets_are_ordered and byte_stable == control_ids do
       :ok
     else
       {:error, :invalid_candidate_scope}
