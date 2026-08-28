@@ -202,6 +202,34 @@ defmodule Rendro.CatalogTest do
              candidate_manifest(changed_control_png, baseline, rubric)
   end
 
+  test "catalog dispositions remain explicit 32-cell, 20-unscored dark screen-only records" do
+    manifest = Catalog.read_manifest!()
+    rubric = JSON.decode!(File.read!("priv/quality/rubric_scores.json"))
+    dispositions = rubric["catalog_dispositions"]
+
+    assert is_integer(length(manifest["cells"]))
+    assert length(manifest["cells"]) == 32
+    assert is_integer(length(Enum.filter(dispositions, &(&1["review_status"] == "unscored"))))
+    assert Enum.count(dispositions, &(&1["review_status"] == "unscored")) == 20
+
+    assert Enum.all?(dispositions, fn disposition ->
+             disposition["review_status"] in ["scored", "unscored"]
+           end)
+
+    dark_dispositions = Enum.filter(dispositions, &(&1["mode"] == "dark"))
+
+    assert Enum.all?(dark_dispositions, fn
+             %{"review_status" => "scored", "gate_results" => %{"print_safety" => false}} ->
+               true
+
+             %{"review_status" => "unscored", "reason" => reason} when is_binary(reason) ->
+               true
+
+             _ ->
+               false
+           end)
+  end
+
   test "candidate generation includes the separate four-image multipage proof collection" do
     source = File.read!("dev/rendro/catalog.ex")
 
