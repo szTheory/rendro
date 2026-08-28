@@ -91,8 +91,8 @@ defmodule Rendro.Catalog do
   @visual_target_profiles %{
     "invoice--cedar-mutual--corporate-classic--dark" => %{semantic_ink: :primary_secondary},
     "statement--signal-ledger--minimal-mono--dark" => %{semantic_ink: :primary_secondary},
-    "payslip--northline-logistics--swiss--light" => %{ledger_layout: :sequential},
-    "payslip--northline-logistics--swiss--dark" => %{ledger_layout: :sequential},
+    "payslip--northline-logistics--swiss--light" => %{ledger_layout: :sequential_measured},
+    "payslip--northline-logistics--swiss--dark" => %{ledger_layout: :sequential_measured},
     "ticket--aurora-live--brutalist--light" => %{locator_layout: :one_row_clear},
     "ticket--aurora-live--brutalist--dark" => %{locator_layout: :one_row_clear}
   }
