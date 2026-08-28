@@ -273,6 +273,51 @@ defmodule Rendro.Recipes.StatementTest do
                    false
                end)
     end
+
+    test "long Statement descriptions and context use measured wrapping without clipping" do
+      account_name =
+        Enum.join(List.duplicate("independently selected account context", 12), " ")
+
+      description =
+        Enum.join(List.duplicate("held-out ledger description segment", 12), " ")
+
+      data = %{
+        fixture_data(0)
+        | account: %{name: account_name},
+          lines: [
+            %{
+              date: ~D[2026-05-01],
+              description: description,
+              amount: Decimal.new("100.00")
+            }
+          ]
+      }
+
+      opts = [
+        theme: Rendro.Theme.preset(:minimal_mono, accent: "#0E7C76", mode: :dark),
+        presentation_profile: %{semantic_ink: :primary_secondary}
+      ]
+
+      document =
+        data
+        |> Statement.document(opts)
+        |> Rendro.Theme.Presets.register_fonts(:minimal_mono)
+
+      header = Enum.find(document.sections, &(&1.region == :header))
+      body = Enum.find(document.sections, &(&1.region == :body))
+      [table_block | _] = body.content
+
+      assert Enum.any?(header.content, fn
+               %Rendro.Block{content: %Rendro.Text{content: ^account_name}} -> true
+               _ -> false
+             end)
+
+      assert Enum.any?(table_block.content.rows, &(row_cell_text(&1, 1) == description))
+
+      assert {:ok, first_pdf} = Rendro.render(document, deterministic: true)
+      assert {:ok, second_pdf} = Rendro.render(document, deterministic: true)
+      assert first_pdf == second_pdf
+    end
   end
 
   # ---------------------------------------------------------------------------
