@@ -92,7 +92,7 @@
 | CATALOG-10 | Phase 136 | Complete |
 | CATALOG-11 | Phase 136 | Complete |
 | CATALOG-12 | Phase 136 | Complete |
-| CATALOG-13 | Phase 136 | Pending |
+| CATALOG-13 | Phase 136 | Complete |
 | HANDOFF-01 | Phase 137 | Pending |
 | HANDOFF-02 | Phase 137 | Pending |
 | HANDOFF-03 | Phase 137 | Pending |
