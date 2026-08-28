@@ -320,6 +320,153 @@ defmodule Rendro.CatalogTest do
     assert source =~ "statement-line-items-60-plus-page-final"
   end
 
+  test "baseline identity is a full Git commit proven against the exact manifest blob" do
+    root = temp_root!("baseline-identity")
+    manifest_path = Path.join(root, "assets/rendro/catalog.json")
+
+    git!(root, ["init", "-q"])
+    git!(root, ["config", "user.email", "catalog@example.test"])
+    git!(root, ["config", "user.name", "Catalog Test"])
+    File.mkdir_p!(Path.dirname(manifest_path))
+    File.write!(manifest_path, "{\"cells\":[]}\n")
+    git!(root, ["add", "assets/rendro/catalog.json"])
+    git!(root, ["commit", "-qm", "baseline"])
+    baseline_sha = git!(root, ["rev-parse", "HEAD"])
+
+    File.write!(Path.join(root, "candidate.txt"), "candidate\n")
+    git!(root, ["add", "candidate.txt"])
+    git!(root, ["commit", "-qm", "candidate"])
+    candidate_sha = git!(root, ["rev-parse", "HEAD"])
+
+    assert {:ok, ^baseline_sha} =
+             Catalog.baseline_commit_sha(repo_root: root, manifest_path: manifest_path)
+
+    assert byte_size(baseline_sha) == 40
+    refute baseline_sha == candidate_sha
+
+    assert {:ok, ^candidate_sha} =
+             Catalog.baseline_commit_sha(
+               repo_root: root,
+               manifest_path: manifest_path,
+               commit_sha: candidate_sha
+             )
+
+    assert git!(root, ["show", "#{baseline_sha}:assets/rendro/catalog.json"], trim: false) ==
+             File.read!(manifest_path)
+  end
+
+  test "baseline identity fails closed for dirty, missing, malformed, and mismatched Git evidence" do
+    root = temp_root!("baseline-failures")
+    manifest_path = Path.join(root, "assets/rendro/catalog.json")
+
+    git!(root, ["init", "-q"])
+    git!(root, ["config", "user.email", "catalog@example.test"])
+    git!(root, ["config", "user.name", "Catalog Test"])
+    File.mkdir_p!(Path.dirname(manifest_path))
+    File.write!(manifest_path, "old\n")
+    git!(root, ["add", "assets/rendro/catalog.json"])
+    git!(root, ["commit", "-qm", "old baseline"])
+    old_sha = git!(root, ["rev-parse", "HEAD"])
+
+    File.write!(manifest_path, "current\n")
+    git!(root, ["add", "assets/rendro/catalog.json"])
+    git!(root, ["commit", "-qm", "current baseline"])
+
+    assert {:error, :invalid_baseline_commit_sha} =
+             Catalog.baseline_commit_sha(
+               repo_root: root,
+               manifest_path: manifest_path,
+               commit_sha: "abc123"
+             )
+
+    assert {:error, :baseline_manifest_mismatch} =
+             Catalog.baseline_commit_sha(
+               repo_root: root,
+               manifest_path: manifest_path,
+               commit_sha: old_sha
+             )
+
+    File.write!(manifest_path, "dirty\n")
+
+    assert {:error, :baseline_manifest_dirty} =
+             Catalog.baseline_commit_sha(repo_root: root, manifest_path: manifest_path)
+
+    missing = Path.join(root, "assets/rendro/missing.json")
+
+    assert {:error, :baseline_manifest_missing} =
+             Catalog.baseline_commit_sha(repo_root: root, manifest_path: missing)
+  end
+
+  test "candidate and canonical manifests keep independently proven source identities" do
+    baseline = Catalog.read_manifest!()
+    rubric = JSON.decode!(File.read!("priv/quality/rubric_scores.json"))
+    target_ids = visual_target_ids(baseline)
+    candidate_sha = String.duplicate("a", 40)
+    baseline_sha = String.duplicate("b", 40)
+
+    assert {:ok, candidate} =
+             Catalog.candidate_manifest(
+               candidate_cells_with_changed_targets(baseline["cells"], target_ids),
+               baseline,
+               rubric,
+               "v0.11.0",
+               candidate_sha,
+               candidate_multipage_proofs(),
+               baseline_sha
+             )
+
+    assert candidate["candidate"]["commit_sha"] == candidate_sha
+    assert candidate["candidate"]["baseline_commit_sha"] == baseline_sha
+    refute candidate["candidate"]["baseline_commit_sha"] == candidate_sha
+
+    canonical = Catalog.canonical_manifest(baseline["cells"], "v0.11.0", candidate_sha)
+    assert canonical["source_commit_sha"] == candidate_sha
+    assert canonical["renderer"]["kind"] == "pdfium-render"
+    assert canonical["renderer"]["version"] == "v0.11.0"
+  end
+
+  test "canonical publication restores the complete old generation at every injected boundary" do
+    for fail_at <- [
+          :backup_assets,
+          :backup_manifest,
+          :install_assets,
+          :install_manifest,
+          :verify_assets,
+          :verify_manifest
+        ] do
+      paths = publication_fixture!(fail_at)
+      before_assets = directory_snapshot(paths.asset_root)
+      before_manifest = File.read!(paths.manifest_path)
+
+      assert {:error, {:injected_failure, ^fail_at}} =
+               Catalog.publish_canonical_staging(paths, fail_at: fail_at)
+
+      assert directory_snapshot(paths.asset_root) == before_assets
+      assert File.read!(paths.manifest_path) == before_manifest
+      refute File.exists?(paths.asset_staging_root)
+      refute File.exists?(paths.manifest_staging_path)
+      refute File.exists?(paths.asset_backup_root)
+      refute File.exists?(paths.manifest_backup_path)
+    end
+  end
+
+  test "canonical publication installs one complete generation and removes transaction state" do
+    paths = publication_fixture!(:success)
+
+    assert :ok = Catalog.publish_canonical_staging(paths)
+
+    assert directory_snapshot(paths.asset_root) == %{
+             "new-a.png" => "new-a",
+             "new-b.png" => "new-b"
+           }
+
+    assert File.read!(paths.manifest_path) == "new-manifest\n"
+    refute File.exists?(paths.asset_staging_root)
+    refute File.exists?(paths.manifest_staging_path)
+    refute File.exists?(paths.asset_backup_root)
+    refute File.exists?(paths.manifest_backup_path)
+  end
+
   test "the literal registry is the locked ordered 32-cell catalog" do
     expected_ids = ~w(
       invoice--default--default--light invoice--northline-logistics--swiss--light invoice--northline-logistics--swiss--dark invoice--cedar-mutual--corporate-classic--light invoice--cedar-mutual--corporate-classic--dark
@@ -566,6 +713,57 @@ defmodule Rendro.CatalogTest do
           "ticket--aurora-live--brutalist--dark"
         ])
     )
+  end
+
+  defp temp_root!(suffix) do
+    root =
+      Path.join(
+        System.tmp_dir!(),
+        "rendro-catalog-#{suffix}-#{System.unique_integer([:positive])}"
+      )
+
+    File.rm_rf!(root)
+    File.mkdir_p!(root)
+    on_exit(fn -> File.rm_rf!(root) end)
+    root
+  end
+
+  defp git!(root, args, opts \\ []) do
+    {output, 0} = System.cmd("git", args, cd: root, stderr_to_stdout: true)
+    if Keyword.get(opts, :trim, true), do: String.trim(output), else: output
+  end
+
+  defp publication_fixture!(suffix) do
+    root = temp_root!("publish-#{suffix}")
+    asset_root = Path.join(root, "catalog")
+    manifest_path = Path.join(root, "catalog.json")
+    asset_staging_root = Path.join(root, "catalog.staging")
+    manifest_staging_path = Path.join(root, "catalog.json.staging")
+
+    File.mkdir_p!(asset_root)
+    File.write!(Path.join(asset_root, "old.png"), "old")
+    File.write!(manifest_path, "old-manifest\n")
+    File.mkdir_p!(asset_staging_root)
+    File.write!(Path.join(asset_staging_root, "new-a.png"), "new-a")
+    File.write!(Path.join(asset_staging_root, "new-b.png"), "new-b")
+    File.write!(manifest_staging_path, "new-manifest\n")
+
+    %{
+      asset_root: asset_root,
+      manifest_path: manifest_path,
+      asset_staging_root: asset_staging_root,
+      manifest_staging_path: manifest_staging_path,
+      asset_backup_root: asset_root <> ".previous",
+      manifest_backup_path: manifest_path <> ".previous"
+    }
+  end
+
+  defp directory_snapshot(root) do
+    root
+    |> Path.join("**/*")
+    |> Path.wildcard(match_dot: true)
+    |> Enum.filter(&File.regular?/1)
+    |> Map.new(&{Path.relative_to(&1, root), File.read!(&1)})
   end
 
   defp sha256(binary), do: :crypto.hash(:sha256, binary) |> Base.encode16(case: :lower)
