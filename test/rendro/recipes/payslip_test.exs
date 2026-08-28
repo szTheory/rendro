@@ -498,7 +498,7 @@ defmodule Rendro.Recipes.PayslipTest do
       body = Enum.find(sections, &(&1.region == :body))
       tables = Enum.filter(body.content, &is_struct(&1.content, Rendro.Table))
 
-      assert Enum.map(tables, & &1.content.header) == [
+      assert Enum.map(tables, &collect_content_from_row(&1.content.header)) == [
                ["Earnings", "Current", "YTD"],
                ["Deductions", "Current", "YTD"]
              ]
