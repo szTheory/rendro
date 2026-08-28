@@ -183,6 +183,54 @@ defmodule Rendro.Recipes.InvoiceTest do
     end
   end
 
+  describe "held-out semantic-profile measured layout" do
+    test "long Invoice labels and facts use measured header space without clipping" do
+      issuer_address =
+        Enum.join(List.duplicate("independently selected issuer address segment", 8), " ")
+
+      customer_address =
+        Enum.join(List.duplicate("independently selected billing address segment", 8), " ")
+
+      terms = Enum.join(List.duplicate("net thirty with held-out settlement conditions", 10), " ")
+      item_name = Enum.join(List.duplicate("measured service description", 10), " ")
+
+      data = %{
+        id: "INV-SEMANTIC-LONG",
+        date: ~D[2026-04-30],
+        issuer: %{name: "Northwind Systems", address: issuer_address},
+        customer: %{name: "Held Out Customer", address: customer_address},
+        due_date: ~D[2026-05-30],
+        terms: terms,
+        items: [%{name: item_name, qty: 1, price: Decimal.new("10.00")}],
+        totals: %{subtotal: Decimal.new("10.00"), total: Decimal.new("10.00")}
+      }
+
+      opts = [
+        theme: Rendro.Theme.preset(:corporate_classic, accent: "#1F4FB8", mode: :dark),
+        presentation_profile: %{semantic_ink: :primary_secondary}
+      ]
+
+      document =
+        data
+        |> Invoice.document(opts)
+        |> Rendro.Theme.Presets.register_fonts(:corporate_classic)
+
+      header = Enum.find(document.sections, &(&1.region == :header))
+      body = Enum.find(document.sections, &(&1.region == :body))
+      header_text = Enum.map(header.content, &block_text/1)
+      body_text = body |> invoice_tables() |> Enum.flat_map(&table_text/1)
+
+      assert Enum.any?(header_text, &String.contains?(&1, issuer_address))
+      assert Enum.any?(header_text, &String.contains?(&1, customer_address))
+      assert Enum.any?(header_text, &String.contains?(&1, terms))
+      assert item_name in body_text
+
+      assert {:ok, first_pdf} = Rendro.render(document, deterministic: true)
+      assert {:ok, second_pdf} = Rendro.render(document, deterministic: true)
+      assert first_pdf == second_pdf
+    end
+  end
+
   describe "document/2" do
     test "returns a %Rendro.Document{} struct" do
       doc = Invoice.document(sample_data())
@@ -220,6 +268,22 @@ defmodule Rendro.Recipes.InvoiceTest do
       assert flat =~ "INV-042"
       assert flat =~ "Widget A"
     end
+  end
+
+  defp block_text(%Rendro.Block{content: %Rendro.Text{content: text}}), do: text
+  defp block_text(_block), do: ""
+
+  defp invoice_tables(body) do
+    Enum.filter(body.content, &is_struct(&1.content, Rendro.Table))
+  end
+
+  defp table_text(%Rendro.Block{content: %Rendro.Table{} = table}) do
+    Enum.flat_map(table.rows, fn row ->
+      Enum.map(row, fn
+        %Rendro.Block{content: %Rendro.Text{content: text}} -> text
+        text when is_binary(text) -> text
+      end)
+    end)
   end
 
   # ---------------------------------------------------------------------------
