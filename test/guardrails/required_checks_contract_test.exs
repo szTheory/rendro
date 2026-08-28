@@ -182,7 +182,19 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert source =~ "test/rendro/theme/preset_raster_snapshot_test.exs"
       assert source =~ "preset-review/preset.json"
       assert source =~ "-printf '%f\\n'"
-      assert source =~ "test \"$(jq '.images | length'"
+
+      assert source =~
+               "test \"$(jq '.cells | length' tmp/phase130-candidate/candidate-manifest.json)\" = 32"
+
+      refute source =~
+               "test \"$(jq '.images | length' tmp/phase130-candidate/candidate-manifest.json)\" = 32"
+
+      assert source =~
+               "test \"$(jq '.images | length' \"${RENDRO_CATALOG_REVIEW_DIR}/final/identity-manifest.json\")\" = 12"
+
+      assert source =~
+               "test \"$(jq '.images | length' handoff/preset-review-manifest.json)\" = 12"
+
       assert source =~ "multipage-checksums.sha256"
       assert source =~ "actions/download-artifact@"
 
