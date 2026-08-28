@@ -138,6 +138,27 @@ defmodule Rendro.CatalogTest do
     refute File.exists?("assets/rendro/catalog.json.staging")
   end
 
+  test "real catalog target profiles change exactly the six allowlisted source PDFs" do
+    baseline = Catalog.read_manifest!()
+    baseline_by_id = Map.new(baseline["cells"], &{&1["id"], &1})
+    target_ids = visual_target_ids(baseline)
+
+    rendered =
+      Enum.map(Catalog.catalog_specs(), fn spec ->
+        assert {:ok, pdf} = Catalog.render_source_pdf(spec)
+
+        {spec.id, sha256(pdf) != baseline_by_id[spec.id]["source_pdf_sha256"]}
+      end)
+
+    changed_targets = for {id, true} <- rendered, do: id
+    byte_stable = for {id, false} <- rendered, do: id
+
+    assert changed_targets == target_ids
+    assert length(changed_targets) == 6
+    assert byte_stable == Enum.map(baseline["cells"], & &1["id"]) -- target_ids
+    assert length(byte_stable) == 26
+  end
+
   test "candidate manifest permits exactly the ordered six target changes without reviewer judgment" do
     baseline = Catalog.read_manifest!()
     rubric = JSON.decode!(File.read!("priv/quality/rubric_scores.json"))
@@ -155,6 +176,7 @@ defmodule Rendro.CatalogTest do
              )
 
     assert manifest["diff"] == %{
+             "changed_targets" => target_ids,
              "changed_scored" => target_ids,
              "changed_unscored" => [],
              "byte_stable" => Enum.map(baseline["cells"], & &1["id"]) -- target_ids
@@ -162,8 +184,59 @@ defmodule Rendro.CatalogTest do
 
     assert Enum.all?(manifest["cells"], fn cell ->
              not Map.has_key?(cell, "quality") and not Map.has_key?(cell, "passed") and
-               not Map.has_key?(cell, "dimension_scores")
+               not Map.has_key?(cell, "dimension_scores") and
+               not Map.has_key?(cell, "gate_results") and
+               not Map.has_key?(cell, "justifications") and
+               not Map.has_key?(cell, "signed_off_by")
            end)
+  end
+
+  test "candidate target membership remains byte-derived when a target becomes unscored" do
+    baseline = Catalog.read_manifest!()
+    rubric = JSON.decode!(File.read!("priv/quality/rubric_scores.json"))
+    target_ids = visual_target_ids(baseline)
+    unscored_target = hd(target_ids)
+
+    rubric =
+      update_in(rubric, ["catalog_dispositions"], fn dispositions ->
+        Enum.map(dispositions, fn disposition ->
+          if disposition["catalog_id"] == unscored_target do
+            disposition
+            |> Map.drop([
+              "dimension_scores",
+              "gate_results",
+              "passed",
+              "signed_off_by",
+              "signed_off_at",
+              "justifications",
+              "resolution_ref",
+              "supersedes_evidence_ref"
+            ])
+            |> Map.merge(%{
+              "review_status" => "unscored",
+              "reason" => "Awaiting exact candidate-bound review."
+            })
+          else
+            disposition
+          end
+        end)
+      end)
+
+    assert {:ok, manifest} =
+             candidate_manifest(
+               candidate_cells_with_changed_targets(baseline["cells"], target_ids),
+               baseline,
+               rubric
+             )
+
+    assert manifest["diff"]["changed_targets"] == target_ids
+    assert manifest["diff"]["changed_unscored"] == [unscored_target]
+    assert manifest["diff"]["changed_scored"] == tl(target_ids)
+
+    target_cell = Enum.find(manifest["cells"], &(&1["id"] == unscored_target))
+    assert target_cell["review_status"] == "changed_unscored"
+    refute Map.has_key?(target_cell, "dimension_scores")
+    refute Map.has_key?(target_cell, "passed")
   end
 
   test "candidate manifest rejects missing targets and either changed control hash" do
@@ -200,6 +273,13 @@ defmodule Rendro.CatalogTest do
 
     assert {:error, :invalid_candidate_scope} =
              candidate_manifest(changed_control_png, baseline, rubric)
+
+    reordered =
+      candidate_cells_with_changed_targets(baseline["cells"], target_ids)
+      |> then(fn [first, second | rest] -> [second, first | rest] end)
+
+    assert {:error, :invalid_candidate_scope} =
+             candidate_manifest(reordered, baseline, rubric)
   end
 
   test "catalog dispositions remain explicit 32-cell, 20-unscored dark screen-only records" do
@@ -486,4 +566,6 @@ defmodule Rendro.CatalogTest do
         ])
     )
   end
+
+  defp sha256(binary), do: :crypto.hash(:sha256, binary) |> Base.encode16(case: :lower)
 end

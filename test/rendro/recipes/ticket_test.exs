@@ -214,9 +214,11 @@ defmodule Rendro.Recipes.TicketTest do
           ]
         )
 
+      light = Rendro.Theme.preset(:brutalist, accent: "#C78600", mode: :light)
+
       main =
         Ticket.sections(data,
-          theme: Rendro.Theme.preset(:brutalist, accent: "#C78600", mode: :light),
+          theme: light,
           catalog_layout: true,
           presentation_profile: %{locator_layout: :atomic_equal_share}
         )
@@ -226,6 +228,7 @@ defmodule Rendro.Recipes.TicketTest do
       table = grid_block.content
 
       assert table.columns == List.duplicate({:share, 1}, 4)
+      assert table.header_fill == light.colors.surface
       assert Enum.map(table.header, &cell_text/1) == ["SECTION", "ROW", "SEAT", "GATE"]
       assert [value_cells] = table.rows
       assert Enum.map(value_cells, &cell_text/1) == ["GA", "H", "24", "B"]
@@ -233,6 +236,30 @@ defmodule Rendro.Recipes.TicketTest do
       refute Enum.any?(value_cells, &(cell_text(&1) == "24B"))
       assert Enum.all?(value_cells, &(cell_text(&1) in ["GA", "H", "24", "B"]))
       assert Enum.all?(value_cells, &(cell_size(&1) == 34))
+    end
+
+    test "semantic locator header fill is gated to the atomic equal-share profile" do
+      theme = Rendro.Theme.preset(:brutalist, accent: "#C78600", mode: :light)
+
+      table_for = fn opts ->
+        Ticket.sections(fixture_data(), opts)
+        |> Enum.find(&(&1.region == :main))
+        |> Map.fetch!(:content)
+        |> Enum.find(&is_struct(&1.content, Rendro.Table))
+        |> Map.fetch!(:content)
+      end
+
+      assert table_for.(theme: theme).header_fill == nil
+
+      assert table_for.(
+               theme: theme,
+               presentation_profile: %{locator_layout: :atomic_equal_share}
+             ).header_fill == theme.colors.surface
+
+      assert table_for.(
+               theme: theme,
+               presentation_profile: %{locator_layout: :unrelated}
+             ).header_fill == nil
     end
 
     test "sections/2 returns %Section{} structs including :main and :stub regions" do
