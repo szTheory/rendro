@@ -529,6 +529,136 @@ defmodule Rendro.Recipes.PayslipTest do
              ]
     end
 
+    test "zero, one, and many real rows preserve supplied section order without padding" do
+      cases = [
+        {"zero deductions", default_earnings(), []},
+        {"one row per section", default_earnings(), default_deductions()},
+        {"asymmetric many rows",
+         for(
+           index <- 1..5,
+           do: %{
+             description: "Earning #{index}",
+             amount: Decimal.new("100.00"),
+             ytd: Decimal.new("1200.00")
+           }
+         ),
+         for(
+           index <- 1..3,
+           do: %{
+             description: "Deduction #{index}",
+             amount: Decimal.new("10.00"),
+             ytd: Decimal.new("120.00")
+           }
+         )}
+      ]
+
+      for {label, earnings, deductions} <- cases do
+        document = sequential_document(fixture_data(earnings: earnings, deductions: deductions))
+        body = Enum.find(document.sections, &(&1.region == :body))
+
+        earning_rows = rows_for_heading(body, "Earnings")
+        deduction_rows = rows_for_heading(body, "Deductions")
+
+        assert Enum.map(earning_rows, &(&1 |> collect_content_from_row() |> hd())) ==
+                 Enum.map(earnings, & &1.description),
+               label
+
+        assert Enum.map(deduction_rows, &(&1 |> collect_content_from_row() |> hd())) ==
+                 Enum.map(deductions, & &1.description),
+               label
+
+        assert length(earning_rows) == length(earnings), label
+        assert length(deduction_rows) == length(deductions), label
+
+        refute Enum.any?(
+                 earning_rows ++ deduction_rows,
+                 &(collect_content_from_row(&1) == ["", "", ""])
+               )
+
+        assert {:ok, first_pdf} = Rendro.render(document, deterministic: true)
+        assert {:ok, second_pdf} = Rendro.render(document, deterministic: true)
+        assert first_pdf == second_pdf, label
+      end
+    end
+
+    test "the held-out description boundary wraps only prose while equal money ties stay atomic" do
+      exact_fit = Enum.join(List.duplicate("route", 7), " ")
+      one_step_over = Enum.join(List.duplicate("route", 8), " ")
+      widest_money = Decimal.new("123456789.00")
+
+      data =
+        fixture_data(
+          earnings: [
+            %{description: exact_fit, amount: widest_money, ytd: widest_money},
+            %{description: one_step_over, amount: widest_money, ytd: widest_money}
+          ],
+          deductions: []
+        )
+
+      document = sequential_document(data)
+      body = Enum.find(document.sections, &(&1.region == :body))
+      [table_block] = tables_for_heading(body, "Earnings")
+      table = table_block.content
+
+      {_header_height, [exact_height, over_height]} =
+        Rendro.measure_rows(table.rows, 595.28 - 2 * 72, document,
+          header: table.header,
+          columns: table.columns,
+          cell_align: table.cell_align,
+          borders: table.borders
+        )
+
+      assert exact_height < 20
+      assert over_height > exact_height
+      assert fixed_width(table.columns, 1) == fixed_width(table.columns, 2)
+
+      for row <- table.rows, index <- [1, 2] do
+        assert one_line?(Enum.at(row, index), fixed_width(table.columns, index), document)
+      end
+
+      assert Enum.map(table.rows, &(&1 |> collect_content_from_row() |> hd())) == [
+               exact_fit,
+               one_step_over
+             ]
+
+      assert {:ok, first_pdf} = Rendro.render(document, deterministic: true)
+      assert {:ok, second_pdf} = Rendro.render(document, deterministic: true)
+      assert first_pdf == second_pdf
+    end
+
+    test "28 exactly fitting rows stay on one ledger page and row 29 starts a repeated header" do
+      exact_document =
+        sequential_document(fixture_data(earnings: boundary_earnings(28), deductions: []))
+
+      over_document =
+        sequential_document(fixture_data(earnings: boundary_earnings(29), deductions: []))
+
+      exact_body = Enum.find(exact_document.sections, &(&1.region == :body))
+      over_body = Enum.find(over_document.sections, &(&1.region == :body))
+
+      assert length(tables_for_heading(exact_body, "Earnings")) == 1
+      assert length(tables_for_heading(over_body, "Earnings")) == 2
+      assert length(rows_for_heading(exact_body, "Earnings")) == 28
+      assert length(rows_for_heading(over_body, "Earnings")) == 29
+
+      assert Enum.map(rows_for_heading(over_body, "Earnings"), fn row ->
+               row |> collect_content_from_row() |> hd()
+             end) == Enum.map(1..29, &"Boundary earning #{&1}")
+
+      for document <- [exact_document, over_document] do
+        assert {:ok, first_pdf} = Rendro.render(document, deterministic: true)
+        assert {:ok, second_pdf} = Rendro.render(document, deterministic: true)
+        assert first_pdf == second_pdf
+        assert first_pdf =~ "Gross Pay"
+        assert first_pdf =~ "Total Deductions"
+        assert first_pdf =~ "NET PAY"
+      end
+
+      assert {:ok, over_pdf} = Rendro.render(over_document, deterministic: true)
+      assert count_occurrences(over_pdf, "(Earnings)") == 2
+      assert over_pdf =~ "(Page 2 of"
+    end
+
     test "renders independent full-width Earnings then Deductions tables for the Swiss profile" do
       sections =
         Payslip.sections(fixture_data(),
@@ -697,5 +827,35 @@ defmodule Rendro.Recipes.PayslipTest do
       Rendro.measure_rows([[cell]], width, doc, columns: [{:fixed, width}])
 
     row_height < 20
+  end
+
+  defp sequential_document(data) do
+    Payslip.document(data,
+      theme: Rendro.Theme.preset(:swiss, accent: "#2C6BED"),
+      presentation_profile: %{ledger_layout: :sequential_measured}
+    )
+  end
+
+  defp tables_for_heading(body, heading) do
+    Enum.filter(body.content, fn block ->
+      is_struct(block.content, Rendro.Table) and
+        collect_content_from_row(block.content.header) == [heading, "Current", "YTD"]
+    end)
+  end
+
+  defp rows_for_heading(body, heading) do
+    body
+    |> tables_for_heading(heading)
+    |> Enum.flat_map(& &1.content.rows)
+  end
+
+  defp boundary_earnings(count) do
+    for index <- 1..count do
+      %{
+        description: "Boundary earning #{index}",
+        amount: Decimal.new("100.00"),
+        ytd: Decimal.new("1200.00")
+      }
+    end
   end
 end
