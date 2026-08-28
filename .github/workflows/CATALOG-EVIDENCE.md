@@ -76,15 +76,17 @@ gh run download RUN_ID --dir /tmp/rendro-catalog-evidence
 find /tmp/rendro-catalog-evidence -maxdepth 2 -type f | sort
 ```
 
-Validate the extracted root with the trusted control checkout. Replace
-`BUNDLE_ROOT` with the directory that contains `manifest.json`:
+Before validating or reading bundle metadata, establish `CONTROL_SHA` from an
+independently trusted default-branch control record. Do not derive it from the
+bundle. Validate the extracted root from that exact trusted control checkout.
+Replace `BUNDLE_ROOT` with the directory that contains `manifest.json`:
 
 ```bash
 git checkout --detach CONTROL_SHA
 mix deps.get
 mix run -e '
   Code.require_file("dev/rendro/catalog_evidence_bundle.ex")
-  case Rendro.CatalogEvidenceBundle.validate(System.fetch_env!("BUNDLE_ROOT"), System.fetch_env!("OPERATION")) do
+  case Rendro.CatalogEvidenceBundle.validate(System.fetch_env!("BUNDLE_ROOT"), System.fetch_env!("OPERATION"), System.fetch_env!("CONTROL_SHA")) do
     :ok -> IO.puts("Catalog evidence bundle VERIFIED")
     {:error, reasons} -> Mix.raise("Catalog evidence bundle failed validation: #{inspect(reasons)}")
   end
@@ -94,7 +96,7 @@ mix run -e '
 Run it with explicit values:
 
 ```bash
-BUNDLE_ROOT=/tmp/rendro-catalog-evidence/EXTRACTED_ROOT OPERATION=review mix run -e 'Code.require_file("dev/rendro/catalog_evidence_bundle.ex"); IO.inspect(Rendro.CatalogEvidenceBundle.validate(System.fetch_env!("BUNDLE_ROOT"), System.fetch_env!("OPERATION")))'
+CONTROL_SHA=TRUSTED_DEFAULT_BRANCH_CONTROL_SHA BUNDLE_ROOT=/tmp/rendro-catalog-evidence/EXTRACTED_ROOT OPERATION=review mix run -e 'Code.require_file("dev/rendro/catalog_evidence_bundle.ex"); IO.inspect(Rendro.CatalogEvidenceBundle.validate(System.fetch_env!("BUNDLE_ROOT"), System.fetch_env!("OPERATION"), System.fetch_env!("CONTROL_SHA")))'
 ```
 
 Check these textual facts against the downloaded bundle manifest:
@@ -124,7 +126,8 @@ extra, or partial value is a validation failure, not close-enough evidence.
 `review` run and leave every affected cell unreviewed and unpromoted.
 
 **Review bundle loading:** downloaded files are ineligible for review until
-`Rendro.CatalogEvidenceBundle.validate/2` completes successfully. There is no
+`Rendro.CatalogEvidenceBundle.validate/3` completes successfully against the
+independently trusted control SHA, checkout, and checked-in PDFium pin. There is no
 browser or in-document loading surface to infer from.
 
 **Review bundle error:** show the failing manifest, checksum, identity, pin,

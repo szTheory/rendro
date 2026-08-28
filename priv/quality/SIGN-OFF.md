@@ -134,7 +134,7 @@ re-associated with this candidate.
 **Next action:** publish the exact candidate object to a remote-reachable ref,
 then dispatch a new `review` run for that same full SHA. After it completes,
 download its sole closed artifact using that new run's identity and validate it
-with `Rendro.CatalogEvidenceBundle.validate/2` before
+with `Rendro.CatalogEvidenceBundle.validate/3` before
 opening images. If valid, request six complete named reviewer records while
 viewing the reconciled full-size pairs in Invoice light → dark, Statement light
 → dark, Payslip light → dark, Ticket light → dark order. If unavailable,

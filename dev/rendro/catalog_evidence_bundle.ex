@@ -27,7 +27,7 @@ defmodule Rendro.CatalogEvidenceBundle do
 
     with :ok <- validate_input(operation, payload_sources, provenance, output_root),
          :ok <- write_bundle(operation, payload_sources, provenance, output_root),
-         :ok <- validate(output_root, operation) do
+         :ok <- validate(output_root, operation, provenance.control_sha) do
       :ok
     else
       {:error, reasons} when is_list(reasons) -> {:error, reasons}
@@ -38,12 +38,22 @@ defmodule Rendro.CatalogEvidenceBundle do
   def build(_operation, _payload_sources, _provenance, _output_root),
     do: {:error, [:invalid_bundle_input]}
 
-  @spec validate(Path.t(), atom() | String.t()) :: :ok | {:error, [atom()]}
-  def validate(output_root, operation) when is_binary(output_root) do
+  @spec validate(Path.t(), atom() | String.t(), String.t()) :: :ok | {:error, [atom()]}
+  def validate(output_root, operation, expected_control_sha)
+      when is_binary(output_root) and is_binary(expected_control_sha) do
     operation = normalize_operation(operation)
 
-    with {:ok, manifest} <- read_manifest(output_root),
-         :ok <- validate_manifest(operation, manifest),
+    with {:ok, pin} <- read_renderer_pin(),
+         {:ok, checkout_control_sha} <- checked_out_control_sha(),
+         {:ok, manifest} <- read_manifest(output_root),
+         :ok <-
+           validate_manifest(
+             operation,
+             manifest,
+             expected_control_sha,
+             checkout_control_sha,
+             pin
+           ),
          :ok <- validate_files(output_root, manifest),
          :ok <- validate_checksums(output_root, manifest) do
       :ok
@@ -53,7 +63,8 @@ defmodule Rendro.CatalogEvidenceBundle do
     end
   end
 
-  def validate(_output_root, _operation), do: {:error, [:invalid_bundle_root]}
+  def validate(_output_root, _operation, _expected_control_sha),
+    do: {:error, [:invalid_bundle_root]}
 
   defp validate_input(operation, sources, provenance, output_root) do
     reasons =
@@ -146,7 +157,7 @@ defmodule Rendro.CatalogEvidenceBundle do
     File.write(Path.join(output_root, "checksums.sha256"), contents)
   end
 
-  defp validate_manifest(operation, manifest) do
+  defp validate_manifest(operation, manifest, expected_control_sha, checkout_control_sha, pin) do
     expected_roles = Map.get(@roles, operation, [])
     payloads = Map.get(manifest, "payloads", [])
 
@@ -161,9 +172,18 @@ defmodule Rendro.CatalogEvidenceBundle do
         valid_sha?(get_in(manifest, ["control", "workflow_sha"])),
         :invalid_control_sha
       )
+      |> invalid_unless(valid_sha?(expected_control_sha), :invalid_expected_control_sha)
+      |> invalid_unless(
+        get_in(manifest, ["control", "workflow_sha"]) == expected_control_sha,
+        :control_sha_mismatch
+      )
+      |> invalid_unless(
+        expected_control_sha == checkout_control_sha,
+        :control_checkout_mismatch
+      )
       |> invalid_unless(valid_run_id?(manifest["run_id"]), :invalid_run_id)
       |> invalid_unless(valid_run_attempt?(manifest["run_attempt"]), :invalid_run_attempt)
-      |> invalid_unless(valid_renderer?(manifest["renderer"]), :invalid_renderer)
+      |> invalid_unless(valid_renderer?(manifest["renderer"], pin), :renderer_pin_mismatch)
       |> invalid_unless(
         valid_payloads?(payloads, expected_roles, operation),
         :invalid_payload_roles
@@ -258,10 +278,12 @@ defmodule Rendro.CatalogEvidenceBundle do
       (operation != :review or authority["reviewer_approval_recorded"] == false)
   end
 
-  defp valid_renderer?(%{"version" => version, "binary_sha256" => sha, "dpi" => dpi}),
-    do: is_binary(version) and valid_sha256?(sha) and is_integer(dpi) and dpi > 0
+  defp valid_renderer?(%{"version" => version, "binary_sha256" => sha, "dpi" => dpi}, pin),
+    do:
+      is_binary(version) and valid_sha256?(sha) and is_integer(dpi) and dpi > 0 and
+        version == pin["version"] and sha == pin["sha256"]
 
-  defp valid_renderer?(_renderer), do: false
+  defp valid_renderer?(_renderer, _pin), do: false
 
   defp payload_file_errors(output_root, payloads) do
     Enum.flat_map(payloads, fn payload ->
@@ -328,7 +350,7 @@ defmodule Rendro.CatalogEvidenceBundle do
   end
 
   defp renderer(provenance) do
-    pin = "priv/pdfium_pin.json" |> File.read!() |> JSON.decode!()
+    {:ok, pin} = read_renderer_pin()
 
     %{
       "version" => pin["version"],
@@ -367,6 +389,27 @@ defmodule Rendro.CatalogEvidenceBundle do
   end
 
   defp safe_output_root?(path), do: path != "" and not String.contains?(path, "\0")
+
+  defp read_renderer_pin do
+    with {:ok, contents} <- File.read("priv/pdfium_pin.json"),
+         {:ok, pin} <- Jason.decode(contents),
+         true <- is_binary(pin["version"]) and valid_sha256?(pin["sha256"]) do
+      {:ok, pin}
+    else
+      _ -> {:error, :invalid_renderer_pin}
+    end
+  end
+
+  defp checked_out_control_sha do
+    case System.cmd("git", ["rev-parse", "HEAD"], stderr_to_stdout: true) do
+      {sha, 0} ->
+        sha = String.trim(sha)
+        if valid_sha?(sha), do: {:ok, sha}, else: {:error, :invalid_control_checkout}
+
+      _ ->
+        {:error, :invalid_control_checkout}
+    end
+  end
 
   defp valid_sha?(value), do: is_binary(value) and Regex.match?(~r/\A[0-9a-f]{40}\z/, value)
   defp valid_sha256?(value), do: is_binary(value) and Regex.match?(~r/\A[0-9a-f]{64}\z/, value)
