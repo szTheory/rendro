@@ -12,6 +12,8 @@ defmodule Rendro.DocsContract.CatalogEvidenceRunbookTest do
     for heading <- [
           "## Request evidence for one immutable commit",
           "## Review one complete evidence bundle",
+          "## Review the bound eight-image reviewer packet",
+          "## Record the machine-readable receipt",
           "## Consume the stable bundle contract in Phase 136",
           "## Audit the control plane and diagnose failures"
         ] do
@@ -68,7 +70,46 @@ defmodule Rendro.DocsContract.CatalogEvidenceRunbookTest do
              "Invoice light → dark, Statement light → dark, Payslip light → dark, Ticket light → dark"
 
     assert runbook =~ "full-size images"
+
+    assert runbook =~
+             "RUN_ATTEMPT=$(gh api \"repos/OWNER/REPO/actions/runs/${RUN_ID}\" --jq '.run_attempt')"
+
+    assert runbook =~
+             "rendro-catalog-reviewer-packet--${FULL_CANDIDATE_SHA}--run-${RUN_ID}--attempt-${RUN_ATTEMPT}"
+
+    assert runbook =~ "EVIDENCE_PROVIDER_DIGEST"
+    assert runbook =~ "PACKET_PROVIDER_DIGEST"
+    assert runbook =~ "EVIDENCE_ARCHIVE_SHA256"
+    assert runbook =~ "PACKET_ARCHIVE_SHA256"
+    assert runbook =~ "archive_download_url"
+    assert runbook =~ "test ! -e \"${EVIDENCE_DIR}\""
+    assert runbook =~ "test ! -e \"${PACKET_DIR}\""
+    assert runbook =~ "--candidate-manifest"
+    assert runbook =~ "--final-manifest"
+    assert runbook =~ "--validate-intake"
+    assert runbook =~ "--bundle"
+    assert runbook =~ "--control-sha"
+    assert runbook =~ "authority: none"
+    assert runbook =~ "invoice_light_control"
+    assert runbook =~ "invoice_dark_target"
+    assert runbook =~ "statement_light_control"
+    assert runbook =~ "statement_dark_target"
+    assert runbook =~ "payslip_light_target"
+    assert runbook =~ "payslip_dark_target"
+    assert runbook =~ "ticket_light_target"
+    assert runbook =~ "ticket_dark_target"
+    assert runbook =~ "136-12-RECEIPT.json"
+    assert runbook =~ "complete"
+    assert runbook =~ "unavailable"
+    assert runbook =~ "revision_gate"
+    assert runbook =~ "cap: 3"
+    assert runbook =~ "attempt 2 or later"
+    assert runbook =~ "evidence bundle first"
+    assert runbook =~ "not an\nautomated visual score"
     assert runbook =~ "continue with explicit deferral"
+
+    refute runbook =~ "attempt-1"
+    refute runbook =~ "convenience-only"
 
     refute runbook =~ ".planning/phases"
     refute runbook =~ "approves a change"
