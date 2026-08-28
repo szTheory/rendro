@@ -119,7 +119,7 @@ jobs:
           CONTROL_SHA: ${{ steps.control.outputs.sha }}
         run: |
           [[ "$(git rev-parse HEAD)" == "${CONTROL_SHA}" ]]
-          [[ "$(find candidate-handoff -type l -o ! -type f | wc -l | tr -d ' ')" = 0 ]]
+          [[ "$(find candidate-handoff -mindepth 1 -type l -o ! -type f | wc -l | tr -d ' ')" = 0 ]]
           [[ "$(find candidate-handoff -type f | wc -l | tr -d ' ')" -le 5 ]]
           [[ "$(du -sk candidate-handoff | cut -f1)" -le 20480 ]]
           actual_files="$(find candidate-handoff -type f -printf '%f\n' | sort | tr '\n' ' ')"

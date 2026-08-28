@@ -198,6 +198,11 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert source =~ "multipage-checksums.sha256"
       assert source =~ "actions/download-artifact@"
 
+      assert source =~
+               "find candidate-handoff -mindepth 1 -type l -o ! -type f"
+
+      refute source =~ "find candidate-handoff -type l -o ! -type f"
+
       for forbidden <- [
             "actions/cache",
             "secrets.",
