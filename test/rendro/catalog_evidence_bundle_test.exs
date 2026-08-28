@@ -5,7 +5,7 @@ defmodule Rendro.CatalogEvidenceBundleTest do
 
   @sha String.duplicate("a", 40)
 
-  test "builds and validates a closed review bundle with sorted checksums" do
+  test "builds and validates a closed review bundle with candidate cells and image manifests" do
     root = temporary_root("review")
 
     assert :ok = CatalogEvidenceBundle.build(:review, review_sources(root), provenance(), root)
@@ -111,7 +111,7 @@ defmodule Rendro.CatalogEvidenceBundleTest do
     sources = review_sources(root)
 
     candidate = List.first(sources)
-    File.write!(candidate.source, images_json(31))
+    File.write!(candidate.source, cells_json(31))
 
     assert {:error, reasons} = CatalogEvidenceBundle.build(:review, sources, provenance(), root)
     assert :invalid_payload_counts in reasons
@@ -131,7 +131,7 @@ defmodule Rendro.CatalogEvidenceBundleTest do
 
   defp review_sources(root) do
     [
-      {"candidate/catalog.json", images_json(32), 32},
+      {"candidate/catalog.json", cells_json(32), 32},
       {"final-review/final.json", images_json(12), 12},
       {"multipage-review/multipage.json", checksums(4), 4},
       {"preset-review/preset.json", images_json(12), 12}
@@ -166,6 +166,9 @@ defmodule Rendro.CatalogEvidenceBundleTest do
 
   defp images_json(count),
     do: Jason.encode!(%{"images" => Enum.map(1..count, &%{"id" => "item-#{&1}"})})
+
+  defp cells_json(count),
+    do: Jason.encode!(%{"cells" => Enum.map(1..count, &%{"id" => "item-#{&1}"})})
 
   defp checksums(count) do
     Enum.map_join(1..count, "\n", fn index ->
