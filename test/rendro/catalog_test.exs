@@ -202,6 +202,29 @@ defmodule Rendro.CatalogTest do
              candidate_manifest(changed_control_png, baseline, rubric)
   end
 
+  test "real catalog target profiles change exactly the six allowlisted source PDFs" do
+    baseline_by_id =
+      Catalog.read_manifest!()["cells"]
+      |> Map.new(&{&1["id"], &1["source_pdf_sha256"]})
+
+    changed_ids =
+      Catalog.catalog_specs()
+      |> Enum.flat_map(fn spec ->
+        assert {:ok, pdf} = Catalog.render_source_pdf(spec)
+        sha256 = :crypto.hash(:sha256, pdf) |> Base.encode16(case: :lower)
+        if sha256 == baseline_by_id[spec.id], do: [], else: [spec.id]
+      end)
+
+    assert changed_ids == [
+             "invoice--cedar-mutual--corporate-classic--dark",
+             "statement--signal-ledger--minimal-mono--dark",
+             "payslip--northline-logistics--swiss--light",
+             "payslip--northline-logistics--swiss--dark",
+             "ticket--aurora-live--brutalist--light",
+             "ticket--aurora-live--brutalist--dark"
+           ]
+  end
+
   test "catalog dispositions remain explicit 32-cell, 20-unscored dark screen-only records" do
     manifest = Catalog.read_manifest!()
     rubric = JSON.decode!(File.read!("priv/quality/rubric_scores.json"))
