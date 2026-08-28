@@ -24,7 +24,9 @@ jobs:
     timeout-minutes: 45
     env:
       CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+      CONTROL_SHA: ${{ github.sha }}
       OPERATION: ${{ inputs.operation }}
+      RENDRO_CATALOG_BASELINE_COMMIT_SHA: ${{ github.sha }}
     steps:
       - name: Validate closed dispatch inputs
         shell: bash
@@ -35,6 +37,7 @@ jobs:
         with:
           ref: ${{ env.CANDIDATE_SHA }}
           persist-credentials: false
+          fetch-depth: 0
       - uses: erlef/setup-beam@8251c48667b97e88a0a24ec512f5b72a039fcea7 # v1
         with:
           otp-version: '28'
@@ -43,6 +46,14 @@ jobs:
         shell: bash
         run: |
           [[ "$(git rev-parse HEAD)" == "${CANDIDATE_SHA}" ]]
+          test "${OPERATION}" != canonical || test "${CANDIDATE_SHA}" = "${CONTROL_SHA}"
+          jq -e '
+            type == "object" and
+            (keys == ["binary", "sha256", "version"]) and
+            (.binary == "pdfium-webassembly-linux-amd64") and
+            (.version | type == "string" and test("^v[0-9]+\\.[0-9]+\\.[0-9]+$")) and
+            (.sha256 | type == "string" and test("^[0-9a-f]{64}$"))
+          ' priv/pdfium_pin.json >/dev/null
           expected_sha="$(jq -r '.sha256' priv/pdfium_pin.json)"
           version="$(jq -r '.version' priv/pdfium_pin.json)"
           curl -fsSL -o pdfium-cli "https://github.com/klippa-app/pdfium-cli/releases/download/${version}/pdfium-webassembly-linux-amd64"
@@ -56,20 +67,36 @@ jobs:
             mix rendro.catalog.candidate
             export RENDRO_CATALOG_REVIEW_DIR="$PWD/tmp/catalog-evidence-review"
             mix test --include raster_snapshot test/rendro/catalog_raster_review_test.exs
-            find "${RENDRO_CATALOG_REVIEW_DIR}/multipage" -maxdepth 1 -type f -name '*.png' -print0 | sort -z | xargs -0 sha256sum > handoff/multipage-checksums.sha256
+            jq --slurpfile candidate tmp/phase130-candidate/candidate-manifest.json '
+              {
+                candidate_sha: $candidate[0].candidate.commit_sha,
+                control_sha: $candidate[0].candidate.baseline_commit_sha,
+                run_id: $candidate[0].candidate.run_id,
+                run_attempt: $candidate[0].candidate.run_attempt,
+                renderer: {
+                  version: $candidate[0].candidate.renderer.version,
+                  sha256: $candidate[0].candidate.renderer.sha256
+                },
+                images: .images
+              }
+            ' "${RENDRO_CATALOG_REVIEW_DIR}/final/identity-manifest.json" > handoff/final-manifest.json
+            mix rendro.catalog.gallery \
+              --candidate-manifest tmp/phase130-candidate/candidate-manifest.json \
+              --final-manifest handoff/final-manifest.json \
+              --output "$PWD/tmp/catalog-reviewer-packet"
+            (cd "${RENDRO_CATALOG_REVIEW_DIR}/multipage" && find . -maxdepth 1 -type f -name '*.png' -printf '%f\0' | sort -z | xargs -0 sha256sum) > handoff/multipage-checksums.sha256
             export RENDRO_PRESET_RASTER_REVIEW_DIR="$PWD/tmp/rendro_preset_raster_review"
             mix test --include raster_snapshot test/rendro/theme/preset_raster_snapshot_test.exs
-            jq -n --arg candidate_sha "${CANDIDATE_SHA}" --arg renderer_version "$(jq -r '.version' priv/pdfium_pin.json)" --arg renderer_sha256 "${expected_sha}" --argjson images "$(find "${RENDRO_PRESET_RASTER_REVIEW_DIR}" -maxdepth 1 -type f -name '*.png' -printf '%f\n' | sort | while IFS= read -r name; do jq -n --arg id "${name%.png}" --arg sha256 "$(sha256sum "${RENDRO_PRESET_RASTER_REVIEW_DIR}/${name}" | cut -d ' ' -f 1)" '{id: $id, sha256: $sha256}'; done | jq -s)" '{candidate_sha: $candidate_sha, renderer: {version: $renderer_version, sha256: $renderer_sha256}, images: $images}' > handoff/preset-review-manifest.json
-            test "$(jq '.images | length' tmp/phase130-candidate/candidate-manifest.json)" = 32
+            jq -n --arg candidate_sha "${CANDIDATE_SHA}" --arg renderer_version "$(jq -r '.version' priv/pdfium_pin.json)" --arg renderer_sha256 "${expected_sha}" --argjson images "$(find "${RENDRO_PRESET_RASTER_REVIEW_DIR}" -maxdepth 1 -type f -name '*.png' -printf '%f\n' | sort | while IFS= read -r name; do jq -n --arg id "${name%.png}" --arg path "preset-review/${name}" --arg sha256 "$(sha256sum "${RENDRO_PRESET_RASTER_REVIEW_DIR}/${name}" | cut -d ' ' -f 1)" '{id: $id, path: $path, sha256: $sha256}'; done | jq -s)" '{candidate_sha: $candidate_sha, renderer: {version: $renderer_version, sha256: $renderer_sha256}, images: $images}' > handoff/preset-review-manifest.json
+            test "$(jq '.cells | length' tmp/phase130-candidate/candidate-manifest.json)" = 32
             test "$(jq '.images | length' "${RENDRO_CATALOG_REVIEW_DIR}/final/identity-manifest.json")" = 12
             test "$(wc -l < handoff/multipage-checksums.sha256 | tr -d ' ')" = 4
             test "$(jq '.images | length' handoff/preset-review-manifest.json)" = 12
             cp tmp/phase130-candidate/candidate-manifest.json handoff/candidate-manifest.json
-            cp "${RENDRO_CATALOG_REVIEW_DIR}/final/identity-manifest.json" handoff/final-manifest.json
           else
             mix rendro.catalog.gen
             mix rendro.catalog.check
-            test "$(jq 'length' assets/rendro/catalog.json)" = 32
+            test "$(jq '.cells | length' assets/rendro/catalog.json)" = 32
             cp assets/rendro/catalog.json handoff/catalog.json
           fi
       - name: Upload isolated candidate handoff
@@ -79,6 +106,15 @@ jobs:
           path: handoff
           if-no-files-found: error
           retention-days: 1
+      - name: Upload authority-none eight-image reviewer packet
+        id: reviewer_packet_upload
+        if: inputs.operation == 'review'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rendro-catalog-reviewer-packet--${{ inputs.candidate_sha }}--run-${{ github.run_id }}--attempt-${{ github.run_attempt }}
+          path: tmp/catalog-reviewer-packet
+          if-no-files-found: error
+          retention-days: 30
 
   catalog-evidence:
     # A dispatch from any other ref cannot select its workflow/helper as control.
@@ -98,6 +134,7 @@ jobs:
         with:
           ref: ${{ env.CONTROL_SHA }}
           persist-credentials: false
+          fetch-depth: 0
       - name: Bind trusted control to default branch
         id: control
         shell: bash
@@ -119,7 +156,7 @@ jobs:
           CONTROL_SHA: ${{ steps.control.outputs.sha }}
         run: |
           [[ "$(git rev-parse HEAD)" == "${CONTROL_SHA}" ]]
-          [[ "$(find candidate-handoff -type l -o ! -type f | wc -l | tr -d ' ')" = 0 ]]
+          [[ "$(find candidate-handoff -mindepth 1 -type l -o ! -type f | wc -l | tr -d ' ')" = 0 ]]
           [[ "$(find candidate-handoff -type f | wc -l | tr -d ' ')" -le 5 ]]
           [[ "$(du -sk candidate-handoff | cut -f1)" -le 20480 ]]
           actual_files="$(find candidate-handoff -type f -printf '%f\n' | sort | tr '\n' ' ')"

@@ -188,8 +188,10 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert packet_upload["with"]["if-no-files-found"] == "error"
       assert packet_upload["with"]["retention-days"] == 30
 
-      assert source =~
-               "mix rendro.catalog.gallery \\\n+  --candidate-manifest tmp/phase130-candidate/candidate-manifest.json \\\n+  --final-manifest handoff/final-manifest.json \\\n+  --output \"$PWD/tmp/catalog-reviewer-packet\""
+      assert source =~ "mix rendro.catalog.gallery \\"
+      assert source =~ "--candidate-manifest tmp/phase130-candidate/candidate-manifest.json \\"
+      assert source =~ "--final-manifest handoff/final-manifest.json \\"
+      assert source =~ "--output \"$PWD/tmp/catalog-reviewer-packet\""
 
       refute source =~ "candidate-handoff/catalog-reviewer-packet"
       refute source =~ "catalog-visual-gallery"
