@@ -487,6 +487,66 @@ defmodule Rendro.Recipes.PayslipTest do
     end
   end
 
+  describe "sequential measured ledger profile" do
+    test "renders independent full-width Earnings then Deductions tables for the Swiss profile" do
+      sections =
+        Payslip.sections(fixture_data(),
+          theme: Rendro.Theme.preset(:swiss, accent: "#2C6BED"),
+          presentation_profile: %{ledger_layout: :sequential_measured}
+        )
+
+      body = Enum.find(sections, &(&1.region == :body))
+      tables = Enum.filter(body.content, &is_struct(&1.content, Rendro.Table))
+
+      assert Enum.map(tables, &collect_content_from_row(&1.content.header)) == [
+               ["Earnings", "Current", "YTD"],
+               ["Deductions", "Current", "YTD"]
+             ]
+
+      assert Enum.all?(tables, fn block ->
+               block.content.columns |> length() |> Kernel.==(3)
+             end)
+    end
+
+    test "keeps a continued ledger's own header and reconciliation adjacent to the final table" do
+      earnings =
+        for index <- 1..80 do
+          %{
+            description: "Long earned route coverage description #{index}",
+            amount: Decimal.new("100.00"),
+            ytd: Decimal.new("1200.00")
+          }
+        end
+
+      sections =
+        Payslip.sections(fixture_data(earnings: earnings),
+          theme: Rendro.Theme.preset(:swiss, accent: "#2C6BED"),
+          presentation_profile: %{ledger_layout: :sequential_measured}
+        )
+
+      body = Enum.find(sections, &(&1.region == :body))
+      tables = Enum.filter(body.content, &is_struct(&1.content, Rendro.Table))
+      headers = Enum.map(tables, &collect_content_from_row(&1.content.header))
+      deduction_index = Enum.find_index(headers, &(&1 == ["Deductions", "Current", "YTD"]))
+
+      assert Enum.count(headers, &(&1 == ["Earnings", "Current", "YTD"])) >= 2
+      assert deduction_index && deduction_index > 0
+      refute Enum.at(tables, deduction_index).break_before
+
+      [last_table | _] = Enum.reverse(tables)
+
+      reconciliation_index =
+        Enum.find_index(body.content, &(&1.content == last_table.content)) + 1
+
+      assert %Rendro.Text{content: reconciliation} =
+               Enum.at(body.content, reconciliation_index).content
+
+      assert reconciliation =~ "Gross Pay"
+      assert reconciliation =~ "Total Deductions"
+      assert reconciliation =~ "NET PAY"
+    end
+  end
+
   # ---------------------------------------------------------------------------
   # Recursive %Rendro.Text{} size/content collectors — reused by Task 3's
   # table assertions (a table's header/rows/cells may wrap Rendro.Block/

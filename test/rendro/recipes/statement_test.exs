@@ -215,6 +215,66 @@ defmodule Rendro.Recipes.StatementTest do
     end
   end
 
+  describe "private semantic ink presentation profile" do
+    test "omitted, empty, and unrelated profiles preserve themed Statement sections" do
+      data = fixture_data(3)
+      theme = Rendro.Theme.preset(:minimal_mono, accent: "#0E7C76", mode: :dark)
+
+      assert Statement.sections(data, theme: theme) ==
+               Statement.sections(data, theme: theme, presentation_profile: %{})
+
+      assert Statement.sections(data, theme: theme) ==
+               Statement.sections(data,
+                 theme: theme,
+                 presentation_profile: %{semantic_ink: :other}
+               )
+    end
+
+    test "primary_secondary gives ledger headers and values primary ink without flattening Closing Balance" do
+      data = fixture_data(3)
+      theme = Rendro.Theme.preset(:minimal_mono, accent: "#0E7C76", mode: :dark)
+      colors = Rendro.Theme.resolve(theme).colors
+      primary_ink = colors.ink
+      secondary_ink = colors.muted
+
+      sections =
+        Statement.sections(data,
+          theme: theme,
+          presentation_profile: %{semantic_ink: :primary_secondary}
+        )
+
+      header = Enum.find(sections, &(&1.region == :header))
+      body = Enum.find(sections, &(&1.region == :body))
+
+      [%Rendro.Block{content: %Rendro.Table{header: table_header, rows: rows}}] =
+        Enum.filter(body.content, &is_struct(&1.content, Rendro.Table))
+
+      for cell <- table_header ++ List.flatten(rows) do
+        assert %Rendro.Block{content: %Rendro.Text{color: ^primary_ink}} = cell
+      end
+
+      assert %Rendro.Block{content: %Rendro.Text{content: period, color: ^secondary_ink}} =
+               Enum.find(header.content, fn
+                 %Rendro.Block{content: %Rendro.Text{content: content}} ->
+                   String.contains?(content, "2026-05-01 to 2026-05-31")
+
+                 _ ->
+                   false
+               end)
+
+      assert period == "2026-05-01 to 2026-05-31"
+
+      assert %Rendro.Block{content: %Rendro.Text{size: 16, color: ^primary_ink}} =
+               Enum.find(header.content, fn
+                 %Rendro.Block{content: %Rendro.Text{content: content}} ->
+                   content == Rendro.Format.money(expected_closing(3))
+
+                 _ ->
+                   false
+               end)
+    end
+  end
+
   # ---------------------------------------------------------------------------
   # V2: multi-page page count == ceil(rows / capacity)
   # ---------------------------------------------------------------------------

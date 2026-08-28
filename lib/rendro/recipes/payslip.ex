@@ -575,6 +575,14 @@ defmodule Rendro.Recipes.Payslip do
   # typography/1 seam (no-theme literal-default preserves that exact value).
 
   defp body_section(data, opts) do
+    if sequential_ledger?(opts) do
+      sequential_ledger_blocks(data, opts)
+    else
+      paired_ledger_blocks(data, opts)
+    end
+  end
+
+  defp paired_ledger_blocks(data, opts) do
     colors = palette(opts)
     type = typography(opts)
     lbl = Rendro.Recipes.Pagination.label_resolver(opts, @default_labels)
@@ -661,6 +669,150 @@ defmodule Rendro.Recipes.Payslip do
       region: :body,
       content: table_blocks ++ reconciliation_blocks
     )
+  end
+
+  # The catalog selects this private, generic layout intent. Recipe code never
+  # knows which catalog cell, brand, preset, or phase supplied it.
+  defp sequential_ledger?(opts) do
+    match?(%{ledger_layout: :sequential_measured}, opts[:presentation_profile])
+  end
+
+  defp sequential_ledger_blocks(data, opts) do
+    colors = palette(opts)
+    type = typography(opts)
+    lbl = Rendro.Recipes.Pagination.label_resolver(opts, @default_labels)
+    fmt_amount = Rendro.Recipes.Pagination.formatter(opts, :amount, &Rendro.Format.money/1)
+    g = geometry(opts)
+    totals = derive_totals(data)
+    doc_for_measure = Rendro.Document.new() |> with_unicode_fallback_font()
+    {current_width, ytd_width} = money_column_width(data, lbl, fmt_amount, type)
+
+    earnings =
+      ledger_table(
+        data.earnings,
+        lbl.(:earnings),
+        data,
+        colors,
+        type,
+        lbl,
+        fmt_amount,
+        g,
+        doc_for_measure,
+        current_width,
+        ytd_width,
+        false
+      )
+
+    deductions =
+      ledger_table(
+        data.deductions,
+        lbl.(:deductions),
+        data,
+        colors,
+        type,
+        lbl,
+        fmt_amount,
+        g,
+        doc_for_measure,
+        current_width,
+        ytd_width,
+        false
+      )
+
+    reconciliation_blocks =
+      build_reconciliation_blocks(data, colors, type, lbl, fmt_amount, totals)
+
+    Rendro.section(
+      name: :payslip_body,
+      region: :body,
+      content: earnings ++ deductions ++ reconciliation_blocks
+    )
+  end
+
+  defp ledger_table(
+         lines,
+         heading,
+         data,
+         colors,
+         type,
+         lbl,
+         fmt_amount,
+         g,
+         doc_for_measure,
+         current_width,
+         ytd_width,
+         starts_after_previous
+       ) do
+    rows =
+      Enum.map(lines, fn line ->
+        [
+          cell_text(line.description, colors, type),
+          cell_text(fmt_amount.(line.amount), colors, type),
+          cell_text(fmt_amount.(line.ytd), colors, type)
+        ]
+      end)
+
+    table_opts = [
+      header: [
+        cell_text(heading, colors, type),
+        cell_text(lbl.(:amount), colors, type),
+        cell_text(lbl.(:ytd_amount), colors, type)
+      ],
+      columns: [{:share, 1}, {:fixed, current_width}, {:fixed, ytd_width}],
+      borders: :columns,
+      border_style: %{color: colors.rule, width: 0.5},
+      header_fill: colors.surface,
+      cell_align: %{1 => :right, 2 => :right}
+    ]
+
+    {header_h, row_heights} = Rendro.measure_rows(rows, g.content_w, doc_for_measure, table_opts)
+
+    effective_capacity =
+      g.body_h - header_h - reconciliation_reserved_height(data) - @row_epsilon
+
+    pages =
+      rows
+      |> Enum.zip(row_heights)
+      |> Enum.map(fn {row, height} -> {row, height, nil} end)
+      |> Rendro.Recipes.Pagination.chunk_rows_into_pages(effective_capacity)
+
+    case pages do
+      [] ->
+        [Rendro.block(Rendro.table([], table_opts), break_before: starts_after_previous)]
+
+      _pages ->
+        pages
+        |> Enum.with_index()
+        |> Enum.map(fn {{page_rows, _meta}, index} ->
+          Rendro.block(
+            Rendro.table(page_rows, table_opts),
+            break_before: (starts_after_previous and index == 0) or index > 0
+          )
+        end)
+    end
+  end
+
+  # Amount columns are explicit and shared by the two sequential tables. The
+  # selected Helvetica metrics are the primary face of :payslip_sans; the
+  # document used below registers the fallback before rows are measured.
+  defp money_column_width(data, lbl, fmt_amount, type) do
+    tokens =
+      [lbl.(:amount), lbl.(:ytd_amount)] ++
+        Enum.flat_map([data.earnings, data.deductions], fn lines ->
+          Enum.flat_map(lines, &[fmt_amount.(&1.amount), fmt_amount.(&1.ytd)])
+        end)
+
+    widest =
+      tokens
+      |> Enum.map(
+        &Rendro.PDF.Font.text_width(Rendro.PDF.Font.helvetica(), &1, type.scale.subtitle)
+      )
+      |> Enum.max(fn -> 0 end)
+
+    # Fixed deterministic breathing room avoids clipping without changing the
+    # established font role or treating amounts as flexible prose.
+    width = Float.ceil(widest + 6.0, 1)
+    {width, width}
   end
 
   defp subtotal_row(lbl, fmt_amount, colors, type, totals) do

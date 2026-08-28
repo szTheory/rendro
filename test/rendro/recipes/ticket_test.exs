@@ -203,6 +203,41 @@ defmodule Rendro.Recipes.TicketTest do
   # ---------------------------------------------------------------------------
 
   describe "sections/2 and document/2" do
+    test "atomic equal-share profile preserves the real Aurora Section/GA through Gate/B association" do
+      data =
+        fixture_data(
+          placement: [
+            %{label: "Section", value: "GA"},
+            %{label: "Row", value: "H"},
+            %{label: "Seat", value: "24"},
+            %{label: "Gate", value: "B"}
+          ]
+        )
+
+      theme = Rendro.Theme.preset(:brutalist, accent: "#C78600", mode: :light)
+
+      main =
+        Ticket.sections(data,
+          theme: theme,
+          catalog_layout: true,
+          presentation_profile: %{locator_layout: :atomic_equal_share}
+        )
+        |> Enum.find(&(&1.region == :main))
+
+      [grid_block] = Enum.filter(main.content, &is_struct(&1.content, Rendro.Table))
+      table = grid_block.content
+
+      assert table.columns == List.duplicate({:share, 1}, 4)
+      assert table.header_fill == theme.colors.surface
+      assert Enum.map(table.header, &cell_text/1) == ["SECTION", "ROW", "SEAT", "GATE"]
+      assert [value_cells] = table.rows
+      assert Enum.map(value_cells, &cell_text/1) == ["GA", "H", "24", "B"]
+      assert Enum.all?(value_cells, &match?(%Rendro.Cell{split_policy: :atomic}, &1))
+      refute Enum.any?(value_cells, &(cell_text(&1) == "24B"))
+      assert Enum.all?(value_cells, &(cell_text(&1) in ["GA", "H", "24", "B"]))
+      assert Enum.all?(value_cells, &(cell_size(&1) == 34))
+    end
+
     test "sections/2 returns %Section{} structs including :main and :stub regions" do
       sections = Ticket.sections(fixture_data())
       assert Enum.all?(sections, &match?(%Rendro.Section{}, &1))
@@ -350,6 +385,43 @@ defmodule Rendro.Recipes.TicketTest do
                    false
                end)
       end
+    end
+
+    test "atomic dark locator uses semantic secondary ink for labels, stub reference, rules, and terms" do
+      dark = Rendro.Theme.preset(:brutalist, accent: "#C78600", mode: :dark)
+
+      data =
+        fixture_data(
+          placement: [
+            %{label: "Section", value: "GA"},
+            %{label: "Row", value: "H"},
+            %{label: "Seat", value: "24"},
+            %{label: "Gate", value: "B"}
+          ],
+          terms: "Present this reference at the gate for scanning."
+        )
+
+      sections =
+        Ticket.sections(data,
+          theme: dark,
+          catalog_layout: true,
+          presentation_profile: %{locator_layout: :atomic_equal_share}
+        )
+
+      main = Enum.find(sections, &(&1.region == :main))
+      stub = Enum.find(sections, &(&1.region == :stub))
+      terms = Enum.find(sections, &(&1.region == :terms))
+      [grid_block] = Enum.filter(main.content, &is_struct(&1.content, Rendro.Table))
+
+      assert Enum.all?(grid_block.content.header, &(cell_color(&1) == dark.colors.muted))
+      assert Enum.all?(hd(grid_block.content.rows), &(cell_color(&1) == dark.colors.ink))
+      assert text_color(stub, "AUR-88213-GA") == dark.colors.muted
+
+      assert text_color(terms, "Present this reference at the gate for scanning.") ==
+               dark.colors.muted
+
+      assert Enum.all?(path_colors(stub), &(&1 == dark.colors.rule))
+      assert Enum.any?(path_colors(main), &(&1 == dark.colors.rule))
     end
   end
 
@@ -508,6 +580,45 @@ defmodule Rendro.Recipes.TicketTest do
   defp collect_from_cell_content(%Rendro.Block{} = block), do: collect_from_block(block)
   defp collect_from_cell_content(%Rendro.Text{size: size}), do: [size]
   defp collect_from_cell_content(_other), do: []
+
+  defp cell_text(%Rendro.Block{content: %Rendro.Text{content: content}}), do: content
+  defp cell_text(%Rendro.Text{content: content}), do: content
+  defp cell_text(%Rendro.Cell{content: content}), do: cell_text(content)
+
+  defp cell_size(%Rendro.Block{content: %Rendro.Text{size: size}}), do: size
+  defp cell_size(%Rendro.Text{size: size}), do: size
+  defp cell_size(%Rendro.Cell{content: content}), do: cell_size(content)
+
+  defp cell_color(%Rendro.Block{content: %Rendro.Text{color: color}}), do: color
+  defp cell_color(%Rendro.Text{color: color}), do: color
+  defp cell_color(%Rendro.Cell{content: content}), do: cell_color(content)
+
+  defp text_color(%Rendro.Section{content: content}, text) do
+    content
+    |> Enum.flat_map(&text_colors_from_block/1)
+    |> Map.new()
+    |> Map.fetch!(text)
+  end
+
+  defp path_colors(%Rendro.Section{content: content}) do
+    for %Rendro.Block{content: %Rendro.Path{stroke: %{color: color}}} <- content, do: color
+  end
+
+  defp text_colors_from_block(%Rendro.Block{
+         content: %Rendro.Text{content: content, color: color}
+       }),
+       do: [{content, color}]
+
+  defp text_colors_from_block(%Rendro.Block{content: %Rendro.Table{} = table}) do
+    ((table.header || []) ++ List.flatten(table.rows))
+    |> Enum.flat_map(fn
+      %Rendro.Block{} = block -> text_colors_from_block(block)
+      %Rendro.Cell{} = cell -> text_colors_from_block(cell.content)
+      _ -> []
+    end)
+  end
+
+  defp text_colors_from_block(_other), do: []
 
   defp text_sizes(%Rendro.Section{content: content}) do
     content

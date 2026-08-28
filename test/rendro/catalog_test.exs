@@ -33,6 +33,75 @@ defmodule Rendro.CatalogTest do
     end
   end
 
+  test "the dev-only visual target map contains only the six ordered target IDs" do
+    source = File.read!("dev/rendro/catalog.ex")
+
+    expected_ids = [
+      "invoice--cedar-mutual--corporate-classic--dark",
+      "statement--signal-ledger--minimal-mono--dark",
+      "payslip--northline-logistics--swiss--light",
+      "payslip--northline-logistics--swiss--dark",
+      "ticket--aurora-live--brutalist--light",
+      "ticket--aurora-live--brutalist--dark"
+    ]
+
+    assert source =~ "@visual_target_profiles"
+
+    assert Enum.map(expected_ids, &(String.split(source, &1, parts: 2) |> hd() |> byte_size())) ==
+             Enum.sort(
+               Enum.map(
+                 expected_ids,
+                 &(String.split(source, &1, parts: 2) |> hd() |> byte_size())
+               )
+             )
+
+    assert Enum.all?(expected_ids, &String.contains?(source, &1))
+    assert length(Regex.scan(~r/--(?:dark|light)"\s*=>\s*%\{/, source)) == 6
+    assert source =~ "Map.get(@visual_target_profiles, spec.id)"
+  end
+
+  test "only the Corporate Classic Invoice dark catalog render receives generic semantic ink" do
+    target =
+      Enum.find(
+        Catalog.catalog_specs(),
+        &(&1.id == "invoice--cedar-mutual--corporate-classic--dark")
+      )
+
+    control =
+      Enum.find(
+        Catalog.catalog_specs(),
+        &(&1.id == "invoice--cedar-mutual--corporate-classic--light")
+      )
+
+    target_doc = Catalog.source_document_for(target)
+    control_doc = Catalog.source_document_for(control)
+
+    assert inspect(target_doc, limit: :infinity, printable_limit: :infinity) =~ "Date:"
+    assert inspect(control_doc, limit: :infinity, printable_limit: :infinity) =~ "Date:"
+
+    assert {:ok, first} = Catalog.render_source_pdf(target)
+    assert {:ok, second} = Catalog.render_source_pdf(target)
+    assert first == second
+  end
+
+  test "catalog identity literals remain outside core recipes" do
+    recipe_sources =
+      Path.wildcard("lib/rendro/recipes/*.ex")
+      |> Enum.map(&File.read!/1)
+      |> Enum.join("\n")
+
+    for id <- [
+          "invoice--cedar-mutual--corporate-classic--dark",
+          "statement--signal-ledger--minimal-mono--dark",
+          "payslip--northline-logistics--swiss--light",
+          "payslip--northline-logistics--swiss--dark",
+          "ticket--aurora-live--brutalist--light",
+          "ticket--aurora-live--brutalist--dark"
+        ] do
+      refute recipe_sources =~ id
+    end
+  end
+
   test "catalog paths reject traversal before I/O" do
     assert_raise ArgumentError, ~r/unsafe catalog/, fn ->
       Catalog.source_document_for(%{
@@ -69,52 +138,119 @@ defmodule Rendro.CatalogTest do
     refute File.exists?("assets/rendro/catalog.json.staging")
   end
 
-  test "candidate manifest classifies stale scored bindings without copying reviewer judgment" do
-    [first | rest] = Catalog.read_manifest!()["cells"]
-
-    candidate_cells =
-      Enum.map([first | rest], fn cell ->
-        %{
-          cell
-          | "png_path" =>
-              String.replace(cell["png_path"], "assets/rendro", "tmp/phase130-candidate")
-        }
-      end)
-
-    [candidate | candidate_rest] = candidate_cells
-    candidate = %{candidate | "png_sha256" => String.duplicate("c", 64)}
-
-    rubric = %{
-      "catalog_dispositions" => [
-        %{
-          "catalog_id" => first["id"],
-          "review_status" => "scored",
-          "png_sha256" => first["png_sha256"],
-          "source_pdf_sha256" => first["source_pdf_sha256"],
-          "passed" => true,
-          "dimension_scores" => %{"content_hierarchy" => 5}
-        }
-      ]
-    }
+  test "candidate manifest permits exactly the ordered six target changes without reviewer judgment" do
+    baseline = Catalog.read_manifest!()
+    rubric = JSON.decode!(File.read!("priv/quality/rubric_scores.json"))
+    target_ids = visual_target_ids(baseline)
+    candidate_cells = candidate_cells_with_changed_targets(baseline["cells"], target_ids)
 
     assert {:ok, manifest} =
              Catalog.candidate_manifest(
-               [candidate | candidate_rest],
-               Catalog.read_manifest!(),
+               candidate_cells,
+               baseline,
                rubric,
                "v0.11.0",
                String.duplicate("a", 40),
                candidate_multipage_proofs()
              )
 
-    changed = hd(manifest["cells"])
-    assert changed["review_status"] == "review_required"
-    assert changed["prior_png_sha256"] == first["png_sha256"]
-    assert changed["candidate_png_sha256"] == String.duplicate("c", 64)
-    refute Map.has_key?(changed, "quality")
-    refute Map.has_key?(changed, "passed")
-    refute Map.has_key?(changed, "dimension_scores")
-    assert manifest["diff"]["changed_scored"] == [first["id"]]
+    assert manifest["diff"] == %{
+             "changed_scored" => target_ids,
+             "changed_unscored" => [],
+             "byte_stable" => Enum.map(baseline["cells"], & &1["id"]) -- target_ids
+           }
+
+    assert Enum.all?(manifest["cells"], fn cell ->
+             not Map.has_key?(cell, "quality") and not Map.has_key?(cell, "passed") and
+               not Map.has_key?(cell, "dimension_scores")
+           end)
+  end
+
+  test "candidate manifest rejects missing targets and either changed control hash" do
+    baseline = Catalog.read_manifest!()
+    rubric = JSON.decode!(File.read!("priv/quality/rubric_scores.json"))
+    target_ids = visual_target_ids(baseline)
+
+    missing_target =
+      candidate_cells_with_changed_targets(baseline["cells"], Enum.drop(target_ids, 1))
+
+    assert {:error, :invalid_candidate_scope} =
+             candidate_manifest(missing_target, baseline, rubric)
+
+    [control | _] = Enum.reject(baseline["cells"], &(&1["id"] in target_ids))
+
+    changed_control_pdf =
+      candidate_cells_with_changed_targets(baseline["cells"], target_ids)
+      |> Enum.map(fn cell ->
+        if cell["id"] == control["id"],
+          do: %{cell | "source_pdf_sha256" => String.duplicate("f", 64)},
+          else: cell
+      end)
+
+    assert {:error, :invalid_candidate_scope} =
+             candidate_manifest(changed_control_pdf, baseline, rubric)
+
+    changed_control_png =
+      candidate_cells_with_changed_targets(baseline["cells"], target_ids)
+      |> Enum.map(fn cell ->
+        if cell["id"] == control["id"],
+          do: %{cell | "png_sha256" => String.duplicate("e", 64)},
+          else: cell
+      end)
+
+    assert {:error, :invalid_candidate_scope} =
+             candidate_manifest(changed_control_png, baseline, rubric)
+  end
+
+  test "real catalog target profiles change exactly the six allowlisted source PDFs" do
+    baseline_by_id =
+      Catalog.read_manifest!()["cells"]
+      |> Map.new(&{&1["id"], &1["source_pdf_sha256"]})
+
+    changed_ids =
+      Catalog.catalog_specs()
+      |> Enum.flat_map(fn spec ->
+        assert {:ok, pdf} = Catalog.render_source_pdf(spec)
+        sha256 = :crypto.hash(:sha256, pdf) |> Base.encode16(case: :lower)
+        if sha256 == baseline_by_id[spec.id], do: [], else: [spec.id]
+      end)
+
+    assert changed_ids == [
+             "invoice--cedar-mutual--corporate-classic--dark",
+             "statement--signal-ledger--minimal-mono--dark",
+             "payslip--northline-logistics--swiss--light",
+             "payslip--northline-logistics--swiss--dark",
+             "ticket--aurora-live--brutalist--light",
+             "ticket--aurora-live--brutalist--dark"
+           ]
+  end
+
+  test "catalog dispositions remain explicit 32-cell, 20-unscored dark screen-only records" do
+    manifest = Catalog.read_manifest!()
+    rubric = JSON.decode!(File.read!("priv/quality/rubric_scores.json"))
+    dispositions = rubric["catalog_dispositions"]
+
+    assert is_integer(length(manifest["cells"]))
+    assert length(manifest["cells"]) == 32
+    assert is_integer(length(Enum.filter(dispositions, &(&1["review_status"] == "unscored"))))
+    assert Enum.count(dispositions, &(&1["review_status"] == "unscored")) == 20
+
+    assert Enum.all?(dispositions, fn disposition ->
+             disposition["review_status"] in ["scored", "unscored"]
+           end)
+
+    dark_dispositions = Enum.filter(dispositions, &(&1["mode"] == "dark"))
+
+    assert Enum.all?(dark_dispositions, fn
+             %{"review_status" => "scored", "gate_results" => %{"print_safety" => false}} ->
+               true
+
+             %{"review_status" => "unscored", "reason" => reason} when is_binary(reason) ->
+               true
+
+             _ ->
+               false
+           end)
   end
 
   test "candidate generation includes the separate four-image multipage proof collection" do
@@ -326,5 +462,51 @@ defmodule Rendro.CatalogTest do
         "source_pdf_sha256" => String.duplicate("e", 64)
       }
     end
+  end
+
+  defp candidate_manifest(cells, baseline, rubric) do
+    Catalog.candidate_manifest(
+      cells,
+      baseline,
+      rubric,
+      "v0.11.0",
+      String.duplicate("a", 40),
+      candidate_multipage_proofs()
+    )
+  end
+
+  defp candidate_cells_with_changed_targets(cells, target_ids) do
+    Enum.map(cells, fn cell ->
+      cell = %{
+        cell
+        | "png_path" =>
+            String.replace(cell["png_path"], "assets/rendro", "tmp/phase130-candidate")
+      }
+
+      if cell["id"] in target_ids do
+        %{
+          cell
+          | "png_sha256" => String.duplicate("c", 64),
+            "source_pdf_sha256" => String.duplicate("d", 64)
+        }
+      else
+        cell
+      end
+    end)
+  end
+
+  defp visual_target_ids(%{"cells" => cells}) do
+    cells
+    |> Enum.map(& &1["id"])
+    |> Enum.filter(
+      &(&1 in [
+          "invoice--cedar-mutual--corporate-classic--dark",
+          "statement--signal-ledger--minimal-mono--dark",
+          "payslip--northline-logistics--swiss--light",
+          "payslip--northline-logistics--swiss--dark",
+          "ticket--aurora-live--brutalist--light",
+          "ticket--aurora-live--brutalist--dark"
+        ])
+    )
   end
 end
