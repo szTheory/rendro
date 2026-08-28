@@ -169,6 +169,10 @@
         "source_pdf_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
         "recorded_at": { "type": "string", "format": "date" },
         "review_status": { "enum": ["scored", "unscored"] },
+        "print_safety": {
+          "description": "Scope-boundary metadata for unscored dark output only. False is not reviewer evidence, approval, accessibility, PDF/UA, viewer, or print-support proof.",
+          "const": false
+        },
         "dimension_scores": { "$ref": "#/$defs/score_entry/properties/dimension_scores" },
         "gate_results": { "$ref": "#/$defs/score_entry/properties/gate_results" },
         "passed": { "type": "boolean" },
@@ -189,7 +193,32 @@
         },
         {
           "if": { "properties": { "review_status": { "const": "unscored" } }, "required": ["review_status"] },
-          "then": { "required": ["reason"], "not": { "anyOf": [{ "required": ["dimension_scores"] }, { "required": ["gate_results"] }, { "required": ["passed"] }] } }
+          "then": {
+            "required": ["reason"],
+            "not": {
+              "anyOf": [
+                { "required": ["dimension_scores"] },
+                { "required": ["gate_results"] },
+                { "required": ["passed"] },
+                { "required": ["signed_off_by"] },
+                { "required": ["signed_off_at"] },
+                { "required": ["justifications"] },
+                { "required": ["resolution_ref"] },
+                { "required": ["supersedes_evidence_ref"] }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "review_status": { "const": "unscored" },
+              "mode": { "const": "dark" }
+            },
+            "required": ["review_status", "mode"]
+          },
+          "then": { "required": ["print_safety"] },
+          "else": { "not": { "required": ["print_safety"] } }
         },
         {
           "if": { "required": ["supersedes_evidence_ref"] },

@@ -329,6 +329,7 @@
       "source_pdf_sha256": "d8f9504692bedef4c3c0b292f7c830221985a50e7e88c231c8ae3ff1a971ab41",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
+      "print_safety": false,
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
     },
     {
@@ -484,6 +485,7 @@
       "source_pdf_sha256": "8a5514348386f48d1b6c0a1b222a394d8b4c44dee355ac93dea9e64117848eef",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
+      "print_safety": false,
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
     },
     {
@@ -581,6 +583,7 @@
       "source_pdf_sha256": "3ebb88c4c4184dbd1e6a1e7c08d9578dd4d8c480344b706031c3ebdee711d103",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
+      "print_safety": false,
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
     },
     {
@@ -620,6 +623,7 @@
       "source_pdf_sha256": "31b1788a73ab11a82689ed12cbe89634cea567bd44bb6e3bb555dde0ad7b7d74",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
+      "print_safety": false,
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
     },
     {
@@ -775,6 +779,7 @@
       "source_pdf_sha256": "faebde994c4e768ceb168112999783501b68134459ee27db64fad9761c14756c",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
+      "print_safety": false,
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
     },
     {
@@ -814,6 +819,7 @@
       "source_pdf_sha256": "42057a0c92c5cdb6b36a6267063cb189411bef178a2ed6a6e1881b1339aad919",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
+      "print_safety": false,
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
     },
     {
@@ -840,6 +846,7 @@
       "source_pdf_sha256": "f5af9327fabe223160a92a51afc83d1b0e1a1d4bec59843df8e448a0f0142427",
       "recorded_at": "2026-08-17",
       "review_status": "unscored",
+      "print_safety": false,
       "reason": "Outside the twelve-cell flagship review budget for Phase 127"
     },
     {
