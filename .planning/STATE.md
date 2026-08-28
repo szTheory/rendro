@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v2.14
 milestone_name: Quality & Maintainability
 current_phase: 136
-current_phase_name: Catalog Visual Quality
+current_phase_name: catalog-visual-quality
 status: executing
-stopped_at: Phase 136 UI-SPEC approved
-last_updated: "2026-08-28T02:52:53.837Z"
+stopped_at: Completed 136-01-PLAN.md
+last_updated: "2026-08-28T03:03:07.331Z"
 last_activity: 2026-08-27
-last_activity_desc: Phase 135 complete, transitioned to Phase 136
+last_activity_desc: Phase 136 execution started
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 31
-  completed_plans: 25
+  completed_plans: 26
   percent: 67
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-27)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 136 — Catalog Visual Quality
+**Current focus:** Phase 136 — catalog-visual-quality
 
 ## Current Position
 
-Phase: 136 — Catalog Visual Quality
-Plan: Not started
+Phase: 136 (catalog-visual-quality) — EXECUTING
+Plan: 2 of 6
 Status: Ready to execute
-Last activity: 2026-08-27 — Phase 135 complete, transitioned to Phase 136
+Last activity: 2026-08-27 — Phase 136 execution started
 
 ## Roadmap Snapshot (v2.14, Phases 132-137)
 
@@ -94,6 +94,8 @@ Phase 137 Closure & Handoff ............................... Pending
 - [Phase ?]: [Phase 135]: The trusted control checkout alone packages and validates detached candidate output before the sole 30-day upload.
 - [Phase ?]: Four complete same-SHA remote parity rows are the mandatory predecessor to legacy catalog-route removal.
 - [Phase ?]: Commit 8a2292f is the rollback-sized legacy catalog-route cutover; generic evidence stays standalone and ci-success remains sole authority.
+- [Phase ?]: Catalog IDs remain dev-only; recipes receive generic private presentation data only.
+- [Phase ?]: Candidate manifests require the exact ordered six changed IDs and 26 byte-stable controls.
 
 ### Pending Todos
 
@@ -115,9 +117,9 @@ None outside the roadmap.
 
 ## Session Continuity
 
-Last session: 2026-08-28T02:16:41.812Z
-Stopped at: Phase 136 UI-SPEC approved
-Resume file: .planning/phases/136-catalog-visual-quality/136-UI-SPEC.md
+Last session: 2026-08-28T03:03:07.324Z
+Stopped at: Completed 136-01-PLAN.md
+Resume file: None
 
 ## Next Steps
 
@@ -164,3 +166,4 @@ Resume file: .planning/phases/136-catalog-visual-quality/136-UI-SPEC.md
 | Phase 135 P01 | 7m | 3 tasks | 9 files |
 | Phase 135 P02 | 16m | 2 tasks | 6 files |
 | Phase 135 P03 | 7m | 2 tasks | 4 files |
+| Phase 136 P01 | 22m | 2 tasks | 5 files |
