@@ -173,14 +173,14 @@ Plans:
   3. The catalog still contains exactly 32 cells with 20 explicitly unscored entries, and every dark record remains screen-oriented with `print_safety: false`.
   4. Every changed record is traceable through source SHA, renderer identity, artifact hashes, human review, and canonical publication provenance.
 
-**Plans**: 1/6 plans executed
+**Plans**: 2/6 plans executed
 **Wave 1**
 
 - [x] 136-01-PLAN.md
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 136-02-PLAN.md
+- [x] 136-02-PLAN.md
 - [ ] 136-03-PLAN.md
 - [ ] 136-04-PLAN.md
 
@@ -216,7 +216,7 @@ Plans:
 | 133. Repository & Evidence Hygiene | 4 | 13/13 | Complete    | 2026-08-26 |
 | 134. Core Architecture & Readability | 4 | 5/5 | Complete    | 2026-08-27 |
 | 135. Test & CI/CD Simplification | 7 | 3/3 | Complete    | 2026-08-27 |
-| 136. Catalog Visual Quality | 4 | 1/6 | In Progress|  |
+| 136. Catalog Visual Quality | 4 | 2/6 | In Progress|  |
 | 137. Closure & Handoff | 3 | 0/TBD | Not started | — |
 
 **Coverage:** 26/26 active requirements mapped exactly once.

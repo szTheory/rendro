@@ -5,15 +5,15 @@ milestone_name: Quality & Maintainability
 current_phase: 136
 current_phase_name: catalog-visual-quality
 status: executing
-stopped_at: Completed 136-01-PLAN.md
-last_updated: "2026-08-28T03:03:07.331Z"
+stopped_at: Completed 136-02-PLAN.md
+last_updated: "2026-08-28T03:10:37.497Z"
 last_activity: 2026-08-27
 last_activity_desc: Phase 136 execution started
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 31
-  completed_plans: 26
+  completed_plans: 27
   percent: 67
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-27)
 ## Current Position
 
 Phase: 136 (catalog-visual-quality) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-08-27 — Phase 136 execution started
 
@@ -96,6 +96,9 @@ Phase 137 Closure & Handoff ............................... Pending
 - [Phase ?]: Commit 8a2292f is the rollback-sized legacy catalog-route cutover; generic evidence stays standalone and ci-success remains sole authority.
 - [Phase ?]: Catalog IDs remain dev-only; recipes receive generic private presentation data only.
 - [Phase ?]: Candidate manifests require the exact ordered six changed IDs and 26 byte-stable controls.
+- [Phase ?]: Semantic profile activation stays recipe-local and consumes only generic semantic_ink data.
+- [Phase ?]: Invoice preserves the blue Total Due anchor while the target-profile footer uses secondary ink.
+- [Phase ?]: Statement target-profile ledger headers use existing primary-ink cells while omitted profiles keep string headers.
 
 ### Pending Todos
 
@@ -117,8 +120,8 @@ None outside the roadmap.
 
 ## Session Continuity
 
-Last session: 2026-08-28T03:03:07.324Z
-Stopped at: Completed 136-01-PLAN.md
+Last session: 2026-08-28T03:10:37.487Z
+Stopped at: Completed 136-02-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -167,3 +170,4 @@ Resume file: None
 | Phase 135 P02 | 16m | 2 tasks | 6 files |
 | Phase 135 P03 | 7m | 2 tasks | 4 files |
 | Phase 136 P01 | 22m | 2 tasks | 5 files |
+| Phase 136 P02 | 8m | 2 tasks | 4 files |
