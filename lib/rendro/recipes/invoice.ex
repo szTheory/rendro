@@ -259,22 +259,11 @@ defmodule Rendro.Recipes.Invoice do
     # anatomy fields still render only when present, as NEW blocks around this
     # base pair.
     base_content = [
+      Rendro.block(Rendro.text("INVOICE ##{id}", header_title_options(opts, colors, type))),
       Rendro.block(
-        Rendro.text("INVOICE ##{id}",
-          size: type.scale.title,
-          font: type.fonts.mono,
-          line_height: type.leading,
-          widows: type.widows,
-          orphans: type.orphans
-        )
-      ),
-      Rendro.block(
-        Rendro.text("Date: #{date}",
-          size: type.scale.body,
-          font: type.fonts.body,
-          line_height: type.leading,
-          widows: type.widows,
-          orphans: type.orphans
+        Rendro.text(
+          "Date: #{date}",
+          header_label_options(opts, colors, type)
         )
       )
     ]
@@ -484,7 +473,7 @@ defmodule Rendro.Recipes.Invoice do
             line_height: type.leading,
             widows: type.widows,
             orphans: type.orphans,
-            color: colors.ink
+            color: footer_ink(opts, colors)
           )
         )
       ]
@@ -681,6 +670,42 @@ defmodule Rendro.Recipes.Invoice do
       surface: {255, 255, 255},
       rule: {0, 0, 0}
     })
+  end
+
+  defp header_label_options(opts, colors, type) do
+    [
+      size: type.scale.body,
+      font: type.fonts.body,
+      line_height: type.leading,
+      widows: type.widows,
+      orphans: type.orphans
+    ]
+    |> maybe_put_primary_ink(opts, colors)
+  end
+
+  defp header_title_options(opts, colors, type) do
+    [
+      size: type.scale.title,
+      font: type.fonts.mono,
+      line_height: type.leading,
+      widows: type.widows,
+      orphans: type.orphans
+    ]
+    |> maybe_put_primary_ink(opts, colors)
+  end
+
+  defp maybe_put_primary_ink(text_opts, opts, colors) do
+    if primary_secondary_semantic_ink?(opts),
+      do: Keyword.put(text_opts, :color, colors.ink),
+      else: text_opts
+  end
+
+  defp primary_secondary_semantic_ink?(opts) do
+    match?(%{semantic_ink: :primary_secondary}, opts[:presentation_profile])
+  end
+
+  defp footer_ink(opts, colors) do
+    if primary_secondary_semantic_ink?(opts), do: colors.muted, else: colors.ink
   end
 
   # ---------------------------------------------------------------------------

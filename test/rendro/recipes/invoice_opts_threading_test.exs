@@ -143,5 +143,16 @@ defmodule Rendro.Recipes.InvoiceOptsThreadingTest do
       data = sample_data()
       assert Invoice.sections(data) == Invoice.sections(data, [])
     end
+
+    test "omitted and empty presentation profiles preserve existing themed sections" do
+      data = sample_data()
+      theme = Rendro.Theme.preset(:corporate_classic, accent: "#1F4FB8", mode: :dark)
+
+      assert Invoice.sections(data, theme: theme) ==
+               Invoice.sections(data, theme: theme, presentation_profile: %{})
+
+      assert Invoice.sections(data, theme: theme) ==
+               Invoice.sections(data, theme: theme, presentation_profile: %{semantic_ink: :other})
+    end
   end
 end

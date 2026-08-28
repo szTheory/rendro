@@ -525,7 +525,11 @@ defmodule Rendro.Recipes.Statement do
     rows_with_balance = fold_balance(ob, lines)
 
     table_header = ["Date", "Description", "Amount", lbl.(:balance)]
-    table_opts = [header: table_header, columns: @table_columns]
+
+    table_opts = [
+      header: semantic_table_header(table_header, opts, colors, type),
+      columns: @table_columns
+    ]
 
     # Convert balanced rows to formatted table rows, seamed to `colors.ink`
     # (D-02) via `cell_text/2` at size 12 — the implicit `Rendro.Text` default
@@ -682,6 +686,21 @@ defmodule Rendro.Recipes.Statement do
           color: colors.ink
         )
       )
+
+  # Catalog presentation data is private and generic: only the selected
+  # semantic role turns the existing plain header strings into primary-ink
+  # cells. Omitted or unrelated profiles retain the original string headers.
+  defp semantic_table_header(values, opts, colors, type) do
+    if primary_secondary_semantic_ink?(opts) do
+      Enum.map(values, &cell_text(&1, colors, type))
+    else
+      values
+    end
+  end
+
+  defp primary_secondary_semantic_ink?(opts) do
+    match?(%{semantic_ink: :primary_secondary}, opts[:presentation_profile])
+  end
 
   defp footer_section(_data, opts) do
     colors = palette(opts)

@@ -86,6 +86,17 @@ defmodule Rendro.Catalog do
      :brutalist}
   ]
 
+  # The catalog owns the exact, ordered visual-change allowlist. Recipes only
+  # receive these generic private presentation values, never catalog identity.
+  @visual_target_profiles %{
+    "invoice--cedar-mutual--corporate-classic--dark" => %{semantic_ink: :primary_secondary},
+    "statement--signal-ledger--minimal-mono--dark" => %{semantic_ink: :primary_secondary},
+    "payslip--northline-logistics--swiss--light" => %{ledger_layout: :sequential_measured},
+    "payslip--northline-logistics--swiss--dark" => %{ledger_layout: :sequential_measured},
+    "ticket--aurora-live--brutalist--light" => %{locator_layout: :atomic_equal_share},
+    "ticket--aurora-live--brutalist--dark" => %{locator_layout: :atomic_equal_share}
+  }
+
   @spec asset_root() :: String.t()
   def asset_root, do: @asset_root
 
@@ -131,12 +142,27 @@ defmodule Rendro.Catalog do
       fixture_ref |> Rendro.Examples.load!() |> then(&Rendro.ExamplesData.transform(family, &1))
 
     theme = theme_for(spec)
-    doc = Map.fetch!(spec, :recipe_module).document(data, theme: theme, catalog_layout: true)
+    opts = recipe_options(spec, theme)
+    doc = Map.fetch!(spec, :recipe_module).document(data, opts)
 
     if preset = Map.get(spec, :preset_atom),
       do: Rendro.Theme.Presets.register_fonts(doc, preset),
       else: doc
   end
+
+  defp recipe_options(spec, theme) do
+    [theme: theme, catalog_layout: true]
+    |> maybe_put_presentation_profile(presentation_profile(spec))
+  end
+
+  defp presentation_profile(spec) do
+    Map.get(@visual_target_profiles, spec.id)
+  end
+
+  defp maybe_put_presentation_profile(opts, nil), do: opts
+
+  defp maybe_put_presentation_profile(opts, profile),
+    do: Keyword.put(opts, :presentation_profile, profile)
 
   @spec render_source_pdf(map()) :: {:ok, binary()} | {:error, term()}
   def render_source_pdf(spec) do
@@ -268,33 +294,39 @@ defmodule Rendro.Catalog do
           end
         )
 
-      {:ok,
-       %{
-         "schema_version" => @schema_version,
-         "generated_by" => @candidate_generated_by,
-         "candidate" => %{
-           "commit_sha" => commit_sha,
-           "baseline_commit_sha" => commit_sha,
-           "run_id" => System.get_env("GITHUB_RUN_ID") || "local-#{commit_sha}",
-           "renderer" => %{
-             "kind" => @renderer_kind,
-             "version" => renderer_version,
-             "dpi" => @dpi,
-             "pin_path" => @pdfium_pin_path,
-             "sha256" => pin["sha256"]
-           }
-         },
-         "renderer" => %{
-           "kind" => @renderer_kind,
-           "version" => renderer_version,
-           "dpi" => @dpi,
-           "pin_path" => @pdfium_pin_path,
-           "pin_sha256" => pin["sha256"]
-         },
-         "cells" => candidate_cells,
-         "multipage" => multipage,
-         "diff" => Map.new(diff, fn {bucket, ids} -> {Atom.to_string(bucket), ids} end)
-       }}
+      case valid_candidate_diff(diff) do
+        :ok ->
+          {:ok,
+           %{
+             "schema_version" => @schema_version,
+             "generated_by" => @candidate_generated_by,
+             "candidate" => %{
+               "commit_sha" => commit_sha,
+               "baseline_commit_sha" => commit_sha,
+               "run_id" => System.get_env("GITHUB_RUN_ID") || "local-#{commit_sha}",
+               "renderer" => %{
+                 "kind" => @renderer_kind,
+                 "version" => renderer_version,
+                 "dpi" => @dpi,
+                 "pin_path" => @pdfium_pin_path,
+                 "sha256" => pin["sha256"]
+               }
+             },
+             "renderer" => %{
+               "kind" => @renderer_kind,
+               "version" => renderer_version,
+               "dpi" => @dpi,
+               "pin_path" => @pdfium_pin_path,
+               "pin_sha256" => pin["sha256"]
+             },
+             "cells" => candidate_cells,
+             "multipage" => multipage,
+             "diff" => Map.new(diff, fn {bucket, ids} -> {Atom.to_string(bucket), ids} end)
+           }}
+
+        {:error, _reason} = error ->
+          error
+      end
     else
       false -> {:error, :invalid_candidate_identity}
       {:error, _reason} = error -> error
@@ -1024,6 +1056,30 @@ defmodule Rendro.Catalog do
         do: {"review_required", :changed_scored},
         else: {"changed_unscored", :changed_unscored}
     end
+  end
+
+  defp valid_candidate_diff(%{
+         changed_scored: changed_scored,
+         changed_unscored: [],
+         byte_stable: byte_stable
+       }) do
+    target_ids = visual_target_ids()
+    control_ids = Enum.reject(Enum.map(catalog_specs(), & &1.id), &(&1 in target_ids))
+
+    if map_size(@visual_target_profiles) == 6 and changed_scored == target_ids and
+         byte_stable == control_ids do
+      :ok
+    else
+      {:error, :invalid_candidate_scope}
+    end
+  end
+
+  defp valid_candidate_diff(_), do: {:error, :invalid_candidate_scope}
+
+  defp visual_target_ids do
+    catalog_specs()
+    |> Enum.map(& &1.id)
+    |> Enum.filter(&Map.has_key?(@visual_target_profiles, &1))
   end
 
   defp validate_candidate_staging(cells) do
