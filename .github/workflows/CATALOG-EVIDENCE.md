@@ -110,6 +110,56 @@ If validation reports a path, count, checksum, control/candidate/HEAD, or
 renderer-pin failure, stop interpreting the payload. Re-run the exact operation
 for the same full SHA after fixing the source or control-plane mismatch.
 
+## Validate review bundle
+
+Review eligibility starts only after the downloaded `review` bundle validates in
+the trusted control checkout. Before looking at an image, compare the full
+lowercase 40-character candidate SHA to detached HEAD, then check the control
+SHA, PDFium version and full executable digest, positive run ID and attempt,
+closed roles/counts, safe paths, full PDF/PNG hashes, Artifact URL, and Archive
+digest. A prefix, uppercase, truncated, stale, neighboring-run, reordered,
+extra, or partial value is a validation failure, not close-enough evidence.
+
+**Review bundle empty:** there is no review authority. Dispatch a new exact-SHA
+`review` run and leave every affected cell unreviewed and unpromoted.
+
+**Review bundle loading:** downloaded files are ineligible for review until
+`Rendro.CatalogEvidenceBundle.validate/2` completes successfully. There is no
+browser or in-document loading surface to infer from.
+
+**Review bundle error:** show the failing manifest, checksum, identity, pin,
+role, or count condition. Do not score images; correct that condition and run a
+new exact-SHA dispatch.
+
+**Review bundle populated:** one valid closed manifest-rooted bundle is the
+happy path. Review full-size images only, in the locked family order: Invoice light → dark, Statement light → dark, Payslip light → dark, Ticket light → dark. Thumbnails and prior hashes are navigation aids, never review authority.
+
+**Review bundle partial:** a missing target image, score, reading order,
+reviewer identity, rationale, role, count, provenance field, or hash keeps its
+cell unreviewed and unpromoted. Record the exact missing item and dispatch or
+correct only the matching immutable evidence.
+
+**Review bundle overflow:** do not crop the full-size images. Preserve complete
+machine-checked provenance values instead of abbreviated identifiers.
+
+**Review bundle zero/one/many:** the candidate contract classifies exactly six
+changed IDs and 26 byte-identical controls; six target review records are
+required for a promotable Phase 136 decision. Any other quantity is partial.
+
+**Review bundle long text:** retain complete but concise reviewer rationale and
+verbatim machine identities/digests. Do not shorten fields to fit a display.
+
+After deterministic validation, the human review remains advisory. For each of
+the six targets, accept only a named independent record with the frozen integer
+scores, reading order, `print_safety`, rationale, review date, source SHA,
+PDFium identity, run/attempt, source-PDF hash, PNG hash, Artifact URL/digest,
+and superseded reference. A visual threshold is hierarchy `5` and every other
+visual dimension at least `4`; `print_safety: false` remains a screen-only
+boundary and does not become a pass. If review is unavailable, incomplete, or a
+target misses, continue with explicit deferral: record the actual unreviewed /
+unpromoted cell and the bounded next action. Never synthesize, round, clamp,
+average, or infer a reviewer score or approval.
+
 ## Consume the stable bundle contract in Phase 136
 
 Phase 136 may consume the one validated bundle contract: root manifest,

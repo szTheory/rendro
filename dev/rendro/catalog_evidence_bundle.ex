@@ -157,6 +157,12 @@ defmodule Rendro.CatalogEvidenceBundle do
       |> invalid_unless(manifest["operation"] == Atom.to_string(operation), :operation_mismatch)
       |> invalid_unless(valid_sha?(manifest["candidate_sha"]), :invalid_candidate_sha)
       |> invalid_unless(manifest["candidate_sha"] == manifest["checked_out_head"], :head_mismatch)
+      |> invalid_unless(
+        valid_sha?(get_in(manifest, ["control", "workflow_sha"])),
+        :invalid_control_sha
+      )
+      |> invalid_unless(valid_run_id?(manifest["run_id"]), :invalid_run_id)
+      |> invalid_unless(valid_run_attempt?(manifest["run_attempt"]), :invalid_run_attempt)
       |> invalid_unless(valid_renderer?(manifest["renderer"]), :invalid_renderer)
       |> invalid_unless(
         valid_payloads?(payloads, expected_roles, operation),
@@ -356,8 +362,7 @@ defmodule Rendro.CatalogEvidenceBundle do
       &Map.has_key?(provenance, &1)
     ) and
       valid_sha?(provenance[:control_sha]) and is_binary(provenance[:event]) and
-      is_binary(provenance[:run_id]) and
-      is_integer(provenance[:run_attempt]) and provenance[:run_attempt] > 0 and
+      valid_run_id?(provenance[:run_id]) and valid_run_attempt?(provenance[:run_attempt]) and
       is_integer(provenance[:dpi])
   end
 
@@ -365,6 +370,8 @@ defmodule Rendro.CatalogEvidenceBundle do
 
   defp valid_sha?(value), do: is_binary(value) and Regex.match?(~r/\A[0-9a-f]{40}\z/, value)
   defp valid_sha256?(value), do: is_binary(value) and Regex.match?(~r/\A[0-9a-f]{64}\z/, value)
+  defp valid_run_id?(value), do: is_binary(value) and Regex.match?(~r/\A[1-9][0-9]*\z/, value)
+  defp valid_run_attempt?(value), do: is_integer(value) and value > 0
 
   defp sha256_file!(path) do
     path

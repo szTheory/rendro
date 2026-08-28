@@ -59,7 +59,10 @@ defmodule Rendro.DocsContract.CatalogEvidenceRunbookTest do
     assert runbook =~ "Review bundle overflow"
     assert runbook =~ "Review bundle zero/one/many"
     assert runbook =~ "Review bundle long text"
-    assert runbook =~ "Invoice light → dark, Statement light → dark, Payslip light → dark, Ticket light → dark"
+
+    assert runbook =~
+             "Invoice light → dark, Statement light → dark, Payslip light → dark, Ticket light → dark"
+
     assert runbook =~ "full-size images"
     assert runbook =~ "continue with explicit deferral"
 
