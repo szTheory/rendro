@@ -2,6 +2,7 @@ defmodule Rendro.Recipes.TicketByteIdentityTest do
   use ExUnit.Case, async: true
 
   alias Rendro.Recipes.Ticket
+  alias Rendro.Theme.Presets
 
   # Frozen golden, computed by actually running a render on pristine (fully
   # implemented) `ticket.ex` via `mix run` -- never hand-typed. A fresh
@@ -67,4 +68,57 @@ defmodule Rendro.Recipes.TicketByteIdentityTest do
       assert pdf_with_nil == pdf_omitted
     end
   end
+
+  describe "136-04 target profile geometry and determinism" do
+    test "light and dark atomic locator profiles retain identical geometry and deterministic bytes" do
+      profile = [
+        catalog_layout: true,
+        presentation_profile: %{locator_layout: :atomic_equal_share}
+      ]
+
+      data =
+        Map.merge(fixture_data(), %{
+          placement: [
+            %{label: "Section", value: "GA"},
+            %{label: "Row", value: "H"},
+            %{label: "Seat", value: "24"},
+            %{label: "Gate", value: "B"}
+          ],
+          subtitle: "Doors 7:00 PM - Show 8:00 PM - Saturday 27 June 2026",
+          terms: "Non-transferable. Present this reference at the gate for scanning."
+        })
+
+      light = Rendro.Theme.preset(:brutalist, accent: "#C78600", mode: :light)
+      dark = Rendro.Theme.preset(:brutalist, accent: "#C78600", mode: :dark)
+
+      light_doc = Ticket.document(data, [theme: light] ++ profile)
+      dark_doc = Ticket.document(data, [theme: dark] ++ profile)
+
+      assert locator_geometry(light_doc) == locator_geometry(dark_doc)
+
+      for doc <- [light_doc, dark_doc] do
+        doc = Presets.register_fonts(doc, :brutalist)
+        assert {:ok, pdf1} = Rendro.render(doc, deterministic: true)
+        assert {:ok, pdf2} = Rendro.render(doc, deterministic: true)
+        assert pdf1 == pdf2
+      end
+    end
+  end
+
+  defp locator_geometry(doc) do
+    main = Enum.find(doc.sections, &(&1.region == :main))
+    terms = Enum.find(doc.sections, &(&1.region == :terms))
+
+    [grid_block] = Enum.filter(main.content, &is_struct(&1.content, Rendro.Table))
+    table = grid_block.content
+
+    {doc.page_template, table.columns, Enum.map(table.header, &text_content/1),
+     table.rows |> Enum.map(fn row -> Enum.map(row, &text_content/1) end),
+     Enum.map(terms.content, &text_content/1)}
+  end
+
+  defp text_content(%Rendro.Cell{content: content}), do: text_content(content)
+  defp text_content(%Rendro.Block{content: content}), do: text_content(content)
+  defp text_content(%Rendro.Text{content: content}), do: content
+  defp text_content(_other), do: nil
 end

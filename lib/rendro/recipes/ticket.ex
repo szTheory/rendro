@@ -504,6 +504,7 @@ defmodule Rendro.Recipes.Ticket do
       )
 
     image = get_in(data, [:code, :image])
+    stub_colors = if dark_atomic_locator?(opts), do: %{colors | ink: colors.muted}, else: colors
 
     Rendro.section(
       name: :ticket_stub,
@@ -512,7 +513,7 @@ defmodule Rendro.Recipes.Ticket do
         [perforation, code_box] ++
           code_area_blocks(
             data,
-            colors,
+            stub_colors,
             type,
             roles,
             lbl,
@@ -756,6 +757,10 @@ defmodule Rendro.Recipes.Ticket do
   # a catalog ID, brand, preset, or phase identifier.
   defp atomic_locator?(opts) do
     get_in(opts[:presentation_profile] || %{}, [:locator_layout]) == :atomic_equal_share
+  end
+
+  defp dark_atomic_locator?(opts) do
+    atomic_locator?(opts) and match?(%{mode: :dark}, opts[:theme])
   end
 
   defp locator_cell(content, opts) do
