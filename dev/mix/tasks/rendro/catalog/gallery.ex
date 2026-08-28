@@ -2,20 +2,7 @@ defmodule Mix.Tasks.Rendro.Catalog.Gallery do
   use Mix.Task
 
   @shortdoc "Build or validate the authority-none eight-image catalog review packet"
-  @moduledoc """
-  Builds and validates the exact eight-image Phase 136 reviewer packet.
-
-      mix rendro.catalog.gallery --candidate-manifest PATH --final-manifest PATH --output DIR
-      mix rendro.catalog.gallery --validate-intake INTAKE.json
-      mix rendro.catalog.gallery --validate-intake PACKET_DIR --bundle BUNDLE_DIR --control-sha SHA
-      mix rendro.catalog.gallery --validate-receipt PATH
-      mix rendro.catalog.gallery --require-complete-receipt PATH
-      mix rendro.catalog.gallery --validate-review-receipt PATH
-      mix rendro.catalog.gallery --require-qualified-review-receipt PATH
-
-  The packet is review navigation only and has no evidence, approval, disposition,
-  or canonical authority.
-  """
+  @moduledoc false
 
   @impl Mix.Task
   def run(args) do
