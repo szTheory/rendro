@@ -108,6 +108,41 @@ This is the current catalog-review authority, reconciled to SHA-256 `1646eeb8875
 
 Bounded multipage review: Statement endpoints close at `$7,500`. Supplied Invoice endpoints show lines 1–40 and 42–65; line 41 is neither asserted nor denied and remains deterministic-test evidence only.
 
+---
+
+## Phase 136 catalog visual-review intake · explicit deferral · 2026-08-28
+
+The Phase 136 visual candidate is source SHA
+`d547bbfa60760d43f19a15372d88a2d159bfa327`. A `review` dispatch was created as
+GitHub Actions run `33139093669`, attempt `1`, from control-plane SHA
+`834a7d32101ab98258fcc5d4f2a3caccbbc1df5c`. The candidate-generation checkout
+failed before bundle creation because the remote did not contain the requested
+candidate object (`upload-pack: not our ref`), so no downloaded, validated
+closed bundle exists. No image was opened or interpreted, and no reviewer-owned
+score, reading-order result, rationale, or approval is asserted here.
+
+The following exact candidate cells are therefore **unreviewed and unpromoted
+for Phase 136**: `invoice--cedar-mutual--corporate-classic--dark`,
+`statement--signal-ledger--minimal-mono--dark`,
+`payslip--northline-logistics--swiss--light`,
+`payslip--northline-logistics--swiss--dark`,
+`ticket--aurora-live--brutalist--light`, and
+`ticket--aurora-live--brutalist--dark`. Existing Phase 130 records retain their
+own older immutable evidence identities and are neither overwritten nor
+re-associated with this candidate.
+
+**Next action:** publish the exact candidate object to a remote-reachable ref,
+then dispatch a new `review` run for that same full SHA. After it completes,
+download its sole closed artifact using that new run's identity and validate it
+with `Rendro.CatalogEvidenceBundle.validate/2` before
+opening images. If valid, request six complete named reviewer records while
+viewing the reconciled full-size pairs in Invoice light → dark, Statement light
+→ dark, Payslip light → dark, Ticket light → dark order. If unavailable,
+incomplete, or below the visual threshold, append the exact miss/absence and
+keep that cell unpromoted. Plan 06 must treat this candidate as
+canonical-ineligible and leave canonical assets unchanged unless complete,
+exactly bound human evidence is later appended.
+
 ## Phase 127 catalog flagship review · 2026-08-17 (historical; superseded by Phase 130 above)
 
 Jon reviewed the twelve full-size catalog inputs in canonical family order, with each light cell
