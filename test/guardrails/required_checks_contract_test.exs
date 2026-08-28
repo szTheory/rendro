@@ -7,6 +7,7 @@ defmodule Guardrails.RequiredChecksContractTest do
   @release_path ".github/workflows/release.yml"
   @verify_docs_path "scripts/verify_docs.exs"
   @catalog_evidence_path ".github/workflows/catalog-evidence.yml"
+  @catalog_gallery_path "dev/rendro/catalog_visual_gallery.ex"
 
   @required_contexts ~w(ci-success)
 
@@ -122,6 +123,7 @@ defmodule Guardrails.RequiredChecksContractTest do
              }
 
       assert candidate_job["env"]["CANDIDATE_SHA"] == "${{ inputs.candidate_sha }}"
+      assert candidate_job["env"]["CONTROL_SHA"] == "${{ github.sha }}"
       assert candidate_job["env"]["OPERATION"] == "${{ inputs.operation }}"
       assert job["env"]["CONTROL_SHA"] == "${{ github.sha }}"
       assert source =~ "[[ \"${CANDIDATE_SHA}\" =~ ^[0-9a-f]{40}$ ]]"
@@ -140,7 +142,8 @@ defmodule Guardrails.RequiredChecksContractTest do
 
       assert Enum.all?(checkout_steps, fn step ->
                step["uses"] == "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" and
-                 step["with"]["persist-credentials"] == false
+                 step["with"]["persist-credentials"] == false and
+                 step["with"]["fetch-depth"] == 0
              end)
 
       assert Enum.map(checkout_steps, & &1["with"]["ref"]) |> Enum.sort() == [
@@ -168,10 +171,10 @@ defmodule Guardrails.RequiredChecksContractTest do
 
       upload = Enum.find(upload_steps, &(&1["id"] == "evidence_upload"))
 
-      gallery_upload =
+      packet_upload =
         Enum.find(upload_steps, fn step ->
           get_in(step, ["with", "name"]) ==
-            "rendro-catalog-visual-gallery--${{ inputs.candidate_sha }}--run-${{ github.run_id }}--attempt-${{ github.run_attempt }}"
+            "rendro-catalog-reviewer-packet--${{ inputs.candidate_sha }}--run-${{ github.run_id }}--attempt-${{ github.run_attempt }}"
         end)
 
       assert upload["with"]["name"] ==
@@ -179,11 +182,24 @@ defmodule Guardrails.RequiredChecksContractTest do
 
       assert upload["with"]["retention-days"] == 30
       assert upload["with"]["if-no-files-found"] == "error"
-      assert gallery_upload["if"] == "inputs.operation == 'review'"
-      assert gallery_upload["with"]["path"] == "tmp/catalog-visual-gallery"
-      assert gallery_upload["with"]["if-no-files-found"] == "error"
-      assert source =~ "mix rendro.catalog.gallery --output \"$PWD/tmp/catalog-visual-gallery\""
-      refute source =~ "candidate-handoff/catalog-visual-gallery"
+      assert packet_upload["id"] == "reviewer_packet_upload"
+      assert packet_upload["if"] == "inputs.operation == 'review'"
+      assert packet_upload["with"]["path"] == "tmp/catalog-reviewer-packet"
+      assert packet_upload["with"]["if-no-files-found"] == "error"
+      assert packet_upload["with"]["retention-days"] == 30
+
+      assert source =~ "mix rendro.catalog.gallery \\"
+      assert source =~ "--candidate-manifest tmp/phase130-candidate/candidate-manifest.json \\"
+      assert source =~ "--final-manifest handoff/final-manifest.json \\"
+      assert source =~ "--output \"$PWD/tmp/catalog-reviewer-packet\""
+
+      refute source =~ "candidate-handoff/catalog-reviewer-packet"
+      refute source =~ "catalog-visual-gallery"
+      assert source =~ "RENDRO_CATALOG_BASELINE_COMMIT_SHA"
+      assert source =~ "keys == [\"binary\", \"sha256\", \"version\"]"
+
+      assert source =~
+               "test \"${OPERATION}\" != canonical || test \"${CANDIDATE_SHA}\" = \"${CONTROL_SHA}\""
 
       assert source =~ "Rendro.CatalogEvidenceBundle.build"
       assert source =~ "Rendro.CatalogEvidenceBundle.validate"
@@ -196,6 +212,9 @@ defmodule Guardrails.RequiredChecksContractTest do
 
       assert source =~
                "test \"$(jq '.cells | length' tmp/phase130-candidate/candidate-manifest.json)\" = 32"
+
+      assert source =~
+               "test \"$(jq '.cells | length' assets/rendro/catalog.json)\" = 32"
 
       refute source =~
                "test \"$(jq '.images | length' tmp/phase130-candidate/candidate-manifest.json)\" = 32"
@@ -213,6 +232,24 @@ defmodule Guardrails.RequiredChecksContractTest do
                "find candidate-handoff -mindepth 1 -type l -o ! -type f"
 
       refute source =~ "find candidate-handoff -type l -o ! -type f"
+
+      gallery = File.read!(@catalog_gallery_path)
+
+      for role <- [
+            "invoice_light_control",
+            "invoice_dark_target",
+            "statement_light_control",
+            "statement_dark_target",
+            "payslip_light_target",
+            "payslip_dark_target",
+            "ticket_light_target",
+            "ticket_dark_target"
+          ] do
+        assert gallery =~ role
+      end
+
+      assert gallery =~ ~s("authority" => "none")
+      assert gallery =~ "length(images) == 8"
 
       for forbidden <- [
             "actions/cache",

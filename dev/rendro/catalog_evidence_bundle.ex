@@ -19,14 +19,59 @@ defmodule Rendro.CatalogEvidenceBundle do
     "preset-review/preset.json" => 12,
     "canonical/catalog.json" => 32
   }
+  @target_ids [
+    "invoice--cedar-mutual--corporate-classic--dark",
+    "statement--signal-ledger--minimal-mono--dark",
+    "payslip--northline-logistics--swiss--light",
+    "payslip--northline-logistics--swiss--dark",
+    "ticket--aurora-live--brutalist--light",
+    "ticket--aurora-live--brutalist--dark"
+  ]
+  @final_ids [
+    "invoice--cedar-mutual--corporate-classic--light",
+    "invoice--cedar-mutual--corporate-classic--dark",
+    "statement--signal-ledger--minimal-mono--light",
+    "statement--signal-ledger--minimal-mono--dark",
+    "receipt--poppy-and-grain--humanist--light",
+    "receipt--poppy-and-grain--humanist--dark",
+    "certificate--meridian-arts-fellowship--editorial--light",
+    "certificate--meridian-arts-fellowship--editorial--dark",
+    "payslip--northline-logistics--swiss--light",
+    "payslip--northline-logistics--swiss--dark",
+    "ticket--aurora-live--brutalist--light",
+    "ticket--aurora-live--brutalist--dark"
+  ]
+  @multipage_ids [
+    "invoice-line-items-60-plus-page-first",
+    "invoice-line-items-60-plus-page-final",
+    "statement-line-items-60-plus-page-first",
+    "statement-line-items-60-plus-page-final"
+  ]
+  @preset_ids [
+    "brutalist_payslip_dark_page_1",
+    "brutalist_receipt_light_page_1",
+    "corporate_classic_branded_invoice_light_page_1",
+    "corporate_classic_invoice_dark_page_1",
+    "editorial_certificate_light_page_1",
+    "editorial_ticket_dark_page_1",
+    "humanist_payslip_dark_page_1",
+    "humanist_receipt_light_page_1",
+    "minimal_mono_statement_light_page_1",
+    "minimal_mono_ticket_dark_page_1",
+    "swiss_certificate_dark_page_1",
+    "swiss_invoice_light_page_1"
+  ]
+  @forbidden_authority_fields ~w(quality scores passed disposition sign_off sign-off signoff reviewer reviewer_approval approval canonical_eligible publication_authorization publication_result)
 
   @spec build(atom() | String.t(), [map()], map(), Path.t()) :: :ok | {:error, [atom()]}
   def build(operation, payload_sources, provenance, output_root)
       when is_list(payload_sources) and is_map(provenance) and is_binary(output_root) do
     operation = normalize_operation(operation)
 
-    with :ok <- validate_input(operation, payload_sources, provenance, output_root),
-         :ok <- write_bundle(operation, payload_sources, provenance, output_root),
+    with {:ok, pin} <- read_renderer_pin(),
+         :ok <- validate_input(operation, payload_sources, provenance, output_root),
+         :ok <- validate_semantic_sources(operation, payload_sources, provenance, pin),
+         :ok <- write_bundle(operation, payload_sources, provenance, output_root, pin),
          :ok <- validate(output_root, operation, provenance.control_sha) do
       :ok
     else
@@ -55,7 +100,8 @@ defmodule Rendro.CatalogEvidenceBundle do
              pin
            ),
          :ok <- validate_files(output_root, manifest),
-         :ok <- validate_checksums(output_root, manifest) do
+         :ok <- validate_checksums(output_root, manifest),
+         :ok <- validate_bundle_semantics(output_root, operation, manifest, pin) do
       :ok
     else
       {:error, reasons} when is_list(reasons) -> {:error, reasons}
@@ -65,6 +111,40 @@ defmodule Rendro.CatalogEvidenceBundle do
 
   def validate(_output_root, _operation, _expected_control_sha),
     do: {:error, [:invalid_bundle_root]}
+
+  @spec inspect_review(Path.t(), String.t()) :: {:ok, map()} | {:error, [atom()]}
+  def inspect_review(output_root, expected_control_sha) do
+    with :ok <- validate(output_root, :review, expected_control_sha),
+         {:ok, pin} <- read_renderer_pin(),
+         {:ok, candidate} <- read_json(Path.join(output_root, "candidate/catalog.json")),
+         {:ok, final} <- read_json(Path.join(output_root, "final-review/final.json")),
+         {:ok, preset} <- read_json(Path.join(output_root, "preset-review/preset.json")),
+         {:ok, multipage} <-
+           read_checksum_payload(Path.join(output_root, "multipage-review/multipage.json")) do
+      {:ok,
+       %{
+         candidate: candidate,
+         final: final,
+         multipage: multipage,
+         preset: preset,
+         renderer: pin,
+         root: output_root
+       }}
+    else
+      {:error, reasons} when is_list(reasons) -> {:error, reasons}
+      {:error, reason} -> {:error, [reason]}
+    end
+  end
+
+  @spec validate_renderer_pin(Path.t()) :: :ok | {:error, [atom()]}
+  def validate_renderer_pin(path) when is_binary(path) do
+    case read_renderer_pin(path) do
+      {:ok, _pin} -> :ok
+      {:error, _reason} -> {:error, [:invalid_renderer_pin]}
+    end
+  end
+
+  def validate_renderer_pin(_path), do: {:error, [:invalid_renderer_pin]}
 
   defp validate_input(operation, sources, provenance, output_root) do
     reasons =
@@ -87,11 +167,11 @@ defmodule Rendro.CatalogEvidenceBundle do
     if reasons == [], do: :ok, else: {:error, Enum.reverse(reasons)}
   end
 
-  defp write_bundle(operation, sources, provenance, output_root) do
+  defp write_bundle(operation, sources, provenance, output_root, pin) do
     with :ok <- File.mkdir_p(output_root),
          :ok <- copy_payloads(sources, output_root),
          :ok <- write_readme(output_root, operation, provenance),
-         :ok <- write_manifest(output_root, operation, sources, provenance),
+         :ok <- write_manifest(output_root, operation, sources, provenance, pin),
          :ok <- write_checksums(output_root, sources) do
       :ok
     end
@@ -121,7 +201,7 @@ defmodule Rendro.CatalogEvidenceBundle do
     File.write(Path.join(output_root, "README.md"), contents)
   end
 
-  defp write_manifest(output_root, operation, sources, provenance) do
+  defp write_manifest(output_root, operation, sources, provenance, pin) do
     manifest = %{
       "schema_version" => @schema_version,
       "evidence_state" => evidence_state(operation),
@@ -132,7 +212,7 @@ defmodule Rendro.CatalogEvidenceBundle do
       "event" => provenance.event,
       "run_id" => provenance.run_id,
       "run_attempt" => provenance.run_attempt,
-      "renderer" => renderer(provenance),
+      "renderer" => renderer(provenance, pin),
       "commands" => commands(operation),
       "payloads" => payloads(sources, output_root),
       "authority" => authority(operation)
@@ -321,11 +401,12 @@ defmodule Rendro.CatalogEvidenceBundle do
 
   defp record_count("candidate/catalog.json", path), do: json_record_count(path, "cells")
 
+  defp record_count("canonical/catalog.json", path), do: json_record_count(path, "cells")
+
   defp record_count(role, path)
        when role in [
               "final-review/final.json",
-              "preset-review/preset.json",
-              "canonical/catalog.json"
+              "preset-review/preset.json"
             ] do
     json_record_count(path, "images")
   end
@@ -342,6 +423,272 @@ defmodule Rendro.CatalogEvidenceBundle do
     end
   end
 
+  defp validate_bundle_semantics(output_root, operation, manifest, pin) do
+    sources =
+      Map.get(@roles, operation, [])
+      |> Enum.map(fn role ->
+        %{
+          role: role,
+          source: Path.join(output_root, role),
+          media_type: "application/json",
+          count: @role_counts[role]
+        }
+      end)
+
+    provenance = %{
+      candidate_sha: manifest["candidate_sha"],
+      checked_out_head: manifest["checked_out_head"],
+      control_sha: get_in(manifest, ["control", "workflow_sha"]),
+      event: manifest["event"],
+      run_id: manifest["run_id"],
+      run_attempt: manifest["run_attempt"],
+      dpi: get_in(manifest, ["renderer", "dpi"])
+    }
+
+    validate_semantic_sources(operation, sources, provenance, pin)
+  end
+
+  defp validate_semantic_sources(:review, sources, provenance, pin) do
+    by_role = Map.new(sources, &{&1.role, &1.source})
+
+    with {:ok, candidate} <- read_json(by_role["candidate/catalog.json"]),
+         {:ok, final} <- read_json(by_role["final-review/final.json"]),
+         {:ok, multipage} <- read_checksum_payload(by_role["multipage-review/multipage.json"]),
+         {:ok, preset} <- read_json(by_role["preset-review/preset.json"]) do
+      reasons =
+        []
+        |> add_unless(
+          valid_candidate_payload?(candidate, provenance, pin),
+          :invalid_candidate_payload
+        )
+        |> add_unless(valid_final_payload?(final, provenance, pin), :invalid_final_payload)
+        |> add_unless(valid_multipage_payload?(multipage), :invalid_multipage_payload)
+        |> add_unless(valid_preset_payload?(preset, provenance, pin), :invalid_preset_payload)
+        |> add_unless(
+          cross_payloads_match?(candidate, final, multipage),
+          :cross_payload_identity_mismatch
+        )
+
+      if reasons == [], do: :ok, else: {:error, Enum.reverse(reasons)}
+    else
+      _ -> {:error, [:invalid_role_payload]}
+    end
+  end
+
+  defp validate_semantic_sources(:canonical, [source], provenance, pin) do
+    with {:ok, canonical} <- read_json(source.source) do
+      if valid_canonical_payload?(canonical, provenance, pin),
+        do: :ok,
+        else: {:error, [:invalid_canonical_payload]}
+    else
+      _ -> {:error, [:invalid_canonical_payload]}
+    end
+  end
+
+  defp validate_semantic_sources(:canonical, _sources, _provenance, _pin),
+    do: {:error, [:invalid_canonical_payload]}
+
+  defp validate_semantic_sources(_operation, _sources, _provenance, _pin),
+    do: {:error, [:invalid_operation]}
+
+  defp valid_candidate_payload?(payload, provenance, pin) when is_map(payload) do
+    ids = canonical_ids()
+    cells = payload["cells"]
+    candidate = payload["candidate"]
+    renderer = payload["renderer"]
+    diff = payload["diff"]
+    controls = Enum.reject(ids, &(&1 in @target_ids))
+
+    is_list(cells) and Enum.map(cells, &Map.get(&1, "id")) == ids and
+      length(Enum.uniq(ids)) == 32 and
+      Enum.all?(cells, &valid_candidate_cell?(&1, pin)) and
+      is_map(candidate) and candidate["commit_sha"] == provenance.candidate_sha and
+      candidate["baseline_commit_sha"] == provenance.control_sha and
+      candidate["run_id"] == provenance.run_id and
+      candidate["run_attempt"] == provenance.run_attempt and
+      valid_candidate_renderer?(candidate["renderer"], provenance, pin) and
+      valid_candidate_renderer?(renderer, provenance, pin, "pin_sha256") and
+      is_map(diff) and diff["changed_targets"] == @target_ids and
+      diff["byte_stable"] == controls and
+      diff["changed_scored"] ++ diff["changed_unscored"] == @target_ids and
+      MapSet.disjoint?(MapSet.new(diff["changed_targets"]), MapSet.new(diff["byte_stable"])) and
+      not authority_bearing?(payload)
+  rescue
+    _ -> false
+  end
+
+  defp valid_candidate_cell?(cell, pin) when is_map(cell) do
+    id = cell["id"]
+
+    case String.split(id || "", "--") do
+      [family, _brand, _preset, mode] ->
+        id in canonical_ids() and cell["family"] == family and cell["mode"] == mode and
+          cell["page"] == 1 and is_integer(cell["page_count"]) and cell["page_count"] > 0 and
+          safe_relative?(cell["png_path"], "tmp/phase130-candidate/") and
+          valid_sha256?(cell["png_sha256"]) and valid_sha256?(cell["source_pdf_sha256"]) and
+          cell["renderer_kind"] == "pdfium-render" and
+          cell["renderer_version"] == pin["version"] and
+          cell["renderer_sha256"] == pin["sha256"] and is_integer(cell["width_px"]) and
+          cell["width_px"] > 0 and is_integer(cell["height_px"]) and cell["height_px"] > 0
+
+      _ ->
+        false
+    end
+  end
+
+  defp valid_candidate_cell?(_cell, _pin), do: false
+
+  defp valid_candidate_renderer?(renderer, provenance, pin, digest_key \\ "sha256")
+
+  defp valid_candidate_renderer?(renderer, provenance, pin, digest_key) when is_map(renderer) do
+    renderer["kind"] == "pdfium-render" and renderer["version"] == pin["version"] and
+      renderer[digest_key] == pin["sha256"] and renderer["dpi"] == provenance.dpi and
+      renderer["pin_path"] == "priv/pdfium_pin.json"
+  end
+
+  defp valid_candidate_renderer?(_renderer, _provenance, _pin, _digest_key), do: false
+
+  defp valid_final_payload?(payload, provenance, pin) when is_map(payload) do
+    images = payload["images"]
+
+    Map.keys(payload) |> Enum.sort() ==
+      Enum.sort(~w(candidate_sha control_sha images renderer run_attempt run_id)) and
+      payload["candidate_sha"] == provenance.candidate_sha and
+      payload["control_sha"] == provenance.control_sha and payload["run_id"] == provenance.run_id and
+      payload["run_attempt"] == provenance.run_attempt and
+      payload["renderer"] == %{"version" => pin["version"], "sha256" => pin["sha256"]} and
+      is_list(images) and Enum.map(images, &Map.get(&1, "catalog_id")) == @final_ids and
+      Enum.all?(images, &valid_final_image?(&1, provenance, pin)) and
+      not authority_bearing?(payload)
+  end
+
+  defp valid_final_image?(image, provenance, pin) when is_map(image) do
+    id = image["catalog_id"]
+    mode = id && List.last(String.split(id, "--"))
+
+    Map.keys(image) |> Enum.sort() ==
+      Enum.sort(
+        ~w(catalog_id commit_sha control_sha mode png_path png_sha256 renderer_sha256 renderer_version run_attempt run_id source_pdf_sha256)
+      ) and
+      id in @final_ids and image["mode"] == mode and
+      safe_relative?(image["png_path"], "tmp/phase130-candidate/") and
+      valid_sha256?(image["png_sha256"]) and valid_sha256?(image["source_pdf_sha256"]) and
+      image["renderer_version"] == pin["version"] and image["renderer_sha256"] == pin["sha256"] and
+      image["commit_sha"] == provenance.candidate_sha and
+      image["control_sha"] == provenance.control_sha and
+      image["run_id"] == provenance.run_id and image["run_attempt"] == provenance.run_attempt
+  end
+
+  defp valid_final_image?(_image, _provenance, _pin), do: false
+
+  defp valid_multipage_payload?(entries) when is_list(entries) do
+    Enum.map(entries, &elem(&1, 1)) == Enum.map(@multipage_ids, &(&1 <> ".png")) and
+      Enum.all?(entries, fn {digest, path} -> valid_sha256?(digest) and safe_relative?(path) end)
+  end
+
+  defp valid_preset_payload?(payload, provenance, pin) when is_map(payload) do
+    images = payload["images"]
+
+    Map.keys(payload) |> Enum.sort() == Enum.sort(~w(candidate_sha images renderer)) and
+      payload["candidate_sha"] == provenance.candidate_sha and
+      payload["renderer"] == %{"version" => pin["version"], "sha256" => pin["sha256"]} and
+      is_list(images) and Enum.map(images, &Map.get(&1, "id")) == @preset_ids and
+      Enum.all?(images, fn image ->
+        Map.keys(image) |> Enum.sort() == Enum.sort(~w(id path sha256)) and
+          image["id"] in @preset_ids and safe_relative?(image["path"], "preset-review/") and
+          valid_sha256?(image["sha256"])
+      end) and not authority_bearing?(payload)
+  end
+
+  defp valid_canonical_payload?(payload, provenance, pin) when is_map(payload) do
+    cells = payload["cells"]
+    renderer = payload["renderer"]
+
+    is_list(cells) and Enum.map(cells, &Map.get(&1, "id")) == canonical_ids() and
+      Enum.all?(cells, fn cell ->
+        cell["id"] in canonical_ids() and
+          safe_relative?(cell["png_path"], "assets/rendro/catalog/") and
+          valid_sha256?(cell["png_sha256"]) and valid_sha256?(cell["source_pdf_sha256"]) and
+          cell["renderer_kind"] == "pdfium-render" and cell["renderer_version"] == pin["version"]
+      end) and renderer["kind"] == "pdfium-render" and renderer["version"] == pin["version"] and
+      renderer["pin_sha256"] == pin["sha256"] and
+      payload["source_commit_sha"] == provenance.control_sha
+  rescue
+    _ -> false
+  end
+
+  defp cross_payloads_match?(candidate, final, multipage) do
+    cells = Map.new(candidate["cells"] || [], &{&1["id"], &1})
+    proofs = Map.new(candidate["multipage"] || [], &{&1["id"], &1})
+
+    Enum.all?(final["images"] || [], fn image ->
+      cell = cells[image["catalog_id"]]
+
+      is_map(cell) and image["png_path"] == cell["png_path"] and
+        image["png_sha256"] == cell["png_sha256"] and
+        image["source_pdf_sha256"] == cell["source_pdf_sha256"]
+    end) and
+      Enum.all?(multipage, fn {digest, path} ->
+        id = String.trim_trailing(path, ".png")
+        is_map(proofs[id]) and proofs[id]["png_sha256"] == digest
+      end)
+  rescue
+    _ -> false
+  end
+
+  defp read_json(path) when is_binary(path) do
+    with {:ok, contents} <- File.read(path),
+         {:ok, decoded} when is_map(decoded) <- Jason.decode(contents),
+         do: {:ok, decoded},
+         else: (_ -> {:error, :invalid_json_payload})
+  end
+
+  defp read_json(_path), do: {:error, :invalid_json_payload}
+
+  defp read_checksum_payload(path) when is_binary(path) do
+    with {:ok, contents} <- File.read(path),
+         {:ok, entries} <- parse_checksums(contents),
+         do: {:ok, entries},
+         else: (_ -> {:error, :invalid_checksum_payload})
+  end
+
+  defp read_checksum_payload(_path), do: {:error, :invalid_checksum_payload}
+
+  defp canonical_ids do
+    case File.read("assets/rendro/catalog.json") do
+      {:ok, contents} ->
+        case Jason.decode(contents) do
+          {:ok, %{"cells" => cells}} when is_list(cells) -> Enum.map(cells, & &1["id"])
+          _ -> []
+        end
+
+      _ ->
+        []
+    end
+  end
+
+  defp safe_relative?(path, prefix \\ nil)
+
+  defp safe_relative?(path, prefix) when is_binary(path) do
+    path != "" and not String.contains?(path, ["\0", "\\"]) and Path.type(path) == :relative and
+      match?({:ok, _}, Path.safe_relative(path)) and
+      (is_nil(prefix) or String.starts_with?(path, prefix))
+  end
+
+  defp safe_relative?(_path, _prefix), do: false
+
+  defp authority_bearing?(value) when is_map(value) do
+    Enum.any?(value, fn {key, nested} ->
+      key in @forbidden_authority_fields or authority_bearing?(nested)
+    end)
+  end
+
+  defp authority_bearing?(value) when is_list(value), do: Enum.any?(value, &authority_bearing?/1)
+  defp authority_bearing?(_value), do: false
+
+  defp add_unless(reasons, true, _reason), do: reasons
+  defp add_unless(reasons, false, reason), do: [reason | reasons]
+
   defp payloads(sources, output_root) do
     Enum.map(sources, fn source ->
       %{
@@ -354,9 +701,7 @@ defmodule Rendro.CatalogEvidenceBundle do
     end)
   end
 
-  defp renderer(provenance) do
-    {:ok, pin} = read_renderer_pin()
-
+  defp renderer(provenance, pin) do
     %{
       "version" => pin["version"],
       "binary_sha256" => pin["sha256"],
@@ -395,8 +740,8 @@ defmodule Rendro.CatalogEvidenceBundle do
 
   defp safe_output_root?(path), do: path != "" and not String.contains?(path, "\0")
 
-  defp read_renderer_pin do
-    with {:ok, contents} <- File.read("priv/pdfium_pin.json"),
+  defp read_renderer_pin(path \\ "priv/pdfium_pin.json") do
+    with {:ok, contents} <- File.read(path),
          {:ok, pin} <- Jason.decode(contents),
          true <- is_binary(pin["version"]) and valid_sha256?(pin["sha256"]) do
       {:ok, pin}
