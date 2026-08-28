@@ -93,8 +93,8 @@ defmodule Rendro.Catalog do
     "statement--signal-ledger--minimal-mono--dark" => %{semantic_ink: :primary_secondary},
     "payslip--northline-logistics--swiss--light" => %{ledger_layout: :sequential_measured},
     "payslip--northline-logistics--swiss--dark" => %{ledger_layout: :sequential_measured},
-    "ticket--aurora-live--brutalist--light" => %{locator_layout: :one_row_clear},
-    "ticket--aurora-live--brutalist--dark" => %{locator_layout: :one_row_clear}
+    "ticket--aurora-live--brutalist--light" => %{locator_layout: :atomic_equal_share},
+    "ticket--aurora-live--brutalist--dark" => %{locator_layout: :atomic_equal_share}
   }
 
   @spec asset_root() :: String.t()

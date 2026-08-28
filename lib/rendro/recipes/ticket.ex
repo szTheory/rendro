@@ -319,29 +319,35 @@ defmodule Rendro.Recipes.Ticket do
 
     header_cells =
       Enum.map(data.placement, fn %{label: l} ->
-        Rendro.block(
-          Rendro.text(String.upcase(l),
-            size: type.scale.caption,
-            font: type.fonts.body,
-            color: colors.muted,
-            line_height: type.leading,
-            widows: type.widows,
-            orphans: type.orphans
-          )
+        locator_cell(
+          Rendro.block(
+            Rendro.text(String.upcase(l),
+              size: type.scale.caption,
+              font: type.fonts.body,
+              color: colors.muted,
+              line_height: type.leading,
+              widows: type.widows,
+              orphans: type.orphans
+            )
+          ),
+          opts
         )
       end)
 
     value_cells =
       Enum.map(data.placement, fn %{value: v} ->
-        Rendro.block(
-          Rendro.text(v,
-            size: roles.placement,
-            font: type.fonts.body,
-            color: colors.ink,
-            line_height: type.leading,
-            widows: type.widows,
-            orphans: type.orphans
-          )
+        locator_cell(
+          Rendro.block(
+            Rendro.text(v,
+              size: roles.placement,
+              font: type.fonts.body,
+              color: colors.ink,
+              line_height: type.leading,
+              widows: type.widows,
+              orphans: type.orphans
+            )
+          ),
+          opts
         )
       end)
 
@@ -743,6 +749,19 @@ defmodule Rendro.Recipes.Ticket do
       _theme ->
         %{placement: type.scale.display, title: type.scale.title, reference: type.scale.caption}
     end
+  end
+
+  # Catalog tooling may opt into the existing one-row locator archetype with
+  # explicit atomic cells. The profile is generic: this recipe never receives
+  # a catalog ID, brand, preset, or phase identifier.
+  defp atomic_locator?(opts) do
+    get_in(opts[:presentation_profile] || %{}, [:locator_layout]) == :atomic_equal_share
+  end
+
+  defp locator_cell(content, opts) do
+    if atomic_locator?(opts),
+      do: %Rendro.Cell{content: content, split_policy: :atomic},
+      else: content
   end
 
   # ---------------------------------------------------------------------------
