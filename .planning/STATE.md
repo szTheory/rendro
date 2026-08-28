@@ -5,15 +5,15 @@ milestone_name: Quality & Maintainability
 current_phase: 136
 current_phase_name: catalog-visual-quality
 status: executing
-stopped_at: Completed 136-03-PLAN.md
-last_updated: "2026-08-28T03:16:53.708Z"
+stopped_at: Completed 136-04-PLAN.md
+last_updated: "2026-08-28T03:24:16.392Z"
 last_activity: 2026-08-27
 last_activity_desc: Phase 136 execution started
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 31
-  completed_plans: 28
+  completed_plans: 29
   percent: 67
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-27)
 ## Current Position
 
 Phase: 136 (catalog-visual-quality) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-08-27 — Phase 136 execution started
 
@@ -101,6 +101,8 @@ Phase 137 Closure & Handoff ............................... Pending
 - [Phase ?]: Statement target-profile ledger headers use existing primary-ink cells while omitted profiles keep string headers.
 - [Phase ?]: Swiss targets select the generic private ledger_layout: :sequential_measured profile.
 - [Phase ?]: Sequential tables retain one flexible description column and equal explicit measured money widths.
+- [Phase ?]: Ticket consumes only generic locator_layout: :atomic_equal_share, never catalog identity.
+- [Phase ?]: The dark target stub reference uses muted semantic ink while placement values remain primary ink.
 
 ### Pending Todos
 
@@ -122,8 +124,8 @@ None outside the roadmap.
 
 ## Session Continuity
 
-Last session: 2026-08-28T03:16:53.695Z
-Stopped at: Completed 136-03-PLAN.md
+Last session: 2026-08-28T03:24:16.381Z
+Stopped at: Completed 136-04-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -174,3 +176,4 @@ Resume file: None
 | Phase 136 P01 | 22m | 2 tasks | 5 files |
 | Phase 136 P02 | 8m | 2 tasks | 4 files |
 | Phase 136 P03 | 14m | 2 tasks | 4 files |
+| Phase 136 P04 | 15m | 2 tasks | 4 files |
