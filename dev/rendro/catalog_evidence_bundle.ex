@@ -319,23 +319,28 @@ defmodule Rendro.CatalogEvidenceBundle do
     end
   end
 
+  defp record_count("candidate/catalog.json", path), do: json_record_count(path, "cells")
+
   defp record_count(role, path)
        when role in [
-              "candidate/catalog.json",
               "final-review/final.json",
               "preset-review/preset.json",
               "canonical/catalog.json"
             ] do
+    json_record_count(path, "images")
+  end
+
+  defp record_count(_role, _path), do: :error
+
+  defp json_record_count(path, collection) do
     with {:ok, contents} <- File.read(path),
          {:ok, decoded} <- Jason.decode(contents),
-         records when is_list(records) <- Map.get(decoded, "images", decoded) do
+         records when is_list(records) <- Map.get(decoded, collection) do
       {:ok, length(records)}
     else
       _ -> :error
     end
   end
-
-  defp record_count(_role, _path), do: :error
 
   defp payloads(sources, output_root) do
     Enum.map(sources, fn source ->
