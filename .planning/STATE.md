@@ -5,17 +5,17 @@ milestone_name: Quality & Maintainability (Phases 132-137)
 current_phase: 136
 current_phase_name: Catalog Visual Quality
 status: executing
-stopped_at: Gap-closure plans 136-09 through 136-15 verified; next executable plan is 136-09
-last_updated: "2026-08-28T19:06:58.229Z"
+stopped_at: Completed 136-09-PLAN.md
+last_updated: "2026-08-28T19:25:30.824Z"
 last_activity: 2026-08-28
-state_head: 286c83fbba200307d2574aceaf00640f7e3e6f5e
+last_activity_desc: Phase 136 execution started
+state_head: c1bdcfdfeeadc3ffce4722a17f69b0c47a8d12d2
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 40
-  completed_plans: 33
+  completed_plans: 34
   percent: 67
-last_activity_desc: Phase 136 gap-closure plans verified
 ---
 
 # Project State
@@ -25,14 +25,14 @@ last_activity_desc: Phase 136 gap-closure plans verified
 See: .planning/PROJECT.md (updated 2026-08-27)
 
 **Core value:** Phoenix teams can generate reliable, auditable, deterministic PDFs from Elixir data/components, with clear pagination behavior and production-grade observability.
-**Current focus:** Phase 136 — catalog-visual-quality
+**Current focus:** Phase 136 — Catalog Visual Quality
 
 ## Current Position
 
-Phase: 136 (Catalog Visual Quality) — READY TO EXECUTE
-Plan: 8 of 15
+Phase: 136 (Catalog Visual Quality) — EXECUTING
+Plan: 2 of 15
 Status: Ready to execute
-Last activity: 2026-08-28 — Phase 136 gap-closure plans verified
+Last activity: 2026-08-28 — Phase 136 execution started
 
 ## Roadmap Snapshot (v2.14, Phases 132-137)
 
@@ -110,6 +110,8 @@ Phase 137 Closure & Handoff ............................... Pending
 - [Phase ?]: Published only the authorized exact candidate ref and recorded the failed dynamic review run as unavailable evidence with no review or canonical claim.
 - [Phase 136]: Run 33177154682 is unavailable review evidence; the six targets remain unpromoted and canonical publication is ineligible.
 - [Phase 136]: Convenience-gallery LGTM is advisory only and cannot become exact target review evidence.
+- [Phase 136]: Complete PDF/PNG inequality in canonical order determines changed_targets; scored/unscored buckets remain descriptive only.
+- [Phase 136]: Top-level print_safety:false on an unscored dark disposition is scope-boundary metadata, never review evidence or a support claim.
 
 ### Pending Todos
 
@@ -131,8 +133,8 @@ Phase 137 Closure & Handoff ............................... Pending
 
 ## Session Continuity
 
-Last session: 2026-08-28T17:37:06.559Z
-Stopped at: Completed 136-08-PLAN.md with evidence deferral; CATALOG-10 through CATALOG-13 remain open
+Last session: 2026-08-28T19:25:30.581Z
+Stopped at: Completed 136-09-PLAN.md
 Resume file: None
 
 ## Next Steps
@@ -188,3 +190,4 @@ Resume file: None
 | Phase 136 P06 | 13min | 2 tasks | 1 files |
 | Phase 136-catalog-visual-quality P07 | 401s | 2 tasks | 1 files |
 | Phase 136 P08 | 14m | 1 tasks | 2 files |
+| Phase 136 P09 | 14min | 2 tasks | 8 files |

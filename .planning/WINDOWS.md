@@ -1,15 +1,15 @@
 ---
 schema_version: 1
-open_count: 14
+open_count: 15
 waived_count: 0
 fixed_count: 6
-total_count: 20
-last_updated: 2026-08-26T22:36:35.405Z
+total_count: 21
+last_updated: 2026-08-28T19:23:45.832Z
 ---
 
 # Broken Windows Ledger
 
-> Cross-phase defect register. `/gsd-ship` blocks while `open_count > 0`.
+> Cross-phase defect register. With `workflow.windows_enforce` enabled, `/gsd-ship` blocks while `open_count > 0`.
 > Waive with `gsd-tools windows waive <id> "<reason>"` (reason required).
 > Mark fixed with `gsd-tools windows fixed <id>`.
 
@@ -35,6 +35,7 @@ last_updated: 2026-08-26T22:36:35.405Z
 | 18 | 133 | deviation | .planning/phases/133-repository-evidence-hygiene/133-05-PLAN.md |  | Mix 1.19 rejects the planned -x option; equivalent focused suite ran without it. | open |  | 2026-08-26T22:26:41.647Z |  |
 | 19 | 133 | deviation | test/scripts/repository_evidence_test.exs |  | Legacy source reads in the evidence test were replaced with fixed capsule provenance, fact, and sidecar digest contracts before deleting batch A. | open |  | 2026-08-26T22:32:48.088Z |  |
 | 20 | 133 | deviation | .planning/phases/133-repository-evidence-hygiene/133-07-PLAN.md |  | Mix 1.19 rejects the plan's -x option; the equivalent focused test command passed without it. | open |  | 2026-08-26T22:36:35.405Z |  |
+| 21 | 136 | unrun-verify | .planning/todos/pending/2026-08-28-unify-catalog-recipe-visual-design-system.md |  | mix ci.fast stops at repository hygiene because a pre-existing tracked TODO is outside an active phase or milestone archive | open |  | 2026-08-28T19:23:45.832Z |  |
 
 ````json
 [
@@ -276,6 +277,18 @@ last_updated: 2026-08-26T22:36:35.405Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-26T22:36:35.405Z",
+    "resolved_at": null
+  },
+  {
+    "id": 21,
+    "kind": "unrun-verify",
+    "phase": "136",
+    "file": ".planning/todos/pending/2026-08-28-unify-catalog-recipe-visual-design-system.md",
+    "line": null,
+    "description": "mix ci.fast stops at repository hygiene because a pre-existing tracked TODO is outside an active phase or milestone archive",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-28T19:23:45.832Z",
     "resolved_at": null
   }
 ]
