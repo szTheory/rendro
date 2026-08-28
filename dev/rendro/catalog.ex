@@ -294,33 +294,39 @@ defmodule Rendro.Catalog do
           end
         )
 
-      {:ok,
-       %{
-         "schema_version" => @schema_version,
-         "generated_by" => @candidate_generated_by,
-         "candidate" => %{
-           "commit_sha" => commit_sha,
-           "baseline_commit_sha" => commit_sha,
-           "run_id" => System.get_env("GITHUB_RUN_ID") || "local-#{commit_sha}",
-           "renderer" => %{
-             "kind" => @renderer_kind,
-             "version" => renderer_version,
-             "dpi" => @dpi,
-             "pin_path" => @pdfium_pin_path,
-             "sha256" => pin["sha256"]
-           }
-         },
-         "renderer" => %{
-           "kind" => @renderer_kind,
-           "version" => renderer_version,
-           "dpi" => @dpi,
-           "pin_path" => @pdfium_pin_path,
-           "pin_sha256" => pin["sha256"]
-         },
-         "cells" => candidate_cells,
-         "multipage" => multipage,
-         "diff" => Map.new(diff, fn {bucket, ids} -> {Atom.to_string(bucket), ids} end)
-       }}
+      case valid_candidate_diff(diff) do
+        :ok ->
+          {:ok,
+           %{
+             "schema_version" => @schema_version,
+             "generated_by" => @candidate_generated_by,
+             "candidate" => %{
+               "commit_sha" => commit_sha,
+               "baseline_commit_sha" => commit_sha,
+               "run_id" => System.get_env("GITHUB_RUN_ID") || "local-#{commit_sha}",
+               "renderer" => %{
+                 "kind" => @renderer_kind,
+                 "version" => renderer_version,
+                 "dpi" => @dpi,
+                 "pin_path" => @pdfium_pin_path,
+                 "sha256" => pin["sha256"]
+               }
+             },
+             "renderer" => %{
+               "kind" => @renderer_kind,
+               "version" => renderer_version,
+               "dpi" => @dpi,
+               "pin_path" => @pdfium_pin_path,
+               "pin_sha256" => pin["sha256"]
+             },
+             "cells" => candidate_cells,
+             "multipage" => multipage,
+             "diff" => Map.new(diff, fn {bucket, ids} -> {Atom.to_string(bucket), ids} end)
+           }}
+
+        {:error, _reason} = error ->
+          error
+      end
     else
       false -> {:error, :invalid_candidate_identity}
       {:error, _reason} = error -> error
@@ -1050,6 +1056,30 @@ defmodule Rendro.Catalog do
         do: {"review_required", :changed_scored},
         else: {"changed_unscored", :changed_unscored}
     end
+  end
+
+  defp valid_candidate_diff(%{
+         changed_scored: changed_scored,
+         changed_unscored: [],
+         byte_stable: byte_stable
+       }) do
+    target_ids = visual_target_ids()
+    control_ids = Enum.reject(Enum.map(catalog_specs(), & &1.id), &(&1 in target_ids))
+
+    if map_size(@visual_target_profiles) == 6 and changed_scored == target_ids and
+         byte_stable == control_ids do
+      :ok
+    else
+      {:error, :invalid_candidate_scope}
+    end
+  end
+
+  defp valid_candidate_diff(_), do: {:error, :invalid_candidate_scope}
+
+  defp visual_target_ids do
+    catalog_specs()
+    |> Enum.map(& &1.id)
+    |> Enum.filter(&Map.has_key?(@visual_target_profiles, &1))
   end
 
   defp validate_candidate_staging(cells) do
