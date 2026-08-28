@@ -50,7 +50,14 @@ defmodule Rendro.CatalogEvidenceBundleTest do
   test "builds and validates a closed review bundle with candidate cells and image manifests" do
     root = temporary_root("review")
 
-    assert :ok = CatalogEvidenceBundle.build(:review, review_sources(root), provenance(), root)
+    assert :ok =
+             CatalogEvidenceBundle.build(
+               :review,
+               semantic_review_sources(root),
+               provenance(),
+               root
+             )
+
     assert :ok = CatalogEvidenceBundle.validate(root, :review, control_sha())
 
     manifest = root |> Path.join("manifest.json") |> File.read!() |> JSON.decode!()
@@ -84,14 +91,19 @@ defmodule Rendro.CatalogEvidenceBundleTest do
     root = temporary_root("invalid")
 
     assert {:error, reasons} =
-             CatalogEvidenceBundle.build(:invalid, review_sources(root), provenance(), root)
+             CatalogEvidenceBundle.build(
+               :invalid,
+               semantic_review_sources(root),
+               provenance(),
+               root
+             )
 
     assert :invalid_operation in reasons
 
     assert {:error, reasons} =
              CatalogEvidenceBundle.build(
                :review,
-               review_sources(root),
+               semantic_review_sources(root),
                %{provenance() | candidate_sha: "A" <> String.duplicate("a", 39)},
                root
              )
@@ -118,7 +130,7 @@ defmodule Rendro.CatalogEvidenceBundleTest do
     assert {:error, reasons} =
              CatalogEvidenceBundle.build(
                :review,
-               review_sources(root),
+               semantic_review_sources(root),
                Map.put(provenance(), :reviewer_approval, true),
                root
              )
@@ -128,7 +140,7 @@ defmodule Rendro.CatalogEvidenceBundleTest do
     assert {:error, reasons} =
              CatalogEvidenceBundle.build(
                :review,
-               review_sources(root),
+               semantic_review_sources(root),
                %{provenance() | run_id: "", run_attempt: 0},
                root
              )
@@ -138,7 +150,14 @@ defmodule Rendro.CatalogEvidenceBundleTest do
 
   test "fails closed on manifest, role, count, and payload hash drift" do
     root = temporary_root("drift")
-    assert :ok = CatalogEvidenceBundle.build(:review, review_sources(root), provenance(), root)
+
+    assert :ok =
+             CatalogEvidenceBundle.build(
+               :review,
+               semantic_review_sources(root),
+               provenance(),
+               root
+             )
 
     manifest_path = Path.join(root, "manifest.json")
     manifest = JSON.decode!(File.read!(manifest_path))
@@ -160,7 +179,15 @@ defmodule Rendro.CatalogEvidenceBundleTest do
 
   test "rejects a checksum-recomputed bundle whose control SHA differs from trusted control" do
     root = temporary_root("forged-control")
-    assert :ok = CatalogEvidenceBundle.build(:review, review_sources(root), provenance(), root)
+
+    assert :ok =
+             CatalogEvidenceBundle.build(
+               :review,
+               semantic_review_sources(root),
+               provenance(),
+               root
+             )
+
     forged_control_sha = String.duplicate("c", 40)
 
     rewrite_manifest_and_checksums(root, fn manifest ->
@@ -176,7 +203,14 @@ defmodule Rendro.CatalogEvidenceBundleTest do
 
   test "rejects checksum-recomputed renderer version and digest drift" do
     root = temporary_root("forged-renderer")
-    assert :ok = CatalogEvidenceBundle.build(:review, review_sources(root), provenance(), root)
+
+    assert :ok =
+             CatalogEvidenceBundle.build(
+               :review,
+               semantic_review_sources(root),
+               provenance(),
+               root
+             )
 
     for renderer <- [
           %{"version" => "v9.9.9", "binary_sha256" => pin_sha(), "dpi" => 96},
