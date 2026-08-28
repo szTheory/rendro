@@ -447,7 +447,7 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
             [
               "missing validated closed review bundle for d547bbfa60760d43f19a15372d88a2d159bfa327",
               "missing six complete named reviewer records",
-              "next action: publish the exact candidate object to a remote-reachable ref, dispatch review, validate the closed bundle, then collect six records"
+              "next action: investigate invalid candidate scope, then create a new immutable candidate if needed, publish, dispatch review, validate the closed bundle, and collect six records"
             ]} = phase136_canonical_eligibility(manifest(), catalog, sign_off)
 
     assert Enum.count(catalog["cells"], &(&1["quality"]["status"] == "unscored")) == 20
@@ -521,12 +521,12 @@ defmodule Rendro.DocsContract.RubricManifestContractTest do
   end
 
   defp phase136_canonical_eligibility(_rubric, _catalog, sign_off) when is_binary(sign_off) do
-    if Regex.match?(~r/candidate-generation checkout\s+failed before bundle creation/, sign_off) do
+    if Regex.match?(~r/`review` dispatch, GitHub Actions run `33177154682` attempt `1`.*?:invalid_candidate_scope/s, sign_off) do
       {:canonical_ineligible,
        [
          "missing validated closed review bundle for d547bbfa60760d43f19a15372d88a2d159bfa327",
          "missing six complete named reviewer records",
-         "next action: publish the exact candidate object to a remote-reachable ref, dispatch review, validate the closed bundle, then collect six records"
+         "next action: investigate invalid candidate scope, then create a new immutable candidate if needed, publish, dispatch review, validate the closed bundle, and collect six records"
        ]}
     else
       {:canonical_ineligible, ["missing explicit Phase 136 evidence deferral"]}

@@ -143,6 +143,37 @@ keep that cell unpromoted. Plan 06 must treat this candidate as
 canonical-ineligible and leave canonical assets unchanged unless complete,
 exactly bound human evidence is later appended.
 
+---
+
+## Phase 136 exact review attempt update · explicit deferral · 2026-08-28
+
+The published exact candidate remains
+`d547bbfa60760d43f19a15372d88a2d159bfa327`. Its one authorized replacement
+`review` dispatch, GitHub Actions run `33177154682` attempt `1`, reached the
+candidate-generation step but failed with `:invalid_candidate_scope` at
+`2026-08-28T13:52:46Z`. That failure occurred before the candidate handoff
+upload; the trusted control packaging job was skipped and the artifact API
+reported zero artifacts. Consequently there is no archive digest, validated
+closed bundle, reconciled full-size image path, renderer executable identity,
+source-PDF/PNG identity, or exact candidate review packet for this run.
+
+The six Phase 136 target cells remain **unreviewed and unpromoted**. No
+dimension score, reading-order result, rationale, reviewer identity, date, or
+eligibility result is created from this failed run. The user's overall “looked
+good” feedback for the convenience gallery is retained only as advisory
+feedback for that non-authoritative gallery; it is not evidence for any target
+record and does not qualify canonical publication. Existing Phase 130 records
+remain immutable and are not reassociated with this candidate.
+
+**Next action:** investigate `mix rendro.catalog.candidate` against this
+published candidate's invalid scope. If a bounded source correction is needed,
+create a new immutable candidate, obtain fresh publication authorization for
+that SHA, and dispatch one new `review` operation. Validate its sole closed
+artifact from a freshly asserted detached control checkout before opening
+images or collecting six complete named records. Until then, do not dispatch
+`canonical`, do not run catalog generation, and keep all canonical catalog
+paths unchanged.
+
 ## Phase 127 catalog flagship review · 2026-08-17 (historical; superseded by Phase 130 above)
 
 Jon reviewed the twelve full-size catalog inputs in canonical family order, with each light cell
