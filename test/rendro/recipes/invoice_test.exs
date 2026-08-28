@@ -229,6 +229,92 @@ defmodule Rendro.Recipes.InvoiceTest do
       assert {:ok, second_pdf} = Rendro.render(document, deterministic: true)
       assert first_pdf == second_pdf
     end
+
+    test "long Invoice facts and items preserve exact wrap and pagination boundaries" do
+      opts = [
+        theme: Rendro.Theme.preset(:corporate_classic, accent: "#1F4FB8", mode: :dark),
+        presentation_profile: %{semantic_ink: :primary_secondary}
+      ]
+
+      cardinality_cases = [
+        {"empty", []},
+        {"single", [%{name: "Single held-out item", qty: 1, price: Decimal.new("10.00")}]},
+        {"equal-measure ties",
+         [
+           %{name: "Alpha tie", qty: 1, price: Decimal.new("10.00")},
+           %{name: "Bravo tie", qty: 1, price: Decimal.new("10.00")}
+         ]}
+      ]
+
+      for {label, items} <- cardinality_cases do
+        data = %{id: "INV-CARDINALITY", date: ~D[2026-04-30], items: items}
+        document = profiled_invoice(data, opts)
+        body = Enum.find(document.sections, &(&1.region == :body))
+        rows = body |> invoice_tables() |> Enum.flat_map(& &1.content.rows)
+
+        assert Enum.map(rows, &(&1 |> hd() |> block_text())) == Enum.map(items, & &1.name), label
+        assert length(rows) == length(items), label
+        assert render_invoice!(document) == render_invoice!(document), label
+      end
+
+      exact_fit = Enum.join(List.duplicate("service", 9), " ")
+      one_step_over = Enum.join(List.duplicate("service", 10), " ")
+
+      wrap_data = %{
+        id: "INV-WRAP-BOUNDARY",
+        date: ~D[2026-04-30],
+        items: [
+          %{name: exact_fit, qty: 1, price: Decimal.new("10.00")},
+          %{name: one_step_over, qty: 1, price: Decimal.new("10.00")}
+        ]
+      }
+
+      wrap_document = profiled_invoice(wrap_data, opts)
+      wrap_body = Enum.find(wrap_document.sections, &(&1.region == :body))
+      [wrap_table] = invoice_tables(wrap_body)
+
+      {_header_height, [exact_height, over_height]} =
+        Rendro.measure_rows(wrap_table.content.rows, 595.28 - 2 * 72, wrap_document,
+          header: wrap_table.content.header,
+          columns: wrap_table.content.columns
+        )
+
+      assert exact_height < over_height
+
+      assert Enum.map(wrap_table.content.rows, &(&1 |> hd() |> block_text())) == [
+               exact_fit,
+               one_step_over
+             ]
+
+      exact_page_document = profiled_invoice(invoice_boundary_data(46), opts)
+      over_page_document = profiled_invoice(invoice_boundary_data(47), opts)
+      exact_body = Enum.find(exact_page_document.sections, &(&1.region == :body))
+      over_body = Enum.find(over_page_document.sections, &(&1.region == :body))
+
+      assert length(invoice_tables(exact_body)) == 1
+      assert length(invoice_tables(over_body)) == 2
+
+      assert over_body |> invoice_tables() |> Enum.flat_map(&table_text/1) |> Enum.take_every(3) ==
+               Enum.map(1..47, &"Boundary item #{&1}")
+
+      exact_page_pdf = render_invoice!(exact_page_document)
+      over_page_pdf = render_invoice!(over_page_document)
+      assert exact_page_pdf =~ "/Count 2"
+      assert over_page_pdf =~ "/Count 3"
+      assert over_page_pdf == render_invoice!(over_page_document)
+
+      omitted =
+        sample_data()
+        |> Invoice.document(theme: opts[:theme])
+        |> Rendro.Theme.Presets.register_fonts(:corporate_classic)
+
+      unrelated =
+        sample_data()
+        |> Invoice.document(theme: opts[:theme], presentation_profile: %{semantic_ink: :other})
+        |> Rendro.Theme.Presets.register_fonts(:corporate_classic)
+
+      assert render_invoice!(omitted) == render_invoice!(unrelated)
+    end
   end
 
   describe "document/2" do
@@ -284,6 +370,28 @@ defmodule Rendro.Recipes.InvoiceTest do
         text when is_binary(text) -> text
       end)
     end)
+  end
+
+  defp profiled_invoice(data, opts) do
+    data
+    |> Invoice.document(opts)
+    |> Rendro.Theme.Presets.register_fonts(:corporate_classic)
+  end
+
+  defp render_invoice!(document) do
+    assert {:ok, pdf} = Rendro.render(document, deterministic: true)
+    pdf
+  end
+
+  defp invoice_boundary_data(count) do
+    %{
+      id: "INV-PAGE-BOUNDARY",
+      date: ~D[2026-04-30],
+      items:
+        Enum.map(1..count, fn index ->
+          %{name: "Boundary item #{index}", qty: 1, price: Decimal.new("10.00")}
+        end)
+    }
   end
 
   # ---------------------------------------------------------------------------

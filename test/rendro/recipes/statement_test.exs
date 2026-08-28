@@ -318,6 +318,82 @@ defmodule Rendro.Recipes.StatementTest do
       assert {:ok, second_pdf} = Rendro.render(document, deterministic: true)
       assert first_pdf == second_pdf
     end
+
+    test "long Statement ledger facts preserve exact wrap and pagination boundaries" do
+      opts = statement_semantic_opts()
+
+      cardinality_cases = [
+        {"empty", []},
+        {"single", [statement_line("Single ledger fact", 1)]},
+        {"equal-measure ties", [statement_line("Alpha tie", 1), statement_line("Bravo tie", 2)]}
+      ]
+
+      for {label, lines} <- cardinality_cases do
+        data = %{fixture_data(0) | lines: lines}
+        document = profiled_statement(data, opts)
+        body = Enum.find(document.sections, &(&1.region == :body))
+        rows = body.content |> Enum.flat_map(& &1.content.rows) |> transaction_rows()
+
+        assert Enum.map(rows, &row_cell_text(&1, 1)) == Enum.map(lines, & &1.description), label
+        assert length(rows) == length(lines), label
+        assert render_statement_doc!(document) == render_statement_doc!(document), label
+      end
+
+      exact_fit = Enum.join(List.duplicate("ledger", 6), " ")
+      one_step_over = Enum.join(List.duplicate("ledger", 7), " ")
+
+      wrap_data = %{
+        fixture_data(0)
+        | lines: [statement_line(exact_fit, 1), statement_line(one_step_over, 2)]
+      }
+
+      wrap_document = profiled_statement(wrap_data, opts)
+      wrap_body = Enum.find(wrap_document.sections, &(&1.region == :body))
+      [wrap_table] = wrap_body.content
+
+      {_header_height, [exact_height, over_height]} =
+        Rendro.measure_rows(wrap_table.content.rows, 595.28 - 2 * 72, wrap_document,
+          header: wrap_table.content.header,
+          columns: wrap_table.content.columns
+        )
+
+      assert exact_height < over_height
+
+      assert Enum.map(wrap_table.content.rows, &row_cell_text(&1, 1)) == [
+               exact_fit,
+               one_step_over
+             ]
+
+      exact_page_document = profiled_statement(statement_boundary_data(30), opts)
+      over_page_document = profiled_statement(statement_boundary_data(31), opts)
+      exact_body = Enum.find(exact_page_document.sections, &(&1.region == :body))
+      over_body = Enum.find(over_page_document.sections, &(&1.region == :body))
+
+      assert length(exact_body.content) == 1
+      assert length(over_body.content) == 2
+
+      assert over_body.content
+             |> Enum.flat_map(& &1.content.rows)
+             |> transaction_rows()
+             |> Enum.map(&row_cell_text(&1, 1)) == Enum.map(1..31, &"Boundary ledger #{&1}")
+
+      assert render_statement_doc!(over_page_document) ==
+               render_statement_doc!(over_page_document)
+
+      assert render_statement_doc!(over_page_document) =~ "(Page 2 of"
+
+      omitted =
+        fixture_data(3)
+        |> Statement.document(theme: opts[:theme])
+        |> Rendro.Theme.Presets.register_fonts(:minimal_mono)
+
+      unrelated =
+        fixture_data(3)
+        |> Statement.document(theme: opts[:theme], presentation_profile: %{semantic_ink: :other})
+        |> Rendro.Theme.Presets.register_fonts(:minimal_mono)
+
+      assert render_statement_doc!(omitted) == render_statement_doc!(unrelated)
+    end
   end
 
   # ---------------------------------------------------------------------------
@@ -875,4 +951,45 @@ defmodule Rendro.Recipes.StatementTest do
   defp extract_text(%{content: inner}), do: extract_text(inner)
 
   defp extract_text(other), do: inspect(other)
+
+  defp statement_semantic_opts do
+    [
+      theme: Rendro.Theme.preset(:minimal_mono, accent: "#0E7C76", mode: :dark),
+      presentation_profile: %{semantic_ink: :primary_secondary}
+    ]
+  end
+
+  defp profiled_statement(data, opts) do
+    data
+    |> Statement.document(opts)
+    |> Rendro.Theme.Presets.register_fonts(:minimal_mono)
+  end
+
+  defp render_statement_doc!(document) do
+    assert {:ok, pdf} = Rendro.render(document, deterministic: true)
+    pdf
+  end
+
+  defp statement_line(description, day) do
+    %{
+      date: Date.add(~D[2026-05-01], day - 1),
+      description: description,
+      amount: Decimal.new("10.00")
+    }
+  end
+
+  defp statement_boundary_data(count) do
+    %{
+      period: %{from: ~D[2026-05-01], to: ~D[2026-06-30]},
+      account: %{name: "Held Out Account"},
+      opening_balance: Decimal.new("0.00"),
+      lines: Enum.map(1..count, &statement_line("Boundary ledger #{&1}", &1))
+    }
+  end
+
+  defp transaction_rows(rows) do
+    Enum.reject(rows, fn row ->
+      row_cell_text(row, 0) in ["Carried forward", "Brought forward"]
+    end)
+  end
 end
