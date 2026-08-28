@@ -12,6 +12,7 @@ defmodule Rendro.DocsContract.CatalogEvidenceRunbookTest do
     for heading <- [
           "## Request evidence for one immutable commit",
           "## Review one complete evidence bundle",
+          "## Open the optional visual gallery",
           "## Consume the stable bundle contract in Phase 136",
           "## Audit the control plane and diagnose failures"
         ] do
@@ -50,6 +51,29 @@ defmodule Rendro.DocsContract.CatalogEvidenceRunbookTest do
     assert runbook =~ "Artifact URL"
     assert runbook =~ "Archive digest"
     assert runbook =~ "Next:"
+    assert runbook =~ "Validate review bundle"
+    assert runbook =~ "Review bundle empty"
+    assert runbook =~ "Review bundle loading"
+    assert runbook =~ "Review bundle error"
+    assert runbook =~ "Review bundle populated"
+    assert runbook =~ "Review bundle partial"
+    assert runbook =~ "Review bundle overflow"
+    assert runbook =~ "Review bundle zero/one/many"
+    assert runbook =~ "Review bundle long text"
+    assert runbook =~ "validate/3"
+    assert runbook =~ "independently trusted default-branch control record"
+    assert runbook =~ ~r/Do not derive it from the\s+bundle/
+    refute runbook =~ "validate/2"
+
+    assert runbook =~
+             "Invoice light → dark, Statement light → dark, Payslip light → dark, Ticket light → dark"
+
+    assert runbook =~ "full-size images"
+    assert runbook =~ "rendro-catalog-visual-gallery--FULL_CANDIDATE_SHA--run-RUN_ID--attempt-1"
+    assert runbook =~ "convenience-only"
+    assert runbook =~ "never crosses into"
+    assert runbook =~ "not an\nautomated visual score"
+    assert runbook =~ "continue with explicit deferral"
 
     refute runbook =~ ".planning/phases"
     refute runbook =~ "approves a change"

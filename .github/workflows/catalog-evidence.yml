@@ -56,6 +56,7 @@ jobs:
             mix rendro.catalog.candidate
             export RENDRO_CATALOG_REVIEW_DIR="$PWD/tmp/catalog-evidence-review"
             mix test --include raster_snapshot test/rendro/catalog_raster_review_test.exs
+            mix rendro.catalog.gallery --output "$PWD/tmp/catalog-visual-gallery"
             find "${RENDRO_CATALOG_REVIEW_DIR}/multipage" -maxdepth 1 -type f -name '*.png' -print0 | sort -z | xargs -0 sha256sum > handoff/multipage-checksums.sha256
             export RENDRO_PRESET_RASTER_REVIEW_DIR="$PWD/tmp/rendro_preset_raster_review"
             mix test --include raster_snapshot test/rendro/theme/preset_raster_snapshot_test.exs
@@ -79,6 +80,14 @@ jobs:
           path: handoff
           if-no-files-found: error
           retention-days: 1
+      - name: Upload convenience-only visual gallery
+        if: inputs.operation == 'review'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rendro-catalog-visual-gallery--${{ inputs.candidate_sha }}--run-${{ github.run_id }}--attempt-${{ github.run_attempt }}
+          path: tmp/catalog-visual-gallery
+          if-no-files-found: error
+          retention-days: 30
 
   catalog-evidence:
     # A dispatch from any other ref cannot select its workflow/helper as control.
@@ -131,7 +140,7 @@ jobs:
           cmp --silent priv/pdfium_pin.json candidate-handoff/pdfium_pin.json
           mix deps.get
           export BUNDLE_ROOT="$RUNNER_TEMP/rendro-catalog-evidence"
-          mix run -e 'Code.require_file("dev/rendro/catalog_evidence_bundle.ex"); operation = String.to_existing_atom(System.fetch_env!("OPERATION")); root = "candidate-handoff"; sources = case operation do :review -> [%{role: "candidate/catalog.json", source: Path.join(root, "candidate-manifest.json"), media_type: "application/json", count: 32}, %{role: "final-review/final.json", source: Path.join(root, "final-manifest.json"), media_type: "application/json", count: 12}, %{role: "multipage-review/multipage.json", source: Path.join(root, "multipage-checksums.sha256"), media_type: "text/plain", count: 4}, %{role: "preset-review/preset.json", source: Path.join(root, "preset-review-manifest.json"), media_type: "application/json", count: 12}]; :canonical -> [%{role: "canonical/catalog.json", source: Path.join(root, "catalog.json"), media_type: "application/json", count: 32}] end; provenance = %{candidate_sha: System.fetch_env!("CANDIDATE_SHA"), checked_out_head: System.fetch_env!("CANDIDATE_SHA"), control_sha: System.fetch_env!("CONTROL_SHA"), event: "workflow_dispatch", run_id: System.fetch_env!("RUN_ID"), run_attempt: String.to_integer(System.fetch_env!("RUN_ATTEMPT")), dpi: 96}; with :ok <- Rendro.CatalogEvidenceBundle.build(operation, sources, provenance, System.fetch_env!("BUNDLE_ROOT")), :ok <- Rendro.CatalogEvidenceBundle.validate(System.fetch_env!("BUNDLE_ROOT"), operation), do: :ok, else: ({:error, reasons} -> Mix.raise("Catalog evidence bundle failed validation: #{inspect(reasons)}"))'
+          mix run -e 'Code.require_file("dev/rendro/catalog_evidence_bundle.ex"); operation = String.to_existing_atom(System.fetch_env!("OPERATION")); root = "candidate-handoff"; sources = case operation do :review -> [%{role: "candidate/catalog.json", source: Path.join(root, "candidate-manifest.json"), media_type: "application/json", count: 32}, %{role: "final-review/final.json", source: Path.join(root, "final-manifest.json"), media_type: "application/json", count: 12}, %{role: "multipage-review/multipage.json", source: Path.join(root, "multipage-checksums.sha256"), media_type: "text/plain", count: 4}, %{role: "preset-review/preset.json", source: Path.join(root, "preset-review-manifest.json"), media_type: "application/json", count: 12}]; :canonical -> [%{role: "canonical/catalog.json", source: Path.join(root, "catalog.json"), media_type: "application/json", count: 32}] end; provenance = %{candidate_sha: System.fetch_env!("CANDIDATE_SHA"), checked_out_head: System.fetch_env!("CANDIDATE_SHA"), control_sha: System.fetch_env!("CONTROL_SHA"), event: "workflow_dispatch", run_id: System.fetch_env!("RUN_ID"), run_attempt: String.to_integer(System.fetch_env!("RUN_ATTEMPT")), dpi: 96}; with :ok <- Rendro.CatalogEvidenceBundle.build(operation, sources, provenance, System.fetch_env!("BUNDLE_ROOT")), :ok <- Rendro.CatalogEvidenceBundle.validate(System.fetch_env!("BUNDLE_ROOT"), operation, System.fetch_env!("CONTROL_SHA")), do: :ok, else: ({:error, reasons} -> Mix.raise("Catalog evidence bundle failed validation: #{inspect(reasons)}"))'
       - name: Upload bounded catalog evidence bundle
         id: evidence_upload
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

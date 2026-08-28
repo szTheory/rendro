@@ -159,7 +159,7 @@ defmodule Guardrails.RequiredChecksContractTest do
         |> Enum.flat_map(& &1["steps"])
         |> Enum.filter(&String.contains?(&1["uses"] || "", "actions/upload-artifact@"))
 
-      assert length(upload_steps) == 2
+      assert length(upload_steps) == 3
 
       assert Enum.all?(
                upload_steps,
@@ -168,11 +168,22 @@ defmodule Guardrails.RequiredChecksContractTest do
 
       upload = Enum.find(upload_steps, &(&1["id"] == "evidence_upload"))
 
+      gallery_upload =
+        Enum.find(upload_steps, fn step ->
+          get_in(step, ["with", "name"]) ==
+            "rendro-catalog-visual-gallery--${{ inputs.candidate_sha }}--run-${{ github.run_id }}--attempt-${{ github.run_attempt }}"
+        end)
+
       assert upload["with"]["name"] ==
                "rendro-catalog-evidence--${{ inputs.operation }}--${{ inputs.candidate_sha }}--run-${{ github.run_id }}--attempt-${{ github.run_attempt }}"
 
       assert upload["with"]["retention-days"] == 30
       assert upload["with"]["if-no-files-found"] == "error"
+      assert gallery_upload["if"] == "inputs.operation == 'review'"
+      assert gallery_upload["with"]["path"] == "tmp/catalog-visual-gallery"
+      assert gallery_upload["with"]["if-no-files-found"] == "error"
+      assert source =~ "mix rendro.catalog.gallery --output \"$PWD/tmp/catalog-visual-gallery\""
+      refute source =~ "candidate-handoff/catalog-visual-gallery"
 
       assert source =~ "Rendro.CatalogEvidenceBundle.build"
       assert source =~ "Rendro.CatalogEvidenceBundle.validate"
