@@ -84,7 +84,17 @@ jobs:
               --candidate-manifest tmp/phase130-candidate/candidate-manifest.json \
               --final-manifest handoff/final-manifest.json \
               --output "$PWD/tmp/catalog-reviewer-packet"
-            (cd "${RENDRO_CATALOG_REVIEW_DIR}/multipage" && find . -maxdepth 1 -type f -name '*.png' -printf '%f\0' | sort -z | xargs -0 sha256sum) > handoff/multipage-checksums.sha256
+            (
+              cd "${RENDRO_CATALOG_REVIEW_DIR}/multipage"
+              for name in \
+                invoice-line-items-60-plus-page-first.png \
+                invoice-line-items-60-plus-page-final.png \
+                statement-line-items-60-plus-page-first.png \
+                statement-line-items-60-plus-page-final.png
+              do
+                sha256sum "${name}"
+              done
+            ) > handoff/multipage-checksums.sha256
             export RENDRO_PRESET_RASTER_REVIEW_DIR="$PWD/tmp/rendro_preset_raster_review"
             mix test --include raster_snapshot test/rendro/theme/preset_raster_snapshot_test.exs
             jq -n --arg candidate_sha "${CANDIDATE_SHA}" --arg renderer_version "$(jq -r '.version' priv/pdfium_pin.json)" --arg renderer_sha256 "${expected_sha}" --argjson images "$(find "${RENDRO_PRESET_RASTER_REVIEW_DIR}" -maxdepth 1 -type f -name '*.png' -printf '%f\n' | sort | while IFS= read -r name; do jq -n --arg id "${name%.png}" --arg path "preset-review/${name}" --arg sha256 "$(sha256sum "${RENDRO_PRESET_RASTER_REVIEW_DIR}/${name}" | cut -d ' ' -f 1)" '{id: $id, path: $path, sha256: $sha256}'; done | jq -s)" '{candidate_sha: $candidate_sha, renderer: {version: $renderer_version, sha256: $renderer_sha256}, images: $images}' > handoff/preset-review-manifest.json
