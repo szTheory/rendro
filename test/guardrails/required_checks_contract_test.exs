@@ -226,6 +226,23 @@ defmodule Guardrails.RequiredChecksContractTest do
                "test \"$(jq '.images | length' handoff/preset-review-manifest.json)\" = 12"
 
       assert source =~ "multipage-checksums.sha256"
+
+      first_index =
+        :binary.match(source, "invoice-line-items-60-plus-page-first.png") |> elem(0)
+
+      invoice_final_index =
+        :binary.match(source, "invoice-line-items-60-plus-page-final.png") |> elem(0)
+
+      statement_first_index =
+        :binary.match(source, "statement-line-items-60-plus-page-first.png") |> elem(0)
+
+      statement_final_index =
+        :binary.match(source, "statement-line-items-60-plus-page-final.png") |> elem(0)
+
+      assert first_index < invoice_final_index
+      assert invoice_final_index < statement_first_index
+      assert statement_first_index < statement_final_index
+      refute source =~ "find . -maxdepth 1 -type f -name '*.png' -printf '%f\\0' | sort -z"
       assert source =~ "actions/download-artifact@"
 
       assert source =~
