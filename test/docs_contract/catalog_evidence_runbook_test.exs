@@ -142,6 +142,7 @@ defmodule Rendro.DocsContract.CatalogEvidenceRunbookTest do
 
     assert workflow =~ "Upload separate source-PDF artifact"
     assert workflow =~ "Rendro.Catalog.render_source_pdf"
+
     assert workflow =~
              "rendro-catalog-source-pdfs--${{ inputs.candidate_sha }}--run-${{ github.run_id }}--attempt-${{ github.run_attempt }}"
 
@@ -152,13 +153,18 @@ defmodule Rendro.DocsContract.CatalogEvidenceRunbookTest do
     assert workflow =~ "tmp/phase130-candidate/ticket/aurora-live/brutalist-dark.pdf"
     assert workflow =~ "run-metadata.json"
     assert workflow =~ "candidate_manifest_sha256"
-    assert workflow =~ "renderer: {version: $renderer_version, executable_sha256: $renderer_sha256}"
+
+    assert workflow =~
+             "renderer: {version: $renderer_version, executable_sha256: $renderer_sha256}"
 
     assert runbook =~ "## Retrieve the separate source-PDF artifact"
     assert runbook =~ "exactly six target-relative PDF files and `run-metadata.json`"
     assert runbook =~ "SOURCE_PROVIDER_DIGEST"
     assert runbook =~ "archive_download_url"
-    assert runbook =~ "If the exact source artifact is absent, ambiguous, or expired, halt this route."
+
+    assert runbook =~
+             "If the exact source artifact is absent, ambiguous, or expired, halt this route."
+
     assert runbook =~ "Do not substitute canonical PDFs or PNGs"
     refute runbook =~ ".planning/phases"
   end
