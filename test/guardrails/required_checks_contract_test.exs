@@ -162,7 +162,7 @@ defmodule Guardrails.RequiredChecksContractTest do
         |> Enum.flat_map(& &1["steps"])
         |> Enum.filter(&String.contains?(&1["uses"] || "", "actions/upload-artifact@"))
 
-      assert length(upload_steps) == 3
+      assert length(upload_steps) == 4
 
       assert Enum.all?(
                upload_steps,
@@ -177,6 +177,12 @@ defmodule Guardrails.RequiredChecksContractTest do
             "rendro-catalog-reviewer-packet--${{ inputs.candidate_sha }}--run-${{ github.run_id }}--attempt-${{ github.run_attempt }}"
         end)
 
+      source_pdf_upload =
+        Enum.find(upload_steps, fn step ->
+          get_in(step, ["with", "name"]) ==
+            "rendro-catalog-source-pdfs--${{ inputs.candidate_sha }}--run-${{ github.run_id }}--attempt-${{ github.run_attempt }}"
+        end)
+
       assert upload["with"]["name"] ==
                "rendro-catalog-evidence--${{ inputs.operation }}--${{ inputs.candidate_sha }}--run-${{ github.run_id }}--attempt-${{ github.run_attempt }}"
 
@@ -187,6 +193,11 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert packet_upload["with"]["path"] == "tmp/catalog-reviewer-packet"
       assert packet_upload["with"]["if-no-files-found"] == "error"
       assert packet_upload["with"]["retention-days"] == 30
+
+      assert source_pdf_upload["if"] == "inputs.operation == 'review'"
+      assert source_pdf_upload["with"]["path"] == "tmp/catalog-source-pdfs"
+      assert source_pdf_upload["with"]["if-no-files-found"] == "error"
+      assert source_pdf_upload["with"]["retention-days"] == 30
 
       assert source =~ "mix rendro.catalog.gallery \\"
       assert source =~ "--candidate-manifest tmp/phase130-candidate/candidate-manifest.json \\"
