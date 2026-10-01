@@ -6,12 +6,13 @@ approval, or release authority. Candidate generation and default-branch control
 packaging run on separate runners with `permissions: contents: read` and
 `persist-credentials: false`.
 
-A successful `review` run exposes two separate 30-day artifacts: one
-authoritative closed evidence bundle and one `authority: none` eight-image
-reviewer packet. No secrets, caches, writes, workflow bridge, or attestation are
-available. The packet never crosses into the trusted control job and never
-records review, disposition, approval, or canonical eligibility.
-Both review artifacts are retained for 30 days.
+A successful `review` run exposes three separate artifacts, each retained for
+30 days: an authoritative closed evidence bundle, an `authority: none`
+eight-image reviewer packet, and a source-PDF artifact with workflow-created
+run metadata. The source artifact is not part of the evidence bundle or packet.
+No secrets, caches, writes, workflow bridge, or attestation are available. The
+packet never crosses into the trusted control job and never records review,
+disposition, approval, or canonical eligibility.
 
 ## Request evidence for one immutable commit
 
@@ -50,6 +51,44 @@ If dispatch rejects the request, correct the full SHA or operation and repeat
 the same `gh workflow run` command. A renderer pin that is malformed JSON, has
 the wrong key set or value type, or lacks a full lowercase SHA-256 fails before
 PDFium is downloaded or any image is produced.
+
+## Retrieve the separate source-PDF artifact
+
+Plan 136 consumes source PDFs only from a new exact-candidate `review` run. The
+source artifact is named
+`rendro-catalog-source-pdfs--{full_candidate_sha}--run-{run_id}--attempt-{run_attempt}`.
+It contains exactly six target-relative PDF files and `run-metadata.json` (seven
+regular files total), at most 10 MiB per PDF and 40 MiB combined. Metadata binds
+the candidate and control SHAs, checked-out HEAD, run/attempt, pinned PDFium
+version and executable digest, candidate-manifest digest, and the ordered six
+PDF paths, IDs, hashes, and byte sizes. It carries no scores or reviewer fields.
+
+Resolve this artifact through the exact run's API listing. Do not use a name
+search across runs or download it by an unqualified run command:
+
+```bash
+SOURCE_NAME="rendro-catalog-source-pdfs--${FULL_CANDIDATE_SHA}--run-${RUN_ID}--attempt-${RUN_ATTEMPT}"
+ARTIFACTS_JSON=$(gh api "repos/OWNER/REPO/actions/runs/${RUN_ID}/artifacts")
+test "$(jq --arg name "${SOURCE_NAME}" '[.artifacts[] | select(.name == $name)] | length' <<<"${ARTIFACTS_JSON}")" = 1
+SOURCE_META=$(jq -c --arg name "${SOURCE_NAME}" '.artifacts[] | select(.name == $name) | {id,name,archive_download_url,digest}' <<<"${ARTIFACTS_JSON}")
+SOURCE_ID=$(jq -r '.id' <<<"${SOURCE_META}")
+SOURCE_ARTIFACT_URL=$(jq -r '.archive_download_url' <<<"${SOURCE_META}")
+SOURCE_PROVIDER_DIGEST=$(jq -r '.digest' <<<"${SOURCE_META}")
+test "$(jq -r '.name' <<<"${SOURCE_META}")" = "${SOURCE_NAME}"
+test "$(jq -r '.id' <<<"${SOURCE_META}")" != "${EVIDENCE_ID}"
+test "$(jq -r '.id' <<<"${SOURCE_META}")" != "${PACKET_ID}"
+SOURCE_ARCHIVE="${DOWNLOAD_ROOT}/source-pdfs.zip"
+gh api -H 'Accept: application/vnd.github+json' "${SOURCE_ARTIFACT_URL}" > "${SOURCE_ARCHIVE}"
+SOURCE_ARCHIVE_SHA256=$(sha256sum "${SOURCE_ARCHIVE}" | cut -d ' ' -f 1)
+test "${SOURCE_PROVIDER_DIGEST}" = "sha256:${SOURCE_ARCHIVE_SHA256}"
+```
+
+The source archive is a separate provenance input. Validate the evidence bundle
+and reviewer packet independently, then use the phase's source-archive verifier
+before consuming the PDFs; neither artifact substitutes for a PDF.
+If the exact source artifact is absent, ambiguous, or expired, halt this route.
+Do not substitute canonical PDFs or PNGs, regenerate PDFs under the old run
+identity, or claim the expired run supplied bytes it never retained.
 
 ## Review one complete evidence bundle
 

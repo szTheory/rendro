@@ -65,6 +65,93 @@ jobs:
           cp priv/pdfium_pin.json handoff/pdfium_pin.json
           if [[ "${OPERATION}" == review ]]; then
             mix rendro.catalog.candidate
+            # Candidate generation measures these PDFs but writes only PNGs.
+            # Persist the same deterministic source bytes under the candidate's
+            # ignored tmp root so the manifest hash below can bind the artifact.
+            mix run -e 'targets = [{"invoice--cedar-mutual--corporate-classic--dark", "tmp/phase130-candidate/invoice/cedar-mutual/corporate-classic-dark.pdf"}, {"statement--signal-ledger--minimal-mono--dark", "tmp/phase130-candidate/statement/signal-ledger/minimal-mono-dark.pdf"}, {"payslip--northline-logistics--swiss--light", "tmp/phase130-candidate/payslip/northline-logistics/swiss-light.pdf"}, {"payslip--northline-logistics--swiss--dark", "tmp/phase130-candidate/payslip/northline-logistics/swiss-dark.pdf"}, {"ticket--aurora-live--brutalist--light", "tmp/phase130-candidate/ticket/aurora-live/brutalist-light.pdf"}, {"ticket--aurora-live--brutalist--dark", "tmp/phase130-candidate/ticket/aurora-live/brutalist-dark.pdf"}]; specs = Map.new(Rendro.Catalog.catalog_specs(), &{&1.id, &1}); Enum.each(targets, fn {id, path} -> {:ok, pdf} = Rendro.Catalog.render_source_pdf(Map.fetch!(specs, id)); :ok = File.mkdir_p(Path.dirname(path)); :ok = File.write(path, pdf) end)'
+            source_root="$PWD/tmp/catalog-source-pdfs"
+            manifest="tmp/phase130-candidate/candidate-manifest.json"
+            target_ids=(
+              "invoice--cedar-mutual--corporate-classic--dark"
+              "statement--signal-ledger--minimal-mono--dark"
+              "payslip--northline-logistics--swiss--light"
+              "payslip--northline-logistics--swiss--dark"
+              "ticket--aurora-live--brutalist--light"
+              "ticket--aurora-live--brutalist--dark"
+            )
+            target_paths=(
+              "tmp/phase130-candidate/invoice/cedar-mutual/corporate-classic-dark.pdf"
+              "tmp/phase130-candidate/statement/signal-ledger/minimal-mono-dark.pdf"
+              "tmp/phase130-candidate/payslip/northline-logistics/swiss-light.pdf"
+              "tmp/phase130-candidate/payslip/northline-logistics/swiss-dark.pdf"
+              "tmp/phase130-candidate/ticket/aurora-live/brutalist-light.pdf"
+              "tmp/phase130-candidate/ticket/aurora-live/brutalist-dark.pdf"
+            )
+            expected_ids="$(printf '%s\n' "${target_ids[@]}" | jq -R . | jq -s .)"
+            expected_cells='[]'
+            for index in "${!target_ids[@]}"; do
+              png_path="${target_paths[$index]%.pdf}.png"
+              expected_cells="$(jq -cn --argjson cells "${expected_cells}" --arg id "${target_ids[$index]}" --arg path "${png_path}" '$cells + [{id: $id, path: $path}]')"
+            done
+            jq -e \
+              --arg candidate "${CANDIDATE_SHA}" \
+              --arg control "${CONTROL_SHA}" \
+              --arg run "${GITHUB_RUN_ID}" \
+              --argjson attempt "${GITHUB_RUN_ATTEMPT}" \
+              --arg renderer_version "${version}" \
+              --arg renderer_sha "${expected_sha}" \
+              --argjson ids "${expected_ids}" \
+              --argjson expected "${expected_cells}" '
+                .candidate.commit_sha == $candidate and
+                .candidate.baseline_commit_sha == $control and
+                .candidate.run_id == $run and
+                .candidate.run_attempt == $attempt and
+                .candidate.renderer.version == $renderer_version and
+                .candidate.renderer.sha256 == $renderer_sha and
+                (.cells | length) == 32 and
+                ([.cells[].id] | unique | length) == 32 and
+                .diff.changed_targets == $ids and
+                ((.diff.changed_scored + .diff.changed_unscored) | sort) == ($ids | sort) and
+                (.diff.byte_stable | length) == 26 and
+                ((.diff.byte_stable + $ids | sort) == ([.cells[].id] | sort)) and
+                ([.cells[] | select(.id as $id | $ids | index($id)) | {id, path: .png_path}] == $expected)
+              ' "${manifest}" >/dev/null
+            mkdir -p "${source_root}"
+            source_entries='[]'
+            total_bytes=0
+            for index in "${!target_ids[@]}"; do
+              relative_path="${target_paths[$index]}"
+              source_pdf="${PWD}/${relative_path}"
+              [[ -f "${source_pdf}" && ! -L "${source_pdf}" ]]
+              [[ "$(head -c 5 "${source_pdf}")" == "%PDF-" ]]
+              size="$(wc -c < "${source_pdf}" | tr -d ' ')"
+              (( size > 0 && size <= 10485760 ))
+              total_bytes=$((total_bytes + size))
+              (( total_bytes <= 41943040 ))
+              pdf_sha="$(sha256sum "${source_pdf}" | cut -d ' ' -f 1)"
+              manifest_sha="$(jq -er --arg id "${target_ids[$index]}" '.cells[] | select(.id == $id) | .source_pdf_sha256' "${manifest}")"
+              [[ "${pdf_sha}" == "${manifest_sha}" ]]
+              mkdir -p "${source_root}/$(dirname "${relative_path}")"
+              cp -- "${source_pdf}" "${source_root}/${relative_path}"
+              entry="$(jq -cn --arg id "${target_ids[$index]}" --arg path "${relative_path}" --arg sha256 "${pdf_sha}" --argjson size "${size}" '{id: $id, path: $path, sha256: $sha256, size: $size}')"
+              source_entries="$(jq -cn --argjson entries "${source_entries}" --argjson entry "${entry}" '$entries + [$entry]')"
+            done
+            manifest_sha="$(sha256sum "${manifest}" | cut -d ' ' -f 1)"
+            jq -n \
+              --arg candidate_sha "${CANDIDATE_SHA}" \
+              --arg control_sha "${CONTROL_SHA}" \
+              --arg checked_out_head "$(git rev-parse HEAD)" \
+              --arg run_id "${GITHUB_RUN_ID}" \
+              --argjson run_attempt "${GITHUB_RUN_ATTEMPT}" \
+              --arg renderer_version "${version}" \
+              --arg renderer_sha256 "${expected_sha}" \
+              --arg candidate_manifest_sha256 "${manifest_sha}" \
+              --argjson pdfs "${source_entries}" \
+              '{schema_version: 1, candidate_sha: $candidate_sha, control_sha: $control_sha, checked_out_head: $checked_out_head, run_id: $run_id, run_attempt: $run_attempt, renderer: {version: $renderer_version, executable_sha256: $renderer_sha256}, candidate_manifest_sha256: $candidate_manifest_sha256, pdfs: $pdfs}' \
+              > "${source_root}/run-metadata.json"
+            test "$(find "${source_root}" -mindepth 1 \( -type l -o \( ! -type f ! -type d \) \) | wc -l | tr -d ' ')" = 0
+            test "$(find "${source_root}" -type f | wc -l | tr -d ' ')" = 7
+            test "$(du -sk "${source_root}" | cut -f1)" -le 40960
             export RENDRO_CATALOG_REVIEW_DIR="$PWD/tmp/catalog-evidence-review"
             mix test --include raster_snapshot test/rendro/catalog_raster_review_test.exs
             jq --slurpfile candidate tmp/phase130-candidate/candidate-manifest.json '
@@ -123,6 +210,14 @@ jobs:
         with:
           name: rendro-catalog-reviewer-packet--${{ inputs.candidate_sha }}--run-${{ github.run_id }}--attempt-${{ github.run_attempt }}
           path: tmp/catalog-reviewer-packet
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload separate source-PDF artifact
+        if: inputs.operation == 'review'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rendro-catalog-source-pdfs--${{ inputs.candidate_sha }}--run-${{ github.run_id }}--attempt-${{ github.run_attempt }}
+          path: tmp/catalog-source-pdfs
           if-no-files-found: error
           retention-days: 30
 
