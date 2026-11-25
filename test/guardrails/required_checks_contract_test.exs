@@ -291,7 +291,7 @@ defmodule Guardrails.RequiredChecksContractTest do
       end
     end
 
-    test "keeps ordinary CI topology and the sole ci-success authority unchanged" do
+    test "keeps Catalog Evidence separate from the sole ci-success authority" do
       ci = load_workflow!(@ci_path)
       catalog = load_workflow!(@catalog_evidence_path)
       ci_success = ci["jobs"]["ci-success"]
@@ -299,6 +299,7 @@ defmodule Guardrails.RequiredChecksContractTest do
       assert Enum.sort(Map.keys(ci["on"])) == ["pull_request", "push", "schedule"]
 
       assert ci_success["needs"] == [
+               "crash-dump-check",
                "test",
                "configurator-browser",
                "integration-proofs",

@@ -18,8 +18,28 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  crash-dump-check:
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: ${{ github.event_name == 'schedule' && '1' || '0' }}
+          persist-credentials: false
+
+      - name: Reject crash dumps in new commits
+        if: github.event_name != 'schedule'
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: sh scripts/check-crash-dumps.sh --range "$BASE" "$HEAD"
+
+      - name: Reject tracked crash dumps
+        if: github.event_name == 'schedule'
+        run: sh scripts/check-crash-dumps.sh
+
+  test:
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -161,7 +181,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   example-phoenix:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # no `needs:` -> graph-disconnected (D-09); no continue-on-error (D-10)
     steps:
       - name: Checkout
@@ -214,7 +234,7 @@ jobs:
           retention-days: 14
 
   advisory-checks:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # no 'needs:' -> graph-disconnected; only the legacy adapter comparison is advisory
     steps:
       - name: Checkout
@@ -277,7 +297,7 @@ jobs:
         run: node scripts/pdfjs_observer/observe.mjs --check
 
   integration-proofs:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: test
     timeout-minutes: 45
 
@@ -345,7 +365,7 @@ jobs:
         run: mix run scripts/release_preflight_proof.exs --current-version-tag --skip-ci --skip-security-audits --worktree "$RUNNER_TEMP/rendro-release-proof"
 
   security-audit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     continue-on-error: true
     steps:
       - name: Checkout
@@ -367,7 +387,7 @@ jobs:
         run: mix hex.audit
 
   quality-governance:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       MIX_ENV: test
     steps:
@@ -393,7 +413,7 @@ jobs:
 
   ci-success:
     if: always()
-    needs: [test, configurator-browser, integration-proofs, quality-governance]
+    needs: [crash-dump-check, test, configurator-browser, integration-proofs, quality-governance]
     runs-on: ubuntu-latest
     steps:
       - name: Enforce strict checks
