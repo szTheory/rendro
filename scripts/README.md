@@ -21,6 +21,7 @@ former broad worktree wrapper has no compatibility alias or replacement script.
 | Helper | Stable owner role | Purpose and supported invocation | Inputs / outputs | Authority lane | Current callers | Review / removal trigger |
 | --- | --- | --- | --- | --- | --- | --- |
 | `scripts/adoption_snapshot.exs` | adoption evidence maintainer | Capture the dated adoption snapshot: `mix run --require scripts/adoption_snapshot.exs -- --output PATH --date YYYY-MM-DD`. | GitHub read-only API facts -> redacted snapshot JSON. | advisory evidence | `test/docs_contract/adoption_evidence_contract_test.exs`. | Remove when the adoption gate/snapshot contract is retired. |
+| `scripts/check-crash-dumps.sh` | repository maintainer | Reject Erlang crash dump paths in the Git index or new commits. Run with `sh scripts/check-crash-dumps.sh` or with `--range BASE HEAD`. | Git path metadata -> pass or failure. | repository guard | Local pre-commit hook and `.github/workflows/ci.yml`. | Remove when both callers use an equivalent check. |
 | `scripts/configurator_e2e/static-server.mjs` | catalog configurator maintainer | Serve the static configurator for the locked Playwright suite. | Catalog static files -> local HTTP responses. | regression | `scripts/configurator_e2e/playwright.config.mjs` and `npm test --prefix scripts/configurator_e2e`. | Remove with the static configurator browser contract. |
 | `scripts/configurator_e2e/tests/configurator.spec.mjs` | catalog configurator maintainer | Exercise configurator breakpoints and visual states: `npm test --prefix scripts/configurator_e2e`. | Static configurator -> Playwright assertions and snapshots. | regression | `.github/workflows/ci.yml` required static-browser gate and package `test` script. | Remove with the browser contract; update snapshots only through its approved visual-review path. |
 | `scripts/long_lived_viewer_proof_fixture.exs` | signing evidence maintainer | Generate the LTV viewer fixture: `mix run scripts/long_lived_viewer_proof_fixture.exs --output PATH`. | Signing fixture material -> LTV PDF fixture. | advisory evidence | `scripts/signing_viewer_proof_fixtures.exs`, `lib/rendro/viewer_evidence/recorder.ex`, and fixture documentation. | Remove when long-lived viewer proof is retired. |
@@ -35,6 +36,19 @@ former broad worktree wrapper has no compatibility alias or replacement script.
 | `scripts/verify_livebook.exs` | Livebook tutorial maintainer | Convert/check a Livebook: `elixir scripts/verify_livebook.exs NOTEBOOK_PATH OUTPUT_PATH`. | Livebook source -> generated/checkable notebook artifact. | advisory evidence | `Rendro.Livebook.Check`, Livebook tests, and the advisory CI lane. | Remove when the Livebook tutorial is retired. |
 | `scripts/verify_public_launch_urls.sh` | public launch maintainer | Poll approved public launch URLs: `scripts/verify_public_launch_urls.sh`. | Public GitHub/Hex/HexDocs URLs -> status/content check result. | advisory evidence | `.github/workflows/hexdocs.yml` and launch-execution contract tests. | Remove when public launch verification is retired. |
 | `scripts/verify_public_release.exs` | release evidence maintainer | Verify public Hex/release identity facts: `mix run scripts/verify_public_release.exs`. | Public release responses and capsule facts -> redacted verification result. | advisory evidence | `test/scripts/public_release_verifier_test.exs` and the clean-room proof tests. | Remove when public-release identity verification is retired. |
+
+## Local crash dump guard
+
+From the repository root, install the check when the clone has no pre-commit hook.
+
+```sh
+hook=$(git rev-parse --git-path hooks/pre-commit)
+if [ ! -e "$hook" ] && [ ! -L "$hook" ]; then
+  install -m 0755 scripts/check-crash-dumps.sh "$hook"
+fi
+```
+
+If a hook already exists, add `sh scripts/check-crash-dumps.sh || exit $?` to its existing checks.
 
 ## Retained support assets
 

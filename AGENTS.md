@@ -53,6 +53,12 @@ Use these entry points:
 Do not make direct repo edits outside a GSD workflow unless the user explicitly requests bypass.
 <!-- gsd-workflow-end -->
 
+## Diagnostic Artifacts
+
+Runtime crash dumps can contain credentials. Keep `erl_crash.dump` and its copies out of Git, and inspect staged files before committing diagnostic artifacts. When investigating an exposure, check historical refs, including branches, tags, and pull-request refs.
+
+Install the [local crash dump guard](scripts/README.md#local-crash-dump-guard) in each clone to catch force-added dumps before commit.
+
 <!-- gsd-profile-start -->
 ## Developer Profile
 
