@@ -4,6 +4,7 @@ defmodule Mix.Tasks.Rendro.ViewerEvidenceTest do
   import ExUnit.CaptureIO
 
   alias Mix.Tasks.Rendro.ViewerEvidence
+  alias Rendro.ViewerEvidence.Matrix
 
   @moduletag :subcommands
 
@@ -73,9 +74,26 @@ defmodule Mix.Tasks.Rendro.ViewerEvidenceTest do
   end
 
   describe "validate --strict" do
-    test "returns :ok on the production matrix with current recorded_at dates" do
+    test "returns :ok when supported fixture rows have current recorded_at dates" do
+      recorded_at = Date.to_iso8601(Date.utc_today())
+
+      tmp =
+        matrix_fixture!(fn matrix ->
+          Enum.reduce(Matrix.enumerate_viewer_cells(matrix), matrix, fn
+            %{status: "supported", matrix_path: path}, acc ->
+              put_in(acc, String.split(path, ".") ++ ["recorded_at"], recorded_at)
+
+            _cell, acc ->
+              acc
+          end)
+        end)
+
+      on_exit(fn -> File.rm_rf!(tmp) end)
+
       {messages, result} =
-        capture_shell_messages(fn -> ViewerEvidence.run(["validate", "--strict"]) end)
+        File.cd!(tmp, fn ->
+          capture_shell_messages(fn -> ViewerEvidence.run(["validate", "--strict"]) end)
+        end)
 
       assert result == :ok
       output = Enum.join(messages, "\n")
@@ -145,21 +163,23 @@ defmodule Mix.Tasks.Rendro.ViewerEvidenceTest do
   end
 
   defp stale_matrix_fixture! do
-    tmp =
-      Path.join(System.tmp_dir!(), "rendro_stale_matrix_#{System.unique_integer([:positive])}")
-
-    File.mkdir_p!(tmp)
-    File.cp_r!("priv", Path.join(tmp, "priv"))
-
-    matrix_path = Path.join(tmp, "priv/support_matrix.json")
-    matrix = matrix_path |> File.read!() |> JSON.decode!()
-
     stale_date =
       Date.utc_today()
       |> Date.add(-181)
       |> Date.to_iso8601()
 
-    matrix = put_in(matrix, ["forms", "viewers", "apple_preview", "recorded_at"], stale_date)
+    matrix_fixture!(fn matrix ->
+      put_in(matrix, ["forms", "viewers", "apple_preview", "recorded_at"], stale_date)
+    end)
+  end
+
+  defp matrix_fixture!(update) do
+    tmp = Path.join(System.tmp_dir!(), "rendro_matrix_#{System.unique_integer([:positive])}")
+    File.mkdir_p!(tmp)
+    File.cp_r!("priv", Path.join(tmp, "priv"))
+
+    matrix_path = Path.join(tmp, "priv/support_matrix.json")
+    matrix = matrix_path |> File.read!() |> JSON.decode!() |> update.()
     File.write!(matrix_path, JSON.encode!(matrix))
 
     tmp

@@ -42,7 +42,7 @@ defmodule Rendro.DocsContract.DxLocalReproducibilityClaimsTest do
     assert workflow =~ "ci-success:"
 
     assert workflow =~
-             "needs: [test, configurator-browser, integration-proofs, quality-governance]"
+             "needs: [crash-dump-check, test, configurator-browser, integration-proofs, quality-governance]"
 
     assert workflow =~ "configurator-browser:"
 
